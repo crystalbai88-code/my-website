@@ -82,7 +82,6 @@ a {
   min-height: calc(100vh - 72px);
   padding: clamp(52px, 8vw, 110px) clamp(20px, 6vw, 96px);
   background:
-    radial-gradient(circle at 76% 22%, rgba(196, 147, 59, 0.22), transparent 28%),
     linear-gradient(135deg, #fbfaf5 0%, #eef5f0 100%);
 }
 
@@ -305,6 +304,106 @@ h3 {
   color: var(--muted);
 }
 
+.loop-section {
+  background: var(--soft);
+}
+
+.loop-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  max-width: 1160px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.loop-grid article {
+  min-height: 310px;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.loop-grid span {
+  display: inline-block;
+  margin-bottom: 24px;
+  color: var(--gold);
+  font-weight: 900;
+}
+
+.loop-grid p,
+.ceo-copy p,
+.ceo-card li {
+  color: var(--muted);
+}
+
+.loop-flow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-width: 1120px;
+  margin-top: 28px;
+}
+
+.loop-flow span {
+  padding: 9px 13px;
+  color: var(--deep);
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-weight: 800;
+}
+
+.ceo-section {
+  background: var(--paper);
+}
+
+.ceo-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.62fr);
+  gap: clamp(28px, 5vw, 72px);
+  align-items: stretch;
+  max-width: 1120px;
+}
+
+.ceo-copy {
+  padding: clamp(26px, 4vw, 40px);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--line);
+}
+
+.ceo-copy p {
+  margin-bottom: 18px;
+  font-size: 18px;
+}
+
+.ceo-copy p:last-child {
+  margin-bottom: 0;
+}
+
+.ceo-card {
+  padding: clamp(26px, 4vw, 40px);
+  color: var(--white);
+  background: var(--green);
+  box-shadow: var(--shadow);
+}
+
+.ceo-card h3 {
+  color: var(--white);
+}
+
+.ceo-card ul {
+  padding-left: 20px;
+  margin: 18px 0 0;
+}
+
+.ceo-card li {
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.ceo-card li + li {
+  margin-top: 9px;
+}
+
 .impact-section {
   background: var(--paper);
 }
@@ -407,6 +506,8 @@ h3 {
   .ability-grid,
   .split-grid,
   .revolution-list,
+  .loop-grid,
+  .ceo-grid,
   .impact-grid {
     grid-template-columns: 1fr;
   }
@@ -426,4 +527,4 @@ h3 {
   h1 {
     font-size: 40px;
   }
-}
+}\n
