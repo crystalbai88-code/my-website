@@ -200,6 +200,7 @@ button {
 }
 
 .thesis-section,
+.club-section,
 .method-section,
 .system-section,
 .ceo-section,
@@ -231,6 +232,60 @@ button {
   color: var(--muted);
   font-size: 18px;
   line-height: 1.85;
+}
+
+.club-section {
+  max-width: 1220px;
+  margin: 0 auto;
+  padding-top: 28px;
+}
+
+.club-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.club-grid article {
+  min-height: 230px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(255, 250, 242, 0.96) 0%, rgba(247, 239, 228, 0.98) 100%);
+  box-shadow: var(--shadow);
+}
+
+.club-grid article:nth-child(2) {
+  background: linear-gradient(135deg, rgba(35, 157, 141, 0.14) 0%, rgba(255, 250, 242, 0.96) 64%);
+}
+
+.club-grid article:nth-child(3) {
+  color: #fff7ea;
+  border-color: rgba(255, 255, 255, 0.12);
+  background: var(--dark);
+}
+
+.club-grid span {
+  color: var(--orange);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+}
+
+.club-grid h3 {
+  margin: 48px 0 12px;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.club-grid p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.club-grid article:nth-child(3) p {
+  color: rgba(255, 247, 234, 0.72);
 }
 
 .method-section {
@@ -699,6 +754,7 @@ button {
   }
 
   .process-grid,
+  .club-grid,
   .cohort-timeline,
   .pillar-grid,
   .service-list,
@@ -733,6 +789,7 @@ button {
 
   .hero-metrics,
   .process-grid,
+  .club-grid,
   .cohort-timeline,
   .pillar-grid,
   .service-list,
@@ -742,6 +799,7 @@ button {
   }
 
   .thesis-section,
+  .club-section,
   .method-section,
   .system-section,
   .cohort-section,
