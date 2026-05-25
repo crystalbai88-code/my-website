@@ -11,10 +11,23 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --ink:#1a1814;--ink2:#4a4740;--ink3:#8a877f;
-  --paper:#f5f2ec;--paper2:#ede9e0;--paper3:#e0dbd0;--paper4:#d4cdc0;
-  --warm:#b5763a;--warm2:#d4954e;--warm3:#f0c080;
-  --moss:#5a7a4e;--moss2:#7a9a6e;--moss3:#e8f0e4;
+  --ink:#2d2416;
+  --ink2:#5c4a2a;
+  --ink3:#a08c6e;
+  --paper:#fdf8f0;
+  --paper2:#f5ede0;
+  --paper3:#e8dcc8;
+  --paper4:#d8c9b0;
+  --warm:#e07b2a;
+  --warm2:#f0a050;
+  --warm3:#f7c878;
+  --coral:#d95f3b;
+  --moss:#4a7c59;
+  --moss2:#6fa07a;
+  --sky:#5b8fae;
+  --tint-orange:rgba(224,123,42,0.10);
+  --tint-green:rgba(74,124,89,0.10);
+  --tint-blue:rgba(91,143,174,0.10);
   --serif:'Noto Serif SC',serif;--sans:'Noto Sans SC',sans-serif;
 }
 html{scroll-behavior:smooth}
@@ -25,7 +38,7 @@ nav{
   position:fixed;top:0;left:0;right:0;z-index:200;
   padding:18px 64px;
   display:flex;justify-content:space-between;align-items:center;
-  background:rgba(245,242,236,0.95);
+  background:rgba(253,248,240,0.96);
   backdrop-filter:blur(20px);
   border-bottom:1px solid rgba(180,170,150,0.18);
   transition:padding 0.4s;
@@ -85,7 +98,7 @@ nav{
 }
 .hero-visual{
   position:relative;z-index:1;
-  width:100%;background:var(--ink);
+  width:100%;background:#1e1508;
   overflow:hidden;min-height:50vh;
   display:flex;align-items:stretch;
 }
@@ -137,7 +150,7 @@ nav{
 .btn-ghost{font-size:12px;color:var(--ink3);text-decoration:none;letter-spacing:0.08em;border-bottom:1px solid var(--ink3);padding-bottom:2px;transition:all 0.3s;cursor:pointer;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--sans);white-space:nowrap}
 .btn-ghost:hover{color:var(--warm);border-color:var(--warm)}
 .hero-stats{
-  background:var(--paper2);display:flex;border-top:1px solid var(--paper3);
+  background:var(--paper3);display:flex;border-top:1px solid var(--paper4);
 }
 .hero-stat{flex:1;padding:22px 32px;border-right:1px solid var(--paper3)}
 .hero-stat:last-child{border-right:none}
@@ -146,22 +159,23 @@ nav{
 @keyframes spulse{0%,100%{opacity:0.35}50%{opacity:1}}
 
 /* MANIFESTO */
-.manifesto{padding:120px 64px;background:var(--ink);color:var(--paper);position:relative;overflow:hidden}
-.manifesto-wm{position:absolute;right:-20px;top:10px;font-family:var(--serif);font-size:280px;font-weight:300;color:rgba(255,255,255,0.022);line-height:1;pointer-events:none;user-select:none}
-.manifesto-inner{max-width:960px;margin:0 auto;position:relative;z-index:1}
-.manifesto-body{font-family:var(--serif);font-size:clamp(22px,3vw,36px);font-weight:300;line-height:2;color:rgba(245,242,236,0.88)}
-.manifesto-body p{margin-bottom:1.8em} .manifesto-body p:last-child{margin-bottom:0}
-.manifesto-body em{font-style:normal;color:var(--warm2)}
-.manifesto-pillars{margin-top:80px;padding-top:48px;border-top:1px solid rgba(255,255,255,0.07);display:grid;grid-template-columns:repeat(3,1fr);gap:48px}
-.pillar-num{font-family:var(--serif);font-size:52px;font-weight:300;color:rgba(255,255,255,0.09);line-height:1;margin-bottom:12px}
-.pillar-title{font-size:14px;color:var(--warm2);margin-bottom:10px;letter-spacing:0.08em}
-.pillar-desc{font-size:13px;color:rgba(245,242,236,0.42);line-height:1.95}
+.belief{padding:80px 64px;background:var(--paper2);position:relative;overflow:hidden}
+.belief-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--paper3);margin-top:52px}
+.belief-card{background:var(--paper2);padding:44px 36px 48px;position:relative;overflow:hidden;transition:background 0.3s}
+.belief-card:hover{background:var(--paper)}
+.belief-card-illo{margin-bottom:28px;height:120px;display:flex;align-items:center}
+.belief-card-illo svg{width:100%;height:120px}
+.belief-card-tag{font-size:10px;letter-spacing:0.22em;color:var(--warm);text-transform:uppercase;margin-bottom:12px}
+.belief-card h3{font-family:var(--serif);font-size:24px;font-weight:400;color:var(--ink);margin-bottom:12px;line-height:1.35}
+.belief-card p{font-size:14px;color:var(--ink2);line-height:1.9}
+.belief-accent{position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--warm);transform:scaleX(0);transform-origin:left;transition:transform 0.4s}
+.belief-card:hover .belief-accent{transform:scaleX(1)}
 
 /* QUICK ENTRY CARDS on home */
-.home-entries{padding:80px 64px;background:var(--paper)}
+.home-entries{padding:72px 64px;background:var(--paper)}
 .entries-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--paper3);margin-top:48px}
-.entry-card{background:var(--paper);padding:40px 28px 52px;position:relative;cursor:pointer;transition:background 0.3s}
-.entry-card:hover{background:var(--paper2)}
+.entry-card{background:var(--paper);padding:40px 28px 52px;position:relative;cursor:pointer;transition:all 0.3s;border-left:3px solid transparent}
+.entry-card:hover{background:var(--paper2);border-left:3px solid var(--warm)}
 .entry-num{font-family:var(--serif);font-size:11px;color:var(--ink3);letter-spacing:0.12em;margin-bottom:36px}
 .entry-glyph{font-size:26px;margin-bottom:22px;color:var(--warm)}
 .entry-card h3{font-family:var(--serif);font-size:19px;font-weight:400;color:var(--ink);margin-bottom:12px;line-height:1.4}
@@ -509,11 +523,11 @@ footer p{font-size:11px;color:rgba(245,242,236,0.25);letter-spacing:0.1em}
           <svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-height:44vh">
             <defs>
               <style>
-                .sk{stroke:#e8dfc8;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
-                .skf{stroke:#e8dfc8;stroke-width:1.5;fill:rgba(232,223,200,0.06);stroke-linecap:round;stroke-linejoin:round}
+                .sk{stroke:#f0dfc0;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+                .skf{stroke:#f0dfc0;stroke-width:1.5;fill:rgba(232,223,200,0.06);stroke-linecap:round;stroke-linejoin:round}
                 .skw{stroke:#d4954e;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
                 .skwf{fill:rgba(212,149,78,0.15);stroke:#d4954e;stroke-width:1.5}
-                .txt{fill:#e8dfc8;font-family:sans-serif;font-size:13px;opacity:0.55}
+                .txt{fill:#f0dfc0;font-family:sans-serif;font-size:13px;opacity:0.55}
                 .txth{fill:#d4954e;font-family:sans-serif;font-size:12px}
               </style>
             </defs>
@@ -568,12 +582,12 @@ footer p{font-size:11px;color:rgba(245,242,236,0.25);letter-spacing:0.1em}
           <svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-height:44vh">
             <defs>
               <style>
-                .sk{stroke:#e8dfc8;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
-                .skf{stroke:#e8dfc8;stroke-width:1.5;fill:rgba(232,223,200,0.06);stroke-linecap:round;stroke-linejoin:round}
+                .sk{stroke:#f0dfc0;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+                .skf{stroke:#f0dfc0;stroke-width:1.5;fill:rgba(232,223,200,0.06);stroke-linecap:round;stroke-linejoin:round}
                 .skw{stroke:#d4954e;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
                 .skwf{fill:rgba(212,149,78,0.15);stroke:#d4954e;stroke-width:1.5}
                 .skg{stroke:#7a9a6e;stroke-width:1.8;fill:rgba(122,154,110,0.1);stroke-linecap:round}
-                .txt{fill:#e8dfc8;font-family:sans-serif;font-size:13px;opacity:0.55}
+                .txt{fill:#f0dfc0;font-family:sans-serif;font-size:13px;opacity:0.55}
                 .txth{fill:#d4954e;font-family:sans-serif;font-size:12px}
               </style>
             </defs>
@@ -638,12 +652,12 @@ footer p{font-size:11px;color:rgba(245,242,236,0.25);letter-spacing:0.1em}
           <svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-height:44vh">
             <defs>
               <style>
-                .sk{stroke:#e8dfc8;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
-                .skf{stroke:#e8dfc8;stroke-width:1.5;fill:rgba(232,223,200,0.06);stroke-linecap:round;stroke-linejoin:round}
+                .sk{stroke:#f0dfc0;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+                .skf{stroke:#f0dfc0;stroke-width:1.5;fill:rgba(232,223,200,0.06);stroke-linecap:round;stroke-linejoin:round}
                 .skw{stroke:#d4954e;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
                 .skwf{fill:rgba(212,149,78,0.2);stroke:#d4954e;stroke-width:1.5}
                 .skg{stroke:#7a9a6e;stroke-width:1.8;fill:rgba(122,154,110,0.12)}
-                .txt{fill:#e8dfc8;font-family:sans-serif;font-size:13px;opacity:0.55}
+                .txt{fill:#f0dfc0;font-family:sans-serif;font-size:13px;opacity:0.55}
                 .txth{fill:#d4954e;font-family:sans-serif;font-size:13px;font-weight:bold}
                 .txtg{fill:#7a9a6e;font-family:sans-serif;font-size:12px}
               </style>
@@ -737,19 +751,114 @@ footer p{font-size:11px;color:rgba(245,242,236,0.25);letter-spacing:0.1em}
 
   </section>
 
-  <section class="manifesto">
-    <div class="manifesto-wm">场</div>
-    <div class="manifesto-inner">
-      <div class="section-label on-dark reveal">我们的信念</div>
-      <div class="manifesto-body reveal">
-        <p>孩子不需要被告知<em>该做什么</em>。<br>他们需要的是一个<em>安全的地方</em>，让自己的好奇心有处落地。</p>
-        <p>我们不替孩子解决问题。<br>我们陪伴他们<em>慢慢看清</em>自己的问题，<br>然后<em>一步一步</em>找到属于自己的答案。</p>
+  <section class="belief">
+    <div class="section-label reveal">这里是什么样的地方</div>
+    <h2 class="h-serif reveal" style="font-size:clamp(28px,3.5vw,46px);color:var(--ink);max-width:660px;margin-top:12px">
+      充满创造力，<br>有同频的伙伴，<br>有人陪着你找到答案。
+    </h2>
+
+    <div class="belief-grid reveal">
+
+      <!-- 卡片1：同频的人 -->
+      <div class="belief-card">
+        <div class="belief-card-illo">
+          <svg viewBox="0 0 280 120" xmlns="http://www.w3.org/2000/svg">
+            <defs><style>
+              .bs{stroke:#e07b2a;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+              .bsf{stroke:#e07b2a;stroke-width:1.5;fill:rgba(224,123,42,0.12)}
+              .bg{stroke:#4a7c59;stroke-width:1.8;fill:rgba(74,124,89,0.10);stroke-linecap:round}
+            </style></defs>
+            <!-- three people connecting with lines -->
+            <circle cx="60" cy="55" r="22" class="bsf"/>
+            <path d="M38,110 Q38,80 60,72 Q82,80 82,110" class="bsf"/>
+            <circle cx="140" cy="38" r="22" class="bg"/>
+            <path d="M118,95 Q118,65 140,57 Q162,65 162,95" class="bg"/>
+            <circle cx="220" cy="55" r="22" class="bsf"/>
+            <path d="M198,110 Q198,80 220,72 Q242,80 242,110" class="bsf"/>
+            <!-- connecting spark lines -->
+            <path d="M82,52 Q111,35 118,42" class="bs" stroke-dasharray="4,3"/>
+            <path d="M162,46 Q188,38 198,50" class="bs" stroke-dasharray="4,3"/>
+            <!-- spark dots -->
+            <circle cx="100" cy="40" r="3" fill="#e07b2a" opacity="0.7"/>
+            <circle cx="180" cy="38" r="3" fill="#4a7c59" opacity="0.7"/>
+            <circle cx="140" cy="18" r="5" fill="#f0a050" opacity="0.5"/>
+          </svg>
+        </div>
+        <div class="belief-card-tag">同频</div>
+        <h3>遇见同路人</h3>
+        <p>这里聚集了一群有想法、有好奇心的孩子。志同道合的伙伴，是成长最好的燃料。</p>
+        <div class="belief-accent"></div>
       </div>
-      <div class="manifesto-pillars reveal">
-        <div><div class="pillar-num">01</div><div class="pillar-title">孩子是主角</div><div class="pillar-desc">所有项目都从孩子的真实想法出发，导师只是陪伴者与引导者。</div></div>
-        <div><div class="pillar-num">02</div><div class="pillar-title">没有标准答案</div><div class="pillar-desc">我们关注孩子的思考过程，而不是最终结果是否符合某个预设期待。</div></div>
-        <div><div class="pillar-num">03</div><div class="pillar-title">长期陪伴</div><div class="pillar-desc">真正的成长需要时间，我们以年为单位陪伴，不以课时计算关系。</div></div>
+
+      <!-- 卡片2：引导式导师 -->
+      <div class="belief-card">
+        <div class="belief-card-illo">
+          <svg viewBox="0 0 280 120" xmlns="http://www.w3.org/2000/svg">
+            <defs><style>
+              .bs{stroke:#e07b2a;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+              .bsf{stroke:#e07b2a;stroke-width:1.5;fill:rgba(224,123,42,0.12)}
+              .bb{stroke:#5b8fae;stroke-width:1.8;fill:rgba(91,143,174,0.10);stroke-linecap:round}
+            </style></defs>
+            <!-- mentor (larger) guiding child (smaller) -->
+            <circle cx="90" cy="45" r="28" class="bb"/>
+            <path d="M62,112 Q62,78 90,68 Q118,78 118,112" class="bb"/>
+            <circle cx="195" cy="52" r="20" class="bsf"/>
+            <path d="M175,112 Q175,85 195,77 Q215,85 215,112" class="bsf"/>
+            <!-- guiding gesture: hand pointing to a light bulb -->
+            <line x1="118" y1="75" x2="165" y2="65" class="bs"/>
+            <circle cx="175" cy="60" r="10" class="bsf"/>
+            <!-- lightbulb shape -->
+            <path d="M170,55 Q175,48 180,55 Q183,60 180,64 L170,64 Q167,60 170,55Z" class="bsf"/>
+            <line x1="170" y1="65" x2="180" y2="65" class="bs" stroke-width="1.2"/>
+            <line x1="171" y1="68" x2="179" y2="68" class="bs" stroke-width="1.2"/>
+            <!-- path/road dots from mentor to child  -->
+            <path d="M90,25 Q140,10 170,28" class="bb" stroke-dasharray="3,4" opacity="0.5"/>
+          </svg>
+        </div>
+        <div class="belief-card-tag">引导</div>
+        <h3>导师不给答案</h3>
+        <p>导师的工作是陪孩子慢慢看清自己的问题，然后一步一步找到属于自己的答案。</p>
+        <div class="belief-accent"></div>
       </div>
+
+      <!-- 卡片3：创造力场域 -->
+      <div class="belief-card">
+        <div class="belief-card-illo">
+          <svg viewBox="0 0 280 120" xmlns="http://www.w3.org/2000/svg">
+            <defs><style>
+              .bs{stroke:#e07b2a;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+              .bsf{stroke:#e07b2a;stroke-width:1.5;fill:rgba(224,123,42,0.12)}
+              .bg{stroke:#4a7c59;stroke-width:1.8;fill:rgba(74,124,89,0.10);stroke-linecap:round}
+              .bc{stroke:#d95f3b;stroke-width:1.5;fill:rgba(217,95,59,0.09);stroke-linecap:round}
+            </style></defs>
+            <!-- orbit of ideas around a center person -->
+            <circle cx="140" cy="62" r="20" class="bsf"/>
+            <path d="M120,112 Q120,88 140,82 Q160,88 160,112" class="bsf"/>
+            <!-- orbiting idea objects -->
+            <ellipse cx="140" cy="62" rx="70" ry="45" class="bs" stroke-dasharray="5,4" opacity="0.3"/>
+            <!-- idea 1: pencil -->
+            <line x1="60" y1="30" x2="82" y2="48" class="bg" stroke-width="3"/>
+            <polygon points="82,48 90,42 86,56" fill="rgba(74,124,89,0.3)" stroke="#4a7c59" stroke-width="1"/>
+            <!-- idea 2: gear -->
+            <circle cx="218" cy="35" r="12" class="bc"/>
+            <circle cx="218" cy="35" r="6" fill="rgba(217,95,59,0.2)" stroke="#d95f3b" stroke-width="1.2"/>
+            <!-- idea 3: star/spark -->
+            <path d="M218,90 L221,98 L230,98 L223,103 L226,111 L218,107 L210,111 L213,103 L206,98 L215,98Z" class="bsf"/>
+            <!-- idea 4: chat bubble -->
+            <rect x="50" y="80" width="38" height="26" rx="8" class="bg"/>
+            <polygon points="65,106 72,115 79,106" class="bg"/>
+            <!-- small dots floating -->
+            <circle cx="100" cy="18" r="4" fill="#f0a050" opacity="0.6"/>
+            <circle cx="185" cy="16" r="3" fill="#4a7c59" opacity="0.5"/>
+            <circle cx="240" cy="68" r="4" fill="#e07b2a" opacity="0.4"/>
+          </svg>
+        </div>
+        <div class="belief-card-tag">创造</div>
+        <h3>想法在这里落地</h3>
+        <p>这是一个充满创造力的场域。孩子带着自己的想法来，把它变成真实存在的作品。</p>
+        <div class="belief-accent"></div>
+      </div>
+
     </div>
   </section>
 
