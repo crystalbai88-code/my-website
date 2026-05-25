@@ -2,7 +2,7 @@ const projects = [
   {
     title: "FamilyTrip 家庭旅行管家",
     category: "life ai",
-    student: "智造少年 · 少年CEO项目组 A",
+    student: "智能少年俱乐部 · 少年CEO项目组 A",
     stage: "第二版原型",
     image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80",
     insight: "家庭旅行不是缺攻略，而是缺少照顾孩子、老人、天气、距离和休息节奏的一体化决策。",
@@ -14,7 +14,7 @@ const projects = [
   {
     title: "校园午餐排队优化",
     category: "life community",
-    student: "智造少年 · 少年CEO项目组 B",
+    student: "智能少年俱乐部 · 少年CEO项目组 B",
     stage: "洞察验证",
     image: "https://images.unsplash.com/photo-1543353071-10c8ba85a904?auto=format&fit=crop&w=900&q=80",
     insight: "午餐排队最长的不是买饭时间，而是学生不知道哪个窗口当前更快。",
@@ -26,7 +26,7 @@ const projects = [
   {
     title: "AI 植物照护助手",
     category: "ai life",
-    student: "智造少年 · 少年CEO项目组 C",
+    student: "智能少年俱乐部 · 少年CEO项目组 C",
     stage: "可用原型",
     image: "https://images.unsplash.com/photo-1520412099551-62b6bafeb5bb?auto=format&fit=crop&w=900&q=80",
     insight: "很多家庭养植物失败，不是因为不喜欢，而是不知道植物什么时候真的需要水和光。",
@@ -38,7 +38,7 @@ const projects = [
   {
     title: "社区老人便利地图",
     category: "community life",
-    student: "智造少年 · 少年CEO项目组 D",
+    student: "智能少年俱乐部 · 少年CEO项目组 D",
     stage: "用户访谈",
     image: "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=900&q=80",
     insight: "老人不是不会用地图，而是普通地图没有把厕所、座椅、坡道、药店这些真正重要的信息放前面。",
@@ -50,7 +50,7 @@ const projects = [
   {
     title: "儿童零花钱实验室",
     category: "business life",
-    student: "智造少年 · 少年CEO项目组 E",
+    student: "智能少年俱乐部 · 少年CEO项目组 E",
     stage: "商业实验",
     image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=900&q=80",
     insight: "孩子不是不懂钱，而是缺少把选择、预算、延迟满足和价值判断放在一起练习的真实场景。",
@@ -62,7 +62,7 @@ const projects = [
   {
     title: "城市热岛观察计划",
     category: "community ai",
-    student: "智造少年 · 少年CEO项目组 F",
+    student: "智能少年俱乐部 · 少年CEO项目组 F",
     stage: "数据采集",
     image: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=900&q=80",
     insight: "同一个城市里，树荫、地面材质和建筑密度会让孩子体感到完全不同的夏天。",
