@@ -203,6 +203,7 @@ button {
 .method-section,
 .system-section,
 .ceo-section,
+.cohort-section,
 .portfolio-section,
 .evidence-section,
 .rubric-section,
@@ -379,6 +380,7 @@ button {
 }
 
 .process-grid p,
+.cohort-timeline p,
 .pillar-grid p,
 .service-list p,
 .evidence-grid p,
@@ -388,6 +390,60 @@ button {
 .rubric-list span {
   color: var(--muted);
   line-height: 1.7;
+}
+
+.cohort-section {
+  max-width: 1220px;
+  margin: 0 auto;
+  padding-top: 24px;
+}
+
+.cohort-timeline {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper-strong);
+  box-shadow: var(--shadow);
+}
+
+.cohort-timeline article {
+  min-height: 260px;
+  padding: 22px 18px;
+  border-right: 1px solid var(--line);
+  background: linear-gradient(180deg, #fffaf2 0%, #f6ecdf 100%);
+}
+
+.cohort-timeline article:last-child {
+  color: #fff7ea;
+  border-right: 0;
+  background: var(--dark);
+}
+
+.cohort-timeline span {
+  display: block;
+  min-height: 18px;
+  color: var(--teal);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.cohort-timeline h3 {
+  margin: 46px 0 12px;
+  font-size: 21px;
+  line-height: 1.25;
+}
+
+.cohort-timeline article:last-child span {
+  color: var(--gold);
+}
+
+.cohort-timeline article:last-child p {
+  color: rgba(255, 247, 234, 0.72);
 }
 
 .portfolio-section {
@@ -643,6 +699,7 @@ button {
   }
 
   .process-grid,
+  .cohort-timeline,
   .pillar-grid,
   .service-list,
   .evidence-grid {
@@ -676,6 +733,7 @@ button {
 
   .hero-metrics,
   .process-grid,
+  .cohort-timeline,
   .pillar-grid,
   .service-list,
   .project-grid,
@@ -686,6 +744,7 @@ button {
   .thesis-section,
   .method-section,
   .system-section,
+  .cohort-section,
   .portfolio-section,
   .evidence-section,
   .rubric-section,
