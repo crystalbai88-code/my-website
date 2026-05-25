@@ -73,17 +73,99 @@ const projects = [
   }
 ];
 
+const topicContent = {
+  membership: {
+    title: "年度会员俱乐部",
+    image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1100&q=80",
+    text: "智能少年俱乐部不是一门短课，而是孩子长期拥有的成长场所。孩子以会员身份加入，有想法时来推进项目，想找同伴时来组队，需要帮助时预约老师。",
+    points: ["按年加入，长期开放", "可约同伴一起做项目", "可预约不同方向老师", "每次来都让作品往前一步"]
+  },
+  ceo: {
+    title: "少年CEO项目",
+    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1100&q=80",
+    text: "少年CEO是俱乐部里的核心项目场景。孩子从真实世界里发现问题，用产品思维设计方案，再通过反馈和迭代把想法变成可以展示、可以使用、可以继续生长的作品。",
+    points: ["真实世界洞察", "用户问题定义", "产品原型设计", "路演表达与持续迭代"]
+  },
+  mentor: {
+    title: "导师预约系统",
+    image: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1100&q=80",
+    text: "俱乐部会形成老师和行业导师名单。孩子可以根据项目阶段预约不同老师：有人帮他拆问题，有人帮他做技术，有人帮他改表达，也有人帮他看商业落地。",
+    points: ["项目教练", "AI与工程老师", "人文表达老师", "行业专业人士"]
+  },
+  credits: {
+    title: "学分分层系统",
+    image: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1100&q=80",
+    text: "这里的学分不是考试分数，而是孩子在真实项目中的成长证据。每一次观察、访谈、原型、修改和公开表达，都能被记录进作品集。",
+    points: ["观察学分", "问题学分", "原型学分", "迭代学分", "表达学分"]
+  }
+};
+
+const creditContent = {
+  observer: {
+    code: "L1",
+    title: "观察者",
+    text: "孩子开始把注意力放回真实生活，学会看见现象、记录细节，并说出为什么这个现象值得被关注。",
+    goals: ["完成一次真实场景观察", "记录不少于三个细节", "用自己的话讲清楚发现"]
+  },
+  questioner: {
+    code: "L2",
+    title: "提问者",
+    text: "孩子不急着给答案，而是先学会追问：这是一个谁的问题？为什么会发生？现有方案哪里不够好？",
+    goals: ["提出一个可研究的问题", "完成一次访谈或资料整理", "区分现象、原因和需求"]
+  },
+  builder: {
+    code: "L3",
+    title: "原型师",
+    text: "孩子把想法做出来。可以是一张流程图、一个网页、一个工具、一个服务方案，也可以是一场小型实验。",
+    goals: ["做出第一版可展示原型", "说明核心功能和用户路径", "收集至少一次真实反馈"]
+  },
+  leader: {
+    code: "L4",
+    title: "项目负责人",
+    text: "孩子开始组织资源推进项目，学会分工、排优先级、预约导师、管理时间，并根据反馈持续迭代。",
+    goals: ["制定项目推进计划", "组织同伴或导师协作", "完成一次明确版本迭代"]
+  },
+  creator: {
+    code: "L5",
+    title: "少年创造者",
+    text: "孩子能把项目讲给别人听，形成完整作品集，并开始产生真实影响：帮助一个人、改善一个场景、启发一群同伴。",
+    goals: ["完成一次公开展示或路演", "沉淀项目作品集页面", "说明项目带来的真实改变"]
+  }
+};
+
 const grid = document.querySelector("#projectGrid");
 const detail = document.querySelector("#projectDetail");
 const filterButtons = document.querySelectorAll(".filter-button");
 const year = document.querySelector("#year");
+const topicDetail = document.querySelector("#topicDetail");
+const tapCards = document.querySelectorAll(".tap-card");
+const creditDetail = document.querySelector("#creditDetail");
+const creditButtons = document.querySelectorAll(".credit-level");
 
 let activeFilter = "all";
 let activeProject = projects[0];
 
+renderTopic("membership");
+renderCredit("observer");
 renderProjects();
 renderDetail(activeProject);
 if (year) year.textContent = new Date().getFullYear();
+
+tapCards.forEach((button) => {
+  button.addEventListener("click", () => {
+    tapCards.forEach((item) => item.classList.remove("active"));
+    button.classList.add("active");
+    renderTopic(button.dataset.topic);
+  });
+});
+
+creditButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    creditButtons.forEach((item) => item.classList.remove("active"));
+    button.classList.add("active");
+    renderCredit(button.dataset.level);
+  });
+});
 
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => {
@@ -97,12 +179,52 @@ filterButtons.forEach((button) => {
   });
 });
 
+function renderTopic(key) {
+  if (!topicDetail || !topicContent[key]) return;
+  const topic = topicContent[key];
+
+  topicDetail.innerHTML = `
+    <img src="${topic.image}" alt="${escapeHtml(topic.title)}" />
+    <div class="tap-detail-body">
+      <span class="label">Club Entry</span>
+      <h3>${topic.title}</h3>
+      <p>${topic.text}</p>
+      <ul>
+        ${topic.points.map((point) => `<li>${point}</li>`).join("")}
+      </ul>
+    </div>
+  `;
+}
+
+function renderCredit(key) {
+  if (!creditDetail || !creditContent[key]) return;
+  const level = creditContent[key];
+
+  creditDetail.innerHTML = `
+    <div>
+      <span class="label">Credit Level</span>
+      <h3>${level.title}</h3>
+      <p>${level.text}</p>
+      <ul>
+        ${level.goals.map((goal) => `<li>${goal}</li>`).join("")}
+      </ul>
+    </div>
+    <div class="credit-badge" aria-label="${escapeHtml(level.title)}">
+      <div>
+        <strong>${level.code}</strong>
+        <span>${level.title}</span>
+      </div>
+    </div>
+  `;
+}
+
 function getFilteredProjects() {
   if (activeFilter === "all") return projects;
   return projects.filter((project) => project.category.includes(activeFilter));
 }
 
 function renderProjects() {
+  if (!grid) return;
   const filtered = getFilteredProjects();
   grid.innerHTML = filtered.map((project) => `
     <article class="project-card ${project.title === activeProject.title ? "active" : ""}" data-title="${escapeHtml(project.title)}">
@@ -125,6 +247,7 @@ function renderProjects() {
 }
 
 function renderDetail(project) {
+  if (!detail || !project) return;
   detail.innerHTML = `
     <div class="detail-header">
       <span class="label">Selected Project</span>
