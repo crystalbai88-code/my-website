@@ -4,496 +4,466 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>智能少年俱乐部 · 为有想法的孩子</title>
-<meta name="description" content="智能少年俱乐部是面向AI时代的少年成长场域。少年CEO探索班、PBL项目体系、年度会员制。"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --ink:#2d2416;
-  --ink2:#5c4a2a;
-  --ink3:#a08c6e;
-  --paper:#fdf8f0;
-  --paper2:#f5ede0;
-  --paper3:#e8dcc8;
-  --paper4:#d8c9b0;
-  --warm:#e07b2a;
-  --warm2:#f0a050;
-  --warm3:#f7c878;
-  --coral:#d95f3b;
-  --moss:#4a7c59;
-  --moss2:#6fa07a;
-  --sky:#5b8fae;
-  --tint-orange:rgba(224,123,42,0.10);
-  --tint-green:rgba(74,124,89,0.10);
-  --tint-blue:rgba(91,143,174,0.10);
-  --serif:'Noto Serif SC',serif;--sans:'Noto Sans SC',sans-serif;
+  --ink:#2b1d0e;
+  --ink2:#6b4a24;
+  --ink3:#b08c5c;
+  --paper:#fffcf5;
+  --paper2:#fff8ec;
+  --paper3:#fdefd4;
+  --paper4:#f5ddb0;
+  --warm:#e8720c;
+  --warm2:#f59332;
+  --warm3:#ffc870;
+  --coral:#d94f2a;
+  --moss:#2e8c56;
+  --moss2:#5ab37c;
+  --sky:#2e7cb8;
+  --sky2:#5aa8d8;
+  --lav:#7060b0;
+  --serif:'Noto Serif SC',serif;
+  --sans:'Noto Sans SC',sans-serif;
 }
 html{scroll-behavior:smooth}
 body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-weight:300;line-height:1.8;overflow-x:hidden}
 
-/* ═══ NAV ═══ */
-nav{
-  position:fixed;top:0;left:0;right:0;z-index:200;
-  padding:18px 64px;
-  display:flex;justify-content:space-between;align-items:center;
-  background:rgba(253,248,240,0.96);
-  backdrop-filter:blur(20px);
-  border-bottom:1px solid rgba(180,170,150,0.18);
-  transition:padding 0.4s;
-}
+/* ══ NAV ══ */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:16px 56px;display:flex;justify-content:space-between;align-items:center;background:rgba(255,252,245,0.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(232,114,12,0.12);box-shadow:0 2px 20px rgba(232,114,12,0.06);transition:padding 0.4s}
 .brand{font-family:var(--serif);font-size:15px;font-weight:400;color:var(--ink);text-decoration:none;letter-spacing:0.05em}
 .brand em{color:var(--warm);font-style:normal}
 .nav-links{display:flex;gap:0}
-.nav-links a{
-  font-size:12px;color:var(--ink2);text-decoration:none;
-  letter-spacing:0.08em;font-weight:400;transition:color 0.3s;
-  padding:6px 18px;position:relative;
-}
-.nav-links a::after{
-  content:'';position:absolute;bottom:0;left:18px;right:18px;
-  height:1px;background:var(--warm);transform:scaleX(0);
-  transform-origin:center;transition:transform 0.3s;
-}
+.nav-links a{font-size:12px;color:var(--ink2);text-decoration:none;letter-spacing:0.08em;font-weight:400;transition:color 0.3s;padding:6px 16px;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:0;left:16px;right:16px;height:2px;background:var(--warm);transform:scaleX(0);transform-origin:center;transition:transform 0.3s;border-radius:1px}
 .nav-links a:hover{color:var(--warm)}
 .nav-links a:hover::after,.nav-links a.active::after{transform:scaleX(1)}
 .nav-links a.active{color:var(--warm)}
-.nav-cta{
-  font-size:11px;letter-spacing:0.12em;color:var(--paper);
-  background:var(--ink);padding:9px 22px;text-decoration:none;
-  transition:background 0.3s;font-weight:400;
-}
-.nav-cta:hover{background:var(--warm)}
+.nav-cta{font-size:11px;letter-spacing:0.12em;color:#fff;background:var(--warm);padding:9px 22px;text-decoration:none;transition:background 0.3s;border-radius:2px;font-weight:400}
+.nav-cta:hover{background:var(--coral)}
 
-/* ═══ PAGE SECTIONS (SPA nav) ═══ */
-.page{display:none}
-.page.active{display:block}
+/* ══ PAGES ══ */
+.page{display:none}.page.active{display:block}
 
-/* ═══ SHARED UTILITIES ═══ */
-.wrap{max-width:1160px;margin:0 auto;padding:0 64px}
-.section-label{
-  font-size:11px;letter-spacing:0.25em;text-transform:uppercase;
-  margin-bottom:16px;display:flex;align-items:center;gap:14px;color:var(--warm);
-}
-.section-label::before{content:'';display:block;width:28px;height:1px;background:currentColor}
-.on-dark .section-label{color:var(--warm2)}
-.on-dark .section-label::before{background:var(--warm2)}
+/* ══ SHARED ══ */
+.section-label{font-size:10px;letter-spacing:0.28em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:12px;color:var(--warm)}
+.section-label::before{content:'';display:block;width:24px;height:2px;background:currentColor;border-radius:1px}
 .h-serif{font-family:var(--serif);font-weight:300;line-height:1.4}
-.reveal{opacity:0;transform:translateY(24px);transition:opacity 0.85s ease,transform 0.85s ease}
+.reveal{opacity:0;transform:translateY(20px);transition:opacity 0.8s ease,transform 0.8s ease}
 .reveal.in{opacity:1;transform:none}
 
-/* ═══════════════════════════════
-   PAGE 1: HOME
-═══════════════════════════════ */
+/* ══ HERO ══ */
+.hero{min-height:100vh;display:grid;grid-template-rows:1fr auto auto;background:var(--paper2);padding-top:68px}
 
-/* ═══ HERO — NEW CLEAN LAYOUT ═══ */
-.hero{
-  min-height:100vh;
-  display:grid;
-  grid-template-rows:1fr auto auto;
-  background:var(--paper);
-  padding-top:72px;
+/* ── Animated scene area ── */
+.hero-scene{
+  background:var(--paper3);
   position:relative;overflow:hidden;
+  min-height:52vh;
+  display:flex;align-items:center;justify-content:center;
 }
-.hero-visual{
-  position:relative;z-index:1;
-  width:100%;background:#1e1508;
-  overflow:hidden;min-height:50vh;
-  display:flex;align-items:stretch;
+/* warm radial glow */
+.hero-scene::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 70% at 50% 50%, rgba(255,200,112,0.25) 0%, transparent 70%);
+  pointer-events:none;
 }
-.carousel-track{
+
+/* Carousel: 3 frames */
+.scene-track{
   display:flex;width:300%;height:100%;
-  animation:carouselSlide 9s ease-in-out infinite;
+  transition:none;
 }
-@keyframes carouselSlide{
-  0%,28%  {transform:translateX(0)}
-  33%,61% {transform:translateX(-33.333%)}
-  66%,94% {transform:translateX(-66.667%)}
+.scene-frame{
+  flex:0 0 33.333%;
+  display:flex;align-items:center;justify-content:center;
+  padding:24px 80px;position:relative;
+}
+.scene-caption{
+  position:absolute;bottom:20px;left:56px;
+  font-size:10px;letter-spacing:0.22em;color:var(--ink3);text-transform:uppercase;
+}
+.scene-step{
+  position:absolute;bottom:20px;right:56px;
+  font-size:10px;letter-spacing:0.12em;color:var(--warm);font-family:'Arial',sans-serif;
+}
+/* auto-slide via animation */
+.scene-track{animation:sceneSlide 12s ease-in-out infinite}
+@keyframes sceneSlide{
+  0%,30%  {transform:translateX(0)}
+  35%,63% {transform:translateX(-33.333%)}
+  68%,96% {transform:translateX(-66.667%)}
   100%    {transform:translateX(0)}
 }
-.carousel-frame{
-  flex:0 0 33.333%;height:100%;
-  position:relative;display:flex;align-items:center;justify-content:center;
-  padding:32px 80px;
+
+/* SVG draw-on animation */
+.draw-path{
+  stroke-dasharray:1200;
+  stroke-dashoffset:1200;
 }
-.carousel-caption{
-  position:absolute;bottom:24px;left:64px;
-  font-size:10px;letter-spacing:0.22em;color:rgba(255,255,255,0.35);
-  text-transform:uppercase;font-family:var(--sans);
+.draw-circle{
+  stroke-dasharray:200;
+  stroke-dashoffset:200;
 }
-.carousel-step{
-  position:absolute;bottom:24px;right:64px;
-  font-size:10px;letter-spacing:0.15em;color:rgba(255,255,255,0.25);
-  font-family:'Arial',sans-serif;
+/* Frame 1 animate when visible */
+.frame1-active .d1{animation:drawIn 0.6s ease forwards}
+.frame1-active .d2{animation:drawIn 0.6s 0.15s ease forwards}
+.frame1-active .d3{animation:drawIn 0.6s 0.3s ease forwards}
+.frame1-active .d4{animation:drawIn 0.6s 0.45s ease forwards}
+.frame1-active .d5{animation:drawIn 0.6s 0.6s ease forwards}
+.frame1-active .d6{animation:drawIn 0.6s 0.75s ease forwards}
+.frame1-active .d7{animation:drawIn 0.6s 0.9s ease forwards}
+.frame1-active .d8{animation:drawIn 0.6s 1.05s ease forwards}
+/* Frame 2 */
+.frame2-active .d1{animation:drawIn 0.5s ease forwards}
+.frame2-active .d2{animation:drawIn 0.5s 0.12s ease forwards}
+.frame2-active .d3{animation:drawIn 0.5s 0.24s ease forwards}
+.frame2-active .d4{animation:drawIn 0.5s 0.36s ease forwards}
+.frame2-active .d5{animation:drawIn 0.5s 0.48s ease forwards}
+.frame2-active .d6{animation:drawIn 0.5s 0.6s ease forwards}
+.frame2-active .d7{animation:drawIn 0.5s 0.72s ease forwards}
+.frame2-active .d8{animation:drawIn 0.5s 0.84s ease forwards}
+.frame2-active .d9{animation:drawIn 0.5s 0.96s ease forwards}
+/* Frame 3 */
+.frame3-active .d1{animation:drawIn 0.5s ease forwards}
+.frame3-active .d2{animation:drawIn 0.5s 0.1s ease forwards}
+.frame3-active .d3{animation:drawIn 0.5s 0.2s ease forwards}
+.frame3-active .d4{animation:drawIn 0.5s 0.3s ease forwards}
+.frame3-active .d5{animation:drawIn 0.5s 0.4s ease forwards}
+.frame3-active .d6{animation:drawIn 0.5s 0.5s ease forwards}
+.frame3-active .d7{animation:drawIn 0.5s 0.6s ease forwards}
+.frame3-active .d8{animation:drawIn 0.5s 0.7s ease forwards}
+.frame3-active .d9{animation:drawIn 0.5s 0.8s ease forwards}
+.frame3-active .d10{animation:drawIn 0.5s 0.9s ease forwards}
+@keyframes drawIn{to{stroke-dashoffset:0}}
+/* float bob for decoration elements */
+.bob{animation:bobFloat 3s ease-in-out infinite alternate}
+.bob2{animation:bobFloat 3.5s 0.5s ease-in-out infinite alternate}
+.bob3{animation:bobFloat 2.8s 1s ease-in-out infinite alternate}
+@keyframes bobFloat{0%{transform:translateY(0)}100%{transform:translateY(-8px)}}
+
+/* ── Hero text area ── */
+.hero-text{
+  padding:40px 56px 44px;
+  display:grid;grid-template-columns:1fr auto;align-items:center;gap:40px;
+  background:var(--paper2);
+  border-top:2px solid var(--paper4);
 }
-.hero-text-wrap{
-  position:relative;z-index:1;
-  padding:44px 64px 48px;
-  display:grid;grid-template-columns:1fr auto;
-  align-items:end;gap:40px;background:var(--paper);
-}
-.hero-tag-line{
-  font-size:10px;letter-spacing:0.28em;color:var(--warm);
-  text-transform:uppercase;margin-bottom:18px;
-  display:flex;align-items:center;gap:14px;
-}
-.hero-tag-line::before{content:'';display:block;width:28px;height:1px;background:var(--warm)}
-.hero-h1{
-  font-family:var(--serif);font-size:clamp(34px,4.2vw,58px);
-  font-weight:300;line-height:1.22;color:var(--ink);
-}
+.hero-eyebrow{font-size:10px;letter-spacing:0.28em;color:var(--warm);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:12px}
+.hero-eyebrow::before{content:'';display:block;width:24px;height:2px;background:var(--warm);border-radius:1px}
+.hero-h1{font-family:var(--serif);font-size:clamp(32px,4vw,54px);font-weight:300;line-height:1.25;color:var(--ink)}
 .hero-h1 em{font-style:normal;color:var(--warm)}
-.hero-cta-col{display:flex;flex-direction:column;align-items:flex-end;gap:14px;padding-bottom:4px}
-.btn-primary{font-size:12px;letter-spacing:0.15em;color:var(--paper);background:var(--ink);padding:14px 36px;text-decoration:none;transition:background 0.3s;font-weight:400;cursor:pointer;border:none;font-family:var(--sans);white-space:nowrap}
-.btn-primary:hover{background:var(--warm)}
-.btn-ghost{font-size:12px;color:var(--ink3);text-decoration:none;letter-spacing:0.08em;border-bottom:1px solid var(--ink3);padding-bottom:2px;transition:all 0.3s;cursor:pointer;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--sans);white-space:nowrap}
-.btn-ghost:hover{color:var(--warm);border-color:var(--warm)}
-.hero-stats{
-  background:var(--paper3);display:flex;border-top:1px solid var(--paper4);
+.hero-btns{display:flex;flex-direction:column;align-items:flex-end;gap:12px}
+.btn-fill{font-size:12px;letter-spacing:0.12em;color:#fff;background:var(--warm);padding:14px 32px;border:none;cursor:pointer;font-family:var(--sans);transition:background 0.3s;border-radius:2px;white-space:nowrap}
+.btn-fill:hover{background:var(--coral)}
+.btn-line{font-size:12px;letter-spacing:0.08em;color:var(--ink3);background:none;border:none;border-bottom:1px solid var(--paper4);padding-bottom:2px;cursor:pointer;font-family:var(--sans);transition:all 0.3s;white-space:nowrap}
+.btn-line:hover{color:var(--warm);border-color:var(--warm)}
+
+/* ── Stat strip ── */
+.hero-strip{display:grid;grid-template-columns:repeat(3,1fr);background:var(--paper3);border-top:1px solid var(--paper4)}
+.strip-item{padding:20px 32px;border-right:1px solid var(--paper4);display:flex;align-items:center;gap:16px}
+.strip-item:last-child{border-right:none}
+.strip-icon{font-size:22px;line-height:1}
+.strip-label{font-size:13px;color:var(--ink2);font-family:var(--serif)}
+.strip-sub{font-size:11px;color:var(--ink3);margin-top:2px}
+
+/* ══ BELIEF SECTION ══ */
+.belief{padding:72px 56px;background:var(--paper)}
+.belief-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:52px;gap:40px}
+.belief-header h2{font-family:var(--serif);font-size:clamp(26px,3vw,40px);font-weight:300;color:var(--ink);max-width:520px;line-height:1.4}
+.belief-header p{font-size:14px;color:var(--ink3);max-width:260px;text-align:right;line-height:1.9}
+.belief-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.bcard{
+  background:var(--paper2);border-radius:4px;
+  padding:36px 32px 40px;
+  position:relative;overflow:hidden;
+  border:1.5px solid var(--paper3);
+  transition:all 0.35s;
 }
-.hero-stat{flex:1;padding:22px 32px;border-right:1px solid var(--paper3)}
-.hero-stat:last-child{border-right:none}
-.hs-num{font-family:var(--serif);font-size:30px;font-weight:300;color:var(--warm);line-height:1}
-.hs-label{font-size:11px;color:var(--ink3);margin-top:6px;letter-spacing:0.06em}
-@keyframes spulse{0%,100%{opacity:0.35}50%{opacity:1}}
+.bcard:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(232,114,12,0.1);border-color:var(--warm2)}
+.bcard-illo{height:130px;margin-bottom:28px;display:flex;align-items:center;justify-content:center}
+.bcard-tag{font-size:10px;letter-spacing:0.22em;color:var(--warm);text-transform:uppercase;margin-bottom:10px}
+.bcard h3{font-family:var(--serif);font-size:22px;font-weight:400;color:var(--ink);margin-bottom:10px}
+.bcard p{font-size:13px;color:var(--ink2);line-height:1.85}
+.bcard-line{position:absolute;bottom:0;left:0;right:0;height:3px;transform:scaleX(0);transform-origin:left;transition:transform 0.4s;border-radius:0 0 2px 2px}
+.bcard:hover .bcard-line{transform:scaleX(1)}
+.bcard:nth-child(1) .bcard-line{background:var(--warm)}
+.bcard:nth-child(2) .bcard-line{background:var(--sky)}
+.bcard:nth-child(3) .bcard-line{background:var(--moss)}
 
-/* MANIFESTO */
-.belief{padding:80px 64px;background:var(--paper2);position:relative;overflow:hidden}
-.belief-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--paper3);margin-top:52px}
-.belief-card{background:var(--paper2);padding:44px 36px 48px;position:relative;overflow:hidden;transition:background 0.3s}
-.belief-card:hover{background:var(--paper)}
-.belief-card-illo{margin-bottom:28px;height:120px;display:flex;align-items:center}
-.belief-card-illo svg{width:100%;height:120px}
-.belief-card-tag{font-size:10px;letter-spacing:0.22em;color:var(--warm);text-transform:uppercase;margin-bottom:12px}
-.belief-card h3{font-family:var(--serif);font-size:24px;font-weight:400;color:var(--ink);margin-bottom:12px;line-height:1.35}
-.belief-card p{font-size:14px;color:var(--ink2);line-height:1.9}
-.belief-accent{position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--warm);transform:scaleX(0);transform-origin:left;transition:transform 0.4s}
-.belief-card:hover .belief-accent{transform:scaleX(1)}
+/* ══ ENTRY CARDS ══ */
+.entries{padding:64px 56px;background:var(--paper3)}
+.entries h2{font-family:var(--serif);font-size:clamp(22px,2.5vw,34px);font-weight:300;color:var(--ink);margin-bottom:8px;margin-top:12px}
+.entries-sub{font-size:14px;color:var(--ink3);margin-bottom:44px}
+.entries-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ecard{
+  background:var(--paper2);border-radius:4px;padding:36px 28px 44px;
+  position:relative;cursor:pointer;transition:all 0.3s;
+  border:1.5px solid var(--paper4);
+}
+.ecard:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(232,114,12,0.12);border-color:var(--warm2)}
+.ecard-num{font-size:11px;color:var(--ink3);letter-spacing:0.12em;margin-bottom:28px}
+.ecard-icon{font-size:28px;margin-bottom:20px;color:var(--warm)}
+.ecard h3{font-family:var(--serif);font-size:18px;font-weight:400;color:var(--ink);margin-bottom:10px;line-height:1.4}
+.ecard p{font-size:12px;color:var(--ink2);line-height:1.85}
+.ecard-arrow{position:absolute;bottom:24px;right:24px;font-size:16px;color:var(--paper4);transition:all 0.3s}
+.ecard:hover .ecard-arrow{color:var(--warm);transform:translate(3px,-3px)}
 
-/* QUICK ENTRY CARDS on home */
-.home-entries{padding:72px 64px;background:var(--paper)}
-.entries-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--paper3);margin-top:48px}
-.entry-card{background:var(--paper);padding:40px 28px 52px;position:relative;cursor:pointer;transition:all 0.3s;border-left:3px solid transparent}
-.entry-card:hover{background:var(--paper2);border-left:3px solid var(--warm)}
-.entry-num{font-family:var(--serif);font-size:11px;color:var(--ink3);letter-spacing:0.12em;margin-bottom:36px}
-.entry-glyph{font-size:26px;margin-bottom:22px;color:var(--warm)}
-.entry-card h3{font-family:var(--serif);font-size:19px;font-weight:400;color:var(--ink);margin-bottom:12px;line-height:1.4}
-.entry-card p{font-size:13px;color:var(--ink2);line-height:1.9}
-.entry-arrow{position:absolute;bottom:28px;right:28px;font-size:16px;color:var(--paper3);transition:all 0.3s}
-.entry-card:hover .entry-arrow{color:var(--warm);transform:translate(4px,-4px)}
+/* ══ CONTACT ══ */
+.contact-band{padding:80px 56px;background:var(--paper2);position:relative;overflow:hidden}
+.contact-band::before{content:'';position:absolute;right:-60px;top:-60px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(232,114,12,0.08),transparent 70%);pointer-events:none}
+.contact-inner{max-width:700px;position:relative;z-index:1}
+.contact-inner h2{font-family:var(--serif);font-size:clamp(28px,4vw,50px);font-weight:300;line-height:1.35;margin:14px 0 22px;color:var(--ink)}
+.contact-inner>p{font-size:15px;color:var(--ink2);line-height:2;max-width:520px;margin-bottom:52px}
+.crow-list{border-top:1px solid var(--paper4)}
+.crow{display:flex;justify-content:space-between;align-items:center;padding:22px 0;border-bottom:1px solid var(--paper4);text-decoration:none;color:inherit;transition:padding-left 0.3s}
+a.crow:hover{padding-left:10px}
+.crow-label{font-size:11px;letter-spacing:0.2em;color:var(--ink3);text-transform:uppercase}
+.crow-value{font-family:var(--serif);font-size:17px;color:var(--ink);font-weight:300}
+.crow-arrow{font-size:16px;color:var(--paper4);transition:all 0.3s}
+a.crow:hover .crow-arrow{color:var(--warm);transform:translate(4px,-4px)}
 
-/* ═══════════════════════════════
-   PAGE 2: CEO PROGRAM
-═══════════════════════════════ */
-.ceo-hero{padding:140px 64px 80px;background:var(--ink);position:relative;overflow:hidden}
-.ceo-hero-wm{position:absolute;left:-30px;bottom:-40px;font-family:var(--serif);font-size:320px;font-weight:300;color:rgba(255,255,255,0.025);line-height:1;pointer-events:none;user-select:none}
-.ceo-hero-inner{max-width:900px;position:relative;z-index:1}
-.ceo-hero h1{font-family:var(--serif);font-size:clamp(38px,5vw,66px);font-weight:300;color:var(--paper);line-height:1.25;margin-bottom:28px}
-.ceo-hero h1 em{font-style:normal;color:var(--warm2)}
-.ceo-hero-sub{font-size:17px;color:rgba(245,242,236,0.6);max-width:620px;line-height:2;margin-bottom:48px}
-.ceo-badges{display:flex;gap:12px;flex-wrap:wrap}
-.badge{font-size:11px;letter-spacing:0.12em;padding:7px 16px;border:1px solid rgba(255,255,255,0.15);color:rgba(245,242,236,0.55);text-transform:uppercase}
+/* ══ OTHER PAGES (preserve existing) ══ */
+.ceo-hero{padding:120px 56px 72px;background:linear-gradient(135deg,var(--paper3) 0%,var(--paper2) 100%);position:relative;overflow:hidden}
+.ceo-hero h1{font-family:var(--serif);font-size:clamp(34px,5vw,60px);font-weight:300;color:var(--ink);line-height:1.25;margin-bottom:24px}
+.ceo-hero h1 em{font-style:normal;color:var(--warm)}
+.ceo-hero-sub{font-size:16px;color:var(--ink2);max-width:580px;line-height:2;margin-bottom:40px}
+.badge{font-size:11px;letter-spacing:0.1em;padding:6px 14px;border:1px solid var(--warm2);color:var(--warm);border-radius:2px;background:rgba(232,114,12,0.05)}
+.ceo-badges{display:flex;gap:10px;flex-wrap:wrap}
 
-.ceo-structure{padding:100px 64px;background:var(--paper)}
-.structure-intro{max-width:700px;margin-bottom:72px}
-.structure-intro h2{font-family:var(--serif);font-size:clamp(26px,3vw,40px);font-weight:300;margin-bottom:16px;line-height:1.5}
-.structure-intro p{font-size:15px;color:var(--ink2);line-height:2}
+.ceo-structure{padding:80px 56px;background:var(--paper2)}
+.structure-intro{max-width:660px;margin-bottom:56px}
+.structure-intro h2{font-family:var(--serif);font-size:clamp(24px,3vw,38px);font-weight:300;margin-bottom:14px;line-height:1.5;color:var(--ink)}
+.structure-intro p{font-size:14px;color:var(--ink2);line-height:2}
 
-.cohort-phases{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--paper3);margin-bottom:80px}
-.phase{background:var(--paper);padding:44px 36px}
-.phase-num{font-size:10px;letter-spacing:0.2em;color:var(--warm);text-transform:uppercase;margin-bottom:24px}
-.phase h3{font-family:var(--serif);font-size:22px;font-weight:400;color:var(--ink);margin-bottom:16px;line-height:1.4}
+.cohort-phases{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:60px}
+.phase{background:var(--paper);padding:36px 30px;border-radius:4px;border:1.5px solid var(--paper3)}
+.phase-num{font-size:10px;letter-spacing:0.2em;color:var(--warm);text-transform:uppercase;margin-bottom:20px}
+.phase h3{font-family:var(--serif);font-size:20px;font-weight:400;color:var(--ink);margin-bottom:14px;line-height:1.4}
 .phase p{font-size:13px;color:var(--ink2);line-height:2}
-.phase-detail{margin-top:20px;padding-top:20px;border-top:1px solid var(--paper3)}
-.phase-detail li{font-size:12px;color:var(--ink3);line-height:2;list-style:none;padding-left:16px;position:relative}
+.phase-detail{margin-top:18px;padding-top:18px;border-top:1px solid var(--paper3)}
+.phase-detail li{font-size:12px;color:var(--ink3);line-height:2;list-style:none;padding-left:14px;position:relative}
 .phase-detail li::before{content:'—';position:absolute;left:0;color:var(--warm2);font-size:10px}
 
-.ceo-flow{background:var(--paper2);padding:80px 64px}
-.flow-title{font-family:var(--serif);font-size:clamp(22px,2.5vw,34px);font-weight:300;margin-bottom:12px}
-.flow-sub{font-size:14px;color:var(--ink2);margin-bottom:56px;max-width:540px;line-height:1.9}
-.flow-steps{display:flex;align-items:flex-start;gap:0;position:relative}
-.flow-steps::before{content:'';position:absolute;top:20px;left:20px;right:20px;height:1px;background:linear-gradient(to right,var(--warm),var(--paper3));z-index:0}
-.flow-step{flex:1;padding-top:52px;position:relative;z-index:1;padding-right:16px}
-.flow-dot{
-  position:absolute;top:12px;left:0;
-  width:17px;height:17px;border-radius:50%;
-  background:var(--paper2);border:1.5px solid var(--ink3);
-  transition:all 0.3s;
-}
-.flow-step:first-child .flow-dot{background:var(--warm);border-color:var(--warm);width:19px;height:19px;top:11px}
-.flow-step-label{font-size:10px;letter-spacing:0.18em;color:var(--warm);text-transform:uppercase;margin-bottom:10px}
-.flow-step-name{font-family:var(--serif);font-size:17px;font-weight:400;color:var(--ink);margin-bottom:8px}
+.ceo-flow{background:var(--paper3);padding:64px 56px}
+.flow-title{font-family:var(--serif);font-size:clamp(20px,2.5vw,32px);font-weight:300;margin-bottom:10px;color:var(--ink)}
+.flow-sub{font-size:14px;color:var(--ink2);margin-bottom:48px;max-width:500px;line-height:1.9}
+.flow-steps{display:flex;align-items:flex-start;position:relative}
+.flow-steps::before{content:'';position:absolute;top:18px;left:18px;right:18px;height:2px;background:linear-gradient(to right,var(--warm),var(--paper4));z-index:0;border-radius:1px}
+.flow-step{flex:1;padding-top:48px;position:relative;z-index:1;padding-right:14px}
+.flow-dot{position:absolute;top:10px;left:0;width:16px;height:16px;border-radius:50%;background:var(--paper3);border:2px solid var(--ink3);transition:all 0.3s}
+.flow-step:first-child .flow-dot{background:var(--warm);border-color:var(--warm);width:18px;height:18px;top:9px}
+.flow-step-label{font-size:10px;letter-spacing:0.18em;color:var(--warm);text-transform:uppercase;margin-bottom:8px}
+.flow-step-name{font-family:var(--serif);font-size:16px;font-weight:400;color:var(--ink);margin-bottom:6px}
 .flow-step-desc{font-size:12px;color:var(--ink2);line-height:1.9}
 .flow-step.highlight .flow-dot{background:var(--warm2);border-color:var(--warm2)}
 .flow-step.highlight .flow-step-name{color:var(--warm)}
 
-.ceo-cohort-info{padding:80px 64px;background:var(--paper)}
-.cohort-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--paper3)}
-.cohort-item{background:var(--paper);padding:52px 44px}
-.cohort-item h3{font-family:var(--serif);font-size:26px;font-weight:300;color:var(--ink);margin-bottom:20px;line-height:1.4}
+.ceo-cohort-info{padding:64px 56px;background:var(--paper2)}
+.cohort-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cohort-item{background:var(--paper);padding:44px 36px;border-radius:4px;border:1.5px solid var(--paper3)}
+.cohort-item h3{font-family:var(--serif);font-size:24px;font-weight:300;color:var(--ink);margin-bottom:18px;line-height:1.4}
 .cohort-item h3 em{font-style:normal;color:var(--warm)}
-.cohort-item p{font-size:14px;color:var(--ink2);line-height:2.1;margin-bottom:16px}
-.cohort-spec{display:flex;gap:32px;margin-top:28px;padding-top:24px;border-top:1px solid var(--paper3)}
+.cohort-item p{font-size:14px;color:var(--ink2);line-height:2;margin-bottom:14px}
+.cohort-spec{display:flex;gap:28px;margin-top:24px;padding-top:20px;border-top:1px solid var(--paper3)}
 .spec-item{text-align:center}
-.spec-num{font-family:var(--serif);font-size:36px;font-weight:300;color:var(--warm);line-height:1}
-.spec-label{font-size:11px;color:var(--ink3);letter-spacing:0.1em;margin-top:6px}
+.spec-num{font-family:var(--serif);font-size:32px;font-weight:300;color:var(--warm);line-height:1}
+.spec-label{font-size:11px;color:var(--ink3);letter-spacing:0.08em;margin-top:4px}
 
-/* ═══════════════════════════════
-   PAGE 3: PBL SYSTEM
-═══════════════════════════════ */
-.pbl-hero{padding:140px 64px 80px;background:var(--paper2);position:relative;overflow:hidden}
-.pbl-hero-wm{position:absolute;right:-30px;bottom:-60px;font-family:var(--serif);font-size:320px;font-weight:300;color:rgba(160,140,100,0.06);line-height:1;pointer-events:none;user-select:none}
-.pbl-hero-inner{max-width:860px;position:relative;z-index:1}
-.pbl-hero h1{font-family:var(--serif);font-size:clamp(36px,5vw,64px);font-weight:300;color:var(--ink);line-height:1.3;margin-bottom:28px}
+/* PBL */
+.pbl-hero{padding:120px 56px 64px;background:linear-gradient(135deg,var(--paper3),var(--paper2));position:relative;overflow:hidden}
+.pbl-hero h1{font-family:var(--serif);font-size:clamp(32px,5vw,58px);font-weight:300;color:var(--ink);line-height:1.3;margin-bottom:24px}
 .pbl-hero h1 em{font-style:normal;color:var(--warm)}
-.pbl-hero-sub{font-size:17px;color:var(--ink2);max-width:600px;line-height:2}
+.pbl-hero-sub{font-size:16px;color:var(--ink2);max-width:560px;line-height:2}
 
-.pbl-intro{padding:80px 64px;background:var(--paper)}
-.pbl-intro-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
-.pbl-intro-text h2{font-family:var(--serif);font-size:clamp(24px,2.8vw,38px);font-weight:300;margin-bottom:20px;line-height:1.5}
-.pbl-intro-text p{font-size:14px;color:var(--ink2);line-height:2.1;margin-bottom:16px}
-.pbl-intro-quote{padding:40px;background:var(--ink);position:relative}
-.pbl-intro-quote::before{content:'"';font-family:var(--serif);font-size:80px;color:var(--warm2);opacity:0.3;position:absolute;top:16px;left:24px;line-height:1}
-.pbl-intro-quote p{font-family:var(--serif);font-size:20px;font-weight:300;color:var(--paper);line-height:1.9;padding-top:32px;position:relative;z-index:1}
-.pbl-intro-quote p em{font-style:normal;color:var(--warm2)}
+.pbl-intro{padding:64px 56px;background:var(--paper2)}
+.pbl-intro-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.pbl-intro-text h2{font-family:var(--serif);font-size:clamp(22px,2.8vw,34px);font-weight:300;margin-bottom:18px;line-height:1.5;color:var(--ink)}
+.pbl-intro-text p{font-size:14px;color:var(--ink2);line-height:2;margin-bottom:14px}
+.pbl-quote{padding:36px;background:var(--paper3);border-left:4px solid var(--warm);border-radius:2px;position:relative}
+.pbl-quote::before{content:'\201C';font-family:var(--serif);font-size:64px;color:var(--warm2);opacity:0.4;position:absolute;top:8px;left:20px;line-height:1}
+.pbl-quote p{font-family:var(--serif);font-size:18px;font-weight:300;color:var(--ink);line-height:1.9;padding-top:28px;position:relative;z-index:1}
+.pbl-quote p em{font-style:normal;color:var(--warm)}
 
-.pbl-cycle{padding:80px 64px;background:var(--paper2)}
-.pbl-cycle h2{font-family:var(--serif);font-size:clamp(24px,2.8vw,38px);font-weight:300;margin-bottom:12px}
-.pbl-cycle > p{font-size:14px;color:var(--ink2);margin-bottom:56px;max-width:520px;line-height:1.9}
-.cycle-steps{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--paper3)}
-.cycle-step{background:var(--paper2);padding:36px 24px;text-align:center;position:relative}
-.cycle-step::after{
-  content:'→';position:absolute;right:-8px;top:50%;transform:translateY(-50%);
-  color:var(--warm2);font-size:14px;z-index:1;
-}
+.pbl-cycle{padding:64px 56px;background:var(--paper)}
+.pbl-cycle h2{font-family:var(--serif);font-size:clamp(22px,2.8vw,34px);font-weight:300;margin-bottom:10px;color:var(--ink)}
+.pbl-cycle>p{font-size:14px;color:var(--ink2);margin-bottom:44px;max-width:480px;line-height:1.9}
+.cycle-steps{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.cycle-step{background:var(--paper2);padding:28px 20px;text-align:center;border-radius:4px;border:1.5px solid var(--paper3);position:relative}
+.cycle-step::after{content:'→';position:absolute;right:-12px;top:50%;transform:translateY(-50%);color:var(--warm2);font-size:13px;z-index:1}
 .cycle-step:last-child::after{display:none}
-.cs-num{font-family:var(--serif);font-size:28px;font-weight:300;color:rgba(180,140,80,0.25);line-height:1;margin-bottom:12px}
-.cs-name{font-family:var(--serif);font-size:16px;font-weight:400;color:var(--ink);margin-bottom:8px}
+.cs-num{font-family:var(--serif);font-size:24px;font-weight:300;color:rgba(180,140,80,0.3);line-height:1;margin-bottom:10px}
+.cs-name{font-family:var(--serif);font-size:15px;font-weight:400;color:var(--ink);margin-bottom:6px}
 .cs-desc{font-size:11px;color:var(--ink3);line-height:1.8}
 
-.pbl-houses{padding:80px 64px;background:var(--ink)}
-.houses-header{margin-bottom:72px}
-.houses-header h2{font-family:var(--serif);font-size:clamp(26px,3vw,42px);font-weight:300;color:var(--paper);line-height:1.4;max-width:600px;margin-top:16px}
-.house-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;background:rgba(255,255,255,0.04)}
-.house{background:var(--ink);padding:52px 44px;position:relative;overflow:hidden;transition:background 0.4s;cursor:default}
-.house:hover{background:#22201a}
-.house-wm{position:absolute;right:-16px;bottom:-24px;font-family:var(--serif);font-size:140px;font-weight:300;color:rgba(255,255,255,0.025);line-height:1;pointer-events:none;user-select:none}
-.house-glyph{font-size:26px;margin-bottom:32px;line-height:1}
-.house-tag{font-size:10px;letter-spacing:0.2em;color:var(--warm2);text-transform:uppercase;margin-bottom:14px}
-.house h3{font-family:var(--serif);font-size:24px;font-weight:300;color:var(--paper);margin-bottom:16px;line-height:1.35}
-.house p{font-size:14px;color:rgba(245,242,236,0.48);line-height:2}
-.house-projects{margin-top:28px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.07)}
-.house-projects-label{font-size:10px;letter-spacing:0.15em;color:var(--warm2);text-transform:uppercase;margin-bottom:12px;opacity:0.7}
-.proj-example{font-size:12px;color:rgba(245,242,236,0.38);line-height:1.9;padding-left:14px;position:relative}
-.proj-example::before{content:'·';position:absolute;left:0;color:var(--warm2);opacity:0.5}
-.htags{display:flex;flex-wrap:wrap;gap:7px;margin-top:20px}
-.htag{font-size:10px;padding:4px 12px;border:1px solid rgba(255,255,255,0.09);color:rgba(245,242,236,0.35);letter-spacing:0.05em;transition:all 0.3s}
-.house:hover .htag{border-color:rgba(255,255,255,0.16);color:rgba(245,242,236,0.55)}
+.pbl-houses{padding:64px 56px;background:var(--paper3)}
+.houses-header{margin-bottom:52px}
+.houses-header h2{font-family:var(--serif);font-size:clamp(24px,3vw,38px);font-weight:300;color:var(--ink);line-height:1.4;max-width:560px;margin-top:14px}
+.house-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.house{background:var(--paper2);padding:44px 36px;position:relative;overflow:hidden;transition:all 0.35s;border-radius:4px;border:1.5px solid var(--paper3)}
+.house:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(232,114,12,0.1);border-color:var(--warm2)}
+.house-glyph{font-size:24px;margin-bottom:28px;line-height:1;color:var(--warm)}
+.house-tag{font-size:10px;letter-spacing:0.2em;color:var(--warm);text-transform:uppercase;margin-bottom:12px}
+.house h3{font-family:var(--serif);font-size:22px;font-weight:300;color:var(--ink);margin-bottom:14px;line-height:1.35}
+.house p{font-size:13px;color:var(--ink2);line-height:2}
+.house-projects{margin-top:24px;padding-top:20px;border-top:1px solid var(--paper3)}
+.house-projects-label{font-size:10px;letter-spacing:0.15em;color:var(--ink3);text-transform:uppercase;margin-bottom:10px;opacity:0.7}
+.proj-example{font-size:12px;color:var(--ink3);line-height:1.9;padding-left:12px;position:relative}
+.proj-example::before{content:'·';position:absolute;left:0;color:var(--warm2);opacity:0.6}
+.htags{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
+.htag{font-size:10px;padding:4px 12px;border:1px solid var(--paper3);color:var(--ink3);border-radius:20px;transition:all 0.3s}
+.house:hover .htag{border-color:var(--warm2);color:var(--warm)}
 
-/* ═══════════════════════════════
-   PAGE 4: PORTFOLIO
-═══════════════════════════════ */
-.portfolio-hero{padding:140px 64px 72px;background:var(--paper)}
-.portfolio-hero h1{font-family:var(--serif);font-size:clamp(36px,5vw,64px);font-weight:300;color:var(--ink);line-height:1.3;margin-bottom:20px}
+/* PORTFOLIO */
+.portfolio-hero{padding:120px 56px 56px;background:linear-gradient(135deg,var(--paper3),var(--paper2))}
+.portfolio-hero h1{font-family:var(--serif);font-size:clamp(32px,5vw,58px);font-weight:300;color:var(--ink);line-height:1.3;margin-bottom:18px}
 .portfolio-hero h1 em{font-style:normal;color:var(--warm)}
-.portfolio-hero-sub{font-size:16px;color:var(--ink2);max-width:580px;line-height:2}
-
-.filter-bar{display:flex;gap:0;padding:0 64px;border-bottom:1px solid var(--paper3);background:var(--paper);overflow-x:auto}
-.filter-btn{
-  font-size:12px;letter-spacing:0.1em;color:var(--ink3);
-  padding:16px 24px;cursor:pointer;border:none;background:none;
-  font-family:var(--sans);transition:all 0.3s;
-  border-bottom:2px solid transparent;white-space:nowrap;
-  position:relative;bottom:-1px;
-}
+.portfolio-hero-sub{font-size:15px;color:var(--ink2);max-width:540px;line-height:2}
+.filter-bar{display:flex;gap:0;padding:0 56px;border-bottom:1px solid var(--paper3);background:var(--paper2);overflow-x:auto}
+.filter-btn{font-size:12px;letter-spacing:0.1em;color:var(--ink3);padding:15px 22px;cursor:pointer;border:none;background:none;font-family:var(--sans);transition:all 0.3s;border-bottom:2px solid transparent;white-space:nowrap;position:relative;bottom:-1px}
 .filter-btn:hover{color:var(--warm)}
 .filter-btn.active{color:var(--warm);border-bottom-color:var(--warm)}
-
-.portfolio-grid-wrap{padding:56px 64px 100px;background:var(--paper)}
-.proj-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--paper3)}
-.proj-card{
-  background:var(--paper);padding:0;
-  cursor:pointer;transition:background 0.3s;overflow:hidden;
-}
-.proj-card:hover{background:var(--paper2)}
-.proj-card-img{aspect-ratio:4/3;overflow:hidden;background:var(--paper3);position:relative}
-.proj-card-img-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:48px;opacity:0.15}
-.proj-card-body{padding:28px 28px 36px}
-.proj-house-tag{font-size:10px;letter-spacing:0.15em;color:var(--warm);text-transform:uppercase;margin-bottom:10px}
-.proj-card-body h3{font-family:var(--serif);font-size:18px;font-weight:400;color:var(--ink);margin-bottom:10px;line-height:1.4}
-.proj-card-body p{font-size:13px;color:var(--ink2);line-height:1.85}
-.proj-meta{display:flex;gap:16px;margin-top:20px;padding-top:16px;border-top:1px solid var(--paper3)}
-.proj-meta span{font-size:11px;color:var(--ink3);letter-spacing:0.08em}
-.proj-level{
-  display:inline-block;font-size:10px;padding:3px 10px;
-  background:var(--paper2);color:var(--warm);letter-spacing:0.08em;
-}
-
-/* proj modal */
-.proj-modal-overlay{
-  display:none;position:fixed;inset:0;z-index:300;
-  background:rgba(26,24,20,0.72);backdrop-filter:blur(8px);
-  align-items:center;justify-content:center;padding:40px;
-}
+.portfolio-grid-wrap{padding:48px 56px 80px;background:var(--paper2)}
+.proj-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.proj-card{background:var(--paper);border-radius:4px;cursor:pointer;transition:all 0.3s;overflow:hidden;border:1.5px solid var(--paper3)}
+.proj-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(232,114,12,0.1);border-color:var(--warm2)}
+.proj-card-img{aspect-ratio:4/3;overflow:hidden;background:var(--paper3);position:relative;display:flex;align-items:center;justify-content:center;font-size:56px;opacity:0.2}
+.proj-card-body{padding:24px 24px 30px}
+.proj-house-tag{font-size:10px;letter-spacing:0.15em;color:var(--warm);text-transform:uppercase;margin-bottom:8px}
+.proj-card-body h3{font-family:var(--serif);font-size:17px;font-weight:400;color:var(--ink);margin-bottom:8px;line-height:1.4}
+.proj-card-body p{font-size:12px;color:var(--ink2);line-height:1.85}
+.proj-meta{display:flex;gap:14px;margin-top:18px;padding-top:14px;border-top:1px solid var(--paper3)}
+.proj-meta span{font-size:11px;color:var(--ink3);letter-spacing:0.06em}
+.proj-level{display:inline-block;font-size:10px;padding:3px 10px;background:var(--paper3);color:var(--warm);border-radius:20px}
+.proj-modal-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(43,29,14,0.5);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:40px}
 .proj-modal-overlay.open{display:flex}
-.proj-modal{
-  background:var(--paper);max-width:720px;width:100%;
-  max-height:80vh;overflow-y:auto;position:relative;
-}
-.proj-modal-close{
-  position:absolute;top:20px;right:20px;
-  background:none;border:none;font-size:22px;cursor:pointer;color:var(--ink2);
-  width:36px;height:36px;display:flex;align-items:center;justify-content:center;
-  transition:color 0.3s;
-}
-.proj-modal-close:hover{color:var(--warm)}
-.proj-modal-body{padding:52px 52px 48px}
-.proj-modal-tag{font-size:10px;letter-spacing:0.2em;color:var(--warm);text-transform:uppercase;margin-bottom:16px}
-.proj-modal-body h2{font-family:var(--serif);font-size:30px;font-weight:300;margin-bottom:20px;line-height:1.4}
-.proj-modal-author{font-size:13px;color:var(--ink3);margin-bottom:32px;letter-spacing:0.06em}
-.proj-modal-desc{font-size:15px;color:var(--ink2);line-height:2.1;margin-bottom:32px}
-.proj-modal-process{}
-.proj-modal-process h4{font-size:12px;letter-spacing:0.15em;color:var(--warm);text-transform:uppercase;margin-bottom:16px}
-.process-steps-list{display:flex;flex-direction:column;gap:0;border-left:1px solid var(--paper3)}
-.psl-item{padding:12px 0 12px 20px;position:relative}
-.psl-item::before{content:'';position:absolute;left:-4px;top:18px;width:7px;height:7px;border-radius:50%;background:var(--paper);border:1px solid var(--ink3)}
+.proj-modal{background:var(--paper);max-width:680px;width:100%;max-height:80vh;overflow-y:auto;position:relative;border-radius:6px}
+.proj-modal-close{position:absolute;top:18px;right:18px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--ink2);width:34px;height:34px;display:flex;align-items:center;justify-content:center;transition:color 0.3s;border-radius:50%;background:var(--paper3)}
+.proj-modal-close:hover{color:var(--warm);background:var(--paper4)}
+.proj-modal-body{padding:48px 48px 44px}
+.proj-modal-tag{font-size:10px;letter-spacing:0.2em;color:var(--warm);text-transform:uppercase;margin-bottom:14px}
+.proj-modal-body h2{font-family:var(--serif);font-size:28px;font-weight:300;margin-bottom:18px;line-height:1.4;color:var(--ink)}
+.proj-modal-author{font-size:12px;color:var(--ink3);margin-bottom:28px;letter-spacing:0.06em}
+.proj-modal-desc{font-size:14px;color:var(--ink2);line-height:2;margin-bottom:28px}
+.proj-modal-process h4{font-size:11px;letter-spacing:0.15em;color:var(--warm);text-transform:uppercase;margin-bottom:14px}
+.process-steps-list{display:flex;flex-direction:column;gap:0;border-left:2px solid var(--paper3)}
+.psl-item{padding:10px 0 10px 18px;position:relative}
+.psl-item::before{content:'';position:absolute;left:-5px;top:17px;width:8px;height:8px;border-radius:50%;background:var(--paper);border:2px solid var(--ink3)}
 .psl-name{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:4px}
 .psl-desc{font-size:12px;color:var(--ink2);line-height:1.8}
 
-/* ═══════════════════════════════
-   PAGE 5: MEMBERSHIP
-═══════════════════════════════ */
-.mem-hero{padding:140px 64px 80px;background:var(--paper2);position:relative;overflow:hidden}
-.mem-hero-wm{position:absolute;right:-20px;top:-20px;font-family:var(--serif);font-size:300px;font-weight:300;color:rgba(160,140,100,0.055);line-height:1;pointer-events:none;user-select:none}
-.mem-hero-inner{max-width:860px;position:relative;z-index:1}
-.mem-hero h1{font-family:var(--serif);font-size:clamp(36px,5vw,64px);font-weight:300;color:var(--ink);line-height:1.3;margin-bottom:28px}
+/* MEMBERSHIP */
+.mem-hero{padding:120px 56px 72px;background:linear-gradient(135deg,var(--paper3),var(--paper2));position:relative;overflow:hidden}
+.mem-hero h1{font-family:var(--serif);font-size:clamp(32px,5vw,58px);font-weight:300;color:var(--ink);line-height:1.3;margin-bottom:24px}
 .mem-hero h1 em{font-style:normal;color:var(--warm)}
-.mem-hero-sub{font-size:17px;color:var(--ink2);max-width:600px;line-height:2}
-
-.mem-what{padding:100px 64px;background:var(--paper)}
-.mem-what-header{margin-bottom:72px}
-.mem-what-header h2{font-family:var(--serif);font-size:clamp(24px,3vw,40px);font-weight:300;line-height:1.4;margin-top:16px}
-.mem-pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--paper3)}
-.mem-pillar{background:var(--paper);padding:48px 36px}
-.mp-glyph{font-size:24px;margin-bottom:28px;color:var(--warm)}
-.mp-title{font-family:var(--serif);font-size:20px;font-weight:400;color:var(--ink);margin-bottom:14px}
+.mem-hero-sub{font-size:16px;color:var(--ink2);max-width:560px;line-height:2}
+.mem-what{padding:64px 56px;background:var(--paper2)}
+.mem-what-header{margin-bottom:52px}
+.mem-what-header h2{font-family:var(--serif);font-size:clamp(22px,3vw,36px);font-weight:300;line-height:1.4;margin-top:14px;color:var(--ink)}
+.mem-pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.mem-pillar{background:var(--paper);padding:40px 32px;border-radius:4px;border:1.5px solid var(--paper3)}
+.mp-glyph{font-size:22px;margin-bottom:24px;color:var(--warm)}
+.mp-title{font-family:var(--serif);font-size:19px;font-weight:400;color:var(--ink);margin-bottom:12px}
 .mp-desc{font-size:13px;color:var(--ink2);line-height:2}
-
-.mem-peer{padding:100px 64px;background:var(--ink)}
-.mem-peer h2{font-family:var(--serif);font-size:clamp(24px,3vw,40px);font-weight:300;color:var(--paper);line-height:1.4;margin:16px 0 20px}
-.mem-peer-sub{font-size:15px;color:rgba(245,242,236,0.5);max-width:560px;line-height:2;margin-bottom:64px}
-.peer-scenarios{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:rgba(255,255,255,0.04)}
-.peer-scenario{background:var(--ink);padding:44px 36px;transition:background 0.3s}
-.peer-scenario:hover{background:#22201a}
-.ps-emoji{font-size:24px;margin-bottom:24px;line-height:1}
-.ps-title{font-family:var(--serif);font-size:18px;font-weight:300;color:var(--paper);margin-bottom:12px}
-.ps-desc{font-size:13px;color:rgba(245,242,236,0.45);line-height:1.95}
-
-.mem-mentor{padding:100px 64px;background:var(--paper2)}
-.mentor-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start;margin-top:56px}
-.mentor-text h2{font-family:var(--serif);font-size:clamp(24px,3vw,38px);font-weight:300;line-height:1.5;margin-bottom:16px}
-.mentor-text p{font-size:14px;color:var(--ink2);line-height:2.1;margin-bottom:16px}
-.mentor-how{background:var(--paper);padding:0}
-.mentor-how-title{font-size:11px;letter-spacing:0.2em;color:var(--warm);text-transform:uppercase;padding:24px 32px 16px;border-bottom:1px solid var(--paper3)}
+.mem-peer{padding:64px 56px;background:var(--paper3)}
+.mem-peer h2{font-family:var(--serif);font-size:clamp(22px,3vw,36px);font-weight:300;color:var(--ink);line-height:1.4;margin:14px 0 18px}
+.mem-peer-sub{font-size:14px;color:var(--ink2);max-width:520px;line-height:2;margin-bottom:52px}
+.peer-scenarios{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.peer-scenario{background:var(--paper2);padding:36px 30px;border-radius:4px;transition:all 0.3s;border:1.5px solid var(--paper3)}
+.peer-scenario:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(232,114,12,0.08);border-color:var(--warm2)}
+.ps-emoji{font-size:22px;margin-bottom:20px;line-height:1}
+.ps-title{font-family:var(--serif);font-size:17px;font-weight:300;color:var(--ink);margin-bottom:10px}
+.ps-desc{font-size:13px;color:var(--ink2);line-height:1.95}
+.mem-mentor{padding:64px 56px;background:var(--paper2)}
+.mentor-grid{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:start;margin-top:44px}
+.mentor-text h2{font-family:var(--serif);font-size:clamp(22px,3vw,34px);font-weight:300;line-height:1.5;margin-bottom:14px;color:var(--ink)}
+.mentor-text p{font-size:14px;color:var(--ink2);line-height:2;margin-bottom:14px}
+.mentor-how{background:var(--paper);border-radius:4px;overflow:hidden;border:1.5px solid var(--paper3)}
+.mentor-how-title{font-size:11px;letter-spacing:0.2em;color:var(--warm);text-transform:uppercase;padding:20px 28px 14px;border-bottom:1px solid var(--paper3)}
 .mentor-steps{display:flex;flex-direction:column}
-.ms{padding:24px 32px;border-bottom:1px solid var(--paper3);display:flex;gap:20px;align-items:flex-start}
-.ms-num{font-family:var(--serif);font-size:20px;font-weight:300;color:var(--warm2);min-width:24px;line-height:1.3}
-.ms-content h4{font-size:14px;font-weight:500;color:var(--ink);margin-bottom:6px}
-.ms-content p{font-size:13px;color:var(--ink2);line-height:1.85}
+.ms{padding:20px 28px;border-bottom:1px solid var(--paper3);display:flex;gap:16px;align-items:flex-start}
+.ms-num{font-family:var(--serif);font-size:18px;font-weight:300;color:var(--warm2);min-width:20px;line-height:1.3}
+.ms-content h4{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:4px}
+.ms-content p{font-size:12px;color:var(--ink2);line-height:1.85}
 
-/* ═══════════════════════════════
-   PAGE 6: PHILOSOPHY
-═══════════════════════════════ */
-.phil-hero{padding:140px 64px 80px;background:var(--ink);position:relative;overflow:hidden}
-.phil-hero-wm{position:absolute;left:-40px;bottom:-60px;font-family:var(--serif);font-size:320px;font-weight:300;color:rgba(255,255,255,0.022);line-height:1;pointer-events:none;user-select:none}
-.phil-hero-inner{max-width:900px;position:relative;z-index:1}
-.phil-hero h1{font-family:var(--serif);font-size:clamp(36px,5vw,64px);font-weight:300;color:var(--paper);line-height:1.3;margin-bottom:28px}
-.phil-hero h1 em{font-style:normal;color:var(--warm2)}
-.phil-hero-sub{font-size:17px;color:rgba(245,242,236,0.55);max-width:600px;line-height:2}
-
-.phil-qa{padding:100px 64px;background:var(--paper2)}
-.phil-qa-header h2{font-family:var(--serif);font-size:clamp(24px,3vw,38px);font-weight:300;line-height:1.5;margin:16px 0 64px}
-.qa-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--paper3);margin-bottom:2px}
-.qa-item{background:var(--paper2);padding:52px 44px}
-.qa-q{font-family:var(--serif);font-size:22px;font-weight:300;color:var(--ink);margin-bottom:24px;line-height:1.55}
+/* PHILOSOPHY */
+.phil-hero{padding:120px 56px 72px;background:linear-gradient(135deg,var(--paper3),var(--paper2));position:relative;overflow:hidden}
+.phil-hero h1{font-family:var(--serif);font-size:clamp(32px,5vw,58px);font-weight:300;color:var(--ink);line-height:1.3;margin-bottom:24px}
+.phil-hero h1 em{font-style:normal;color:var(--warm)}
+.phil-hero-sub{font-size:16px;color:var(--ink2);max-width:560px;line-height:2}
+.phil-qa{padding:64px 56px;background:var(--paper)}
+.phil-qa-header h2{font-family:var(--serif);font-size:clamp(22px,3vw,34px);font-weight:300;line-height:1.5;margin:14px 0 52px;color:var(--ink)}
+.qa-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.qa-item{background:var(--paper2);padding:44px 36px;border-radius:4px;border:1.5px solid var(--paper3)}
+.qa-q{font-family:var(--serif);font-size:20px;font-weight:300;color:var(--ink);margin-bottom:20px;line-height:1.55}
 .qa-q em{font-style:normal;color:var(--warm)}
-.qa-a{font-size:14px;color:var(--ink2);line-height:2.1;padding-left:20px;position:relative}
-.qa-a::before{content:'';position:absolute;left:0;top:8px;width:1px;height:calc(100% - 16px);background:var(--warm2);opacity:0.32}
-
-.phil-closing{background:var(--paper);border-left:3px solid var(--warm);padding:52px 48px}
-.phil-closing p{font-family:var(--serif);font-size:20px;font-weight:300;color:var(--ink);line-height:2;max-width:720px}
+.qa-a{font-size:13px;color:var(--ink2);line-height:2.1;padding-left:18px;position:relative}
+.qa-a::before{content:'';position:absolute;left:0;top:7px;width:2px;height:calc(100% - 14px);background:var(--warm2);opacity:0.4;border-radius:1px}
+.phil-closing{background:var(--paper3);border-left:4px solid var(--warm);padding:44px 40px;border-radius:2px}
+.phil-closing p{font-family:var(--serif);font-size:19px;font-weight:300;color:var(--ink);line-height:2;max-width:680px}
 .phil-closing p em{font-style:normal;color:var(--warm)}
-
-.phil-compare{padding:100px 64px;background:var(--paper)}
-.phil-compare h2{font-family:var(--serif);font-size:clamp(24px,3vw,38px);font-weight:300;line-height:1.5;margin:16px 0 56px}
-.compare-table{width:100%;border-collapse:collapse;border:1px solid var(--paper3)}
-.compare-table th{font-size:12px;letter-spacing:0.12em;text-transform:uppercase;padding:16px 24px;text-align:left;font-weight:400;background:var(--paper2);color:var(--ink3);border-bottom:1px solid var(--paper3)}
-.compare-table td{padding:20px 24px;font-size:14px;border-bottom:1px solid var(--paper3);vertical-align:top;line-height:1.8}
+.phil-compare{padding:64px 56px;background:var(--paper2)}
+.phil-compare h2{font-family:var(--serif);font-size:clamp(22px,3vw,34px);font-weight:300;line-height:1.5;margin:14px 0 48px;color:var(--ink)}
+.compare-table{width:100%;border-collapse:collapse;border-radius:4px;overflow:hidden;border:1px solid var(--paper3)}
+.compare-table th{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;padding:14px 20px;text-align:left;font-weight:400;background:var(--paper3);color:var(--ink3);border-bottom:1px solid var(--paper4)}
+.compare-table td{padding:16px 20px;font-size:13px;border-bottom:1px solid var(--paper3);vertical-align:top;line-height:1.8}
 .compare-table tr:last-child td{border-bottom:none}
 .compare-table .col-us{color:var(--ink);font-weight:400}
 .compare-table .col-them{color:var(--ink3)}
-.compare-table .col-topic{color:var(--warm);font-size:12px;letter-spacing:0.08em;font-weight:500}
+.compare-table .col-topic{color:var(--warm);font-size:11px;letter-spacing:0.08em;font-weight:500}
 .compare-table tr:nth-child(odd) td{background:var(--paper)}
 .compare-table tr:nth-child(even) td{background:var(--paper2)}
 
-/* ═══════════════════════════════
-   CONTACT (shared footer section)
-═══════════════════════════════ */
-.contact-band{padding:100px 64px;background:var(--paper2);position:relative;overflow:hidden}
-.contact-wm{position:absolute;right:-40px;top:-20px;font-family:var(--serif);font-size:320px;font-weight:300;color:rgba(170,150,110,0.05);line-height:1;pointer-events:none;user-select:none}
-.contact-inner{max-width:800px;position:relative;z-index:1}
-.contact-inner h2{font-family:var(--serif);font-size:clamp(30px,4.5vw,56px);font-weight:300;line-height:1.35;margin:16px 0 24px}
-.contact-inner > p{font-size:16px;color:var(--ink2);line-height:2.1;max-width:540px;margin-bottom:64px}
-.crow-list{border-top:1px solid var(--paper3)}
-.crow{display:flex;justify-content:space-between;align-items:center;padding:26px 0;border-bottom:1px solid var(--paper3);text-decoration:none;color:inherit;transition:padding-left 0.3s}
-a.crow:hover{padding-left:10px}
-.crow-label{font-size:11px;letter-spacing:0.2em;color:var(--ink3);text-transform:uppercase}
-.crow-value{font-family:var(--serif);font-size:18px;color:var(--ink);font-weight:300}
-.crow-arrow{font-size:18px;color:var(--paper3);transition:all 0.3s}
-a.crow:hover .crow-arrow{color:var(--warm);transform:translate(5px,-5px)}
+/* MEMBERSHIP sections */
+.journey-section{padding:64px 56px;background:var(--paper)}
+.journey-head{margin-bottom:64px}
+.journey-head h2{font-family:var(--serif);font-size:clamp(24px,3vw,38px);font-weight:300;margin-bottom:14px;line-height:1.4;color:var(--ink)}
+.journey-head p{font-size:14px;color:var(--ink2);max-width:480px;line-height:2}
+.journey-track{display:grid;grid-template-columns:repeat(5,1fr);gap:0;position:relative}
+.journey-track::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,var(--warm),var(--paper3));border-radius:1px}
+.j-step{padding:36px 24px 0;position:relative}
+.j-step::before{content:'';position:absolute;top:-5px;left:24px;width:10px;height:10px;border-radius:50%;background:var(--paper);border:2px solid var(--ink3);transition:all 0.3s}
+.j-step:first-child::before{background:var(--warm);border-color:var(--warm);width:12px;height:12px;top:-6px}
+.j-step:hover::before{background:var(--warm2);border-color:var(--warm2)}
+.j-level{font-size:10px;letter-spacing:0.18em;color:var(--warm);text-transform:uppercase;margin-bottom:12px}
+.j-name{font-family:var(--serif);font-size:18px;font-weight:400;color:var(--ink);margin-bottom:10px}
+.j-desc{font-size:12px;color:var(--ink2);line-height:1.95}
 
-/* ═══ FOOTER ═══ */
-footer{padding:36px 64px;background:var(--ink);display:flex;justify-content:space-between;align-items:center}
-footer p{font-size:11px;color:rgba(245,242,236,0.25);letter-spacing:0.1em}
-.footer-mark{font-family:var(--serif);font-size:13px;color:rgba(245,242,236,0.16)}
+/* footer */
+footer{padding:32px 56px;background:var(--paper3);display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--paper4)}
+footer p{font-size:12px;color:var(--ink3);letter-spacing:0.08em}
+.footer-mark{font-family:var(--serif);font-size:13px;color:var(--ink3)}
 
-/* ═══ RESPONSIVE ═══ */
-@media(max-width:960px){
-  nav{padding:16px 28px}
-  .nav-links a{padding:6px 12px}
-  .hero,.ceo-hero,.pbl-hero,.portfolio-hero,.mem-hero,.phil-hero,
-  .manifesto,.home-entries,.ceo-structure,.ceo-flow,.ceo-cohort-info,
-  .pbl-intro,.pbl-cycle,.pbl-houses,
-  .filter-bar,.portfolio-grid-wrap,
-  .mem-what,.mem-peer,.mem-mentor,
-  .phil-qa,.phil-compare,.contact-band,footer{
-    padding-left:28px;padding-right:28px;
-  }
-  .cohort-phases,.house-grid,.cohort-grid,.qa-grid,.mem-pillars,.peer-scenarios{grid-template-columns:1fr}
-  .manifesto-pillars{grid-template-columns:1fr;gap:28px}
-  .pbl-intro-grid,.mentor-grid{grid-template-columns:1fr}
-  .entries-grid{grid-template-columns:repeat(2,1fr)}
-  .proj-grid{grid-template-columns:repeat(2,1fr)}
+/* RESPONSIVE */
+@media(max-width:900px){
+  nav{padding:14px 24px}
+  .hero-scene{min-height:42vh}.scene-frame{padding:20px 32px}
+  .hero-text,.belief,.entries,.contact-band,.ceo-hero,.ceo-structure,.ceo-flow,.ceo-cohort-info,.pbl-hero,.pbl-intro,.pbl-cycle,.pbl-houses,.portfolio-hero,.filter-bar,.portfolio-grid-wrap,.mem-hero,.mem-what,.mem-peer,.mem-mentor,.phil-hero,.phil-qa,.phil-compare,.journey-section{padding-left:24px;padding-right:24px}
+  .belief-cards,.entries-grid,.cohort-phases,.house-grid,.peer-scenarios,.qa-grid,.mem-pillars{grid-template-columns:1fr}
+  .pbl-intro-grid,.mentor-grid,.cohort-grid{grid-template-columns:1fr}
   .cycle-steps{grid-template-columns:repeat(3,1fr)}
-  .flow-steps{flex-direction:column;gap:0}
-  .flow-steps::before{display:none}
-  .flow-step{padding:0 0 36px 24px;border-left:1px solid var(--paper3)}
-  .flow-dot{left:-5px;top:0}
-  footer{flex-direction:column;gap:10px}
-}
-@media(max-width:620px){
-  nav{padding:14px 20px}
+  .flow-steps{flex-direction:column}.flow-steps::before{display:none}
+  .flow-step{padding:0 0 28px 22px;border-left:2px solid var(--paper3)}.flow-dot{left:-5px;top:0}
+  .journey-track{grid-template-columns:1fr}.journey-track::before{display:none}
+  .j-step{padding:0 0 24px 22px;border-left:2px solid var(--paper3)}.j-step::before{left:-5px;top:0}
+  .proj-grid{grid-template-columns:repeat(2,1fr)}
+  .hero-text{grid-template-columns:1fr}.hero-btns{flex-direction:row;align-items:center}
+  footer{flex-direction:column;gap:8px}
   .nav-links{display:none}
-  .entries-grid,.proj-grid,.cycle-steps,.cohort-phases{grid-template-columns:1fr}
-  .nav-cta{display:none}
-  .proj-modal-body{padding:32px 24px}
+}
+@media(max-width:600px){
+  .proj-grid,.cycle-steps{grid-template-columns:1fr}
+  .hero-strip{grid-template-columns:1fr}
+  .strip-item{border-right:none;border-bottom:1px solid var(--paper4)}
 }
 </style>
 </head>
 <body>
 
-<!-- ══ NAV ══ -->
+<!-- NAV -->
 <nav id="mainNav">
   <a class="brand" href="#" onclick="showPage('home');return false"><em>智能</em>少年俱乐部</a>
   <div class="nav-links">
@@ -504,404 +474,377 @@ footer p{font-size:11px;color:rgba(245,242,236,0.25);letter-spacing:0.1em}
     <a href="#" onclick="showPage('membership');return false" id="nav-membership">会员社群</a>
     <a href="#" onclick="showPage('philosophy');return false" id="nav-philosophy">教育理念</a>
   </div>
-  <a class="nav-cta" href="#" onclick="showPage('home');document.getElementById('homeContact').scrollIntoView({behavior:'smooth'});return false">预约到访</a>
+  <a class="nav-cta" href="#" onclick="showPage('home');setTimeout(()=>document.getElementById('homeContact').scrollIntoView({behavior:'smooth'}),100);return false">预约到访</a>
 </nav>
 
-<!-- ══════════════════════════════════════
-     PAGE: HOME
-══════════════════════════════════════ -->
+<!-- ══════════ HOME ══════════ -->
 <div class="page active" id="page-home">
 
   <section class="hero">
 
-    <!-- ── Illustration Carousel ── -->
-    <div class="hero-visual">
-      <div class="carousel-track">
+    <!-- Animated Scene Carousel -->
+    <div class="hero-scene">
+      <div class="scene-track" id="sceneTrack">
 
-        <!-- Frame 1: 围坐讨论项目 -->
-        <div class="carousel-frame">
-          <svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-height:44vh">
+        <!-- ── Frame 1: 围坐讨论·想法冒泡 ── -->
+        <div class="scene-frame" id="frame1">
+          <svg viewBox="0 0 860 380" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-height:46vh">
             <defs>
               <style>
-                .sk{stroke:#f0dfc0;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
-                .skf{stroke:#f0dfc0;stroke-width:1.5;fill:rgba(232,223,200,0.06);stroke-linecap:round;stroke-linejoin:round}
-                .skw{stroke:#d4954e;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
-                .skwf{fill:rgba(212,149,78,0.15);stroke:#d4954e;stroke-width:1.5}
-                .txt{fill:#f0dfc0;font-family:sans-serif;font-size:13px;opacity:0.55}
-                .txth{fill:#d4954e;font-family:sans-serif;font-size:12px}
+                .lw{stroke:#e8720c;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+                .lf{stroke:#e8720c;stroke-width:1.8;fill:rgba(232,114,12,0.10)}
+                .lg{stroke:#2e8c56;stroke-width:2;fill:rgba(46,140,86,0.10);stroke-linecap:round}
+                .lb{stroke:#2e7cb8;stroke-width:2;fill:rgba(46,124,184,0.10);stroke-linecap:round}
+                .lv{stroke:#7060b0;stroke-width:1.8;fill:rgba(112,96,176,0.10);stroke-linecap:round}
+                .lt{fill:#6b4a24;font-family:sans-serif;font-size:13px}
+                .lts{fill:#e8720c;font-family:sans-serif;font-size:12px;font-weight:bold}
               </style>
             </defs>
-            <!-- table -->
-            <ellipse cx="450" cy="260" rx="200" ry="70" class="skf"/>
-            <!-- laptop on table -->
-            <rect x="390" y="210" width="120" height="75" rx="4" class="skwf"/>
-            <rect x="395" y="215" width="110" height="62" rx="2" class="skw"/>
-            <line x1="370" x2="530" y1="285" y2="285" class="skw"/>
-            <!-- notes/paper on table -->
-            <rect x="270" y="235" width="80" height="55" rx="3" class="skf" transform="rotate(-12,310,262)"/>
-            <line x1="280" x2="330" y1="245" y2="245" class="sk" transform="rotate(-12,310,262)"/>
-            <line x1="280" x2="330" y1="255" y2="255" class="sk" transform="rotate(-12,310,262)"/>
-            <line x1="280" x2="310" y1="265" y2="265" class="sk" transform="rotate(-12,310,262)"/>
-            <!-- person left -->
-            <circle cx="200" cy="190" r="28" class="skf"/>
-            <path d="M172,300 Q172,240 200,230 Q228,240 228,300" class="skf"/>
-            <path d="M200,218 L260,248" class="sk" stroke-dasharray="4,3"/>
-            <!-- person top -->
-            <circle cx="450" cy="140" r="28" class="skf"/>
-            <path d="M422,250 Q422,190 450,180 Q478,190 478,250" class="skf"/>
-            <!-- person right -->
-            <circle cx="700" cy="190" r="28" class="skf"/>
-            <path d="M672,300 Q672,240 700,230 Q728,240 728,300" class="skf"/>
-            <path d="M700,218 L640,248" class="sk" stroke-dasharray="4,3"/>
-            <!-- person bottom-left -->
-            <circle cx="290" cy="340" r="24" class="skf"/>
-            <path d="M266,420 Q266,375 290,366 Q314,375 314,420" class="skf"/>
-            <!-- person bottom-right -->
-            <circle cx="610" cy="340" r="24" class="skf"/>
-            <path d="M586,420 Q586,375 610,366 Q634,375 634,420" class="skf"/>
-            <!-- speech bubbles -->
-            <rect x="130" y="130" width="90" height="36" rx="18" class="skwf"/>
-            <polygon points="165,166 175,180 185,166" class="skwf"/>
-            <text x="175" y="153" text-anchor="middle" class="txth">想法！</text>
-            <rect x="680" y="115" width="110" height="36" rx="18" class="skwf"/>
-            <polygon points="720,151 730,165 740,151" class="skwf"/>
-            <text x="735" y="138" text-anchor="middle" class="txth">我来试试</text>
-            <!-- decorative marks -->
-            <text x="50" y="60" class="txt">◦ 头脑风暴</text>
-            <text x="750" y="400" class="txt">项目启动 ◦</text>
-            <!-- connecting lines (ideas) -->
-            <line x1="180" x2="420" y1="80" y2="80" class="sk" stroke-dasharray="3,5" opacity="0.3"/>
-            <line x1="500" x2="740" y1="80" y2="80" class="sk" stroke-dasharray="3,5" opacity="0.3"/>
+            <!-- Table oval -->
+            <ellipse cx="430" cy="225" rx="195" ry="75" class="draw-path lf" style="stroke-dasharray:650;stroke-dashoffset:650" id="f1t"/>
+            <!-- Person 1 left -->
+            <circle cx="160" cy="170" r="28" class="draw-circle lw" style="stroke-dasharray:180;stroke-dashoffset:180"/>
+            <path d="M134,280 Q132,225 160,215 Q188,225 186,280" class="draw-path lf" style="stroke-dasharray:220;stroke-dashoffset:220"/>
+            <!-- Person 2 top-center -->
+            <circle cx="430" cy="105" r="28" class="draw-circle lg" style="stroke-dasharray:180;stroke-dashoffset:180"/>
+            <path d="M404,215 Q402,160 430,150 Q458,160 456,215" class="draw-path lg" style="stroke-dasharray:220;stroke-dashoffset:220"/>
+            <!-- Person 3 right -->
+            <circle cx="700" cy="170" r="28" class="draw-circle lb" style="stroke-dasharray:180;stroke-dashoffset:180"/>
+            <path d="M674,280 Q672,225 700,215 Q728,225 726,280" class="draw-path lb" style="stroke-dasharray:220;stroke-dashoffset:220"/>
+            <!-- Person 4 bottom-left -->
+            <circle cx="270" cy="330" r="22" class="draw-circle lv" style="stroke-dasharray:145;stroke-dashoffset:145"/>
+            <path d="M250,380 Q248,357 270,350 Q292,357 290,380" class="draw-path lv" style="stroke-dasharray:160;stroke-dashoffset:160"/>
+            <!-- Person 5 bottom-right -->
+            <circle cx="590" cy="330" r="22" class="draw-circle lg" style="stroke-dasharray:145;stroke-dashoffset:145"/>
+            <path d="M570,380 Q568,357 590,350 Q612,357 610,380" class="draw-path lg" style="stroke-dasharray:160;stroke-dashoffset:160"/>
+            <!-- Laptop on table -->
+            <rect x="388" y="182" width="84" height="54" rx="3" class="draw-path lw" style="stroke-dasharray:280;stroke-dashoffset:280"/>
+            <rect x="393" y="187" width="74" height="44" rx="2" class="draw-path lw" style="stroke-dasharray:240;stroke-dashoffset:240"/>
+            <!-- Arms reaching in -->
+            <path d="M184,250 Q280,230 380,220" class="draw-path lw" style="stroke-dasharray:250;stroke-dashoffset:250" stroke-dasharray="5,4"/>
+            <path d="M676,250 Q580,230 480,220" class="draw-path lb" style="stroke-dasharray:250;stroke-dashoffset:250" stroke-dasharray="5,4"/>
+            <!-- Speech bubbles -->
+            <rect x="60" y="108" width="88" height="34" rx="17" class="draw-path lf" style="stroke-dasharray:250;stroke-dashoffset:250"/>
+            <polygon points="92,142 100,156 110,142" fill="rgba(232,114,12,0.10)" stroke="#e8720c" stroke-width="1.8"/>
+            <text x="104" y="130" text-anchor="middle" class="lts">想法！</text>
+            <rect x="702" y="95" width="108" height="34" rx="17" class="draw-path lb" style="stroke-dasharray:260;stroke-dashoffset:260"/>
+            <polygon points="736,129 744,143 754,129" fill="rgba(46,124,184,0.10)" stroke="#2e7cb8" stroke-width="1.8"/>
+            <text x="756" y="117" text-anchor="middle" fill="#2e7cb8" font-family="sans-serif" font-size="12">我来试试</text>
+            <!-- floating sparkles -->
+            <circle cx="330" cy="148" r="5" fill="#ffc870" class="bob" opacity="0.7"/>
+            <circle cx="520" cy="135" r="4" fill="#e8720c" class="bob2" opacity="0.6"/>
+            <circle cx="430" cy="58" r="6" fill="#5ab37c" class="bob3" opacity="0.5"/>
+            <text x="28" y="52" class="lt" opacity="0.5">◦ 想法汇聚</text>
+            <text x="720" y="370" class="lt" opacity="0.5">项目启动 ◦</text>
           </svg>
-          <div class="carousel-caption">01 — 聚在一起，想法开始流动</div>
-          <div class="carousel-step">1 / 3</div>
+          <div class="scene-caption">01 · 一群有想法的孩子聚在一起</div>
+          <div class="scene-step">1 / 3</div>
         </div>
 
-        <!-- Frame 2: 分头创作/动手做 -->
-        <div class="carousel-frame">
-          <svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-height:44vh">
+        <!-- ── Frame 2: 分头创作·各展所能 ── -->
+        <div class="scene-frame" id="frame2">
+          <svg viewBox="0 0 860 380" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-height:46vh">
             <defs>
               <style>
-                .sk{stroke:#f0dfc0;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
-                .skf{stroke:#f0dfc0;stroke-width:1.5;fill:rgba(232,223,200,0.06);stroke-linecap:round;stroke-linejoin:round}
-                .skw{stroke:#d4954e;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
-                .skwf{fill:rgba(212,149,78,0.15);stroke:#d4954e;stroke-width:1.5}
-                .skg{stroke:#7a9a6e;stroke-width:1.8;fill:rgba(122,154,110,0.1);stroke-linecap:round}
-                .txt{fill:#f0dfc0;font-family:sans-serif;font-size:13px;opacity:0.55}
-                .txth{fill:#d4954e;font-family:sans-serif;font-size:12px}
+                .lw{stroke:#e8720c;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+                .lf{stroke:#e8720c;stroke-width:1.8;fill:rgba(232,114,12,0.10)}
+                .lg{stroke:#2e8c56;stroke-width:2;fill:rgba(46,140,86,0.10);stroke-linecap:round}
+                .lb{stroke:#2e7cb8;stroke-width:2;fill:rgba(46,124,184,0.10);stroke-linecap:round}
+                .lv{stroke:#7060b0;stroke-width:1.8;fill:rgba(112,96,176,0.10);stroke-linecap:round}
+                .lt{fill:#6b4a24;font-family:sans-serif;font-size:13px}
               </style>
             </defs>
-            <!-- person 1: coding at laptop -->
-            <rect x="60" y="200" width="200" height="130" rx="6" class="skf"/>
-            <circle cx="160" cy="155" r="30" class="skf"/>
-            <path d="M130,265 Q130,195 160,185 Q190,195 190,265" class="skf"/>
-            <!-- laptop -->
-            <rect x="80" y="235" width="160" height="95" rx="4" class="skwf"/>
-            <rect x="86" y="241" width="148" height="80" rx="2" class="skw"/>
-            <!-- code lines on screen -->
-            <line x1="96" x2="160" y1="255" y2="255" class="skw" stroke-width="1.2"/>
-            <line x1="96" x2="185" y1="265" y2="265" class="skw" stroke-width="1.2"/>
-            <line x1="96" x2="145" y1="275" y2="275" class="skw" stroke-width="1.2"/>
-            <line x1="108" x2="172" y1="285" y2="285" class="skw" stroke-width="1.2"/>
-            <line x1="108" x2="195" y1="295" y2="295" class="skw" stroke-width="1.2"/>
-            <text x="160" y="175" text-anchor="middle" class="txt">在做</text>
+            <!-- Zone dividers (soft dashed) -->
+            <line x1="285" y1="30" x2="285" y2="370" stroke="rgba(232,114,12,0.18)" stroke-width="1.5" stroke-dasharray="6,5"/>
+            <line x1="575" y1="30" x2="575" y2="370" stroke="rgba(46,124,184,0.18)" stroke-width="1.5" stroke-dasharray="6,5"/>
+            <!-- Zone labels -->
+            <text x="142" y="42" text-anchor="middle" fill="#e8720c" font-family="sans-serif" font-size="11" letter-spacing="3" opacity="0.7">写 CODE</text>
+            <text x="430" y="42" text-anchor="middle" fill="#2e8c56" font-family="sans-serif" font-size="11" letter-spacing="3" opacity="0.7">画 DESIGN</text>
+            <text x="718" y="42" text-anchor="middle" fill="#2e7cb8" font-family="sans-serif" font-size="11" letter-spacing="3" opacity="0.7">用 AI</text>
 
-            <!-- person 2: drawing/designing -->
-            <circle cx="450" cy="140" r="30" class="skf"/>
-            <path d="M420,250 Q420,185 450,175 Q480,185 480,250" class="skf"/>
-            <!-- sketchbook -->
-            <rect x="360" y="240" width="180" height="140" rx="4" class="skf"/>
-            <line x1="450" x2="450" y1="240" y2="380" class="sk" stroke-width="1"/>
-            <!-- sketching lines -->
-            <rect x="375" y="258" width="60" height="45" rx="3" class="skg"/>
-            <path d="M382,278 Q395,265 408,278 Q421,292 435,278" class="skg" stroke-width="1.5"/>
-            <line x1="375" x2="435" y1="310" y2="310" class="sk" stroke-width="1"/>
-            <line x1="375" x2="415" y1="320" y2="320" class="sk" stroke-width="1"/>
-            <!-- pencil in hand -->
-            <line x1="465" x2="510" y1="255" y2="220" class="skw" stroke-width="3"/>
-            <polygon points="510,220 520,210 515,225" class="skwf"/>
-            <text x="450" y="160" text-anchor="middle" class="txt">在画</text>
-
-            <!-- person 3: AI on screen -->
-            <circle cx="740" cy="160" r="30" class="skf"/>
-            <path d="M710,270 Q710,205 740,195 Q770,205 770,270" class="skf"/>
-            <!-- tablet -->
-            <rect x="660" y="255" width="160" height="120" rx="8" class="skwf"/>
-            <rect x="668" y="263" width="144" height="104" rx="4" class="skw"/>
-            <!-- AI interface mockup -->
-            <rect x="676" y="272" width="60" height="36" rx="3" class="skg"/>
-            <rect x="744" y="272" width="60" height="16" rx="3" class="skg" style="opacity:0.5"/>
-            <rect x="744" y="294" width="40" height="14" rx="3" class="skg" style="opacity:0.3"/>
-            <line x1="676" x2="804" y1="318" y2="318" class="sk" stroke-width="1"/>
-            <line x1="676" x2="760" y1="330" y2="330" class="sk" stroke-width="1"/>
-            <line x1="676" x2="790" y1="342" y2="342" class="sk" stroke-width="1"/>
-            <text x="740" y="180" text-anchor="middle" class="txt">在用AI</text>
-
-            <!-- connecting arc between them -->
-            <path d="M240,220 Q450,160 660,220" class="sk" stroke-dasharray="5,6" opacity="0.25"/>
-
-            <text x="50" y="55" class="txt">◦ 动手创作</text>
-            <text x="700" y="400" class="txt">各自推进 ◦</text>
+            <!-- Person 1: coding -->
+            <circle cx="142" cy="115" r="28" class="draw-circle lf" style="stroke-dasharray:180;stroke-dashoffset:180"/>
+            <path d="M116,220 Q114,168 142,158 Q170,168 168,220" class="draw-path lf" style="stroke-dasharray:220;stroke-dashoffset:220"/>
+            <!-- Laptop with code -->
+            <rect x="78" y="222" width="130" height="90" rx="4" class="draw-path lw" style="stroke-dasharray:440;stroke-dashoffset:440"/>
+            <rect x="84" y="228" width="118" height="76" rx="2" class="draw-path lw" style="stroke-dasharray:390;stroke-dashoffset:390"/>
+            <!-- code lines -->
+            <line x1="93" y1="242" x2="148" y2="242" stroke="#e8720c" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="93" y1="252" x2="165" y2="252" stroke="#e8720c" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="93" y1="262" x2="138" y2="262" stroke="#ffc870" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="104" y1="272" x2="155" y2="272" stroke="#e8720c" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="104" y1="282" x2="170" y2="282" stroke="#ffc870" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="93" y1="292" x2="145" y2="292" stroke="#e8720c" stroke-width="1.5" stroke-linecap="round"/>
+            <!-- Person 2: designing -->
+            <circle cx="430" cy="105" r="28" class="draw-circle lg" style="stroke-dasharray:180;stroke-dashoffset:180"/>
+            <path d="M404,210 Q402,158 430,148 Q458,158 456,210" class="draw-path lg" style="stroke-dasharray:220;stroke-dashoffset:220"/>
+            <!-- Sketchbook -->
+            <rect x="350" y="210" width="160" height="125" rx="4" class="draw-path lg" style="stroke-dasharray:570;stroke-dashoffset:570"/>
+            <line x1="430" y1="210" x2="430" y2="335" stroke="#2e8c56" stroke-width="1" opacity="0.4"/>
+            <!-- sketch shapes -->
+            <rect x="362" y="224" width="52" height="40" rx="3" class="draw-path lg" style="stroke-dasharray:185;stroke-dashoffset:185"/>
+            <circle cx="388" cy="244" r="14" class="draw-circle lg" style="stroke-dasharray:90;stroke-dashoffset:90"/>
+            <line x1="362" y1="278" x2="414" y2="278" stroke="#2e8c56" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="362" y1="288" x2="405" y2="288" stroke="#2e8c56" stroke-width="1.2" stroke-linecap="round"/>
+            <!-- pencil -->
+            <line x1="446" y1="222" x2="490" y2="192" stroke="#2e8c56" stroke-width="3.5" stroke-linecap="round"/>
+            <polygon points="490,192 500,183 495,198" fill="rgba(46,140,86,0.4)" stroke="#2e8c56" stroke-width="1.5"/>
+            <!-- Person 3: using AI -->
+            <circle cx="718" cy="115" r="28" class="draw-circle lb" style="stroke-dasharray:180;stroke-dashoffset:180"/>
+            <path d="M692,220 Q690,168 718,158 Q746,168 744,220" class="draw-path lb" style="stroke-dasharray:220;stroke-dashoffset:220"/>
+            <!-- Tablet -->
+            <rect x="648" y="218" width="140" height="110" rx="7" class="draw-path lb" style="stroke-dasharray:500;stroke-dashoffset:500"/>
+            <rect x="655" y="225" width="126" height="96" rx="4" class="draw-path lb" style="stroke-dasharray:440;stroke-dashoffset:440"/>
+            <!-- AI interface -->
+            <rect x="663" y="233" width="50" height="36" rx="3" fill="rgba(46,124,184,0.15)" stroke="#2e7cb8" stroke-width="1.5"/>
+            <rect x="723" y="233" width="50" height="15" rx="3" fill="rgba(46,124,184,0.10)" stroke="#2e7cb8" stroke-width="1"/>
+            <rect x="723" y="254" width="36" height="15" rx="3" fill="rgba(46,124,184,0.06)" stroke="#2e7cb8" stroke-width="1" opacity="0.6"/>
+            <line x1="663" y1="280" x2="773" y2="280" stroke="#2e7cb8" stroke-width="1" stroke-linecap="round"/>
+            <line x1="663" y1="292" x2="750" y2="292" stroke="#2e7cb8" stroke-width="1" stroke-linecap="round"/>
+            <line x1="663" y1="304" x2="763" y2="304" stroke="#2e7cb8" stroke-width="1" stroke-linecap="round"/>
+            <!-- floating elements -->
+            <circle cx="430" cy="60" r="5" fill="#ffc870" class="bob" opacity="0.6"/>
+            <circle cx="212" cy="340" r="4" fill="#e8720c" class="bob2" opacity="0.5"/>
+            <circle cx="650" cy="345" r="5" fill="#5ab37c" class="bob3" opacity="0.5"/>
+            <text x="28" y="360" class="lt" opacity="0.5">◦ 动手创作</text>
           </svg>
-          <div class="carousel-caption">02 — 动手去做，想法变成作品</div>
-          <div class="carousel-step">2 / 3</div>
+          <div class="scene-caption">02 · 各自动手，把想法变成作品</div>
+          <div class="scene-step">2 / 3</div>
         </div>
 
-        <!-- Frame 3: 路演展示 -->
-        <div class="carousel-frame">
-          <svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-height:44vh">
+        <!-- ── Frame 3: 路演展示·作品被看见 ── -->
+        <div class="scene-frame" id="frame3">
+          <svg viewBox="0 0 860 380" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-height:46vh">
             <defs>
               <style>
-                .sk{stroke:#f0dfc0;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
-                .skf{stroke:#f0dfc0;stroke-width:1.5;fill:rgba(232,223,200,0.06);stroke-linecap:round;stroke-linejoin:round}
-                .skw{stroke:#d4954e;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
-                .skwf{fill:rgba(212,149,78,0.2);stroke:#d4954e;stroke-width:1.5}
-                .skg{stroke:#7a9a6e;stroke-width:1.8;fill:rgba(122,154,110,0.12)}
-                .txt{fill:#f0dfc0;font-family:sans-serif;font-size:13px;opacity:0.55}
-                .txth{fill:#d4954e;font-family:sans-serif;font-size:13px;font-weight:bold}
-                .txtg{fill:#7a9a6e;font-family:sans-serif;font-size:12px}
+                .lw{stroke:#e8720c;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+                .lf{stroke:#e8720c;stroke-width:1.8;fill:rgba(232,114,12,0.10)}
+                .lg{stroke:#2e8c56;stroke-width:2;fill:rgba(46,140,86,0.10);stroke-linecap:round}
+                .lb{stroke:#2e7cb8;stroke-width:2;fill:rgba(46,124,184,0.10);stroke-linecap:round}
+                .lt{fill:#6b4a24;font-family:sans-serif;font-size:13px}
               </style>
             </defs>
-            <!-- stage / screen area -->
-            <rect x="280" y="60" width="340" height="210" rx="6" class="skwf"/>
-            <rect x="290" y="70" width="320" height="190" rx="4" class="skw"/>
-            <!-- content on screen: bar chart -->
-            <rect x="320" y="175" width="32" height="60" rx="2" class="skg"/>
-            <rect x="362" y="145" width="32" height="90" rx="2" class="skg"/>
-            <rect x="404" y="120" width="32" height="115" rx="2" class="skg"/>
-            <rect x="446" y="155" width="32" height="80" rx="2" class="skg"/>
-            <rect x="488" y="135" width="32" height="100" rx="2" class="skg"/>
-            <line x1="310" x2="530" y1="240" y2="240" class="skw" stroke-width="1"/>
-            <!-- title text on screen -->
-            <rect x="310" y="82" width="180" height="16" rx="3" class="skwf"/>
-            <rect x="310" y="104" width="120" height="10" rx="2" fill="rgba(212,149,78,0.1)" stroke="#d4954e" stroke-width="1"/>
-            <!-- stand/podium -->
-            <rect x="395" y="270" width="110" height="18" rx="3" class="skwf"/>
-            <rect x="430" y="288" width="40" height="50" rx="2" class="skf"/>
-
-            <!-- presenter person -->
-            <circle cx="220" cy="230" r="32" class="skf"/>
-            <path d="M188,370 Q188,290 220,278 Q252,290 252,370" class="skf"/>
-            <!-- arm pointing -->
-            <path d="M248,300 Q310,280 390,290" class="skw" stroke-width="2.5"/>
-            <circle cx="395" cy="290" r="5" class="skwf"/>
-
-            <!-- audience row 1 -->
-            <circle cx="580" cy="310" r="22" class="skf"/>
-            <circle cx="640" cy="310" r="22" class="skf"/>
-            <circle cx="700" cy="310" r="22" class="skf"/>
-            <circle cx="760" cy="310" r="22" class="skf"/>
-            <circle cx="820" cy="310" r="22" class="skf"/>
-            <!-- audience row 2 (smaller, farther) -->
-            <circle cx="600" cy="370" r="18" class="skf" opacity="0.6"/>
-            <circle cx="655" cy="370" r="18" class="skf" opacity="0.6"/>
-            <circle cx="710" cy="370" r="18" class="skf" opacity="0.6"/>
-            <circle cx="765" cy="370" r="18" class="skf" opacity="0.6"/>
-
-            <!-- reaction bubbles -->
-            <text x="570" y="278" class="txtg">✓</text>
-            <text x="625" y="272" class="txth">！</text>
-            <text x="685" y="280" class="txtg">◎</text>
-            <text x="745" y="275" class="txth">棒</text>
-
-            <!-- spotlight effect lines -->
-            <line x1="390" y1="60" x2="220" y2="200" class="sk" stroke-dasharray="3,8" opacity="0.15"/>
-            <line x1="510" y1="60" x2="220" y2="200" class="sk" stroke-dasharray="3,8" opacity="0.15"/>
-
-            <text x="50" y="55" class="txt">◦ 成果展示</text>
-            <text x="690" y="415" class="txt">公开路演 ◦</text>
+            <!-- Big screen -->
+            <rect x="265" y="48" width="330" height="205" rx="6" class="draw-path lf" style="stroke-dasharray:1100;stroke-dashoffset:1100"/>
+            <rect x="273" y="56" width="314" height="189" rx="4" stroke="#e8720c" stroke-width="1.2" fill="rgba(255,200,112,0.05)"/>
+            <!-- screen content: bar chart + title -->
+            <rect x="285" y="68" width="170" height="14" rx="3" fill="rgba(232,114,12,0.2)" stroke="#e8720c" stroke-width="1"/>
+            <rect x="285" y="87" width="100" height="8" rx="2" fill="rgba(232,114,12,0.1)" stroke="#e8720c" stroke-width="0.8"/>
+            <!-- bars -->
+            <rect x="298" y="162" width="28" height="52" rx="2" fill="rgba(46,140,86,0.25)" stroke="#2e8c56" stroke-width="1.5" class="draw-path" style="stroke-dasharray:160;stroke-dashoffset:160"/>
+            <rect x="336" y="142" width="28" height="72" rx="2" fill="rgba(46,140,86,0.35)" stroke="#2e8c56" stroke-width="1.5" class="draw-path" style="stroke-dasharray:200;stroke-dashoffset:200"/>
+            <rect x="374" y="125" width="28" height="89" rx="2" fill="rgba(232,114,12,0.3)" stroke="#e8720c" stroke-width="1.5" class="draw-path" style="stroke-dasharray:240;stroke-dashoffset:240"/>
+            <rect x="412" y="148" width="28" height="66" rx="2" fill="rgba(46,140,86,0.3)" stroke="#2e8c56" stroke-width="1.5" class="draw-path" style="stroke-dasharray:185;stroke-dashoffset:185"/>
+            <rect x="450" y="132" width="28" height="82" rx="2" fill="rgba(46,124,184,0.3)" stroke="#2e7cb8" stroke-width="1.5" class="draw-path" style="stroke-dasharray:220;stroke-dashoffset:220"/>
+            <line x1="285" y1="214" x2="490" y2="214" stroke="#e8720c" stroke-width="1.2"/>
+            <!-- Screen stand -->
+            <rect x="408" y="253" width="44" height="16" rx="3" class="draw-path lf" style="stroke-dasharray:120;stroke-dashoffset:120"/>
+            <rect x="422" y="269" width="16" height="40" rx="2" fill="rgba(232,114,12,0.08)" stroke="#e8720c" stroke-width="1.5"/>
+            <!-- Presenter -->
+            <circle cx="195" cy="210" r="30" class="draw-circle lf" style="stroke-dasharray:190;stroke-dashoffset:190"/>
+            <path d="M165,330 Q163,268 195,258 Q227,268 225,330" class="draw-path lf" style="stroke-dasharray:250;stroke-dashoffset:250"/>
+            <!-- pointing arm -->
+            <path d="M222,275 Q290,255 358,265" class="draw-path lw" style="stroke-dasharray:200;stroke-dashoffset:200" stroke-width="2.5"/>
+            <circle cx="362" cy="266" r="5" fill="#e8720c" opacity="0.7"/>
+            <!-- Audience row 1 -->
+            <circle cx="610" cy="285" r="20" class="draw-circle lb" style="stroke-dasharray:130;stroke-dashoffset:130"/>
+            <circle cx="660" cy="285" r="20" class="draw-circle lg" style="stroke-dasharray:130;stroke-dashoffset:130"/>
+            <circle cx="710" cy="285" r="20" class="draw-circle lf" style="stroke-dasharray:130;stroke-dashoffset:130"/>
+            <circle cx="760" cy="285" r="20" class="draw-circle lb" style="stroke-dasharray:130;stroke-dashoffset:130"/>
+            <circle cx="810" cy="285" r="20" class="draw-circle lg" style="stroke-dasharray:130;stroke-dashoffset:130"/>
+            <!-- Audience row 2 -->
+            <circle cx="628" cy="348" r="16" class="draw-circle lf" style="stroke-dasharray:105;stroke-dashoffset:105" opacity="0.6"/>
+            <circle cx="675" cy="348" r="16" class="draw-circle lg" style="stroke-dasharray:105;stroke-dashoffset:105" opacity="0.6"/>
+            <circle cx="722" cy="348" r="16" class="draw-circle lb" style="stroke-dasharray:105;stroke-dashoffset:105" opacity="0.6"/>
+            <circle cx="769" cy="348" r="16" class="draw-circle lf" style="stroke-dasharray:105;stroke-dashoffset:105" opacity="0.6"/>
+            <!-- Reaction emojis -->
+            <text x="601" y="255" fill="#2e8c56" font-family="sans-serif" font-size="14">✓</text>
+            <text x="650" y="250" fill="#e8720c" font-family="sans-serif" font-size="16" font-weight="bold">!</text>
+            <text x="700" y="255" fill="#2e7cb8" font-family="sans-serif" font-size="14">◎</text>
+            <text x="750" y="250" fill="#2e8c56" font-family="sans-serif" font-size="14">棒</text>
+            <!-- spotlight rays -->
+            <line x1="370" y1="48" x2="195" y2="185" stroke="rgba(255,200,112,0.3)" stroke-width="1.5" stroke-dasharray="4,8"/>
+            <line x1="500" y1="48" x2="195" y2="185" stroke="rgba(255,200,112,0.25)" stroke-width="1.5" stroke-dasharray="4,8"/>
+            <!-- floating stars -->
+            <circle cx="100" cy="80" r="5" fill="#ffc870" class="bob" opacity="0.6"/>
+            <circle cx="850" cy="120" r="4" fill="#e8720c" class="bob2" opacity="0.5"/>
+            <text x="28" y="52" class="lt" opacity="0.5">◦ 成果展示</text>
+            <text x="688" y="378" class="lt" opacity="0.5">作品亮相 ◦</text>
           </svg>
-          <div class="carousel-caption">03 — 走上台，让作品被世界看见</div>
-          <div class="carousel-step">3 / 3</div>
+          <div class="scene-caption">03 · 站上台，让作品被世界看见</div>
+          <div class="scene-step">3 / 3</div>
         </div>
 
-      </div><!-- /carousel-track -->
-    </div><!-- /hero-visual -->
+      </div><!-- /scene-track -->
+    </div><!-- /hero-scene -->
 
-    <!-- ── Main tagline ── -->
-    <div class="hero-text-wrap">
-      <div class="hero-main-text">
-        <div class="hero-tag-line">A Place for Young Minds · AI Era</div>
-        <h1 class="hero-h1">
-          孩子有想法，<br>
-          这里帮他<em>让它发生</em>。
-        </h1>
+    <!-- Hero Text -->
+    <div class="hero-text">
+      <div>
+        <div class="hero-eyebrow">A Place for Young Minds · AI Era</div>
+        <h1 class="hero-h1">孩子有想法，<br>这里帮他<em>让它发生</em>。</h1>
       </div>
-      <div class="hero-cta-col">
-        <button class="btn-primary" onclick="showPage('philosophy')">了解理念</button>
-        <button class="btn-ghost" onclick="document.getElementById('homeContact').scrollIntoView({behavior:'smooth'})">预约到访 →</button>
+      <div class="hero-btns">
+        <button class="btn-fill" onclick="showPage('ceo')">了解少年CEO</button>
+        <button class="btn-line" onclick="document.getElementById('homeContact').scrollIntoView({behavior:'smooth'})">预约到访 →</button>
       </div>
     </div>
 
-    <!-- ── Three stats ── -->
-    <div class="hero-stats">
-      <div class="hero-stat">
-        <div class="hs-num">小班制</div>
-        <div class="hs-label">每期最多 8 名学员 · 导师全程陪伴</div>
+    <!-- Strip -->
+    <div class="hero-strip">
+      <div class="strip-item">
+        <div class="strip-icon">◎</div>
+        <div><div class="strip-label">小班制 · 最多 8 人</div><div class="strip-sub">导师全程陪伴</div></div>
       </div>
-      <div class="hero-stat">
-        <div class="hs-num">年度制</div>
-        <div class="hs-label">长期归属 · 不以课时计算关系</div>
+      <div class="strip-item">
+        <div class="strip-icon">⬡</div>
+        <div><div class="strip-label">年度会员制</div><div class="strip-sub">长期归属，不以课时计算</div></div>
       </div>
-      <div class="hero-stat">
-        <div class="hs-num">作品集</div>
-        <div class="hs-label">每个项目完整记录 · 真实能力的证明</div>
+      <div class="strip-item">
+        <div class="strip-icon">✦</div>
+        <div><div class="strip-label">真实作品集</div><div class="strip-sub">每个项目完整记录</div></div>
       </div>
     </div>
 
-  </section>
+  </section><!-- /hero -->
 
+  <!-- ── Belief Section ── -->
   <section class="belief">
     <div class="section-label reveal">这里是什么样的地方</div>
-    <h2 class="h-serif reveal" style="font-size:clamp(28px,3.5vw,46px);color:var(--ink);max-width:660px;margin-top:12px">
-      充满创造力，<br>有同频的伙伴，<br>有人陪着你找到答案。
-    </h2>
+    <div class="belief-header reveal">
+      <h2 class="h-serif">充满创造力，<br>有同频的伙伴，<br>有人陪你找到答案。</h2>
+      <p>不是课程，不是补习。这里是一个场域——孩子因为好奇心聚在一起，带着自己的想法，和导师、伙伴一起把它变成真实的东西。</p>
+    </div>
+    <div class="belief-cards reveal">
 
-    <div class="belief-grid reveal">
-
-      <!-- 卡片1：同频的人 -->
-      <div class="belief-card">
-        <div class="belief-card-illo">
-          <svg viewBox="0 0 280 120" xmlns="http://www.w3.org/2000/svg">
-            <defs><style>
-              .bs{stroke:#e07b2a;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
-              .bsf{stroke:#e07b2a;stroke-width:1.5;fill:rgba(224,123,42,0.12)}
-              .bg{stroke:#4a7c59;stroke-width:1.8;fill:rgba(74,124,89,0.10);stroke-linecap:round}
-            </style></defs>
-            <!-- three people connecting with lines -->
-            <circle cx="60" cy="55" r="22" class="bsf"/>
-            <path d="M38,110 Q38,80 60,72 Q82,80 82,110" class="bsf"/>
-            <circle cx="140" cy="38" r="22" class="bg"/>
-            <path d="M118,95 Q118,65 140,57 Q162,65 162,95" class="bg"/>
-            <circle cx="220" cy="55" r="22" class="bsf"/>
-            <path d="M198,110 Q198,80 220,72 Q242,80 242,110" class="bsf"/>
-            <!-- connecting spark lines -->
-            <path d="M82,52 Q111,35 118,42" class="bs" stroke-dasharray="4,3"/>
-            <path d="M162,46 Q188,38 198,50" class="bs" stroke-dasharray="4,3"/>
-            <!-- spark dots -->
-            <circle cx="100" cy="40" r="3" fill="#e07b2a" opacity="0.7"/>
-            <circle cx="180" cy="38" r="3" fill="#4a7c59" opacity="0.7"/>
-            <circle cx="140" cy="18" r="5" fill="#f0a050" opacity="0.5"/>
+      <div class="bcard">
+        <div class="bcard-illo">
+          <svg viewBox="0 0 240 120" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:120px">
+            <!-- Three kids connecting with idea sparks -->
+            <circle cx="55" cy="52" r="22" fill="rgba(232,114,12,0.12)" stroke="#e8720c" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M35,100 Q33,75 55,68 Q77,75 75,100" fill="rgba(232,114,12,0.10)" stroke="#e8720c" stroke-width="1.8" stroke-linecap="round"/>
+            <circle cx="120" cy="38" r="22" fill="rgba(46,140,86,0.12)" stroke="#2e8c56" stroke-width="1.8"/>
+            <path d="M100,88 Q98,63 120,56 Q142,63 140,88" fill="rgba(46,140,86,0.10)" stroke="#2e8c56" stroke-width="1.8"/>
+            <circle cx="185" cy="52" r="22" fill="rgba(46,124,184,0.12)" stroke="#2e7cb8" stroke-width="1.8"/>
+            <path d="M165,100 Q163,75 185,68 Q207,75 205,100" fill="rgba(46,124,184,0.10)" stroke="#2e7cb8" stroke-width="1.8"/>
+            <!-- spark connections -->
+            <path d="M77,48 Q99,32 100,40" stroke="#e8720c" stroke-width="1.8" fill="none" stroke-dasharray="4,3"/>
+            <path d="M140,46 Q162,36 163,48" stroke="#2e8c56" stroke-width="1.8" fill="none" stroke-dasharray="4,3"/>
+            <!-- floating dots -->
+            <circle cx="98" cy="26" r="4" fill="#ffc870" opacity="0.8" class="bob"/>
+            <circle cx="155" cy="22" r="3" fill="#e8720c" opacity="0.6" class="bob2"/>
+            <circle cx="120" cy="10" r="5" fill="#5ab37c" opacity="0.5" class="bob3"/>
           </svg>
         </div>
-        <div class="belief-card-tag">同频</div>
+        <div class="bcard-tag">同频</div>
         <h3>遇见同路人</h3>
-        <p>这里聚集了一群有想法、有好奇心的孩子。志同道合的伙伴，是成长最好的燃料。</p>
-        <div class="belief-accent"></div>
+        <p>有想法的孩子聚在一起，好奇心遇见好奇心，一个人的火花变成一群人的光。</p>
+        <div class="bcard-line"></div>
       </div>
 
-      <!-- 卡片2：引导式导师 -->
-      <div class="belief-card">
-        <div class="belief-card-illo">
-          <svg viewBox="0 0 280 120" xmlns="http://www.w3.org/2000/svg">
-            <defs><style>
-              .bs{stroke:#e07b2a;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
-              .bsf{stroke:#e07b2a;stroke-width:1.5;fill:rgba(224,123,42,0.12)}
-              .bb{stroke:#5b8fae;stroke-width:1.8;fill:rgba(91,143,174,0.10);stroke-linecap:round}
-            </style></defs>
-            <!-- mentor (larger) guiding child (smaller) -->
-            <circle cx="90" cy="45" r="28" class="bb"/>
-            <path d="M62,112 Q62,78 90,68 Q118,78 118,112" class="bb"/>
-            <circle cx="195" cy="52" r="20" class="bsf"/>
-            <path d="M175,112 Q175,85 195,77 Q215,85 215,112" class="bsf"/>
-            <!-- guiding gesture: hand pointing to a light bulb -->
-            <line x1="118" y1="75" x2="165" y2="65" class="bs"/>
-            <circle cx="175" cy="60" r="10" class="bsf"/>
-            <!-- lightbulb shape -->
-            <path d="M170,55 Q175,48 180,55 Q183,60 180,64 L170,64 Q167,60 170,55Z" class="bsf"/>
-            <line x1="170" y1="65" x2="180" y2="65" class="bs" stroke-width="1.2"/>
-            <line x1="171" y1="68" x2="179" y2="68" class="bs" stroke-width="1.2"/>
-            <!-- path/road dots from mentor to child  -->
-            <path d="M90,25 Q140,10 170,28" class="bb" stroke-dasharray="3,4" opacity="0.5"/>
+      <div class="bcard">
+        <div class="bcard-illo">
+          <svg viewBox="0 0 240 120" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:120px">
+            <!-- Mentor pointing to lightbulb path -->
+            <circle cx="72" cy="45" r="26" fill="rgba(46,124,184,0.12)" stroke="#2e7cb8" stroke-width="1.8"/>
+            <path d="M48,106 Q46,78 72,70 Q98,78 96,106" fill="rgba(46,124,184,0.10)" stroke="#2e7cb8" stroke-width="1.8"/>
+            <circle cx="178" cy="52" r="20" fill="rgba(232,114,12,0.12)" stroke="#e8720c" stroke-width="1.8"/>
+            <path d="M158,106 Q156,83 178,76 Q200,83 198,106" fill="rgba(232,114,12,0.10)" stroke="#e8720c" stroke-width="1.8"/>
+            <!-- dotted path from mentor to idea -->
+            <path d="M96,72 Q130,60 148,68" stroke="#2e7cb8" stroke-width="1.8" fill="none" stroke-dasharray="5,4"/>
+            <!-- lightbulb at end of path -->
+            <path d="M148,62 Q152,52 158,58 Q163,65 160,71 L150,71 Q147,65 148,62Z" fill="rgba(255,200,112,0.35)" stroke="#e8720c" stroke-width="1.5" stroke-linejoin="round"/>
+            <line x1="150" y1="72" x2="160" y2="72" stroke="#e8720c" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="151" y1="76" x2="159" y2="76" stroke="#e8720c" stroke-width="1.5" stroke-linecap="round"/>
+            <!-- glow -->
+            <circle cx="154" cy="63" r="14" fill="rgba(255,200,112,0.1)" class="bob"/>
+            <!-- arrow/direction indicator -->
+            <path d="M86,42 Q130,24 148,40" stroke="#ffc870" stroke-width="1.5" fill="none" stroke-dasharray="3,5" opacity="0.6"/>
           </svg>
         </div>
-        <div class="belief-card-tag">引导</div>
+        <div class="bcard-tag">引导</div>
         <h3>导师不给答案</h3>
-        <p>导师的工作是陪孩子慢慢看清自己的问题，然后一步一步找到属于自己的答案。</p>
-        <div class="belief-accent"></div>
+        <p>导师陪孩子慢慢看清自己的问题，然后一步一步找到属于自己的答案。</p>
+        <div class="bcard-line"></div>
       </div>
 
-      <!-- 卡片3：创造力场域 -->
-      <div class="belief-card">
-        <div class="belief-card-illo">
-          <svg viewBox="0 0 280 120" xmlns="http://www.w3.org/2000/svg">
-            <defs><style>
-              .bs{stroke:#e07b2a;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
-              .bsf{stroke:#e07b2a;stroke-width:1.5;fill:rgba(224,123,42,0.12)}
-              .bg{stroke:#4a7c59;stroke-width:1.8;fill:rgba(74,124,89,0.10);stroke-linecap:round}
-              .bc{stroke:#d95f3b;stroke-width:1.5;fill:rgba(217,95,59,0.09);stroke-linecap:round}
-            </style></defs>
-            <!-- orbit of ideas around a center person -->
-            <circle cx="140" cy="62" r="20" class="bsf"/>
-            <path d="M120,112 Q120,88 140,82 Q160,88 160,112" class="bsf"/>
-            <!-- orbiting idea objects -->
-            <ellipse cx="140" cy="62" rx="70" ry="45" class="bs" stroke-dasharray="5,4" opacity="0.3"/>
-            <!-- idea 1: pencil -->
-            <line x1="60" y1="30" x2="82" y2="48" class="bg" stroke-width="3"/>
-            <polygon points="82,48 90,42 86,56" fill="rgba(74,124,89,0.3)" stroke="#4a7c59" stroke-width="1"/>
-            <!-- idea 2: gear -->
-            <circle cx="218" cy="35" r="12" class="bc"/>
-            <circle cx="218" cy="35" r="6" fill="rgba(217,95,59,0.2)" stroke="#d95f3b" stroke-width="1.2"/>
-            <!-- idea 3: star/spark -->
-            <path d="M218,90 L221,98 L230,98 L223,103 L226,111 L218,107 L210,111 L213,103 L206,98 L215,98Z" class="bsf"/>
-            <!-- idea 4: chat bubble -->
-            <rect x="50" y="80" width="38" height="26" rx="8" class="bg"/>
-            <polygon points="65,106 72,115 79,106" class="bg"/>
-            <!-- small dots floating -->
-            <circle cx="100" cy="18" r="4" fill="#f0a050" opacity="0.6"/>
-            <circle cx="185" cy="16" r="3" fill="#4a7c59" opacity="0.5"/>
-            <circle cx="240" cy="68" r="4" fill="#e07b2a" opacity="0.4"/>
+      <div class="bcard">
+        <div class="bcard-illo">
+          <svg viewBox="0 0 240 120" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:120px">
+            <!-- Center person with orbiting ideas -->
+            <circle cx="120" cy="62" r="22" fill="rgba(232,114,12,0.12)" stroke="#e8720c" stroke-width="1.8"/>
+            <path d="M100,112 Q98,87 120,80 Q142,87 140,112" fill="rgba(232,114,12,0.10)" stroke="#e8720c" stroke-width="1.8"/>
+            <!-- orbit ring -->
+            <ellipse cx="120" cy="55" rx="72" ry="44" stroke="#e8720c" stroke-width="1.2" fill="none" stroke-dasharray="5,5" opacity="0.3"/>
+            <!-- orbiting objects -->
+            <!-- pencil -->
+            <line x1="42" y1="28" x2="60" y2="42" stroke="#2e8c56" stroke-width="3" stroke-linecap="round"/>
+            <polygon points="60,42 67,36 63,50" fill="rgba(46,140,86,0.35)" stroke="#2e8c56" stroke-width="1.5"/>
+            <!-- gear -->
+            <circle cx="205" cy="30" r="12" fill="rgba(46,124,184,0.15)" stroke="#2e7cb8" stroke-width="1.5"/>
+            <circle cx="205" cy="30" r="6" fill="rgba(46,124,184,0.2)" stroke="#2e7cb8" stroke-width="1.2"/>
+            <!-- star -->
+            <path d="M198,88 L201,96 L210,96 L203,101 L206,109 L198,105 L190,109 L193,101 L186,96 L195,96Z" fill="rgba(232,114,12,0.2)" stroke="#e8720c" stroke-width="1.5"/>
+            <!-- chat bubble -->
+            <rect x="42" y="76" width="34" height="24" rx="8" fill="rgba(46,140,86,0.12)" stroke="#2e8c56" stroke-width="1.5"/>
+            <polygon points="55,100 60,110 66,100" fill="rgba(46,140,86,0.12)" stroke="#2e8c56" stroke-width="1.5"/>
+            <!-- floating dots -->
+            <circle cx="90" cy="14" r="4" fill="#ffc870" opacity="0.7" class="bob"/>
+            <circle cx="162" cy="10" r="3" fill="#5ab37c" opacity="0.6" class="bob2"/>
           </svg>
         </div>
-        <div class="belief-card-tag">创造</div>
+        <div class="bcard-tag">创造</div>
         <h3>想法在这里落地</h3>
-        <p>这是一个充满创造力的场域。孩子带着自己的想法来，把它变成真实存在的作品。</p>
-        <div class="belief-accent"></div>
+        <p>孩子带着想法来，把它变成真实存在的作品。这是一个充满创造力的场域。</p>
+        <div class="bcard-line"></div>
       </div>
 
     </div>
   </section>
 
-  <section class="home-entries">
+  <!-- ── Entry Cards ── -->
+  <section class="entries" id="explore">
     <div class="section-label reveal">进入俱乐部</div>
+    <h2 class="h-serif reveal">从这里开始</h2>
+    <p class="entries-sub reveal">选择适合孩子的路径</p>
     <div class="entries-grid reveal">
-      <div class="entry-card" onclick="showPage('ceo')">
-        <div class="entry-num">001</div>
-        <div class="entry-glyph">◎</div>
+      <div class="ecard" onclick="showPage('ceo')">
+        <div class="ecard-num">001</div>
+        <div class="ecard-icon">◎</div>
         <h3>少年CEO探索班</h3>
         <p>小班制、导师全程陪伴，六至八周完成一个真实项目，结业后转为年度会员。</p>
-        <div class="entry-arrow">↗</div>
+        <div class="ecard-arrow">↗</div>
       </div>
-      <div class="entry-card" onclick="showPage('pbl')">
-        <div class="entry-num">002</div>
-        <div class="entry-glyph">◈</div>
+      <div class="ecard" onclick="showPage('pbl')">
+        <div class="ecard-num">002</div>
+        <div class="ecard-icon">◈</div>
         <h3>PBL 项目体系</h3>
         <p>以项目为核心的学习方式，覆盖人文、科学、工程、商业四个院系方向。</p>
-        <div class="entry-arrow">↗</div>
+        <div class="ecard-arrow">↗</div>
       </div>
-      <div class="entry-card" onclick="showPage('membership')">
-        <div class="entry-num">003</div>
-        <div class="entry-glyph">⬡</div>
+      <div class="ecard" onclick="showPage('membership')">
+        <div class="ecard-num">003</div>
+        <div class="ecard-icon">⬡</div>
         <h3>年度会员社群</h3>
         <p>同伴互学、导师预约、开放空间。孩子长期归属这里，关系持续生长。</p>
-        <div class="entry-arrow">↗</div>
+        <div class="ecard-arrow">↗</div>
       </div>
-      <div class="entry-card" onclick="showPage('portfolio')">
-        <div class="entry-num">004</div>
-        <div class="entry-glyph">✦</div>
+      <div class="ecard" onclick="showPage('portfolio')">
+        <div class="ecard-num">004</div>
+        <div class="ecard-icon">✦</div>
         <h3>作品档案集</h3>
         <p>所有会员孩子的真实项目存档，记录想法从萌芽到落地的完整过程。</p>
-        <div class="entry-arrow">↗</div>
+        <div class="ecard-arrow">↗</div>
       </div>
     </div>
   </section>
 
+  <!-- ── Contact ── -->
   <section class="contact-band" id="homeContact">
-    <div class="contact-wm">来</div>
     <div class="contact-inner reveal">
       <div class="section-label">预约到访</div>
-      <h2>如果你的孩子<br>心里有个想法</h2>
-      <p>带他来坐坐。我们不做入学测试，不要求任何基础。只要他对某件事感到好奇，就可以来。</p>
+      <h2>如果孩子心里有个想法</h2>
+      <p>带他来坐坐。不做测试，不要基础，只要他对某件事感到好奇，就可以来。</p>
       <div class="crow-list">
         <a class="crow" href="https://ai00.tech" target="_blank" rel="noopener">
           <span class="crow-label">官网</span><span class="crow-value">ai00.tech</span><span class="crow-arrow">↗</span>
@@ -910,177 +853,79 @@ footer p{font-size:11px;color:rgba(245,242,236,0.25);letter-spacing:0.1em}
           <span class="crow-label">邮件</span><span class="crow-value">hello@example.com</span><span class="crow-arrow">↗</span>
         </a>
         <div class="crow">
-          <span class="crow-label">微信</span><span class="crow-value">请替换为你的微信号</span><span class="crow-arrow" style="opacity:0.15">—</span>
+          <span class="crow-label">微信</span><span class="crow-value">请替换为你的微信号</span><span class="crow-arrow" style="opacity:0.2">—</span>
         </div>
       </div>
     </div>
   </section>
+
 </div><!-- /home -->
 
-
-<!-- ══════════════════════════════════════
-     PAGE: CEO
-══════════════════════════════════════ -->
+<!-- ══════════ CEO ══════════ -->
 <div class="page" id="page-ceo">
-
   <section class="ceo-hero">
-    <div class="ceo-hero-wm">CEO</div>
-    <div class="ceo-hero-inner">
-      <div class="section-label on-dark">少年CEO探索班</div>
-      <h1>小班制导师陪伴，<br><em>六至八周做出一个真实项目。</em></h1>
-      <p class="ceo-hero-sub">探索班不是培训营，而是一段认真的共同创作。每期最多八名学员，全程一位主导师、一位助理导师，围绕孩子自己的想法展开。</p>
-      <div class="ceo-badges">
-        <span class="badge">小班制 · 最多8人</span>
-        <span class="badge">6—8 周</span>
-        <span class="badge">导师全程陪伴</span>
-        <span class="badge">真实项目落地</span>
-        <span class="badge">结业转年度会员</span>
-      </div>
+    <div class="section-label on-dark">少年CEO探索班</div>
+    <h1>小班制导师陪伴，<br><em>六至八周做出一个真实项目。</em></h1>
+    <p class="ceo-hero-sub">探索班不是培训营，而是一段认真的共同创作。每期最多八名学员，全程导师陪伴，围绕孩子自己的想法展开。</p>
+    <div class="ceo-badges">
+      <span class="badge">小班制 · 最多8人</span>
+      <span class="badge">6—8 周</span>
+      <span class="badge">导师全程陪伴</span>
+      <span class="badge">真实项目落地</span>
+      <span class="badge">结业转年度会员</span>
     </div>
   </section>
-
   <section class="ceo-structure">
     <div class="structure-intro reveal">
       <div class="section-label">探索班结构</div>
-      <h2 class="h-serif">一期探索班分三个阶段，<br>从想法到作品到公开呈现。</h2>
+      <h2 class="h-serif">三个阶段，从想法到作品到公开呈现。</h2>
       <p>我们不提前规定孩子要做什么。第一周的任务，只是帮助他找到自己真正在意的那件事。</p>
     </div>
     <div class="cohort-phases reveal">
-      <div class="phase">
-        <div class="phase-num">Phase 01 · 第 1—2 周</div>
-        <h3>发现阶段<br>找到真正在意的事</h3>
-        <p>通过田野观察、对话访谈、头脑风暴，帮助孩子从模糊的兴趣中提炼出一个值得深入的真实问题。</p>
-        <ul class="phase-detail">
-          <li>个人兴趣图谱绘制</li>
-          <li>真实场景观察与记录</li>
-          <li>问题定义工作坊</li>
-          <li>导师一对一面谈</li>
-        </ul>
-      </div>
-      <div class="phase">
-        <div class="phase-num">Phase 02 · 第 3—6 周</div>
-        <h3>创造阶段<br>把想法变成真实作品</h3>
-        <p>根据问题方向，借助 AI 工具进行快速原型制作，在导师和同伴的反馈中持续迭代改进。</p>
-        <ul class="phase-detail">
-          <li>原型设计与制作</li>
-          <li>用户测试与反馈收集</li>
-          <li>AI 工具综合运用</li>
-          <li>每周小组复盘</li>
-        </ul>
-      </div>
-      <div class="phase">
-        <div class="phase-num">Phase 03 · 第 7—8 周</div>
-        <h3>表达阶段<br>让作品被真实看见</h3>
-        <p>完成项目档案，准备公开展示。邀请家长、导师和俱乐部会员共同见证孩子的成果呈现。</p>
-        <ul class="phase-detail">
-          <li>作品档案整理归纳</li>
-          <li>路演表达训练</li>
-          <li>结业公开展示</li>
-          <li>会员身份正式激活</li>
-        </ul>
-      </div>
+      <div class="phase"><div class="phase-num">Phase 01 · 第 1—2 周</div><h3>发现阶段<br>找到真正在意的事</h3><p>通过田野观察、对话访谈、头脑风暴，帮助孩子从模糊的兴趣中提炼出一个值得深入的真实问题。</p><ul class="phase-detail"><li>个人兴趣图谱绘制</li><li>真实场景观察与记录</li><li>问题定义工作坊</li><li>导师一对一面谈</li></ul></div>
+      <div class="phase"><div class="phase-num">Phase 02 · 第 3—6 周</div><h3>创造阶段<br>把想法变成真实作品</h3><p>根据问题方向，借助 AI 工具进行快速原型制作，在导师和同伴的反馈中持续迭代改进。</p><ul class="phase-detail"><li>原型设计与制作</li><li>用户测试与反馈收集</li><li>AI 工具综合运用</li><li>每周小组复盘</li></ul></div>
+      <div class="phase"><div class="phase-num">Phase 03 · 第 7—8 周</div><h3>表达阶段<br>让作品被真实看见</h3><p>完成项目档案，准备公开展示。邀请家长、导师和俱乐部会员共同见证孩子的成果呈现。</p><ul class="phase-detail"><li>作品档案整理归纳</li><li>路演表达训练</li><li>结业公开展示</li><li>会员身份正式激活</li></ul></div>
     </div>
   </section>
-
   <section class="ceo-flow">
     <div class="section-label reveal">探索班 → 会员路径</div>
     <h2 class="flow-title h-serif reveal">结业，是长期成长的开始。</h2>
     <p class="flow-sub reveal">探索班结束后，孩子以年度会员身份进入俱乐部，继续使用空间、预约导师、结识同伴。</p>
     <div class="flow-steps reveal">
-      <div class="flow-step">
-        <div class="flow-dot"></div>
-        <div class="flow-step-label">报名</div>
-        <div class="flow-step-name">申请入班</div>
-        <div class="flow-step-desc">预约面谈，了解孩子的兴趣方向和当下状态。</div>
-      </div>
-      <div class="flow-step">
-        <div class="flow-dot"></div>
-        <div class="flow-step-label">Phase 1</div>
-        <div class="flow-step-name">发现问题</div>
-        <div class="flow-step-desc">观察、访谈、提炼，找到属于自己的真实问题。</div>
-      </div>
-      <div class="flow-step">
-        <div class="flow-dot"></div>
-        <div class="flow-step-label">Phase 2</div>
-        <div class="flow-step-name">创造作品</div>
-        <div class="flow-step-desc">原型、迭代、反馈，把想法变成真实可见的东西。</div>
-      </div>
-      <div class="flow-step">
-        <div class="flow-dot"></div>
-        <div class="flow-step-label">Phase 3</div>
-        <div class="flow-step-name">公开呈现</div>
-        <div class="flow-step-desc">路演展示，完成作品档案，收获真实反馈。</div>
-      </div>
-      <div class="flow-step highlight">
-        <div class="flow-dot"></div>
-        <div class="flow-step-label">结业后</div>
-        <div class="flow-step-name">成为会员</div>
-        <div class="flow-step-desc">以年度会员身份长期留在俱乐部，开启下一个项目。</div>
-      </div>
+      <div class="flow-step"><div class="flow-dot"></div><div class="flow-step-label">报名</div><div class="flow-step-name">申请入班</div><div class="flow-step-desc">预约面谈，了解孩子的兴趣方向和当下状态。</div></div>
+      <div class="flow-step"><div class="flow-dot"></div><div class="flow-step-label">Phase 1</div><div class="flow-step-name">发现问题</div><div class="flow-step-desc">观察、访谈、提炼，找到属于自己的真实问题。</div></div>
+      <div class="flow-step"><div class="flow-dot"></div><div class="flow-step-label">Phase 2</div><div class="flow-step-name">创造作品</div><div class="flow-step-desc">原型、迭代、反馈，把想法变成真实可见的东西。</div></div>
+      <div class="flow-step"><div class="flow-dot"></div><div class="flow-step-label">Phase 3</div><div class="flow-step-name">公开呈现</div><div class="flow-step-desc">路演展示，完成作品档案，收获真实反馈。</div></div>
+      <div class="flow-step highlight"><div class="flow-dot"></div><div class="flow-step-label">结业后</div><div class="flow-step-name">成为会员</div><div class="flow-step-desc">以年度会员身份长期留在俱乐部，开启下一个项目。</div></div>
     </div>
   </section>
-
   <section class="ceo-cohort-info">
     <div class="cohort-grid reveal">
-      <div class="cohort-item">
-        <h3>小班制，<em>认真的</em>陪伴</h3>
-        <p>每期最多八名学员，确保每个孩子都能得到导师足够的关注。我们宁愿少招一人，也不愿让任何孩子只是在场而非投入。</p>
-        <p>主导师负责整体方向把握与深度对话，助理导师跟进日常执行与工具辅助，两人配合始终陪伴孩子的完整项目旅程。</p>
-        <div class="cohort-spec">
-          <div class="spec-item"><div class="spec-num">8</div><div class="spec-label">每期最多学员</div></div>
-          <div class="spec-item"><div class="spec-num">2</div><div class="spec-label">导师配置</div></div>
-          <div class="spec-item"><div class="spec-num">6—8</div><div class="spec-label">探索周数</div></div>
-        </div>
-      </div>
-      <div class="cohort-item">
-        <h3>结业之后，<em>不是结束</em></h3>
-        <p>探索班只是起点。结业的孩子以年度会员身份进入俱乐部，可以约着同伴一起来工作，遇到问题时随时预约导师指导。</p>
-        <p>俱乐部空间常开，作品档案持续更新，长期关系在这里自然生长。我们希望孩子把这里当成自己的地方，而不是上课的地点。</p>
-        <div class="cohort-spec">
-          <div class="spec-item"><div class="spec-num">∞</div><div class="spec-label">会员归属感</div></div>
-          <div class="spec-item"><div class="spec-num">随时</div><div class="spec-label">导师预约</div></div>
-          <div class="spec-item"><div class="spec-num">持续</div><div class="spec-label">作品迭代</div></div>
-        </div>
-      </div>
+      <div class="cohort-item"><h3>小班制，<em>认真的</em>陪伴</h3><p>每期最多八名学员，确保每个孩子都能得到导师足够的关注。主导师负责整体方向把握与深度对话，助理导师跟进日常执行与工具辅助。</p><p>我们宁愿少招一人，也不愿让任何孩子只是在场而非投入。</p><div class="cohort-spec"><div class="spec-item"><div class="spec-num">8</div><div class="spec-label">每期最多学员</div></div><div class="spec-item"><div class="spec-num">2</div><div class="spec-label">导师配置</div></div><div class="spec-item"><div class="spec-num">6—8</div><div class="spec-label">探索周数</div></div></div></div>
+      <div class="cohort-item"><h3>结业之后，<em>不是结束</em></h3><p>探索班只是起点。结业的孩子以年度会员身份进入俱乐部，可以约着同伴一起来工作，遇到问题时随时预约导师指导。</p><p>俱乐部空间常开，作品档案持续更新，长期关系在这里自然生长。</p><div class="cohort-spec"><div class="spec-item"><div class="spec-num">∞</div><div class="spec-label">会员归属感</div></div><div class="spec-item"><div class="spec-num">随时</div><div class="spec-label">导师预约</div></div><div class="spec-item"><div class="spec-num">持续</div><div class="spec-label">作品迭代</div></div></div></div>
     </div>
   </section>
-
   <section class="contact-band">
-    <div class="contact-wm">报</div>
     <div class="contact-inner reveal">
       <div class="section-label">报名探索班</div>
       <h2>为孩子申请<br>一席探索名额</h2>
       <p>每期名额有限，以面谈为准。我们会先了解孩子，再决定是否适合这一期。</p>
       <div class="crow-list">
-        <a class="crow" href="https://ai00.tech" target="_blank" rel="noopener">
-          <span class="crow-label">官网</span><span class="crow-value">ai00.tech</span><span class="crow-arrow">↗</span>
-        </a>
-        <a class="crow" href="mailto:hello@example.com">
-          <span class="crow-label">邮件预约</span><span class="crow-value">hello@example.com</span><span class="crow-arrow">↗</span>
-        </a>
-        <div class="crow">
-          <span class="crow-label">微信</span><span class="crow-value">请替换为你的微信号</span><span class="crow-arrow" style="opacity:0.15">—</span>
-        </div>
+        <a class="crow" href="https://ai00.tech" target="_blank" rel="noopener"><span class="crow-label">官网</span><span class="crow-value">ai00.tech</span><span class="crow-arrow">↗</span></a>
+        <a class="crow" href="mailto:hello@example.com"><span class="crow-label">邮件预约</span><span class="crow-value">hello@example.com</span><span class="crow-arrow">↗</span></a>
+        <div class="crow"><span class="crow-label">微信</span><span class="crow-value">请替换为你的微信号</span><span class="crow-arrow" style="opacity:0.2">—</span></div>
       </div>
     </div>
   </section>
-</div><!-- /ceo -->
+</div>
 
-
-<!-- ══════════════════════════════════════
-     PAGE: PBL
-══════════════════════════════════════ -->
+<!-- ══════════ PBL ══════════ -->
 <div class="page" id="page-pbl">
-
   <section class="pbl-hero">
-    <div class="pbl-hero-wm">项目</div>
-    <div class="pbl-hero-inner">
-      <div class="section-label">PBL 项目体系</div>
-      <h1>以<em>真实项目</em>为核心，<br>而不是以知识传授为核心。</h1>
-      <p class="pbl-hero-sub">PBL（Project-Based Learning）是俱乐部所有活动的底层逻辑。孩子不是来学知识的，而是来解决自己真正在意的问题的。知识在这个过程中自然发生。</p>
-    </div>
+    <div class="section-label">PBL 项目体系</div>
+    <h1>以<em>真实项目</em>为核心，<br>而不是以知识传授为核心。</h1>
+    <p class="pbl-hero-sub">PBL（Project-Based Learning）是俱乐部所有活动的底层逻辑。孩子不是来学知识的，而是来解决自己真正在意的问题的。</p>
   </section>
-
   <section class="pbl-intro">
     <div class="pbl-intro-grid reveal">
       <div class="pbl-intro-text">
@@ -1088,14 +933,10 @@ footer p{font-size:11px;color:rgba(245,242,236,0.25);letter-spacing:0.1em}
         <h2 class="h-serif">问题先于答案，<br>行动先于理论。</h2>
         <p>传统教育的逻辑是：先学知识，再去应用。PBL 的逻辑反过来：先遇见真实的问题，再去寻找解决它所需要的一切。</p>
         <p>这个顺序的改变，意味着孩子学到的每一件事都有具体的用途。他知道为什么要学这个，因为他的项目需要它。</p>
-        <p>在俱乐部里，每个孩子的项目都是独特的。导师的工作是根据孩子的具体项目，帮助他找到所需的知识和工具。</p>
       </div>
-      <div class="pbl-intro-quote">
-        <p>学习不是把空杯子装满，<br>而是<em>点燃一把火</em>，<br>让孩子自己去寻找燃料。</p>
-      </div>
+      <div class="pbl-quote"><p>学习不是把空杯子装满，<br>而是<em>点燃一把火</em>，<br>让孩子自己去寻找燃料。</p></div>
     </div>
   </section>
-
   <section class="pbl-cycle">
     <div class="section-label reveal">PBL 学习周期</div>
     <h2 class="h-serif reveal">六个环节，形成一个完整的项目循环。</h2>
@@ -1109,86 +950,27 @@ footer p{font-size:11px;color:rgba(245,242,236,0.25);letter-spacing:0.1em}
       <div class="cycle-step"><div class="cs-num">06</div><div class="cs-name">迭代</div><div class="cs-desc">根据反馈改进，进入下一轮循环，直到满意为止。</div></div>
     </div>
   </section>
-
   <section class="pbl-houses">
     <div class="houses-header reveal">
-      <div class="section-label on-dark">四个项目院系</div>
+      <div class="section-label">四个项目院系</div>
       <h2 class="h-serif">AI 时代的完整能力版图</h2>
     </div>
     <div class="house-grid reveal">
-      <div class="house">
-        <div class="house-wm">人</div>
-        <div class="house-glyph">✦</div>
-        <div class="house-tag">AI + 人文</div>
-        <h3>理解人，表达自己</h3>
-        <p>阅读、写作、审美判断、社会议题。AI 时代最稀缺的能力，依然是深刻的人文感知力和清晰的表达能力。</p>
-        <div class="house-projects">
-          <div class="house-projects-label">项目方向举例</div>
-          <div class="proj-example">写一本关于外婆生活的口述历史小书</div>
-          <div class="proj-example">用 AI 分析一座城市街道名的变迁逻辑</div>
-          <div class="proj-example">为社区老人创作一份双语生活指南</div>
-        </div>
-        <div class="htags"><span class="htag">创意写作</span><span class="htag">议题研究</span><span class="htag">内容创作</span><span class="htag">视觉叙事</span></div>
-      </div>
-      <div class="house">
-        <div class="house-wm">理</div>
-        <div class="house-glyph">◈</div>
-        <div class="house-tag">AI + 科学</div>
-        <h3>好奇世界的运转方式</h3>
-        <p>观察、实验、数据分析、模型建构。用科学方法去理解一个真实问题的本质，而不只是记忆公式和定义。</p>
-        <div class="house-projects">
-          <div class="house-projects-label">项目方向举例</div>
-          <div class="proj-example">用传感器监测家附近的空气质量变化</div>
-          <div class="proj-example">分析学校食堂一周的食物浪费数据</div>
-          <div class="proj-example">设计一个验证植物生长规律的实验</div>
-        </div>
-        <div class="htags"><span class="htag">实验设计</span><span class="htag">数据分析</span><span class="htag">模型思维</span><span class="htag">科学表达</span></div>
-      </div>
-      <div class="house">
-        <div class="house-wm">造</div>
-        <div class="house-glyph">⬡</div>
-        <div class="house-tag">AI + 工程</div>
-        <h3>把想法做成真实的工具</h3>
-        <p>网页、自动化工具、产品原型。用工程思维把概念变成可以运转的东西，感受从零到一的创造感。</p>
-        <div class="house-projects">
-          <div class="house-projects-label">项目方向举例</div>
-          <div class="proj-example">为妈妈的小店做一个在线菜单网站</div>
-          <div class="proj-example">用 AI 搭建一个自动整理作业的工具</div>
-          <div class="proj-example">设计并3D打印一个解决日常问题的产品</div>
-        </div>
-        <div class="htags"><span class="htag">产品设计</span><span class="htag">前端开发</span><span class="htag">自动化流程</span><span class="htag">原型制作</span></div>
-      </div>
-      <div class="house">
-        <div class="house-wm">商</div>
-        <div class="house-glyph">◎</div>
-        <div class="house-tag">AI + 商业落地</div>
-        <h3>让想法在真实世界存活</h3>
-        <p>用户洞察、价值主张、品牌表达、真实反馈。学会在真实市场中验证和迭代自己的判断，而不只是做 PPT。</p>
-        <div class="house-projects">
-          <div class="house-projects-label">项目方向举例</div>
-          <div class="proj-example">为同龄人设计一款真正会用的记账产品</div>
-          <div class="proj-example">在跳蚤市场验证一个手作品牌的可行性</div>
-          <div class="proj-example">调研并提案改善学校某个空间的体验</div>
-        </div>
-        <div class="htags"><span class="htag">用户研究</span><span class="htag">品牌设计</span><span class="htag">路演表达</span><span class="htag">商业验证</span></div>
-      </div>
+      <div class="house"><div class="house-glyph">✦</div><div class="house-tag">AI + 人文</div><h3>理解人，表达自己</h3><p>阅读、写作、审美判断、社会议题。AI 时代最稀缺的能力，依然是深刻的人文感知力。</p><div class="house-projects"><div class="house-projects-label">项目方向举例</div><div class="proj-example">写一本关于外婆生活的口述历史小书</div><div class="proj-example">用 AI 分析一座城市街道名的变迁逻辑</div><div class="proj-example">为社区老人创作一份双语生活指南</div></div><div class="htags"><span class="htag">创意写作</span><span class="htag">议题研究</span><span class="htag">内容创作</span><span class="htag">视觉叙事</span></div></div>
+      <div class="house"><div class="house-glyph">◈</div><div class="house-tag">AI + 科学</div><h3>好奇世界的运转方式</h3><p>观察、实验、数据分析、模型建构。用科学方法去理解一个真实问题的本质。</p><div class="house-projects"><div class="house-projects-label">项目方向举例</div><div class="proj-example">用传感器监测家附近的空气质量变化</div><div class="proj-example">分析学校食堂一周的食物浪费数据</div><div class="proj-example">设计一个验证植物生长规律的实验</div></div><div class="htags"><span class="htag">实验设计</span><span class="htag">数据分析</span><span class="htag">模型思维</span><span class="htag">科学表达</span></div></div>
+      <div class="house"><div class="house-glyph">⬡</div><div class="house-tag">AI + 工程</div><h3>把想法做成真实的工具</h3><p>网页、自动化工具、产品原型。用工程思维把概念变成可以运转的东西。</p><div class="house-projects"><div class="house-projects-label">项目方向举例</div><div class="proj-example">为妈妈的小店做一个在线菜单网站</div><div class="proj-example">用 AI 搭建一个自动整理作业的工具</div><div class="proj-example">设计并制作一个解决日常问题的产品</div></div><div class="htags"><span class="htag">产品设计</span><span class="htag">前端开发</span><span class="htag">自动化流程</span><span class="htag">原型制作</span></div></div>
+      <div class="house"><div class="house-glyph">◎</div><div class="house-tag">AI + 商业落地</div><h3>让想法在真实世界存活</h3><p>用户洞察、价值主张、品牌表达、真实反馈。学会在真实市场中验证和迭代判断。</p><div class="house-projects"><div class="house-projects-label">项目方向举例</div><div class="proj-example">为同龄人设计一款真正会用的记账产品</div><div class="proj-example">在跳蚤市场验证一个手作品牌的可行性</div><div class="proj-example">调研并提案改善学校某个空间的体验</div></div><div class="htags"><span class="htag">用户研究</span><span class="htag">品牌设计</span><span class="htag">路演表达</span><span class="htag">商业验证</span></div></div>
     </div>
   </section>
+</div>
 
-</div><!-- /pbl -->
-
-
-<!-- ══════════════════════════════════════
-     PAGE: PORTFOLIO
-══════════════════════════════════════ -->
+<!-- ══════════ PORTFOLIO ══════════ -->
 <div class="page" id="page-portfolio">
-
   <section class="portfolio-hero">
     <div class="section-label">作品档案集</div>
     <h1>每一件作品，<br>都是一段<em>真实的探索</em>。</h1>
     <p class="portfolio-hero-sub">这里收录的不是完美的成品，而是孩子们从一个问题出发，一步步走到今天的真实记录。</p>
   </section>
-
   <div class="filter-bar">
     <button class="filter-btn active" onclick="filterProjects('all',this)">全部</button>
     <button class="filter-btn" onclick="filterProjects('humanities',this)">AI + 人文</button>
@@ -1196,210 +978,122 @@ footer p{font-size:11px;color:rgba(245,242,236,0.25);letter-spacing:0.1em}
     <button class="filter-btn" onclick="filterProjects('engineering',this)">AI + 工程</button>
     <button class="filter-btn" onclick="filterProjects('business',this)">AI + 商业</button>
   </div>
-
   <div class="portfolio-grid-wrap">
     <div class="proj-grid" id="projGrid"></div>
   </div>
-
-  <!-- Modal -->
   <div class="proj-modal-overlay" id="projModal" onclick="closeModal(event)">
     <div class="proj-modal" id="projModalContent">
       <button class="proj-modal-close" onclick="document.getElementById('projModal').classList.remove('open')">✕</button>
       <div class="proj-modal-body" id="projModalBody"></div>
     </div>
   </div>
+</div>
 
-</div><!-- /portfolio -->
-
-
-<!-- ══════════════════════════════════════
-     PAGE: MEMBERSHIP
-══════════════════════════════════════ -->
+<!-- ══════════ MEMBERSHIP ══════════ -->
 <div class="page" id="page-membership">
-
   <section class="mem-hero">
-    <div class="mem-hero-wm">会</div>
-    <div class="mem-hero-inner">
-      <div class="section-label">年度会员社群</div>
-      <h1>一个<em>长期归属</em>的地方，<br>不是一段有期限的服务。</h1>
-      <p class="mem-hero-sub">会员不是订阅，而是一种归属感。孩子在这里认识同伴、预约导师、使用空间，在自己的节奏里持续成长。</p>
-    </div>
+    <div class="section-label">年度会员社群</div>
+    <h1>一个<em>长期归属</em>的地方，<br>不是一段有期限的服务。</h1>
+    <p class="mem-hero-sub">会员不是订阅，而是一种归属感。孩子在这里认识同伴、预约导师、使用空间，在自己的节奏里持续成长。</p>
   </section>
-
   <section class="mem-what">
     <div class="mem-what-header reveal">
       <div class="section-label">会员体系</div>
       <h2 class="h-serif">会员制给孩子三样东西：<br>空间、同伴和专业引导。</h2>
     </div>
     <div class="mem-pillars reveal">
-      <div class="mem-pillar">
-        <div class="mp-glyph">◎</div>
-        <div class="mp-title">开放的空间</div>
-        <div class="mp-desc">俱乐部空间对会员全年开放，孩子可以随时来这里工作、思考、创作。空间是恒定在那里的安全感。</div>
-      </div>
-      <div class="mem-pillar">
-        <div class="mp-glyph">⬡</div>
-        <div class="mp-title">真实的同伴</div>
-        <div class="mp-desc">会员孩子来自不同背景和兴趣方向，相互认识、相互启发。有时候，同龄人的一句话比导师的十句话更有力。</div>
-      </div>
-      <div class="mem-pillar">
-        <div class="mp-glyph">◈</div>
-        <div class="mp-title">按需的引导</div>
-        <div class="mp-desc">当孩子在项目中遇到真正困难的时候，可以预约专业导师。是孩子主动来找帮助，而不是被动接受辅导。</div>
-      </div>
+      <div class="mem-pillar"><div class="mp-glyph">◎</div><div class="mp-title">开放的空间</div><div class="mp-desc">俱乐部空间对会员全年开放，孩子可以随时来这里工作、思考、创作。空间是恒定在那里的安全感。</div></div>
+      <div class="mem-pillar"><div class="mp-glyph">⬡</div><div class="mp-title">真实的同伴</div><div class="mp-desc">会员孩子来自不同背景和兴趣方向，相互认识、相互启发。有时候，同龄人的一句话比导师的十句话更有力。</div></div>
+      <div class="mem-pillar"><div class="mp-glyph">◈</div><div class="mp-title">按需的引导</div><div class="mp-desc">当孩子在项目中遇到真正困难的时候，可以预约专业导师。是孩子主动来找帮助，而不是被动接受辅导。</div></div>
     </div>
   </section>
-
   <section class="mem-peer">
-    <div class="section-label on-dark reveal">同伴社群的日常</div>
+    <div class="section-label reveal">同伴社群的日常</div>
     <h2 class="h-serif reveal">孩子们在这里，<br>会自然发生什么？</h2>
     <p class="mem-peer-sub reveal">没有人规定孩子们必须做什么。但一个有温度的空间，会让好事自然发生。</p>
     <div class="peer-scenarios reveal">
-      <div class="peer-scenario">
-        <div class="ps-emoji">💡</div>
-        <div class="ps-title">想法碰撞</div>
-        <div class="ps-desc">两个孩子在角落聊起各自的项目，发现一个意想不到的交集，决定试试合作一段。</div>
-      </div>
-      <div class="peer-scenario">
-        <div class="ps-emoji">🔧</div>
-        <div class="ps-title">互相帮助</div>
-        <div class="ps-desc">一个孩子的网页卡住了，旁边正好有个会写代码的会员，停下来帮忙看了半小时。</div>
-      </div>
-      <div class="peer-scenario">
-        <div class="ps-emoji">👀</div>
-        <div class="ps-title">作品观摩</div>
-        <div class="ps-desc">某个孩子展示了自己的最新版本，其他人围过来看，七嘴八舌给出意见，比任何测试都真实。</div>
-      </div>
-      <div class="peer-scenario">
-        <div class="ps-emoji">📅</div>
-        <div class="ps-title">约着一起来</div>
-        <div class="ps-desc">「周六下午要来吗？」孩子们开始自发组织共同工作的时间，俱乐部成了他们的工作据点。</div>
-      </div>
-      <div class="peer-scenario">
-        <div class="ps-emoji">🌱</div>
-        <div class="ps-title">找到自己的节奏</div>
-        <div class="ps-desc">没有人催着孩子进展。他可以沉浸一整个下午只想一个问题，也可以什么都不做，只是待着。</div>
-      </div>
-      <div class="peer-scenario">
-        <div class="ps-emoji">🎯</div>
-        <div class="ps-title">约导师答疑</div>
-        <div class="ps-desc">项目到了某个真正卡住的节点，孩子主动发消息预约导师，带着具体问题来，谈完就继续做。</div>
-      </div>
+      <div class="peer-scenario"><div class="ps-emoji">💡</div><div class="ps-title">想法碰撞</div><div class="ps-desc">两个孩子在角落聊起各自的项目，发现一个意想不到的交集，决定试试合作一段。</div></div>
+      <div class="peer-scenario"><div class="ps-emoji">🔧</div><div class="ps-title">互相帮助</div><div class="ps-desc">一个孩子的项目卡住了，旁边正好有个擅长这个方向的会员，停下来帮忙看了半小时。</div></div>
+      <div class="peer-scenario"><div class="ps-emoji">📅</div><div class="ps-title">约着一起来</div><div class="ps-desc">「周六下午要来吗？」孩子们自发组织共同工作的时间，俱乐部成了他们的据点。</div></div>
+      <div class="peer-scenario"><div class="ps-emoji">🌱</div><div class="ps-title">找到自己的节奏</div><div class="ps-desc">没有人催着进展。他可以沉浸一整个下午只想一个问题，也可以什么都不做，只是待着。</div></div>
+      <div class="peer-scenario"><div class="ps-emoji">🎯</div><div class="ps-title">约导师答疑</div><div class="ps-desc">项目到了某个真正卡住的节点，孩子主动预约导师，带着具体问题来，谈完就继续做。</div></div>
+      <div class="peer-scenario"><div class="ps-emoji">🤝</div><div class="ps-title">成为校友</div><div class="ps-desc">项目结束了，但关系留下来。多年后，他们或许会是彼此创业路上最懂对方的伙伴。</div></div>
     </div>
   </section>
-
   <section class="mem-mentor">
     <div class="mentor-grid reveal">
       <div class="mentor-text">
         <div class="section-label">导师预约制</div>
         <h2 class="h-serif">不是被分配到某个老师，<br>而是主动找到需要的人。</h2>
         <p>俱乐部的导师来自不同领域：有做产品的、有做科研的、有做设计的、有做写作的。孩子根据自己项目的当下需求，预约最合适的那一位。</p>
-        <p>这个设计有意为之。我们希望孩子学会判断「我现在需要什么帮助」，然后主动去寻求。这本身就是一种重要的能力。</p>
         <p>导师的任务不是教，而是帮孩子把模糊的卡点说清楚，指出几个可能的方向，然后让孩子自己决定走哪条路。</p>
       </div>
       <div class="mentor-how">
         <div class="mentor-how-title">如何预约导师</div>
         <div class="mentor-steps">
-          <div class="ms">
-            <div class="ms-num">1</div>
-            <div class="ms-content"><h4>明确需要什么帮助</h4><p>预约前，孩子需要写下自己遇到的具体问题，不能只说「不知道怎么做了」。</p></div>
-          </div>
-          <div class="ms">
-            <div class="ms-num">2</div>
-            <div class="ms-content"><h4>选择合适的导师方向</h4><p>根据问题类型选择人文、科学、工程或商业方向的导师，也可以请工作人员帮助匹配。</p></div>
-          </div>
-          <div class="ms">
-            <div class="ms-num">3</div>
-            <div class="ms-content"><h4>在线或到场约谈</h4><p>可以在俱乐部面谈，也可以在线视频。一次约谈通常是 45—60 分钟，聚焦解决一个具体问题。</p></div>
-          </div>
-          <div class="ms">
-            <div class="ms-num">4</div>
-            <div class="ms-content"><h4>带着行动点离开</h4><p>导师约谈结束时，孩子会写下自己接下来要做的两三件具体的事，作为下一阶段的行动指引。</p></div>
-          </div>
+          <div class="ms"><div class="ms-num">1</div><div class="ms-content"><h4>明确需要什么帮助</h4><p>预约前，孩子需要写下自己遇到的具体问题，不能只说「不知道怎么做了」。</p></div></div>
+          <div class="ms"><div class="ms-num">2</div><div class="ms-content"><h4>选择合适的导师方向</h4><p>根据问题类型选择人文、科学、工程或商业方向的导师，也可以请工作人员帮助匹配。</p></div></div>
+          <div class="ms"><div class="ms-num">3</div><div class="ms-content"><h4>在线或到场约谈</h4><p>一次约谈通常是 45—60 分钟，聚焦解决一个具体问题，不是漫无目的的聊天。</p></div></div>
+          <div class="ms"><div class="ms-num">4</div><div class="ms-content"><h4>带着行动点离开</h4><p>导师约谈结束时，孩子会写下接下来要做的两三件具体的事，作为下一阶段的行动指引。</p></div></div>
         </div>
       </div>
     </div>
   </section>
-
+  <section class="journey-section">
+    <div class="journey-head reveal">
+      <div class="section-label">成长路径</div>
+      <h2 class="h-serif">从一个问题，到一件作品</h2>
+      <p>我们不规定孩子走多快，但我们陪伴每一步。五个阶段是地图，不是课程表。</p>
+    </div>
+    <div class="journey-track reveal">
+      <div class="j-step"><div class="j-level">L1 · Observer</div><div class="j-name">观察者</div><div class="j-desc">带着眼睛走进真实世界，看见那些被忽视的细节，积累属于自己的观察库。</div></div>
+      <div class="j-step"><div class="j-level">L2 · Questioner</div><div class="j-name">提问者</div><div class="j-desc">把观察到的现象转化为一个真实的问题。好问题比好答案更难得。</div></div>
+      <div class="j-step"><div class="j-level">L3 · Builder</div><div class="j-name">原型师</div><div class="j-desc">做出第一个不完美的版本。让想法变成可以被看见、被讨论、被改进的东西。</div></div>
+      <div class="j-step"><div class="j-level">L4 · Leader</div><div class="j-name">负责人</div><div class="j-desc">收集反馈，组织资源，推动迭代。开始承担一个项目的整体责任。</div></div>
+      <div class="j-step"><div class="j-level">L5 · Creator</div><div class="j-name">创造者</div><div class="j-desc">把作品带到公众面前，表达自己，影响他人，成为一个真正的创造者。</div></div>
+    </div>
+  </section>
   <section class="contact-band">
-    <div class="contact-wm">入</div>
     <div class="contact-inner reveal">
       <div class="section-label">加入会员</div>
       <h2>开始你的<br>年度会员旅程</h2>
       <p>完成少年CEO探索班的孩子将自动成为年度会员。也欢迎直接咨询会员加入方式。</p>
       <div class="crow-list">
-        <a class="crow" href="https://ai00.tech" target="_blank" rel="noopener">
-          <span class="crow-label">官网</span><span class="crow-value">ai00.tech</span><span class="crow-arrow">↗</span>
-        </a>
-        <a class="crow" href="mailto:hello@example.com">
-          <span class="crow-label">邮件</span><span class="crow-value">hello@example.com</span><span class="crow-arrow">↗</span>
-        </a>
-        <div class="crow">
-          <span class="crow-label">微信</span><span class="crow-value">请替换为你的微信号</span><span class="crow-arrow" style="opacity:0.15">—</span>
-        </div>
+        <a class="crow" href="https://ai00.tech" target="_blank" rel="noopener"><span class="crow-label">官网</span><span class="crow-value">ai00.tech</span><span class="crow-arrow">↗</span></a>
+        <a class="crow" href="mailto:hello@example.com"><span class="crow-label">邮件</span><span class="crow-value">hello@example.com</span><span class="crow-arrow">↗</span></a>
+        <div class="crow"><span class="crow-label">微信</span><span class="crow-value">请替换为你的微信号</span><span class="crow-arrow" style="opacity:0.2">—</span></div>
       </div>
     </div>
   </section>
-</div><!-- /membership -->
+</div>
 
-
-<!-- ══════════════════════════════════════
-     PAGE: PHILOSOPHY
-══════════════════════════════════════ -->
+<!-- ══════════ PHILOSOPHY ══════════ -->
 <div class="page" id="page-philosophy">
-
   <section class="phil-hero">
-    <div class="phil-hero-wm">育</div>
-    <div class="phil-hero-inner">
-      <div class="section-label on-dark">教育理念</div>
-      <h1>我们相信，<br><em>好奇心是最重要的起点。</em></h1>
-      <p class="phil-hero-sub">教育不是把知识从成人转移到孩子，而是帮助孩子发现和保护他们天然拥有的好奇心，直到它生长为真实的能力与自信。</p>
-    </div>
+    <div class="section-label">教育理念</div>
+    <h1>我们相信，<br><em>好奇心是最重要的起点。</em></h1>
+    <p class="phil-hero-sub">教育不是把知识从成人转移到孩子，而是帮助孩子发现和保护他们天然拥有的好奇心，直到它生长为真实的能力与自信。</p>
   </section>
-
   <section class="phil-qa">
     <div class="phil-qa-header reveal">
       <div class="section-label">常见问题</div>
       <h2 class="h-serif">家长问得最多的那些问题，<br>我们认真回答。</h2>
     </div>
     <div class="qa-grid reveal">
-      <div class="qa-item">
-        <div class="qa-q">孩子<em>没有想法</em>怎么办？</div>
-        <div class="qa-a">我们不会帮他想。我们会带他走到真实的世界里去——看一个菜场，聊一个老人，玩一段代码——直到他自己遇见某个让他停下来的瞬间。那个瞬间，才是真正的开始。</div>
-      </div>
-      <div class="qa-item">
-        <div class="qa-q">导师的角色是<em>教</em>吗？</div>
-        <div class="qa-a">不完全是。导师更像一个认真的伙伴：他会问问题，会帮孩子把模糊的想法说清楚，会在孩子卡住的时候指一个可能的方向——但绝不替他走路。</div>
-      </div>
-      <div class="qa-item">
-        <div class="qa-q">AI 在这里扮演什么角色？</div>
-        <div class="qa-a">AI 是孩子手里的一把工具，不是答案机器。我们希望孩子学会的，是如何与 AI 协作来实现自己的想法，而不是依赖 AI 帮自己想清楚。</div>
-      </div>
-      <div class="qa-item">
-        <div class="qa-q">怎么衡量<em>成长</em>？</div>
-        <div class="qa-a">我们不用考试衡量。我们看孩子的问题是否变得更精准，他的作品是否在迭代，他是否开始对某个领域产生持续的好奇。这些，都写在他的作品档案里。</div>
-      </div>
-      <div class="qa-item">
-        <div class="qa-q">这里<em>适合什么年龄</em>的孩子？</div>
-        <div class="qa-a">我们面向大约 10—18 岁的青少年。更重要的不是年龄，而是孩子是否有基本的自驱力。如果他对某件事感到好奇，并且愿意为此花时间，就可以来。</div>
-      </div>
-      <div class="qa-item">
-        <div class="qa-q">孩子需要<em>有基础</em>吗？</div>
-        <div class="qa-a">完全不需要。我们不要求孩子提前学过编程、AI 或任何特定技能。项目是从孩子的真实兴趣出发的，所需要的工具和知识，会在项目进行中自然出现。</div>
-      </div>
+      <div class="qa-item"><div class="qa-q">孩子<em>没有想法</em>怎么办？</div><div class="qa-a">我们不会帮他想。我们会带他走到真实的世界里去——看一个菜场，聊一个老人，玩一段代码——直到他自己遇见某个让他停下来的瞬间。那个瞬间，才是真正的开始。</div></div>
+      <div class="qa-item"><div class="qa-q">导师的角色是<em>教</em>吗？</div><div class="qa-a">不完全是。导师更像一个认真的伙伴：他会问问题，会帮孩子把模糊的想法说清楚，会在孩子卡住的时候指一个可能的方向——但绝不替他走路。</div></div>
+      <div class="qa-item"><div class="qa-q">AI 在这里扮演什么角色？</div><div class="qa-a">AI 是孩子手里的一把工具，不是答案机器。我们希望孩子学会的，是如何与 AI 协作来实现自己的想法，而不是依赖 AI 帮自己想清楚。</div></div>
+      <div class="qa-item"><div class="qa-q">怎么衡量<em>成长</em>？</div><div class="qa-a">我们不用考试衡量。我们看孩子的问题是否变得更精准，他的作品是否在迭代，他是否开始对某个领域产生持续的好奇。这些，都写在他的作品档案里。</div></div>
+      <div class="qa-item"><div class="qa-q">这里<em>适合什么年龄</em>的孩子？</div><div class="qa-a">我们面向大约 10—18 岁的青少年。更重要的不是年龄，而是孩子是否有基本的自驱力。如果他对某件事感到好奇，并且愿意为此花时间，就可以来。</div></div>
+      <div class="qa-item"><div class="qa-q">孩子需要<em>有基础</em>吗？</div><div class="qa-a">完全不需要。我们不要求孩子提前学过编程、AI 或任何特定技能。项目是从孩子的真实兴趣出发的，所需要的工具和知识，会在项目进行中自然出现。</div></div>
     </div>
-    <div class="phil-closing reveal">
-      <p>我们相信，<em>每个孩子都有天然的好奇心</em>。教育的任务不是灌输，而是<em>保护这份好奇</em>，直到它生长成真实的能力与自信。</p>
-    </div>
+    <div class="phil-closing reveal"><p>我们相信，<em>每个孩子都有天然的好奇心</em>。教育的任务不是灌输，而是<em>保护这份好奇</em>，直到它生长成真实的能力与自信。</p></div>
   </section>
-
   <section class="phil-compare">
     <div class="section-label reveal">和传统教育的区别</div>
     <h2 class="h-serif reveal">我们不是在做一种<br>更好的补习班。</h2>
     <table class="compare-table reveal">
-      <thead>
-        <tr><th>维度</th><th>传统课外教育</th><th>智能少年俱乐部</th></tr>
-      </thead>
+      <thead><tr><th>维度</th><th>传统课外教育</th><th>智能少年俱乐部</th></tr></thead>
       <tbody>
         <tr><td class="col-topic">起点</td><td class="col-them">课程大纲决定学什么</td><td class="col-us">孩子的真实问题决定学什么</td></tr>
         <tr><td class="col-topic">导师角色</td><td class="col-them">知识传授者</td><td class="col-us">问题陪伴者与方向引导者</td></tr>
@@ -1411,170 +1105,124 @@ footer p{font-size:11px;color:rgba(245,242,236,0.25);letter-spacing:0.1em}
       </tbody>
     </table>
   </section>
+</div>
 
-</div><!-- /philosophy -->
-
-
-<!-- ══ FOOTER (always visible) ══ -->
 <footer>
   <p>© <span id="yr"></span> 智能少年俱乐部</p>
-  <div class="footer-mark">A Place for Young Minds</div>
+  <div class="footer-mark">A Place for Young Minds · ai00.tech</div>
 </footer>
 
-
 <script>
-/* ── Year ── */
 document.getElementById('yr').textContent = new Date().getFullYear();
 
-/* ── Page routing ── */
-function showPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-  const page = document.getElementById('page-' + id);
-  if (page) { page.classList.add('active'); }
-  const navLink = document.getElementById('nav-' + id);
-  if (navLink) navLink.classList.add('active');
-  window.scrollTo({top: 0, behavior: 'instant'});
-  setTimeout(triggerReveal, 80);
+// ── Page routing ──
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
+  const page=document.getElementById('page-'+id);
+  if(page)page.classList.add('active');
+  const nav=document.getElementById('nav-'+id);
+  if(nav)nav.classList.add('active');
+  window.scrollTo({top:0,behavior:'instant'});
+  setTimeout(triggerReveal,80);
+  setTimeout(triggerDrawAnimations,100);
 }
 
-/* ── Scroll reveal ── */
-let revealObserver;
-function triggerReveal() {
-  if (revealObserver) revealObserver.disconnect();
-  revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('in');
-        revealObserver.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
-  const activePage = document.querySelector('.page.active');
-  if (activePage) {
-    activePage.querySelectorAll('.reveal').forEach(el => {
-      el.classList.remove('in');
-      revealObserver.observe(el);
-    });
-  }
+// ── Scroll reveal ──
+let revealObs;
+function triggerReveal(){
+  if(revealObs)revealObs.disconnect();
+  revealObs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');revealObs.unobserve(e.target)}});
+  },{threshold:0.08,rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.page.active .reveal').forEach(el=>{el.classList.remove('in');revealObs.observe(el)});
 }
 triggerReveal();
 
-/* ── Nav scroll shrink ── */
-const nav = document.querySelector('nav');
-window.addEventListener('scroll', () => {
-  nav.style.padding = window.scrollY > 60 ? '12px 64px' : '18px 64px';
-}, { passive: true });
+// ── Nav shrink ──
+const mainNav=document.querySelector('nav');
+window.addEventListener('scroll',()=>{
+  mainNav.style.padding=window.scrollY>60?'10px 56px':'16px 56px';
+},{passive:true});
 
-/* ── Portfolio data ── */
-const projects = [
-  {
-    id:1, category:'humanities',
-    title:'外婆的城市记忆',
-    author:'李同学 · 13岁',
-    level:'L3 原型师',
-    house:'AI + 人文',
-    summary:'通过对外婆三十年城市生活的口述访谈，结合 AI 辅助整理，创作了一本图文并茂的个人历史小书。',
-    emoji:'📖',
-    process:[
-      {name:'观察与发现', desc:'发现外婆提起「以前的城市」时眼神的变化，决定认真记录下来。'},
-      {name:'访谈设计', desc:'学习了口述历史的基本方法，设计了十二个开放式问题。'},
-      {name:'AI 辅助整理', desc:'用 AI 工具把十小时录音转录和归类，找出最动人的二十个片段。'},
-      {name:'图文创作', desc:'用手绘和老照片结合，完成了三十页的手工书第一版。'},
-      {name:'公开展示', desc:'在社区图书馆做了小型展览，收到了附近老人的强烈共鸣和新的故事线索。'},
-    ]
-  },
-  {
-    id:2, category:'science',
-    title:'学校食堂的食物浪费调查',
-    author:'王同学 · 12岁',
-    level:'L2 提问者',
-    house:'AI + 科学',
-    summary:'为期三周的数据采集项目，记录学校食堂每天的剩餐情况，分析原因，向校方提出了三条具体建议。',
-    emoji:'🔬',
-    process:[
-      {name:'问题定义', desc:'在食堂观察到大量剩饭，好奇「到底有多少，为什么会这样」。'},
-      {name:'数据采集', desc:'连续15个工作日，记录每种菜品的剩余比例和就餐人数。'},
-      {name:'AI 数据分析', desc:'用 AI 工具制作可视化图表，发现周三炒土豆丝的浪费率最高达 47%。'},
-      {name:'原因调研', desc:'对40名同学进行问卷调查，找到了三个主要原因。'},
-      {name:'提案与反馈', desc:'向学校总务处提交报告，对方表示将调整周三的菜品搭配。'},
-    ]
-  },
-  {
-    id:3, category:'engineering',
-    title:'给妈妈小店做的在线菜单',
-    author:'陈同学 · 14岁',
-    level:'L3 原型师',
-    house:'AI + 工程',
-    summary:'用 AI 辅助编程，为妈妈的小面馆从零搭建了一个手机端在线菜单，顾客扫码即可查看菜品和价格。',
-    emoji:'💻',
-    process:[
-      {name:'需求发现', desc:'看到妈妈每天要手写菜单黑板，雨天字迹模糊，决定帮她解决这个问题。'},
-      {name:'原型设计', desc:'先用纸笔画出界面草图，和妈妈确认功能需求。'},
-      {name:'AI 辅助开发', desc:'用 AI 工具辅助写 HTML/CSS，学会了基本的网页结构。'},
-      {name:'测试与修改', desc:'让五位顾客扫码试用，根据反馈调整了字体大小和图片比例。'},
-      {name:'正式上线', desc:'打印了二维码贴在桌上，妈妈现在每天用手机更新菜品。'},
-    ]
-  },
-  {
-    id:4, category:'business',
-    title:'手作文具品牌「纸间」',
-    author:'张同学 · 15岁',
-    level:'L4 负责人',
-    house:'AI + 商业',
-    summary:'从一个对手账文化的兴趣出发，调研同龄用户需求，设计品牌视觉，并在跳蚤市场完成了第一次真实销售验证。',
-    emoji:'✏️',
-    process:[
-      {name:'用户洞察', desc:'对二十名喜欢手账的同学进行深度访谈，发现「找不到合适纸张克重」是最大痛点。'},
-      {name:'产品设计', desc:'选定三种特殊纸张，用 AI 辅助设计了品牌 Logo 和包装风格。'},
-      {name:'定价实验', desc:'制作了不同价位的组合，在班级内进行了小规模价格敏感度测试。'},
-      {name:'市场验证', desc:'在学校跳蚤市场摆摊，三小时售出42份，回收了宝贵的产品反馈。'},
-      {name:'迭代方向', desc:'根据反馈决定增加「散页自由组合」功能，正在准备第二版产品。'},
-    ]
-  },
-  {
-    id:5, category:'humanities',
-    title:'消失的方言——粤语拼音图鉴',
-    author:'黄同学 · 11岁',
-    level:'L2 提问者',
-    house:'AI + 人文',
-    summary:'发现爷爷奶奶说的很多粤语词汇自己完全不懂，用 AI 工具整理了一份有趣的粤语日常词汇图鉴，送给了全家人。',
-    emoji:'🗣️',
-    process:[
-      {name:'问题发现', desc:'发现自己听不懂爷爷奶奶的很多词，担心这些词「会消失掉」。'},
-      {name:'词汇采集', desc:'用录音笔记录了十次家庭对话，整理出63个有趣的粤语词汇。'},
-      {name:'AI 辅助创作', desc:'用 AI 工具帮助配音标注和生成插画风格，制作了图文版词汇卡。'},
-      {name:'制作成册', desc:'在导师帮助下用印刷店做成了精美的小册子。'},
-    ]
-  },
-  {
-    id:6, category:'engineering',
-    title:'AI 作业提醒小助手',
-    author:'刘同学 · 13岁',
-    level:'L3 原型师',
-    house:'AI + 工程',
-    summary:'用自动化工具搭建了一个微信小程序，可以帮同学记录和提醒各科作业截止时间，在班级内有20人在用。',
-    emoji:'🤖',
-    process:[
-      {name:'需求来源', desc:'自己常忘交作业被扣分，发现班上很多人有同样问题。'},
-      {name:'功能规划', desc:'列出「核心功能三件套」：添加作业、定时提醒、完成打卡。'},
-      {name:'工具选型', desc:'在导师建议下选择了低代码平台，降低了开发门槛。'},
-      {name:'内测与修改', desc:'先在五个好朋友中试用，根据反馈增加了「科目颜色标签」功能。'},
-      {name:'推广使用', desc:'在班群分享后自然扩散到20人，收到了「希望能同步到日历」的新需求。'},
-    ]
-  },
+// ── Animated drawings: trigger draw-on per frame ──
+function triggerDrawAnimations(){
+  // reset all
+  document.querySelectorAll('.draw-path,.draw-circle').forEach(el=>{
+    el.style.strokeDashoffset=el.getAttribute('stroke-dasharray')||el.style.strokeDasharray||'200';
+  });
+}
+// Auto-trigger draw animations when carousel frame becomes visible
+let currentFrame=0;
+const FRAMES=['frame1','frame2','frame3'];
+const CAPTIONS_INTERVAL=4000;
+
+function activateFrame(idx){
+  FRAMES.forEach((f,i)=>{
+    const el=document.getElementById(f);
+    if(!el)return;
+    // remove active classes
+    el.classList.remove('frame1-active','frame2-active','frame3-active');
+    // trigger the draw-on for paths in this frame
+    if(i===idx){
+      el.querySelectorAll('.draw-path,.draw-circle').forEach(path=>{
+        const da=parseFloat(path.getAttribute('stroke-dasharray')||path.style.strokeDasharray||200);
+        path.style.transition='none';
+        path.style.strokeDashoffset=da+'';
+        requestAnimationFrame(()=>{
+          requestAnimationFrame(()=>{
+            const delay=parseFloat(path.getAttribute('data-delay')||0);
+            path.style.transition=`stroke-dashoffset 0.7s ${delay}s ease`;
+            path.style.strokeDashoffset='0';
+          });
+        });
+      });
+    }
+  });
+}
+
+// Assign sequential delays to paths within each frame
+function prepareFrameDelays(){
+  FRAMES.forEach((fid,fi)=>{
+    const el=document.getElementById(fid);
+    if(!el)return;
+    el.querySelectorAll('.draw-path,.draw-circle').forEach((p,i)=>{
+      p.setAttribute('data-delay',(i*0.09).toFixed(2));
+    });
+  });
+}
+prepareFrameDelays();
+
+// Watch carousel position
+let carouselTimer;
+function startCarouselWatch(){
+  clearInterval(carouselTimer);
+  let step=0;
+  activateFrame(0);
+  carouselTimer=setInterval(()=>{
+    step=(step+1)%3;
+    activateFrame(step);
+  },4000);
+}
+startCarouselWatch();
+
+// ── Portfolio ──
+const projects=[
+  {id:1,category:'humanities',title:'外婆的城市记忆',author:'李同学 · 13岁',level:'L3 原型师',house:'AI + 人文',summary:'通过对外婆三十年城市生活的口述访谈，结合 AI 辅助整理，创作了一本图文并茂的个人历史小书。',emoji:'📖',process:[{name:'观察与发现',desc:'发现外婆提起「以前的城市」时眼神的变化，决定认真记录下来。'},{name:'访谈设计',desc:'学习了口述历史的基本方法，设计了十二个开放式问题。'},{name:'AI 辅助整理',desc:'用 AI 工具把十小时录音转录和归类，找出最动人的二十个片段。'},{name:'图文创作',desc:'用手绘和老照片结合，完成了三十页的手工书第一版。'},{name:'公开展示',desc:'在社区图书馆做了小型展览，收到了附近老人的强烈共鸣。'}]},
+  {id:2,category:'science',title:'学校食堂的食物浪费调查',author:'王同学 · 12岁',level:'L2 提问者',house:'AI + 科学',summary:'为期三周的数据采集项目，记录学校食堂每天的剩餐情况，分析原因，向校方提出了三条具体建议。',emoji:'🔬',process:[{name:'问题定义',desc:'在食堂观察到大量剩饭，好奇「到底有多少，为什么会这样」。'},{name:'数据采集',desc:'连续15个工作日，记录每种菜品的剩余比例和就餐人数。'},{name:'AI 数据分析',desc:'用 AI 工具制作可视化图表，发现周三炒土豆丝的浪费率最高达 47%。'},{name:'原因调研',desc:'对40名同学进行问卷调查，找到了三个主要原因。'},{name:'提案与反馈',desc:'向学校总务处提交报告，对方表示将调整周三的菜品搭配。'}]},
+  {id:3,category:'engineering',title:'给妈妈小店做的在线菜单',author:'陈同学 · 14岁',level:'L3 原型师',house:'AI + 工程',summary:'用 AI 辅助编程，为妈妈的小面馆从零搭建了一个手机端在线菜单，顾客扫码即可查看菜品和价格。',emoji:'💻',process:[{name:'需求发现',desc:'看到妈妈每天要手写菜单黑板，雨天字迹模糊，决定帮她解决这个问题。'},{name:'原型设计',desc:'先用纸笔画出界面草图，和妈妈确认功能需求。'},{name:'AI 辅助开发',desc:'用 AI 工具辅助写 HTML/CSS，学会了基本的网页结构。'},{name:'测试与修改',desc:'让五位顾客扫码试用，根据反馈调整了字体大小和图片比例。'},{name:'正式上线',desc:'打印了二维码贴在桌上，妈妈现在每天用手机更新菜品。'}]},
+  {id:4,category:'business',title:'手作文具品牌「纸间」',author:'张同学 · 15岁',level:'L4 负责人',house:'AI + 商业',summary:'从一个对手账文化的兴趣出发，调研同龄用户需求，设计品牌视觉，并在跳蚤市场完成了第一次真实销售验证。',emoji:'✏️',process:[{name:'用户洞察',desc:'对二十名喜欢手账的同学进行深度访谈，发现「找不到合适纸张克重」是最大痛点。'},{name:'产品设计',desc:'选定三种特殊纸张，用 AI 辅助设计了品牌 Logo 和包装风格。'},{name:'定价实验',desc:'制作了不同价位的组合，在班级内进行了小规模价格敏感度测试。'},{name:'市场验证',desc:'在学校跳蚤市场摆摊，三小时售出42份，回收了宝贵的产品反馈。'},{name:'迭代方向',desc:'根据反馈决定增加「散页自由组合」功能，正在准备第二版产品。'}]},
+  {id:5,category:'humanities',title:'消失的方言——粤语拼音图鉴',author:'黄同学 · 11岁',level:'L2 提问者',house:'AI + 人文',summary:'发现爷爷奶奶说的很多粤语词汇自己完全不懂，用 AI 工具整理了一份有趣的粤语日常词汇图鉴，送给了全家人。',emoji:'🗣️',process:[{name:'问题发现',desc:'发现自己听不懂爷爷奶奶的很多词，担心这些词「会消失掉」。'},{name:'词汇采集',desc:'用录音笔记录了十次家庭对话，整理出63个有趣的粤语词汇。'},{name:'AI 辅助创作',desc:'用 AI 工具帮助配音标注和生成插画风格，制作了图文版词汇卡。'},{name:'制作成册',desc:'在导师帮助下用印刷店做成了精美的小册子。'}]},
+  {id:6,category:'engineering',title:'AI 作业提醒小助手',author:'刘同学 · 13岁',level:'L3 原型师',house:'AI + 工程',summary:'用自动化工具搭建了一个微信小程序，可以帮同学记录和提醒各科作业截止时间，在班级内有20人在用。',emoji:'🤖',process:[{name:'需求来源',desc:'自己常忘交作业被扣分，发现班上很多人有同样问题。'},{name:'功能规划',desc:'列出「核心功能三件套」：添加作业、定时提醒、完成打卡。'},{name:'工具选型',desc:'在导师建议下选择了低代码平台，降低了开发门槛。'},{name:'内测与修改',desc:'先在五个好朋友中试用，根据反馈增加了「科目颜色标签」功能。'},{name:'推广使用',desc:'在班群分享后自然扩散到20人，收到了「希望能同步到日历」的新需求。'}]},
 ];
-
-let currentFilter = 'all';
-function renderProjects() {
-  const grid = document.getElementById('projGrid');
-  if (!grid) return;
-  const filtered = currentFilter === 'all' ? projects : projects.filter(p => p.category === currentFilter);
-  grid.innerHTML = filtered.map(p => `
+let currentFilter='all';
+function renderProjects(){
+  const grid=document.getElementById('projGrid');
+  if(!grid)return;
+  const filtered=currentFilter==='all'?projects:projects.filter(p=>p.category===currentFilter);
+  grid.innerHTML=filtered.map(p=>`
     <div class="proj-card" onclick="openModal(${p.id})">
-      <div class="proj-card-img">
-        <div class="proj-card-img-placeholder">${p.emoji}</div>
-      </div>
+      <div class="proj-card-img">${p.emoji}</div>
       <div class="proj-card-body">
         <div class="proj-house-tag">${p.house}</div>
         <h3>${p.title}</h3>
@@ -1584,22 +1232,18 @@ function renderProjects() {
           <span class="proj-level">${p.level}</span>
         </div>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
-
-function filterProjects(cat, btn) {
-  currentFilter = cat;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+function filterProjects(cat,btn){
+  currentFilter=cat;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   renderProjects();
 }
-
-function openModal(id) {
-  const p = projects.find(x => x.id === id);
-  if (!p) return;
-  const body = document.getElementById('projModalBody');
-  body.innerHTML = `
+function openModal(id){
+  const p=projects.find(x=>x.id===id);
+  if(!p)return;
+  document.getElementById('projModalBody').innerHTML=`
     <div class="proj-modal-tag">${p.house}</div>
     <h2>${p.title}</h2>
     <div class="proj-modal-author">${p.author} · ${p.level}</div>
@@ -1607,27 +1251,14 @@ function openModal(id) {
     <div class="proj-modal-process">
       <h4>项目过程</h4>
       <div class="process-steps-list">
-        ${p.process.map(s => `
-          <div class="psl-item">
-            <div class="psl-name">${s.name}</div>
-            <div class="psl-desc">${s.desc}</div>
-          </div>
-        `).join('')}
+        ${p.process.map(s=>`<div class="psl-item"><div class="psl-name">${s.name}</div><div class="psl-desc">${s.desc}</div></div>`).join('')}
       </div>
-    </div>
-  `;
+    </div>`;
   document.getElementById('projModal').classList.add('open');
 }
-function closeModal(e) {
-  if (e.target === document.getElementById('projModal')) {
-    document.getElementById('projModal').classList.remove('open');
-  }
-}
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') document.getElementById('projModal').classList.remove('open');
-});
+function closeModal(e){if(e.target===document.getElementById('projModal'))document.getElementById('projModal').classList.remove('open')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('projModal').classList.remove('open')});
 
-/* Init portfolio */
 showPage('home');
 renderProjects();
 </script>
