@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI世界文明实验室</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+
+      <!-- 侧边栏 -->
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">GC</div>
+          <div>
+            <p class="eyebrow">AI Global Civilization Lab</p>
+            <h1>世界文明实验室</h1>
+          </div>
+        </div>
+
+        <nav class="timeline" aria-label="课程时间轴" id="timeline"></nav>
+
+        <section class="progress-panel">
+          <div class="panel-header">
+            <span>文明护照</span>
+            <strong id="passportCount">0/0</strong>
+          </div>
+          <div class="passport" id="passport"></div>
+        </section>
+
+        <button class="settings-btn" id="settingsBtn" title="API设置">⚙ 设置</button>
+      </aside>
+
+      <!-- 主工作区 -->
+      <main class="workspace">
+
+        <!-- 顶部栏 -->
+        <header class="topbar">
+          <div class="lesson-info">
+            <p class="eyebrow" id="lessonEyebrow">正在载入</p>
+            <h2 id="lessonTitle">AI世界文明实验室</h2>
+          </div>
+          <div class="top-actions">
+            <div class="search-box">
+              <input id="searchInput" type="search" placeholder="搜索知识库：苏美尔、尼罗河、甲骨文..." />
+              <button id="searchButton" class="icon-button" title="搜索">⌕</button>
+            </div>
+            <button id="voiceButton" class="tool-button" title="语音搜索">🎤 语音</button>
+            <button id="readButton" class="tool-button" title="朗读当前课程">🔊 朗读</button>
+          </div>
+        </header>
+
+        <!-- 标签栏 -->
+        <nav class="tab-bar" role="tablist">
+          <button class="tab active" data-tab="explore" role="tab">🗺 探索</button>
+          <button class="tab" data-tab="chat" role="tab">💬 AI对话</button>
+          <button class="tab" data-tab="create" role="tab">✏ 我的创作</button>
+          <button class="tab" data-tab="history" role="tab">📖 历史轨迹</button>
+        </nav>
+
+        <!-- 搜索结果覆盖层 -->
+        <div class="search-overlay hidden" id="searchOverlay">
+          <div class="search-panel">
+            <div class="search-header">
+              <h3>知识库搜索结果</h3>
+              <button id="closeSearch" class="icon-button">✕</button>
+            </div>
+            <div id="searchResults" class="search-results"></div>
+          </div>
+        </div>
+
+        <!-- ===== 探索 TAB ===== -->
+        <div class="tab-content active" id="tab-explore">
+
+          <section class="hero-band">
+            <div class="hero-copy">
+              <p class="time-chip" id="timeAnchor">公元前3000年</p>
+              <h3 id="coreQuestion">为什么人类会从村落走向城市？</h3>
+              <p id="worldSnapshot"></p>
+              <p class="takeaway" id="takeaway"></p>
+              <div class="hero-actions">
+                <button id="startExplore" class="primary-button">探索世界地图</button>
+                <button id="goCreate" class="secondary-button">开始创作任务</button>
+              </div>
+            </div>
+            <div class="voice-status-card" id="voiceStatus">
+              <p class="eyebrow">语音互动</p>
+              <strong>可以说："搜索尼罗河"或"朗读两河流域"</strong>
+              <span>浏览器支持时可直接语音搜索</span>
+            </div>
+          </section>
+
+          <section class="map-section" id="mapSection">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Historical Journey Map</p>
+                <h3>历史轨迹地图</h3>
+              </div>
+              <div class="map-legend">
+                <span><i class="dot exploring"></i>正在探索</span>
+                <span><i class="dot visited"></i>已到达</span>
+                <span><i class="dot locked"></i>未来解锁</span>
+              </div>
+            </div>
+            <div class="map-layout">
+              <div class="world-map" id="worldMap" aria-label="世界文明地图">
+                <div class="map-grid"></div>
+                <div class="map-label label-left">大河文明</div>
+                <div class="map-label label-right">同步观察</div>
+              </div>
+              <aside class="place-card" id="placeCard">
+                <p class="eyebrow">点击地图节点</p>
+                <h4>选择一个文明地点</h4>
+                <p>查看这个地点在当前时代的状态、可信度和可创作素材。</p>
+              </aside>
+            </div>
+          </section>
+
+          <section class="content-grid">
+            <article class="knowledge-panel">
+              <div class="section-heading compact">
+                <div>
+                  <p class="eyebrow">Synchronized Civilizations</p>
+                  <h3>同一时间，世界正在发生什么</h3>
+                </div>
+              </div>
+              <div class="region-tabs" id="regionTabs"></div>
+              <div class="region-detail" id="regionDetail"></div>
+            </article>
+
+            <aside class="side-panel">
+              <div class="panel-block">
+                <div class="section-heading compact">
+                  <div>
+                    <p class="eyebrow">Causal Chain</p>
+                    <h3>文明形成的因果链</h3>
+                  </div>
+                </div>
+                <div class="causal-chain" id="causalChain"></div>
+              </div>
+              <div class="panel-block">
+                <div class="section-heading compact">
+                  <div>
+                    <p class="eyebrow">Core Concepts</p>
+                    <h3>核心概念</h3>
+                  </div>
+                </div>
+                <div class="concept-list" id="conceptList"></div>
+              </div>
+            </aside>
+          </section>
+
+          <section class="changes-section">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Historical Timeline</p>
+                <h3>这个时代的重要变化</h3>
+              </div>
+            </div>
+            <div class="change-list" id="changeList"></div>
+          </section>
+
+          <section class="sources-section">
+            <div class="section-heading compact">
+              <div><p class="eyebrow">Sources</p><h3>资料来源</h3></div>
+            </div>
+            <div class="sources-list" id="sourcesList"></div>
+          </section>
+
+        </div><!-- end tab-explore -->
+
+        <!-- ===== AI对话 TAB ===== -->
+        <div class="tab-content hidden" id="tab-chat">
+          <section class="chat-section">
+            <div class="chat-header">
+              <div>
+                <p class="eyebrow">AI Civilization Tutor</p>
+                <h3>文明探索助手</h3>
+              </div>
+              <div class="chat-context">
+                <span class="context-chip" id="chatLessonChip">第1课 · 公元前3000年</span>
+                <span class="context-note">助手了解当前课程内容</span>
+              </div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+              <div class="chat-message ai">
+                <div class="message-avatar">AI</div>
+                <div class="message-bubble">
+                  <p>你好！我是文明探索助手 🌍</p>
+                  <p>我了解这节课的所有内容，可以回答你关于当前课程的问题，也可以帮你完成创作任务。</p>
+                  <p>试着问我：<em>"为什么要修水渠？"</em> 或 <em>"苏美尔人怎么记录粮食？"</em></p>
+                </div>
+              </div>
+            </div>
+
+            <div class="chat-suggestions" id="chatSuggestions"></div>
+
+            <div class="chat-input-row">
+              <textarea id="chatInput" placeholder="问任何关于这节课的问题..." rows="2"></textarea>
+              <button id="chatSendBtn" class="primary-button">发送</button>
+            </div>
+
+            <div class="api-hint" id="apiHint">
+              <span>💡 内置知识库模式。</span>
+              <button onclick="openSettings()" class="link-btn">输入API密钥升级为真实AI对话 →</button>
+            </div>
+          </section>
+        </div><!-- end tab-chat -->
+
+        <!-- ===== 我的创作 TAB ===== -->
+        <div class="tab-content hidden" id="tab-create">
+          <section class="create-section">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Creative Task</p>
+                <h3 id="taskTitle">创作任务</h3>
+              </div>
+              <span class="time-chip small" id="taskTimeChip"></span>
+            </div>
+
+            <div class="create-layout">
+              <div class="task-form-panel">
+                <div class="task-brief" id="taskBrief"></div>
+                <form id="taskForm">
+                  <div id="taskFields"></div>
+                  <div class="form-actions">
+                    <button type="submit" class="primary-button">生成文明方案</button>
+                    <button type="button" id="checkArtifact" class="secondary-button">历史质检</button>
+                  </div>
+                </form>
+                <div id="artifactOutput" class="artifact-output-area"></div>
+              </div>
+
+              <div class="drawing-panel">
+                <div class="drawing-header">
+                  <p class="eyebrow">Drawing Studio</p>
+                  <h4>文明绘图板</h4>
+                </div>
+                <div class="drawing-toolbar">
+                  <div class="tool-group">
+                    <button class="draw-tool active" data-tool="pencil" title="铅笔">✏</button>
+                    <button class="draw-tool" data-tool="brush" title="粗笔刷">🖌</button>
+                    <button class="draw-tool" data-tool="eraser" title="橡皮">⬜</button>
+                  </div>
+                  <div class="tool-group colors">
+                    <button class="color-btn active" data-color="#d4a853" style="background:#d4a853" title="金沙"></button>
+                    <button class="color-btn" data-color="#8b4513" style="background:#8b4513" title="赤土"></button>
+                    <button class="color-btn" data-color="#4a7c59" style="background:#4a7c59" title="田绿"></button>
+                    <button class="color-btn" data-color="#2d6b8f" style="background:#2d6b8f" title="河蓝"></button>
+                    <button class="color-btn" data-color="#c0a882" style="background:#c0a882" title="石灰"></button>
+                    <button class="color-btn" data-color="#1a1a1a" style="background:#1a1a1a" title="墨黑"></button>
+                    <button class="color-btn" data-color="#f5e6c8" style="background:#f5e6c8" title="纸白"></button>
+                  </div>
+                  <div class="tool-group size-group">
+                    <label class="size-label">笔触</label>
+                    <input type="range" id="brushSize" min="2" max="20" value="4" class="size-slider" />
+                  </div>
+                </div>
+
+                <div class="stamps-row">
+                  <span class="stamps-label">印章：</span>
+                  <button class="stamp-btn" data-stamp="temple">🏛</button>
+                  <button class="stamp-btn" data-stamp="river">〰</button>
+                  <button class="stamp-btn" data-stamp="farm">🌾</button>
+                  <button class="stamp-btn" data-stamp="house">🏠</button>
+                  <button class="stamp-btn" data-stamp="grain">🛖</button>
+                  <button class="stamp-btn" data-stamp="wall">⛩</button>
+                  <button class="stamp-btn" data-stamp="scroll">📜</button>
+                </div>
+
+                <canvas id="drawingCanvas" width="480" height="360"></canvas>
+
+                <div class="canvas-actions">
+                  <button id="clearCanvas" class="secondary-button small">清除</button>
+                  <button id="saveDrawing" class="secondary-button small">保存图稿</button>
+                  <button id="downloadDrawing" class="secondary-button small">下载</button>
+                </div>
+
+                <div class="saved-drawings" id="savedDrawings"></div>
+              </div>
+            </div>
+          </section>
+        </div><!-- end tab-create -->
+
+        <!-- ===== 历史轨迹 TAB ===== -->
+        <div class="tab-content hidden" id="tab-history">
+          <section class="history-section">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">My Learning Journey</p>
+                <h3>我的学习历史轨迹</h3>
+              </div>
+              <button id="clearHistory" class="secondary-button small">清除记录</button>
+            </div>
+            <div class="history-stats" id="historyStats"></div>
+            <div class="history-timeline" id="historyTimeline">
+              <p class="empty-state">开始探索课程，你的学习轨迹会记录在这里。</p>
+            </div>
+          </section>
+        </div><!-- end tab-history -->
+
+      </main>
+    </div>
+
+    <!-- 设置弹窗 -->
+    <div class="modal-overlay hidden" id="settingsModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>设置</h3>
+          <button id="closeSettings" class="icon-button">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="setting-group">
+            <label>Anthropic API 密钥（可选）</label>
+            <p class="setting-desc">输入后，AI对话将使用真实的Claude模型。密钥仅存储在本地浏览器中，不会上传。</p>
+            <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." class="setting-input" />
+          </div>
+          <div class="setting-group">
+            <label>语音朗读速度</label>
+            <div class="range-row">
+              <input type="range" id="speechRate" min="0.7" max="1.3" step="0.1" value="0.95" class="size-slider" />
+              <span id="speechRateLabel">0.95×</span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="saveSettings" class="primary-button">保存设置</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="./data.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
