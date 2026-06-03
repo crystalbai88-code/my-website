@@ -180,11 +180,16 @@ function applyEraColors(id) {
   root.style.setProperty('--era-water', c.water);
   root.style.setProperty('--era-sky', c.sky);
 
-  $$('#continents path').forEach((p) => {
-    p.setAttribute('fill', adjustColor(c.land, (Math.random() - .5) * .15));
-  });
+  // Only change the ocean — terrain paths keep their individual colors
+  // Apply a CSS hue-shift filter to the whole continent group for era tint
   $('#ocean').setAttribute('fill', c.water);
-  $('#s-lesson').style.background = `linear-gradient(180deg, ${c.sky} 0%, ${adjustColor(c.sky, .05)} 100%)`;
+  const continents = $('#continents');
+  if (continents) {
+    // Subtle saturation shift based on era — older = less saturated
+    const sat = c.sat != null ? c.sat : 0.8;
+    continents.style.filter = `saturate(${sat}) brightness(${0.85 + sat * 0.2})`;
+  }
+  $('#s-lesson').style.background = `linear-gradient(180deg, ${c.sky} 0%, ${adjustColor(c.sky, .04)} 100%)`;
 }
 
 function hexToRgb(hex) {

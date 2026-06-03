@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI世界文明实验室</title>
-  <link rel="stylesheet" href="./styles.css?v=3" />
+  <link rel="stylesheet" href="./styles.css?v=5" />
 </head>
 <body>
 
@@ -26,17 +26,77 @@
     <div class="tl-line"><div class="tl-line-fill" id="tlLineFill"></div></div>
     <div class="tl-dots" id="tlDots"></div>
     <div id="tl-figure">
-      <svg viewBox="-16 -52 32 52" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="0" cy="-44" r="10" fill="rgba(240,192,96,.15)"/>
-        <circle cx="0" cy="-44" r="7" fill="#f0c060"/>
-        <circle cx="-2.5" cy="-45" r="1.2" fill="#1a0e04"/>
-        <circle cx="2.5" cy="-45" r="1.2" fill="#1a0e04"/>
-        <line x1="0" y1="-37" x2="0" y2="-18" stroke="#f0c060" stroke-width="3" stroke-linecap="round"/>
-        <line x1="0" y1="-32" x2="-10" y2="-24" stroke="#f0c060" stroke-width="2.5" stroke-linecap="round"/>
-        <line x1="0" y1="-32" x2="10" y2="-24" stroke="#f0c060" stroke-width="2.5" stroke-linecap="round"/>
-        <line x1="0" y1="-18" x2="-8" y2="-4" stroke="#f0c060" stroke-width="2.5" stroke-linecap="round"/>
-        <line x1="0" y1="-18" x2="8" y2="-4" stroke="#f0c060" stroke-width="2.5" stroke-linecap="round"/>
-        <ellipse cx="0" cy="-2" rx="10" ry="3" fill="rgba(0,0,0,.3)"/>
+      <!-- Cartoon Explorer Character — walks along the timeline -->
+      <svg width="56" height="88" viewBox="-28 -82 56 88" style="overflow:visible" xmlns="http://www.w3.org/2000/svg">
+        <!-- Ground shadow -->
+        <ellipse cx="0" cy="4" rx="18" ry="5" fill="rgba(0,0,0,0.35)"/>
+        <!-- ── Left leg (back) ── -->
+        <g class="char-leg-l" style="transform-origin:0px -14px">
+          <rect x="-11" y="-14" width="9" height="26" rx="4.5" fill="#3a8de0"/>
+          <rect x="-11" y="9" width="9" height="9" rx="4" fill="#222a50"/><!-- shoe -->
+          <rect x="-13" y="10" width="11" height="6" rx="3" fill="#1a2040"/><!-- sole -->
+        </g>
+        <!-- ── Right leg (front) ── -->
+        <g class="char-leg-r" style="transform-origin:0px -14px">
+          <rect x="2" y="-14" width="9" height="26" rx="4.5" fill="#4a9de8"/>
+          <rect x="2" y="9" width="9" height="9" rx="4" fill="#2a3460"/><!-- shoe -->
+          <rect x="2" y="10" width="11" height="6" rx="3" fill="#1a2040"/><!-- sole -->
+        </g>
+        <!-- ── Body (shirt + bobbing) ── -->
+        <g class="char-body">
+          <!-- Backpack -->
+          <rect x="9" y="-44" width="10" height="16" rx="4" fill="#7dc455" stroke="#5a9a38" stroke-width="1"/>
+          <rect x="10" y="-38" width="8" height="2" rx="1" fill="#5a9a38"/>
+          <!-- Shirt body -->
+          <rect x="-14" y="-46" width="28" height="28" rx="7" fill="#ff6b3d"/>
+          <!-- Shirt collar -->
+          <path d="M-5,-46 Q0,-42 5,-46" fill="#e84f25"/>
+          <!-- Belt -->
+          <rect x="-14" y="-22" width="28" height="5" rx="2.5" fill="#c8520a"/>
+          <!-- Belt buckle -->
+          <rect x="-4" y="-23" width="8" height="7" rx="2" fill="#ffd654" stroke="#cc9a10" stroke-width="1"/>
+          <!-- ── Left arm ── -->
+          <g class="char-arm-l" style="transform-origin:-14px -38px">
+            <rect x="-22" y="-42" width="10" height="20" rx="5" fill="#ff6b3d"/>
+            <ellipse cx="-17" cy="-22" rx="5.5" ry="5.5" fill="#f4c490"/><!-- hand -->
+          </g>
+          <!-- ── Right arm ── -->
+          <g class="char-arm-r" style="transform-origin:14px -38px">
+            <rect x="12" y="-42" width="10" height="20" rx="5" fill="#ff6b3d"/>
+            <ellipse cx="17" cy="-22" rx="5.5" ry="5.5" fill="#f4c490"/><!-- hand -->
+          </g>
+          <!-- ── Neck ── -->
+          <rect x="-5" y="-50" width="10" height="7" rx="4" fill="#f4c490"/>
+          <!-- ── Head ── -->
+          <circle cx="0" cy="-62" r="18" fill="#f4c490"/>
+          <!-- Cheeks blush -->
+          <ellipse cx="-11" cy="-57" rx="5" ry="3.5" fill="rgba(255,120,100,.25)"/>
+          <ellipse cx="11" cy="-57" rx="5" ry="3.5" fill="rgba(255,120,100,.25)"/>
+          <!-- Hair -->
+          <path d="M-17,-70 Q-14,-82 0,-80 Q14,-82 17,-70 Q16,-62 12,-60 Q0,-56 -12,-60 Q-16,-62 -17,-70Z" fill="#5c3512"/>
+          <!-- Explorer hat brim -->
+          <ellipse cx="0" cy="-76" rx="22" ry="6" fill="#c07020"/>
+          <!-- Hat crown -->
+          <rect x="-13" y="-86" width="26" height="18" rx="6" fill="#e0902a"/>
+          <!-- Hat band -->
+          <rect x="-13" y="-78" width="26" height="5" rx="2" fill="#8a4a10"/>
+          <!-- Hat feather -->
+          <path d="M13,-86 Q22,-96 16,-104 Q8,-98 13,-86Z" fill="#1ecfc0" opacity=".9"/>
+          <!-- Eyes white -->
+          <ellipse cx="-7" cy="-63" rx="5" ry="6" fill="white"/>
+          <ellipse cx="7" cy="-63" rx="5" ry="6" fill="white"/>
+          <!-- Iris -->
+          <circle cx="-7" cy="-62" r="3.5" fill="#3a2010"/>
+          <circle cx="7" cy="-62" r="3.5" fill="#3a2010"/>
+          <!-- Eye shine -->
+          <circle cx="-5.5" cy="-63.5" r="1.3" fill="white"/>
+          <circle cx="8.5" cy="-63.5" r="1.3" fill="white"/>
+          <!-- Eyebrows (cheerful arc) -->
+          <path d="M-13,-70 Q-7,-73 -2,-70" stroke="#5c3512" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <path d="M2,-70 Q7,-73 13,-70" stroke="#5c3512" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <!-- Smile -->
+          <path d="M-7,-54 Q0,-48 7,-54" stroke="#c05030" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+        </g>
       </svg>
     </div>
   </div>
@@ -104,23 +164,118 @@
             </radialGradient>
             <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
           </defs>
-          <rect id="ocean" width="1000" height="520" fill="#1a3a5a"/>
+          <!-- Ocean with gradient depth -->
+          <defs>
+            <radialGradient id="oceanGrad" cx="50%" cy="45%" r="65%">
+              <stop offset="0%" stop-color="#1e6ca8"/>
+              <stop offset="50%" stop-color="#1254a0"/>
+              <stop offset="100%" stop-color="#0a3070"/>
+            </radialGradient>
+            <radialGradient id="civGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#ffd654" stop-opacity=".7"/>
+              <stop offset="100%" stop-color="#ffd654" stop-opacity="0"/>
+            </radialGradient>
+            <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <rect id="ocean" width="1000" height="520" fill="url(#oceanGrad)"/>
+
+          <!-- Ocean wave lines (decorative) -->
+          <g stroke="rgba(255,255,255,0.06)" stroke-width="1" fill="none">
+            <path d="M 0,200 Q 100,190 200,200 Q 300,210 400,200 Q 500,190 600,200 Q 700,210 800,200 Q 900,190 1000,200"/>
+            <path d="M 0,300 Q 120,290 240,300 Q 360,310 480,300 Q 600,290 720,300 Q 840,310 1000,300"/>
+          </g>
+
           <g id="continents">
-            <path id="north-america" fill="#7a6020" d="M 90,60 C 120,45 160,40 195,55 L 230,70 255,90 270,120 265,160 280,190 270,220 255,260 235,300 215,330 190,340 165,320 145,290 120,265 100,235 85,200 75,165 70,130 80,95 Z"/>
-            <path fill="#7a6020" d="M 215,330 L 230,340 225,360 210,370 200,355 205,340 Z"/>
-            <path id="south-america" fill="#6a5518" d="M 205,370 C 225,365 255,370 270,390 L 285,420 285,460 270,490 245,505 220,500 200,475 190,445 195,415 200,390 Z"/>
-            <path id="europe" fill="#6b7840" d="M 445,75 C 465,65 495,68 515,80 L 525,95 530,115 515,135 500,148 475,150 460,138 445,120 440,100 Z"/>
-            <path fill="#6b7840" d="M 440,120 L 450,130 445,148 430,150 425,135 430,122 Z"/>
-            <path fill="#6b7840" d="M 445,78 L 455,70 460,78 452,86 443,82 Z"/>
-            <path fill="#6b7840" d="M 470,50 L 490,42 505,55 495,70 475,68 Z"/>
-            <path id="africa" fill="#8b7030" d="M 445,155 C 475,148 515,155 545,175 L 565,205 580,245 575,290 565,335 545,375 520,405 490,425 460,415 440,385 425,345 425,300 432,258 440,215 440,180 Z"/>
-            <path id="arabia" fill="#9a8040" d="M 560,180 L 590,172 615,185 620,215 610,240 590,248 570,238 558,215 Z"/>
-            <path id="asia" fill="#6e7040" d="M 525,72 C 580,55 660,50 745,58 L 840,70 900,95 920,130 905,160 880,175 850,180 820,195 790,215 765,240 740,265 715,285 690,295 665,290 645,275 620,260 598,245 575,225 558,200 548,175 535,145 525,110 Z"/>
-            <path id="india" fill="#7a6e30" d="M 660,215 L 690,210 715,225 720,258 700,285 675,290 655,275 645,248 Z"/>
-            <path fill="#6a6832" d="M 755,250 L 790,240 815,255 820,280 800,295 775,285 755,265 Z"/>
-            <path fill="#6a6535" d="M 845,140 L 860,130 870,142 862,158 847,155 Z"/>
-            <path fill="#6a6535" d="M 855,110 L 870,105 877,118 868,130 854,125 Z"/>
-            <path id="australia" fill="#7a6528" d="M 755,355 C 790,340 835,345 865,368 L 875,400 860,430 825,440 790,432 765,408 750,378 Z"/>
+            <!-- ── NORTH AMERICA: mixed terrain ── -->
+            <!-- Base (forests/plains) -->
+            <path id="north-america" fill="#4a8c38"
+              d="M 90,60 C 120,45 160,40 195,55 L 230,70 255,90 270,120 265,160 280,190 270,220 255,260 235,300 215,330 190,340 165,320 145,290 120,265 100,235 85,200 75,165 70,130 80,95 Z"/>
+            <!-- Rocky Mountains (western) -->
+            <path fill="#9a7a55" d="M 110,80 L 125,65 145,80 155,120 145,160 130,180 115,160 105,130 Z"/>
+            <!-- Great Plains (centre) -->
+            <path fill="#c4b050" d="M 155,130 L 200,115 230,130 235,170 220,210 195,220 165,210 150,175 Z"/>
+            <!-- Central America -->
+            <path fill="#3d8030" d="M 215,330 L 232,340 227,360 212,370 202,355 207,340 Z"/>
+
+            <!-- ── SOUTH AMERICA: Amazon + Andes ── -->
+            <!-- Base greenery -->
+            <path id="south-america" fill="#3a8c28"
+              d="M 205,370 C 225,365 255,370 270,390 L 285,420 285,460 270,490 245,505 220,500 200,475 190,445 195,415 200,390 Z"/>
+            <!-- Amazon rainforest (dark green) -->
+            <path fill="#206018" d="M 210,375 Q 255,368 272,392 L 282,430 265,455 235,460 215,440 205,415 210,390 Z"/>
+            <!-- Andes (mountain) -->
+            <path fill="#8c7050" d="M 205,370 L 215,368 220,385 215,430 208,450 202,440 195,415 198,390 Z"/>
+            <!-- Pampas (grassland) -->
+            <path fill="#8ab840" d="M 230,455 L 270,460 275,490 250,505 225,500 220,475 Z"/>
+
+            <!-- ── EUROPE: temperate green ── -->
+            <path id="europe" fill="#6aaa3e"
+              d="M 445,75 C 465,65 495,68 515,80 L 525,95 530,115 515,135 500,148 475,150 460,138 445,120 440,100 Z"/>
+            <!-- Alps mountain range -->
+            <path fill="#c8bca0" d="M 465,115 L 480,108 498,112 505,125 495,132 475,133 462,126 Z"/>
+            <!-- Iberian Peninsula -->
+            <path fill="#c0a858" d="M 440,120 L 450,130 445,148 430,150 425,135 430,122 Z"/>
+            <!-- British Isles -->
+            <path fill="#5aa830" d="M 445,78 L 455,70 460,78 452,86 443,82 Z"/>
+            <!-- Scandinavia (taiga) -->
+            <path fill="#4a8a38" d="M 470,50 L 490,42 505,55 495,70 475,68 Z"/>
+
+            <!-- ── AFRICA: rich terrain diversity ── -->
+            <!-- Base (varied) -->
+            <path id="africa" fill="#d4a840"
+              d="M 445,155 C 475,148 515,155 545,175 L 565,205 580,245 575,290 565,335 545,375 520,405 490,425 460,415 440,385 425,345 425,300 432,258 440,215 440,180 Z"/>
+            <!-- Sahara Desert (sandy) -->
+            <path fill="#e8c860" d="M 445,160 L 540,160 L 565,205 L 560,230 L 440,230 L 432,210 Z"/>
+            <!-- Central Africa rainforest -->
+            <path fill="#2a7020" d="M 445,260 L 530,255 L 555,295 L 545,335 L 490,340 L 450,325 L 435,295 Z"/>
+            <!-- East Africa savanna (golden) -->
+            <path fill="#c8a838" d="M 540,260 L 565,270 L 565,335 L 548,355 L 535,330 L 545,300 Z"/>
+            <!-- Southern tip (grassland) -->
+            <path fill="#80b040" d="M 460,380 L 520,375 L 535,400 L 515,418 L 490,422 L 462,412 Z"/>
+            <!-- Nile corridor (green strip) -->
+            <path fill="#508840" d="M 512,160 L 522,165 L 520,220 L 510,220 L 508,165 Z"/>
+
+            <!-- ── ARABIA: desert ── -->
+            <path id="arabia" fill="#e0b84a"
+              d="M 560,180 L 590,172 615,185 620,215 610,240 590,248 570,238 558,215 Z"/>
+            <!-- Sand dune highlights -->
+            <path fill="#eecc70" d="M 568,185 Q 585,178 600,183 L 610,200 Q 595,194 578,198 Z" opacity=".5"/>
+
+            <!-- ── ASIA: huge terrain diversity ── -->
+            <!-- Base (green/mixed) -->
+            <path id="asia" fill="#6a9838"
+              d="M 525,72 C 580,55 660,50 745,58 L 840,70 900,95 920,130 905,160 880,175 850,180 820,195 790,215 765,240 740,265 715,285 690,295 665,290 645,275 620,260 598,245 575,225 558,200 548,175 535,145 525,110 Z"/>
+            <!-- Siberian taiga (north, grey-green) -->
+            <path fill="#507040" d="M 620,58 L 750,58 L 840,70 L 850,100 L 810,105 L 745,90 L 680,80 L 625,75 Z"/>
+            <!-- Gobi/Central Asian desert (tan) -->
+            <path fill="#c8a848" d="M 650,110 L 750,105 L 800,130 L 790,165 L 745,175 L 690,168 L 655,148 Z"/>
+            <!-- Chinese plains (fertile green) -->
+            <path fill="#78b840" d="M 780,155 L 840,145 L 870,160 L 865,195 L 840,205 L 800,200 L 775,185 Z"/>
+            <!-- Himalayas/Tibet (mountain plateau) -->
+            <path fill="#c0aaaa" d="M 650,168 L 695,162 L 720,175 L 718,200 L 688,208 L 658,200 L 644,185 Z"/>
+            <!-- Mesopotamia / Fertile Crescent (lush) -->
+            <path fill="#88b840" d="M 555,180 L 590,175 L 610,195 L 605,225 L 580,232 L 558,218 Z"/>
+
+            <!-- ── INDIAN SUBCONTINENT ── -->
+            <path id="india" fill="#90c050"
+              d="M 660,215 L 690,210 715,225 720,258 700,285 675,290 655,275 645,248 Z"/>
+            <!-- Thar Desert (northwest India) -->
+            <path fill="#d4b860" d="M 648,220 L 666,216 L 672,238 L 658,242 L 646,232 Z"/>
+
+            <!-- ── SOUTHEAST ASIA ── -->
+            <path fill="#3a8c28" d="M 755,250 L 790,240 815,255 820,280 800,295 775,285 755,265 Z"/>
+
+            <!-- ── JAPAN ── -->
+            <path fill="#70a838" d="M 845,140 L 860,130 870,142 862,158 847,155 Z"/>
+            <path fill="#70a838" d="M 855,110 L 870,105 877,118 868,130 854,125 Z"/>
+
+            <!-- ── AUSTRALIA: outback + coasts ── -->
+            <!-- Outback (red-brown) -->
+            <path id="australia" fill="#c47830"
+              d="M 755,355 C 790,340 835,345 865,368 L 875,400 860,430 825,440 790,432 765,408 750,378 Z"/>
+            <!-- Coastal green fringe -->
+            <path fill="#6a9830" d="M 756,380 Q 762,360 775,358 L 800,358 L 820,365 L 832,380 L 820,388 L 795,385 L 768,388 Z"/>
+            <path fill="#6a9830" d="M 820,418 L 855,408 L 862,425 L 840,435 L 820,432 Z"/>
           </g>
           <g id="civ-markers"></g>
         </svg>
@@ -338,7 +493,7 @@
   </div>
 </div>
 
-<script src="./data.js?v=3"></script>
-<script src="./app.js?v=3"></script>
+<script src="./data.js?v=5"></script>
+<script src="./app.js?v=5"></script>
 </body>
 </html>
