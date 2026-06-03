@@ -1536,3 +1536,319 @@ html, body {
 .evo-misconceptions-box li {
   font-size: 12px; color: var(--ink2); margin-bottom: 4px; line-height: 1.5;
 }
+
+/* ════════════════════════════════════════════════════
+   🎮 时光机角色扮演 Time-Machine Scenario
+════════════════════════════════════════════════════ */
+.scenario-layer {
+  background: linear-gradient(160deg, rgba(212,164,53,.05), rgba(184,48,24,.04)) !important;
+  border-top: 2px solid rgba(184,48,24,.3) !important;
+  border-bottom: 2px solid rgba(184,48,24,.3) !important;
+}
+
+.scenario-container { max-width: 760px; margin: 0 auto; }
+
+/* ── Cover / Intro ── */
+.scenario-intro { padding: 14px 0; }
+.scenario-cover {
+  background: linear-gradient(135deg, #fdf5e0, #f5e2c0 60%, #ecd0a0);
+  border: 2px solid rgba(184,48,24,.25);
+  border-radius: 14px;
+  padding: 32px 28px;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(100,40,10,.15);
+  position: relative;
+  overflow: hidden;
+}
+.scenario-cover::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 6px;
+  background: linear-gradient(90deg, var(--warm), var(--amber), var(--warm));
+}
+.scenario-cover-emoji {
+  font-size: 56px; margin-bottom: 12px;
+  filter: drop-shadow(0 4px 12px rgba(100,40,10,.25));
+}
+.scenario-cover h4 {
+  font-family: var(--serif); font-size: 22px;
+  color: var(--warm); margin-bottom: 14px;
+  letter-spacing: .1em;
+}
+.scenario-intro-text {
+  font-size: 14px; line-height: 2;
+  color: var(--ink2); margin-bottom: 20px;
+  max-width: 540px; margin-left: auto; margin-right: auto;
+}
+.scenario-stat-preview {
+  display: flex; align-items: center; gap: 10px;
+  justify-content: center; margin: 18px 0;
+  font-size: 12px; color: var(--ink2);
+}
+.scenario-bar {
+  width: 200px; height: 14px;
+  background: rgba(160,100,30,.15);
+  border-radius: 7px; overflow: hidden;
+  border: 1px solid rgba(160,100,30,.3);
+}
+.scenario-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--warm), var(--amber));
+  border-radius: 6px;
+  transition: width .6s cubic-bezier(.4,0,.2,1);
+}
+.scenario-stat-num {
+  font-weight: 700; color: var(--warm);
+  font-family: 'Courier New', monospace;
+}
+.scenario-start-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--warm), var(--amber));
+  color: #fff5e8; border: none;
+  padding: 14px 36px; font-size: 16px;
+  border-radius: 30px; cursor: pointer;
+  font-family: var(--serif); font-weight: 700;
+  letter-spacing: .1em;
+  box-shadow: 0 6px 16px rgba(184,48,24,.35);
+  transition: all .25s;
+}
+.scenario-start-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 9px 22px rgba(184,48,24,.45);
+}
+
+/* ── Play State ── */
+.scenario-play { padding: 14px 0; }
+.scenario-topbar {
+  display: flex; align-items: center; gap: 24px;
+  margin-bottom: 16px; padding: 12px 18px;
+  background: rgba(255,248,228,.7);
+  border: 1px solid rgba(160,100,30,.2);
+  border-radius: 10px;
+  flex-wrap: wrap;
+}
+.scenario-progress {
+  display: flex; align-items: center; gap: 4px;
+  flex: 1; min-width: 160px;
+}
+.scenario-prog-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: rgba(160,100,30,.2);
+  border: 2px solid rgba(160,100,30,.3);
+  transition: all .3s;
+}
+.scenario-prog-dot.done {
+  background: var(--amber);
+  border-color: var(--amber);
+}
+.scenario-prog-dot.active {
+  background: var(--warm);
+  border-color: var(--warm);
+  box-shadow: 0 0 0 3px rgba(184,48,24,.25);
+  animation: scenarioPulse 1.5s infinite;
+}
+@keyframes scenarioPulse {
+  0%,100% { box-shadow: 0 0 0 3px rgba(184,48,24,.25); }
+  50%     { box-shadow: 0 0 0 7px rgba(184,48,24,.08); }
+}
+.scenario-prog-line {
+  flex: 1; height: 2px;
+  background: rgba(160,100,30,.2);
+  min-width: 8px;
+}
+.scenario-stat {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; color: var(--ink2);
+}
+
+/* ── Scene Card ── */
+.scenario-card {
+  background: linear-gradient(135deg, #fdf5e0, #f8ebd0);
+  border: 2px solid rgba(160,100,30,.3);
+  border-radius: 14px;
+  padding: 26px 28px;
+  box-shadow: 0 8px 24px rgba(100,40,10,.12);
+  margin-bottom: 8px;
+}
+@keyframes scenarioCardIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: none; }
+}
+.scenario-card-enter { animation: scenarioCardIn .45s both; }
+
+.scenario-scene-head {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 16px;
+}
+.scenario-scene-emoji {
+  font-size: 42px; line-height: 1;
+  filter: drop-shadow(0 3px 8px rgba(100,40,10,.2));
+}
+.scenario-scene-head h4 {
+  font-family: var(--serif);
+  font-size: 19px;
+  color: var(--warm);
+  letter-spacing: .06em;
+}
+.scenario-situation {
+  font-size: 14px; line-height: 2;
+  color: var(--ink); margin-bottom: 22px;
+  padding: 14px 16px;
+  background: rgba(255,255,255,.5);
+  border-left: 3px solid var(--amber);
+  border-radius: 0 6px 6px 0;
+}
+
+/* ── Choices ── */
+.scenario-choices {
+  display: flex; flex-direction: column; gap: 10px;
+}
+.scenario-choice-btn {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px; gap: 12px;
+  background: rgba(255,255,255,.7);
+  border: 2px solid rgba(160,100,30,.25);
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: var(--serif);
+  font-size: 14px;
+  color: var(--ink);
+  text-align: left; line-height: 1.6;
+  transition: all .22s;
+}
+.scenario-choice-btn:hover {
+  background: linear-gradient(135deg, rgba(200,104,32,.1), rgba(184,48,24,.05));
+  border-color: var(--warm);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(184,48,24,.18);
+}
+.scenario-choice-text { flex: 1; }
+.scenario-choice-arrow {
+  font-size: 18px; color: var(--warm);
+  font-weight: 700; opacity: 0; transition: opacity .2s;
+}
+.scenario-choice-btn:hover .scenario-choice-arrow { opacity: 1; }
+
+/* ── Outcome ── */
+.scenario-outcome-card { animation: scenarioCardIn .45s both; }
+.scenario-outcome-head {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 14px;
+}
+.scenario-outcome-emoji { font-size: 36px; }
+.scenario-effect-badge {
+  margin-left: auto;
+  padding: 5px 14px;
+  border-radius: 16px;
+  font-family: 'Courier New', monospace;
+  font-weight: 700; font-size: 14px;
+}
+.scenario-effect-badge.positive {
+  background: rgba(80,160,60,.18);
+  color: #4a7a30;
+  border: 1px solid rgba(80,160,60,.35);
+}
+.scenario-effect-badge.negative {
+  background: rgba(200,60,40,.15);
+  color: #a02818;
+  border: 1px solid rgba(200,60,40,.35);
+}
+.scenario-effect-badge.neutral {
+  background: rgba(160,100,30,.12);
+  color: var(--ink2);
+  border: 1px solid rgba(160,100,30,.25);
+}
+.scenario-outcome-text {
+  font-size: 14px; line-height: 2;
+  color: var(--ink);
+  margin-bottom: 14px;
+}
+.scenario-fact-box {
+  background: rgba(200,160,60,.1);
+  border: 1px solid rgba(200,104,32,.25);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+.scenario-fact-box strong {
+  display: block; font-size: 12px;
+  color: var(--warm); margin-bottom: 4px;
+  letter-spacing: .05em;
+}
+.scenario-fact-box p {
+  font-size: 13px; line-height: 1.85;
+  color: var(--ink2); margin: 0;
+}
+.scenario-wiki-row {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 10px;
+  font-size: 12px; color: var(--ink2);
+}
+.scenario-next-btn {
+  background: var(--warm);
+  color: #fff5e8;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 22px;
+  font-family: var(--serif);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: .05em;
+  float: right;
+  transition: all .2s;
+}
+.scenario-next-btn:hover {
+  background: var(--amber);
+  transform: translateX(3px);
+}
+
+/* ── Ending ── */
+.scenario-card-ending {
+  text-align: center;
+  background: linear-gradient(135deg, #fdf5e0, #f5e2c0, #ecd0a0);
+  position: relative;
+}
+.scenario-card-ending::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px;
+  background: linear-gradient(90deg, var(--warm), var(--amber), var(--warm));
+}
+.scenario-ending-emoji {
+  font-size: 72px; margin: 6px 0 12px;
+  animation: scenarioFloat 2.5s ease-in-out infinite;
+}
+@keyframes scenarioFloat {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-8px); }
+}
+.scenario-card-ending h3 {
+  font-family: var(--serif);
+  font-size: 24px;
+  color: var(--warm);
+  letter-spacing: .1em;
+  margin-bottom: 14px;
+}
+.scenario-ending-body {
+  font-size: 14px;
+  line-height: 2;
+  color: var(--ink);
+  max-width: 540px;
+  margin: 0 auto 20px;
+}
+.scenario-stat-final {
+  justify-content: center;
+  margin: 18px 0 22px;
+}
+.scenario-ending-actions {
+  display: flex; gap: 12px; justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .scenario-cover { padding: 22px 16px; }
+  .scenario-cover h4 { font-size: 18px; }
+  .scenario-intro-text { font-size: 13px; }
+  .scenario-card { padding: 18px; }
+  .scenario-scene-head h4 { font-size: 16px; }
+  .scenario-choice-btn { font-size: 13px; padding: 12px 14px; }
+}

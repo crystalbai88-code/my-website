@@ -1123,9 +1123,10 @@ function renderPreEra(p) {
     `<button class="pre-layer-pill" onclick="scrollToPreLayer('pre-${l.id}')">${l.icon} ${l.label}</button>`
   ).join('');
 
-  // Body: render all 9 layers
+  // Body: render all layers (+ scenario if available)
   const body = $('#preEraBody');
   body.innerHTML = [
+    renderScenarioLayer(p),
     renderPreLayer1(p),
     renderPreLayer2(p),
     renderPreLayer3(p),
@@ -1136,6 +1137,9 @@ function renderPreEra(p) {
     renderPreLayer8(p),
     renderPreLayer9(p),
   ].join('');
+
+  // Bind scenario interactions
+  if (p.scenario) bindScenarioInteractions(p);
 
   // Bind region tabs
   const rtabs = body.querySelectorAll('.preg-tab');
@@ -1236,6 +1240,187 @@ function renderPreLayer1(p) {
     <div class="ptl-scale">⏱ ${tl.scale_note}</div>
     ${evoSection}
   </section>`;
+}
+
+// ══════════════════════════════════════════════
+// 🎮 时光机角色扮演 Time-Machine Scenario
+// ══════════════════════════════════════════════
+function renderScenarioLayer(p) {
+  if (!p.scenario) return '';
+  const s = p.scenario;
+  return `<section class="pre-layer scenario-layer" id="pre-scenario">
+    <div class="pl-header"><span class="pl-icon">🎮</span><div><h3>时光机 · 角色扮演</h3><p class="pl-sub">${s.subtitle}</p></div></div>
+
+    <div class="scenario-container" id="scenarioContainer">
+      <!-- 开场 -->
+      <div class="scenario-intro" id="scenarioIntro">
+        <div class="scenario-cover">
+          <div class="scenario-cover-emoji">🦴</div>
+          <h4>${s.title}</h4>
+          <p class="scenario-intro-text">${s.intro}</p>
+          <div class="scenario-stat-preview">
+            <span>💛 生存值</span>
+            <div class="scenario-bar"><div class="scenario-bar-fill" style="width:${s.start_survival}%"></div></div>
+            <span class="scenario-stat-num">${s.start_survival}/100</span>
+          </div>
+          <button class="scenario-start-btn" data-pid="${p.id}">🎬 开始穿越</button>
+        </div>
+      </div>
+
+      <!-- 场景容器 -->
+      <div class="scenario-play" id="scenarioPlay" style="display:none">
+        <div class="scenario-topbar">
+          <div class="scenario-progress" id="scenarioProgress"></div>
+          <div class="scenario-stat">
+            <span>💛 生存值</span>
+            <div class="scenario-bar"><div class="scenario-bar-fill" id="scenarioStatFill"></div></div>
+            <span class="scenario-stat-num" id="scenarioStatNum"></span>
+          </div>
+        </div>
+        <div class="scenario-scene" id="scenarioScene"></div>
+      </div>
+
+      <!-- 结局容器 -->
+      <div class="scenario-ending" id="scenarioEnding" style="display:none"></div>
+    </div>
+  </section>`;
+}
+
+// Scenario state (per era)
+let scenarioState = {};
+
+function bindScenarioInteractions(p) {
+  const startBtn = document.querySelector('.scenario-start-btn[data-pid="' + p.id + '"]');
+  if (!startBtn) return;
+  startBtn.onclick = () => beginScenario(p);
+}
+
+function beginScenario(p) {
+  const s = p.scenario;
+  scenarioState[p.id] = {
+    sceneIdx: 0,
+    survival: s.start_survival,
+    history: [],
+  };
+  document.getElementById('scenarioIntro').style.display = 'none';
+  document.getElementById('scenarioPlay').style.display = 'block';
+  document.getElementById('scenarioEnding').style.display = 'none';
+  renderScenarioScene(p);
+}
+
+function renderScenarioScene(p) {
+  const s = p.scenario;
+  const st = scenarioState[p.id];
+  const scene = s.scenes[st.sceneIdx];
+  if (!scene) { showScenarioEnding(p); return; }
+
+  // Update topbar progress + stat
+  const progEl = document.getElementById('scenarioProgress');
+  progEl.innerHTML = s.scenes.map((sc, i) =>
+    `<div class="scenario-prog-dot ${i < st.sceneIdx ? 'done' : ''} ${i === st.sceneIdx ? 'active' : ''}"></div>`
+  ).join('<div class="scenario-prog-line"></div>');
+  updateScenarioStat(p);
+
+  const sceneEl = document.getElementById('scenarioScene');
+  sceneEl.innerHTML = `
+    <div class="scenario-card scenario-card-enter">
+      <div class="scenario-scene-head">
+        <span class="scenario-scene-emoji">${scene.emoji}</span>
+        <h4>${scene.title}</h4>
+      </div>
+      <p class="scenario-situation">${scene.situation}</p>
+      <div class="scenario-choices">
+        ${scene.choices.map((c, i) => `
+          <button class="scenario-choice-btn" data-idx="${i}">
+            <span class="scenario-choice-text">${c.text}</span>
+            <span class="scenario-choice-arrow">→</span>
+          </button>`).join('')}
+      </div>
+    </div>`;
+
+  // bind choices
+  sceneEl.querySelectorAll('.scenario-choice-btn').forEach((btn, i) => {
+    btn.onclick = () => makeChoice(p, i);
+  });
+  sceneEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function makeChoice(p, choiceIdx) {
+  const s = p.scenario;
+  const st = scenarioState[p.id];
+  const scene = s.scenes[st.sceneIdx];
+  const choice = scene.choices[choiceIdx];
+
+  // Apply effect
+  st.survival = Math.max(0, Math.min(s.max_survival, st.survival + choice.effect));
+  st.history.push({ sceneIdx: st.sceneIdx, choice: choice.text, effect: choice.effect });
+
+  // Show outcome card
+  const sceneEl = document.getElementById('scenarioScene');
+  const effectClass = choice.effect > 0 ? 'positive' : (choice.effect < 0 ? 'negative' : 'neutral');
+  const effectIcon = choice.effect > 0 ? '+' : '';
+  sceneEl.innerHTML = `
+    <div class="scenario-card scenario-outcome-card">
+      <div class="scenario-outcome-head">
+        <span class="scenario-outcome-emoji">${scene.emoji}</span>
+        <span class="scenario-effect-badge ${effectClass}">${effectIcon}${choice.effect}</span>
+      </div>
+      <p class="scenario-outcome-text">${choice.outcome}</p>
+      <div class="scenario-fact-box">
+        <strong>💡 真实历史</strong>
+        <p>${choice.fact}</p>
+        ${choice.wiki_term ? `<div class="scenario-wiki-row">想深入了解？${wikiBtn(choice.wiki_term)}</div>` : ''}
+      </div>
+      <button class="scenario-next-btn">下一个场景 →</button>
+    </div>`;
+  updateScenarioStat(p);
+
+  sceneEl.querySelector('.scenario-next-btn').onclick = () => {
+    st.sceneIdx++;
+    if (st.sceneIdx >= s.scenes.length) {
+      showScenarioEnding(p);
+    } else {
+      renderScenarioScene(p);
+    }
+  };
+}
+
+function updateScenarioStat(p) {
+  const st = scenarioState[p.id];
+  const max = p.scenario.max_survival;
+  const fillEl = document.getElementById('scenarioStatFill');
+  const numEl  = document.getElementById('scenarioStatNum');
+  if (fillEl) fillEl.style.width = (st.survival / max * 100) + '%';
+  if (numEl)  numEl.textContent  = st.survival + '/' + max;
+}
+
+function showScenarioEnding(p) {
+  const s = p.scenario;
+  const st = scenarioState[p.id];
+  // pick the highest-min ending the survival meets
+  const sortedEndings = [...s.endings].sort((a, b) => b.min - a.min);
+  const ending = sortedEndings.find(e => st.survival >= e.min) || s.endings[s.endings.length - 1];
+
+  document.getElementById('scenarioPlay').style.display = 'none';
+  const endEl = document.getElementById('scenarioEnding');
+  endEl.style.display = 'block';
+  endEl.innerHTML = `
+    <div class="scenario-card scenario-card-ending">
+      <div class="scenario-ending-emoji">${ending.emoji}</div>
+      <h3>${ending.title}</h3>
+      <p class="scenario-ending-body">${ending.body}</p>
+      <div class="scenario-stat scenario-stat-final">
+        <span>最终生存值</span>
+        <div class="scenario-bar"><div class="scenario-bar-fill" style="width:${st.survival}%"></div></div>
+        <span class="scenario-stat-num">${st.survival}/100</span>
+      </div>
+      <div class="scenario-ending-actions">
+        <button class="primary-button" onclick="beginScenario(PREHISTORIC.periods.find(x=>x.id==='${p.id}'))">🔄 再玩一次</button>
+        <button class="secondary-button" onclick="document.getElementById('pre-timeline').scrollIntoView({behavior:'smooth'})">继续学习 ↓</button>
+      </div>
+    </div>`;
+  endEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  logHistory('lesson_view', `完成时光机：${p.title} · 生存值 ${st.survival}`);
 }
 
 function renderPreLayer2(p) {
