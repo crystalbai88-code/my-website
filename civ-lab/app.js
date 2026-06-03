@@ -142,6 +142,12 @@ function positionFigure() {
 // ENTER LESSON
 // ════════════════════════════════════════════════
 function enterLesson(id) {
+  // 史前文明单元：P01 跳转到 8 时代总览
+  if (id === 'P01') {
+    showPreOverview();
+    return;
+  }
+
   state.activeLessonId = id;
   state.currentCiv = null;
   state.currentEvent = null;
@@ -1003,6 +1009,402 @@ $('#event-overlay').addEventListener('click', (e) => {
   if (e.target === e.currentTarget) closeEvent();
 });
 window.addEventListener('resize', () => positionFigure());
+
+// ════════════════════════════════════════════════
+// 史前文明系统
+// ════════════════════════════════════════════════
+
+let activePreEraId = null;
+let preAiHistory = {}; // era id → chat messages array
+
+function scrollToPreLayer(id) {
+  const body = document.getElementById('preEraBody');
+  const target = document.getElementById(id);
+  if (!body || !target) return;
+  body.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
+}
+
+// ── Screen 4: 史前总览 ────────────────────────────
+function showPreOverview() {
+  showScreen('s-pre-overview');
+  $('#preIntroText').textContent = PREHISTORIC.unit.intro;
+  renderPreEraGrid();
+  $('#preHomeBtn').onclick = () => showScreen('s-home');
+  logHistory('lesson_view', '进入史前文明单元总览');
+}
+
+function renderPreEraGrid() {
+  const grid = $('#preEraGrid');
+  grid.innerHTML = PREHISTORIC.periods.map((p, i) => `
+    <div class="pre-era-card" onclick="enterPreEra('${p.id}')" style="--pcolor:${p.color}">
+      <div class="pec-num">时代 ${i+1}/8</div>
+      <div class="pec-icon">${p.icon}</div>
+      <div class="pec-time">${p.time}</div>
+      <h3 class="pec-title">${p.title}</h3>
+      <p class="pec-snap">${p.snapshot.slice(0,80)}…</p>
+      <div class="pec-bar"><div class="pec-bar-fill" style="width:${p.timeline.position_pct}%"></div></div>
+      <div class="pec-cta">9层深探 →</div>
+    </div>`).join('');
+}
+
+// ── Screen 5: 史前时代 9层 ────────────────────────
+function enterPreEra(id) {
+  activePreEraId = id;
+  const period = PREHISTORIC.periods.find(p => p.id === id);
+  if (!period) return;
+  showScreen('s-pre-era');
+  renderPreEra(period);
+  $('#preEraBackBtn').onclick = () => showPreOverview();
+  logHistory('lesson_view', `史前探索：${period.time} · ${period.title}`);
+}
+
+function renderPreEra(p) {
+  // Topbar
+  $('#preEraTopInfo').innerHTML = `<span class="pre-era-top-icon">${p.icon}</span><div><strong>${p.title}</strong><span>${p.time}</span></div>`;
+
+  // Layer pills — scroll within pre-era body
+  $('#preLayerPills').innerHTML = PREHISTORIC.LAYERS.map(l =>
+    `<button class="pre-layer-pill" onclick="scrollToPreLayer('pre-${l.id}')">${l.icon} ${l.label}</button>`
+  ).join('');
+
+  // Body: render all 9 layers
+  const body = $('#preEraBody');
+  body.innerHTML = [
+    renderPreLayer1(p),
+    renderPreLayer2(p),
+    renderPreLayer3(p),
+    renderPreLayer4(p),
+    renderPreLayer5(p),
+    renderPreLayer6(p),
+    renderPreLayer7(p),
+    renderPreLayer8(p),
+    renderPreLayer9(p),
+  ].join('');
+
+  // Bind region tabs
+  const rtabs = body.querySelectorAll('.preg-tab');
+  rtabs.forEach(tab => {
+    tab.onclick = () => {
+      rtabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const rid = tab.dataset.rid;
+      const region = p.regions.find(r => r.id === rid);
+      if (region) renderPreRegionDetail(region, body.querySelector('#preRegionDetail'));
+    };
+  });
+  if (p.regions[0]) renderPreRegionDetail(p.regions[0], body.querySelector('#preRegionDetail'));
+
+  // Bind AI
+  const aiSend = body.querySelector('#preAISend');
+  const aiInp = body.querySelector('#preAIInput');
+  if (aiSend && aiInp) {
+    aiSend.onclick = () => sendPreAIMsg(p, aiInp, body.querySelector('#preAIMsgs'));
+    aiInp.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendPreAIMsg(p, aiInp, body.querySelector('#preAIMsgs')); } };
+    // suggestion chips
+    body.querySelectorAll('#preAISuggestions .suggestion-chip').forEach(btn => {
+      btn.onclick = () => { aiInp.value = btn.textContent; sendPreAIMsg(p, aiInp, body.querySelector('#preAIMsgs')); };
+    });
+    // init welcome
+    if (!preAiHistory[p.id]) {
+      preAiHistory[p.id] = [];
+      addPreAIMsg(body.querySelector('#preAIMsgs'), 'ai', `你好！我是史前探索助手 🌍<br>我了解<strong>${p.time}·${p.title}</strong>的所有内容。<br>试试问我：<em>${p.ai.suggested_questions[0]}</em>`);
+    } else {
+      const msgsEl = body.querySelector('#preAIMsgs');
+      preAiHistory[p.id].forEach(m => addPreAIMsg(msgsEl, m.role, m.html));
+    }
+  }
+
+  // Bind notes
+  const noteSave = body.querySelector('#preNoteSave');
+  if (noteSave) {
+    noteSave.onclick = () => {
+      const note = body.querySelector('#preNotepad').value.trim();
+      if (!note) return;
+      logHistory('pre_note', `史前笔记(${p.time})：${note.slice(0,40)}`);
+      noteSave.textContent = '✓ 已保存';
+      setTimeout(() => { noteSave.textContent = '保存笔记'; }, 1800);
+    };
+  }
+
+  body.scrollTo(0, 0);
+}
+
+function renderPreLayer1(p) {
+  const tl = p.timeline;
+  const pcts = PREHISTORIC.periods.map(ep => ({ id: ep.id, pct: ep.timeline.position_pct, icon: ep.icon, title: ep.title }));
+  const bars = pcts.map(ep => {
+    const w = ep.id === p.id ? 14 : 7;
+    return `<div class="ptl-seg ${ep.id === p.id ? 'active' : ''}" style="flex:${w};background:${PREHISTORIC.periods.find(x=>x.id===ep.id).color}${ep.id===p.id?'':'66'}" title="${ep.title}">${ep.id === p.id ? ep.icon : ''}</div>`;
+  }).join('');
+  return `<section class="pre-layer" id="pre-timeline">
+    <div class="pl-header"><span class="pl-icon">⏳</span><div><h3>时间定位</h3><p class="pl-sub">30万年全程 · 当前时代的位置</p></div></div>
+    <div class="ptl-bar">${bars}</div>
+    <div class="ptl-range"><span>30万年前</span><span>→ 文明史</span></div>
+    <div class="ptl-cards">
+      <div class="ptlc before"><p class="pl-sub">之前</p><p>${tl.before}</p></div>
+      <div class="ptlc now" style="border-color:${p.color}"><p class="pl-sub">当前</p><strong>${p.time} · ${p.title}</strong><p>${tl.context}</p></div>
+      <div class="ptlc after"><p class="pl-sub">之后</p><p>${tl.after}</p></div>
+    </div>
+    <div class="ptl-scale">⏱ ${tl.scale_note}</div>
+  </section>`;
+}
+
+function renderPreLayer2(p) {
+  const pts = p.map.map_points.map((pt, i) => `
+    <circle class="pre-svg-dot" cx="${pt.x}" cy="${pt.y}" r="8" fill="${p.color}" opacity="0.85" style="animation-delay:${i*120}ms"/>
+    <text x="${pt.x}" y="${pt.y-12}" text-anchor="middle" font-size="11" fill="#f5e6c8" font-family="sans-serif">${pt.name.split('·')[0]}</text>`
+  ).join('');
+  const routes = (p.map.routes || []).map(r =>
+    `<line x1="${r.from[0]}" y1="${r.from[1]}" x2="${r.to[0]}" y2="${r.to[1]}" stroke="${p.color}" stroke-width="2" stroke-dasharray="6,4" opacity="0.7"/>`
+  ).join('');
+  return `<section class="pre-layer" id="pre-map">
+    <div class="pl-header"><span class="pl-icon">🗺</span><div><h3>世界地图</h3><p class="pl-sub">${p.map.overlay_note}</p></div></div>
+    <div class="pre-map-wrap">
+      <div class="pre-svg-map-box">
+        <svg viewBox="0 0 1000 520" class="pre-svg-map" preserveAspectRatio="xMidYMid meet">
+          <rect width="1000" height="520" fill="#5a8aaa" rx="8"/>
+          ${routes}${pts}
+        </svg>
+      </div>
+      <div class="pre-map-note">${p.map.overlay_note}</div>
+    </div>
+  </section>`;
+}
+
+function renderPreLayer3(p) {
+  const tabs = p.regions.map((r, i) =>
+    `<button class="preg-tab ${i===0?'active':''}" data-rid="${r.id}">${r.icon||'🌍'} ${r.name}</button>`
+  ).join('');
+  return `<section class="pre-layer" id="pre-region">
+    <div class="pl-header"><span class="pl-icon">🏔</span><div><h3>文明区域</h3><p class="pl-sub">这个时代各地区的状态</p></div></div>
+    <div class="preg-tabs">${tabs}</div>
+    <div class="preg-detail" id="preRegionDetail"></div>
+  </section>`;
+}
+
+function renderPreRegionDetail(r, el) {
+  if (!el) return;
+  el.innerHTML = `
+    <h4>${r.name}</h4>
+    <p class="preg-desc">${r.description}</p>
+    <div class="preg-grid">
+      ${r.environment ? `<div><strong>环境</strong><span>${r.environment}</span></div>` : ''}
+      ${r.population ? `<div><strong>人口</strong><span>${r.population}</span></div>` : ''}
+      ${r.lifestyle  ? `<div><strong>生活方式</strong><span>${r.lifestyle}</span></div>` : ''}
+      ${r.challenge  ? `<div><strong>主要挑战</strong><span>${r.challenge}</span></div>` : ''}
+    </div>
+    <button class="sl-btn" onclick="speakText('${esc(r.name + '。' + r.description)}')">🔊 朗读</button>`;
+}
+
+function renderPreLayer4(p) {
+  const cards = p.themes.map(t => `
+    <div class="pth-card">
+      <div class="pth-icon">${t.icon}</div>
+      <h4>${t.title}</h4>
+      <p class="pth-sum">${t.summary}</p>
+      <ul>${t.content.map(c=>`<li>${c}</li>`).join('')}</ul>
+      ${t.caution ? `<div class="pth-caution">⚠ ${t.caution}</div>` : ''}
+    </div>`).join('');
+  return `<section class="pre-layer" id="pre-theme">
+    <div class="pl-header"><span class="pl-icon">💡</span><div><h3>知识主题</h3><p class="pl-sub">这个时代的核心问题与知识</p></div></div>
+    <div class="pth-grid">${cards}</div>
+  </section>`;
+}
+
+function renderPreLayer5(p) {
+  const items = p.evidence.map(ev => `
+    <div class="pev-card">
+      <div class="pev-emoji">${ev.emoji}</div>
+      <div class="pev-body">
+        <h4>${ev.name}</h4>
+        <p>${ev.description}</p>
+        <div class="pev-qa">
+          <div><strong>能告诉我们</strong><span>${ev.tells}</span></div>
+          <div><strong>不能告诉我们</strong><span>${ev.cannot_tell}</span></div>
+        </div>
+        ${ev.question ? `<div class="pev-q">💬 ${ev.question}</div>` : ''}
+      </div>
+    </div>`).join('');
+  return `<section class="pre-layer" id="pre-evidence">
+    <div class="pl-header"><span class="pl-icon">🔍</span><div><h3>证据物</h3><p class="pl-sub">我们怎么知道这些历史</p></div></div>
+    <div class="pev-list">${items}</div>
+  </section>`;
+}
+
+function renderPreLayer6(p) {
+  const s = p.story;
+  return `<section class="pre-layer" id="pre-story">
+    <div class="pl-header"><span class="pl-icon">📖</span><div><h3>故事讲解</h3><p class="pl-sub">${s.title} · ${s.setting}</p></div></div>
+    <div class="pst-card">
+      <h4>${s.title}</h4>
+      <p class="pst-setting">${s.setting}</p>
+      ${s.paragraphs.map(para => `<p class="pst-para">${para}</p>`).join('')}
+      <div class="pst-insight">💡 ${s.key_insight}</div>
+      <div class="pst-q">🗣 ${s.discussion_question}</div>
+      <button class="sl-btn" onclick="speakText('${esc(s.paragraphs.join(' '))}')">🔊 朗读故事</button>
+    </div>
+  </section>`;
+}
+
+function renderPreLayer7(p) {
+  const cmps = p.comparisons || [];
+  const cards = cmps.map(c => `
+    <div class="pcmp-wrap">
+      <h4>${c.title}</h4>
+      <p class="pl-sub">${c.dimension}</p>
+      <div class="pcmp-grid">
+        <div class="pcmp-side left">
+          <div class="pcmp-icon">${c.left.icon||''}</div>
+          <strong>${c.left.name}</strong>
+          <p>${c.left.description}</p>
+        </div>
+        <div class="pcmp-vs">VS</div>
+        <div class="pcmp-side right">
+          <div class="pcmp-icon">${c.right.icon||''}</div>
+          <strong>${c.right.name}</strong>
+          <p>${c.right.description}</p>
+        </div>
+      </div>
+      <div class="pcmp-insight">💡 ${c.insight}</div>
+    </div>`).join('');
+
+  const idx = PREHISTORIC.periods.findIndex(ep => ep.id === p.id);
+  const prev = PREHISTORIC.periods[idx - 1];
+  const next = PREHISTORIC.periods[idx + 1];
+  const nav = `<div class="pcmp-nav">
+    ${prev ? `<button class="sl-btn" onclick="enterPreEra('${prev.id}')">← ${prev.icon} ${prev.title}</button>` : '<span></span>'}
+    ${next ? `<button class="sl-btn" onclick="enterPreEra('${next.id}')">${next.icon} ${next.title} →</button>` : `<button class="sl-btn" onclick="enterLesson('L01')">→ 进入文明史 L01</button>`}
+  </div>`;
+
+  return `<section class="pre-layer" id="pre-compare">
+    <div class="pl-header"><span class="pl-icon">⚖</span><div><h3>对比关系</h3><p class="pl-sub">与前后时代的关键差异</p></div></div>
+    ${cards || '<p class="pre-empty">即将补充对比内容</p>'}
+    ${nav}
+  </section>`;
+}
+
+function renderPreLayer8(p) {
+  const ai = p.ai;
+  const chips = ai.suggested_questions.map(q =>
+    `<button class="suggestion-chip">${q}</button>`).join('');
+  return `<section class="pre-layer" id="pre-ai">
+    <div class="pl-header"><span class="pl-icon">🤖</span><div><h3>AI互动</h3><p class="pl-sub">向AI提问、质检、探索</p></div></div>
+    <div class="pre-ai-panel">
+      <div class="chat-messages" id="preAIMsgs" style="max-height:300px;overflow-y:auto"></div>
+      <div class="chat-suggestions" id="preAISuggestions">${chips}</div>
+      <div class="chat-input-row">
+        <textarea id="preAIInput" placeholder="问关于${p.title}的任何问题…" rows="2"></textarea>
+        <button id="preAISend" class="primary-button">发送</button>
+      </div>
+      ${ai.check_prompt ? `<div class="pre-ai-check"><strong>质检提示：</strong>${ai.check_prompt}</div>` : ''}
+    </div>
+  </section>`;
+}
+
+function renderPreLayer9(p) {
+  const art = p.artifact;
+  const fields = art.fields.map(f => `
+    <label>${f.label}${f.required ? ' <span class="req">*</span>' : ''}
+      <textarea placeholder="${f.placeholder}" rows="2" data-fid="${f.id}"></textarea>
+    </label>`).join('');
+  return `<section class="pre-layer" id="pre-works">
+    <div class="pl-header"><span class="pl-icon">✏</span><div><h3>作品 / 笔记</h3><p class="pl-sub">${art.title}</p></div></div>
+    <div class="pre-works-layout">
+      <div class="pre-works-task">
+        <h4>${art.title}</h4>
+        <p class="pre-task-inst">${art.instructions}</p>
+        <div class="pre-task-fields">${fields}</div>
+        ${art.fact_vs_fiction ? `<div class="pre-fvf">✅ 完成后请标注：哪些内容基于历史事实，哪些是你的想象？</div>` : ''}
+      </div>
+      <div class="pre-notepad-box">
+        <p class="pl-sub">我的探索笔记</p>
+        <textarea id="preNotepad" class="pre-notepad" rows="12" placeholder="写下你的发现、问题、想象…"></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button id="preNoteSave" class="primary-button">保存笔记</button>
+          <button class="secondary-button" onclick="speakText(document.getElementById('preNotepad').value)">🔊 朗读</button>
+        </div>
+      </div>
+    </div>
+  </section>`;
+}
+
+// ── 史前 AI 对话 ──────────────────────────────────
+async function sendPreAIMsg(p, inputEl, msgsEl) {
+  const text = inputEl.value.trim();
+  if (!text) return;
+  inputEl.value = '';
+  addPreAIMsg(msgsEl, 'user', text);
+  preAiHistory[p.id] = preAiHistory[p.id] || [];
+  preAiHistory[p.id].push({ role: 'user', html: text });
+  logHistory('chat', `史前AI(${p.time})：${text}`);
+
+  const thinkId = 'prethink-' + Date.now();
+  addPreAIMsg(msgsEl, 'ai', '<em>正在思考…</em>', thinkId);
+
+  let resp;
+  if (state.apiKey) {
+    resp = await callPreClaudeAPI(text, p);
+  } else {
+    resp = getPreKBResponse(text, p);
+  }
+
+  document.getElementById(thinkId)?.closest('.chat-message')?.remove();
+  addPreAIMsg(msgsEl, 'ai', resp);
+  preAiHistory[p.id].push({ role: 'ai', html: resp });
+}
+
+function addPreAIMsg(msgsEl, role, html, id) {
+  if (!msgsEl) return;
+  const div = document.createElement('div');
+  div.className = `chat-message ${role}`;
+  if (id) div.id = id;
+  div.innerHTML = `<div class="message-avatar">${role === 'ai' ? 'AI' : '你'}</div><div class="message-bubble">${html.includes('<') ? html : `<p>${html}</p>`}</div>`;
+  msgsEl.appendChild(div);
+  msgsEl.scrollTop = msgsEl.scrollHeight;
+}
+
+async function callPreClaudeAPI(msg, p) {
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': state.apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 500,
+        system: p.ai.system_context + '\n\n注意事项：' + (p.ai.guardrails || []).join('；'),
+        messages: [{ role: 'user', content: msg }],
+      }),
+    });
+    const data = await res.json();
+    return data.content[0].text.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
+  } catch (e) {
+    return `<p>API连接失败，知识库模式：</p><p>${getPreKBResponse(msg, p)}</p>`;
+  }
+}
+
+function getPreKBResponse(q, p) {
+  const lower = q.toLowerCase();
+  for (const ev of p.evidence) {
+    if (lower.includes(ev.name.slice(0, 3)) || ev.name.toLowerCase().split(/\s+/).some(w => lower.includes(w) && w.length > 1))
+      return `<p><strong>${ev.name}</strong></p><p>${ev.description}</p><p><em>能告诉我们：</em>${ev.tells}</p>`;
+  }
+  for (const t of p.themes) {
+    if (lower.includes(t.title.slice(0, 3)) || t.content.some(c => c.slice(0, 8).toLowerCase().split('').some(ch => lower.includes(ch))))
+      return `<p><strong>${t.title}</strong></p><p>${t.summary}</p><ul>${t.content.map(c => `<li>${c}</li>`).join('')}</ul>`;
+  }
+  for (const r of p.regions) {
+    if (lower.includes(r.name.split('·')[0].slice(0, 3)))
+      return `<p><strong>${r.name}</strong></p><p>${r.description}</p>`;
+  }
+  if (lower.includes('故事') || lower.includes('当时') || lower.includes('那时'))
+    return `<p><strong>${p.story.title}</strong></p><p>${p.story.paragraphs[0]}</p><p>💡 ${p.story.key_insight}</p>`;
+  return `<p>关于「${p.time}·${p.title}」，可以问我：</p><ul>${p.ai.suggested_questions.map(q => `<li>「${q}」</li>`).join('')}</ul>`;
+}
 
 // ── BOOT ──────────────────────────────────────────
 init();

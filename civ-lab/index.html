@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI世界文明实验室</title>
-  <link rel="stylesheet" href="./styles.css?v=8" />
+  <link rel="stylesheet" href="./styles.css?v=10" />
 </head>
 <body>
 
@@ -557,6 +557,35 @@
 </div>
 
 <!-- ════════════════════════════════════════
+     SCREEN 4: PREHISTORIC OVERVIEW (8 eras)
+════════════════════════════════════════ -->
+<div class="screen hidden" id="s-pre-overview">
+  <div class="pre-topbar">
+    <button class="back-btn" id="preHomeBtn">← 时间轴</button>
+    <div class="pre-topbar-center">
+      <div class="pre-topbar-title">史前文明探索</div>
+      <div class="pre-topbar-sub">从人类出现到第一座城市 · 约30万年 — 约3000年前</div>
+    </div>
+  </div>
+  <div class="pre-intro-band">
+    <p id="preIntroText"></p>
+  </div>
+  <div class="pre-era-grid" id="preEraGrid"></div>
+</div>
+
+<!-- ════════════════════════════════════════
+     SCREEN 5: PREHISTORIC ERA (9 layers)
+════════════════════════════════════════ -->
+<div class="screen hidden" id="s-pre-era">
+  <div class="pre-era-topbar">
+    <button class="back-btn" id="preEraBackBtn">← 史前总览</button>
+    <div class="pre-era-topbar-info" id="preEraTopInfo"></div>
+    <div class="pre-layer-pills" id="preLayerPills"></div>
+  </div>
+  <div class="pre-era-body" id="preEraBody"></div>
+</div>
+
+<!-- ════════════════════════════════════════
      SETTINGS MODAL
 ════════════════════════════════════════ -->
 <div class="modal-overlay hidden" id="settingsModal">
@@ -585,7 +614,8 @@
   </div>
 </div>
 
-<script src="./data.js?v=8"></script>
-<script src="./app.js?v=8"></script>
+<script src="./data.js?v=10"></script>
+<script src="./prehistoric.js?v=10"></script>
+<script src="./app.js?v=10"></script>
 </body>
 </html>
