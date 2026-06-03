@@ -1087,7 +1087,81 @@ function scrollToPreLayer(id) {
   const body = document.getElementById('preEraBody');
   const target = document.getElementById(id);
   if (!body || !target) return;
-  body.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
+  // 在手风琴模式下，先展开
+  if (target.classList.contains('accordion-section')) {
+    expandAccordionSection(target);
+  }
+  // 等动画启动后再滚
+  setTimeout(() => {
+    body.scrollTo({ top: target.offsetTop - 10, behavior: 'smooth' });
+  }, 80);
+}
+
+// ══════════════════════════════════════════════
+// 🎵 手风琴：每层只剩标题，点击展开内容
+// ══════════════════════════════════════════════
+function initAccordion(body) {
+  const sections = body.querySelectorAll('.pre-layer');
+  sections.forEach((sec, i) => {
+    const header = sec.querySelector('.pl-header');
+    if (!header) return;
+
+    // 把 .pl-header 之后的所有内容包进 .pl-body 容器
+    const allChildren = Array.from(sec.children);
+    const headerIdx = allChildren.indexOf(header);
+    const bodyEls = allChildren.slice(headerIdx + 1);
+    if (bodyEls.length > 0) {
+      const bodyDiv = document.createElement('div');
+      bodyDiv.className = 'pl-body';
+      bodyEls.forEach(el => bodyDiv.appendChild(el));
+      sec.appendChild(bodyDiv);
+    }
+
+    // 给 header 加箭头指示
+    if (!header.querySelector('.accordion-arrow')) {
+      const arrow = document.createElement('span');
+      arrow.className = 'accordion-arrow';
+      arrow.textContent = '▼';
+      header.appendChild(arrow);
+    }
+
+    sec.classList.add('accordion-section');
+    // 默认：第一个展开，其他折叠
+    if (i === 0) sec.classList.add('expanded');
+    else sec.classList.add('collapsed');
+
+    // header 整行可点击
+    header.style.cursor = 'pointer';
+    header.addEventListener('click', (e) => {
+      // 防止点击 header 内的按钮误触发
+      if (e.target.closest('a, button')) return;
+      toggleAccordionSection(sec);
+    });
+  });
+}
+
+function toggleAccordionSection(section) {
+  if (section.classList.contains('expanded')) {
+    // 当前展开 → 收起
+    section.classList.remove('expanded');
+    section.classList.add('collapsed');
+    return;
+  }
+  expandAccordionSection(section);
+}
+
+function expandAccordionSection(section) {
+  // 收起所有其他
+  const allSections = section.parentElement.querySelectorAll('.pre-layer.accordion-section');
+  allSections.forEach(s => {
+    if (s !== section) {
+      s.classList.remove('expanded');
+      s.classList.add('collapsed');
+    }
+  });
+  // 展开自己
+  section.classList.remove('collapsed');
+  section.classList.add('expanded');
 }
 
 // ── Screen 4: 史前总览 ────────────────────────────
@@ -1150,6 +1224,9 @@ function renderPreEra(p) {
 
   // Bind scenario interactions
   if (p.scenario) bindScenarioInteractions(p);
+
+  // 🎵 手风琴模式：每层默认折叠，点击标题展开
+  initAccordion(body);
 
   // Bind region tabs
   const rtabs = body.querySelectorAll('.preg-tab');
