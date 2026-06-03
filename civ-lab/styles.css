@@ -1284,3 +1284,48 @@ html, body {
 /* ── Icon button ── */
 .icon-button { background: transparent !important; border: 1px solid rgba(160,100,30,.3) !important; color: var(--ink2) !important; }
 .icon-button:hover { border-color: var(--warm) !important; color: var(--warm) !important; }
+
+/* ── 维基百科链接按钮 ── */
+.wiki-btns {
+  display: inline-flex; align-items: center; gap: 4px;
+  margin-left: 8px; vertical-align: middle; flex-shrink: 0;
+}
+.wiki-btn {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 11px; font-weight: 600; padding: 3px 9px;
+  border-radius: 3px; text-decoration: none; transition: all .15s;
+  white-space: nowrap; line-height: 1;
+}
+.wiki-btn.zh {
+  background: rgba(200,104,32,.1);
+  border: 1px solid rgba(200,104,32,.3);
+  color: var(--amber);
+}
+.wiki-btn.zh:hover {
+  background: var(--warm);
+  border-color: var(--warm);
+  color: #fff5e8;
+}
+.wiki-btn.en {
+  background: rgba(100,120,200,.08);
+  border: 1px solid rgba(100,120,200,.25);
+  color: #4a6aaa;
+}
+.wiki-btn.en:hover {
+  background: #4a6aaa;
+  border-color: #4a6aaa;
+  color: #fff;
+}
+/* Title row flex layout */
+.pev-title-row, .pth-title-row, .preg-title-row {
+  display: flex; align-items: flex-start; gap: 8px;
+  flex-wrap: wrap; margin-bottom: 6px;
+}
+.pev-title-row h4, .pth-title-row h4, .preg-title-row h4 {
+  margin-bottom: 0 !important; flex-shrink: 0;
+}
+/* Civ panel name row */
+.panel-civ-name { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+/* Event modal title */
+.event-modal-title-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+#evModalTitle { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }

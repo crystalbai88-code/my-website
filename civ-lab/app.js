@@ -40,6 +40,31 @@ function esc(str) {
   return (str || '').replace(/'/g, '').replace(/"/g, '');
 }
 
+// ── 维基百科链接生成器 ─────────────────────────────
+// 从名称中提取可搜索的关键词（去掉地名前缀、英文注释等）
+function wikiQuery(term) {
+  return term
+    .split('·').pop()          // 取 · 后面部分（如"摩洛哥·杰贝尔" → "杰贝尔"）
+    .split('（')[0]             // 去掉括号注释
+    .split('（')[0]
+    .split('/')[0]
+    .replace(/\s+[A-Za-z].*/,'') // 去掉英文后缀（如 "Jebel Irhoud"）
+    .trim();
+}
+
+// 生成中英文维基百科链接按钮组
+function wikiBtn(term, wikiEnSlug) {
+  const q = wikiQuery(term);
+  const zhUrl = `https://zh.wikipedia.org/w/index.php?search=${encodeURIComponent(q)}`;
+  const enUrl = wikiEnSlug
+    ? `https://en.wikipedia.org/wiki/${wikiEnSlug}`
+    : `https://en.wikipedia.org/w/index.php?search=${encodeURIComponent(term.split('·').join(' '))}`;
+  return `<span class="wiki-btns">
+    <a href="${zhUrl}" target="_blank" rel="noreferrer noopener" class="wiki-btn zh">📖 中文维基</a>
+    <a href="${enUrl}" target="_blank" rel="noreferrer noopener" class="wiki-btn en">🔗 EN</a>
+  </span>`;
+}
+
 // ── 存储 ─────────────────────────────────────────
 function loadPersisted() {
   try { state.completed = JSON.parse(localStorage.getItem('civ_completed') || '[]'); } catch { state.completed = []; }
@@ -330,7 +355,7 @@ function selectCiv(civId) {
   content.style.display = 'flex';
 
   $('#panelEra').textContent = civ.era;
-  $('#panelCivName').textContent = civ.name;
+  $('#panelCivName').innerHTML = `${civ.name} ${wikiBtn(civ.name, civ.wiki_en)}`;
   $('#panelCivDesc').textContent = civ.desc;
 
   $('#panelPeople').innerHTML = (civ.people || []).map((p) =>
@@ -379,7 +404,7 @@ function openEvent(eventId) {
   state.currentEvent = ev;
 
   $('#evModalTag').textContent = civ.name + ' · ' + mapEntry.time;
-  $('#evModalTitle').textContent = ev.emoji + ' ' + ev.title;
+  $('#evModalTitle').innerHTML = `${ev.emoji} ${ev.title} ${wikiBtn(ev.title, ev.wiki_en)}`;
   $('#evModalYear').textContent = ev.year;
   $('#evModalBody').textContent = ev.body;
   $('#evModalInsight').textContent = ev.insight;
@@ -1185,7 +1210,10 @@ function renderPreLayer3(p) {
 function renderPreRegionDetail(r, el) {
   if (!el) return;
   el.innerHTML = `
-    <h4>${r.name}</h4>
+    <div class="preg-title-row">
+      <h4>${r.name}</h4>
+      ${wikiBtn(r.name, r.wiki_en)}
+    </div>
     <p class="preg-desc">${r.description}</p>
     <div class="preg-grid">
       ${r.environment ? `<div><strong>环境</strong><span>${r.environment}</span></div>` : ''}
@@ -1200,7 +1228,7 @@ function renderPreLayer4(p) {
   const cards = p.themes.map(t => `
     <div class="pth-card">
       <div class="pth-icon">${t.icon}</div>
-      <h4>${t.title}</h4>
+      <div class="pth-title-row"><h4>${t.title}</h4>${wikiBtn(t.title)}</div>
       <p class="pth-sum">${t.summary}</p>
       <ul>${t.content.map(c=>`<li>${c}</li>`).join('')}</ul>
       ${t.caution ? `<div class="pth-caution">⚠ ${t.caution}</div>` : ''}
@@ -1216,7 +1244,10 @@ function renderPreLayer5(p) {
     <div class="pev-card">
       <div class="pev-emoji">${ev.emoji}</div>
       <div class="pev-body">
-        <h4>${ev.name}</h4>
+        <div class="pev-title-row">
+          <h4>${ev.name}</h4>
+          ${wikiBtn(ev.name, ev.wiki_en)}
+        </div>
         <p>${ev.description}</p>
         <div class="pev-qa">
           <div><strong>能告诉我们</strong><span>${ev.tells}</span></div>
