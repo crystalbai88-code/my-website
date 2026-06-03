@@ -2822,3 +2822,135 @@ html, body {
   .kg-detail-head h4 { font-size: 16px; }
   .kg-detail-body { font-size: 13px; line-height: 1.85; }
 }
+
+/* ════════════════════════════════════════════════════
+   🎮 互动·娱乐区 + 字号放大 + 树形布局适配
+════════════════════════════════════════════════════ */
+
+/* 互动娱乐区（在主网络上方） */
+.kg-play-area {
+  background: linear-gradient(135deg, rgba(184,48,24,.05), rgba(212,164,53,.08));
+  border: 1.5px dashed rgba(184,48,24,.3);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+}
+.kg-play-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px; flex-wrap: wrap;
+}
+.kg-play-tag {
+  font-family: var(--serif);
+  font-size: 13px; font-weight: 700;
+  color: var(--warm);
+  letter-spacing: .08em;
+}
+.kg-play-note {
+  font-size: 11px; color: var(--ink3);
+  font-style: italic;
+}
+.kg-play-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+.kg-play-card {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px;
+  background: rgba(255,255,255,.6);
+  border: 2px solid var(--play-color, var(--warm));
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: var(--sans);
+  text-align: left;
+  transition: all .2s;
+  box-shadow: 0 2px 8px rgba(60,30,5,.1);
+}
+.kg-play-card:hover {
+  background: var(--play-color, var(--warm));
+  color: #fff5e8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(184,48,24,.3);
+}
+.kg-play-card:hover .kg-play-text strong,
+.kg-play-card:hover .kg-play-text span { color: #fff5e8; }
+.kg-play-icon {
+  font-size: 28px; line-height: 1;
+  flex-shrink: 0;
+}
+.kg-play-text { display: flex; flex-direction: column; gap: 2px; }
+.kg-play-text strong {
+  font-family: var(--serif);
+  font-size: 15px; font-weight: 800;
+  color: var(--ink);
+}
+.kg-play-text span {
+  font-size: 11px; color: var(--ink3);
+}
+
+/* 树形布局 SVG 容器 */
+.kg-svg.kg-tree {
+  min-height: 600px;
+  max-height: 80vh;
+}
+
+/* 详情卡字号大幅放大 */
+.kg-detail-head h4 {
+  font-size: 22px !important;
+  letter-spacing: .04em;
+}
+.kg-detail-sub {
+  font-size: 13px !important;
+}
+.kg-detail-body {
+  font-size: 16px !important;
+  line-height: 2 !important;
+}
+.kg-detail-icon {
+  width: 58px !important; height: 58px !important;
+  font-size: 32px !important;
+}
+.kg-detail-tip {
+  font-size: 14px !important;
+  padding: 10px 16px !important;
+}
+.kg-related strong {
+  font-size: 14px !important;
+}
+.kg-related-chip {
+  font-size: 13.5px !important;
+  padding: 8px 16px !important;
+}
+
+/* Wiki 按钮放大 */
+.wiki-btn {
+  font-size: 13px !important;
+  padding: 5px 12px !important;
+}
+
+/* 图例字号放大 */
+.kg-graph-pane .kg-legend {
+  font-size: 13px !important;
+  gap: 18px !important;
+}
+
+/* SVG 容器尺寸 — 树形布局更高 */
+.kg-graph-pane {
+  max-height: none !important;
+}
+.kg-svg.kg-tree { width: 100%; height: auto; }
+
+/* 节点交互优化 */
+.kg-node circle {
+  transition: r .25s, stroke-width .2s;
+}
+.kg-node:hover circle:nth-of-type(1) {
+  filter: drop-shadow(0 6px 18px rgba(184,48,24,.55));
+}
+
+/* 响应式调整 */
+@media (max-width: 960px) {
+  .kg-play-row { grid-template-columns: 1fr; }
+  .kg-detail-head h4 { font-size: 19px !important; }
+  .kg-detail-body { font-size: 15px !important; }
+}

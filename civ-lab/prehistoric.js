@@ -313,114 +313,121 @@ const PREHISTORIC = {
       // 🕸 知识网络：所有概念互联成图，点击展开
       // ══════════════════════════════════════════════
       knowledge_network: {
-        intro: '点击任何一个圆圈，深入了解它',
-        // 中心节点（点击中心显示总览）
+        layout: 'tree',           // 🌳 树形布局
+        viewBox: '0 0 900 1100',
+        intro: '从上到下，跟随时间脉络深入了解人类的演化历程',
+        // 中心节点（点击中心显示总览）— 树形布局时作为顶部标题
         hub: { id: 'hub', label: '人类起源', sub: '约30万年前', icon: '🦴', color: '#c84820',
+          x: 440, y: 40,  // 顶部装饰位置
           detail: {
             title: '现代人类出现 · 约30万年前',
             body: '这一节我们走过 700 万年的人类演化史，认识 Lucy、直立人、智人。理解为什么文明的第一步不是城市、不是文字，而是「会合作、会学习、会传递经验」的人类出现本身。',
-            related: ['origin','sapiens','africa','time_machine']
+            related: ['origin','sapiens','africa','evidence']
           }
         },
-        // 14 个外圈节点（两圈布局：内圈概念 + 外圈交互内容）
-        // ring=1 内圈（概念，r=180），ring=2 外圈（内容，r=300）
+        // 🌳 树形主干 — 自上而下时间演化 (中心 trunk x=440)
+        // + 右侧分支：内容/证据节点 (x=720)
+        // + 底部分支：智人的两个关键特征 (x=300 / x=580, y=970)
         nodes: [
-          // === 内圈：概念 / 物种 / 地点 (8 个，r=180) ===
-          { id:'origin', ring:1, angle:-90, label:'共同祖先', sub:'约700万年前', icon:'🌳', color:'#6a8c30',
+          // ── 主干（中心 x=440，自上而下时间）──
+          { id:'origin', x:440, y:130, label:'共同祖先', sub:'约700万年前', icon:'🌳', color:'#6a8c30',
             detail:{ title:'人类与黑猩猩的共同祖先',
               body:'人类不是从今天的黑猩猩变来的，而是和它们有共同的古老祖先。约700-600万年前，两支祖先分开演化，走向不同方向。演化像一棵树，不是一条直线。',
               wiki_zh:'人类演化', wiki_en:'Human_evolution',
               related:['biped','africa','time_image'] } },
-          { id:'biped', ring:1, angle:-45, label:'直立行走', sub:'约600万年前', icon:'🚶', color:'#8a7030',
+          { id:'biped', x:440, y:265, label:'直立行走', sub:'约600万年前', icon:'🚶', color:'#8a7030',
             detail:{ title:'直立行走解放了双手',
               body:'当人类祖先能稳定地用两条腿走路，双手就空出来了。这让我们可以拿工具、搬东西、照顾孩子、传递食物——这是文明的基础动作。',
               wiki_zh:'双足步行', wiki_en:'Bipedalism',
               related:['lucy','tools','origin'] } },
-          { id:'lucy', ring:1, angle:0, label:'Lucy', sub:'约390万年前', icon:'👩', color:'#a06030',
+          { id:'lucy', x:440, y:400, label:'Lucy', sub:'约390万年前', icon:'👩', color:'#a06030',
             detail:{ title:'Lucy 告诉我们的关键事实',
               body:'人类祖先在大脑明显变大之前，已经能够双足行走。站起来这件事本身，就改变了人类未来的道路。Lucy 化石 1974 年在埃塞俄比亚发现，是迄今最完整的早期人类化石之一。',
               wiki_zh:'Lucy（化石）', wiki_en:'Lucy_(Australopithecus)',
               related:['biped','africa','evidence','africa_map'] } },
-          { id:'tools', ring:1, angle:45, label:'工具使用', sub:'约280万年前', icon:'🪨', color:'#7a5030',
+          { id:'tools', x:440, y:540, label:'工具使用', sub:'约280万年前', icon:'🪨', color:'#7a5030',
             detail:{ title:'石器：最早的工具证据',
               body:'人类祖先开始系统制作石器：用于切割、刮削、砍砸。工具不只是石头——它代表「发现问题 → 思考解决方案 → 制造工具 → 教给别人」的完整链条，这是文明的认知雏形。',
               wiki_zh:'石器', wiki_en:'Stone_tool',
               related:['biped','coop','evidence'] } },
-          { id:'fire', ring:1, angle:90, label:'火与远行', sub:'约190万年前', icon:'🔥', color:'#c8401a',
+          { id:'fire', x:440, y:680, label:'火与远行', sub:'约190万年前', icon:'🔥', color:'#c8401a',
             detail:{ title:'直立人与火',
               body:'直立人开始能控制火，身体也更适合长距离行走。他们走出非洲，到达亚洲——这是人类第一次走向世界。火让人类摆脱了夜晚的危险，扩大了食物范围（熟食），还成为社交的中心。',
               wiki_zh:'直立人', wiki_en:'Homo_erectus',
               related:['africa_map','sapiens','time_image'] } },
-          { id:'sapiens', ring:1, angle:135, label:'智人', sub:'约30万年前', icon:'🧠', color:'#b8302a',
+          { id:'sapiens', x:440, y:820, label:'智人', sub:'约30万年前', icon:'🧠', color:'#b8302a',
             detail:{ title:'Homo sapiens：我们这个物种',
               body:'我们这个物种在非洲出现。但 30 万年前的现代人没有城市、农业、文字——他们仍然依靠自然、工具、火和群体合作生活。文明的第一步不是金字塔，而是这种人的出现本身。',
               wiki_zh:'智人', wiki_en:'Homo_sapiens',
-              related:['fire','coop','time_machine','story'] } },
-          { id:'africa', ring:1, angle:180, label:'非洲起源', sub:'关键地点', icon:'🌍', color:'#5a8030',
+              related:['fire','coop','africa'] } },
+
+          // ── 底部双分支：智人的两个关键特征 ──
+          { id:'africa', x:280, y:970, label:'非洲起源', sub:'关键地点', icon:'🌍', color:'#5a8030',
             detail:{ title:'为什么是非洲？',
               body:'化石、DNA、地质学三个独立的证据线索都指向：现代人类起源于非洲大陆。重要遗址：摩洛哥 Jebel Irhoud（30万年前最早智人化石）、埃塞俄比亚 Omo Kibish（早期智人骨骼）、哈达（Lucy 发现地）。',
               wiki_zh:'走出非洲', wiki_en:'Recent_African_origin_of_modern_humans',
               related:['africa_map','lucy','sapiens'] } },
-          { id:'coop', ring:1, angle:-135, label:'合作能力', sub:'文明的种子', icon:'🤝', color:'#3a6098',
+          { id:'coop', x:600, y:970, label:'合作能力', sub:'文明的种子', icon:'🤝', color:'#3a6098',
             detail:{ title:'合作 = 文明的基础',
               body:'一个人类的力气远不如大猩猩。但一百个人类合作，可以完成大猩猩永远做不到的事。会合作、会学习、会传递经验给下一代，正是人类与动物的关键差异——这是后来所有城市、王国、帝国的起点。',
               wiki_zh:'群体生活', wiki_en:'Sociality',
-              related:['sapiens','tools','time_machine'] } },
+              related:['sapiens','tools'] } },
 
-          // === 外圈：交互内容 (6 个 feature 节点, r=320) ===
-          // 这些节点点击后展开「富内容」（时光机/大图/地图/故事/证据/AI）
-          { id:'time_machine', ring:2, angle:-90, label:'时光机', sub:'4 个决定的角色扮演', icon:'🎮', color:'#c84820',
-            special:'scenario',
-            detail:{ title:'🎮 你是 30 万年前的智人',
-              body:'通过 4 个场景决策，体验早期智人的生存挑战。你的选择影响族群命运。',
-              related:['sapiens','coop','story'] } },
-          { id:'time_image', ring:2, angle:-30, label:'演化时间轴', sub:'700万年到30万年', icon:'🌳', color:'#7a5530',
+          // ── 右侧分支：内容/证据 (x=720)，按时代关联 ──
+          { id:'time_image', x:720, y:200, label:'演化时间轴', sub:'700万→30万年', icon:'🌳', color:'#7a5530',
             special:'timeline_image',
             detail:{ title:'🌳 人类起源完整时间轴',
               body:'一张完整图谱：从 700 万年前共同祖先到 30 万年前现代人类的 7 个关键节点。',
               related:['origin','biped','lucy','fire','sapiens'] } },
-          { id:'africa_map', ring:2, angle:30, label:'非洲起源地图', sub:'8 个化石遗址点', icon:'🗺', color:'#3a7868',
-            special:'evolution_map',
-            detail:{ title:'🗺 人类起源地图',
-              body:'8 个化石点散布在非洲：摩洛哥到东非大裂谷，连成 700 万年的演化轨迹。',
-              related:['africa','lucy','fire'] } },
-          { id:'story', ring:2, angle:90, label:'故事', sub:'清晨的智人', icon:'📖', color:'#8a5a30',
-            special:'story',
-            detail:{ title:'📖 早期智人的一天',
-              body:'通过一个具体的故事场景，理解智人当时的生活：食物、火、合作、传承。',
-              related:['sapiens','coop','time_machine'] } },
-          { id:'evidence', ring:2, angle:150, label:'证据物', sub:'考古发现', icon:'🔍', color:'#506890',
+          { id:'evidence', x:720, y:470, label:'证据物', sub:'考古发现', icon:'🔍', color:'#506890',
             special:'evidence',
             detail:{ title:'🔍 我们怎么知道这些？',
               body:'颅骨化石、石器、赭石颜料、动物骨骼——4 类考古证据如何让我们重建 30 万年前的世界。',
               related:['lucy','tools','africa_map'] } },
-          { id:'ai_chat', ring:2, angle:210, label:'AI 互动', sub:'问任何问题', icon:'🤖', color:'#8a4090',
+          { id:'africa_map', x:720, y:720, label:'非洲地图', sub:'8 个化石点', icon:'🗺', color:'#3a7868',
+            special:'evolution_map',
+            detail:{ title:'🗺 人类起源地图',
+              body:'8 个化石点散布在非洲：摩洛哥到东非大裂谷，连成 700 万年的演化轨迹。',
+              related:['africa','lucy','fire'] } },
+          { id:'ai_chat', x:720, y:920, label:'AI 互动', sub:'问任何问题', icon:'🤖', color:'#8a4090',
             special:'ai',
             detail:{ title:'🤖 与 AI 导师对话',
               body:'问 AI 任何关于这一节的问题，或让它帮你质检你写的内容。',
               related:['coop','sapiens'] } },
         ],
-        // 边
+
+        // 🎮 互动 · 娱乐节点（不属于主课程体系，独立放置）
+        play_nodes: [
+          { id:'time_machine', label:'时光机', sub:'4 个决定的角色扮演', icon:'🎮', color:'#c84820',
+            special:'scenario',
+            detail:{ title:'🎮 你是 30 万年前的智人',
+              body:'通过 4 个场景决策，体验早期智人的生存挑战。你的选择影响族群命运。',
+              related:['sapiens','coop'] } },
+          { id:'story', label:'故事讲解', sub:'清晨的智人', icon:'📖', color:'#8a5a30',
+            special:'story',
+            detail:{ title:'📖 早期智人的一天',
+              body:'通过一个具体的故事场景，理解智人当时的生活：食物、火、合作、传承。',
+              related:['sapiens','coop'] } },
+        ],
+
+        // 边（树形主干 + 分支）
         edges: [
-          // 时间线
-          { from:'origin', to:'biped', type:'time' },
-          { from:'biped', to:'lucy', type:'time' },
-          { from:'lucy', to:'tools', type:'time' },
-          { from:'tools', to:'fire', type:'time' },
-          { from:'fire', to:'sapiens', type:'time' },
-          // 时间节点 ↔ 非洲（地点关联）
-          { from:'origin', to:'africa', type:'place' },
-          { from:'lucy', to:'africa', type:'place' },
-          { from:'sapiens', to:'africa', type:'place' },
-          // 关键能力
-          { from:'coop', to:'sapiens', type:'concept' },
-          { from:'tools', to:'coop', type:'concept' },
-          // 内容节点 → 关联到对应概念（淡色辅助线）
-          { from:'time_machine', to:'sapiens', type:'feature' },
-          { from:'time_image', to:'lucy', type:'feature' },
-          { from:'africa_map', to:'africa', type:'feature' },
-          { from:'evidence', to:'tools', type:'feature' },
-          { from:'story', to:'sapiens', type:'feature' },
+          // 🌳 主干：自上而下时间线（红色实线）
+          { from:'origin',  to:'biped',   type:'time' },
+          { from:'biped',   to:'lucy',    type:'time' },
+          { from:'lucy',    to:'tools',   type:'time' },
+          { from:'tools',   to:'fire',    type:'time' },
+          { from:'fire',    to:'sapiens', type:'time' },
+          // 底部双分支
+          { from:'sapiens', to:'africa',  type:'place' },
+          { from:'sapiens', to:'coop',    type:'concept' },
+          // 右侧分支（内容节点连接到对应时代）
+          { from:'origin',  to:'time_image',   type:'feature' },
+          { from:'lucy',    to:'evidence',     type:'feature' },
+          { from:'fire',    to:'africa_map',   type:'feature' },
+          { from:'sapiens', to:'ai_chat',      type:'feature' },
+          // 跨概念关联（虚线辅助）
+          { from:'tools',   to:'coop',         type:'concept' },
         ],
       },
 

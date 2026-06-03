@@ -1422,13 +1422,14 @@ function renderPreEra(p) {
 function renderPreEraGraphMode(p) {
   const kn = p.knowledge_network;
 
-  // Hide accordion layer pills (no scroll, no layers)
+  // Hide accordion layer pills
   $('#preLayerPills').innerHTML = '';
 
   const body = $('#preEraBody');
   body.innerHTML = `
     <div class="kg-page">
       <div class="kg-graph-pane" id="kgGraphPane">
+        ${renderPlayArea(p, kn)}
         ${renderGraphSvg(p, kn)}
       </div>
       <div class="kg-detail-pane" id="kgDetailPane">
@@ -1441,93 +1442,137 @@ function renderPreEraGraphMode(p) {
   body.scrollTo(0, 0);
 }
 
-// 构造完整节点列表（hub + nodes，附计算坐标）
-function computeGraphNodes(kn) {
-  const cx = 400, cy = 360;
-  const R1 = 175;  // 内圈半径（概念）
-  const R2 = 305;  // 外圈半径（功能）
+// 🎮 互动·娱乐区（独立于主课程网络）
+function renderPlayArea(p, kn) {
+  const plays = kn.play_nodes || [];
+  if (plays.length === 0) return '';
+  const cards = plays.map(n => `
+    <button class="kg-play-card" data-nid="${n.id}" style="--play-color:${n.color}">
+      <span class="kg-play-icon">${n.icon}</span>
+      <div class="kg-play-text">
+        <strong>${n.label}</strong>
+        <span>${n.sub}</span>
+      </div>
+    </button>`).join('');
+  return `<div class="kg-play-area">
+    <div class="kg-play-header">
+      <span class="kg-play-tag">🎮 互动 · 娱乐</span>
+      <span class="kg-play-note">不属于课程主线，可随时来玩</span>
+    </div>
+    <div class="kg-play-row">${cards}</div>
+  </div>`;
+}
 
-  const out = [{ ...kn.hub, x: cx, y: cy, isHub: true }];
+// 构造完整节点列表 — 优先使用显式 x,y；兜底用 angle/ring 计算
+function computeGraphNodes(kn) {
+  const out = [];
+  // Hub
+  const hubX = kn.hub.x != null ? kn.hub.x : 400;
+  const hubY = kn.hub.y != null ? kn.hub.y : 360;
+  out.push({ ...kn.hub, x: hubX, y: hubY, isHub: true });
+
+  // 兜底圆形布局参数（向后兼容老数据）
+  const cx = 400, cy = 360, R1 = 175, R2 = 305;
   kn.nodes.forEach(n => {
-    const r = n.ring === 2 ? R2 : R1;
-    const rad = (n.angle * Math.PI) / 180;
-    out.push({ ...n, x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) });
+    let x, y;
+    if (n.x != null && n.y != null) { x = n.x; y = n.y; }
+    else {
+      const r = n.ring === 2 ? R2 : R1;
+      const rad = (n.angle * Math.PI) / 180;
+      x = cx + r * Math.cos(rad); y = cy + r * Math.sin(rad);
+    }
+    out.push({ ...n, x, y });
   });
   return out;
 }
 
-// 绘制 SVG 图谱
+// 绘制 SVG 图谱（支持树形 + 圆形布局）
 function renderGraphSvg(p, kn) {
   const allNodes = computeGraphNodes(kn);
   const byId = {};
   allNodes.forEach(n => byId[n.id] = n);
   byId.hub = allNodes[0];
 
+  const isTree = kn.layout === 'tree';
+  const viewBox = kn.viewBox || (isTree ? '0 0 900 1100' : '0 0 800 720');
+
   const edgeStyle = (t) => {
-    if (t === 'time')    return { c: '#c84820', w: 2,   d: '0',   o: 0.55 };
-    if (t === 'place')   return { c: '#3a7868', w: 1.5, d: '5,4', o: 0.5 };
-    if (t === 'concept') return { c: '#8a5a90', w: 1.5, d: '5,4', o: 0.5 };
-    return { c: '#a07840', w: 1.2, d: '2,5', o: 0.32 };
+    if (t === 'time')    return { c:'#c84820', w:3,   d:'0',   o:0.7 };
+    if (t === 'place')   return { c:'#3a7868', w:2,   d:'6,5', o:0.55 };
+    if (t === 'concept') return { c:'#8a5a90', w:2,   d:'6,5', o:0.55 };
+    return { c:'#a07840', w:1.5, d:'3,6', o:0.4 };
   };
 
-  // hub → 每个内圈节点：淡色辐射线
-  const hubLines = kn.nodes.filter(n => n.ring !== 2).map(n => {
-    const t = byId[n.id];
-    return `<line x1="${byId.hub.x}" y1="${byId.hub.y}" x2="${t.x}" y2="${t.y}"
-      stroke="#c8a040" stroke-width="1" stroke-opacity=".18"/>`;
-  }).join('');
-
+  // 边
   const edges = kn.edges.map(e => {
     const a = byId[e.from], b = byId[e.to];
     if (!a || !b) return '';
     const s = edgeStyle(e.type);
     return `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"
-      stroke="${s.c}" stroke-width="${s.w}" stroke-opacity="${s.o}" stroke-dasharray="${s.d}"/>`;
+      stroke="${s.c}" stroke-width="${s.w}" stroke-opacity="${s.o}"
+      stroke-dasharray="${s.d}" stroke-linecap="round"/>`;
   }).join('');
 
-  // 节点（hub + outer）
+  // 节点 — 字号更大、半径更大
   const nodes = allNodes.map(n => {
     if (n.isHub) {
+      // 树形布局：hub 作为顶部装饰，扁矩形
+      if (isTree) {
+        return `<g class="kg-node hub" data-nid="${n.id}" style="cursor:pointer">
+          <rect x="${n.x-130}" y="${n.y-32}" width="260" height="60" rx="30"
+                fill="url(#kg-hub-grad)" stroke="${n.color}" stroke-width="3"
+                filter="drop-shadow(0 4px 12px rgba(184,48,24,.3))"/>
+          <text x="${n.x-95}" y="${n.y+6}" text-anchor="middle" font-size="28" pointer-events="none">${n.icon}</text>
+          <text x="${n.x+18}" y="${n.y-2}" text-anchor="middle" font-size="18" font-weight="800"
+                fill="${n.color}" font-family="STSong,serif" pointer-events="none">${n.label}</text>
+          <text x="${n.x+18}" y="${n.y+18}" text-anchor="middle" font-size="12"
+                fill="#7a4830" opacity=".75" pointer-events="none">${n.sub}</text>
+        </g>`;
+      }
+      // 圆形布局：原 hub 圆
       return `<g class="kg-node hub" data-nid="${n.id}" style="cursor:pointer">
-        <circle cx="${n.x}" cy="${n.y}" r="62"
+        <circle cx="${n.x}" cy="${n.y}" r="68"
                 fill="url(#kg-hub-grad)" stroke="${n.color}" stroke-width="3"
                 filter="drop-shadow(0 4px 14px rgba(184,48,24,.35))"/>
-        <text x="${n.x}" y="${n.y-14}" text-anchor="middle" font-size="30" pointer-events="none">${n.icon}</text>
-        <text x="${n.x}" y="${n.y+10}" text-anchor="middle" font-size="14" font-weight="800"
+        <text x="${n.x}" y="${n.y-14}" text-anchor="middle" font-size="32" pointer-events="none">${n.icon}</text>
+        <text x="${n.x}" y="${n.y+12}" text-anchor="middle" font-size="16" font-weight="800"
               fill="${n.color}" font-family="STSong,serif" pointer-events="none">${n.label}</text>
-        <text x="${n.x}" y="${n.y+26}" text-anchor="middle" font-size="9"
+        <text x="${n.x}" y="${n.y+30}" text-anchor="middle" font-size="11"
               fill="#7a4830" opacity=".75" pointer-events="none">${n.sub}</text>
       </g>`;
     }
-    const r = n.ring === 2 ? 38 : 42;
-    const cls = n.ring === 2 ? 'kg-node feature' : 'kg-node concept';
+    // 普通节点（feature vs concept）— 字号大幅放大
+    const isFeature = n.special != null;
+    const r = isFeature ? 50 : 56;
+    const cls = isFeature ? 'kg-node feature' : 'kg-node concept';
     return `<g class="${cls}" data-nid="${n.id}" style="cursor:pointer">
       <circle cx="${n.x}" cy="${n.y}" r="${r}"
-              fill="white" stroke="${n.color}" stroke-width="2.5"
-              filter="drop-shadow(0 3px 8px rgba(60,30,5,.22))"/>
-      <circle cx="${n.x}" cy="${n.y}" r="${r-3}"
-              fill="${n.color}" fill-opacity="0.1"/>
-      <text x="${n.x}" y="${n.y-6}" text-anchor="middle" font-size="${r * 0.5}" pointer-events="none">${n.icon}</text>
-      <text x="${n.x}" y="${n.y+12}" text-anchor="middle" font-size="10" font-weight="700"
+              fill="white" stroke="${n.color}" stroke-width="3"
+              filter="drop-shadow(0 3px 10px rgba(60,30,5,.25))"/>
+      <circle cx="${n.x}" cy="${n.y}" r="${r-4}"
+              fill="${n.color}" fill-opacity="0.12"/>
+      <text x="${n.x}" y="${n.y-12}" text-anchor="middle" font-size="28" pointer-events="none">${n.icon}</text>
+      <text x="${n.x}" y="${n.y+12}" text-anchor="middle" font-size="13" font-weight="700"
             fill="#2c1a08" font-family="STSong,serif" pointer-events="none">${n.label}</text>
-      <text x="${n.x}" y="${n.y+24}" text-anchor="middle" font-size="8"
-            fill="#7a4830" opacity=".7" pointer-events="none">${n.sub || ''}</text>
+      <text x="${n.x}" y="${n.y+29}" text-anchor="middle" font-size="11"
+            fill="#7a4830" opacity=".8" pointer-events="none">${n.sub || ''}</text>
     </g>`;
   }).join('');
 
-  return `<svg class="kg-svg" viewBox="0 0 800 720" preserveAspectRatio="xMidYMid meet">
+  return `<svg class="kg-svg ${isTree ? 'kg-tree' : ''}" viewBox="${viewBox}" preserveAspectRatio="xMidYMid meet">
     <defs>
       <radialGradient id="kg-hub-grad" cx="50%" cy="40%">
         <stop offset="0%" stop-color="#fdf5e0"/>
         <stop offset="100%" stop-color="#f5e2c0"/>
       </radialGradient>
     </defs>
-    ${hubLines}${edges}${nodes}
+    ${edges}${nodes}
   </svg>
   <div class="kg-legend">
     <span><i class="mn-leg-line" style="background:#c84820"></i>时间脉络</span>
     <span><i class="mn-leg-line dashed" style="background:#3a7868"></i>地点关联</span>
     <span><i class="mn-leg-line dashed" style="background:#8a5a90"></i>概念关联</span>
+    <span><i class="mn-leg-line dashed" style="background:#a07840"></i>内容分支</span>
   </div>`;
 }
 
@@ -1632,15 +1677,16 @@ function bindGraphPage(p) {
       g.classList.toggle('active', g.getAttribute('data-nid') === nodeId);
     });
 
-    // 2. 找到节点 + 渲染详情
+    // 2. 找到节点 + 渲染详情（包括 nodes 和 play_nodes）
     let node;
     let html;
     if (nodeId === 'hub') {
       html = renderHubDetailCard(kn, p);
     } else {
-      node = kn.nodes.find(n => n.id === nodeId);
+      node = kn.nodes.find(n => n.id === nodeId) ||
+             (kn.play_nodes || []).find(n => n.id === nodeId);
       if (!node) return;
-      html = (node.ring === 2 || node.special)
+      html = node.special
         ? renderFeatureDetailCard(node, kn, p)
         : renderConceptDetailCard(node, kn, p);
     }
@@ -1681,9 +1727,12 @@ function bindGraphPage(p) {
 
   // 节点点击 = 聚焦
   document.querySelectorAll('.kg-node').forEach(g => {
-    g.addEventListener('click', () => {
-      focusNode(g.getAttribute('data-nid'));
-    });
+    g.addEventListener('click', () => focusNode(g.getAttribute('data-nid')));
+  });
+
+  // 互动·娱乐节点点击
+  document.querySelectorAll('.kg-play-card').forEach(btn => {
+    btn.addEventListener('click', () => focusNode(btn.getAttribute('data-nid')));
   });
 
   // 暴露给全局，供详情卡内的相关 chip 调用
