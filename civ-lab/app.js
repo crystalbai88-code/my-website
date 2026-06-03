@@ -106,11 +106,16 @@ function renderHomeTimeline() {
     const done = state.completed.includes(lesson.id);
     const active = !done && (i === 0 || state.completed.includes(MAP_DATA[i - 1]?.id));
     const cls = done ? 'done' : active ? 'active' : '';
+    // Special separator before L01 — marks transition from prehistory to civilization
+    const separator = lesson.id === 'L01'
+      ? `<div class="tl-era-sep" title="文明时代开始 · 公元前3000年">◆</div>` : '';
     return `
-      <div class="tl-dot-wrap ${active ? 'active-lesson' : ''}" onclick="enterLesson('${lesson.id}')" data-id="${lesson.id}">
+      <div class="tl-dot-wrap ${active ? 'active-lesson' : ''} ${lesson.id.startsWith('P') ? 'tl-prehistory' : ''}"
+           onclick="enterLesson('${lesson.id}')" data-id="${lesson.id}">
         <div class="tl-label-time">${lesson.time}</div>
         <div class="tl-dot ${cls}" id="dot-${lesson.id}"></div>
-        <div class="tl-label-title">${lesson.icon} ${lesson.title}</div>
+        <div class="tl-label-title">${lesson.icon || ''} ${lesson.title}</div>
+        ${separator}
       </div>`;
   }).join('');
 
@@ -180,15 +185,34 @@ function applyEraColors(id) {
   root.style.setProperty('--era-water', c.water);
   root.style.setProperty('--era-sky', c.sky);
 
-  // Only change the ocean — terrain paths keep their individual colors
-  // Apply a CSS hue-shift filter to the whole continent group for era tint
   $('#ocean').setAttribute('fill', c.water);
   const continents = $('#continents');
   if (continents) {
-    // Subtle saturation shift based on era — older = less saturated
     const sat = c.sat != null ? c.sat : 0.8;
     continents.style.filter = `saturate(${sat}) brightness(${0.85 + sat * 0.2})`;
   }
+
+  // P01 special: highlight Africa, dim other continents
+  const africaEl = $('#africa');
+  const asiaEl = $('#asia');
+  const naEl = $('#north-america');
+  const saEl = $('#south-america');
+  const euEl = $('#europe');
+  const auEl = $('#australia');
+  if (id === 'P01') {
+    // Africa glows warm — this is where the story begins
+    if (africaEl) africaEl.style.filter = 'saturate(1.4) brightness(1.15)';
+    // Other continents dimmed — humanity hasn't reached them yet
+    [asiaEl, naEl, saEl, euEl, auEl].forEach(el => {
+      if (el) el.style.filter = 'saturate(0.3) brightness(0.7) opacity(0.65)';
+    });
+  } else {
+    // Reset all continent special filters for other lessons
+    [africaEl, asiaEl, naEl, saEl, euEl, auEl].forEach(el => {
+      if (el) el.style.filter = '';
+    });
+  }
+
   $('#s-lesson').style.background = `linear-gradient(180deg, ${c.sky} 0%, ${adjustColor(c.sky, .04)} 100%)`;
 }
 
