@@ -847,3 +847,440 @@ html, body {
 /* Fix flexbox overflow scroll */
 .pre-era-body { min-height: 0; }
 #s-pre-era { overflow: visible; }
+
+/* ════════════════════════════════════════
+   国风手绘增强 · Hand-Drawn Scroll Enhancement
+   inspired by traditional Chinese scroll painting style
+════════════════════════════════════════ */
+
+/* ── A. 全局手绘毛边 SVG 滤镜 ── */
+/* Applied to cards/panels via .hd class */
+.hd {
+  filter: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='hd'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.025 0.04' numOctaves='2' seed='8' result='noise'/%3E%3CfeDisplacementMap in='SourceGraphic' in2='noise' scale='2.5' xChannelSelector='R' yChannelSelector='G'/%3E%3C/filter%3E%3C/svg%3E#hd");
+}
+
+/* ── B. 宣纸底纹 · Paper texture on all screens ── */
+#s-home, #s-lesson, #s-summary, #s-pre-overview, #s-pre-era {
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='600' height='600' filter='url(%23p)' opacity='0.045'/%3E%3C/svg%3E");
+}
+
+/* ── C. 首页卷轴实体感 ── */
+/* 卷轴上下横杆 (scroll rod top/bottom) */
+#s-home::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 22px;
+  background: linear-gradient(180deg,
+    #8a5a18 0%, #c89040 25%, #f0cc70 50%, #c89040 75%, #7a4a10 100%);
+  box-shadow: 0 4px 14px rgba(100,60,10,.45), inset 0 1px 3px rgba(255,220,100,.5);
+  z-index: 5;
+}
+#s-home::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 22px;
+  background: linear-gradient(0deg,
+    #8a5a18 0%, #c89040 25%, #f0cc70 50%, #c89040 75%, #7a4a10 100%);
+  box-shadow: 0 -4px 14px rgba(100,60,10,.45), inset 0 -1px 3px rgba(255,220,100,.5);
+  z-index: 5;
+}
+/* 卷轴两端圆形端头 */
+.tl-wrap::before, .tl-wrap::after {
+  content: '';
+  position: absolute; top: -11px;
+  width: 22px; height: 22px;
+  background: radial-gradient(circle at 40% 35%, #f0d070, #a06828);
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(60,30,5,.5);
+  z-index: 6;
+}
+.tl-wrap::before { left: -4px; }
+.tl-wrap::after  { right: -4px; }
+
+/* 卷轴内容区边框（模拟卷轴边缘装饰线） */
+.tl-wrap {
+  border-top: 2px solid rgba(160,100,30,.35);
+  border-bottom: 2px solid rgba(160,100,30,.35);
+  padding-top: 100px;
+  padding-bottom: 60px;
+}
+
+/* 竹节装饰 tl-semester */
+.tl-semester {
+  background: var(--warm);
+  color: #fff5e8 !important;
+  padding: 3px 24px;
+  border-radius: 2px;
+  font-size: 10px !important;
+  letter-spacing: .15em !important;
+  opacity: 1 !important;
+  font-weight: 700;
+}
+
+/* ── D. 红绸缎标题条 Red Ribbon Title Banner ── */
+/* Applies to lesson topbar time chip */
+.map-time-chip {
+  position: relative;
+  background: linear-gradient(90deg, #a02010, var(--warm), #a02010) !important;
+  border-radius: 0 !important;
+  padding: 5px 22px 5px 14px !important;
+  letter-spacing: .1em !important;
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%);
+}
+
+/* 课程标题 - 毛笔字感 */
+.lesson-title-label {
+  font-family: var(--serif) !important;
+  letter-spacing: .08em !important;
+  font-size: 19px !important;
+}
+
+/* ── E. 顶栏卷轴样式增强 ── */
+.lesson-topbar {
+  background: linear-gradient(90deg,
+    #e0c888 0%, #f5e4b8 15%, #fdf4dc 50%, #f5e4b8 85%, #e0c888 100%) !important;
+  border-bottom: 3px solid transparent !important;
+  border-image: linear-gradient(90deg, transparent, #c89040, #a06020, #c89040, transparent) 1 !important;
+}
+
+/* Pre-overview & pre-era topbar  */
+.pre-topbar {
+  background: linear-gradient(90deg, #e0c888, #f5e4b8, #fdf4dc, #f5e4b8, #e0c888) !important;
+  border-bottom: 3px solid transparent !important;
+  border-image: linear-gradient(90deg, transparent, #c89040, #a06020, #c89040, transparent) 1 !important;
+}
+.pre-topbar-title { color: var(--warm) !important; font-family: var(--serif) !important; font-size: 20px !important; letter-spacing: .1em !important; }
+.pre-topbar-sub { color: var(--ink2) !important; opacity: .8 !important; }
+.pre-era-topbar {
+  background: linear-gradient(90deg, #e0c888, #f5e4b8, #fdf4dc, #f5e4b8, #e0c888) !important;
+  border-bottom: 3px solid transparent !important;
+  border-image: linear-gradient(90deg, transparent, #c89040, #a06020, #c89040, transparent) 1 !important;
+}
+
+/* ── F. 时代卡片 - 泛黄宣纸感 ── */
+/* 史前总览 8个时代卡片 */
+.pre-era-card {
+  background: linear-gradient(135deg, #fdf5e0 0%, #f5e8cc 60%, #ede0b8 100%) !important;
+  border: none !important;
+  border-top: none !important;
+  color: var(--ink) !important;
+  box-shadow:
+    2px 2px 0 rgba(100,60,10,.18),
+    4px 4px 8px rgba(100,60,10,.12),
+    inset 0 0 40px rgba(180,130,40,.06) !important;
+  position: relative;
+}
+/* 左侧彩色边条替代 border-top */
+.pre-era-card::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+  background: var(--pcolor, #c86820);
+  border-radius: 12px 0 0 12px;
+}
+.pre-era-card:hover {
+  box-shadow:
+    3px 3px 0 rgba(100,60,10,.25),
+    6px 6px 16px rgba(100,60,10,.18),
+    inset 0 0 40px rgba(180,130,40,.08) !important;
+}
+.pec-num { color: var(--ink3) !important; }
+.pec-time { color: var(--pcolor, #c86820) !important; font-weight: 700 !important; }
+.pec-title { color: var(--ink) !important; font-family: var(--serif) !important; font-size: 17px !important; }
+.pec-snap { color: var(--ink2) !important; }
+.pec-bar { background: rgba(160,100,30,.15) !important; }
+.pec-cta { color: var(--warm) !important; font-family: var(--serif) !important; letter-spacing: .06em !important; }
+.era-explore-btn { display: none !important; } /* hide the separate button, cta text is enough */
+
+/* 介绍带 */
+.pre-intro-band {
+  background: rgba(200,160,60,.08) !important;
+  border-bottom: 1px solid rgba(160,100,30,.2) !important;
+}
+.pre-intro-band p { color: var(--ink2) !important; font-size: 14px !important; line-height: 1.9 !important; }
+
+/* ── G. 9层探索页 - 手卷风格 ── */
+#s-pre-era { background: linear-gradient(160deg, #fdf5e4 0%, #f5e8cc 100%) !important; }
+.pre-era-topbar-info strong { color: var(--warm) !important; font-family: var(--serif) !important; }
+.pre-era-topbar-info span { color: var(--ink2) !important; }
+
+/* Layer headers 红绸缎风格 */
+.pl-header h3 {
+  color: var(--ink) !important;
+  font-family: var(--serif) !important;
+  font-size: 19px !important;
+  letter-spacing: .06em !important;
+}
+.pl-sub { color: var(--ink3) !important; opacity: .75 !important; }
+.pl-icon { font-size: 22px !important; }
+
+/* 每层分隔 */
+.pre-layer {
+  border-bottom: 1px solid rgba(160,100,30,.18) !important;
+  background: transparent !important;
+}
+.pre-layer:nth-child(even) { background: rgba(200,160,60,.04) !important; }
+
+/* 时间轴条 */
+.ptl-seg { opacity: .8 !important; }
+.ptl-seg.active { opacity: 1 !important; outline-color: var(--amber) !important; }
+.ptlc { background: rgba(255,248,228,.9) !important; border-color: rgba(160,100,30,.2) !important; }
+.ptlc.now { background: #fffae8 !important; border-color: var(--amber) !important; }
+.ptlc p, .ptlc strong { color: var(--ink) !important; }
+.ptl-scale { background: rgba(200,160,60,.08) !important; border-left-color: var(--amber) !important; color: var(--ink2) !important; }
+
+/* 地图背景 */
+.pre-svg-map-box { border-color: rgba(160,100,30,.3) !important; }
+
+/* 区域tab */
+.preg-tab { background: rgba(200,160,60,.08) !important; border-color: rgba(160,100,30,.2) !important; color: var(--ink2) !important; }
+.preg-tab.active { background: var(--warm) !important; border-color: var(--warm) !important; color: #fff5e8 !important; }
+.preg-desc { color: var(--ink2) !important; }
+.preg-grid > div { background: rgba(200,160,60,.06) !important; }
+.preg-grid strong { color: var(--amber) !important; }
+.preg-grid span { color: var(--ink2) !important; }
+
+/* 知识主题 */
+.pth-card { background: rgba(255,248,228,.9) !important; border-color: rgba(160,100,30,.2) !important; }
+.pth-card h4 { color: var(--warm) !important; font-family: var(--serif) !important; }
+.pth-card li, .pth-sum { color: var(--ink2) !important; }
+.pth-caution { color: var(--warm) !important; background: rgba(180,48,24,.06) !important; }
+
+/* 证据物 */
+.pev-card { background: rgba(255,248,228,.9) !important; border-color: rgba(160,100,30,.2) !important; }
+.pev-body h4 { color: var(--warm) !important; font-family: var(--serif) !important; }
+.pev-body > p { color: var(--ink2) !important; }
+.pev-qa > div { background: rgba(200,160,60,.06) !important; }
+.pev-qa strong { color: var(--amber) !important; }
+.pev-qa span { color: var(--ink2) !important; }
+.pev-q { color: var(--warm) !important; background: rgba(200,104,32,.06) !important; }
+
+/* 故事讲解 - 仿古纸感 */
+.pst-card {
+  background: linear-gradient(135deg, #fdf5e0 0%, #f8ebce 100%) !important;
+  border: 1px solid rgba(160,100,30,.3) !important;
+  border-left: 4px solid var(--warm) !important;
+}
+.pst-card h4 { color: var(--warm) !important; font-family: var(--serif) !important; }
+.pst-setting { color: var(--ink3) !important; }
+.pst-para { color: var(--ink) !important; }
+.pst-insight { background: rgba(200,160,60,.1) !important; border-left-color: var(--amber) !important; color: var(--ink2) !important; }
+.pst-q { background: rgba(180,48,24,.05) !important; color: var(--ink2) !important; }
+
+/* 对比关系 */
+.pcmp-wrap { background: rgba(255,248,228,.9) !important; border-color: rgba(160,100,30,.2) !important; }
+.pcmp-wrap h4 { color: var(--warm) !important; font-family: var(--serif) !important; }
+.pcmp-side strong { color: var(--ink) !important; }
+.pcmp-side p { color: var(--ink2) !important; }
+.pcmp-vs { color: rgba(160,100,30,.5) !important; }
+.pcmp-insight { background: rgba(200,160,60,.1) !important; color: var(--ink2) !important; }
+
+/* AI互动 - 卷轴内置书信感 */
+.pre-ai-panel .chat-messages { background: rgba(255,248,228,.6) !important; border: 1px solid rgba(160,100,30,.15) !important; border-radius: 4px !important; }
+.pre-ai-check { background: rgba(200,160,60,.06) !important; border-color: rgba(160,100,30,.2) !important; color: var(--ink2) !important; }
+
+/* AI 消息气泡 - 纸页感 */
+.pre-ai-panel .chat-message.ai .message-bubble {
+  background: #fdf5e0 !important;
+  border: 1px solid rgba(160,100,30,.2) !important;
+  color: var(--ink) !important;
+}
+.pre-ai-panel .chat-message.user .message-bubble {
+  background: rgba(200,104,32,.1) !important;
+  border: 1px solid rgba(200,104,32,.25) !important;
+  color: var(--ink) !important;
+}
+.pre-ai-panel .message-avatar { background: var(--warm) !important; color: #fff5e8 !important; }
+
+/* 作品笔记 */
+.pre-works-task h4 { color: var(--warm) !important; font-family: var(--serif) !important; }
+.pre-task-inst { color: var(--ink2) !important; }
+.pre-task-fields textarea {
+  background: rgba(255,248,228,.9) !important;
+  border-color: rgba(160,100,30,.25) !important;
+  color: var(--ink) !important;
+}
+.pre-task-fields textarea:focus { border-color: var(--warm) !important; }
+.pre-notepad {
+  background: linear-gradient(transparent calc(100% / 11 - 1px), rgba(160,100,30,.12) calc(100% / 11 - 1px)) !important;
+  background-size: 100% calc(100% / 11) !important;
+  border-color: rgba(160,100,30,.25) !important;
+  color: var(--ink) !important;
+}
+.pre-notepad:focus { border-color: var(--warm) !important; }
+.pre-fvf { color: var(--green) !important; background: rgba(56,104,48,.06) !important; }
+
+/* ── H. 知识卡 Summary Screen ── */
+#s-summary {
+  background: linear-gradient(160deg, #faf2dc 0%, #f2e4c4 100%) !important;
+}
+.summary-card {
+  background: linear-gradient(160deg, #fdf8ec 0%, #f5ead0 100%) !important;
+  border: none !important;
+  box-shadow: 4px 4px 0 rgba(160,100,30,.2), 8px 8px 24px rgba(100,60,10,.15) !important;
+  position: relative;
+}
+.summary-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 6px;
+  background: linear-gradient(90deg, var(--warm), var(--amber), var(--warm));
+  border-radius: 12px 12px 0 0;
+}
+
+/* ── I. Layer navigation pills - 书签感 ── */
+.pre-layer-pill {
+  background: rgba(200,160,60,.1) !important;
+  border-color: rgba(160,100,30,.2) !important;
+  color: var(--ink2) !important;
+  font-family: var(--serif) !important;
+}
+.pre-layer-pill:hover {
+  background: var(--warm) !important;
+  border-color: var(--warm) !important;
+  color: #fff5e8 !important;
+}
+
+/* ── J. 背板按钮 sl-btn ── */
+.sl-btn {
+  background: rgba(200,160,60,.1) !important;
+  border: 1px solid rgba(160,100,30,.3) !important;
+  color: var(--warm) !important;
+}
+.sl-btn:hover { background: var(--warm) !important; color: #fff5e8 !important; }
+
+/* ── K. Lesson 课程区 - 调整为暖纸色 ── */
+.search-panel { background: #fdf5e0 !important; border-color: rgba(160,100,30,.25) !important; }
+.search-header h3 { color: var(--ink) !important; }
+.result-item { background: rgba(255,248,220,.8) !important; border-color: rgba(160,100,30,.15) !important; }
+.result-item strong { color: var(--ink) !important; }
+.result-item p { color: var(--ink2) !important; }
+.result-type { background: rgba(200,104,32,.12) !important; color: var(--amber) !important; }
+
+/* 地图panel */
+.map-panel { background: linear-gradient(160deg, #fdf5e0, #f8ebce) !important; border-left-color: rgba(160,100,30,.3) !important; }
+.panel-civ-header { background: rgba(200,160,60,.08) !important; border-bottom-color: rgba(160,100,30,.2) !important; }
+
+/* 知识库搜索结果 */
+.panel-no-civ p { color: var(--ink2) !important; }
+.panel-civ-name { color: var(--warm) !important; font-family: var(--serif) !important; }
+.panel-civ-desc { color: var(--ink2) !important; }
+
+/* 历史事件panel */
+.panel-events-title { color: var(--ink) !important; border-bottom-color: rgba(160,100,30,.2) !important; background: rgba(200,160,60,.06) !important; }
+
+/* 创作/AI/历史轨迹 - 暖纸色 */
+.chat-section { background: transparent; }
+.chat-header { border-bottom-color: rgba(160,100,30,.2) !important; }
+.chat-header h3 { color: var(--ink) !important; font-family: var(--serif) !important; }
+.chat-message.ai .message-bubble { background: #fdf5e0 !important; border-color: rgba(160,100,30,.2) !important; color: var(--ink) !important; }
+.chat-message.user .message-bubble { background: rgba(200,104,32,.1) !important; border-color: rgba(200,104,32,.2) !important; color: var(--ink) !important; }
+.message-bubble em { color: var(--warm) !important; }
+.chat-input-row textarea {
+  background: rgba(255,248,228,.9) !important;
+  border-color: rgba(160,100,30,.25) !important;
+  color: var(--ink) !important;
+}
+.chat-input-row textarea:focus { border-color: var(--warm) !important; }
+.primary-button {
+  background: linear-gradient(135deg, var(--warm), var(--amber)) !important;
+  border: none !important;
+  color: #fff5e8 !important;
+  font-family: var(--serif) !important;
+  letter-spacing: .06em !important;
+}
+.primary-button:hover { filter: brightness(1.1) !important; }
+.secondary-button {
+  background: rgba(200,160,60,.1) !important;
+  border: 1px solid rgba(160,100,30,.3) !important;
+  color: var(--warm) !important;
+}
+.secondary-button:hover { background: var(--warm) !important; color: #fff5e8 !important; }
+.suggestion-chip {
+  background: rgba(200,160,60,.1) !important;
+  border-color: rgba(160,100,30,.2) !important;
+  color: var(--ink2) !important;
+}
+.suggestion-chip:hover { background: rgba(200,104,32,.15) !important; color: var(--warm) !important; }
+
+/* 学习历史轨迹 */
+.history-section { background: transparent; }
+.stat-card { background: rgba(255,248,228,.9) !important; border-color: rgba(160,100,30,.2) !important; }
+.stat-card strong { color: var(--warm) !important; }
+.history-item { border-bottom-color: rgba(160,100,30,.12) !important; }
+.history-icon { background: rgba(200,160,60,.12) !important; color: var(--amber) !important; border: 1px solid rgba(160,100,30,.2) !important; }
+.history-type { color: var(--amber) !important; background: rgba(200,104,32,.1) !important; }
+.history-text { color: var(--ink2) !important; }
+.history-ts { color: var(--ink3) !important; }
+
+/* 创作任务 */
+.create-section { background: transparent; }
+.task-brief { background: rgba(255,248,228,.9) !important; border-color: rgba(160,100,30,.2) !important; border-left-color: var(--warm) !important; }
+#taskForm input, #taskForm select, #taskForm textarea {
+  background: rgba(255,248,228,.9) !important;
+  border-color: rgba(160,100,30,.25) !important;
+  color: var(--ink) !important;
+}
+.drawing-panel { background: rgba(255,248,228,.7) !important; border-color: rgba(160,100,30,.2) !important; }
+.artifact-card { background: rgba(255,248,228,.95) !important; border-color: rgba(160,100,30,.2) !important; border-left-color: var(--warm) !important; }
+.artifact-card p { color: var(--ink2) !important; }
+.fact-table > div { background: rgba(200,160,60,.08) !important; border-color: rgba(160,100,30,.15) !important; }
+
+/* ── L. 设置弹窗 暖纸风 ── */
+.modal.dark-modal, .modal-overlay { --nothing: 0; }
+.dark-modal {
+  background: linear-gradient(160deg, #fdf8ec, #f5e8cc) !important;
+  border: 1px solid rgba(160,100,30,.3) !important;
+  color: var(--ink) !important;
+}
+.dark-modal .modal-header { border-bottom-color: rgba(160,100,30,.2) !important; }
+.dark-modal .modal-header h3 { color: var(--ink) !important; font-family: var(--serif) !important; }
+.dark-modal .setting-group label { color: var(--ink) !important; }
+.dark-modal .setting-desc { color: var(--ink2) !important; }
+.setting-input {
+  background: rgba(255,248,228,.9) !important;
+  border-color: rgba(160,100,30,.3) !important;
+  color: var(--ink) !important;
+}
+
+/* ── M. 事件弹窗 ── */
+.event-modal {
+  background: linear-gradient(160deg, #fdf8ec 0%, #f5e8cc 100%) !important;
+  border: 1px solid rgba(160,100,30,.3) !important;
+  color: var(--ink) !important;
+}
+.event-modal h2 { color: var(--warm) !important; font-family: var(--serif) !important; }
+.event-modal-year { color: var(--amber) !important; }
+.event-modal-body { color: var(--ink2) !important; }
+.event-modal-insight { background: rgba(200,160,60,.1) !important; border-left-color: var(--amber) !important; color: var(--ink2) !important; }
+.event-learn-btn { background: linear-gradient(135deg, var(--warm), var(--amber)) !important; color: #fff5e8 !important; border: none !important; }
+.map-complete-btn { background: linear-gradient(135deg, var(--warm), var(--amber)) !important; color: #fff5e8 !important; border: none !important; }
+
+/* ── N. Scrollbar - 毛笔感 ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: rgba(200,160,60,.05); }
+::-webkit-scrollbar-thumb { background: rgba(160,100,30,.25); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--warm); }
+
+/* ── O. 卷轴背景 - 史前总览 ── */
+#s-pre-overview {
+  background: linear-gradient(160deg, #faf0d8 0%, #f2e4c4 50%, #ecdcb0 100%) !important;
+}
+
+/* ── P. 印章红 accent for eyebrow text ── */
+.eyebrow { color: var(--amber) !important; }
+.context-chip { background: rgba(200,104,32,.12) !important; border-color: rgba(200,104,32,.3) !important; color: var(--amber) !important; }
+
+/* ── Q. 标签栏 bookmark style ── */
+.lesson-tab-bar { background: rgba(220,190,100,.2) !important; border-bottom: 2px solid rgba(160,100,30,.3) !important; }
+.ltab { color: var(--ink2) !important; font-family: var(--serif) !important; }
+.ltab:hover { color: var(--warm) !important; background: rgba(200,160,60,.15) !important; }
+.ltab.active { color: var(--warm) !important; border-bottom-color: var(--warm) !important; background: rgba(255,248,220,.6) !important; }
+
+/* ── R. 知识卡 card ── */
+.summary-tag { color: var(--ink2) !important; letter-spacing: .15em !important; }
+.summary-title { color: var(--warm) !important; font-family: var(--serif) !important; }
+.summary-quote { color: var(--ink2) !important; border-left-color: var(--amber) !important; }
+.summary-btn-primary { background: linear-gradient(135deg, var(--warm), var(--amber)) !important; color: #fff5e8 !important; }
+.summary-btn-secondary { background: rgba(200,160,60,.1) !important; border: 1px solid rgba(160,100,30,.3) !important; color: var(--warm) !important; }
+
+/* ── Icon button ── */
+.icon-button { background: transparent !important; border: 1px solid rgba(160,100,30,.3) !important; color: var(--ink2) !important; }
+.icon-button:hover { border-color: var(--warm) !important; color: var(--warm) !important; }
