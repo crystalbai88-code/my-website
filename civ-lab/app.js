@@ -2386,14 +2386,14 @@ function renderPreLayer8(p) {
     `<button class="suggestion-chip">${q}</button>`).join('');
   return `<section class="pre-layer" id="pre-ai">
     <div class="pl-header"><span class="pl-icon">🤖</span><div><h3>AI互动</h3><p class="pl-sub">向AI提问、质检、探索</p></div></div>
-    <div class="pre-ai-panel">
-      <div class="chat-messages" id="preAIMsgs" style="max-height:300px;overflow-y:auto"></div>
-      <div class="chat-suggestions" id="preAISuggestions">${chips}</div>
-      <div class="chat-input-row">
-        <textarea id="preAIInput" placeholder="问关于${p.title}的任何问题…" rows="2"></textarea>
+    <div class="pre-ai-panel pre-ai-panel-large">
+      <div class="chat-messages chat-messages-large" id="preAIMsgs"></div>
+      <div class="chat-suggestions chat-suggestions-large" id="preAISuggestions">${chips}</div>
+      <div class="chat-input-row chat-input-row-large">
+        <textarea id="preAIInput" placeholder="问关于${p.title}的任何问题…" rows="3"></textarea>
         <button id="preAISend" class="primary-button">发送</button>
       </div>
-      ${ai.check_prompt ? `<div class="pre-ai-check"><strong>质检提示：</strong>${ai.check_prompt}</div>` : ''}
+      ${ai.check_prompt ? `<div class="pre-ai-check"><strong>💡 质检提示：</strong>${ai.check_prompt}</div>` : ''}
     </div>
   </section>`;
 }
