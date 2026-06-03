@@ -137,28 +137,160 @@ function showScreen(id) {
 // HOME TIMELINE
 // ════════════════════════════════════════════════
 function renderHomeTimeline() {
-  const dotsEl = $('#tlDots');
-  dotsEl.innerHTML = MAP_DATA.map((lesson, i) => {
-    const done = state.completed.includes(lesson.id);
-    const active = !done && (i === 0 || state.completed.includes(MAP_DATA[i - 1]?.id));
-    const cls = done ? 'done' : active ? 'active' : '';
-    // Special separator before L01 — marks transition from prehistory to civilization
-    const separator = lesson.id === 'L01'
-      ? `<div class="tl-era-sep" title="文明时代开始 · 公元前3000年">◆</div>` : '';
-    return `
-      <div class="tl-dot-wrap ${active ? 'active-lesson' : ''} ${lesson.id.startsWith('P') ? 'tl-prehistory' : ''}"
-           onclick="enterLesson('${lesson.id}')" data-id="${lesson.id}">
-        <div class="tl-label-time">${lesson.time}</div>
-        <div class="tl-dot ${cls}" id="dot-${lesson.id}"></div>
-        <div class="tl-label-title">${lesson.icon || ''} ${lesson.title}</div>
-        ${separator}
-      </div>`;
+  // 🕸 新版：渲染知识网络替代时间轴
+  renderMainKnowledgeNetwork();
+}
+
+// ════════════════════════════════════════════════════
+// 🕸 主知识网络 · Main Knowledge Network (Level 0)
+// 双轴布局：X = 时间，Y = 主题
+// ════════════════════════════════════════════════════
+function renderMainKnowledgeNetwork() {
+  const container = document.getElementById('mainNetworkContainer');
+  if (!container) return;
+
+  const N = MAIN_NETWORK;
+  const W = 1420, H = 580;
+
+  // 主题分层背景条带
+  const themeBands = N.themes.map(t => `
+    <rect x="40" y="${t.y - 50}" width="${W - 80}" height="100"
+          fill="${t.color}" fill-opacity="0.04"/>
+    <text x="60" y="${t.y - 28}" font-size="11" font-weight="700"
+          fill="${t.color}" opacity="0.55" font-family="STSong,serif"
+          letter-spacing="2">${t.icon} ${t.label}</text>
+  `).join('');
+
+  // X 轴时间刻度
+  const timeAxis = N.time_axis.map(t => `
+    <line x1="${t.x}" y1="${H - 38}" x2="${t.x}" y2="${H - 30}"
+          stroke="rgba(160,100,30,.3)" stroke-width="1"/>
+    <text x="${t.x}" y="${H - 14}" text-anchor="middle"
+          font-size="10" fill="#7a4830" font-family="STSong,serif">${t.label}</text>
+  `).join('');
+  const axisLine = `<line x1="40" y1="${H - 38}" x2="${W - 40}" y2="${H - 38}"
+    stroke="rgba(160,100,30,.4)" stroke-width="1.2"/>`;
+
+  // 节点查找表
+  const byId = {};
+  N.nodes.forEach(n => {
+    const theme = N.themes.find(t => t.id === n.theme);
+    byId[n.id] = { ...n, y: theme.y, color: theme.color };
+  });
+
+  // 边 (按 type 不同样式)
+  const edgeStyle = (t) => {
+    if (t === 'time') return { stroke: '#c86820', width: 2,   dash: '0',   op: 0.6 };
+    if (t === 'capstone') return { stroke: '#8a5a90', width: 1.2, dash: '2,5', op: 0.35 };
+    return { stroke: '#8a5a90', width: 1.5, dash: '5,4', op: 0.55 };
+  };
+  const edges = N.edges.map(e => {
+    const a = byId[e.from], b = byId[e.to];
+    if (!a || !b) return '';
+    const s = edgeStyle(e.type);
+    // 弧线连接，更优雅
+    const dx = b.x - a.x;
+    const mid_x = (a.x + b.x) / 2;
+    const mid_y = Math.min(a.y, b.y) - Math.abs(dx) * 0.08 - 10;
+    // 同主题（同y）画直线，跨主题画弧
+    const path = (a.y === b.y)
+      ? `M ${a.x},${a.y} L ${b.x},${b.y}`
+      : `M ${a.x},${a.y} Q ${mid_x},${mid_y} ${b.x},${b.y}`;
+    return `<path d="${path}" fill="none"
+      stroke="${s.stroke}" stroke-width="${s.width}"
+      stroke-opacity="${s.op}" stroke-dasharray="${s.dash}" stroke-linecap="round"/>`;
   }).join('');
 
-  const pct = state.completed.length / MAP_DATA.length * 100;
-  $('#tlLineFill').style.width = Math.max(0, pct) + '%';
-  positionFigure();
+  // 节点
+  const completed = state.completed || [];
+  const nodes = N.nodes.map(n => {
+    const node = byId[n.id];
+    const done = completed.includes(n.id);
+    return `
+      <g class="mn-node ${done ? 'done' : ''}" data-id="${n.id}" style="cursor:pointer">
+        <circle cx="${node.x}" cy="${node.y}" r="32"
+                fill="white" stroke="${node.color}" stroke-width="${done ? 3 : 2.5}"
+                filter="drop-shadow(0 3px 8px rgba(60,30,5,.22))"/>
+        <circle cx="${node.x}" cy="${node.y}" r="28"
+                fill="${node.color}" fill-opacity="${done ? 0.2 : 0.08}"/>
+        <text x="${node.x}" y="${node.y - 4}" text-anchor="middle"
+              font-size="20" pointer-events="none">${n.emoji}</text>
+        <text x="${node.x}" y="${node.y + 14}" text-anchor="middle"
+              font-size="9" fill="${node.color}" font-weight="700"
+              font-family="STSong,serif" pointer-events="none">${n.id}</text>
+        ${done ? `<circle cx="${node.x + 22}" cy="${node.y - 22}" r="9" fill="#4a8030"/>
+                  <text x="${node.x + 22}" y="${node.y - 18}" text-anchor="middle"
+                        font-size="11" fill="white" pointer-events="none">✓</text>` : ''}
+        <!-- 节点下方标题 -->
+        <text x="${node.x}" y="${node.y + 50}" text-anchor="middle"
+              font-size="11" font-weight="700" fill="#2c1a08"
+              font-family="STSong,serif" pointer-events="none">${n.label}</text>
+        <text x="${node.x}" y="${node.y + 63}" text-anchor="middle"
+              font-size="9" fill="#7a4830" pointer-events="none">${n.time}</text>
+      </g>
+    `;
+  }).join('');
+
+  // 双轴标签
+  const axisLabels = `
+    <text x="${W/2}" y="${H-2}" text-anchor="middle" font-size="11"
+          fill="#5a3a18" font-weight="700" font-family="STSong,serif" opacity="0.6"
+          letter-spacing="3">← 时 间 →</text>
+    <text x="22" y="${H/2}" transform="rotate(-90, 22, ${H/2})" text-anchor="middle"
+          font-size="11" fill="#5a3a18" font-weight="700" font-family="STSong,serif"
+          opacity="0.6" letter-spacing="3">← 主 题 →</text>`;
+
+  container.innerHTML = `
+    <svg viewBox="0 0 ${W} ${H}" class="mn-svg" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <pattern id="mn-grid" width="80" height="120" patternUnits="userSpaceOnUse">
+          <path d="M 80 0 L 0 0 0 120" fill="none" stroke="rgba(160,100,30,.06)" stroke-width="1"/>
+        </pattern>
+      </defs>
+      <rect width="${W}" height="${H}" fill="url(#mn-grid)"/>
+      ${themeBands}
+      ${axisLine}
+      ${timeAxis}
+      ${axisLabels}
+      ${edges}
+      ${nodes}
+    </svg>
+  `;
+
+  // 节点点击 → 进入对应课程
+  container.querySelectorAll('.mn-node').forEach(g => {
+    g.addEventListener('click', () => {
+      const id = g.getAttribute('data-id');
+      enterLesson(id);
+    });
+    g.addEventListener('mouseenter', () => {
+      g.classList.add('hover');
+      highlightRelatedNodes(g.getAttribute('data-id'), true);
+    });
+    g.addEventListener('mouseleave', () => {
+      g.classList.remove('hover');
+      highlightRelatedNodes(g.getAttribute('data-id'), false);
+    });
+  });
 }
+
+function highlightRelatedNodes(nodeId, on) {
+  const related = new Set([nodeId]);
+  MAIN_NETWORK.edges.forEach(e => {
+    if (e.from === nodeId) related.add(e.to);
+    if (e.to === nodeId) related.add(e.from);
+  });
+  document.querySelectorAll('.mn-node').forEach(g => {
+    const id = g.getAttribute('data-id');
+    if (on && !related.has(id)) {
+      g.classList.add('dimmed');
+    } else {
+      g.classList.remove('dimmed');
+    }
+  });
+}
+
+function positionFigure() {/* deprecated, kept for safety */}
 
 function positionFigure() {
   const wrap = $('#tlWrap');

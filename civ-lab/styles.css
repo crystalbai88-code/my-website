@@ -2504,3 +2504,118 @@ html, body {
   .evo-map-name { font-size: 12px; }
   .evo-map-species { font-size: 10px; }
 }
+
+/* ════════════════════════════════════════════════════
+   🕸 主知识网络 · Main Knowledge Network (Level 0 = Home)
+════════════════════════════════════════════════════ */
+
+/* 隐藏旧的时间轴元素 */
+.hidden-deprecated, #tl-figure { display: none !important; }
+
+#s-home {
+  overflow-y: auto;
+  padding: 30px 24px 24px !important;
+}
+
+.main-network-container {
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  background: linear-gradient(180deg,
+    rgba(255,248,228,.5) 0%,
+    rgba(245,225,180,.3) 50%,
+    rgba(232,210,170,.4) 100%);
+  border: 1px solid rgba(160,100,30,.25);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 8px 32px rgba(100,60,10,.15);
+  position: relative;
+  z-index: 5;
+}
+
+.mn-svg {
+  width: 100%; height: auto;
+  display: block;
+  min-height: 480px;
+}
+
+/* 节点交互 */
+.mn-node {
+  transition: opacity .25s;
+}
+.mn-node circle:first-child {
+  transition: r .2s, stroke-width .2s, filter .2s;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+.mn-node:hover circle:first-child,
+.mn-node.hover circle:first-child {
+  r: 36;
+  stroke-width: 4;
+  filter: drop-shadow(0 6px 18px rgba(184,48,24,.55)) brightness(1.04);
+}
+.mn-node.dimmed { opacity: 0.22; }
+
+/* 完成节点的高亮 */
+.mn-node.done circle:first-child {
+  stroke-width: 3.5;
+  filter: drop-shadow(0 4px 12px rgba(74,128,48,.4));
+}
+
+/* 图例 */
+.mn-legend {
+  display: flex; justify-content: center;
+  gap: 24px; margin-top: 22px;
+  flex-wrap: wrap;
+  font-size: 12px; color: var(--ink2);
+}
+.mn-legend > span { display: inline-flex; align-items: center; gap: 6px; }
+.mn-leg-line {
+  display: inline-block; width: 26px; height: 2.5px; border-radius: 1px;
+}
+.mn-leg-line.dashed {
+  background-image: linear-gradient(90deg, currentColor 50%, transparent 50%);
+  background-size: 6px 2.5px; background-repeat: repeat-x;
+  background-color: transparent !important;
+}
+.mn-leg-dot {
+  display: inline-block; width: 12px; height: 12px;
+  border-radius: 50%;
+}
+.mn-leg-hint {
+  color: var(--warm); font-weight: 600; margin-left: 14px;
+  animation: mnHintPulse 2.4s ease-in-out infinite;
+}
+@keyframes mnHintPulse {
+  0%,100% { opacity: .7; }
+  50%     { opacity: 1; }
+}
+
+/* 角色选择行向上移到标题旁 */
+.char-select-row {
+  margin-top: 8px !important;
+}
+
+/* 让 header 更紧凑 */
+.tl-header {
+  margin-top: 0 !important;
+  margin-bottom: 14px !important;
+}
+.tl-header h1 {
+  font-size: clamp(24px, 3.6vw, 42px) !important;
+  margin-bottom: 6px !important;
+}
+
+/* 响应式 */
+@media (max-width: 1000px) {
+  .main-network-container { padding: 12px; border-radius: 12px; }
+  .mn-svg { min-height: 380px; }
+  .mn-legend { gap: 12px; font-size: 11px; }
+  .mn-leg-hint { display: none; }
+}
+@media (max-width: 600px) {
+  #s-home { padding: 12px !important; }
+  .tl-header h1 { font-size: 20px !important; }
+  .tl-header p { font-size: 10px !important; }
+  .mn-svg { min-height: 320px; }
+}

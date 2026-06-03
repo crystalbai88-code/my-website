@@ -1632,3 +1632,83 @@ const MAP_DATA = [
     }
   },
 ];
+
+// ════════════════════════════════════════════════════
+// 🕸 主知识网络 · MAIN KNOWLEDGE NETWORK
+// 双轴布局：X = 时间，Y = 主题
+// ════════════════════════════════════════════════════
+const MAIN_NETWORK = {
+  intro: '从 30 万年前到公元 1000 年 · 点击任意节点深入学习',
+
+  // Y 轴主题分层（横向条带）
+  themes: [
+    { id:'origin', label:'演化 · 起源',  icon:'🌳', y: 110, color:'#7a5530' },
+    { id:'civil',  label:'城市 · 文明',  icon:'🏛', y: 230, color:'#c86820' },
+    { id:'empire', label:'王权 · 帝国',  icon:'⚔️', y: 350, color:'#b83018' },
+    { id:'idea',   label:'思想 · 信仰',  icon:'💡', y: 470, color:'#8a5a90' },
+  ],
+
+  // X 轴时间刻度
+  time_axis: [
+    { x: 80,   label: '约30万年前' },
+    { x: 240,  label: '前3000' },
+    { x: 350,  label: '前2500' },
+    { x: 460,  label: '前1600' },
+    { x: 560,  label: '前1200' },
+    { x: 680,  label: '前500' },
+    { x: 800,  label: '前221' },
+    { x: 920,  label: '公元1年' },
+    { x: 1040, label: '300' },
+    { x: 1140, label: '600' },
+    { x: 1240, label: '800' },
+    { x: 1340, label: '1000' },
+  ],
+
+  // 13 个课程节点
+  nodes: [
+    { id:'P01', x:80,   theme:'origin', label:'人类从哪里来',          time:'约30万年前', emoji:'🦴' },
+    { id:'L01', x:240,  theme:'civil',  label:'文明从哪里开始',         time:'公元前3000', emoji:'🌾' },
+    { id:'L02', x:350,  theme:'civil',  label:'金字塔与城市国家',       time:'公元前2500', emoji:'🔺' },
+    { id:'L03', x:460,  theme:'empire', label:'青铜与早期王国',         time:'公元前1600', emoji:'⚔️' },
+    { id:'L04', x:560,  theme:'empire', label:'青铜时代的崩溃',         time:'公元前1200', emoji:'💫' },
+    { id:'L05', x:680,  theme:'idea',   label:'思想大爆发时代',         time:'公元前500',  emoji:'💡' },
+    { id:'L06', x:800,  theme:'empire', label:'统一帝国诞生',           time:'公元前221',  emoji:'🏛' },
+    { id:'L07', x:920,  theme:'civil',  label:'丝绸之路与帝国网络',     time:'公元1年',    emoji:'🐫' },
+    { id:'L08', x:1040, theme:'empire', label:'帝国危机与转型',         time:'公元300年',  emoji:'🔄' },
+    { id:'L09', x:1140, theme:'idea',   label:'宗教迁徙与新秩序',       time:'公元600年',  emoji:'☪️' },
+    { id:'L10', x:1240, theme:'civil',  label:'黄金时代 · 知识与城市',   time:'公元800年',  emoji:'✨' },
+    { id:'L11', x:1340, theme:'civil',  label:'中世纪 · 多极世界',       time:'公元1000年', emoji:'🌍' },
+    { id:'L12', x:1340, theme:'idea',   label:'文明博览会 · 综合展示',   time:'综合',       emoji:'🎨' },
+  ],
+
+  // 概念关联边 · 显示跨课的思路串联
+  edges: [
+    // ── 主时间脉络（演化→城市→...）橙色实线
+    { from:'P01', to:'L01', type:'time' },
+    { from:'L01', to:'L02', type:'time' },
+    { from:'L02', to:'L03', type:'time' },
+    { from:'L03', to:'L04', type:'time' },
+    { from:'L04', to:'L05', type:'time' },
+    { from:'L05', to:'L06', type:'time' },
+    { from:'L06', to:'L07', type:'time' },
+    { from:'L07', to:'L08', type:'time' },
+    { from:'L08', to:'L09', type:'time' },
+    { from:'L09', to:'L10', type:'time' },
+    { from:'L10', to:'L11', type:'time' },
+    // ── 概念串联 · 跨课关联（虚线）
+    { from:'L01', to:'L02', type:'concept', label:'城市' },
+    { from:'L02', to:'L06', type:'concept', label:'王权' },
+    { from:'L02', to:'L07', type:'concept', label:'贸易' },
+    { from:'L07', to:'L10', type:'concept', label:'贸易' },
+    { from:'L10', to:'L11', type:'concept', label:'城市' },
+    { from:'L04', to:'L08', type:'concept', label:'危机' },
+    { from:'L05', to:'L09', type:'concept', label:'思想' },
+    { from:'L09', to:'L10', type:'concept', label:'信仰' },
+    { from:'L03', to:'L06', type:'concept', label:'帝国' },
+    { from:'L06', to:'L08', type:'concept', label:'帝国' },
+    // L12 是综合，连接到所有重要节点（淡色聚合线）
+    { from:'L11', to:'L12', type:'capstone' },
+    { from:'P01', to:'L12', type:'capstone' },
+    { from:'L05', to:'L12', type:'capstone' },
+  ],
+};

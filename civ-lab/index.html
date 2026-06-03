@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI世界文明实验室</title>
-  <link rel="stylesheet" href="./styles.css?v=22" />
+  <link rel="stylesheet" href="./styles.css?v=24" />
 </head>
 <body>
 
@@ -18,7 +18,7 @@
   <div class="tl-header">
     <h1>AI 世界文明实验室</h1>
     <p>Global Civilization · 公元前3000年 — 公元1000年</p>
-    <div class="tl-subtitle">选择一个时间点，进入那个时代的文明世界</div>
+    <div class="tl-subtitle">🕸 知识网络 · 点击任意节点深入探索</div>
     <!-- ── 角色性别选择 ── -->
     <div class="char-select-row">
       <span class="char-select-label">选择你的探险角色</span>
@@ -33,7 +33,12 @@
     </div>
   </div>
 
-  <div class="tl-wrap" id="tlWrap">
+  <!-- 🕸 主知识网络 (Level 0) -->
+  <div class="main-network-container" id="mainNetworkContainer">
+    <!-- 由 JS 渲染 SVG -->
+  </div>
+
+  <div class="tl-wrap hidden-deprecated" id="tlWrap" style="display:none">
     <div class="tl-semester">第一学期 · 文明诞生到公元1000年</div>
     <div class="tl-line"><div class="tl-line-fill" id="tlLineFill"></div></div>
     <div class="tl-dots" id="tlDots"></div>
@@ -229,13 +234,11 @@
     </div><!-- end tl-figure -->
   </div>
 
-  <div class="tl-hint">
-    <p>点击任意时间点，进入那个时代的文明世界</p>
-    <div class="tl-legend">
-      <div class="leg-item"><div class="leg-dot" style="background:var(--dot-done)"></div>已探索</div>
-      <div class="leg-item"><div class="leg-dot" style="background:var(--dot-active);box-shadow:0 0 8px rgba(255,140,48,.8)"></div>当前位置</div>
-      <div class="leg-item"><div class="leg-dot" style="background:var(--dot-locked)"></div>待解锁</div>
-    </div>
+  <div class="mn-legend">
+    <span><i class="mn-leg-line" style="background:#c86820"></i>时间脉络</span>
+    <span><i class="mn-leg-line dashed" style="background:#8a5a90"></i>概念关联</span>
+    <span><i class="mn-leg-dot" style="background:#4a8030"></i>已学过</span>
+    <span class="mn-leg-hint">👆 点击任意节点进入该课程</span>
   </div>
 </div>
 
@@ -246,7 +249,7 @@
 
   <!-- Topbar -->
   <div class="lesson-topbar">
-    <button class="back-btn" id="backBtn">← 时间轴</button>
+    <button class="back-btn" id="backBtn">← 知识网络</button>
     <div class="map-time-chip" id="lessonTimeChip">公元前3000年</div>
     <div class="lesson-title-label" id="lessonTitleLabel">文明从哪里开始？</div>
     <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
@@ -800,7 +803,7 @@
     <div style="font-size:11px;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px">本课探索的文明</div>
     <div class="summary-civs" id="sumCivs"></div>
     <div class="summary-actions">
-      <button class="summary-btn-primary" onclick="completeLesson()">✦ 完成本课，回到时间轴</button>
+      <button class="summary-btn-primary" onclick="completeLesson()">✦ 完成本课，回到知识网络</button>
       <button class="summary-btn-secondary" onclick="backToLesson()">← 继续探索地图</button>
     </div>
   </div>
@@ -811,7 +814,7 @@
 ════════════════════════════════════════ -->
 <div class="screen hidden" id="s-pre-overview">
   <div class="pre-topbar">
-    <button class="back-btn" id="preHomeBtn">← 时间轴</button>
+    <button class="back-btn" id="preHomeBtn">← 知识网络</button>
     <div class="pre-topbar-center">
       <div class="pre-topbar-title">史前文明探索</div>
       <div class="pre-topbar-sub">从人类出现到第一座城市 · 约30万年 — 约3000年前</div>
@@ -864,8 +867,8 @@
   </div>
 </div>
 
-<script src="./data.js?v=22"></script>
-<script src="./prehistoric.js?v=22"></script>
-<script src="./app.js?v=22"></script>
+<script src="./data.js?v=24"></script>
+<script src="./prehistoric.js?v=24"></script>
+<script src="./app.js?v=24"></script>
 </body>
 </html>
