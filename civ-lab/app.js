@@ -1210,6 +1210,7 @@ function renderPreEra(p) {
   // Body: render all layers (+ scenario if available)
   const body = $('#preEraBody');
   body.innerHTML = [
+    renderKnowledgeNetworkLayer(p),  // 🕸 知识网络（最先）
     renderScenarioLayer(p),
     renderPreLayer1(p),
     renderPreLayer2(p),
@@ -1224,6 +1225,7 @@ function renderPreEra(p) {
 
   // Bind scenario interactions
   if (p.scenario) bindScenarioInteractions(p);
+  if (p.knowledge_network) bindKnowledgeNetwork(p);
 
   // 🎵 手风琴模式：每层默认折叠，点击标题展开
   initAccordion(body);
@@ -1358,6 +1360,155 @@ function renderPreLayer1(p) {
 // ══════════════════════════════════════════════
 // 🎮 时光机角色扮演 Time-Machine Scenario
 // ══════════════════════════════════════════════
+// ══════════════════════════════════════════════
+// 🕸 知识网络 Knowledge Network — 最先展示，节点点击展开
+// ══════════════════════════════════════════════
+function renderKnowledgeNetworkLayer(p) {
+  if (!p.knowledge_network) return '';
+  const kn = p.knowledge_network;
+
+  // 计算每个外圈节点的坐标（SVG viewBox 0 0 800 560）
+  const cx = 400, cy = 280;
+  const R = 200; // 外圈节点到中心的距离
+  const nodes = kn.nodes.map(n => {
+    const rad = (n.angle * Math.PI) / 180;
+    return {
+      ...n,
+      x: cx + R * Math.cos(rad),
+      y: cy + R * Math.sin(rad),
+    };
+  });
+  const byId = {};
+  nodes.forEach(n => byId[n.id] = n);
+  byId.hub = { id: 'hub', x: cx, y: cy, ...kn.hub };
+
+  // 边的渲染：根据 type 用不同颜色
+  const edgeColor = (t) => t === 'time' ? '#c84820' : (t === 'place' ? '#3a7868' : '#8a5a90');
+  const edges = kn.edges.map(e => {
+    const a = byId[e.from], b = byId[e.to];
+    if (!a || !b) return '';
+    return `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"
+      stroke="${edgeColor(e.type)}" stroke-width="1.5"
+      stroke-opacity="0.35" stroke-dasharray="${e.type === 'time' ? '0' : '5,4'}"/>`;
+  }).join('');
+
+  // 外圈节点
+  const outerNodes = nodes.map(n => `
+    <g class="kn-node" data-nid="${n.id}" style="cursor:pointer">
+      <circle cx="${n.x}" cy="${n.y}" r="46"
+              fill="white" stroke="${n.color}" stroke-width="3"
+              filter="drop-shadow(0 3px 8px rgba(60,30,5,.25))"/>
+      <circle cx="${n.x}" cy="${n.y}" r="42"
+              fill="${n.color}" fill-opacity="0.1"/>
+      <text x="${n.x}" y="${n.y - 8}" text-anchor="middle"
+            font-size="22" pointer-events="none">${n.icon}</text>
+      <text x="${n.x}" y="${n.y + 14}" text-anchor="middle"
+            font-size="11" fill="#2c1a08" font-weight="700"
+            font-family="STSong,'Noto Serif SC',serif" pointer-events="none">${n.label}</text>
+      <text x="${n.x}" y="${n.y + 27}" text-anchor="middle"
+            font-size="9" fill="#7a4830" opacity="0.75" pointer-events="none">${n.sub}</text>
+    </g>`).join('');
+
+  // 中心节点
+  const hub = kn.hub;
+  const hubSvg = `
+    <g class="kn-hub">
+      <circle cx="${cx}" cy="${cy}" r="68"
+              fill="url(#kn-hub-grad)" stroke="${hub.color}" stroke-width="3"
+              filter="drop-shadow(0 4px 12px rgba(184,48,24,.35))"/>
+      <text x="${cx}" y="${cy - 14}" text-anchor="middle"
+            font-size="34" pointer-events="none">${hub.icon}</text>
+      <text x="${cx}" y="${cy + 14}" text-anchor="middle"
+            font-size="15" fill="${hub.color}" font-weight="800"
+            font-family="STSong,'Noto Serif SC',serif" pointer-events="none">${hub.label}</text>
+      <text x="${cx}" y="${cy + 32}" text-anchor="middle"
+            font-size="10" fill="#7a4830" opacity="0.8" pointer-events="none">${hub.sub}</text>
+    </g>`;
+
+  return `<section class="pre-layer kn-layer" id="pre-network">
+    <div class="pl-header"><span class="pl-icon">🕸</span><div><h3>知识网络</h3><p class="pl-sub">${kn.intro}</p></div></div>
+
+    <div class="kn-canvas-wrap">
+      <svg class="kn-svg" viewBox="0 0 800 560" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <radialGradient id="kn-hub-grad" cx="50%" cy="40%">
+            <stop offset="0%" stop-color="#fdf5e0"/>
+            <stop offset="100%" stop-color="#f5e2c0"/>
+          </radialGradient>
+        </defs>
+        <!-- 边 -->
+        ${edges}
+        <!-- 中心 -->
+        ${hubSvg}
+        <!-- 外圈节点 -->
+        ${outerNodes}
+      </svg>
+
+      <!-- 图例 -->
+      <div class="kn-legend">
+        <span><i class="kn-leg-line" style="background:#c84820"></i>演化时序</span>
+        <span><i class="kn-leg-line dashed" style="background:#3a7868"></i>地点关联</span>
+        <span><i class="kn-leg-line dashed" style="background:#8a5a90"></i>概念关联</span>
+      </div>
+    </div>
+
+    <!-- 节点详情面板（点击节点后显示） -->
+    <div class="kn-detail-panel" id="knDetailPanel">
+      <div class="kn-detail-placeholder">
+        <span class="kn-placeholder-icon">👆</span>
+        <p>点击上方任意圆圈，了解它的含义</p>
+      </div>
+    </div>
+  </section>`;
+}
+
+function bindKnowledgeNetwork(p) {
+  const kn = p.knowledge_network;
+  if (!kn) return;
+  const nodeMap = {};
+  kn.nodes.forEach(n => nodeMap[n.id] = n);
+
+  document.querySelectorAll('.kn-node').forEach(g => {
+    g.addEventListener('click', () => {
+      // 高亮当前节点
+      document.querySelectorAll('.kn-node').forEach(x => x.classList.remove('selected'));
+      g.classList.add('selected');
+
+      const nid = g.getAttribute('data-nid');
+      const n = nodeMap[nid];
+      if (!n) return;
+      const d = n.detail;
+
+      const panel = document.getElementById('knDetailPanel');
+      panel.innerHTML = `
+        <div class="kn-detail-card" style="border-left-color:${n.color}">
+          <div class="kn-detail-head">
+            <span class="kn-detail-icon" style="background:${n.color}20;color:${n.color}">${n.icon}</span>
+            <div>
+              <h4>${d.title}</h4>
+              <p class="kn-detail-sub">${n.label} · ${n.sub}</p>
+            </div>
+          </div>
+          <p class="kn-detail-body">${d.body}</p>
+          <div class="kn-detail-actions">
+            ${d.wiki_zh ? `<a class="wiki-btn zh" target="_blank" rel="noreferrer"
+              href="https://zh.wikipedia.org/w/index.php?search=${encodeURIComponent(d.wiki_zh)}">📖 中文维基</a>` : ''}
+            ${d.wiki_en ? `<a class="wiki-btn en" target="_blank" rel="noreferrer"
+              href="https://en.wikipedia.org/wiki/${d.wiki_en}">🔗 EN</a>` : ''}
+            ${(d.related_layers || []).map(lid => {
+              const layerLabel = (PREHISTORIC.LAYERS.find(l => 'pre-' + l.id === lid) || {}).label || '相关层';
+              const layerIcon  = (PREHISTORIC.LAYERS.find(l => 'pre-' + l.id === lid) || {}).icon  || '';
+              return `<button class="kn-jump-btn" onclick="scrollToPreLayer('${lid}')">${layerIcon} 跳转到「${layerLabel}」 →</button>`;
+            }).join('')}
+          </div>
+        </div>`;
+
+      // 平滑滚动到详情面板
+      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+  });
+}
+
 function renderScenarioLayer(p) {
   if (!p.scenario) return '';
   const s = p.scenario;
@@ -1537,23 +1688,100 @@ function showScenarioEnding(p) {
 }
 
 function renderPreLayer2(p) {
-  const pts = p.map.map_points.map((pt, i) => `
-    <circle class="pre-svg-dot" cx="${pt.x}" cy="${pt.y}" r="8" fill="${p.color}" opacity="0.85" style="animation-delay:${i*120}ms"/>
-    <text x="${pt.x}" y="${pt.y-12}" text-anchor="middle" font-size="11" fill="#f5e6c8" font-family="sans-serif">${pt.name.split('·')[0]}</text>`
-  ).join('');
-  const routes = (p.map.routes || []).map(r =>
-    `<line x1="${r.from[0]}" y1="${r.from[1]}" x2="${r.to[0]}" y2="${r.to[1]}" stroke="${p.color}" stroke-width="2" stroke-dasharray="6,4" opacity="0.7"/>`
-  ).join('');
+  const evo = p.map.evolution_path || [];
+  let evoSvg = '';
+  if (evo.length > 0) {
+    // 红色虚线串联所有点（按时间顺序）
+    const pathD = evo.map((pt, i) => (i === 0 ? `M ${pt.x},${pt.y}` : `L ${pt.x},${pt.y}`)).join(' ');
+    const pathLine = `<path d="${pathD}" fill="none" stroke="#c84820" stroke-width="2"
+      stroke-dasharray="5,3" stroke-linecap="round" opacity="0.7"/>`;
+
+    // 化石点 + 编号 + 时间标签（按 label_dir 方位摆放，避免重叠）
+    const labelOffset = {
+      l:  { x: -14, y:   0, anchor: 'end',    rectDx: -88, rectDy: -7 },
+      r:  { x:  14, y:   0, anchor: 'start',  rectDx:  -2, rectDy: -7 },
+      t:  { x:   0, y: -18, anchor: 'middle', rectDx: -42, rectDy: -7 },
+      b:  { x:   0, y:  20, anchor: 'middle', rectDx: -42, rectDy: -7 },
+      tl: { x: -12, y: -14, anchor: 'end',    rectDx: -88, rectDy: -7 },
+      tr: { x:  12, y: -14, anchor: 'start',  rectDx:  -2, rectDy: -7 },
+      bl: { x: -12, y:  16, anchor: 'end',    rectDx: -88, rectDy: -7 },
+      br: { x:  12, y:  16, anchor: 'start',  rectDx:  -2, rectDy: -7 },
+    };
+    const dots = evo.map((pt, i) => {
+      const off = labelOffset[pt.label_dir || 'r'];
+      const lblX = pt.x + off.x;
+      const lblY = pt.y + off.y;
+      return `
+        <g class="evo-map-pt" data-id="${pt.id}" style="cursor:pointer">
+          <line x1="${pt.x}" y1="${pt.y}" x2="${lblX}" y2="${lblY+3}"
+                stroke="#c84820" stroke-width="0.6" opacity="0.4"/>
+          <circle cx="${pt.x}" cy="${pt.y}" r="9" fill="white" stroke="#c84820" stroke-width="2.5"
+                  filter="drop-shadow(0 2px 4px rgba(200,72,32,.5))"/>
+          <text x="${pt.x}" y="${pt.y+3.5}" text-anchor="middle"
+                font-size="11" font-weight="700" fill="#c84820"
+                font-family="serif" pointer-events="none">${i+1}</text>
+          <rect x="${lblX + off.rectDx}" y="${lblY + off.rectDy}" width="88" height="14" rx="3"
+                fill="rgba(255,248,228,0.95)" stroke="#c84820" stroke-width=".5" pointer-events="none"/>
+          <text x="${lblX}" y="${lblY+3}" text-anchor="${off.anchor}"
+                font-size="9" fill="#3a1a08" font-weight="700"
+                font-family="STSong,serif" pointer-events="none">${pt.time}</text>
+        </g>`;
+    }).join('');
+    evoSvg = pathLine + dots;
+  }
+
+  // 演化路径列表
+  const evoList = evo.map((pt, i) => `
+    <div class="evo-map-list-item" data-id="${pt.id}">
+      <div class="evo-map-num" style="background:#c84820">${i+1}</div>
+      <div class="evo-map-info">
+        <div class="evo-map-time">${pt.time}</div>
+        <div class="evo-map-name">${pt.name}</div>
+        <div class="evo-map-species">${pt.species}</div>
+      </div>
+      ${pt.wiki ? `<a class="wiki-btn zh" target="_blank" rel="noreferrer"
+        href="https://en.wikipedia.org/wiki/${pt.wiki}">📖 维基</a>` : ''}
+    </div>`).join('');
+
+  // 简化的非洲大陆 SVG 路径（viewBox 600x540）
+  const africaShape = `
+    <path d="M 195,80 L 270,75 Q 320,72 360,90 L 410,110 Q 440,140 425,180 L 415,210 Q 420,235 405,260 L 395,290 Q 405,320 385,355 L 360,400 Q 340,440 305,470 L 270,490 Q 240,495 215,475 L 195,440 Q 175,400 165,355 L 155,310 Q 145,275 155,235 L 165,195 Q 175,135 195,80 Z"
+      fill="#e8c890" stroke="#a06840" stroke-width="2"
+      stroke-linejoin="round"/>`;
+  // 阿拉伯半岛小块
+  const arabia = `
+    <path d="M 410,140 Q 440,135 460,150 Q 470,170 458,190 Q 440,205 420,195 L 410,180 Z"
+      fill="#e8c890" stroke="#a06840" stroke-width="1.5" opacity="0.7"/>`;
+  // 海洋 + 大洲标签
+  const labels = `
+    <text x="80" y="110" font-size="11" fill="#3a6aaa" opacity="0.55" font-style="italic" letter-spacing="2">大 西 洋</text>
+    <text x="500" y="400" font-size="11" fill="#3a6aaa" opacity="0.55" font-style="italic" letter-spacing="2">印度洋</text>
+    <text x="495" y="100" font-size="10" fill="#3a6aaa" opacity="0.5" font-style="italic">地中海</text>
+    <text x="290" y="170" font-size="9" fill="#7a5530" opacity="0.6" letter-spacing="1">撒哈拉沙漠</text>
+    <text x="380" y="320" font-size="9" fill="#7a5530" opacity="0.65" letter-spacing="1">东非大裂谷</text>
+    <text x="195" y="60" font-size="13" fill="#5a3a18" opacity="0.85" font-weight="700"
+          font-family="STSong,serif" letter-spacing="6">非　洲</text>`;
+
   return `<section class="pre-layer" id="pre-map">
-    <div class="pl-header"><span class="pl-icon">🗺</span><div><h3>世界地图</h3><p class="pl-sub">${p.map.overlay_note}</p></div></div>
+    <div class="pl-header"><span class="pl-icon">🗺</span><div><h3>世界地图 · 人类起源地图</h3><p class="pl-sub">${p.map.overlay_note}</p></div></div>
     <div class="pre-map-wrap">
       <div class="pre-svg-map-box">
-        <svg viewBox="0 0 1000 520" class="pre-svg-map" preserveAspectRatio="xMidYMid meet">
-          <rect width="1000" height="520" fill="#5a8aaa" rx="8"/>
-          ${routes}${pts}
+        <svg viewBox="0 0 600 540" class="pre-svg-map" preserveAspectRatio="xMidYMid meet">
+          <!-- 海洋 -->
+          <rect width="600" height="540" fill="#a8c8e0" rx="8"/>
+          <!-- 非洲大陆 -->
+          ${africaShape}
+          ${arabia}
+          ${labels}
+          <!-- 演化路径 + 化石点 -->
+          ${evoSvg}
         </svg>
       </div>
-      <div class="pre-map-note">${p.map.overlay_note}</div>
+      ${evoList ? `
+        <div class="evo-map-list">
+          <div class="evo-map-list-title">🦴 演化路径 · 按时间排序（点击地图编号可对应）</div>
+          ${evoList}
+        </div>` : ''}
     </div>
   </section>`;
 }

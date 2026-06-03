@@ -12,6 +12,7 @@ const PREHISTORIC = {
   },
 
   LAYERS: [
+    { id:'network',   icon:'🕸', label:'知识网络', desc:'从这里开始 · 点节点深入' },
     { id:'scenario',  icon:'🎮', label:'时光机',   desc:'你来做关键决定' },
     { id:'timeline',  icon:'⏳', label:'时间轴',  desc:'这个时代在哪里？' },
     { id:'map',       icon:'🗺', label:'世界地图', desc:'世界当时的样子' },
@@ -130,17 +131,25 @@ const PREHISTORIC = {
         ],
       },
 
-      // ── Layer 2 · 世界地图 ──
+      // ── Layer 2 · 世界地图（按时间定位描绘人类起源地域）──
       map: {
         focus: 'africa',
         active_regions: ['africa_east','africa_north'],
         dim_regions: ['europe','asia','americas','australia'],
-        overlay_note: '约30万年前，现代人类主要活动在非洲大陆。其他大陆暂时还没有他们的踪迹。',
-        map_points: [
-          { id:'africa_origin', name:'非洲大陆', x:490, y:295, type:'region', note:'现代人类起源区域' },
-          { id:'jebel_irhoud',  name:'摩洛哥 Jebel Irhoud', x:444, y:210, type:'evidence', note:'重要化石证据地点' },
-          { id:'omo_kibish',    name:'埃塞俄比亚 Omo Kibish', x:528, y:270, type:'evidence', note:'重要化石证据地点' },
-        ]
+        overlay_note: '红线串联了700万年到30万年的演化关键地点。所有节点都在非洲——这就是「走出非洲」的起点。',
+        // 演化时间链 · 每个点是一个化石/重要发现地点（按非洲真实地理分布）
+        // SVG viewBox 0 0 600 540 — 非洲填满画布
+        // label_dir: 'tl'/'tr'/'bl'/'br'/'l'/'r'/'t'/'b' — 标签摆放方向
+        evolution_path: [
+          { id:'jebel',   name:'摩洛哥 Jebel Irhoud', x:170, y:130, time:'约30万年前',  species:'最早智人化石',           wiki:'Jebel_Irhoud',  label_dir:'l' },
+          { id:'sahel',   name:'撒哈拉乍得',           x:295, y:215, time:'约700万年前', species:'Sahelanthropus 萨赫勒人',wiki:'Sahelanthropus',label_dir:'t' },
+          { id:'ardi',    name:'埃塞俄比亚阿法',       x:425, y:240, time:'约440万年前', species:'Ardipithecus 阿尔迪古猿',wiki:'Ardipithecus',  label_dir:'tr' },
+          { id:'omo',     name:'埃塞俄比亚 Omo',      x:445, y:265, time:'约20万年前',  species:'早期智人骨骼',           wiki:'Omo_remains',   label_dir:'r' },
+          { id:'lucy',    name:'埃塞俄比亚哈达',       x:415, y:285, time:'约320万年前', species:'Lucy 南方古猿',          wiki:'Australopithecus_afarensis', label_dir:'br' },
+          { id:'turkana', name:'肯尼亚图尔卡纳湖',     x:380, y:325, time:'约160万年前', species:'Homo erectus 直立人',   wiki:'Homo_erectus',  label_dir:'l' },
+          { id:'orrorin', name:'肯尼亚 Tugen',        x:415, y:355, time:'约600万年前', species:'Orrorin 始祖地猿',       wiki:'Orrorin',       label_dir:'r' },
+          { id:'olduvai', name:'坦桑尼亚奥杜瓦伊',     x:395, y:395, time:'约200万年前', species:'早期 Homo + 石器',       wiki:'Olduvai_Gorge', label_dir:'b' },
+        ],
       },
 
       // ── Layer 3 · 文明区域 ──
@@ -300,6 +309,74 @@ const PREHISTORIC = {
       // ══════════════════════════════════════════════
       // 🎮 时光机：你是30万年前的智人
       // ══════════════════════════════════════════════
+      // ══════════════════════════════════════════════
+      // 🕸 知识网络：所有概念互联成图，点击展开
+      // ══════════════════════════════════════════════
+      knowledge_network: {
+        intro: '点击任何一个圆圈，深入了解它',
+        // 中心节点
+        hub: { id: 'hub', label: '人类起源', sub: '约30万年前', icon: '🦴', color: '#c84820' },
+        // 8 个外圈节点（按角度排列）
+        nodes: [
+          { id: 'origin', angle: -90, label: '共同祖先', sub: '约700万年前', icon: '🌳', color: '#6a8c30',
+            detail: { title: '人类与黑猩猩的共同祖先',
+              body: '人类不是从今天的黑猩猩变来的，而是有共同的古老祖先。约700-600万年前，两支祖先分开演化，走向不同方向。',
+              wiki_zh: '人类演化', wiki_en: 'Human_evolution',
+              related_layers: ['pre-timeline'] } },
+          { id: 'biped', angle: -45, label: '直立行走', sub: '约600万年前', icon: '🚶', color: '#8a7030',
+            detail: { title: '直立行走解放了双手',
+              body: '当人类祖先能稳定地用两条腿走路，双手就空出来了。这让我们可以拿工具、搬东西、照顾孩子、传递食物——这是文明的基础动作。',
+              wiki_zh: '双足步行', wiki_en: 'Bipedalism',
+              related_layers: ['pre-timeline'] } },
+          { id: 'lucy', angle: 0, label: 'Lucy', sub: '约390万年前', icon: '👩', color: '#a06030',
+            detail: { title: 'Lucy 告诉我们的关键事实',
+              body: '人类祖先在大脑明显变大之前，已经能够双足行走。站起来这件事本身，就改变了人类未来的道路。',
+              wiki_zh: 'Lucy（化石）', wiki_en: 'Lucy_(Australopithecus)',
+              related_layers: ['pre-timeline', 'pre-evidence'] } },
+          { id: 'tools', angle: 45, label: '工具使用', sub: '约280万年前', icon: '🪨', color: '#7a5030',
+            detail: { title: '石器：最早的工具证据',
+              body: '人类祖先开始系统制作石器：用于切割、刮削、砍砸。工具不只是石头——它代表「发现问题→思考解决方案→制造→教给别人」的链条。',
+              wiki_zh: '石器时代', wiki_en: 'Stone_tool',
+              related_layers: ['pre-evidence'] } },
+          { id: 'fire', angle: 90, label: '火与远行', sub: '约190万年前', icon: '🔥', color: '#c8401a',
+            detail: { title: 'Homo erectus 与火',
+              body: '直立人开始能控制火，身体也更适合长距离行走。他们走出非洲，到达亚洲——这是人类第一次走向世界。',
+              wiki_zh: '直立人', wiki_en: 'Homo_erectus',
+              related_layers: ['pre-map', 'pre-timeline'] } },
+          { id: 'sapiens', angle: 135, label: '智人出现', sub: '约30万年前', icon: '🧠', color: '#b8302a',
+            detail: { title: 'Homo sapiens：我们这个物种',
+              body: '我们这个物种在非洲出现。但30万年前的现代人没有城市、农业、文字——他们仍然依靠自然、工具、火和群体合作生活。',
+              wiki_zh: '智人', wiki_en: 'Homo_sapiens',
+              related_layers: ['pre-timeline', 'pre-region'] } },
+          { id: 'africa', angle: 180, label: '非洲起源', sub: '关键地点', icon: '🌍', color: '#5a8030',
+            detail: { title: '为什么是非洲？',
+              body: '化石、DNA、地质学三个独立证据都指向：现代人类起源于非洲大陆。重要遗址：摩洛哥 Jebel Irhoud、埃塞俄比亚 Omo Kibish。',
+              wiki_zh: '走出非洲', wiki_en: 'Recent_African_origin_of_modern_humans',
+              related_layers: ['pre-map', 'pre-region'] } },
+          { id: 'coop', angle: -135, label: '合作能力', sub: '文明的种子', icon: '🤝', color: '#3a6098',
+            detail: { title: '合作 = 文明的基础',
+              body: '一个人类的力气远不如大猩猩。但一百个人类合作，可以完成大猩猩永远做不到的事。会合作、会学习、会传递经验，正是人类与动物的关键差异。',
+              wiki_zh: '群体生活', wiki_en: 'Sociality',
+              related_layers: ['pre-scenario', 'pre-theme'] } },
+        ],
+        // 边（连接关系）
+        edges: [
+          // 时间线箭头（演化顺序）
+          { from: 'origin', to: 'biped', type: 'time' },
+          { from: 'biped', to: 'lucy', type: 'time' },
+          { from: 'lucy', to: 'tools', type: 'time' },
+          { from: 'tools', to: 'fire', type: 'time' },
+          { from: 'fire', to: 'sapiens', type: 'time' },
+          // 全部时间节点连到非洲（起源地）
+          { from: 'origin', to: 'africa', type: 'place' },
+          { from: 'lucy', to: 'africa', type: 'place' },
+          { from: 'sapiens', to: 'africa', type: 'place' },
+          // 关键能力连到智人
+          { from: 'coop', to: 'sapiens', type: 'concept' },
+          { from: 'tools', to: 'coop', type: 'concept' },
+        ],
+      },
+
       scenario: {
         title: '你是30万年前的智人',
         subtitle: '4 个决定，看你的族群能否生存下去',

@@ -2274,3 +2274,233 @@ html, body {
   .tl-wrap { padding: 60px 4px 30px !important; }
   .tl-line { left: 12px !important; right: 12px !important; }
 }
+
+/* ════════════════════════════════════════════════════
+   🕸 知识网络 Knowledge Network
+════════════════════════════════════════════════════ */
+.kn-layer {
+  background: linear-gradient(160deg, rgba(212,164,53,.06), rgba(184,48,24,.03)) !important;
+}
+
+.kn-canvas-wrap {
+  position: relative;
+  background: radial-gradient(circle at 50% 45%,
+    rgba(255,248,228,.95) 0%,
+    rgba(245,225,180,.7) 60%,
+    rgba(232,210,170,.4) 100%);
+  border: 1px solid rgba(160,100,30,.25);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 18px;
+  box-shadow: 0 6px 24px rgba(100,60,10,.12);
+}
+
+.kn-svg {
+  width: 100%; height: auto;
+  max-height: 600px;
+  display: block;
+  margin: 0 auto;
+}
+
+/* 节点交互 */
+.kn-node circle:first-child {
+  transition: transform .22s cubic-bezier(.4,0,.2,1),
+              stroke-width .22s, filter .22s;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+.kn-node:hover circle:first-child {
+  stroke-width: 4;
+  filter: drop-shadow(0 4px 14px rgba(184,48,24,.4));
+}
+.kn-node:hover { transform: none; }
+
+.kn-node.selected circle:first-child {
+  stroke-width: 5;
+  filter: drop-shadow(0 0 14px rgba(184,48,24,.55));
+  animation: knPulse 1.6s ease-in-out infinite;
+}
+@keyframes knPulse {
+  0%,100% { filter: drop-shadow(0 0 12px rgba(184,48,24,.5)); }
+  50%     { filter: drop-shadow(0 0 22px rgba(184,48,24,.8)); }
+}
+
+.kn-hub circle {
+  animation: hubBreathe 3s ease-in-out infinite;
+}
+@keyframes hubBreathe {
+  0%,100% { filter: drop-shadow(0 4px 12px rgba(184,48,24,.35)); }
+  50%     { filter: drop-shadow(0 6px 22px rgba(184,48,24,.55)); }
+}
+
+/* 图例 */
+.kn-legend {
+  display: flex; justify-content: center; gap: 18px;
+  flex-wrap: wrap; margin-top: 8px; padding: 8px 12px;
+  font-size: 11px; color: var(--ink2);
+}
+.kn-legend > span { display: inline-flex; align-items: center; gap: 6px; }
+.kn-leg-line {
+  display: inline-block; width: 22px; height: 2px;
+}
+.kn-leg-line.dashed {
+  background-image: linear-gradient(90deg, currentColor 50%, transparent 50%);
+  background-size: 6px 2px; background-repeat: repeat-x;
+  background-color: transparent !important;
+}
+
+/* 详情面板 */
+.kn-detail-panel {
+  background: rgba(255,248,228,.6);
+  border: 1px dashed rgba(160,100,30,.3);
+  border-radius: 12px;
+  padding: 18px 20px;
+  min-height: 100px;
+  transition: all .25s;
+}
+.kn-detail-placeholder {
+  text-align: center; padding: 18px;
+  color: var(--ink3);
+}
+.kn-placeholder-icon {
+  font-size: 28px; display: block; margin-bottom: 6px;
+  animation: knFloat 2s ease-in-out infinite;
+}
+@keyframes knFloat {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-6px); }
+}
+.kn-detail-placeholder p {
+  font-size: 13px; color: var(--ink2);
+}
+
+.kn-detail-card {
+  background: linear-gradient(135deg, #fdf8ec, #f8ebd0);
+  border: 1px solid rgba(160,100,30,.25);
+  border-left: 5px solid var(--warm);
+  border-radius: 10px;
+  padding: 18px 20px;
+  animation: knDetailIn .35s cubic-bezier(.4,0,.2,1) both;
+  box-shadow: 0 4px 14px rgba(100,40,10,.1);
+}
+@keyframes knDetailIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.kn-detail-head {
+  display: flex; align-items: flex-start; gap: 14px; margin-bottom: 12px;
+}
+.kn-detail-icon {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; flex-shrink: 0;
+  border: 2px solid currentColor;
+}
+.kn-detail-head h4 {
+  font-family: var(--serif);
+  font-size: 17px; color: var(--warm);
+  letter-spacing: .05em;
+  margin-bottom: 4px;
+}
+.kn-detail-sub {
+  font-size: 11px; color: var(--ink3);
+  letter-spacing: .05em;
+}
+.kn-detail-body {
+  font-size: 14px; line-height: 1.95;
+  color: var(--ink); margin-bottom: 14px;
+}
+
+.kn-detail-actions {
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+}
+.kn-jump-btn {
+  background: rgba(200,104,32,.1);
+  border: 1px solid rgba(200,104,32,.3);
+  color: var(--warm);
+  padding: 6px 14px;
+  border-radius: 18px;
+  font-size: 12px; font-weight: 600;
+  cursor: pointer;
+  font-family: var(--sans);
+  transition: all .15s;
+}
+.kn-jump-btn:hover {
+  background: var(--warm); color: #fff5e8;
+  transform: translateX(2px);
+}
+
+/* 响应式 */
+@media (max-width: 720px) {
+  .kn-canvas-wrap { padding: 8px; }
+  .kn-svg { max-height: 460px; }
+  .kn-legend { gap: 10px; font-size: 10px; }
+  .kn-detail-head h4 { font-size: 15px; }
+  .kn-detail-body { font-size: 13px; }
+}
+
+/* ════════════════════════════════════════════════════
+   🗺 地图演化路径 · Map Evolution Path
+════════════════════════════════════════════════════ */
+.evo-map-pt circle {
+  filter: drop-shadow(0 2px 4px rgba(200,72,32,.4));
+  transition: r .2s, filter .2s;
+}
+.evo-map-pt:hover circle {
+  filter: drop-shadow(0 0 10px rgba(200,72,32,.6));
+}
+.evo-map-pt:hover circle:first-of-type { r: 12; }
+
+.evo-map-list {
+  margin-top: 14px;
+  background: rgba(255,248,228,.6);
+  border: 1px solid rgba(160,100,30,.2);
+  border-radius: 10px;
+  padding: 14px;
+}
+.evo-map-list-title {
+  font-family: var(--serif);
+  font-size: 14px; color: var(--warm);
+  font-weight: 700;
+  margin-bottom: 10px;
+  letter-spacing: .05em;
+}
+.evo-map-list-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  transition: background .15s;
+  margin-bottom: 4px;
+}
+.evo-map-list-item:hover {
+  background: rgba(200,104,32,.08);
+}
+.evo-map-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-weight: 700; font-size: 13px;
+  flex-shrink: 0;
+  font-family: serif;
+}
+.evo-map-info { flex: 1; min-width: 0; }
+.evo-map-time {
+  font-size: 10px; color: var(--amber);
+  font-weight: 700; letter-spacing: .04em;
+}
+.evo-map-name {
+  font-size: 13px; color: var(--ink);
+  font-weight: 600;
+}
+.evo-map-species {
+  font-size: 11px; color: var(--ink2);
+  font-style: italic;
+}
+
+@media (max-width: 600px) {
+  .evo-map-list-item { gap: 8px; }
+  .evo-map-name { font-size: 12px; }
+  .evo-map-species { font-size: 10px; }
+}
