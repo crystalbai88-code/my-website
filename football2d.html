@@ -575,14 +575,12 @@ function drawGoal(side){
   ctx.fillRect(gx-3,GOAL_T-5,6,10);       // top post
   ctx.fillRect(gx-3,GOAL_B-5,6,10);       // bottom post
 
-  // wall segments above and below goal (audience bleeds into gap otherwise)
+  // Cover entire side audience strip (above, goal opening, below) — prevents crowd bleeding through
   ctx.fillStyle='#241530';
   if(isL){
-    ctx.fillRect(0,FT,AL,GOAL_T-FT);
-    ctx.fillRect(0,GOAL_B,AL,FB-GOAL_B);
+    ctx.fillRect(0,FT,AL,FB-FT);   // full left strip
   } else {
-    ctx.fillRect(FR,FT,AR,GOAL_T-FT);
-    ctx.fillRect(FR,GOAL_B,AR,FB-GOAL_B);
+    ctx.fillRect(FR,FT,AR,FB-FT);  // full right strip
   }
   // goal opening highlight
   ctx.strokeStyle='rgba(255,255,100,0.35)'; ctx.lineWidth=1.5;
