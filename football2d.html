@@ -494,19 +494,34 @@ function trigSigh(){  crowdState='sigh';  crowdT=1.4; }
 
 const CROWD_COLORS=['#cc4444','#4488dd','#44bb44','#ddcc44','#cc44cc','#888','#e8823a','#2abbbb'];
 
-function drawCrowd(dt){
+// Step 1: draw audience BACKGROUNDS only (called before field)
+function drawCrowdBg(dt){
   if(crowdT>0) crowdT-=dt; else crowdState='idle';
-  ctx.fillStyle='#241530'; ctx.fillRect(0,0,W,AT);
-  ctx.fillStyle='#241530'; ctx.fillRect(0,FB,W,H-FB);
-  ctx.fillStyle='#241530'; ctx.fillRect(0,AT,AL,FH);
-  ctx.fillStyle='#241530'; ctx.fillRect(FR,AT,AR,FH);
-  ctx.strokeStyle='rgba(255,255,255,0.06)'; ctx.lineWidth=1;
-  for(let r=0;r<3;r++){ const y=19+r*19; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
-
-  const fanT=selFan!==null?TEAMS[selFan]:null;
-  CROWD.forEach((p,i)=>{
+  // Update figure positions
+  CROWD.forEach(p=>{
     if(crowdState==='cheer') p.ph+=dt*7;
     p.y=crowdState==='cheer'?p.by+Math.sin(p.ph)*4:p.by;
+  });
+  // Background fills
+  ctx.fillStyle='#241530';
+  ctx.fillRect(0,0,W,AT);          // top stand
+  ctx.fillRect(0,FB,W,H-FB);       // bottom stand
+  ctx.fillRect(0,AT,AL,FH);        // left stand
+  ctx.fillRect(FR,AT,AR,FH);       // right stand
+  ctx.strokeStyle='rgba(255,255,255,0.06)'; ctx.lineWidth=1;
+  for(let r=0;r<3;r++){
+    const y=19+r*19;
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+  }
+}
+
+// Step 2: draw audience FIGURES only (called AFTER field so they appear on top)
+function drawCrowdFigs(){
+  const fanT=selFan!==null?TEAMS[selFan]:null;
+  CROWD.forEach((p,i)=>{
+    // Clip: only draw in actual audience strips, not inside field
+    const inField=(p.x>FL+2 && p.x<FR-2 && p.y>FT+2 && p.y<FB-2);
+    if(inField) return;
     const isFan=fanT&&(i%4===0||i%7===1);
     const bc=isFan?fanT.p:CROWD_COLORS[i%CROWD_COLORS.length];
     const px=p.x, py=p.y;
@@ -766,10 +781,11 @@ function gameLoop(ts){
     }
   }
 
-  // ── Render ──
+  // ── Render ──  (order matters: bg → field → crowd figures → players → HUD)
   ctx.clearRect(0,0,W,H);
-  drawCrowd(dt);
-  drawField();
+  drawCrowdBg(dt);   // 1. audience stand backgrounds
+  drawField();       // 2. grass + goal posts (covers bg in field area)
+  drawCrowdFigs();   // 3. audience figures drawn ON TOP of stands (not covered by field)
   if(resetTimer<=0||flashT>0){ p1.draw(); p2ai.draw(); ball.draw(); }
   drawHUD();
 
