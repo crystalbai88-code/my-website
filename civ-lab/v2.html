@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AI 世界文明实验室</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0e0a06; --ink:#f0e6d0; --ink2:#c8ab80; --ink3:#8a7055;
+  --amber:#d4a435; --amber2:#f0c060; --warm:#e05c20;
+  --dot-done:#f0c060; --dot-active:#ff8c30; --dot-locked:#3a2e1e;
+  --era-land:#8b6914; --era-water:#1a3a5a; --era-sky:#0e0a06;
+  --panel-bg:rgba(20,14,6,0.92);
+  --serif:'Georgia','Noto Serif SC',serif;
+  --sans:-apple-system,'PingFang SC','Noto Sans SC',sans-serif;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans)}
+
+/* ─── SCREENS ─── */
+.screen{position:fixed;inset:0;transition:opacity .5s,transform .5s;will-change:opacity,transform}
+.screen.hidden{opacity:0;pointer-events:none;transform:translateY(30px)}
+
+/* ─── STARS ─── */
+#stars{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d,3s) ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.2}50%{opacity:.9}}
+
+/* ═══════════════════════════════════════════
+   SCREEN 1 — TIMELINE
+═══════════════════════════════════════════ */
+#s-timeline{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:10;padding:0 40px;
+}
+
+/* Decorative horizontal glow line behind everything */
+#s-timeline::before{
+  content:'';position:absolute;
+  top:50%;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(212,164,53,.08) 20%,rgba(212,164,53,.08) 80%,transparent);
+  pointer-events:none;
+}
+
+.tl-header{text-align:center;margin-bottom:56px;position:relative;z-index:2;animation:fadeUpIn .8s .2s both}
+.tl-header h1{
+  font-family:var(--serif);font-size:clamp(28px,4.5vw,56px);font-weight:300;
+  letter-spacing:.2em;color:var(--amber2);
+  text-shadow:0 0 60px rgba(240,192,96,.45),0 0 120px rgba(240,192,96,.15);
+  margin-bottom:12px;line-height:1.2;
+}
+.tl-header p{
+  font-size:12px;color:var(--ink3);letter-spacing:.3em;text-transform:uppercase;
+  opacity:.7;
+}
+.tl-subtitle{
+  font-size:14px;color:var(--ink2);margin-top:8px;letter-spacing:.05em;
+  opacity:.6;font-style:italic;
+}
+
+.tl-wrap{
+  position:relative;width:92vw;max-width:1160px;
+  padding:90px 20px 50px;z-index:2;
+  animation:fadeUpIn .8s .5s both;
+}
+
+/* The line */
+.tl-line{
+  position:absolute;top:64px;left:20px;right:20px;height:3px;
+  background:linear-gradient(90deg,transparent,rgba(58,46,30,.8) 8%,rgba(58,46,30,.8) 92%,transparent);
+  border-radius:2px;
+}
+.tl-line-fill{
+  position:absolute;top:0;left:0;height:100%;
+  background:linear-gradient(90deg,var(--dot-done),var(--amber));
+  transition:width 1.4s cubic-bezier(.4,0,.2,1);border-radius:2px;
+  box-shadow:0 0 16px rgba(240,192,96,.6),0 0 40px rgba(240,192,96,.2);
+}
+
+/* Dots row */
+.tl-dots{display:flex;justify-content:space-between;position:relative}
+.tl-dot-wrap{
+  display:flex;flex-direction:column;align-items:center;gap:0;
+  cursor:pointer;flex:1;position:relative;
+  transition:transform .2s;
+}
+.tl-dot-wrap:hover{transform:translateY(-4px)}
+
+.tl-dot{
+  width:22px;height:22px;border-radius:50%;
+  background:var(--dot-locked);border:2px solid rgba(58,46,30,.9);
+  transition:all .35s;position:relative;z-index:3;
+  margin-top:53px;
+  box-shadow:inset 0 0 6px rgba(0,0,0,.4);
+}
+.tl-dot.done{
+  background:radial-gradient(circle at 40% 35%,#ffe090,var(--dot-done));
+  border-color:var(--dot-done);
+  box-shadow:0 0 18px rgba(240,192,96,.8),0 0 40px rgba(240,192,96,.3);
+}
+.tl-dot.active{
+  background:radial-gradient(circle at 40% 35%,#ffb060,var(--dot-active));
+  border-color:var(--dot-active);
+  box-shadow:0 0 24px rgba(255,140,48,1),0 0 50px rgba(255,140,48,.4);
+  animation:pulse 2s ease-in-out infinite;
+}
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 20px rgba(255,140,48,.8),0 0 40px rgba(255,140,48,.3)}
+  50%{box-shadow:0 0 35px rgba(255,140,48,1),0 0 70px rgba(255,140,48,.5)}
+}
+
+/* Vertical tick mark on line */
+.tl-dot-wrap::after{
+  content:'';position:absolute;top:62px;left:50%;transform:translateX(-50%);
+  width:1px;height:8px;background:rgba(58,46,30,.6);z-index:2;
+}
+
+.tl-label-time{
+  font-size:11px;font-weight:700;color:var(--amber);letter-spacing:.06em;
+  margin-bottom:4px;text-align:center;opacity:.9;
+  min-height:18px;
+}
+.tl-label-title{
+  font-size:11px;color:var(--ink3);margin-top:12px;
+  max-width:88px;text-align:center;line-height:1.5;
+  transition:color .2s;
+}
+.tl-dot-wrap:hover .tl-label-title{color:var(--ink2)}
+.tl-dot-wrap.active-lesson .tl-label-title{color:var(--amber2)}
+
+/* The walking figure */
+#tl-figure{
+  position:absolute;top:0;z-index:10;
+  transition:left 1.4s cubic-bezier(.4,0,.2,1);
+  pointer-events:none;
+  filter:drop-shadow(0 0 8px rgba(240,192,96,.6));
+}
+#tl-figure svg{width:36px;height:60px;overflow:visible}
+
+/* Range label under the full timeline */
+.tl-range{
+  display:flex;justify-content:space-between;
+  width:92vw;max-width:1160px;
+  padding:0 20px;
+  font-size:10px;color:rgba(138,112,85,.5);
+  letter-spacing:.1em;text-transform:uppercase;
+  margin-top:-12px;
+}
+
+/* Legend + hint */
+.tl-hint{
+  text-align:center;margin-top:36px;color:var(--ink3);font-size:12px;
+  letter-spacing:.08em;animation:fadeUpIn 1s 1.2s both;
+}
+.tl-legend{display:flex;justify-content:center;gap:32px;margin-top:14px}
+.leg-item{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--ink3)}
+.leg-dot{width:11px;height:11px;border-radius:50%}
+
+/* Semester label */
+.tl-semester{
+  position:absolute;top:-22px;left:50%;transform:translateX(-50%);
+  font-size:9px;color:rgba(212,164,53,.4);letter-spacing:.2em;text-transform:uppercase;
+  white-space:nowrap;
+}
+
+@keyframes fadeUpIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ═══════════════════════════════════════════
+   SCREEN 2 — MAP
+═══════════════════════════════════════════ */
+#s-map{
+  z-index:20;
+  display:flex;flex-direction:column;
+  transition:background .8s;
+}
+
+.map-topbar{
+  display:flex;align-items:center;gap:16px;
+  padding:14px 24px;
+  background:rgba(0,0,0,.4);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,.08);
+  flex-shrink:0;z-index:5;
+}
+.map-topbar .back-btn{
+  background:none;border:1px solid var(--ink3);color:var(--ink2);
+  padding:6px 14px;cursor:pointer;font-size:12px;letter-spacing:.08em;
+  border-radius:2px;transition:all .2s;
+}
+.map-topbar .back-btn:hover{border-color:var(--amber);color:var(--amber)}
+.map-time-chip{
+  font-size:11px;padding:4px 12px;border-radius:20px;
+  background:rgba(212,164,53,.15);border:1px solid rgba(212,164,53,.4);
+  color:var(--amber);letter-spacing:.06em;font-weight:600;
+}
+.map-lesson-title{
+  font-family:var(--serif);font-size:17px;font-weight:400;color:var(--ink);
+}
+.map-progress-hint{margin-left:auto;font-size:11px;color:var(--ink3)}
+
+/* Map + panel layout */
+.map-body{flex:1;display:grid;grid-template-columns:1fr 340px;overflow:hidden;position:relative}
+
+/* SVG map area */
+.map-area{position:relative;overflow:hidden;background:var(--era-water)}
+#world-svg{width:100%;height:100%;display:block}
+
+/* Civilization marker */
+.civ-marker{cursor:pointer;transition:transform .2s}
+.civ-marker:hover{transform:scale(1.15)}
+.civ-marker .civ-glow{opacity:0;transition:opacity .3s}
+.civ-marker.selected .civ-glow{opacity:1}
+.civ-marker .civ-label{
+  font-size:11px;fill:var(--ink);font-family:var(--sans);
+  text-shadow:0 1px 4px rgba(0,0,0,.8);
+}
+
+/* Side panel */
+.map-panel{
+  background:var(--panel-bg);border-left:1px solid rgba(255,255,255,.06);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.panel-civ-header{
+  padding:22px 22px 16px;border-bottom:1px solid rgba(255,255,255,.06);
+  flex-shrink:0;
+}
+.panel-civ-era{font-size:10px;color:var(--amber);letter-spacing:.15em;text-transform:uppercase;margin-bottom:6px}
+.panel-civ-name{font-family:var(--serif);font-size:22px;font-weight:400;color:var(--ink);margin-bottom:8px}
+.panel-civ-desc{font-size:12px;color:var(--ink2);line-height:1.7}
+.panel-civ-people{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.person-chip{
+  display:flex;align-items:center;gap:6px;
+  padding:6px 10px;background:rgba(212,164,53,.1);border:1px solid rgba(212,164,53,.2);
+  border-radius:20px;font-size:11px;color:var(--ink2);
+}
+.person-chip .person-icon{font-size:15px}
+
+.panel-events-title{
+  padding:14px 22px 8px;font-size:10px;letter-spacing:.15em;color:var(--amber);
+  text-transform:uppercase;flex-shrink:0;
+}
+.panel-events{flex:1;overflow-y:auto;padding:0 12px 16px;
+  scrollbar-width:thin;scrollbar-color:rgba(212,164,53,.2) transparent;}
+.event-card{
+  padding:14px 14px;border-radius:4px;cursor:pointer;
+  border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.03);
+  margin-bottom:8px;transition:all .2s;position:relative;
+}
+.event-card:hover{background:rgba(212,164,53,.08);border-color:rgba(212,164,53,.3)}
+.event-card.learned{border-left:3px solid var(--dot-done)}
+.event-year{font-size:10px;color:var(--amber);letter-spacing:.08em;margin-bottom:4px}
+.event-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:5px;line-height:1.4}
+.event-brief{font-size:11px;color:var(--ink3);line-height:1.6}
+.event-check{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  font-size:14px;opacity:0;transition:opacity .2s;
+}
+.event-card.learned .event-check{opacity:1;color:var(--dot-done)}
+
+.panel-no-civ{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:12px;color:var(--ink3);padding:32px;text-align:center;
+}
+.panel-no-civ .arrow-icon{font-size:32px;opacity:.3;animation:arrowPulse 2s ease-in-out infinite}
+@keyframes arrowPulse{0%,100%{transform:translateX(-6px)}50%{transform:translateX(6px)}}
+
+.map-complete-btn{
+  margin:16px;padding:12px;background:linear-gradient(135deg,var(--warm),var(--amber));
+  border:none;border-radius:3px;color:#fff;font-size:13px;letter-spacing:.08em;
+  cursor:pointer;transition:opacity .2s;display:none;font-family:var(--sans);
+}
+.map-complete-btn:hover{opacity:.85}
+.map-complete-btn.visible{display:block}
+
+/* ═══════════════════════════════════════════
+   EVENT OVERLAY
+═══════════════════════════════════════════ */
+#event-overlay{
+  position:fixed;inset:0;z-index:50;
+  display:flex;align-items:center;justify-content:center;padding:24px;
+  background:rgba(10,6,2,.75);backdrop-filter:blur(8px);
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+#event-overlay.open{opacity:1;pointer-events:all}
+.event-modal{
+  background:linear-gradient(135deg,#1a120a,#120d06);
+  border:1px solid rgba(212,164,53,.25);border-radius:6px;
+  max-width:600px;width:100%;max-height:80vh;overflow-y:auto;
+  padding:36px;position:relative;
+}
+.event-modal-close{
+  position:absolute;top:14px;right:14px;background:none;border:none;
+  color:var(--ink3);cursor:pointer;font-size:20px;transition:color .2s;
+}
+.event-modal-close:hover{color:var(--amber)}
+.event-modal-tag{font-size:10px;letter-spacing:.2em;color:var(--amber);text-transform:uppercase;margin-bottom:10px}
+.event-modal h2{font-family:var(--serif);font-size:24px;font-weight:400;margin-bottom:6px;color:var(--ink)}
+.event-modal-year{font-size:12px;color:var(--ink3);margin-bottom:20px}
+.event-modal-body{font-size:14px;color:var(--ink2);line-height:2;margin-bottom:20px}
+.event-modal-insight{
+  background:rgba(212,164,53,.08);border-left:3px solid var(--amber);
+  padding:14px 16px;border-radius:0 4px 4px 0;font-size:13px;color:var(--ink2);
+  line-height:1.8;margin-bottom:24px;
+}
+.event-modal-insight strong{color:var(--amber);display:block;margin-bottom:4px;font-size:11px;letter-spacing:.1em}
+.event-learn-btn{
+  padding:12px 28px;background:var(--amber);border:none;color:#1a0e04;
+  font-size:13px;letter-spacing:.08em;cursor:pointer;border-radius:2px;
+  font-weight:700;transition:background .2s;font-family:var(--sans);
+}
+.event-learn-btn:hover{background:var(--amber2)}
+.event-learn-btn.learned{background:var(--dot-done);cursor:default}
+
+/* ═══════════════════════════════════════════
+   SCREEN 3 — KNOWLEDGE CARD
+═══════════════════════════════════════════ */
+#s-summary{
+  z-index:30;display:flex;align-items:center;justify-content:center;padding:24px;
+}
+.summary-card{
+  background:linear-gradient(135deg,#1e1408 0%,#0e0a06 60%);
+  border:1px solid rgba(212,164,53,.3);border-radius:8px;
+  max-width:680px;width:100%;max-height:90vh;overflow-y:auto;
+  padding:48px;text-align:center;position:relative;
+}
+.summary-card::before{
+  content:'';position:absolute;inset:0;border-radius:8px;
+  background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(212,164,53,.08) 0%,transparent 70%);
+  pointer-events:none;
+}
+.summary-era-icon{font-size:64px;margin-bottom:20px}
+.summary-tag{font-size:10px;color:var(--amber);letter-spacing:.25em;text-transform:uppercase;margin-bottom:14px}
+.summary-title{font-family:var(--serif);font-size:clamp(24px,4vw,36px);font-weight:400;color:var(--ink);margin-bottom:16px;line-height:1.4}
+.summary-quote{
+  font-size:15px;color:var(--ink2);font-style:italic;line-height:2;
+  margin-bottom:32px;padding:16px;
+  border-top:1px solid rgba(212,164,53,.2);border-bottom:1px solid rgba(212,164,53,.2);
+}
+.summary-points{display:flex;flex-direction:column;gap:12px;margin-bottom:32px;text-align:left}
+.summary-point{
+  display:flex;gap:12px;align-items:flex-start;
+  padding:12px 16px;background:rgba(255,255,255,.03);border-radius:4px;
+  border-left:3px solid var(--amber);
+}
+.summary-point-num{
+  flex-shrink:0;width:22px;height:22px;border-radius:50%;
+  background:var(--amber);color:#1a0e04;font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;margin-top:1px;
+}
+.summary-point p{font-size:13px;color:var(--ink2);line-height:1.7}
+.summary-civs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:32px}
+.summary-civ-tag{
+  padding:6px 14px;border-radius:20px;font-size:12px;
+  background:rgba(212,164,53,.1);border:1px solid rgba(212,164,53,.25);color:var(--amber);
+}
+.summary-actions{display:flex;gap:12px;justify-content:center}
+.summary-btn-primary{
+  padding:13px 32px;background:linear-gradient(135deg,var(--warm),var(--amber));
+  border:none;color:#fff;font-size:13px;letter-spacing:.1em;cursor:pointer;
+  border-radius:2px;font-weight:700;transition:opacity .2s;font-family:var(--sans);
+}
+.summary-btn-primary:hover{opacity:.85}
+.summary-btn-secondary{
+  padding:13px 24px;background:none;border:1px solid var(--ink3);
+  color:var(--ink2);font-size:13px;letter-spacing:.08em;cursor:pointer;
+  border-radius:2px;transition:all .2s;font-family:var(--sans);
+}
+.summary-btn-secondary:hover{border-color:var(--amber);color:var(--amber)}
+
+/* ─── Responsive ─── */
+@media(max-width:768px){
+  .map-body{grid-template-columns:1fr}
+  .map-panel{position:fixed;bottom:0;left:0;right:0;height:50vh;border-left:none;border-top:1px solid rgba(255,255,255,.06)}
+}
+</style>
+</head>
+<body>
+
+<!-- STARS -->
+<div id="stars"></div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 1: TIMELINE
+══════════════════════════════════════ -->
+<div class="screen" id="s-timeline">
+  <div class="tl-header">
+    <h1>AI 世界文明实验室</h1>
+    <p>Global Civilization · 公元前3000年 — 公元1000年</p>
+    <div class="tl-subtitle">选择一个时间点，进入那个时代的文明世界</div>
+  </div>
+
+  <div class="tl-wrap" id="tlWrap">
+    <div class="tl-semester">第一学期 · 文明诞生到公元1000年</div>
+    <div class="tl-line"><div class="tl-line-fill" id="tlLineFill"></div></div>
+    <div class="tl-dots" id="tlDots">
+      <!-- rendered by JS -->
+    </div>
+    <!-- Walking figure -->
+    <div id="tl-figure">
+      <svg viewBox="-16 -52 32 52" xmlns="http://www.w3.org/2000/svg">
+        <!-- Head glow -->
+        <circle cx="0" cy="-44" r="10" fill="rgba(240,192,96,.15)"/>
+        <!-- Head -->
+        <circle cx="0" cy="-44" r="7" fill="#f0c060" stroke="none"/>
+        <!-- Eye dots -->
+        <circle cx="-2.5" cy="-45" r="1.2" fill="#1a0e04"/>
+        <circle cx="2.5" cy="-45" r="1.2" fill="#1a0e04"/>
+        <!-- Body -->
+        <line x1="0" y1="-37" x2="0" y2="-18" stroke="#f0c060" stroke-width="3" stroke-linecap="round"/>
+        <!-- Arms -->
+        <line x1="0" y1="-32" x2="-10" y2="-24" stroke="#f0c060" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="0" y1="-32" x2="10" y2="-24" stroke="#f0c060" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- Legs -->
+        <line x1="0" y1="-18" x2="-8" y2="-4" stroke="#f0c060" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="0" y1="-18" x2="8" y2="-4" stroke="#f0c060" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- Shadow -->
+        <ellipse cx="0" cy="-2" rx="10" ry="3" fill="rgba(0,0,0,.3)"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="tl-hint">
+    <p>点击任意时间点，进入那个时代的文明世界</p>
+    <div class="tl-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:var(--dot-done)"></div>已探索</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--dot-active);box-shadow:0 0 8px rgba(255,140,48,.8)"></div>当前位置</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--dot-locked)"></div>待解锁</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 2: MAP
+══════════════════════════════════════ -->
+<div class="screen hidden" id="s-map">
+  <div class="map-topbar">
+    <button class="back-btn" onclick="goBack()">← 时间轴</button>
+    <div class="map-time-chip" id="mapTimeChip">公元前3000年</div>
+    <div class="map-lesson-title" id="mapTitle">文明从哪里开始？</div>
+    <div class="map-progress-hint" id="mapProgressHint">点击地图上的文明标记开始探索</div>
+  </div>
+  <div class="map-body">
+    <div class="map-area">
+      <svg id="world-svg" viewBox="0 0 1000 520" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <radialGradient id="civGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#f0c060" stop-opacity=".6"/>
+            <stop offset="100%" stop-color="#f0c060" stop-opacity="0"/>
+          </radialGradient>
+          <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <!-- Ocean -->
+        <rect id="ocean" width="1000" height="520" fill="#1a3a5a"/>
+        <!-- Continents group -->
+        <g id="continents">
+          <!-- North America -->
+          <path id="north-america" fill="#7a6020"
+            d="M 90,60 C 120,45 160,40 195,55 L 230,70 255,90 270,120 265,160 280,190 270,220 255,260 235,300 215,330 190,340 165,320 145,290 120,265 100,235 85,200 75,165 70,130 80,95 Z"/>
+          <!-- Central America -->
+          <path fill="#7a6020" d="M 215,330 L 230,340 225,360 210,370 200,355 205,340 Z"/>
+          <!-- South America -->
+          <path id="south-america" fill="#6a5518"
+            d="M 205,370 C 225,365 255,370 270,390 L 285,420 285,460 270,490 245,505 220,500 200,475 190,445 195,415 200,390 Z"/>
+          <!-- Europe -->
+          <path id="europe" fill="#6b7840"
+            d="M 445,75 C 465,65 495,68 515,80 L 525,95 530,115 515,135 500,148 475,150 460,138 445,120 440,100 Z"/>
+          <!-- Iberian -->
+          <path fill="#6b7840" d="M 440,120 L 450,130 445,148 430,150 425,135 430,122 Z"/>
+          <!-- Britain -->
+          <path fill="#6b7840" d="M 445,78 L 455,70 460,78 452,86 443,82 Z"/>
+          <!-- Scandinavia -->
+          <path fill="#6b7840" d="M 470,50 L 490,42 505,55 495,70 475,68 Z"/>
+          <!-- Africa -->
+          <path id="africa" fill="#8b7030"
+            d="M 445,155 C 475,148 515,155 545,175 L 565,205 580,245 575,290 565,335 545,375 520,405 490,425 460,415 440,385 425,345 425,300 432,258 440,215 440,180 Z"/>
+          <!-- Arabia -->
+          <path id="arabia" fill="#9a8040"
+            d="M 560,180 L 590,172 615,185 620,215 610,240 590,248 570,238 558,215 Z"/>
+          <!-- Asia main -->
+          <path id="asia" fill="#6e7040"
+            d="M 525,72 C 580,55 660,50 745,58 L 840,70 900,95 920,130 905,160 880,175 850,180 820,195 790,215 765,240 740,265 715,285 690,295 665,290 645,275 620,260 598,245 575,225 558,200 548,175 535,145 525,110 Z"/>
+          <!-- Indian subcontinent -->
+          <path id="india" fill="#7a6e30"
+            d="M 660,215 L 690,210 715,225 720,258 700,285 675,290 655,275 645,248 Z"/>
+          <!-- Southeast Asia -->
+          <path fill="#6a6832" d="M 755,250 L 790,240 815,255 820,280 800,295 775,285 755,265 Z"/>
+          <!-- Japan / Korean -->
+          <path fill="#6a6535" d="M 845,140 L 860,130 870,142 862,158 847,155 Z"/>
+          <path fill="#6a6535" d="M 855,110 L 870,105 877,118 868,130 854,125 Z"/>
+          <!-- Australia -->
+          <path id="australia" fill="#7a6528"
+            d="M 755,355 C 790,340 835,345 865,368 L 875,400 860,430 825,440 790,432 765,408 750,378 Z"/>
+          <!-- New Zealand -->
+          <path fill="#6e6030" d="M 880,420 L 892,412 898,425 888,436 877,428 Z"/>
+        </g>
+        <!-- Civilization markers group — populated by JS -->
+        <g id="civ-markers"></g>
+      </svg>
+    </div>
+
+    <div class="map-panel" id="mapPanel">
+      <div id="panelNoCiv" class="panel-no-civ">
+        <div class="arrow-icon">←</div>
+        <p style="font-size:13px;color:var(--ink3);line-height:1.8">在地图上选择一个文明标记<br>了解那里的人类历史</p>
+      </div>
+      <div id="panelCivContent" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+        <div class="panel-civ-header">
+          <div class="panel-civ-era" id="panelEra"></div>
+          <div class="panel-civ-name" id="panelCivName"></div>
+          <div class="panel-civ-desc" id="panelCivDesc"></div>
+          <div class="panel-civ-people" id="panelPeople"></div>
+        </div>
+        <div class="panel-events-title">重要历史事件</div>
+        <div class="panel-events" id="panelEvents"></div>
+        <button class="map-complete-btn" id="mapCompleteBtn" onclick="showSummary()">
+          ✦ 完成本课探索 → 领取知识卡
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EVENT OVERLAY -->
+<div id="event-overlay">
+  <div class="event-modal">
+    <button class="event-modal-close" onclick="closeEvent()">✕</button>
+    <div class="event-modal-tag" id="evModalTag"></div>
+    <h2 id="evModalTitle"></h2>
+    <div class="event-modal-year" id="evModalYear"></div>
+    <div class="event-modal-body" id="evModalBody"></div>
+    <div class="event-modal-insight">
+      <strong>🏛 历史意义</strong>
+      <span id="evModalInsight"></span>
+    </div>
+    <button class="event-learn-btn" id="evLearnBtn" onclick="markEventLearned()">✓ 已学习，继续探索</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 3: KNOWLEDGE CARD
+══════════════════════════════════════ -->
+<div class="screen hidden" id="s-summary">
+  <div class="summary-card">
+    <div class="summary-era-icon" id="sumIcon"></div>
+    <div class="summary-tag">课程知识卡 · Knowledge Card</div>
+    <div class="summary-title" id="sumTitle"></div>
+    <div class="summary-quote" id="sumQuote"></div>
+    <div class="summary-points" id="sumPoints"></div>
+    <div style="font-size:11px;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px">本课探索的文明</div>
+    <div class="summary-civs" id="sumCivs"></div>
+    <div class="summary-actions">
+      <button class="summary-btn-primary" onclick="completeLesson()">✦ 完成本课，回到时间轴</button>
+      <button class="summary-btn-secondary" onclick="goBack()">← 继续探索地图</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════
+
+const ERA_COLORS = {
+  L01: { land:'#8b6914', water:'#1a3a5a', sky:'#0e0a06', accent:'#c8843a', sat:0.3 },
+  L02: { land:'#9a7520', water:'#1a3d5e', sky:'#100c08', accent:'#d4a035', sat:0.4 },
+  L03: { land:'#7a6025', water:'#183860', sky:'#0e0c0a', accent:'#b87830', sat:0.45 },
+  L04: { land:'#6a5520', water:'#152e48', sky:'#0a0806', accent:'#906020', sat:0.3 },
+  L05: { land:'#607530', water:'#1a4060', sky:'#080c10', accent:'#3a7aaa', sat:0.55 },
+  L06: { land:'#5a6835', water:'#1a3e62', sky:'#080810', accent:'#c03020', sat:0.6 },
+  L07: { land:'#556040', water:'#1e4268', sky:'#060810', accent:'#d4a035', sat:0.65 },
+  L08: { land:'#4a5838', water:'#1a3860', sky:'#06080c', accent:'#806080', sat:0.55 },
+  L09: { land:'#485c38', water:'#1e3e60', sky:'#060808', accent:'#207840', sat:0.65 },
+  L10: { land:'#506040', water:'#1e4268', sky:'#04060c', accent:'#d4a035', sat:0.75 },
+  L11: { land:'#484e3a', water:'#1a3860', sky:'#04060c', accent:'#6040a0', sat:0.7 },
+  L12: { land:'#4a5840', water:'#1a4268', sky:'#020408', accent:'#f0c060', sat:0.8 },
+};
+
+const LESSONS = [
+  {
+    id:'L01', time:'公元前3000年', title:'文明从哪里开始？',
+    question:'为什么人类从村落走向城市？',
+    icon:'🌾',
+    snapshot:'大约公元前3000年，多个大河流域正在出现城市、王权和文字——人类文明的第一道曙光。',
+    civs:[
+      {
+        id:'mesopotamia', name:'两河流域', x:580, y:215,
+        color:'#c8843a', radius:22,
+        era:'苏美尔文明 · 城市的摇篮',
+        desc:'底格里斯河与幼发拉底河之间，人类建造了第一批城市。乌鲁克是世界上最早的大城市之一，有神庙、市场、水渠和记录员。',
+        people:[
+          {icon:'🧔', label:'苏美尔男性', note:'亚麻长袍，留胡须'},
+          {icon:'👘', label:'祭司', note:'兽皮裙装，头冠'},
+        ],
+        events:[
+          {id:'e1',year:'约公元前3200年',title:'楔形文字诞生',emoji:'📝',
+           body:'苏美尔人用芦苇笔在泥板上刻写楔形符号，最初用于记录粮食、牲畜和劳动力的数量。这是已知最早的书写系统之一。',
+           insight:'文字让人类第一次能够跨越时间传递信息——这是文明的飞跃。'},
+          {id:'e2',year:'约公元前3000年',title:'乌鲁克城市繁荣',emoji:'🏛',
+           body:'乌鲁克人口可能超过5万，有高大的神庙台（庙塔），有专业工匠、商人、记录员、祭司和管理者。城市需要规则和组织。',
+           insight:'城市不是房子变多，而是分工、管理和公共生活共同复杂化的结果。'},
+          {id:'e3',year:'约公元前2900年',title:'灌溉农业网络',emoji:'💧',
+           body:'大规模灌溉水渠把河水引到农田，让粮食产量超过自然降雨的极限。管理水渠需要集体协作和权威调度。',
+           insight:'水利工程是早期国家权力的物质基础——谁管理水，谁就管理粮食，谁就有了权威。'},
+        ]
+      },
+      {
+        id:'egypt', name:'尼罗河流域', x:510, y:262,
+        color:'#d4a035', radius:20,
+        era:'埃及早王朝 · 尼罗河的馈赠',
+        desc:'尼罗河每年定期泛滥，留下肥沃的淤泥。埃及人依赖这个节律发展农业，建立王权，形成独特的信仰体系。',
+        people:[
+          {icon:'👑', label:'法老', note:'双冠，亚麻裙裤'},
+          {icon:'📜', label:'书记员', note:'芦苇笔，莎草纸'},
+        ],
+        events:[
+          {id:'e4',year:'约公元前3100年',title:'埃及统一传说',emoji:'⚡',
+           body:'传说中，美尼斯（Menes）统一了上下埃及，建立了第一王朝。尼罗河流域第一次被纳入统一的王权管辖下。',
+           insight:'统一带来更强的粮食调配、防洪工程和军事力量——这是国家权力的早期形态。'},
+          {id:'e5',year:'约公元前3000年',title:'象形文字记录',emoji:'🗿',
+           body:'埃及人发展出象形文字系统，最初刻在王宫石碑和墓葬上，用来记录法老的成就、宗教仪式和历法。',
+           insight:'两个文明几乎同时发明了文字，但形式完全不同——这说明文字是复杂社会的必然需求，而非偶然发明。'},
+        ]
+      },
+      {
+        id:'indus', name:'印度河流域', x:668, y:250,
+        color:'#7aaa60', radius:18,
+        era:'哈拉帕文明早期 · 神秘的规划城市',
+        desc:'印度河流域正在孕育一个高度规划的文明。他们的城市有格网状街道、排水系统和标准砖块，但文字至今未被解读。',
+        people:[
+          {icon:'🪆', label:'印度河居民', note:'棉布衣物，陶器'},
+        ],
+        events:[
+          {id:'e6',year:'约公元前3000年',title:'哈拉帕城市雏形',emoji:'🏗',
+           body:'印度河流域出现了有组织的聚落，使用标准尺寸的砖块建造房屋。成熟的哈拉帕城市稍后才达到高峰，但这时已有城市化的迹象。',
+           insight:'他们的城市规划水平极高——但我们对他们的政治体制几乎一无所知，因为文字尚未被破译。'},
+        ]
+      },
+      {
+        id:'china', name:'中国黄河流域', x:775, y:198,
+        color:'#e05c50', radius:18,
+        era:'新石器晚期 · 农业村落的复杂化',
+        desc:'公元前3000年的中国还不是商朝或秦朝，而是多区域的新石器文化。黄河、长江流域的农业社会正在变得越来越复杂。',
+        people:[
+          {icon:'🏺', label:'陶器工匠', note:'龙山黑陶，精细器皿'},
+        ],
+        events:[
+          {id:'e7',year:'约公元前3000年',title:'龙山文化兴起',emoji:'🏺',
+           body:'黄河下游的龙山文化以精美黑陶著称，出现了城墙围绕的聚落，社会分层迹象增强，可能已有专职的礼仪活动。',
+           insight:'中国早期文明有自己独立的发展节奏，不是从两河流域"传过去"的，而是本地独立生长的。'},
+          {id:'e8',year:'约公元前3000年',title:'良渚古城的水利',emoji:'🌊',
+           body:'良渚文化在长江流域建造了大型水利工程，城址规模超过300万平方米，是早期中国复杂社会的重要证据。',
+           insight:'良渚的发现改变了我们对中国文明起源的认识——它比传统上认为的更早、更复杂。'},
+        ]
+      },
+    ],
+    takeaway:{
+      title:'公元前3000年：文明的第一道曙光',
+      quote:'文明不是突然出现的，而是从河流、农业、粮食剩余、分工和管理中慢慢生长出来的。',
+      points:[
+        '大河带来农业，农业带来剩余，剩余带来分工，分工带来城市。',
+        '世界上最早的城市出现在两河流域，文字同时期在两河和埃及独立诞生。',
+        '这个时代的中国不是统一王朝，而是多个区域文化并行发展。',
+        '越古老的历史，证据越不完整——所以要用「大约」、「可能」来表达。',
+      ]
+    }
+  },
+  {
+    id:'L02', time:'公元前2500年', title:'金字塔、神庙与城市国家',
+    question:'为什么早期文明要建造巨大建筑？',
+    icon:'🔺',
+    snapshot:'公元前2500年，埃及古王国进入金字塔建设高峰，两河城邦蓬勃发展，印度河城市文明成熟，建筑成为权力与信仰的象征。',
+    civs:[
+      {
+        id:'egypt_old',name:'埃及古王国',x:510,y:262,
+        color:'#d4a035',radius:22,
+        era:'古王国时期 · 金字塔的时代',
+        desc:'法老被视为神在人间的代表。胡夫、哈夫拉等法老动员数以万计的工人，在吉萨建造了人类最宏伟的建筑之一。',
+        people:[
+          {icon:'👑',label:'法老',note:'双冠，权杖，神圣身份'},
+          {icon:'⚒️',label:'建造工人',note:'并非奴隶，是有报酬的专业工匠'},
+        ],
+        events:[
+          {id:'e9',year:'约公元前2560年',title:'胡夫大金字塔建成',emoji:'🔺',
+           body:'胡夫大金字塔高约146米，使用约230万块石头，每块重2.5吨，是人类建造的最高建筑，这一纪录保持了3800年。建造者是有组织、有报酬的工匠，而非奴隶。',
+           insight:'金字塔不只是墓葬，而是彰显法老神权与国家组织能力的纪念碑——它告诉世界：埃及有能力调动这么多的人力和资源。'},
+          {id:'e10',year:'约公元前2500年',title:'古王国行政体系',emoji:'📋',
+           body:'古王国建立了精密的行政体系，书记员、大臣、诺姆（省）长官负责管理粮食、劳役和税收。这套体系支撑了金字塔的建造。',
+           insight:'大型工程的背后，是比工程本身更重要的组织能力——行政体系的出现是国家成熟的标志。'},
+        ]
+      },
+      {
+        id:'sumer',name:'苏美尔城邦',x:590,y:218,
+        color:'#c8843a',radius:20,
+        era:'早王朝时期 · 城邦的黄金年代',
+        desc:'两河流域出现了乌尔、乌玛、拉伽什等多个城邦，各自有自己的守护神、神庙和王权。城邦之间既有贸易也有战争。',
+        people:[
+          {icon:'🗡️',label:'战士',note:'青铜头盔，长矛'},
+          {icon:'🏛️',label:'祭司',note:'管理神庙经济'},
+        ],
+        events:[
+          {id:'e11',year:'约公元前2500年',title:'乌尔王墓',emoji:'💎',
+           body:'乌尔王墓出土了精美的黄金器物、天青石首饰和乐器。墓中有大量陪葬人——侍从和士兵随主人入葬，体现了极度的等级分化。',
+           insight:'乌尔王墓告诉我们：苏美尔社会有严格的等级，王权已经神圣化，死后世界的信仰深刻影响着活着的人的行为。'},
+          {id:'e12',year:'约公元前2500年',title:'《乌尔军旗》的战争与和平',emoji:'⚔️',
+           body:'乌尔出土的镶嵌木板，一面描绘战争场面（士兵、战车、俘虏），另一面描绘和平场面（宴会、音乐、贸易）。',
+           insight:'这是迄今最早的「战争与和平」双面叙事，说明苏美尔人已在思考社会秩序的两种状态。'},
+        ]
+      },
+      {
+        id:'indus_mature',name:'印度河成熟城市',x:668,y:250,
+        color:'#7aaa60',radius:20,
+        era:'哈拉帕文明全盛 · 最神秘的古文明',
+        desc:'摩亨佐-达罗和哈拉帕达到繁盛，格网状街道、室内排水系统、标准砖块令现代考古学家叹为观止，但他们的政治体制完全成谜。',
+        people:[
+          {icon:'🧘',label:'印度河市民',note:'整洁棉布，浴室，沐浴文化'},
+        ],
+        events:[
+          {id:'e13',year:'约公元前2500年',title:'摩亨佐-达罗的城市规划',emoji:'🏙️',
+           body:'摩亨佐-达罗有完整的排水系统、砖砌街道、公共浴场和粮仓。街道横平竖直，每块砖尺寸统一，显示出惊人的规划能力。',
+           insight:'令人费解的是：我们找不到王宫、军事设施或大型墓葬——这个文明似乎没有我们通常理解的「专制王权」，这本身就是一个谜。'},
+        ]
+      },
+    ],
+    takeaway:{
+      title:'公元前2500年：权力、信仰与巨型工程',
+      quote:'巨大建筑不只是技术成就，更是一个文明组织人力、调动资源、表达信仰和权力的能力证明。',
+      points:[
+        '金字塔的本质不是墓地，而是国家权力和神王信仰的物质化表达。',
+        '苏美尔城邦展示了城市竞争与合作的早期形态——贸易和战争并存。',
+        '印度河文明高度神秘：拥有最先进的城市规划，却没有明显的专制王权迹象。',
+        '大型工程需要的不只是劳力，更需要行政、物流和专业知识的系统支撑。',
+      ]
+    }
+  },
+  {
+    id:'L03', time:'公元前1600年', title:'青铜、战车与早期王国',
+    question:'技术如何改变文明的力量格局？',
+    icon:'⚔️',
+    snapshot:'青铜武器和战车重塑了战争，中国商朝崛起，埃及新王国扩张，西亚多国竞争。技术不只是工具——它是权力。',
+    civs:[
+      {
+        id:'shang',name:'中国商朝',x:790,y:200,
+        color:'#c03020',radius:22,
+        era:'商朝 · 青铜与甲骨文的王国',
+        desc:'商朝是中国第一个有文字记录的王朝。精美的青铜礼器代表王权与神权，甲骨文用于占卜——向祖先和神灵询问吉凶。',
+        people:[
+          {icon:'👑',label:'商王',note:'冕旒，青铜礼器，甲骨占卜'},
+          {icon:'🐂',label:'祭祀者',note:'大规模动物乃至人祭'},
+        ],
+        events:[
+          {id:'e14',year:'约公元前1600-1046年',title:'甲骨文：神与人的对话',emoji:'🦴',
+           body:'商朝王室把问题刻在龟甲和牛肩胛骨上，用火灼烧，根据裂纹判断神意。这些甲骨上的文字是已知最早的成熟汉字系统。',
+           insight:'甲骨文揭示了商朝政治的神圣性——王权通过与神灵沟通来确立合法性。占卜不只是迷信，而是权力的仪式。'},
+          {id:'e15',year:'约公元前1600年',title:'青铜礼器与权力',emoji:'🏺',
+           body:'商朝青铜铸造工艺达到极高水平。大型青铜鼎不仅是炊具，更是国家权力的象征。「九鼎」代表天下，有鼎者有天下。',
+           insight:'青铜在商朝不只是武器，更是礼仪权力的载体。控制青铜就是控制神圣的秩序——这与其他文明大相径庭。'},
+        ]
+      },
+      {
+        id:'egypt_new',name:'埃及新王国',x:508,y:262,
+        color:'#d4a035',radius:20,
+        era:'新王国 · 帝国的扩张时代',
+        desc:'埃及新王国的法老成为军事征服者，向努比亚和西亚扩张。图特摩斯三世被称为「古代的拿破仑」，拉美西斯二世树立巨型自我纪念碑。',
+        people:[
+          {icon:'🎯',label:'法老战士',note:'战车，弓箭，蓝色作战头盔'},
+          {icon:'🪬',label:'神庙祭司',note:'权力日增，与法老竞争'},
+        ],
+        events:[
+          {id:'e16',year:'约公元前1274年',title:'卡迭石战役',emoji:'⚔️',
+           body:'埃及与赫梯帝国在今叙利亚爆发大规模战役。战斗没有决定性胜负，但双方随后签署了人类历史上最早的书面和平条约之一。',
+           insight:'卡迭石条约表明：大国可以通过外交而非战争来解决冲突——这是国际关系史上的里程碑。'},
+        ]
+      },
+      {
+        id:'hittite',name:'赫梯帝国',x:555,y:180,
+        color:'#8080c0',radius:18,
+        era:'赫梯帝国 · 战车与铁器的先驱',
+        desc:'赫梯人是早期铁器技术的重要掌握者，战车技术精湛。他们位于今土耳其中部，连接黑海、地中海和两河流域。',
+        people:[
+          {icon:'⚔️',label:'赫梯战士',note:'铁制武器，战车，重甲'},
+        ],
+        events:[
+          {id:'e17',year:'约公元前1600-1180年',title:'赫梯与铁器早期使用',emoji:'🔩',
+           body:'赫梯人对铁的加工有一定技术积累，但「铁器时代」真正主导要到公元前1200年以后。赫梯通过战车技术和贸易网络维持帝国地位。',
+           insight:'技术垄断是权力的来源之一，但技术最终会扩散——赫梯对铁的垄断随帝国崩溃而消失。'},
+        ]
+      },
+    ],
+    takeaway:{
+      title:'公元前1600年：技术重塑权力的时代',
+      quote:'青铜不只是材料——它是权力、礼仪和征服的象征。谁掌握技术，谁就拥有改变世界格局的力量。',
+      points:[
+        '商朝的青铜礼器与政治权力深度绑定，「青铜」不仅是工具，更是权威的语言。',
+        '战车改变了战争规则：速度和冲击力让少数精锐可以击败大量步兵。',
+        '埃及新王国的扩张展示了军事帝国主义的早期形态——但也带来了资源消耗和内部矛盾。',
+        '区分青铜时代与铁器时代很重要：公元前1600年还是青铜主导的世界。',
+      ]
+    }
+  },
+  {
+    id:'L04', time:'公元前1200年', title:'青铜时代的崩溃',
+    question:'为什么强大的文明也会崩溃？',
+    icon:'💫',
+    snapshot:'约公元前1200年，东地中海多个青铜时代文明在短期内崩溃，赫梯灭亡，迈锡尼衰落，贸易网络断裂。历史上最神秘的崩溃事件之一。',
+    civs:[
+      {
+        id:'late_bronze_collapse',name:'东地中海崩溃区',x:535,y:195,
+        color:'#805028',radius:24,
+        era:'青铜时代崩溃 · 文明的断层',
+        desc:'迈锡尼、赫梯、乌加里特……约公元前1200年，多个繁荣文明几乎同时崩溃，原因至今争议不断：海上民族入侵？气候变化？贸易断裂？内部叛乱？',
+        people:[
+          {icon:'🚢',label:'"海上民族"',note:'身份神秘，可能来自爱琴海'},
+          {icon:'🌾',label:'普通农民',note:'城市消失后，返回农业村落'},
+        ],
+        events:[
+          {id:'e18',year:'约公元前1200-1150年',title:'赫梯帝国灭亡',emoji:'💥',
+           body:'赫梯首都哈图沙被焚毁、废弃。赫梯帝国突然消失，没有留下正式的历史记录说明原因。考古发现显示大火和暴力的痕迹。',
+           insight:'一个主导西亚数百年的帝国，在几十年内彻底消失——这提醒我们：文明的脆弱性往往来自我们最忽视的地方。'},
+          {id:'e19',year:'约公元前1180年',title:'乌加里特的最后求救信',emoji:'📜',
+           body:'叙利亚的港口城市乌加里特被毁前，留下了一封求救信泥板：「我们正受到船队袭击……粮食已断……」这封信从未送出。',
+           insight:'乌加里特的求救信是历史上最令人心碎的文物之一——一个繁荣城市的最后呼声，定格了文明崩溃的瞬间。'},
+          {id:'e20',year:'约公元前1200年',title:'多因叠加：没有单一原因',emoji:'🧩',
+           body:'现代学者认为青铜时代崩溃是多个因素叠加：气候变化引发粮食危机、贸易网络断裂、「海上民族」迁徙、内部起义——每一个单独都不足以造成大崩溃，但叠加在一起就摧毁了相互依赖的体系。',
+           insight:'复杂系统的崩溃往往不是单一原因造成的——了解这一点，对理解今天的全球体系同样有价值。'},
+        ]
+      },
+      {
+        id:'egypt_survive',name:'埃及：幸存的文明',x:510,y:262,
+        color:'#d4a035',radius:18,
+        era:'新王国末期 · 受冲击但延续',
+        desc:'埃及遭受了「海上民族」的多次进攻和内部动荡，国力大为下降，但没有像赫梯那样彻底崩溃。',
+        people:[
+          {icon:'⚔️',label:'拉美西斯三世',note:'抵御海上民族，最后的伟大法老'},
+        ],
+        events:[
+          {id:'e21',year:'约公元前1178年',title:'拉美西斯三世击退海上民族',emoji:'🛡️',
+           body:'拉美西斯三世在尼罗河三角洲海战和陆战中击退了「海上民族」的大规模入侵，在神庙浮雕上留下了详细的战斗记录。',
+           insight:'埃及的延续说明崩溃不是全球性的——同样的压力，不同的文明有不同的应对能力。地理位置和内部凝聚力可能是关键。'},
+        ]
+      },
+      {
+        id:'china_shang_late',name:'中国商朝晚期',x:790,y:200,
+        color:'#c03020',radius:18,
+        era:'商朝晚期 · 独立发展的东亚',
+        desc:'中国没有经历东地中海的那场大崩溃。商朝晚期内部矛盾加深，周人崛起，准备取代商朝——这是东亚自己的历史节奏。',
+        people:[
+          {icon:'👑',label:'周文王',note:'在渭水流域积蓄力量'},
+        ],
+        events:[
+          {id:'e22',year:'约公元前1046年',title:'周武王伐纣（预告）',emoji:'🏹',
+           body:'这段时间商纣王统治下矛盾激化，周武王正在积蓄力量。公元前1046年的牧野之战将终结商朝，开启周朝——但那是稍后的故事。',
+           insight:'中国的「崩溃」是内部朝代更替，而非外部冲击——东西方文明危机的性质完全不同。'},
+        ]
+      },
+    ],
+    takeaway:{
+      title:'公元前1200年：文明如何崩溃，又如何重生',
+      quote:'崩溃不是终点，而是转型。铁器时代、腓尼基贸易、希腊城邦，都从青铜时代的灰烬中生长出来。',
+      points:[
+        '青铜时代崩溃是人类历史上最神秘的事件之一，没有单一答案，是多因叠加的系统性失败。',
+        '相互依赖的贸易体系是优势，也是脆弱性来源——越紧密连接，某处断裂的后果越严重。',
+        '埃及幸存，中国独立——不同地区对同样压力的反应完全不同，这说明文明韧性因地而异。',
+        '崩溃后的「黑暗时代」孕育了新的文明形态：铁器普及、腓尼基字母、希腊城邦……',
+      ]
+    }
+  },
+  {
+    id:'L05', time:'公元前500年', title:'思想大爆发时代',
+    question:'为什么世界不同地方几乎同时开始深刻思考？',
+    icon:'💡',
+    snapshot:'"轴心时代"——中国诸子百家、印度佛陀、希腊哲学家、波斯琐罗亚斯德，几乎同时在不同文明中出现了对人、社会和宇宙的深刻反思。',
+    civs:[
+      {
+        id:'china_zhou',name:'中国春秋战国',x:790,y:200,
+        color:'#c03020',radius:22,
+        era:'春秋战国 · 百家争鸣',
+        desc:'周朝衰落，诸侯争霸，但思想空前活跃。孔子、老子、孟子、韩非子……不同学派争相为乱世开方子。这是中国哲学的黄金时代。',
+        people:[
+          {icon:'📚',label:'孔子（公元前551-479年）',note:'礼、仁、教育、君子之道'},
+          {icon:'☯️',label:'老子',note:'道、无为、自然、柔弱胜刚强'},
+        ],
+        events:[
+          {id:'e23',year:'公元前551-479年',title:'孔子：礼与仁的教育家',emoji:'📚',
+           body:'孔子周游列国，虽未被重用，但收弟子三千，整理周朝典籍，提出「仁」「礼」「君子」思想。他的核心问题：乱世中如何重建社会秩序？',
+           insight:'孔子的伟大不在于他改变了当时的政治，而在于他创造了一套思维框架，影响中国两千年的伦理与政治文化。'},
+          {id:'e24',year:'约公元前400-300年',title:'百家争鸣：思想的市场',emoji:'🎭',
+           body:'儒家讲礼、道家讲自然、法家讲律令、墨家讲兼爱。这种多元思想竞争，在后来的大一统秦朝后消失——独尊儒术成为政治选择。',
+           insight:'思想的多元繁荣往往出现在政治分裂时期。统一带来稳定，但有时也带来思想的收窄。'},
+        ]
+      },
+      {
+        id:'greece',name:'希腊城邦',x:520,y:192,
+        color:'#3a7aaa',radius:20,
+        era:'古典希腊 · 哲学与民主的摇篮',
+        desc:'雅典的民主制度和哲学传统并行发展。苏格拉底在街头与人辩论，柏拉图创立学园，亚里士多德系统研究万事万物。',
+        people:[
+          {icon:'🦉',label:'苏格拉底',note:'不写作，只辩论，被民主法庭处死'},
+          {icon:'🏛',label:'雅典公民',note:'参与集会，直接民主（限成年男性）'},
+        ],
+        events:[
+          {id:'e25',year:'公元前5世纪',title:'雅典民主的实验',emoji:'🗳️',
+           body:'伯里克利时代的雅典，数千名公民直接参与城邦决策，投票决定战争、法律和官员。这是人类历史上早期直接民主的最重要实践。',
+           insight:'雅典民主有巨大局限（排除女性、奴隶、外邦人），但它提出了一个全新问题：政治权力可以来自「人民」而非神王。这个问题改变了历史。'},
+          {id:'e26',year:'公元前399年',title:'苏格拉底之死',emoji:'⚱️',
+           body:'苏格拉底被雅典民主法庭以「腐蚀青年」和「不敬神」罪处死，饮毒酒而亡。他的弟子柏拉图对民主制度产生了深刻怀疑。',
+           insight:'这是历史上最著名的思想审判之一。它提出了一个永恒问题：多数人的意志是否总是正确的？民主能否保护异见者？'},
+        ]
+      },
+      {
+        id:'india_buddha',name:'印度·佛陀时代',x:668,y:250,
+        color:'#c08030',radius:20,
+        era:'佛陀时代 · 解脱与慈悲',
+        desc:'释迦牟尼（约公元前563-483年）在菩提树下悟道，提出超越种姓制度的普世教义：所有人都能通过修行获得解脱。',
+        people:[
+          {icon:'☸️',label:'释迦牟尼',note:'王子出身，舍弃王位，追求解脱'},
+          {icon:'🧘',label:'比丘',note:'出家修行，托钵化缘'},
+        ],
+        events:[
+          {id:'e27',year:'约公元前500年',title:'佛陀悟道：四圣谛',emoji:'☸️',
+           body:'释迦牟尼在菩提伽耶悟道，提出四圣谛（苦、集、灭、道）和八正道。核心问题：人为什么受苦，如何解脱？他的答案超越了婆罗门的神权秩序。',
+           insight:'佛教的出现是对印度种姓制度的一种精神挑战——它说所有人不论出身都能修行解脱。这是一种深刻的平等主义宗教哲学。'},
+        ]
+      },
+      {
+        id:'persia',name:'波斯帝国',x:618,y:210,
+        color:'#9050a0',radius:20,
+        era:'阿契美尼德波斯 · 第一个世界帝国',
+        desc:'居鲁士大帝建立阿契美尼德王朝，大流士一世将帝国扩展到印度河至爱琴海。这是人类历史上第一个真正意义上的「多民族帝国」。',
+        people:[
+          {icon:'👑',label:'大流士一世',note:'「万王之王」，建波斯波利斯'},
+          {icon:'📮',label:'驿站使者',note:'帝国道路，快速通信系统'},
+        ],
+        events:[
+          {id:'e28',year:'公元前522-486年',title:'大流士的波斯：制度化的帝国',emoji:'🏛',
+           body:'大流士将帝国分为行省（萨特拉普），统一货币、重量和度量，建设波斯御道（可达两千公里），建立驿站系统。这是早期全球化管理的范本。',
+           insight:'波斯帝国展示了「统治多样性」的可能：允许各地保留文化和宗教，只要缴税和维持秩序——这是一种更灵活的帝国模型。'},
+        ]
+      },
+    ],
+    takeaway:{
+      title:'公元前500年：轴心时代，思想改变世界',
+      quote:'在不同文明、不同语言、不同地理的同一时代，人类开始问同样的问题：什么是好的生活？社会如何公正？宇宙有什么秩序？',
+      points:[
+        '「轴心时代」（雅斯贝尔斯提出）：约公元前800-200年，多个文明同时出现了对人类存在的深刻反思。',
+        '孔子、佛陀、苏格拉底三人几乎生活在同一时代，但彼此并不知晓对方——思想是独立发生的。',
+        '这些思想创造了后来两千年文明的精神底色——儒家、佛教、西方哲学至今仍是活着的传统。',
+        '希腊民主的局限性和苏格拉底之死提醒我们：好的思想并不总是被当代人接受。',
+      ]
+    }
+  },
+];
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let state = {
+  currentLesson: null,
+  currentCiv: null,
+  currentEvent: null,
+  completed: JSON.parse(localStorage.getItem('civ_completed')||'[]'),
+  learned: JSON.parse(localStorage.getItem('civ_learned')||'{}'),
+};
+
+function saveState(){
+  localStorage.setItem('civ_completed', JSON.stringify(state.completed));
+  localStorage.setItem('civ_learned', JSON.stringify(state.learned));
+}
+
+// ═══════════════════════════════════════════════════════
+// STARS
+// ═══════════════════════════════════════════════════════
+function createStars(){
+  const c = document.getElementById('stars');
+  for(let i=0;i<120;i++){
+    const s = document.createElement('div');
+    s.className='star';
+    s.style.cssText=`width:${Math.random()*2.5+.5}px;height:${Math.random()*2.5+.5}px;
+      left:${Math.random()*100}%;top:${Math.random()*100}%;
+      --d:${Math.random()*4+2}s;animation-delay:${Math.random()*5}s;opacity:${Math.random()*.5+.1}`;
+    c.appendChild(s);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// TIMELINE
+// ═══════════════════════════════════════════════════════
+function renderTimeline(){
+  const dotsEl = document.getElementById('tlDots');
+  dotsEl.innerHTML = LESSONS.map((lesson,i) => {
+    const done = state.completed.includes(lesson.id);
+    const active = !done && (i===0 || state.completed.includes(LESSONS[i-1]?.id));
+    const cls = done?'done':active?'active':'';
+    const icon = done ? '✦' : active ? '◉' : '○';
+    return `
+      <div class="tl-dot-wrap ${active?'active-lesson':''}" onclick="enterLesson('${lesson.id}')" data-id="${lesson.id}">
+        <div class="tl-label-time">${lesson.time}</div>
+        <div class="tl-dot ${cls}" id="dot-${lesson.id}"></div>
+        <div class="tl-label-title">${lesson.icon} ${lesson.title}</div>
+      </div>`;
+  }).join('');
+
+  // Fill line — based on rightmost completed dot position
+  const pct = state.completed.length / LESSONS.length * 100;
+  document.getElementById('tlLineFill').style.width = Math.max(0,pct)+'%';
+
+  // Position figure
+  positionFigure();
+}
+
+function positionFigure(){
+  const wrap = document.getElementById('tlWrap');
+  const dots = document.querySelectorAll('.tl-dot-wrap');
+  if(!dots.length) return;
+  const fig = document.getElementById('tl-figure');
+  // Find current active dot
+  let idx = state.completed.length;
+  if(idx >= dots.length) idx = dots.length-1;
+  const dot = dots[idx];
+  const wRect = wrap.getBoundingClientRect();
+  const dRect = dot.getBoundingClientRect();
+  const leftPx = dRect.left + dRect.width/2 - wRect.left - 16;
+  fig.style.left = leftPx+'px';
+}
+
+// ═══════════════════════════════════════════════════════
+// ENTER LESSON → MAP
+// ═══════════════════════════════════════════════════════
+function enterLesson(id){
+  const lesson = LESSONS.find(l=>l.id===id);
+  if(!lesson) return;
+  state.currentLesson = lesson;
+  state.currentCiv = null;
+
+  // Update map header
+  document.getElementById('mapTimeChip').textContent = lesson.time;
+  document.getElementById('mapTitle').textContent = lesson.title;
+  document.getElementById('mapProgressHint').textContent = '点击地图上的文明标记开始探索';
+
+  // Apply era colors
+  applyEraColors(id);
+
+  // Render civ markers
+  renderCivMarkers(lesson);
+
+  // Reset panel
+  showPanelNoCiv();
+
+  // Switch screens
+  showScreen('s-map');
+}
+
+function applyEraColors(id){
+  const c = ERA_COLORS[id]||ERA_COLORS.L01;
+  const root = document.documentElement;
+  root.style.setProperty('--era-land', c.land);
+  root.style.setProperty('--era-water', c.water);
+  root.style.setProperty('--era-sky', c.sky);
+
+  // Update continent fills with era land color
+  document.querySelectorAll('#continents path').forEach(p=>{
+    const base = hexToRgb(c.land);
+    const variation = (Math.random()-.5)*.15;
+    p.setAttribute('fill', adjustColor(c.land, variation));
+  });
+  document.getElementById('ocean').setAttribute('fill', c.water);
+  document.getElementById('s-map').style.background = `linear-gradient(180deg, ${c.sky} 0%, ${adjustColor(c.sky,.05)} 100%)`;
+}
+
+function renderCivMarkers(lesson){
+  const g = document.getElementById('civ-markers');
+  g.innerHTML = '';
+  lesson.civs.forEach(civ=>{
+    const learned = (state.learned[lesson.id]||{})[civ.id];
+    const learnedCount = lesson.civs.reduce((sum,c)=>sum+(state.learned[lesson.id]?.[c.id]?.length||0),0);
+    const totalEvents = lesson.civs.reduce((sum,c)=>sum+c.events.length,0);
+
+    const group = document.createElementNS('http://www.w3.org/2000/svg','g');
+    group.classList.add('civ-marker');
+    group.setAttribute('data-id',civ.id);
+    group.setAttribute('transform',`translate(${civ.x},${civ.y})`);
+    group.addEventListener('click',()=>selectCiv(civ.id));
+
+    const glow = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    glow.classList.add('civ-glow');
+    glow.setAttribute('r',civ.radius*2);
+    glow.setAttribute('fill',`${civ.color}40`);
+    glow.style.filter='url(#glow)';
+    group.appendChild(glow);
+
+    const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circle.setAttribute('r',civ.radius);
+    circle.setAttribute('fill',civ.color+'cc');
+    circle.setAttribute('stroke',civ.color);
+    circle.setAttribute('stroke-width','2');
+    group.appendChild(circle);
+
+    // Person silhouette
+    const personG = document.createElementNS('http://www.w3.org/2000/svg','g');
+    const scale = civ.radius/22;
+    personG.setAttribute('transform',`scale(${scale})`);
+    personG.innerHTML = `
+      <circle cx="0" cy="-10" r="5" fill="rgba(255,255,255,.85)"/>
+      <line x1="0" y1="-5" x2="0" y2="4" stroke="rgba(255,255,255,.85)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="-5" y1="-2" x2="5" y2="-2" stroke="rgba(255,255,255,.85)" stroke-width="2" stroke-linecap="round"/>
+      <line x1="0" y1="4" x2="-4" y2="12" stroke="rgba(255,255,255,.85)" stroke-width="2" stroke-linecap="round"/>
+      <line x1="0" y1="4" x2="4" y2="12" stroke="rgba(255,255,255,.85)" stroke-width="2" stroke-linecap="round"/>`;
+    group.appendChild(personG);
+
+    // Label
+    const text = document.createElementNS('http://www.w3.org/2000/svg','text');
+    text.classList.add('civ-label');
+    text.setAttribute('text-anchor','middle');
+    text.setAttribute('x','0');
+    text.setAttribute('y', civ.radius+16);
+    text.setAttribute('fill','#f0e6d0');
+    text.setAttribute('font-size','12');
+    text.setAttribute('font-family','PingFang SC,sans-serif');
+    text.textContent = civ.name;
+    group.appendChild(text);
+
+    // Done badge if all events learned
+    const civLearned = state.learned[lesson.id]?.[civ.id]||[];
+    if(civLearned.length >= civ.events.length){
+      const badge = document.createElementNS('http://www.w3.org/2000/svg','text');
+      badge.setAttribute('x',civ.radius);badge.setAttribute('y',-civ.radius);
+      badge.setAttribute('font-size','14');badge.textContent='✓';
+      group.appendChild(badge);
+    }
+
+    g.appendChild(group);
+  });
+}
+
+function selectCiv(civId){
+  const lesson = state.currentLesson;
+  const civ = lesson.civs.find(c=>c.id===civId);
+  if(!civ) return;
+  state.currentCiv = civ;
+
+  // Highlight marker
+  document.querySelectorAll('.civ-marker').forEach(m=>{
+    m.classList.toggle('selected', m.dataset.id===civId);
+  });
+
+  // Fill panel
+  document.getElementById('panelNoCiv').style.display='none';
+  const content = document.getElementById('panelCivContent');
+  content.style.display='flex';
+
+  document.getElementById('panelEra').textContent = civ.era;
+  document.getElementById('panelCivName').textContent = civ.name;
+  document.getElementById('panelCivDesc').textContent = civ.desc;
+
+  // People chips
+  document.getElementById('panelPeople').innerHTML = (civ.people||[]).map(p=>
+    `<div class="person-chip"><span class="person-icon">${p.icon}</span><span><strong>${p.label}</strong> · ${p.note}</span></div>`
+  ).join('');
+
+  // Events
+  const learned = state.learned[lesson.id]?.[civ.id]||[];
+  document.getElementById('panelEvents').innerHTML = civ.events.map(ev=>{
+    const isLearned = learned.includes(ev.id);
+    return `
+      <div class="event-card ${isLearned?'learned':''}" onclick="openEvent('${ev.id}')">
+        <div class="event-year">${ev.emoji} ${ev.year}</div>
+        <div class="event-title">${ev.title}</div>
+        <div class="event-brief">${ev.body.substring(0,60)}…</div>
+        <div class="event-check">✓</div>
+      </div>`;
+  }).join('');
+
+  checkCompleteButton();
+}
+
+function checkCompleteButton(){
+  const lesson = state.currentLesson;
+  const totalEvents = lesson.civs.reduce((s,c)=>s+c.events.length,0);
+  const learnedEvents = lesson.civs.reduce((s,c)=>{
+    return s+(state.learned[lesson.id]?.[c.id]||[]).length;
+  },0);
+  const btn = document.getElementById('mapCompleteBtn');
+  if(learnedEvents >= Math.ceil(totalEvents*0.5)){
+    btn.classList.add('visible');
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// EVENT OVERLAY
+// ═══════════════════════════════════════════════════════
+function openEvent(eventId){
+  const lesson = state.currentLesson;
+  const civ = state.currentCiv;
+  const ev = civ.events.find(e=>e.id===eventId);
+  if(!ev) return;
+  state.currentEvent = ev;
+
+  document.getElementById('evModalTag').textContent = civ.name+' · '+lesson.time;
+  document.getElementById('evModalTitle').textContent = ev.emoji+' '+ev.title;
+  document.getElementById('evModalYear').textContent = ev.year;
+  document.getElementById('evModalBody').textContent = ev.body;
+  document.getElementById('evModalInsight').textContent = ev.insight;
+
+  const learned = (state.learned[lesson.id]?.[civ.id]||[]).includes(ev.id);
+  const btn = document.getElementById('evLearnBtn');
+  btn.textContent = learned ? '✓ 已学习' : '✓ 已学习，继续探索';
+  btn.className = 'event-learn-btn'+(learned?' learned':'');
+
+  document.getElementById('event-overlay').classList.add('open');
+}
+
+function closeEvent(){
+  document.getElementById('event-overlay').classList.remove('open');
+}
+
+function markEventLearned(){
+  const lesson = state.currentLesson;
+  const civ = state.currentCiv;
+  const ev = state.currentEvent;
+  if(!lesson||!civ||!ev) return;
+
+  if(!state.learned[lesson.id]) state.learned[lesson.id]={};
+  if(!state.learned[lesson.id][civ.id]) state.learned[lesson.id][civ.id]=[];
+  if(!state.learned[lesson.id][civ.id].includes(ev.id)){
+    state.learned[lesson.id][civ.id].push(ev.id);
+    saveState();
+  }
+  closeEvent();
+  selectCiv(civ.id); // refresh panel
+  renderCivMarkers(lesson); // refresh map markers
+  checkCompleteButton();
+}
+
+// ═══════════════════════════════════════════════════════
+// KNOWLEDGE CARD
+// ═══════════════════════════════════════════════════════
+function showSummary(){
+  const lesson = state.currentLesson;
+  const tk = lesson.takeaway;
+
+  document.getElementById('sumIcon').textContent = lesson.icon;
+  document.getElementById('sumTitle').textContent = tk.title;
+  document.getElementById('sumQuote').textContent = '「'+tk.quote+'」';
+  document.getElementById('sumPoints').innerHTML = tk.points.map((p,i)=>
+    `<div class="summary-point">
+      <div class="summary-point-num">${i+1}</div>
+      <p>${p}</p>
+    </div>`
+  ).join('');
+  document.getElementById('sumCivs').innerHTML = lesson.civs.map(c=>
+    `<div class="summary-civ-tag" style="border-color:${c.color}60;color:${c.color}">${c.name}</div>`
+  ).join('');
+
+  showScreen('s-summary');
+}
+
+function completeLesson(){
+  const lesson = state.currentLesson;
+  if(!state.completed.includes(lesson.id)){
+    state.completed.push(lesson.id);
+    saveState();
+  }
+  showScreen('s-timeline');
+  setTimeout(()=>{
+    renderTimeline();
+  },100);
+}
+
+// ═══════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>{
+    s.classList.toggle('hidden', s.id!==id);
+  });
+}
+
+function goBack(){
+  const map = document.getElementById('s-map');
+  const sum = document.getElementById('s-summary');
+  if(!sum.classList.contains('hidden')){
+    showScreen('s-map');
+  } else {
+    showScreen('s-timeline');
+  }
+}
+
+function showPanelNoCiv(){
+  document.getElementById('panelNoCiv').style.display='flex';
+  document.getElementById('panelCivContent').style.display='none';
+  document.getElementById('mapCompleteBtn').classList.remove('visible');
+}
+
+// ═══════════════════════════════════════════════════════
+// COLOR UTILS
+// ═══════════════════════════════════════════════════════
+function hexToRgb(hex){
+  const r=parseInt(hex.slice(1,3),16);
+  const g=parseInt(hex.slice(3,5),16);
+  const b=parseInt(hex.slice(5,7),16);
+  return {r,g,b};
+}
+function adjustColor(hex, amt){
+  const {r,g,b}=hexToRgb(hex);
+  const adj=Math.round(amt*255);
+  const clamp=v=>Math.max(0,Math.min(255,v));
+  return `rgb(${clamp(r+adj)},${clamp(g+adj)},${clamp(b+adj)})`;
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+createStars();
+renderTimeline();
+
+// Keyboard: ESC closes event overlay
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') closeEvent();
+});
+// Click outside event modal
+document.getElementById('event-overlay').addEventListener('click',e=>{
+  if(e.target===e.currentTarget) closeEvent();
+});
+// Resize: re-position figure
+window.addEventListener('resize', ()=>{ if(state) positionFigure(); });
+</script>
+</body>
+</html>
