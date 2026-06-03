@@ -2093,3 +2093,117 @@ html, body {
 .accordion-section.collapsed:hover .pl-icon { opacity: 1; }
 .accordion-section.collapsed:hover .accordion-arrow { color: var(--amber); }
 
+
+/* ════════════════════════════════════════════════════
+   🔧 排版 Bug 修复 · Layout Fixes
+════════════════════════════════════════════════════ */
+
+/* ── Fix 1: 首页标题被金色卷轴压住 ── */
+/* #s-home::before (顶部金杆 22px) + ::after (底部金杆 22px) */
+/* 给首页内容上下各留出 50px 安全空间 */
+#s-home {
+  padding-top: 50px !important;
+  padding-bottom: 50px !important;
+}
+
+/* ── Fix 2: 史前时代页 — 自动展开层的滚动留出 topbar 空间 ── */
+.pre-layer.accordion-section {
+  scroll-margin-top: 80px; /* 大约 topbar 高度 */
+}
+
+/* ── Fix 3: 时光机卡片对比度增强 ── */
+.scenario-card {
+  background: linear-gradient(135deg, #fffcf2, #fdf5e0) !important;
+  border: 2px solid rgba(160,100,30,.4) !important;
+  box-shadow: 0 12px 32px rgba(100,40,10,.18),
+              0 4px 12px rgba(184,48,24,.1) !important;
+}
+.scenario-cover {
+  background: linear-gradient(135deg, #fffaee, #f8ebd0 50%, #eed5a8) !important;
+  border-width: 2px !important;
+}
+
+/* 让时光机层的展开背景更明显一些 */
+.accordion-section.expanded #pre-scenario,
+.accordion-section.expanded.scenario-layer .pl-body {
+  background: linear-gradient(180deg,
+    rgba(255,248,228,.5),
+    rgba(245,225,180,.25));
+}
+
+/* ── Fix 4: 通用防文字溢出 ── */
+.preg-desc, .pth-sum, .pth-card li, .pst-para, .pev-body p, .pev-qa span,
+.evo-event-body-text, .scenario-situation, .scenario-outcome-text,
+.scenario-choice-text, .scenario-fact-box p, .pl-sub,
+.ptlc p, .ctx-card p, .compare-card p,
+.preg-grid span, .summary-card p, .panel-civ-desc {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* ── Fix 5: 长链接 / 长英文不破框 ── */
+.wiki-btn, .wiki-quick-chip, .wiki-quick-label {
+  word-break: keep-all;
+  white-space: nowrap;
+}
+
+/* ── Fix 6: 时光机标题区在折叠状态下不被遮挡 ── */
+.accordion-section.scenario-layer.expanded {
+  margin-top: 0;
+}
+
+/* ── Fix 7: 首页 timeline 下方文字溢出 (公元前 NNNN 年 太长) ── */
+.tl-label-time {
+  font-size: 9.5px !important;
+  white-space: nowrap;
+  overflow: visible;
+  max-width: 100%;
+  letter-spacing: 0;
+}
+
+/* ── Fix 8: scenario 选项按钮长文字换行 ── */
+.scenario-choice-btn {
+  word-break: break-word;
+  align-items: flex-start;
+  text-align: left;
+}
+.scenario-choice-text {
+  line-height: 1.7;
+}
+
+/* ── Fix 9: scenario 进度+生存值条在小屏不挤 ── */
+@media (max-width: 720px) {
+  .scenario-topbar { flex-direction: column; align-items: stretch; gap: 10px; }
+  .scenario-stat { justify-content: space-between; }
+  .scenario-bar { width: auto; flex: 1; }
+}
+
+/* ── Fix 10: 防止 image-hero 图片在小屏破框 ── */
+.image-hero-img, .hero-image {
+  max-width: 100%; height: auto !important;
+}
+
+/* ── Fix 11: 史前总览 8时代卡片防溢出 ── */
+.pec-title, .pec-snap {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* ── Fix 12: pre-era-topbar 内容不被压扁 ── */
+.pre-era-topbar { padding: 12px 20px !important; }
+.pre-era-topbar-info strong {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* ── Fix 13: char-select-row 在小屏不破 ── */
+.char-select-row {
+  width: 100%; padding: 0 16px;
+  justify-content: center;
+}
+.char-select-btns { flex-wrap: wrap; }
+
+/* ── Fix 14: 课程标题(s-lesson) topbar 文字防溢出 ── */
+.lesson-title-label { max-width: 400px; word-break: break-word; }
+
