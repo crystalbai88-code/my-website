@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI世界文明实验室</title>
-  <link rel="stylesheet" href="./styles.css?v=13" />
+  <link rel="stylesheet" href="./styles.css?v=14" />
 </head>
 <body>
 
@@ -19,6 +19,18 @@
     <h1>AI 世界文明实验室</h1>
     <p>Global Civilization · 公元前3000年 — 公元1000年</p>
     <div class="tl-subtitle">选择一个时间点，进入那个时代的文明世界</div>
+    <!-- ── 角色性别选择 ── -->
+    <div class="char-select-row">
+      <span class="char-select-label">选择你的探险角色</span>
+      <div class="char-select-btns">
+        <button class="char-sel-btn active" data-g="boy" onclick="selectChar('boy')">
+          <span class="char-sel-icon">🧒</span> 少年探险家
+        </button>
+        <button class="char-sel-btn" data-g="girl" onclick="selectChar('girl')">
+          <span class="char-sel-icon">👧</span> 少女探险家
+        </button>
+      </div>
+    </div>
   </div>
 
   <div class="tl-wrap" id="tlWrap">
@@ -26,7 +38,8 @@
     <div class="tl-line"><div class="tl-line-fill" id="tlLineFill"></div></div>
     <div class="tl-dots" id="tlDots"></div>
     <div id="tl-figure">
-      <!-- Cartoon Explorer Character — walks along the timeline -->
+      <!-- 男生探险角色 Boy Explorer (default) -->
+      <div id="char-boy">
       <svg width="56" height="88" viewBox="-28 -82 56 88" style="overflow:visible" xmlns="http://www.w3.org/2000/svg">
         <!-- Ground shadow -->
         <ellipse cx="0" cy="4" rx="18" ry="5" fill="rgba(0,0,0,0.35)"/>
@@ -98,7 +111,122 @@
           <path d="M-7,-54 Q0,-48 7,-54" stroke="#c05030" stroke-width="2.2" fill="none" stroke-linecap="round"/>
         </g>
       </svg>
-    </div>
+      </div><!-- end char-boy -->
+
+      <!-- 女生探险角色 Girl Explorer (hidden by default) -->
+      <div id="char-girl" style="display:none">
+      <svg width="56" height="88" viewBox="-28 -82 56 88" style="overflow:visible" xmlns="http://www.w3.org/2000/svg">
+        <!-- Shadow -->
+        <ellipse cx="0" cy="4" rx="18" ry="5" fill="rgba(0,0,0,0.28)"/>
+        <!-- ── Skirt (static, behind legs) ── -->
+        <path d="M-14,-20 Q-18,2 -15,8 L15,8 Q18,2 14,-20Z" fill="#4a9060"/>
+        <rect x="-15" y="2" width="30" height="5" rx="2" fill="#c84820"/>
+        <path d="M-15,2 Q0,-2 15,2" fill="none" stroke="#d4a030" stroke-width="1" opacity=".6"/>
+        <!-- Skirt floral pattern dots -->
+        <circle cx="-6" cy="-8" r="2.5" fill="#e84888" opacity=".5"/>
+        <circle cx="2" cy="-12" r="2"   fill="#f0c020" opacity=".5"/>
+        <circle cx="8" cy="-6"  r="2.5" fill="#e84888" opacity=".5"/>
+        <!-- ── Left leg ── -->
+        <g class="char-leg-l" style="transform-origin:0px -14px">
+          <rect x="-10" y="-14" width="8" height="22" rx="4" fill="#e8b888"/>
+          <!-- Embroidered shoe -->
+          <ellipse cx="-6" cy="9" rx="6" ry="3.5" fill="#8a5030"/>
+          <ellipse cx="-6" cy="8" rx="4" ry="2" fill="#c87840"/>
+        </g>
+        <!-- ── Right leg ── -->
+        <g class="char-leg-r" style="transform-origin:0px -14px">
+          <rect x="2"  y="-14" width="8" height="22" rx="4" fill="#e8c898"/>
+          <ellipse cx="6" cy="9"  rx="6" ry="3.5" fill="#8a5030"/>
+          <ellipse cx="6" cy="8"  rx="4" ry="2" fill="#c87840"/>
+        </g>
+        <!-- ── Body group ── -->
+        <g class="char-body">
+          <!-- Yellow jacket body -->
+          <rect x="-14" y="-46" width="28" height="28" rx="7" fill="#e8a820"/>
+          <!-- Jacket collar (crossed) -->
+          <path d="M-4,-46 L0,-36 L4,-46" fill="#c88010"/>
+          <!-- Floral embroidery on jacket -->
+          <circle cx="-8" cy="-38" r="2.5" fill="#e84888" opacity=".6"/>
+          <circle cx="-6" cy="-34" r="1.8" fill="#f0c020" opacity=".6"/>
+          <circle cx="7"  cy="-38" r="2.5" fill="#e84888" opacity=".6"/>
+          <circle cx="5"  cy="-34" r="1.8" fill="#60c840" opacity=".6"/>
+          <!-- Jacket buttons (盘扣) -->
+          <circle cx="0" cy="-42" r="2" fill="#c88010" stroke="#a06010" stroke-width=".5"/>
+          <circle cx="0" cy="-36" r="2" fill="#c88010" stroke="#a06010" stroke-width=".5"/>
+          <!-- ── Left arm ── -->
+          <g class="char-arm-l" style="transform-origin:-14px -38px">
+            <rect x="-22" y="-42" width="10" height="20" rx="5" fill="#e8a820"/>
+            <ellipse cx="-17" cy="-22" rx="5" ry="5" fill="#f4c490"/>
+            <!-- Waving gesture -->
+            <line x1="-17" y1="-17" x2="-22" y2="-12" stroke="#f4c490" stroke-width="4" stroke-linecap="round"/>
+          </g>
+          <!-- ── Right arm (holding lantern) ── -->
+          <g class="char-arm-r" style="transform-origin:14px -38px">
+            <rect x="12" y="-42" width="10" height="20" rx="5" fill="#e8a820"/>
+            <ellipse cx="17" cy="-22" rx="5" ry="5" fill="#f4c490"/>
+            <!-- Lantern string -->
+            <line x1="17" y1="-22" x2="17" y2="-16" stroke="#8a4a10" stroke-width="1.5"/>
+            <!-- Lantern body -->
+            <rect x="12" y="-16" width="10" height="14" rx="3" fill="#d4720a" opacity=".92"/>
+            <rect x="11" y="-18" width="12" height="3" rx="1.5" fill="#8a4010"/>
+            <rect x="11" y="-3"  width="12" height="3" rx="1.5" fill="#8a4010"/>
+            <!-- Lantern window glow -->
+            <rect x="14" y="-15" width="6" height="10" rx="2" fill="#f8e060" opacity=".5"/>
+            <!-- Tassels -->
+            <line x1="15" y1="0" x2="14" y2="6"  stroke="#c84820" stroke-width="1.2"/>
+            <line x1="17" y1="0" x2="17" y2="7"  stroke="#e8a020" stroke-width="1.2"/>
+            <line x1="19" y1="0" x2="20" y2="6"  stroke="#c84820" stroke-width="1.2"/>
+          </g>
+          <!-- Neck -->
+          <rect x="-5" y="-50" width="10" height="7" rx="4" fill="#f4c490"/>
+          <!-- Head -->
+          <circle cx="0" cy="-62" r="18" fill="#f4c490"/>
+          <!-- Rosy cheeks (bigger) -->
+          <ellipse cx="-11" cy="-57" rx="6"   ry="4" fill="rgba(255,100,120,.28)"/>
+          <ellipse cx="11"  cy="-57" rx="6"   ry="4" fill="rgba(255,100,120,.28)"/>
+          <!-- Hair base -->
+          <path d="M-17,-70 Q-14,-82 0,-80 Q14,-82 17,-70 Q16,-62 12,-60 Q0,-56 -12,-60 Q-16,-62 -17,-70Z" fill="#1a0e06"/>
+          <!-- Hair buns -->
+          <circle cx="-14" cy="-78" r="7" fill="#1a0e06"/>
+          <circle cx="14"  cy="-78" r="7" fill="#1a0e06"/>
+          <!-- Left bun flower accessories -->
+          <circle cx="-16" cy="-84" r="3.5" fill="#e84888"/>
+          <circle cx="-12" cy="-85" r="2.5" fill="#e84888"/>
+          <circle cx="-14" cy="-83" r="2"   fill="#f8e060"/>
+          <!-- Right bun flower + green ribbon -->
+          <circle cx="12"  cy="-85" r="3"   fill="#60c840"/>
+          <circle cx="16"  cy="-84" r="2.5" fill="#60c840"/>
+          <circle cx="14"  cy="-84" r="1.8" fill="#f8e060"/>
+          <!-- Ribbon streamers left -->
+          <path d="M-20,-78 Q-26,-74 -24,-70" stroke="#e84888" stroke-width="2" fill="none" stroke-linecap="round" opacity=".8"/>
+          <path d="M-20,-78 Q-25,-82 -22,-86" stroke="#60c840" stroke-width="2" fill="none" stroke-linecap="round" opacity=".7"/>
+          <!-- Ribbon streamers right -->
+          <path d="M20,-78 Q26,-74 24,-70" stroke="#60c840" stroke-width="2" fill="none" stroke-linecap="round" opacity=".8"/>
+          <path d="M20,-78 Q25,-82 22,-86" stroke="#e84888" stroke-width="2" fill="none" stroke-linecap="round" opacity=".7"/>
+          <!-- Eyes -->
+          <ellipse cx="-7" cy="-63" rx="5" ry="6" fill="white"/>
+          <ellipse cx="7"  cy="-63" rx="5" ry="6" fill="white"/>
+          <circle cx="-7" cy="-62" r="3.5" fill="#1a0e06"/>
+          <circle cx="7"  cy="-62" r="3.5" fill="#1a0e06"/>
+          <circle cx="-5.5" cy="-63.5" r="1.3" fill="white"/>
+          <circle cx="8.5"  cy="-63.5" r="1.3" fill="white"/>
+          <!-- Eyelashes -->
+          <line x1="-11" y1="-67" x2="-13" y2="-70" stroke="#1a0e06" stroke-width="1.2"/>
+          <line x1="-9"  y1="-69" x2="-9"  y2="-72" stroke="#1a0e06" stroke-width="1.2"/>
+          <line x1="-7"  y1="-69" x2="-6"  y2="-72" stroke="#1a0e06" stroke-width="1.2"/>
+          <!-- Eyebrows (gentle arc) -->
+          <path d="M-13,-70 Q-7,-73 -2,-70" stroke="#1a0e06" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <path d="M2,-70 Q7,-73 13,-70"   stroke="#1a0e06" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <!-- Smile -->
+          <path d="M-6,-54 Q0,-49 6,-54" stroke="#c05060" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <!-- Small dimples -->
+          <circle cx="-8" cy="-52" r="1.2" fill="rgba(200,80,100,.3)"/>
+          <circle cx="8"  cy="-52" r="1.2" fill="rgba(200,80,100,.3)"/>
+        </g>
+      </svg>
+      </div><!-- end char-girl -->
+
+    </div><!-- end tl-figure -->
   </div>
 
   <div class="tl-hint">
@@ -395,35 +523,99 @@
             <text x="658" y="255" font-size="7.5" fill="#3a6888" opacity="0.6" transform="rotate(82,658,240)" letter-spacing="1">印度河</text>
           </g>
 
-          <!-- ══ 历史城市标注 Historical city markers ══ -->
-          <g id="city-markers-fixed" font-family="STSong,'Noto Serif SC','SimSun',serif" pointer-events="none">
+          <!-- ══ 历史城市标注 Historical city markers (with label backgrounds) ══ -->
+          <g id="city-markers-fixed" font-family="STSong,'Noto Serif SC','SimSun',serif" font-size="10" font-weight="700" pointer-events="none">
 
-            <!-- 近东 / Near East -->
-            <g class="hcity"><circle cx="583" cy="244" r="3.5" fill="#c84820" stroke="#f0c060" stroke-width="0.8" opacity="0.9"/><text x="583" y="240" text-anchor="middle" font-size="7.5" fill="#3a1a08" opacity="0.85">乌鲁克</text></g>
-            <g class="hcity"><circle cx="522" cy="222" r="3"   fill="#c84820" stroke="#f0c060" stroke-width="0.8" opacity="0.85"/><text x="522" y="218" text-anchor="middle" font-size="7" fill="#3a1a08" opacity="0.8">耶利哥</text></g>
-            <g class="hcity"><circle cx="512" cy="230" r="3"   fill="#c84820" stroke="#f0c060" stroke-width="0.8" opacity="0.85"/><text x="512" y="226" text-anchor="middle" font-size="7" fill="#3a1a08" opacity="0.8">孟菲斯</text></g>
-            <g class="hcity"><circle cx="575" cy="224" r="3"   fill="#c84820" stroke="#f0c060" stroke-width="0.8" opacity="0.8"/><text x="560" y="220" text-anchor="middle" font-size="7" fill="#3a1a08" opacity="0.8">巴比伦</text></g>
-            <g class="hcity"><circle cx="508" cy="390" r="2.8" fill="#c84820" stroke="#f0c060" stroke-width="0.8" opacity="0.8"/><text x="508" y="386" text-anchor="middle" font-size="7" fill="#3a1a08" opacity="0.75">麦罗埃</text></g>
+            <!-- Helper macro: each city = dot + label background rect + text -->
+            <!-- 近东 Near East ─────────────────────────────── -->
+            <g class="hcity"><!-- 乌鲁克 Uruk -->
+              <circle cx="583" cy="244" r="5.5" fill="#c84820" stroke="#f0c060" stroke-width="1.2"/>
+              <rect x="567" y="230" width="32" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="583" y="240" text-anchor="middle" fill="#5a1a06">乌鲁克</text>
+            </g>
+            <g class="hcity"><!-- 孟菲斯 Memphis -->
+              <circle cx="512" cy="232" r="5" fill="#c84820" stroke="#f0c060" stroke-width="1"/>
+              <rect x="496" y="218" width="32" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="512" y="228" text-anchor="middle" fill="#5a1a06">孟菲斯</text>
+            </g>
+            <g class="hcity"><!-- 巴比伦 Babylon -->
+              <circle cx="573" cy="228" r="4.5" fill="#a83818" stroke="#f0c060" stroke-width="1"/>
+              <rect x="557" y="214" width="32" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="573" y="224" text-anchor="middle" fill="#5a1a06">巴比伦</text>
+            </g>
+            <g class="hcity"><!-- 耶利哥 Jericho -->
+              <circle cx="527" cy="220" r="4" fill="#a83818" stroke="#f0c060" stroke-width="1"/>
+              <rect x="511" y="206" width="32" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="527" y="216" text-anchor="middle" fill="#5a1a06">耶利哥</text>
+            </g>
 
-            <!-- 地中海 / Mediterranean -->
-            <g class="hcity"><circle cx="490" cy="178" r="3.5" fill="#8a3020" stroke="#f0c060" stroke-width="0.8" opacity="0.85"/><text x="490" y="174" text-anchor="middle" font-size="7.5" fill="#3a1a08" opacity="0.85">雅典</text></g>
-            <g class="hcity"><circle cx="473" cy="168" r="3.5" fill="#8a3020" stroke="#f0c060" stroke-width="0.8" opacity="0.85"/><text x="473" y="164" text-anchor="middle" font-size="7.5" fill="#3a1a08" opacity="0.85">罗马</text></g>
-            <g class="hcity"><circle cx="466" cy="196" r="3"   fill="#8a3020" stroke="#f0c060" stroke-width="0.8" opacity="0.8"/><text x="466" y="192" text-anchor="middle" font-size="7" fill="#3a1a08" opacity="0.8">迦太基</text></g>
-            <g class="hcity"><circle cx="508" cy="214" r="3"   fill="#8a3020" stroke="#f0c060" stroke-width="0.8" opacity="0.8"/><text x="522" y="212" text-anchor="middle" font-size="7" fill="#3a1a08" opacity="0.8">亚历山大港</text></g>
+            <!-- 地中海 Mediterranean ──────────────────────── -->
+            <g class="hcity"><!-- 雅典 Athens -->
+              <circle cx="490" cy="178" r="5" fill="#8a3020" stroke="#f0c060" stroke-width="1"/>
+              <rect x="475" y="164" width="30" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="490" y="174" text-anchor="middle" fill="#3a1206">雅典</text>
+            </g>
+            <g class="hcity"><!-- 罗马 Rome -->
+              <circle cx="470" cy="165" r="5" fill="#8a3020" stroke="#f0c060" stroke-width="1"/>
+              <rect x="455" y="151" width="30" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="470" y="161" text-anchor="middle" fill="#3a1206">罗马</text>
+            </g>
+            <g class="hcity"><!-- 迦太基 Carthage -->
+              <circle cx="463" cy="196" r="4.5" fill="#8a3020" stroke="#f0c060" stroke-width="1"/>
+              <rect x="444" y="182" width="38" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="463" y="192" text-anchor="middle" fill="#3a1206">迦太基</text>
+            </g>
+            <g class="hcity"><!-- 亚历山大 Alexandria -->
+              <circle cx="508" cy="216" r="4.5" fill="#8a3020" stroke="#f0c060" stroke-width="1"/>
+              <rect x="482" y="202" width="52" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="508" y="212" text-anchor="middle" fill="#3a1206">亚历山大港</text>
+            </g>
 
-            <!-- 中亚·丝路 / Silk Road -->
-            <g class="hcity"><circle cx="634" cy="183" r="3"   fill="#7a4830" stroke="#f0c060" stroke-width="0.8" opacity="0.8"/><text x="634" y="179" text-anchor="middle" font-size="7" fill="#3a1a08" opacity="0.8">撒马尔罕</text></g>
-            <g class="hcity"><circle cx="582" cy="226" r="3"   fill="#7a4830" stroke="#f0c060" stroke-width="0.8" opacity="0.8"/><text x="598" y="224" text-anchor="middle" font-size="7" fill="#3a1a08" opacity="0.8">巴格达</text></g>
+            <!-- 中亚·丝绸之路 Silk Road ───────────────────── -->
+            <g class="hcity"><!-- 撒马尔罕 Samarkand -->
+              <circle cx="635" cy="183" r="4.5" fill="#7a4020" stroke="#f0c060" stroke-width="1"/>
+              <rect x="614" y="169" width="42" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="635" y="179" text-anchor="middle" fill="#3a1206">撒马尔罕</text>
+            </g>
+            <g class="hcity"><!-- 巴格达 Baghdad -->
+              <circle cx="582" cy="226" r="4.5" fill="#7a4020" stroke="#f0c060" stroke-width="1"/>
+              <rect x="565" y="212" width="34" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="582" y="222" text-anchor="middle" fill="#3a1206">巴格达</text>
+            </g>
 
-            <!-- 南亚 / South Asia -->
-            <g class="hcity"><circle cx="648" cy="243" r="3.5" fill="#407830" stroke="#f0c060" stroke-width="0.8" opacity="0.85"/><text x="648" y="239" text-anchor="middle" font-size="7.5" fill="#3a1a08" opacity="0.85">哈拉帕</text></g>
-            <g class="hcity"><circle cx="683" cy="245" r="3"   fill="#407830" stroke="#f0c060" stroke-width="0.8" opacity="0.8"/><text x="698" y="243" text-anchor="middle" font-size="7" fill="#3a1a08" opacity="0.8">华氏城</text></g>
+            <!-- 南亚 South Asia ─────────────────────────────── -->
+            <g class="hcity"><!-- 哈拉帕 Harappa -->
+              <circle cx="648" cy="244" r="5" fill="#386818" stroke="#f0c060" stroke-width="1"/>
+              <rect x="630" y="230" width="36" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="648" y="240" text-anchor="middle" fill="#1a3a06">哈拉帕</text>
+            </g>
+            <g class="hcity"><!-- 华氏城 Pataliputra -->
+              <circle cx="686" cy="248" r="4" fill="#386818" stroke="#f0c060" stroke-width="1"/>
+              <rect x="667" y="234" width="38" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="686" y="244" text-anchor="middle" fill="#1a3a06">华氏城</text>
+            </g>
 
-            <!-- 东亚·中国 / East Asia China -->
-            <g class="hcity"><circle cx="793" cy="201" r="3.5" fill="#8a3020" stroke="#f0c060" stroke-width="0.8" opacity="0.85"/><text x="793" y="197" text-anchor="middle" font-size="7.5" fill="#3a1a08" opacity="0.85">安阳</text></g>
-            <g class="hcity"><circle cx="778" cy="196" r="3.5" fill="#8a3020" stroke="#f0c060" stroke-width="0.8" opacity="0.85"/><text x="764" y="194" text-anchor="middle" font-size="7.5" fill="#3a1a08" opacity="0.85">长安</text></g>
-            <g class="hcity"><circle cx="813" cy="220" r="3"   fill="#8a3020" stroke="#f0c060" stroke-width="0.8" opacity="0.8"/><text x="813" y="216" text-anchor="middle" font-size="7" fill="#3a1a08" opacity="0.8">杭州</text></g>
-            <g class="hcity"><circle cx="788" cy="205" r="3"   fill="#8a3020" stroke="#f0c060" stroke-width="0.8" opacity="0.8"/><text x="803" y="208" text-anchor="middle" font-size="7" fill="#3a1a08" opacity="0.8">洛阳</text></g>
+            <!-- 东亚·中国 East Asia / China ────────────────── -->
+            <g class="hcity"><!-- 安阳 Anyang -->
+              <circle cx="793" cy="202" r="5" fill="#8a3020" stroke="#f0c060" stroke-width="1"/>
+              <rect x="777" y="188" width="32" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="793" y="198" text-anchor="middle" fill="#3a1206">安阳</text>
+            </g>
+            <g class="hcity"><!-- 长安 Chang'an -->
+              <circle cx="776" cy="196" r="5" fill="#8a3020" stroke="#f0c060" stroke-width="1"/>
+              <rect x="760" y="182" width="32" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="776" y="192" text-anchor="middle" fill="#3a1206">长安</text>
+            </g>
+            <g class="hcity"><!-- 洛阳 Luoyang -->
+              <circle cx="790" cy="208" r="4" fill="#7a2818" stroke="#f0c060" stroke-width="1"/>
+              <rect x="774" y="210" width="32" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="790" y="220" text-anchor="middle" fill="#3a1206">洛阳</text>
+            </g>
+            <g class="hcity"><!-- 杭州 Hangzhou -->
+              <circle cx="814" cy="220" r="4" fill="#7a2818" stroke="#f0c060" stroke-width="1"/>
+              <rect x="798" y="206" width="32" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="814" y="216" text-anchor="middle" fill="#3a1206">杭州</text>
+            </g>
           </g>
 
           <!-- ══ 动态文明标记（JS控制） Dynamic civ markers ══ -->
@@ -672,8 +864,8 @@
   </div>
 </div>
 
-<script src="./data.js?v=13"></script>
-<script src="./prehistoric.js?v=13"></script>
-<script src="./app.js?v=13"></script>
+<script src="./data.js?v=14"></script>
+<script src="./prehistoric.js?v=14"></script>
+<script src="./app.js?v=14"></script>
 </body>
 </html>

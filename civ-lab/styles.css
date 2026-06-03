@@ -1425,3 +1425,114 @@ html, body {
 .event-title { font-size: 11.5px !important; line-height: 1.4 !important; color: var(--ink) !important; }
 .event-year { font-size: 10px !important; color: var(--amber) !important; }
 .event-brief { font-size: 11px !important; color: var(--ink2) !important; }
+
+/* ══ 角色性别选择 Character Gender Selector ══ */
+.char-select-row {
+  display: flex; align-items: center; gap: 12px;
+  margin-top: 12px; justify-content: center; flex-wrap: wrap;
+}
+.char-select-label {
+  font-size: 12px; color: var(--ink3); letter-spacing: .05em;
+}
+.char-select-btns { display: flex; gap: 8px; }
+.char-sel-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 20px; border-radius: 24px; cursor: pointer;
+  font-size: 13px; font-family: var(--serif); font-weight: 600;
+  border: 2px solid rgba(160,100,30,.3);
+  background: rgba(200,160,60,.08);
+  color: var(--ink2); transition: all .22s;
+  letter-spacing: .04em;
+}
+.char-sel-btn:hover {
+  border-color: var(--amber);
+  background: rgba(200,104,32,.14);
+  color: var(--warm);
+  transform: translateY(-2px);
+}
+.char-sel-btn.active {
+  background: linear-gradient(135deg, var(--warm), var(--amber)) !important;
+  border-color: transparent !important;
+  color: #fff5e8 !important;
+  box-shadow: 0 3px 12px rgba(184,48,24,.3);
+}
+.char-sel-icon { font-size: 18px; line-height: 1; }
+
+/* ══ 人类起源演化时间轴 Evolution Timeline ══ */
+.evo-timeline-wrap {
+  margin-top: 24px; padding: 20px 0 0;
+  border-top: 2px solid rgba(160,100,30,.2);
+}
+.evo-timeline-title {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 10px;
+}
+.evo-icon { font-size: 22px; }
+.evo-timeline-title strong {
+  font-family: var(--serif); font-size: 16px; color: var(--warm);
+}
+.evo-teacher-note {
+  font-size: 12px; color: var(--ink2); line-height: 1.8;
+  padding: 10px 14px; background: rgba(200,160,60,.08);
+  border-left: 3px solid var(--amber); border-radius: 0 4px 4px 0;
+  margin-bottom: 16px;
+}
+.evo-events {
+  position: relative; padding-left: 28px;
+}
+/* Vertical line */
+.evo-events::before {
+  content: ''; position: absolute; left: 7px; top: 8px; bottom: 8px;
+  width: 2px; background: linear-gradient(180deg, var(--amber), rgba(160,100,30,.2));
+  border-radius: 1px;
+}
+.evo-event {
+  position: relative; margin-bottom: 18px; display: flex; gap: 0;
+}
+.evo-event-dot {
+  position: absolute; left: -24px; top: 4px;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--dot-locked); border: 2px solid rgba(160,100,30,.4);
+  flex-shrink: 0;
+}
+.evo-event.confirmed .evo-event-dot {
+  background: radial-gradient(circle at 40% 35%, #e8d060, var(--warm));
+  border-color: var(--amber);
+  box-shadow: 0 0 6px rgba(200,104,32,.4);
+}
+.evo-event.cautious .evo-event-dot {
+  background: rgba(160,100,30,.4);
+  border-color: rgba(160,100,30,.5);
+  border-style: dashed;
+}
+.evo-event-body { flex: 1; }
+.evo-event-time {
+  font-size: 10px; font-weight: 700; color: var(--amber);
+  letter-spacing: .04em; margin-bottom: 2px;
+}
+.evo-event-title-row {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+  margin-bottom: 4px;
+}
+.evo-event-title-row strong {
+  font-family: var(--serif); font-size: 13px; color: var(--ink);
+}
+.evo-event-body-text {
+  font-size: 12px; color: var(--ink2); line-height: 1.7; margin-bottom: 4px;
+}
+.evo-misconception {
+  font-size: 11px; color: var(--warm); background: rgba(180,48,24,.07);
+  padding: 4px 10px; border-radius: 4px; margin-top: 4px;
+}
+.evo-misconceptions-box {
+  margin-top: 16px; padding: 12px 14px;
+  background: rgba(180,48,24,.05); border: 1px solid rgba(180,48,24,.2);
+  border-radius: 6px;
+}
+.evo-misconceptions-box strong {
+  display: block; font-size: 12px; color: var(--warm); margin-bottom: 8px;
+}
+.evo-misconceptions-box ul { padding-left: 16px; }
+.evo-misconceptions-box li {
+  font-size: 12px; color: var(--ink2); margin-bottom: 4px; line-height: 1.5;
+}

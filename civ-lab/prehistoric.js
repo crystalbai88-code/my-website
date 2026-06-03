@@ -39,7 +39,82 @@ const PREHISTORIC = {
         context: '如果把人类存在的时间压缩成一天，公元前3000年的第一座城市出现在晚上11点56分——而我们现在所在的时刻，是早上刚刚天亮。',
         before: '在此之前，地球上没有现代人类，只有其他古人类物种和数百万年的动物演化史。',
         after: '此后27万年里，人类学会了迁徙、艺术、农业、村落，最终走向城市和文明。',
-        scale_note: '从这一刻到公元前3000年的第一座城市，中间隔了约27万年。文明只是这段旅程最后2%的故事。'
+        scale_note: '从这一刻到公元前3000年的第一座城市，中间隔了约27万年。文明只是这段旅程最后2%的故事。',
+        teacher_note: '人类不是从今天的猴子直接变来的，而是和其他灵长类有共同祖先。演化像一棵树，不是一条直线——文明的第一步是会合作、会学习、会制造工具、会适应环境的人类出现了。',
+        // 人类起源完整时间轴（7个关键节点）
+        evolution_timeline: [
+          {
+            time: '约700万–600万年前',
+            title: '共同祖先分支',
+            body: '人类祖先和黑猩猩祖先像生命树上的两个枝条，逐渐走向不同方向。它们有一个共同的古老祖先，但后来分开演化。',
+            confidence: 'cautious',
+            wiki_zh: '人类与黑猩猩的共同祖先',
+            wiki_en: 'Chimpanzee%E2%80%93human_last_common_ancestor',
+            misconception: '⚠ 人类不是从今天的黑猩猩变来的——我们只是有共同祖先。'
+          },
+          {
+            time: '约600万年前',
+            title: '早期双足行走特征可能出现',
+            body: '一些早期古人类可能已经开始更多用两条腿移动。直立行走解放了双手，让人类祖先可以拿工具、搬东西、照顾孩子。',
+            confidence: 'cautious',
+            wiki_zh: '双足步行',
+            wiki_en: 'Bipedalism',
+            misconception: null
+          },
+          {
+            time: '约440万年前',
+            title: 'Ardipithecus（阿尔迪古猿）',
+            body: '像是生活在树上和地面之间的过渡阶段，提醒我们演化不是一下子完成的，而是漫长渐进的过程。',
+            confidence: 'cautious',
+            wiki_zh: '地猿属',
+            wiki_en: 'Ardipithecus',
+            misconception: null
+          },
+          {
+            time: '约390万–290万年前',
+            title: 'Lucy · Australopithecus afarensis（南方古猿）',
+            body: 'Lucy 告诉我们一个关键事实：人类祖先在大脑明显变大之前，已经能够双足行走。站起来这件事本身，就改变了人类未来的道路。',
+            confidence: 'confirmed',
+            wiki_zh: '阿法南方古猿',
+            wiki_en: 'Australopithecus_afarensis',
+            misconception: '⚠ Lucy 不是现代人，也不是现代黑猩猩——她是人类进化路上一个独特的物种。'
+          },
+          {
+            time: '约280万年前',
+            title: '早期 Homo 属出现',
+            body: '人类祖先越来越依靠工具、学习和解决问题的能力。开始系统制作石器工具。',
+            confidence: 'cautious',
+            wiki_zh: '人属',
+            wiki_en: 'Homo',
+            misconception: null
+          },
+          {
+            time: '约190万年前',
+            title: 'Homo erectus（直立人）',
+            body: '这类古人类身体更适合长距离行走，开始走向更广阔的世界——走出非洲，到达亚洲。他们已经能控制火，并制作更精细的石器。',
+            confidence: 'confirmed',
+            wiki_zh: '直立人',
+            wiki_en: 'Homo_erectus',
+            misconception: null
+          },
+          {
+            time: '约30万年前',
+            title: 'Homo sapiens（现代人类）出现',
+            body: '我们这个物种在非洲出现。但30万年前的现代人没有城市、农业、文字或国家——他们仍然依靠自然、工具、火和群体合作生活。文明的第一步，是这种人的出现本身。',
+            confidence: 'confirmed',
+            wiki_zh: '智人',
+            wiki_en: 'Homo_sapiens',
+            misconception: '⚠ 现代人类出现 ≠ 现代生活。从出现到第一座城市，还需要约27万年。'
+          },
+        ],
+        // 常见误解
+        misconceptions: [
+          '人类是从今天的猴子直接变来的',
+          '演化是一条越来越高级的直线',
+          'Lucy 是现代人',
+          '现代人类一出现就有现代生活',
+          '直立行走和大脑变大同时发生',
+        ],
       },
 
       // ── Layer 2 · 世界地图 ──

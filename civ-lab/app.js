@@ -92,6 +92,7 @@ function init() {
   loadSettings();
   createStars();
   renderHomeTimeline();
+  loadCharacterPref();
   bindLessonTopbar();
   bindLessonTabBar();
   bindSearch();
@@ -1054,6 +1055,24 @@ window.addEventListener('resize', () => positionFigure());
 let activePreEraId = null;
 let preAiHistory = {}; // era id → chat messages array
 
+// ── 角色性别选择 Character Gender Selection ──────────
+function selectChar(gender) {
+  state.characterGender = gender || 'boy';
+  localStorage.setItem('civ_character', state.characterGender);
+  const boy  = document.getElementById('char-boy');
+  const girl = document.getElementById('char-girl');
+  if (boy)  boy.style.display  = state.characterGender === 'girl' ? 'none' : 'block';
+  if (girl) girl.style.display = state.characterGender === 'girl' ? 'block' : 'none';
+  document.querySelectorAll('.char-sel-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.g === state.characterGender);
+  });
+}
+
+function loadCharacterPref() {
+  const saved = localStorage.getItem('civ_character') || 'boy';
+  selectChar(saved);
+}
+
 function scrollToPreLayer(id) {
   const body = document.getElementById('preEraBody');
   const target = document.getElementById(id);
@@ -1173,6 +1192,38 @@ function renderPreLayer1(p) {
     const w = ep.id === p.id ? 14 : 7;
     return `<div class="ptl-seg ${ep.id === p.id ? 'active' : ''}" style="flex:${w};background:${PREHISTORIC.periods.find(x=>x.id===ep.id).color}${ep.id===p.id?'':'66'}" title="${ep.title}">${ep.id === p.id ? ep.icon : ''}</div>`;
   }).join('');
+
+  // Evolution timeline (only for PH01 which has the extra data)
+  const evoSection = tl.evolution_timeline ? `
+    <div class="evo-timeline-wrap">
+      <div class="evo-timeline-title">
+        <span class="evo-icon">🌳</span>
+        <strong>人类起源完整时间轴</strong>
+        <span class="pl-sub" style="font-size:11px;margin-left:8px">从700万年前到现代人类出现</span>
+      </div>
+      ${tl.teacher_note ? `<div class="evo-teacher-note">📝 ${tl.teacher_note}</div>` : ''}
+      <div class="evo-events">
+        ${tl.evolution_timeline.map((ev, i) => `
+          <div class="evo-event ${ev.confidence === 'confirmed' ? 'confirmed' : 'cautious'}">
+            <div class="evo-event-dot"></div>
+            <div class="evo-event-body">
+              <div class="evo-event-time">${ev.time}</div>
+              <div class="evo-event-title-row">
+                <strong>${ev.title}</strong>
+                ${wikiBtn(ev.title, ev.wiki_en)}
+              </div>
+              <p class="evo-event-body-text">${ev.body}</p>
+              ${ev.misconception ? `<div class="evo-misconception">${ev.misconception}</div>` : ''}
+            </div>
+          </div>`).join('')}
+      </div>
+      ${tl.misconceptions ? `
+        <div class="evo-misconceptions-box">
+          <strong>🚫 常见误解（不能这样说）</strong>
+          <ul>${tl.misconceptions.map(m=>`<li>${m}</li>`).join('')}</ul>
+        </div>` : ''}
+    </div>` : '';
+
   return `<section class="pre-layer" id="pre-timeline">
     <div class="pl-header"><span class="pl-icon">⏳</span><div><h3>时间定位</h3><p class="pl-sub">30万年全程 · 当前时代的位置</p></div></div>
     <div class="ptl-bar">${bars}</div>
@@ -1183,6 +1234,7 @@ function renderPreLayer1(p) {
       <div class="ptlc after"><p class="pl-sub">之后</p><p>${tl.after}</p></div>
     </div>
     <div class="ptl-scale">⏱ ${tl.scale_note}</div>
+    ${evoSection}
   </section>`;
 }
 
