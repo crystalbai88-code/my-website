@@ -1329,3 +1329,99 @@ html, body {
 /* Event modal title */
 .event-modal-title-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 #evModalTitle { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* ══ 历史城市标注样式 ══ */
+.hcity text { font-size: 7.5px; font-family: 'STSong','Noto Serif SC','SimSun',serif; }
+.hcity circle { filter: drop-shadow(0 0 2px rgba(200,80,20,.5)); }
+#geo-labels text { pointer-events: none; user-select: none; }
+
+/* ══ 排版修复 · Typography Fixes ══ */
+/* Home timeline — prevent label overlap */
+.tl-label-time {
+  font-size: 10px !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80px;
+}
+.tl-label-title {
+  font-size: 10px !important;
+  line-height: 1.4 !important;
+  max-width: 82px !important;
+  word-break: break-all;
+  hyphens: auto;
+}
+/* Person chips in panel — wrap gracefully */
+.person-chip {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+/* Summary civs wrap */
+.summary-civ-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 3px;
+}
+/* Search result title row */
+.result-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 4px 0;
+}
+.result-title-row strong { color: var(--ink) !important; }
+/* Panel civ name with wiki btn */
+#panelCivName {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+  font-family: var(--serif) !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  color: var(--warm) !important;
+  padding: 0 18px 8px !important;
+}
+/* Event modal title */
+#evModalTitle {
+  font-family: var(--serif) !important;
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  color: var(--warm) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+  margin-bottom: 8px !important;
+}
+/* Layer pills overflow fix */
+.pre-layer-pills { max-width: calc(100vw - 460px); overflow-x: auto; }
+
+/* ══ 地图增强 — 让地图区域有足够高度 ══ */
+.map-area { background: #a8c8e0 !important; min-height: 400px; }
+#world-svg { image-rendering: crisp-edges; }
+
+/* 地图右侧面板文字修复 */
+.panel-civ-desc {
+  font-size: 12px !important;
+  line-height: 1.75 !important;
+  color: var(--ink2) !important;
+  padding: 0 18px 10px !important;
+}
+.panel-civ-era {
+  font-size: 10px !important;
+  color: var(--amber) !important;
+  font-weight: 700 !important;
+  letter-spacing: .08em !important;
+  padding: 14px 18px 4px !important;
+}
+/* Events in panel */
+.event-title { font-size: 11.5px !important; line-height: 1.4 !important; color: var(--ink) !important; }
+.event-year { font-size: 10px !important; color: var(--amber) !important; }
+.event-brief { font-size: 11px !important; color: var(--ink2) !important; }

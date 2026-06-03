@@ -359,7 +359,11 @@ function selectCiv(civId) {
   $('#panelCivDesc').textContent = civ.desc;
 
   $('#panelPeople').innerHTML = (civ.people || []).map((p) =>
-    `<div class="person-chip"><span class="person-icon">${p.icon}</span><span><strong>${p.label}</strong> · ${p.note}</span></div>`
+    `<div class="person-chip">
+       <span class="person-icon">${p.icon}</span>
+       <span><strong>${p.label}</strong> · ${p.note}</span>
+       ${wikiBtn(p.label)}
+     </div>`
   ).join('');
 
   const learned = state.learned[mapEntry.id]?.[civ.id] || [];
@@ -457,7 +461,9 @@ function showSummary() {
     </div>`
   ).join('');
   $('#sumCivs').innerHTML = mapEntry.civs.map((c) =>
-    `<div class="summary-civ-tag" style="border-color:${c.color}60;color:${c.color}">${c.name}</div>`
+    `<div class="summary-civ-tag" style="border-color:${c.color}60;color:${c.color}">
+      ${c.name} ${wikiBtn(c.name, c.wiki_en)}
+    </div>`
   ).join('');
 
   showScreen('s-summary');
@@ -550,8 +556,14 @@ function runSearch(query) {
   $('#searchResults').innerHTML = unique.length
     ? unique.map((r) => `
         <div class="result-item">
-          <div class="result-meta"><span class="result-type">${r.type}</span>${r.lesson ? `<span class="result-lesson">${lessonLabel[r.lesson] || r.lesson}</span>` : ''}</div>
-          <strong>${r.title}</strong>
+          <div class="result-meta">
+            <span class="result-type">${r.type}</span>
+            ${r.lesson ? `<span class="result-lesson">${lessonLabel[r.lesson] || r.lesson}</span>` : ''}
+          </div>
+          <div class="result-title-row">
+            <strong>${r.title}</strong>
+            ${wikiBtn(r.title)}
+          </div>
           <p>${r.text}</p>
         </div>`).join('')
     : `<p class="empty-state">知识库里暂时没有找到"${query}"。试试：尼罗河、苏美尔、甲骨文、青铜、崩溃。</p>`;

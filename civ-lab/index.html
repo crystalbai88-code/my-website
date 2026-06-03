@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI世界文明实验室</title>
-  <link rel="stylesheet" href="./styles.css?v=12" />
+  <link rel="stylesheet" href="./styles.css?v=13" />
 </head>
 <body>
 
@@ -369,6 +369,64 @@
             <path d="M 525,72 C 580,55 660,50 745,58 L 840,70 900,95 920,130 905,160 880,175 850,180 820,195 790,215 765,240 740,265 715,285 690,295 665,290 645,275 620,260 598,245 575,225 558,200 548,175 535,145 525,110 Z"/>
           </g>
 
+          <!-- ══ 海洋·地名标注 Ocean & geo labels ══ -->
+          <g id="geo-labels" font-family="STSong,'Noto Serif SC','SimSun','Times New Roman',serif" pointer-events="none">
+
+            <!-- 大洋名称 Ocean names (italic, spacious) -->
+            <text x="285" y="310" font-size="13" fill="#4a7aaa" opacity="0.55" font-style="italic" letter-spacing="3" text-anchor="middle">大 西 洋</text>
+            <text x="650" y="395" font-size="13" fill="#4a7aaa" opacity="0.55" font-style="italic" letter-spacing="3" text-anchor="middle">印 度 洋</text>
+            <text x="880" y="310" font-size="12" fill="#4a7aaa" opacity="0.5" font-style="italic" letter-spacing="3" text-anchor="middle">太 平 洋</text>
+            <text x="462" y="157" font-size="10" fill="#3a6aaa" opacity="0.55" font-style="italic" letter-spacing="2" text-anchor="middle">地 中 海</text>
+            <text x="538" y="182" font-size="9"  fill="#4a7aaa" opacity="0.45" font-style="italic" text-anchor="middle">红海</text>
+            <text x="790" y="320" font-size="9"  fill="#4a7aaa" opacity="0.45" font-style="italic" text-anchor="middle">南海</text>
+
+            <!-- 山脉标注 Mountain ranges -->
+            <text x="672" y="214" font-size="8.5" fill="#7a5530" opacity="0.7" transform="rotate(-6,672,214)" letter-spacing="1">喜马拉雅山</text>
+            <text x="462" y="144" font-size="8"   fill="#7a5530" opacity="0.65" transform="rotate(-3,462,144)" letter-spacing="1">阿尔卑斯山</text>
+            <text x="116" y="98"  font-size="7.5" fill="#7a5530" opacity="0.55" transform="rotate(12,116,98)"  letter-spacing="1">落基山</text>
+            <text x="206" y="392" font-size="7.5" fill="#7a5530" opacity="0.55" transform="rotate(14,206,392)" letter-spacing="1">安第斯山</text>
+            <text x="598" y="182" font-size="7.5" fill="#7a5530" opacity="0.55" letter-spacing="1">扎格罗斯山</text>
+
+            <!-- 河流标注 River labels -->
+            <text x="508" y="298" font-size="8" fill="#3a6888" opacity="0.65" transform="rotate(84,508,260)" letter-spacing="1">尼 罗 河</text>
+            <text x="565" y="198" font-size="7.5" fill="#3a6888" opacity="0.6" transform="rotate(-10,565,198)" letter-spacing="1">幼发拉底河</text>
+            <text x="820" y="218" font-size="7.5" fill="#3a6888" opacity="0.6" transform="rotate(-4,820,218)" letter-spacing="1">长江</text>
+            <text x="800" y="192" font-size="7.5" fill="#3a6888" opacity="0.6" transform="rotate(-8,800,192)" letter-spacing="1">黄河</text>
+            <text x="658" y="255" font-size="7.5" fill="#3a6888" opacity="0.6" transform="rotate(82,658,240)" letter-spacing="1">印度河</text>
+          </g>
+
+          <!-- ══ 历史城市标注 Historical city markers ══ -->
+          <g id="city-markers-fixed" font-family="STSong,'Noto Serif SC','SimSun',serif" pointer-events="none">
+
+            <!-- 近东 / Near East -->
+            <g class="hcity"><circle cx="583" cy="244" r="3.5" fill="#c84820" stroke="#f0c060" stroke-width="0.8" opacity="0.9"/><text x="583" y="240" text-anchor="middle" font-size="7.5" fill="#3a1a08" opacity="0.85">乌鲁克</text></g>
+            <g class="hcity"><circle cx="522" cy="222" r="3"   fill="#c84820" stroke="#f0c060" stroke-width="0.8" opacity="0.85"/><text x="522" y="218" text-anchor="middle" font-size="7" fill="#3a1a08" opacity="0.8">耶利哥</text></g>
+            <g class="hcity"><circle cx="512" cy="230" r="3"   fill="#c84820" stroke="#f0c060" stroke-width="0.8" opacity="0.85"/><text x="512" y="226" text-anchor="middle" font-size="7" fill="#3a1a08" opacity="0.8">孟菲斯</text></g>
+            <g class="hcity"><circle cx="575" cy="224" r="3"   fill="#c84820" stroke="#f0c060" stroke-width="0.8" opacity="0.8"/><text x="560" y="220" text-anchor="middle" font-size="7" fill="#3a1a08" opacity="0.8">巴比伦</text></g>
+            <g class="hcity"><circle cx="508" cy="390" r="2.8" fill="#c84820" stroke="#f0c060" stroke-width="0.8" opacity="0.8"/><text x="508" y="386" text-anchor="middle" font-size="7" fill="#3a1a08" opacity="0.75">麦罗埃</text></g>
+
+            <!-- 地中海 / Mediterranean -->
+            <g class="hcity"><circle cx="490" cy="178" r="3.5" fill="#8a3020" stroke="#f0c060" stroke-width="0.8" opacity="0.85"/><text x="490" y="174" text-anchor="middle" font-size="7.5" fill="#3a1a08" opacity="0.85">雅典</text></g>
+            <g class="hcity"><circle cx="473" cy="168" r="3.5" fill="#8a3020" stroke="#f0c060" stroke-width="0.8" opacity="0.85"/><text x="473" y="164" text-anchor="middle" font-size="7.5" fill="#3a1a08" opacity="0.85">罗马</text></g>
+            <g class="hcity"><circle cx="466" cy="196" r="3"   fill="#8a3020" stroke="#f0c060" stroke-width="0.8" opacity="0.8"/><text x="466" y="192" text-anchor="middle" font-size="7" fill="#3a1a08" opacity="0.8">迦太基</text></g>
+            <g class="hcity"><circle cx="508" cy="214" r="3"   fill="#8a3020" stroke="#f0c060" stroke-width="0.8" opacity="0.8"/><text x="522" y="212" text-anchor="middle" font-size="7" fill="#3a1a08" opacity="0.8">亚历山大港</text></g>
+
+            <!-- 中亚·丝路 / Silk Road -->
+            <g class="hcity"><circle cx="634" cy="183" r="3"   fill="#7a4830" stroke="#f0c060" stroke-width="0.8" opacity="0.8"/><text x="634" y="179" text-anchor="middle" font-size="7" fill="#3a1a08" opacity="0.8">撒马尔罕</text></g>
+            <g class="hcity"><circle cx="582" cy="226" r="3"   fill="#7a4830" stroke="#f0c060" stroke-width="0.8" opacity="0.8"/><text x="598" y="224" text-anchor="middle" font-size="7" fill="#3a1a08" opacity="0.8">巴格达</text></g>
+
+            <!-- 南亚 / South Asia -->
+            <g class="hcity"><circle cx="648" cy="243" r="3.5" fill="#407830" stroke="#f0c060" stroke-width="0.8" opacity="0.85"/><text x="648" y="239" text-anchor="middle" font-size="7.5" fill="#3a1a08" opacity="0.85">哈拉帕</text></g>
+            <g class="hcity"><circle cx="683" cy="245" r="3"   fill="#407830" stroke="#f0c060" stroke-width="0.8" opacity="0.8"/><text x="698" y="243" text-anchor="middle" font-size="7" fill="#3a1a08" opacity="0.8">华氏城</text></g>
+
+            <!-- 东亚·中国 / East Asia China -->
+            <g class="hcity"><circle cx="793" cy="201" r="3.5" fill="#8a3020" stroke="#f0c060" stroke-width="0.8" opacity="0.85"/><text x="793" y="197" text-anchor="middle" font-size="7.5" fill="#3a1a08" opacity="0.85">安阳</text></g>
+            <g class="hcity"><circle cx="778" cy="196" r="3.5" fill="#8a3020" stroke="#f0c060" stroke-width="0.8" opacity="0.85"/><text x="764" y="194" text-anchor="middle" font-size="7.5" fill="#3a1a08" opacity="0.85">长安</text></g>
+            <g class="hcity"><circle cx="813" cy="220" r="3"   fill="#8a3020" stroke="#f0c060" stroke-width="0.8" opacity="0.8"/><text x="813" y="216" text-anchor="middle" font-size="7" fill="#3a1a08" opacity="0.8">杭州</text></g>
+            <g class="hcity"><circle cx="788" cy="205" r="3"   fill="#8a3020" stroke="#f0c060" stroke-width="0.8" opacity="0.8"/><text x="803" y="208" text-anchor="middle" font-size="7" fill="#3a1a08" opacity="0.8">洛阳</text></g>
+          </g>
+
+          <!-- ══ 动态文明标记（JS控制） Dynamic civ markers ══ -->
           <g id="civ-markers"></g>
         </svg>
       </div>
@@ -614,8 +672,8 @@
   </div>
 </div>
 
-<script src="./data.js?v=12"></script>
-<script src="./prehistoric.js?v=12"></script>
-<script src="./app.js?v=12"></script>
+<script src="./data.js?v=13"></script>
+<script src="./prehistoric.js?v=13"></script>
+<script src="./app.js?v=13"></script>
 </body>
 </html>
