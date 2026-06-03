@@ -250,7 +250,7 @@ function renderCivMarkers(mapEntry) {
     text.setAttribute('text-anchor', 'middle');
     text.setAttribute('x', '0');
     text.setAttribute('y', civ.radius + 16);
-    text.setAttribute('fill', '#f0e6d0');
+    text.setAttribute('fill', '#2c1a08');
     text.setAttribute('font-size', '12');
     text.setAttribute('font-family', 'PingFang SC,sans-serif');
     text.textContent = civ.name;
@@ -267,6 +267,24 @@ function renderCivMarkers(mapEntry) {
 
     g.appendChild(group);
   });
+}
+
+// Update a single civ marker's ✓ badge without re-rendering all markers
+function updateCivBadge(mapEntry, civId) {
+  const civ = mapEntry.civs.find(c => c.id === civId);
+  if (!civ) return;
+  const group = document.querySelector(`.civ-marker[data-id="${civId}"]`);
+  if (!group) return;
+  const civLearned = state.learned[mapEntry.id]?.[civ.id] || [];
+  const hasBadge = group.querySelector('.civ-check-badge');
+  if (civLearned.length >= civ.events.length && !hasBadge) {
+    const badge = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    badge.classList.add('civ-check-badge');
+    badge.setAttribute('x', civ.radius); badge.setAttribute('y', -civ.radius);
+    badge.setAttribute('font-size', '14'); badge.setAttribute('fill', '#4ed080');
+    badge.textContent = '✓';
+    group.appendChild(badge);
+  }
 }
 
 function selectCiv(civId) {
@@ -362,7 +380,8 @@ function markEventLearned() {
   }
   closeEvent();
   selectCiv(civ.id);
-  renderCivMarkers(mapEntry);
+  // Update only this civ's checkmark badge — no full re-render to avoid flash
+  updateCivBadge(mapEntry, civ.id);
   checkCompleteButton();
   logHistory('map_click', `学习了事件：${ev.title}`);
 }

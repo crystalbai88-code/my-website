@@ -821,18 +821,18 @@ const KNOWLEDGE_BASE = [
 
 // ── 地图数据（v2风格：文明标记 + 事件卡 + 知识卡）────────────────
 const ERA_COLORS = {
-  L01: { land:'#8b6914', water:'#1a3a5a', sky:'#0e0a06', accent:'#c8843a' },
-  L02: { land:'#9a7520', water:'#1a3d5e', sky:'#100c08', accent:'#d4a035' },
-  L03: { land:'#7a6025', water:'#183860', sky:'#0e0c0a', accent:'#b87830' },
-  L04: { land:'#6a5520', water:'#152e48', sky:'#0a0806', accent:'#906020' },
-  L05: { land:'#607530', water:'#1a4060', sky:'#080c10', accent:'#3a7aaa' },
-  L06: { land:'#5a6835', water:'#1a3e62', sky:'#080810', accent:'#c03020' },
-  L07: { land:'#556040', water:'#1e4268', sky:'#060810', accent:'#d4a035' },
-  L08: { land:'#4a5838', water:'#1a3860', sky:'#06080c', accent:'#806080' },
-  L09: { land:'#485c38', water:'#1e3e60', sky:'#060808', accent:'#207840' },
-  L10: { land:'#506040', water:'#1e4268', sky:'#04060c', accent:'#d4a035' },
-  L11: { land:'#484e3a', water:'#1a3860', sky:'#04060c', accent:'#6040a0' },
-  L12: { land:'#4a5840', water:'#1a4268', sky:'#020408', accent:'#f0c060' },
+  L01: { land:'#8b6914', water:'#9ab8d0', sky:'#f2e4c4', accent:'#c8843a' },
+  L02: { land:'#9a7520', water:'#9ab8d0', sky:'#f2e4c4', accent:'#d4a035' },
+  L03: { land:'#7a6025', water:'#9ab8d0', sky:'#f2e4c4', accent:'#b87830' },
+  L04: { land:'#6a5520', water:'#9ab8d0', sky:'#f2e4c4', accent:'#906020' },
+  L05: { land:'#607530', water:'#9ab8d0', sky:'#f2e4c4', accent:'#3a7aaa' },
+  L06: { land:'#5a6835', water:'#9ab8d0', sky:'#f2e4c4', accent:'#c03020' },
+  L07: { land:'#556040', water:'#9ab8d0', sky:'#f2e4c4', accent:'#d4a035' },
+  L08: { land:'#4a5838', water:'#9ab8d0', sky:'#f2e4c4', accent:'#806080' },
+  L09: { land:'#485c38', water:'#9ab8d0', sky:'#f2e4c4', accent:'#207840' },
+  L10: { land:'#506040', water:'#9ab8d0', sky:'#f2e4c4', accent:'#d4a035' },
+  L11: { land:'#484e3a', water:'#9ab8d0', sky:'#f2e4c4', accent:'#6040a0' },
+  L12: { land:'#4a5840', water:'#9ab8d0', sky:'#f2e4c4', accent:'#f0c060' },
 };
 
 const MAP_DATA = [
