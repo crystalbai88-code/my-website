@@ -1516,17 +1516,17 @@ function renderGraphSvg(p, kn) {
   // 节点 — 字号更大、半径更大
   const nodes = allNodes.map(n => {
     if (n.isHub) {
-      // 树形布局：hub 作为顶部装饰，扁矩形
+      // 树形布局：hub 作为顶部装饰，胶囊形（字号放大）
       if (isTree) {
         return `<g class="kg-node hub" data-nid="${n.id}" style="cursor:pointer">
-          <rect x="${n.x-130}" y="${n.y-32}" width="260" height="60" rx="30"
-                fill="url(#kg-hub-grad)" stroke="${n.color}" stroke-width="3"
-                filter="drop-shadow(0 4px 12px rgba(184,48,24,.3))"/>
-          <text x="${n.x-95}" y="${n.y+6}" text-anchor="middle" font-size="28" pointer-events="none">${n.icon}</text>
-          <text x="${n.x+18}" y="${n.y-2}" text-anchor="middle" font-size="18" font-weight="800"
+          <rect x="${n.x-160}" y="${n.y-38}" width="320" height="76" rx="38"
+                fill="url(#kg-hub-grad)" stroke="${n.color}" stroke-width="3.5"
+                filter="drop-shadow(0 5px 14px rgba(184,48,24,.32))"/>
+          <text x="${n.x-110}" y="${n.y+10}" text-anchor="middle" font-size="36" pointer-events="none">${n.icon}</text>
+          <text x="${n.x+25}" y="${n.y-2}" text-anchor="middle" font-size="22" font-weight="800"
                 fill="${n.color}" font-family="STSong,serif" pointer-events="none">${n.label}</text>
-          <text x="${n.x+18}" y="${n.y+18}" text-anchor="middle" font-size="12"
-                fill="#7a4830" opacity=".75" pointer-events="none">${n.sub}</text>
+          <text x="${n.x+25}" y="${n.y+22}" text-anchor="middle" font-size="15"
+                fill="#7a4830" opacity=".8" pointer-events="none">${n.sub}</text>
         </g>`;
       }
       // 圆形布局：原 hub 圆
@@ -1541,21 +1541,21 @@ function renderGraphSvg(p, kn) {
               fill="#7a4830" opacity=".75" pointer-events="none">${n.sub}</text>
       </g>`;
     }
-    // 普通节点（feature vs concept）— 字号大幅放大
+    // 普通节点 — 节点圆更大、字号更大
     const isFeature = n.special != null;
-    const r = isFeature ? 50 : 56;
+    const r = isFeature ? 60 : 66;
     const cls = isFeature ? 'kg-node feature' : 'kg-node concept';
     return `<g class="${cls}" data-nid="${n.id}" style="cursor:pointer">
       <circle cx="${n.x}" cy="${n.y}" r="${r}"
-              fill="white" stroke="${n.color}" stroke-width="3"
-              filter="drop-shadow(0 3px 10px rgba(60,30,5,.25))"/>
+              fill="white" stroke="${n.color}" stroke-width="3.5"
+              filter="drop-shadow(0 4px 12px rgba(60,30,5,.28))"/>
       <circle cx="${n.x}" cy="${n.y}" r="${r-4}"
-              fill="${n.color}" fill-opacity="0.12"/>
-      <text x="${n.x}" y="${n.y-12}" text-anchor="middle" font-size="28" pointer-events="none">${n.icon}</text>
-      <text x="${n.x}" y="${n.y+12}" text-anchor="middle" font-size="13" font-weight="700"
+              fill="${n.color}" fill-opacity="0.13"/>
+      <text x="${n.x}" y="${n.y-14}" text-anchor="middle" font-size="34" pointer-events="none">${n.icon}</text>
+      <text x="${n.x}" y="${n.y+14}" text-anchor="middle" font-size="17" font-weight="700"
             fill="#2c1a08" font-family="STSong,serif" pointer-events="none">${n.label}</text>
-      <text x="${n.x}" y="${n.y+29}" text-anchor="middle" font-size="11"
-            fill="#7a4830" opacity=".8" pointer-events="none">${n.sub || ''}</text>
+      <text x="${n.x}" y="${n.y+34}" text-anchor="middle" font-size="13"
+            fill="#7a4830" opacity=".85" pointer-events="none">${n.sub || ''}</text>
     </g>`;
   }).join('');
 
