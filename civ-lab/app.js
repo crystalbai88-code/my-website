@@ -1334,15 +1334,20 @@ function renderPreEra(p) {
   // Topbar
   $('#preEraTopInfo').innerHTML = `<span class="pre-era-top-icon">${p.icon}</span><div><strong>${p.title}</strong><span>${p.time}</span></div>`;
 
-  // Layer pills — scroll within pre-era body
+  // 🆕 Phase B：如果有完整知识网络，使用图谱模式（替代手风琴）
+  if (p.knowledge_network && p.knowledge_network.hub && p.knowledge_network.hub.detail) {
+    return renderPreEraGraphMode(p);
+  }
+
+  // 兜底：旧版手风琴布局
+  // Layer pills
   $('#preLayerPills').innerHTML = PREHISTORIC.LAYERS.map(l =>
     `<button class="pre-layer-pill" onclick="scrollToPreLayer('pre-${l.id}')">${l.icon} ${l.label}</button>`
   ).join('');
 
-  // Body: render all layers (+ scenario if available)
   const body = $('#preEraBody');
   body.innerHTML = [
-    renderKnowledgeNetworkLayer(p),  // 🕸 知识网络（最先）
+    renderKnowledgeNetworkLayer(p),
     renderScenarioLayer(p),
     renderPreLayer1(p),
     renderPreLayer2(p),
@@ -1408,6 +1413,281 @@ function renderPreEra(p) {
   }
 
   body.scrollTo(0, 0);
+}
+
+// ══════════════════════════════════════════════
+// 🕸 Phase B · L1 课程图谱模式
+// 整页就是一张知识网络，点节点 → 详情卡 → 详情内有节点链接 → 继续探索
+// ══════════════════════════════════════════════
+function renderPreEraGraphMode(p) {
+  const kn = p.knowledge_network;
+
+  // Hide accordion layer pills (no scroll, no layers)
+  $('#preLayerPills').innerHTML = '';
+
+  const body = $('#preEraBody');
+  body.innerHTML = `
+    <div class="kg-page">
+      <div class="kg-graph-pane" id="kgGraphPane">
+        ${renderGraphSvg(p, kn)}
+      </div>
+      <div class="kg-detail-pane" id="kgDetailPane">
+        ${renderHubDetailCard(kn, p)}
+      </div>
+    </div>
+  `;
+
+  bindGraphPage(p);
+  body.scrollTo(0, 0);
+}
+
+// 构造完整节点列表（hub + nodes，附计算坐标）
+function computeGraphNodes(kn) {
+  const cx = 400, cy = 360;
+  const R1 = 175;  // 内圈半径（概念）
+  const R2 = 305;  // 外圈半径（功能）
+
+  const out = [{ ...kn.hub, x: cx, y: cy, isHub: true }];
+  kn.nodes.forEach(n => {
+    const r = n.ring === 2 ? R2 : R1;
+    const rad = (n.angle * Math.PI) / 180;
+    out.push({ ...n, x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) });
+  });
+  return out;
+}
+
+// 绘制 SVG 图谱
+function renderGraphSvg(p, kn) {
+  const allNodes = computeGraphNodes(kn);
+  const byId = {};
+  allNodes.forEach(n => byId[n.id] = n);
+  byId.hub = allNodes[0];
+
+  const edgeStyle = (t) => {
+    if (t === 'time')    return { c: '#c84820', w: 2,   d: '0',   o: 0.55 };
+    if (t === 'place')   return { c: '#3a7868', w: 1.5, d: '5,4', o: 0.5 };
+    if (t === 'concept') return { c: '#8a5a90', w: 1.5, d: '5,4', o: 0.5 };
+    return { c: '#a07840', w: 1.2, d: '2,5', o: 0.32 };
+  };
+
+  // hub → 每个内圈节点：淡色辐射线
+  const hubLines = kn.nodes.filter(n => n.ring !== 2).map(n => {
+    const t = byId[n.id];
+    return `<line x1="${byId.hub.x}" y1="${byId.hub.y}" x2="${t.x}" y2="${t.y}"
+      stroke="#c8a040" stroke-width="1" stroke-opacity=".18"/>`;
+  }).join('');
+
+  const edges = kn.edges.map(e => {
+    const a = byId[e.from], b = byId[e.to];
+    if (!a || !b) return '';
+    const s = edgeStyle(e.type);
+    return `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"
+      stroke="${s.c}" stroke-width="${s.w}" stroke-opacity="${s.o}" stroke-dasharray="${s.d}"/>`;
+  }).join('');
+
+  // 节点（hub + outer）
+  const nodes = allNodes.map(n => {
+    if (n.isHub) {
+      return `<g class="kg-node hub" data-nid="${n.id}" style="cursor:pointer">
+        <circle cx="${n.x}" cy="${n.y}" r="62"
+                fill="url(#kg-hub-grad)" stroke="${n.color}" stroke-width="3"
+                filter="drop-shadow(0 4px 14px rgba(184,48,24,.35))"/>
+        <text x="${n.x}" y="${n.y-14}" text-anchor="middle" font-size="30" pointer-events="none">${n.icon}</text>
+        <text x="${n.x}" y="${n.y+10}" text-anchor="middle" font-size="14" font-weight="800"
+              fill="${n.color}" font-family="STSong,serif" pointer-events="none">${n.label}</text>
+        <text x="${n.x}" y="${n.y+26}" text-anchor="middle" font-size="9"
+              fill="#7a4830" opacity=".75" pointer-events="none">${n.sub}</text>
+      </g>`;
+    }
+    const r = n.ring === 2 ? 38 : 42;
+    const cls = n.ring === 2 ? 'kg-node feature' : 'kg-node concept';
+    return `<g class="${cls}" data-nid="${n.id}" style="cursor:pointer">
+      <circle cx="${n.x}" cy="${n.y}" r="${r}"
+              fill="white" stroke="${n.color}" stroke-width="2.5"
+              filter="drop-shadow(0 3px 8px rgba(60,30,5,.22))"/>
+      <circle cx="${n.x}" cy="${n.y}" r="${r-3}"
+              fill="${n.color}" fill-opacity="0.1"/>
+      <text x="${n.x}" y="${n.y-6}" text-anchor="middle" font-size="${r * 0.5}" pointer-events="none">${n.icon}</text>
+      <text x="${n.x}" y="${n.y+12}" text-anchor="middle" font-size="10" font-weight="700"
+            fill="#2c1a08" font-family="STSong,serif" pointer-events="none">${n.label}</text>
+      <text x="${n.x}" y="${n.y+24}" text-anchor="middle" font-size="8"
+            fill="#7a4830" opacity=".7" pointer-events="none">${n.sub || ''}</text>
+    </g>`;
+  }).join('');
+
+  return `<svg class="kg-svg" viewBox="0 0 800 720" preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <radialGradient id="kg-hub-grad" cx="50%" cy="40%">
+        <stop offset="0%" stop-color="#fdf5e0"/>
+        <stop offset="100%" stop-color="#f5e2c0"/>
+      </radialGradient>
+    </defs>
+    ${hubLines}${edges}${nodes}
+  </svg>
+  <div class="kg-legend">
+    <span><i class="mn-leg-line" style="background:#c84820"></i>时间脉络</span>
+    <span><i class="mn-leg-line dashed" style="background:#3a7868"></i>地点关联</span>
+    <span><i class="mn-leg-line dashed" style="background:#8a5a90"></i>概念关联</span>
+  </div>`;
+}
+
+// 中心 hub 的详情卡（默认显示）
+function renderHubDetailCard(kn, p) {
+  const d = kn.hub.detail || {};
+  const related = (d.related || []).map(rid => {
+    const n = kn.nodes.find(x => x.id === rid) || (rid === 'hub' ? kn.hub : null);
+    if (!n) return '';
+    return `<button class="kg-related-chip" data-goto="${rid}">${n.icon} ${n.label}</button>`;
+  }).join('');
+  return `
+    <div class="kg-detail-card kg-detail-hub" style="border-left-color:${kn.hub.color}">
+      <div class="kg-detail-head">
+        <span class="kg-detail-icon" style="background:${kn.hub.color}20;color:${kn.hub.color}">${kn.hub.icon}</span>
+        <div>
+          <h4>${d.title || kn.hub.label}</h4>
+          <p class="kg-detail-sub">${kn.hub.sub}</p>
+        </div>
+      </div>
+      <p class="kg-detail-body">${d.body || ''}</p>
+      ${kn.intro ? `<div class="kg-detail-tip">💡 ${kn.intro}</div>` : ''}
+      ${related ? `<div class="kg-related"><strong>从这里开始 →</strong><div class="kg-related-row">${related}</div></div>` : ''}
+    </div>`;
+}
+
+// 普通概念节点的详情卡
+function renderConceptDetailCard(node, kn, p) {
+  const d = node.detail || {};
+  const related = (d.related || []).map(rid => {
+    const n = kn.nodes.find(x => x.id === rid) || (rid === 'hub' ? kn.hub : null);
+    if (!n) return '';
+    return `<button class="kg-related-chip" data-goto="${rid}">${n.icon} ${n.label}</button>`;
+  }).join('');
+
+  const zhUrl = d.wiki_zh ? `https://zh.wikipedia.org/w/index.php?search=${encodeURIComponent(d.wiki_zh)}` : '';
+  const enUrl = d.wiki_en ? `https://en.wikipedia.org/wiki/${d.wiki_en}` : '';
+
+  return `
+    <div class="kg-detail-card" style="border-left-color:${node.color}">
+      <div class="kg-detail-head">
+        <span class="kg-detail-icon" style="background:${node.color}20;color:${node.color}">${node.icon}</span>
+        <div>
+          <h4>${d.title || node.label}</h4>
+          <p class="kg-detail-sub">${node.label} · ${node.sub}</p>
+        </div>
+      </div>
+      <p class="kg-detail-body">${d.body || ''}</p>
+      <div class="kg-detail-wikis">
+        ${zhUrl ? `<a class="wiki-btn zh" target="_blank" rel="noreferrer" href="${zhUrl}">📖 中文维基</a>` : ''}
+        ${enUrl ? `<a class="wiki-btn en" target="_blank" rel="noreferrer" href="${enUrl}">🔗 EN</a>` : ''}
+      </div>
+      ${related ? `<div class="kg-related"><strong>🔗 相关节点</strong><div class="kg-related-row">${related}</div></div>` : ''}
+    </div>`;
+}
+
+// 富内容节点详情卡 — 根据 special 字段分发
+function renderFeatureDetailCard(node, kn, p) {
+  let richHtml = '';
+  if (node.special === 'scenario') {
+    richHtml = `<div class="kg-feat-mount" id="kgScenarioMount">${renderScenarioLayer(p).replace(/<section[^>]*>|<\/section>/g, '')}</div>`;
+  } else if (node.special === 'timeline_image') {
+    richHtml = renderPreLayer1(p).replace(/<section[^>]*>|<\/section>/g, '');
+  } else if (node.special === 'evolution_map') {
+    richHtml = renderPreLayer2(p).replace(/<section[^>]*>|<\/section>/g, '');
+  } else if (node.special === 'story') {
+    richHtml = renderPreLayer6(p).replace(/<section[^>]*>|<\/section>/g, '');
+  } else if (node.special === 'evidence') {
+    richHtml = renderPreLayer5(p).replace(/<section[^>]*>|<\/section>/g, '');
+  } else if (node.special === 'ai') {
+    richHtml = renderPreLayer8(p).replace(/<section[^>]*>|<\/section>/g, '');
+  }
+
+  const d = node.detail || {};
+  const related = (d.related || []).map(rid => {
+    const n = kn.nodes.find(x => x.id === rid) || (rid === 'hub' ? kn.hub : null);
+    if (!n) return '';
+    return `<button class="kg-related-chip" data-goto="${rid}">${n.icon} ${n.label}</button>`;
+  }).join('');
+
+  return `
+    <div class="kg-detail-card kg-detail-rich" style="border-left-color:${node.color}">
+      <div class="kg-detail-head">
+        <span class="kg-detail-icon" style="background:${node.color}20;color:${node.color}">${node.icon}</span>
+        <div>
+          <h4>${d.title || node.label}</h4>
+          <p class="kg-detail-sub">${d.body || node.sub}</p>
+        </div>
+      </div>
+      <div class="kg-feat-content">${richHtml}</div>
+      ${related ? `<div class="kg-related"><strong>🔗 相关节点</strong><div class="kg-related-row">${related}</div></div>` : ''}
+    </div>`;
+}
+
+// 绑定图谱页交互
+function bindGraphPage(p) {
+  const kn = p.knowledge_network;
+
+  function focusNode(nodeId) {
+    // 1. 高亮 SVG 中的节点
+    document.querySelectorAll('.kg-node').forEach(g => {
+      g.classList.toggle('active', g.getAttribute('data-nid') === nodeId);
+    });
+
+    // 2. 找到节点 + 渲染详情
+    let node;
+    let html;
+    if (nodeId === 'hub') {
+      html = renderHubDetailCard(kn, p);
+    } else {
+      node = kn.nodes.find(n => n.id === nodeId);
+      if (!node) return;
+      html = (node.ring === 2 || node.special)
+        ? renderFeatureDetailCard(node, kn, p)
+        : renderConceptDetailCard(node, kn, p);
+    }
+
+    const pane = document.getElementById('kgDetailPane');
+    pane.innerHTML = html;
+
+    // 3. 绑定详情卡里的「相关节点」chip
+    pane.querySelectorAll('.kg-related-chip').forEach(btn => {
+      btn.onclick = () => focusNode(btn.getAttribute('data-goto'));
+    });
+
+    // 4. 如果是富内容节点，绑定相应交互
+    if (node && node.special === 'scenario') {
+      bindScenarioInteractions(p);
+    } else if (node && node.special === 'ai') {
+      const aiInp = pane.querySelector('#preAIInput');
+      const aiSend = pane.querySelector('#preAISend');
+      if (aiSend && aiInp) {
+        aiSend.onclick = () => sendPreAIMsg(p, aiInp, pane.querySelector('#preAIMsgs'));
+        aiInp.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendPreAIMsg(p, aiInp, pane.querySelector('#preAIMsgs')); } };
+        pane.querySelectorAll('.suggestion-chip').forEach(b => {
+          b.onclick = () => { aiInp.value = b.textContent; sendPreAIMsg(p, aiInp, pane.querySelector('#preAIMsgs')); };
+        });
+        if (!preAiHistory[p.id]) {
+          preAiHistory[p.id] = [];
+          addPreAIMsg(pane.querySelector('#preAIMsgs'), 'ai', `你好！问我任何关于 <strong>${p.title}</strong> 的问题。`);
+        } else {
+          const msgsEl = pane.querySelector('#preAIMsgs');
+          preAiHistory[p.id].forEach(m => addPreAIMsg(msgsEl, m.role, m.html));
+        }
+      }
+    }
+
+    // 5. 滚动到详情
+    pane.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // 节点点击 = 聚焦
+  document.querySelectorAll('.kg-node').forEach(g => {
+    g.addEventListener('click', () => {
+      focusNode(g.getAttribute('data-nid'));
+    });
+  });
+
+  // 暴露给全局，供详情卡内的相关 chip 调用
+  window.focusGraphNode = focusNode;
 }
 
 function renderPreLayer1(p) {

@@ -2619,3 +2619,206 @@ html, body {
   .tl-header p { font-size: 10px !important; }
   .mn-svg { min-height: 320px; }
 }
+
+/* ════════════════════════════════════════════════════
+   🕸 Phase B · L1 课程图谱模式
+════════════════════════════════════════════════════ */
+
+.kg-page {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  padding: 20px 24px;
+  min-height: calc(100vh - 80px);
+}
+
+/* 左侧网络 */
+.kg-graph-pane {
+  position: sticky;
+  top: 12px;
+  height: fit-content;
+  max-height: calc(100vh - 100px);
+  background: radial-gradient(circle at 50% 45%,
+    rgba(255,248,228,.95) 0%,
+    rgba(245,225,180,.7) 60%,
+    rgba(232,210,170,.4) 100%);
+  border: 1px solid rgba(160,100,30,.25);
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 4px 18px rgba(100,60,10,.1);
+  display: flex; flex-direction: column;
+}
+.kg-svg {
+  width: 100%; height: auto;
+  display: block;
+  flex: 1;
+  min-height: 480px;
+}
+
+/* 节点交互 */
+.kg-node circle:first-child {
+  transition: r .25s, stroke-width .2s, filter .2s;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+.kg-node:hover circle:first-child {
+  stroke-width: 4;
+  filter: drop-shadow(0 5px 16px rgba(184,48,24,.45));
+}
+.kg-node.active circle:first-child {
+  stroke-width: 5;
+  filter: drop-shadow(0 0 14px rgba(184,48,24,.7));
+  animation: kgPulse 1.8s ease-in-out infinite;
+}
+@keyframes kgPulse {
+  0%,100% { filter: drop-shadow(0 0 12px rgba(184,48,24,.55)); }
+  50%     { filter: drop-shadow(0 0 22px rgba(184,48,24,.85)); }
+}
+.kg-node.hub circle:first-child {
+  animation: hubBreathe 3s ease-in-out infinite;
+}
+
+/* 右侧详情面板 */
+.kg-detail-pane {
+  min-height: 400px;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.kg-detail-card {
+  background: linear-gradient(135deg, #fdf8ec, #f8ebd0);
+  border: 1px solid rgba(160,100,30,.25);
+  border-left: 5px solid var(--warm);
+  border-radius: 12px;
+  padding: 22px 24px;
+  box-shadow: 0 4px 16px rgba(100,40,10,.1);
+  animation: kgDetailIn .35s cubic-bezier(.4,0,.2,1) both;
+}
+@keyframes kgDetailIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+.kg-detail-hub {
+  background: linear-gradient(135deg, #fdf5e0, #f5e2c0 60%, #ecd0a0);
+}
+
+.kg-detail-head {
+  display: flex; align-items: flex-start; gap: 14px;
+  margin-bottom: 14px;
+}
+.kg-detail-icon {
+  width: 52px; height: 52px;
+  border-radius: 13px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; flex-shrink: 0;
+  border: 2px solid currentColor;
+}
+.kg-detail-head h4 {
+  font-family: var(--serif);
+  font-size: 18px; color: var(--warm);
+  letter-spacing: .04em;
+  margin-bottom: 4px;
+}
+.kg-detail-sub {
+  font-size: 11px; color: var(--ink3);
+  letter-spacing: .04em;
+}
+.kg-detail-body {
+  font-size: 14px; line-height: 1.95;
+  color: var(--ink); margin-bottom: 14px;
+}
+
+.kg-detail-tip {
+  font-size: 12px; color: var(--amber);
+  background: rgba(212,164,53,.1);
+  padding: 8px 14px;
+  border-radius: 6px;
+  margin-bottom: 14px;
+  border-left: 2px solid var(--amber);
+}
+
+.kg-detail-wikis {
+  display: flex; gap: 6px; margin-bottom: 14px;
+}
+
+/* 相关节点 */
+.kg-related {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed rgba(160,100,30,.25);
+}
+.kg-related strong {
+  display: block;
+  font-size: 12px;
+  color: var(--warm);
+  margin-bottom: 8px;
+  letter-spacing: .04em;
+}
+.kg-related-row {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.kg-related-chip {
+  background: rgba(255,255,255,.7);
+  border: 1px solid rgba(160,100,30,.25);
+  color: var(--ink);
+  padding: 6px 12px;
+  border-radius: 18px;
+  font-size: 12px; font-weight: 600;
+  cursor: pointer;
+  font-family: var(--sans);
+  transition: all .18s;
+}
+.kg-related-chip:hover {
+  background: var(--warm);
+  color: #fff5e8;
+  border-color: var(--warm);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(184,48,24,.25);
+}
+
+/* 富内容节点（时光机/地图/时间轴大图等）的内嵌 */
+.kg-detail-rich .kg-feat-content {
+  margin-top: 8px;
+}
+.kg-feat-content .pre-layer,
+.kg-feat-content .pl-header,
+.kg-feat-content section.pre-layer {
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+/* 隐藏富内容里的 layer header (我们已经有详情卡 head 了) */
+.kg-feat-content .pl-header { display: none; }
+
+/* 图例 */
+.kg-graph-pane .kg-legend {
+  display: flex; justify-content: center;
+  gap: 14px; margin-top: 8px;
+  flex-wrap: wrap; font-size: 11px; color: var(--ink2);
+  padding-top: 8px;
+  border-top: 1px solid rgba(160,100,30,.15);
+}
+
+/* 响应式 — 平板 / 手机 */
+@media (max-width: 960px) {
+  .kg-page {
+    grid-template-columns: 1fr;
+    padding: 14px 14px;
+  }
+  .kg-graph-pane {
+    position: relative;
+    top: 0;
+    max-height: 70vh;
+  }
+  .kg-svg { min-height: 380px; }
+  .kg-detail-pane { max-height: none; }
+}
+
+@media (max-width: 600px) {
+  .kg-page { padding: 10px; gap: 12px; }
+  .kg-svg { min-height: 320px; }
+  .kg-detail-card { padding: 16px; }
+  .kg-detail-head h4 { font-size: 16px; }
+  .kg-detail-body { font-size: 13px; line-height: 1.85; }
+}
