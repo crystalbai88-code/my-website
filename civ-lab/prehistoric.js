@@ -42,6 +42,18 @@ const PREHISTORIC = {
         after: '此后27万年里，人类学会了迁徙、艺术、农业、村落，最终走向城市和文明。',
         scale_note: '从这一刻到公元前3000年的第一座城市，中间隔了约27万年。文明只是这段旅程最后2%的故事。',
         teacher_note: '人类不是从今天的猴子直接变来的，而是和其他灵长类有共同祖先。演化像一棵树，不是一条直线——文明的第一步是会合作、会学习、会制造工具、会适应环境的人类出现了。',
+        // 🖼 大图模式：有 image 时整段用图替代文字
+        image: 'images/evo-timeline.png',
+        image_alt: '人类起源完整时间轴：从700万年前到现代人类出现',
+        // 维基百科 quick-link 行（只保留必要交互）
+        wiki_quick_links: [
+          { label: '智人', term: 'Homo_sapiens' },
+          { label: 'Lucy', term: 'Australopithecus_afarensis' },
+          { label: '直立人', term: 'Homo_erectus' },
+          { label: 'Ardipithecus', term: 'Ardipithecus' },
+          { label: '人属', term: 'Homo' },
+          { label: '双足步行', term: 'Bipedalism' },
+        ],
         // 人类起源完整时间轴（7个关键节点）
         evolution_timeline: [
           {

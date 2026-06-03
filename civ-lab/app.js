@@ -52,6 +52,16 @@ function wikiQuery(term) {
     .trim();
 }
 
+// 🖼 通用图片渲染器：当数据节点有 image 字段时，渲染为图片为主的卡片
+// 用法：在数据里加 image: 'images/xxx.png'，自动替换文字
+function renderHeroImage(image, alt, caption) {
+  if (!image) return '';
+  return `<div class="hero-image-block">
+    <img class="hero-image" src="${image}" alt="${alt || ''}" loading="lazy"/>
+    ${caption ? `<p class="hero-image-caption">${caption}</p>` : ''}
+  </div>`;
+}
+
 // 生成中英文维基百科链接按钮组
 function wikiBtn(term, wikiEnSlug) {
   const q = wikiQuery(term);
@@ -1197,36 +1207,62 @@ function renderPreLayer1(p) {
     return `<div class="ptl-seg ${ep.id === p.id ? 'active' : ''}" style="flex:${w};background:${PREHISTORIC.periods.find(x=>x.id===ep.id).color}${ep.id===p.id?'':'66'}" title="${ep.title}">${ep.id === p.id ? ep.icon : ''}</div>`;
   }).join('');
 
-  // Evolution timeline (only for PH01 which has the extra data)
-  const evoSection = tl.evolution_timeline ? `
-    <div class="evo-timeline-wrap">
-      <div class="evo-timeline-title">
-        <span class="evo-icon">🌳</span>
-        <strong>人类起源完整时间轴</strong>
-        <span class="pl-sub" style="font-size:11px;margin-left:8px">从700万年前到现代人类出现</span>
-      </div>
-      ${tl.teacher_note ? `<div class="evo-teacher-note">📝 ${tl.teacher_note}</div>` : ''}
-      <div class="evo-events">
-        ${tl.evolution_timeline.map((ev, i) => `
-          <div class="evo-event ${ev.confidence === 'confirmed' ? 'confirmed' : 'cautious'}">
-            <div class="evo-event-dot"></div>
-            <div class="evo-event-body">
-              <div class="evo-event-time">${ev.time}</div>
-              <div class="evo-event-title-row">
-                <strong>${ev.title}</strong>
-                ${wikiBtn(ev.title, ev.wiki_en)}
+  // 🖼 IMAGE-FIRST MODE — if timeline has an image, render it as hero instead of text cards
+  let evoSection = '';
+  if (tl.image) {
+    // 大图模式：一张图 + 维基快链
+    const quickLinks = (tl.wiki_quick_links || []).map(l => {
+      const enUrl = l.term ? `https://en.wikipedia.org/wiki/${l.term}` : `https://en.wikipedia.org/w/index.php?search=${encodeURIComponent(l.label)}`;
+      const zhUrl = `https://zh.wikipedia.org/w/index.php?search=${encodeURIComponent(l.label)}`;
+      return `<a class="wiki-quick-chip" target="_blank" rel="noreferrer" href="${zhUrl}">📖 ${l.label}</a>`;
+    }).join('');
+    evoSection = `
+      <div class="image-hero-section">
+        <div class="image-hero-head">
+          <span class="evo-icon">🌳</span>
+          <strong>人类起源完整时间轴</strong>
+        </div>
+        <div class="image-hero-wrap">
+          <img class="image-hero-img" src="${tl.image}" alt="${tl.image_alt || ''}" loading="lazy"/>
+        </div>
+        ${quickLinks ? `
+          <div class="wiki-quick-row">
+            <span class="wiki-quick-label">📖 想深入了解？点击查看维基百科：</span>
+            <div class="wiki-quick-chips">${quickLinks}</div>
+          </div>` : ''}
+      </div>`;
+  } else if (tl.evolution_timeline) {
+    // 文字模式（兜底）—— 当没有图时，仍用原来的卡片
+    evoSection = `
+      <div class="evo-timeline-wrap">
+        <div class="evo-timeline-title">
+          <span class="evo-icon">🌳</span>
+          <strong>人类起源完整时间轴</strong>
+          <span class="pl-sub" style="font-size:11px;margin-left:8px">从700万年前到现代人类出现</span>
+        </div>
+        ${tl.teacher_note ? `<div class="evo-teacher-note">📝 ${tl.teacher_note}</div>` : ''}
+        <div class="evo-events">
+          ${tl.evolution_timeline.map((ev, i) => `
+            <div class="evo-event ${ev.confidence === 'confirmed' ? 'confirmed' : 'cautious'}">
+              <div class="evo-event-dot"></div>
+              <div class="evo-event-body">
+                <div class="evo-event-time">${ev.time}</div>
+                <div class="evo-event-title-row">
+                  <strong>${ev.title}</strong>
+                  ${wikiBtn(ev.title, ev.wiki_en)}
+                </div>
+                <p class="evo-event-body-text">${ev.body}</p>
+                ${ev.misconception ? `<div class="evo-misconception">${ev.misconception}</div>` : ''}
               </div>
-              <p class="evo-event-body-text">${ev.body}</p>
-              ${ev.misconception ? `<div class="evo-misconception">${ev.misconception}</div>` : ''}
-            </div>
-          </div>`).join('')}
-      </div>
-      ${tl.misconceptions ? `
-        <div class="evo-misconceptions-box">
-          <strong>🚫 常见误解（不能这样说）</strong>
-          <ul>${tl.misconceptions.map(m=>`<li>${m}</li>`).join('')}</ul>
-        </div>` : ''}
-    </div>` : '';
+            </div>`).join('')}
+        </div>
+        ${tl.misconceptions ? `
+          <div class="evo-misconceptions-box">
+            <strong>🚫 常见误解（不能这样说）</strong>
+            <ul>${tl.misconceptions.map(m=>`<li>${m}</li>`).join('')}</ul>
+          </div>` : ''}
+      </div>`;
+  }
 
   return `<section class="pre-layer" id="pre-timeline">
     <div class="pl-header"><span class="pl-icon">⏳</span><div><h3>时间定位</h3><p class="pl-sub">30万年全程 · 当前时代的位置</p></div></div>
@@ -1474,12 +1510,19 @@ function renderPreRegionDetail(r, el) {
 }
 
 function renderPreLayer4(p) {
+  // 🖼 图片优先：如果有 themes_image，用图替代所有文字主题
+  if (p.themes_image) {
+    return `<section class="pre-layer" id="pre-theme">
+      <div class="pl-header"><span class="pl-icon">💡</span><div><h3>知识主题</h3><p class="pl-sub">这个时代的核心问题与知识</p></div></div>
+      ${renderHeroImage(p.themes_image, '知识主题图', p.themes_image_caption)}
+    </section>`;
+  }
   const cards = p.themes.map(t => `
     <div class="pth-card">
-      <div class="pth-icon">${t.icon}</div>
+      ${t.image ? `<img class="pth-image" src="${t.image}" alt="${t.title}" loading="lazy"/>` : `<div class="pth-icon">${t.icon}</div>`}
       <div class="pth-title-row"><h4>${t.title}</h4>${wikiBtn(t.title)}</div>
-      <p class="pth-sum">${t.summary}</p>
-      <ul>${t.content.map(c=>`<li>${c}</li>`).join('')}</ul>
+      ${!t.image ? `<p class="pth-sum">${t.summary}</p>
+        <ul>${t.content.map(c=>`<li>${c}</li>`).join('')}</ul>` : `<p class="pth-sum">${t.summary}</p>`}
       ${t.caution ? `<div class="pth-caution">⚠ ${t.caution}</div>` : ''}
     </div>`).join('');
   return `<section class="pre-layer" id="pre-theme">
@@ -1489,9 +1532,16 @@ function renderPreLayer4(p) {
 }
 
 function renderPreLayer5(p) {
+  // 🖼 图片优先：整层用一张图替代
+  if (p.evidence_image) {
+    return `<section class="pre-layer" id="pre-evidence">
+      <div class="pl-header"><span class="pl-icon">🔍</span><div><h3>证据物</h3><p class="pl-sub">我们怎么知道这些历史</p></div></div>
+      ${renderHeroImage(p.evidence_image, '证据物图', p.evidence_image_caption)}
+    </section>`;
+  }
   const items = p.evidence.map(ev => `
     <div class="pev-card">
-      <div class="pev-emoji">${ev.emoji}</div>
+      ${ev.image ? `<img class="pev-image" src="${ev.image}" alt="${ev.name}" loading="lazy"/>` : `<div class="pev-emoji">${ev.emoji}</div>`}
       <div class="pev-body">
         <div class="pev-title-row">
           <h4>${ev.name}</h4>
@@ -1516,6 +1566,7 @@ function renderPreLayer6(p) {
   return `<section class="pre-layer" id="pre-story">
     <div class="pl-header"><span class="pl-icon">📖</span><div><h3>故事讲解</h3><p class="pl-sub">${s.title} · ${s.setting}</p></div></div>
     <div class="pst-card">
+      ${s.image ? `<img class="pst-image" src="${s.image}" alt="${s.title}" loading="lazy"/>` : ''}
       <h4>${s.title}</h4>
       <p class="pst-setting">${s.setting}</p>
       ${s.paragraphs.map(para => `<p class="pst-para">${para}</p>`).join('')}
