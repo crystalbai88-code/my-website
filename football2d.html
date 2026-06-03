@@ -63,7 +63,7 @@ canvas { display:block; }
   <div class="grid" id="tgrid"></div>
   <div class="hint">点一下=绿(你的队) | 再点=红(对手) | 再点=橙(观众支持) | 再点=取消</div>
   <button id="startBtn" onclick="startGame()" disabled>开 始 比 赛</button>
-  <div class="hint">W/↑=上移 &nbsp; S=射门 &nbsp; A/←=左移 &nbsp; D/→=右移 &nbsp; ↓=下移 &nbsp; Z=爆射(30s冷却) &nbsp; X=防守</div>
+  <div class="hint">W/↑=上移 &nbsp; S=射门 &nbsp; A/←=左移 &nbsp; D/→=右移 &nbsp; ↓=下移 &nbsp; Y=爆射(30s冷却) &nbsp; B=防守</div>
 </div>
 
 <div id="ov">
@@ -207,33 +207,34 @@ class Ball {
 
   reset(){
     this.x=FCX; this.y=FCY; this.ang=0;
-    // random kick-off direction, slight bias toward sides
     const a=(Math.random()-0.5)*Math.PI*0.6 + (Math.random()>0.5?0:Math.PI);
     const sp=2.5+Math.random()*1.5;
     this.vx=Math.cos(a)*sp; this.vy=Math.sin(a)*sp;
+    this.lastTouch='none'; // 'kick','wall','body'
   }
 
   update(){
-    // gentle friction
     this.vx*=0.991; this.vy*=0.991;
-    // spin visual
     this.ang+=Math.sqrt(this.vx*this.vx+this.vy*this.vy)*0.04;
-
     this.x+=this.vx; this.y+=this.vy;
 
-    // Top / bottom wall bounce
-    if(this.y-BALL_R<=FT){ this.y=FT+BALL_R; this.vy=Math.abs(this.vy)*0.72; }
-    if(this.y+BALL_R>=FB){ this.y=FB-BALL_R; this.vy=-Math.abs(this.vy)*0.72; }
+    // Top / bottom wall bounce — marks as wall touch
+    if(this.y-BALL_R<=FT){ this.y=FT+BALL_R; this.vy=Math.abs(this.vy)*0.72; this.lastTouch='wall'; }
+    if(this.y+BALL_R>=FB){ this.y=FB-BALL_R; this.vy=-Math.abs(this.vy)*0.72; this.lastTouch='wall'; }
 
-    // Left wall / goal opening
+    // Left wall / goal
     if(this.x-BALL_R<=FL){
-      if(this.y>=GOAL_T && this.y<=GOAL_B){ return 'gl'; } // p2 scored
-      this.x=FL+BALL_R; this.vx=Math.abs(this.vx)*0.72;
+      if(this.y>=GOAL_T && this.y<=GOAL_B){
+        return this.lastTouch==='kick'?'gl':'invalid'; // 弹进不算
+      }
+      this.x=FL+BALL_R; this.vx=Math.abs(this.vx)*0.72; this.lastTouch='wall';
     }
-    // Right wall / goal opening
+    // Right wall / goal
     if(this.x+BALL_R>=FR){
-      if(this.y>=GOAL_T && this.y<=GOAL_B){ return 'gr'; } // p1 scored
-      this.x=FR-BALL_R; this.vx=-Math.abs(this.vx)*0.72;
+      if(this.y>=GOAL_T && this.y<=GOAL_B){
+        return this.lastTouch==='kick'?'gr':'invalid'; // 弹进不算
+      }
+      this.x=FR-BALL_R; this.vx=-Math.abs(this.vx)*0.72; this.lastTouch='wall';
     }
     return null;
   }
@@ -283,6 +284,7 @@ class Player {
     ball.vx=(ddx/n)*sp*(power?1.6:1);
     ball.vy=(ddy/n)*sp*(power?1.6:1);
     ball.ang+=this.faceAng*0.4;
+    ball.lastTouch='kick'; // 踢出的球才算进球
     sndKick();
     if(power){ this.powerFx=0.55; psCooldown=30; }
     return true;
@@ -301,6 +303,7 @@ class Player {
       }
       // push ball out of overlap
       ball.x=this.x+nx*(cd+0.5); ball.y=this.y+ny*(cd+0.5);
+      ball.lastTouch='body'; // 身体碰撞不算直接进球
     }
   }
 
@@ -315,12 +318,12 @@ class Player {
 
   draw(){
     const t=this.team();
-    const x=Math.round(this.x), y=Math.round(this.y);
     ctx.save();
-    ctx.translate(x,y);
-
-    // celebrate spin
-    if(this.celT>0) ctx.rotate(this.celT*8);
+    ctx.translate(Math.round(this.x), Math.round(this.y));
+    // Rotate so the person faces their movement direction
+    // faceAng=0 means facing right; we draw person facing "up" in local space
+    ctx.rotate(this.faceAng + Math.PI/2);
+    if(this.celT>0) ctx.rotate(Math.sin(this.celT*9)*0.5);
 
     // defend aura
     if(this.defT>0){
@@ -332,36 +335,54 @@ class Player {
       ctx.beginPath(); ctx.arc(0,0,PR+16,0,Math.PI*2);
       ctx.strokeStyle=`rgba(255,200,0,${this.powerFx})`; ctx.lineWidth=3; ctx.stroke();
     }
-    // drop shadow
-    ctx.save(); ctx.translate(3,4);
-    ctx.beginPath(); ctx.arc(0,0,PR,0,Math.PI*2);
-    ctx.fillStyle='rgba(0,0,0,0.22)'; ctx.fill(); ctx.restore();
+    // ground shadow
+    ctx.save(); ctx.translate(2,3); ctx.scale(1,0.5);
+    ctx.beginPath(); ctx.ellipse(0,0,9,14,0,0,Math.PI*2);
+    ctx.fillStyle='rgba(0,0,0,0.18)'; ctx.fill(); ctx.restore();
 
-    // body circle
-    ctx.beginPath(); ctx.arc(0,0,PR,0,Math.PI*2);
+    const legColor=t.p==='#FFFFFF'?'#999':shadeHex(t.p,-0.35);
+    ctx.lineCap='round'; ctx.lineJoin='round';
+
+    // Legs (below body, kicking animation)
+    const kick=this.kickT>0;
+    ctx.strokeStyle=legColor; ctx.lineWidth=4.5;
+    ctx.beginPath(); ctx.moveTo(-5,5); ctx.lineTo(kick?-8:(-5),14); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(5,5); ctx.lineTo(kick?12:5,kick?8:14); ctx.stroke();
+
+    // Jersey body (oval)
+    ctx.beginPath(); ctx.ellipse(0,1,8,11,0,0,Math.PI*2);
     ctx.fillStyle=t.p; ctx.fill();
-    ctx.strokeStyle=t.c; ctx.lineWidth=2.5; ctx.stroke();
+    ctx.strokeStyle=t.c; ctx.lineWidth=1.8; ctx.stroke();
 
-    // direction stripe (shows which way player faces)
-    const fx=Math.cos(this.faceAng)*PR, fy=Math.sin(this.faceAng)*PR;
-    ctx.strokeStyle=t.c; ctx.lineWidth=3; ctx.lineCap='round';
-    ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(fx,fy); ctx.stroke();
+    // Team short name on jersey
+    const lum=hexLum(t.p);
+    ctx.fillStyle=lum>0.5?'#333':'#fff';
+    ctx.font='bold 6px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(t.s.slice(0,2),0,3);
+    ctx.textBaseline='alphabetic';
 
-    // kick flash ring
+    // Arms
+    ctx.strokeStyle=t.p; ctx.lineWidth=4;
+    const armSwing=kick?-10:0;
+    ctx.beginPath(); ctx.moveTo(-8,-3); ctx.lineTo(-13,4+armSwing); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(8,-3);  ctx.lineTo(13,4-armSwing); ctx.stroke();
+
+    // Head (top = facing direction)
+    ctx.beginPath(); ctx.ellipse(0,-13,6,7,0,0,Math.PI*2);
+    ctx.fillStyle='#FFCC88'; ctx.fill();
+    ctx.strokeStyle='#CC8844'; ctx.lineWidth=1; ctx.stroke();
+    // Eyes
+    ctx.fillStyle='#333';
+    ctx.beginPath(); ctx.arc(-2.2,-14,1.1,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(2.2,-14,1.1,0,Math.PI*2); ctx.fill();
+
+    // kick flash
     if(this.kickT>0){
-      ctx.beginPath(); ctx.arc(0,0,PR+7,0,Math.PI*2);
-      ctx.globalAlpha=this.kickT/0.22*0.7;
+      ctx.globalAlpha=this.kickT/0.22*0.6;
+      ctx.beginPath(); ctx.arc(0,0,PR+8,0,Math.PI*2);
       ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
       ctx.globalAlpha=1;
     }
-
-    // team label
-    const lum=hexLum(t.p);
-    ctx.fillStyle=lum>0.5?'#222':'#fff';
-    ctx.font='bold 7px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText(t.s.slice(0,2),0,1);
-    ctx.textBaseline='alphabetic';
-
     ctx.restore();
   }
 }
@@ -382,25 +403,43 @@ class AIPlayer extends Player {
     const dx=ball.x-this.x, dy=ball.y-this.y;
     const distToBall=Math.sqrt(dx*dx+dy*dy);
     const myGoalX=this.side==='right'?FR:FL;
-    const oppGoalX=this.side==='right'?FL:FR;
+    const myGoalEdge=this.side==='right'?FR-PR-4:FL+PR+4;
     const ballOnMySide=this.side==='right'?ball.x>FCX:ball.x<FCX;
+
+    // ── Corner detection: avoid shooting from corners ──
+    const CORNER=65;
+    const nearTopBot=(this.y<FT+CORNER||this.y>FB-CORNER);
+    const nearMyWall=(this.side==='right'?this.x>FR-CORNER:this.x<FL+CORNER);
+    const inCorner=nearTopBot&&nearMyWall;
+
+    // ── Decide mode ──
+    // Defend: ball on our side AND moving toward our goal
+    const ballMovingAtGoal=this.side==='right'?(ball.vx>0.5):(ball.vx<-0.5);
+    const defending=ballOnMySide&&ballMovingAtGoal;
 
     let tx, ty;
 
-    if(distToBall<180){
-      // Chase ball
-      tx=ball.x+(this.side==='right'?-26:26);
-      ty=ball.y+(ball.y>FCY?-12:12);
-    } else if(ballOnMySide){
-      // Intercept — get between ball and own goal
-      tx=(ball.x+myGoalX)/2;
-      ty=ball.y+(ball.y-FCY)*0.3;
+    if(inCorner){
+      // Escape corner — move toward center of field
+      tx=FCX+(this.side==='right'?80:-80);
+      ty=FCY;
+    } else if(defending){
+      // Block: position between ball and own goal, offset from goal line
+      tx=myGoalEdge+(this.side==='right'?-55:55);
+      ty=Math.max(FT+PR, Math.min(FB-PR, ball.y));
+    } else if(distToBall<170){
+      // Chase ball with slight approach offset
+      const approachOff=this.side==='right'?-20:20;
+      tx=ball.x+approachOff;
+      ty=ball.y+(ball.y>FCY?-10:10);
     } else {
-      // Advance toward opponent side with wander offset
+      // Wander to attacking position
       if(this.wander<=0){
-        this.wander=1.5+Math.random()*2;
-        this.wx=this.side==='right'?FCX+30+Math.random()*(FR-FCX-60):FCX-30-Math.random()*(FCX-FL-60);
-        this.wy=FT+30+Math.random()*(FH-60);
+        this.wander=1.8+Math.random()*2;
+        this.wx=this.side==='right'
+          ?FCX+40+Math.random()*(FR-FCX-100)
+          :FL+40+Math.random()*(FCX-FL-100);
+        this.wy=FT+50+Math.random()*(FH-100);
       }
       tx=this.wx; ty=this.wy;
     }
@@ -409,14 +448,15 @@ class AIPlayer extends Player {
     const mdx=tx-this.x, mdy=ty-this.y;
     const md=Math.sqrt(mdx*mdx+mdy*mdy);
     if(md>6){
-      const spd=PSPD*0.88;
-      this.vx=(mdx/md)*spd; this.vy=(mdy/md)*spd;
+      this.vx=(mdx/md)*PSPD*0.82;
+      this.vy=(mdy/md)*PSPD*0.82;
       this.faceAng=Math.atan2(mdy,mdx);
     } else { this.vx*=0.7; this.vy*=0.7; }
 
-    // Shoot when close enough and aimed at goal
-    if(distToBall<PR+BALL_R+25 && this.ait<=0){
-      this.ait=0.22+Math.random()*0.3;
+    // Shoot: only when NOT in corner, not defending, with cooldown
+    const canShoot=!inCorner && !defending && distToBall<PR+BALL_R+22 && this.ait<=0;
+    if(canShoot){
+      this.ait=0.7+Math.random()*0.5; // cooldown so AI doesn't spam
       this.tryKick(ball,false);
     }
 
@@ -552,6 +592,7 @@ function drawGoal(side){
 // ── HUD ────────────────────────────────────────────────────────────────────
 let flashT=0, flashSide=0;
 let psCooldown=0;
+let invalidT=0; // "弹进无效" flash timer
 
 function drawHUD(){
   const t1=TEAMS[selP1], t2=TEAMS[selP2];
@@ -587,7 +628,19 @@ function drawHUD(){
   ctx.fillStyle=psCooldown>0?`hsl(${pct*110},90%,50%)`:'#00ff99';
   ctx.fillRect(barX,barY,110*pct,11);
   ctx.fillStyle='white'; ctx.font='8px Arial';
-  ctx.fillText(psCooldown>0?`Z爆射 ${Math.ceil(psCooldown)}s`:'Z爆射 就绪!', barX+3, barY+9);
+  ctx.fillText(psCooldown>0?`Y爆射 ${Math.ceil(psCooldown)}s`:'Y爆射 就绪!', barX+3, barY+9);
+
+  // Invalid goal notice
+  if(invalidT>0){
+    const al=Math.min(1,invalidT*3);
+    ctx.fillStyle=`rgba(255,60,60,${al*0.4})`; ctx.fillRect(0,0,W,H);
+    ctx.font=`bold 32px Arial`; ctx.textAlign='center';
+    ctx.fillStyle=`rgba(255,255,255,${al})`;
+    ctx.fillText('❌ 弹进无效！', W/2, H/2);
+    ctx.font='16px Arial'; ctx.fillStyle=`rgba(255,200,100,${al})`;
+    ctx.fillText('需要直接踢进才算', W/2, H/2+36);
+    invalidT-=1/60;
+  }
 
   // fan indicator (bottom-right)
   if(selFan!==null){
@@ -625,7 +678,7 @@ document.addEventListener('keydown',e=>{
 });
 document.addEventListener('keyup',e=>{ keys[e.key]=false; });
 
-let shootHeld=false, zHeld=false;
+let shootHeld=false, yHeld=false;
 
 function onGoal(who){
   score[who]++;
@@ -668,8 +721,8 @@ function gameLoop(ts){
     const uk=keys['ArrowUp']   ||keys['w']||keys['W'];
     const dk=keys['ArrowDown'];
     const sk=keys['s']||keys['S'];
-    const zk=keys['z']||keys['Z'];
-    const xk=keys['x']||keys['X'];
+    const yk=keys['y']||keys['Y'];
+    const bk=keys['b']||keys['B'];
 
     let mvx=0, mvy=0;
     if(lk) mvx=-PSPD;
@@ -688,10 +741,10 @@ function gameLoop(ts){
     if(sk&&!shootHeld&&p1.kickT<=0){ p1.tryKick(ball,false); }
     shootHeld=sk;
 
-    if(zk&&!zHeld&&psCooldown<=0&&p1.kickT<=0){ p1.tryKick(ball,true); }
-    zHeld=zk;
+    if(yk&&!yHeld&&psCooldown<=0&&p1.kickT<=0){ p1.tryKick(ball,true); }
+    yHeld=yk;
 
-    if(xk) p1.defT=0.4;
+    if(bk) p1.defT=0.4;
 
     if(p1.kickT>0)p1.kickT-=dt;
     if(p1.defT>0)p1.defT-=dt;
@@ -706,6 +759,12 @@ function gameLoop(ts){
     if(gr&&goalCd<=0){
       if(gr==='gr') onGoal(0);
       else if(gr==='gl') onGoal(1);
+      else if(gr==='invalid'){
+        // 弹进无效：球弹回中场
+        invalidT=1.8;
+        sndSigh();
+        ball.reset();
+      }
     }
   }
 
@@ -733,7 +792,7 @@ function startGame(){
   if(selP1===null||selP2===null) return;
   document.getElementById('menu').style.display='none';
   score=[0,0]; timeLeft=90; psCooldown=0; goalCd=0; resetTimer=0;
-  flashT=0; gstate='playing'; shootHeld=false; zHeld=false;
+  flashT=0; invalidT=0; gstate='playing'; shootHeld=false; yHeld=false;
   p1=new Player(FL+FW*0.28,FCY,'left',selP1);
   p2ai=new AIPlayer(FL+FW*0.72,FCY,'right',selP2);
   ball=new Ball();
