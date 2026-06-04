@@ -322,22 +322,22 @@ const PREHISTORIC = {
         // 🆕 图片上热点泡泡坐标 (百分比定位)
         hotspots: [
           // 11 个知识点 — 每个 hotspot 精确对齐图中相应的标签/图标位置
-          { id:'primates', pos_x:30, pos_y:24, icon:'🌳', label:'灵长类家族',  sub:'共同祖先',
+          { id:'primates', pos_x:33, pos_y:25, icon:'🌳', label:'灵长类家族',  sub:'共同祖先',
             detail: {
               title:'我们都是灵长类——同一个祖先的后代',
               body:'生命像一棵大树。猴子、黑猩猩、人类——我们看上去差别很大，但都是从同一个祖先慢慢分开的。<br><br>大约 6000-7000 万年前，最早的灵长类动物出现。它们体型小、住在树上、有抓握能力的手指。后来这棵树长出很多分支：猴子是一支、大猩猩是一支、黑猩猩是一支、人类也是一支。<br><br><strong>关键事实</strong>：人类不是从今天的猴子或黑猩猩变来的。我们和黑猩猩在大约 600-700 万年前分开演化，从那时起黑猩猩也演化了 600 多万年——它们不是"原始版的人类"。'
             }},
-          { id:'split', pos_x:85, pos_y:16, icon:'📅', label:'分家时间',  sub:'约600-700万年前',
+          { id:'split', pos_x:64, pos_y:17, icon:'📅', label:'分家时间',  sub:'约600-700万年前',
             detail: {
               title:'约 600-700 万年前 · 人类祖先与黑猩猩祖先分开',
               body:'科学家通过化石和 DNA 证据，推算出在大约 600-700 万年前，人类和黑猩猩的共同祖先分成了两支。<br><br><strong>分开后他们做了什么？</strong><br>- 黑猩猩祖先 → 留在森林，演化成今天的黑猩猩和倭黑猩猩<br>- 人类祖先 → 走向草原，慢慢学会双足行走、用工具、合作<br><br><strong>已发现的早期化石</strong>：<br>- Sahelanthropus tchadensis（萨赫勒人，约 700 万年前，乍得）<br>- Orrorin tugenensis（千禧人，约 600 万年前，肯尼亚）<br>这些化石的颅骨已经显示一些"偏向人类"的特征。'
             }},
-          { id:'biped', pos_x:40, pos_y:37, icon:'👣', label:'先学会双足行走',  sub:'文明的起点',
+          { id:'biped', pos_x:40, pos_y:35, icon:'👣', label:'先学会双足行走',  sub:'文明的起点',
             detail: {
               title:'先学会双足行走，大脑才慢慢变大',
               body:'这是人类演化最颠覆常识的事实之一：<strong>不是因为我们变聪明了才直立，而是因为我们直立了，才有机会变聪明。</strong><br><br><strong>双足行走带来什么改变？</strong><br>1. <strong>双手空出来了</strong>——可以拿工具、搬食物、抱孩子<br>2. <strong>能看得更远</strong>——草原上能提前发现猛兽和食物<br>3. <strong>能跑得更远</strong>——人类是动物界最强的长跑者之一<br>4. <strong>语言准备</strong>——直立姿势改变喉部结构，为后来的语言做好准备<br><br><strong>科学证据</strong>：Lucy 化石（320 万年前）的骨盆和脚已经完全是直立行走的结构，但她的大脑只有 400cc——和黑猩猩差不多大！这证明直立比脑大早 200 万年。'
             }},
-          { id:'lucy', pos_x:68, pos_y:45, icon:'👩', label:'Lucy · 南方古猿',  sub:'约320万年前',
+          { id:'lucy', pos_x:71, pos_y:50, icon:'👩', label:'Lucy · 南方古猿',  sub:'约320万年前',
             detail: {
               title:'Lucy · Australopithecus afarensis（阿法南方古猿）',
               body:'<strong>Lucy 不是"第一个人"，但她改变了我们对人类起源的理解。</strong><br><br>1974 年 11 月 24 日，在埃塞俄比亚 Hadar 地区，古人类学家 Donald Johanson 团队发现了一具 40% 完整的女性骨架（编号 AL 288-1）。当晚他们听 Beatles 的《Lucy in the Sky with Diamonds》庆祝，于是给她起名 <strong>Lucy</strong>。<br><br><strong>Lucy 告诉了我们什么？</strong><br>- 她约 320 万年前生活在东非<br>- 身高约 1.05 米，体重约 28 公斤<br>- 已经<strong>完全双足直立行走</strong>（骨盆+股骨证明）<br>- 但脑容量只有 380-430 cc（和黑猩猩相当）<br>- 这证明：<strong>先直立，后脑大</strong><br><br><strong>常见误解</strong>：<br>❌ Lucy 不是"我们的直接祖先"——她可能是某个表亲<br>❌ Lucy 不是孤独一人——同地点出土多个个体（"第一家庭"AL 333）<br>❌ Lucy 不是 Homo 属（人属）——是南方古猿（Australopithecus）'
