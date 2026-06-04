@@ -3845,8 +3845,8 @@ html, body {
 
 /* 顶部工具栏 */
 .img-overlay-toolbar {
-  display: flex; align-items: center; gap: 16px;
-  padding: 12px 24px;
+  display: flex; align-items: center; gap: 12px;
+  padding: 8px 20px;
   background: rgba(253,245,228,.95);
   border-bottom: 1.5px solid rgba(160,100,30,.25);
   flex-wrap: wrap;
@@ -3854,10 +3854,10 @@ html, body {
 }
 .img-overlay-title {
   font-family: var(--serif);
-  font-size: 17px;
-  font-weight: 800;
+  font-size: 14px;
+  font-weight: 700;
   color: var(--warm);
-  letter-spacing: .06em;
+  letter-spacing: .04em;
 }
 .img-overlay-hint {
   font-size: 13px;
@@ -4832,3 +4832,29 @@ html, body {
   }
   .ai-float-fab { right: 16px; bottom: 16px; }
 }
+
+/* 详情卡底部"下一个 →"按钮 */
+.img-detail-next {
+  display: block; width: 100%;
+  margin-top: 16px;
+  padding: 12px 18px;
+  background: linear-gradient(135deg, #c84820, #a83a18);
+  color: white; border: none;
+  border-radius: 10px;
+  font-size: 14px; font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(200,72,32,.3);
+  transition: all .2s;
+  text-align: center;
+}
+.img-detail-next:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(200,72,32,.45);
+}
+.img-detail-finale {
+  background: linear-gradient(135deg, #2a8038, #1f6028);
+  box-shadow: 0 4px 12px rgba(42,128,56,.35);
+  font-size: 15px;
+  padding: 14px 18px;
+}
+.img-detail-finale:hover { box-shadow: 0 6px 18px rgba(42,128,56,.5); }

@@ -1831,8 +1831,7 @@ function renderImageOverlayMode(p) {
 
       <!-- 顶部工具栏 -->
       <div class="img-overlay-toolbar">
-        <span class="img-overlay-title">🌳 人类起源完整时间轴</span>
-        <span class="img-overlay-hint">点击图上 ① ~ ⑦ 任意泡泡，深入了解每个时代</span>
+        <span class="img-overlay-title">人类从哪里来</span>
         <div class="img-overlay-actions">
           <button class="img-tool-chip" onclick="showImageOverlayPlay('hub')">📜 总览</button>
           <button class="img-tool-chip" onclick="showFullscreenMap()">🗺 地图</button>
@@ -1909,22 +1908,37 @@ function showImageOverlayDetail(nodeId) {
     html = renderConceptDetailCard(node, kn, p);
   }
 
+  // 计算下一个 hotspot（用于"下一个 →"按钮）
+  const allHotspots = kn.hotspots || [];
+  const total = allHotspots.length;
+  const nextHotspot = (hotspotIndex >= 0 && hotspotIndex + 1 < total) ? allHotspots[hotspotIndex + 1] : null;
+  const isLast = hotspotIndex === total - 1 && total > 0;
+
+  const navBtn = isLast
+    ? `<button class="img-detail-next img-detail-finale" onclick="finishHotspotsAndOpenMap()">🗺 看完全部 · 进入迁徙地图 →</button>`
+    : (nextHotspot
+        ? `<button class="img-detail-next" onclick="showImageOverlayDetail('${nextHotspot.id}')">下一个 · ${hotspotIndex + 2}. ${nextHotspot.label} →</button>`
+        : '');
+
   const det = document.getElementById('imgOverlayDetail');
   det.innerHTML = `
     <button class="img-detail-close" onclick="document.getElementById('imgOverlayDetail').classList.add('hidden')">✕</button>
     ${html}
+    ${navBtn}
   `;
   det.classList.remove('hidden');
 
-  // 🔄 自动滚动：如果详情卡不在视口内（点了下面的泡泡），把它滚到可视范围
+  // 🔄 自动滚动到对应的 hotspot 位置（不只是详情卡）
   requestAnimationFrame(() => {
-    const rect = det.getBoundingClientRect();
-    const vh = window.innerHeight;
-    if (rect.top < 0 || rect.top > vh * 0.6 || rect.bottom > vh) {
-      // 滚到让详情卡顶部在视口 80px 处
-      const scrollContainer = det.closest('.screen, .pre-era-body, body') || document.scrollingElement;
-      const detTopAbs = rect.top + scrollContainer.scrollTop;
-      scrollContainer.scrollTo({ top: detTopAbs - 100, behavior: 'smooth' });
+    const activeHotspot = document.querySelector('.img-hotspot.active');
+    if (activeHotspot) {
+      const rect = activeHotspot.getBoundingClientRect();
+      const vh = window.innerHeight;
+      if (rect.top < 80 || rect.bottom > vh - 80) {
+        const scrollContainer = activeHotspot.closest('.screen, .pre-era-body, body') || document.scrollingElement;
+        const absTop = rect.top + (scrollContainer.scrollTop || window.scrollY);
+        scrollContainer.scrollTo({ top: absTop - vh / 3, behavior: 'smooth' });
+      }
     }
   });
 
@@ -1938,15 +1952,11 @@ function showImageOverlayDetail(nodeId) {
     const hotspot = (kn.hotspots || []).find(h => h.id === nodeId);
     trackUserQuestion('查看：' + (hotspot ? hotspot.label : nodeId), p.id);
   }
+}
 
-  // 🎯 自动推进：点击最后一个泡泡（⑦）→ 3 秒后自动打开地图
-  const total = (kn.hotspots || []).length;
-  if (hotspotIndex === total - 1 && total > 0) {
-    showAutoAdvanceHint('看完最后一个时代了 · 3 秒后自动打开 🗺 迁徙地图', () => {
-      document.getElementById('imgOverlayDetail')?.classList.add('hidden');
-      showFullscreenMap();
-    });
-  }
+function finishHotspotsAndOpenMap() {
+  document.getElementById('imgOverlayDetail')?.classList.add('hidden');
+  showFullscreenMap();
 }
 
 // 在屏幕底部短暂显示一个 toast，3 秒后执行回调；可手动取消
@@ -2448,7 +2458,7 @@ function showFullscreenMap() {
         <span class="fs-map-icon">🗺</span>
         <div>
           <h2>人类起源迁徙地图</h2>
-          <p>${p.map.overlay_note || '8 个化石点 · 从 700 万年前到 20 万年前 · 点击任意编号查看深度知识'}</p>
+          <p>8 个化石点 · 从 700 万年前到 20 万年前</p>
         </div>
       </div>
       <div class="fs-map-header-actions">
@@ -2459,8 +2469,26 @@ function showFullscreenMap() {
     <div class="fs-map-body">
       <div class="fs-map-canvas">
         <svg viewBox="0 0 600 540" preserveAspectRatio="xMidYMid meet">
-          <rect width="600" height="540" fill="#a8c8e0"/>
-          ${africaShape}
+          <defs>
+            <radialGradient id="oceanG" cx="50%" cy="40%" r="70%">
+              <stop offset="0%" stop-color="#bcdeec"/>
+              <stop offset="100%" stop-color="#7fb0c8"/>
+            </radialGradient>
+            <radialGradient id="africaG" cx="50%" cy="40%" r="60%">
+              <stop offset="0%" stop-color="#f0d8a8"/>
+              <stop offset="80%" stop-color="#d8b078"/>
+              <stop offset="100%" stop-color="#a87838"/>
+            </radialGradient>
+            <filter id="dotShadow" x="-30%" y="-30%" width="160%" height="160%">
+              <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#3a1a08" flood-opacity="0.4"/>
+            </filter>
+            <pattern id="oceanWaves" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+              <path d="M0,20 Q10,15 20,20 T40,20" fill="none" stroke="#5a8aa8" stroke-width="0.4" opacity="0.3"/>
+            </pattern>
+          </defs>
+          <rect width="600" height="540" fill="url(#oceanG)"/>
+          <rect width="600" height="540" fill="url(#oceanWaves)"/>
+          ${africaShape.replace('fill="#e8c890"', 'fill="url(#africaG)"').replace('stroke-width="2.5"', 'stroke-width="3.5"')}
           ${arabia}
           ${labels}
           ${pathLine}
@@ -2468,8 +2496,7 @@ function showFullscreenMap() {
         </svg>
       </div>
       <div class="fs-map-side" id="fsMapSide">
-        <div class="fs-map-side-title">🦴 演化迁徙路径 · 按时间排序</div>
-        <div class="fs-map-side-hint">点击 ① 至 ⑧ 任意编号查看深度知识；红线 1→2→...→${evo.length} 由最古老到最年轻</div>
+        <div class="fs-map-side-title">🦴 演化迁徙路径</div>
         ${listRows}
       </div>
     </div>
