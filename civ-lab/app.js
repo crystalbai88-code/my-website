@@ -1069,6 +1069,66 @@ function speakText(text) {
   window.speechSynthesis.speak(utt);
 }
 
+// 🔊 朗读知识点（strip HTML，含状态切换）— 用于所有详情卡
+function speakKnowledge(btn, html) {
+  if (!('speechSynthesis' in window)) {
+    alert('当前浏览器不支持语音朗读');
+    return;
+  }
+  // 若已在朗读 → 停止
+  if (window.speechSynthesis.speaking && btn?.classList.contains('speaking')) {
+    window.speechSynthesis.cancel();
+    document.querySelectorAll('.speak-btn.speaking').forEach(b => {
+      b.classList.remove('speaking');
+      const span = b.querySelector('.speak-btn-label');
+      if (span) span.textContent = '朗读';
+      const icon = b.querySelector('.speak-btn-icon');
+      if (icon) icon.textContent = '🔊';
+    });
+    return;
+  }
+  // 取消之前的朗读
+  window.speechSynthesis.cancel();
+  document.querySelectorAll('.speak-btn.speaking').forEach(b => b.classList.remove('speaking'));
+
+  // 解码 HTML 实体并去标签
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html || '';
+  const text = (tmp.textContent || tmp.innerText || '').replace(/\s+/g, ' ').trim();
+  if (!text) return;
+
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'zh-CN';
+  utt.rate = state.speechRate || 0.95;
+  utt.onstart = () => {
+    if (btn) {
+      btn.classList.add('speaking');
+      const span = btn.querySelector('.speak-btn-label');
+      if (span) span.textContent = '停止';
+      const icon = btn.querySelector('.speak-btn-icon');
+      if (icon) icon.textContent = '⏸';
+    }
+  };
+  utt.onend = utt.onerror = () => {
+    if (btn) {
+      btn.classList.remove('speaking');
+      const span = btn.querySelector('.speak-btn-label');
+      if (span) span.textContent = '朗读';
+      const icon = btn.querySelector('.speak-btn-icon');
+      if (icon) icon.textContent = '🔊';
+    }
+  };
+  window.speechSynthesis.speak(utt);
+}
+
+// 渲染一个标准朗读按钮（参数：要读的内容，可含 HTML）
+function speakBtn(content) {
+  const safe = (content || '').replace(/"/g, '&quot;').replace(/'/g, "\\'");
+  return `<button class="speak-btn" onclick="speakKnowledge(this, '${safe}')">
+    <span class="speak-btn-icon">🔊</span><span class="speak-btn-label">朗读</span>
+  </button>`;
+}
+
 function startVoiceInput() {
   const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!Rec) return;
@@ -2301,6 +2361,7 @@ function closeFullscreenAndMaybeAdvance(stepKey) {
   const modal = document.getElementById('fullscreenContentModal');
   modal?.classList.add('hidden');
   refreshAutoAdvanceCard();
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
 }
 
 function goToNextLesson() {
@@ -2341,11 +2402,24 @@ function closeMapAndAdvance(justClose) {
 function renderFossilDetail(fossilId) {
   const k = FOSSIL_KNOWLEDGE[fossilId];
   if (!k) return '<p class="fs-empty">这个化石点的深度知识正在整理中。</p>';
+  // 整合所有文字给朗读用
+  const speakAll = [
+    k.full_name, k.nickname,
+    '年代' + k.age,
+    '地点' + k.location,
+    '发现' + k.discovered,
+    '这个化石告诉我们：' + k.body,
+    '为什么重要：' + (k.why_important || []).join('。'),
+    k.misconceptions ? '常见误解：' + k.misconceptions.join('。') : '',
+  ].filter(Boolean).join('。');
   return `
     <div class="fossil-detail">
       <div class="fd-head">
-        <h3 class="fd-name">${k.full_name}</h3>
-        <p class="fd-nick">${k.nickname}</p>
+        <div class="fd-head-text">
+          <h3 class="fd-name">${k.full_name}</h3>
+          <p class="fd-nick">${k.nickname}</p>
+        </div>
+        ${speakBtn(speakAll)}
       </div>
       <div class="fd-meta-grid">
         <div class="fd-meta"><span class="fd-meta-label">🕰 年代</span><span class="fd-meta-val">${k.age}</span></div>
@@ -2818,6 +2892,7 @@ function renderHubDetailCard(kn, p) {
     if (!n) return '';
     return `<button class="kg-related-chip" data-goto="${rid}">${n.icon} ${n.label}</button>`;
   }).join('');
+  const speakContent = `${d.title || kn.hub.label}。${d.body || ''}`;
   return `
     <div class="kg-detail-card kg-detail-hub" style="border-left-color:${kn.hub.color}">
       <div class="kg-detail-head">
@@ -2826,6 +2901,7 @@ function renderHubDetailCard(kn, p) {
           <h4>${d.title || kn.hub.label}</h4>
           <p class="kg-detail-sub">${kn.hub.sub}</p>
         </div>
+        ${speakBtn(speakContent)}
       </div>
       <p class="kg-detail-body">${d.body || ''}</p>
       ${kn.intro ? `<div class="kg-detail-tip">💡 ${kn.intro}</div>` : ''}
@@ -2845,6 +2921,7 @@ function renderConceptDetailCard(node, kn, p) {
   const zhUrl = d.wiki_zh ? `https://zh.wikipedia.org/w/index.php?search=${encodeURIComponent(d.wiki_zh)}` : '';
   const enUrl = d.wiki_en ? `https://en.wikipedia.org/wiki/${d.wiki_en}` : '';
 
+  const speakContent = `${d.title || node.label}。${d.body || ''}`;
   return `
     <div class="kg-detail-card" style="border-left-color:${node.color}">
       <div class="kg-detail-head">
@@ -2853,12 +2930,9 @@ function renderConceptDetailCard(node, kn, p) {
           <h4>${d.title || node.label}</h4>
           <p class="kg-detail-sub">${node.label} · ${node.sub}</p>
         </div>
+        ${speakBtn(speakContent)}
       </div>
       <p class="kg-detail-body">${d.body || ''}</p>
-      <div class="kg-detail-wikis">
-        ${zhUrl ? `<a class="wiki-btn zh" target="_blank" rel="noreferrer" href="${zhUrl}">📖 中文维基</a>` : ''}
-        ${enUrl ? `<a class="wiki-btn en" target="_blank" rel="noreferrer" href="${enUrl}">🔗 EN</a>` : ''}
-      </div>
       ${related ? `<div class="kg-related"><strong>🔗 相关节点</strong><div class="kg-related-row">${related}</div></div>` : ''}
     </div>`;
 }
