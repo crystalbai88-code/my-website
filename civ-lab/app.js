@@ -1346,22 +1346,8 @@ let activePreEraId = null;
 let preAiHistory = {}; // era id → chat messages array
 
 // ── 角色性别选择 Character Gender Selection ──────────
-function selectChar(gender) {
-  state.characterGender = gender || 'boy';
-  localStorage.setItem('civ_character', state.characterGender);
-  const boy  = document.getElementById('char-boy');
-  const girl = document.getElementById('char-girl');
-  if (boy)  boy.style.display  = state.characterGender === 'girl' ? 'none' : 'block';
-  if (girl) girl.style.display = state.characterGender === 'girl' ? 'block' : 'none';
-  document.querySelectorAll('.char-sel-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.g === state.characterGender);
-  });
-}
-
-function loadCharacterPref() {
-  const saved = localStorage.getItem('civ_character') || 'boy';
-  selectChar(saved);
-}
+// 角色选择功能已移除（无实际功能链接）
+function loadCharacterPref() { /* no-op */ }
 
 function scrollToPreLayer(id) {
   const body = document.getElementById('preEraBody');

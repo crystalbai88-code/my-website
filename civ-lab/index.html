@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI世界文明实验室</title>
-  <link rel="stylesheet" href="./styles.css?v=38" />
+  <link rel="stylesheet" href="./styles.css?v=39" />
 </head>
 <body>
 
@@ -94,18 +94,6 @@
     <h1>AI 世界文明实验室</h1>
     <p>Global Civilization · 公元前3000年 — 公元1000年</p>
     <div class="tl-subtitle">🕸 知识网络 · 点击任意节点深入探索</div>
-    <!-- ── 角色性别选择 ── -->
-    <div class="char-select-row">
-      <span class="char-select-label">选择你的探险角色</span>
-      <div class="char-select-btns">
-        <button class="char-sel-btn active" data-g="boy" onclick="selectChar('boy')">
-          <span class="char-sel-icon">🧒</span> 少年探险家
-        </button>
-        <button class="char-sel-btn" data-g="girl" onclick="selectChar('girl')">
-          <span class="char-sel-icon">👧</span> 少女探险家
-        </button>
-      </div>
-    </div>
   </div>
 
   <!-- 🕸 主知识网络 (Level 0) -->
@@ -117,196 +105,7 @@
     <div class="tl-semester">第一学期 · 文明诞生到公元1000年</div>
     <div class="tl-line"><div class="tl-line-fill" id="tlLineFill"></div></div>
     <div class="tl-dots" id="tlDots"></div>
-    <div id="tl-figure">
-      <!-- 男生探险角色 Boy Explorer (default) -->
-      <div id="char-boy">
-      <svg width="56" height="88" viewBox="-28 -82 56 88" style="overflow:visible" xmlns="http://www.w3.org/2000/svg">
-        <!-- Ground shadow -->
-        <ellipse cx="0" cy="4" rx="18" ry="5" fill="rgba(0,0,0,0.35)"/>
-        <!-- ── Left leg (back) ── -->
-        <g class="char-leg-l" style="transform-origin:0px -14px">
-          <rect x="-11" y="-14" width="9" height="26" rx="4.5" fill="#3a8de0"/>
-          <rect x="-11" y="9" width="9" height="9" rx="4" fill="#222a50"/><!-- shoe -->
-          <rect x="-13" y="10" width="11" height="6" rx="3" fill="#1a2040"/><!-- sole -->
-        </g>
-        <!-- ── Right leg (front) ── -->
-        <g class="char-leg-r" style="transform-origin:0px -14px">
-          <rect x="2" y="-14" width="9" height="26" rx="4.5" fill="#4a9de8"/>
-          <rect x="2" y="9" width="9" height="9" rx="4" fill="#2a3460"/><!-- shoe -->
-          <rect x="2" y="10" width="11" height="6" rx="3" fill="#1a2040"/><!-- sole -->
-        </g>
-        <!-- ── Body (shirt + bobbing) ── -->
-        <g class="char-body">
-          <!-- Backpack -->
-          <rect x="9" y="-44" width="10" height="16" rx="4" fill="#7dc455" stroke="#5a9a38" stroke-width="1"/>
-          <rect x="10" y="-38" width="8" height="2" rx="1" fill="#5a9a38"/>
-          <!-- Shirt body -->
-          <rect x="-14" y="-46" width="28" height="28" rx="7" fill="#ff6b3d"/>
-          <!-- Shirt collar -->
-          <path d="M-5,-46 Q0,-42 5,-46" fill="#e84f25"/>
-          <!-- Belt -->
-          <rect x="-14" y="-22" width="28" height="5" rx="2.5" fill="#c8520a"/>
-          <!-- Belt buckle -->
-          <rect x="-4" y="-23" width="8" height="7" rx="2" fill="#ffd654" stroke="#cc9a10" stroke-width="1"/>
-          <!-- ── Left arm ── -->
-          <g class="char-arm-l" style="transform-origin:-14px -38px">
-            <rect x="-22" y="-42" width="10" height="20" rx="5" fill="#ff6b3d"/>
-            <ellipse cx="-17" cy="-22" rx="5.5" ry="5.5" fill="#f4c490"/><!-- hand -->
-          </g>
-          <!-- ── Right arm ── -->
-          <g class="char-arm-r" style="transform-origin:14px -38px">
-            <rect x="12" y="-42" width="10" height="20" rx="5" fill="#ff6b3d"/>
-            <ellipse cx="17" cy="-22" rx="5.5" ry="5.5" fill="#f4c490"/><!-- hand -->
-          </g>
-          <!-- ── Neck ── -->
-          <rect x="-5" y="-50" width="10" height="7" rx="4" fill="#f4c490"/>
-          <!-- ── Head ── -->
-          <circle cx="0" cy="-62" r="18" fill="#f4c490"/>
-          <!-- Cheeks blush -->
-          <ellipse cx="-11" cy="-57" rx="5" ry="3.5" fill="rgba(255,120,100,.25)"/>
-          <ellipse cx="11" cy="-57" rx="5" ry="3.5" fill="rgba(255,120,100,.25)"/>
-          <!-- Hair -->
-          <path d="M-17,-70 Q-14,-82 0,-80 Q14,-82 17,-70 Q16,-62 12,-60 Q0,-56 -12,-60 Q-16,-62 -17,-70Z" fill="#5c3512"/>
-          <!-- Explorer hat brim -->
-          <ellipse cx="0" cy="-76" rx="22" ry="6" fill="#c07020"/>
-          <!-- Hat crown -->
-          <rect x="-13" y="-86" width="26" height="18" rx="6" fill="#e0902a"/>
-          <!-- Hat band -->
-          <rect x="-13" y="-78" width="26" height="5" rx="2" fill="#8a4a10"/>
-          <!-- Hat feather -->
-          <path d="M13,-86 Q22,-96 16,-104 Q8,-98 13,-86Z" fill="#1ecfc0" opacity=".9"/>
-          <!-- Eyes white -->
-          <ellipse cx="-7" cy="-63" rx="5" ry="6" fill="white"/>
-          <ellipse cx="7" cy="-63" rx="5" ry="6" fill="white"/>
-          <!-- Iris -->
-          <circle cx="-7" cy="-62" r="3.5" fill="#3a2010"/>
-          <circle cx="7" cy="-62" r="3.5" fill="#3a2010"/>
-          <!-- Eye shine -->
-          <circle cx="-5.5" cy="-63.5" r="1.3" fill="white"/>
-          <circle cx="8.5" cy="-63.5" r="1.3" fill="white"/>
-          <!-- Eyebrows (cheerful arc) -->
-          <path d="M-13,-70 Q-7,-73 -2,-70" stroke="#5c3512" stroke-width="2" fill="none" stroke-linecap="round"/>
-          <path d="M2,-70 Q7,-73 13,-70" stroke="#5c3512" stroke-width="2" fill="none" stroke-linecap="round"/>
-          <!-- Smile -->
-          <path d="M-7,-54 Q0,-48 7,-54" stroke="#c05030" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-        </g>
-      </svg>
-      </div><!-- end char-boy -->
-
-      <!-- 女生探险角色 Girl Explorer (hidden by default) -->
-      <div id="char-girl" style="display:none">
-      <svg width="56" height="88" viewBox="-28 -82 56 88" style="overflow:visible" xmlns="http://www.w3.org/2000/svg">
-        <!-- Shadow -->
-        <ellipse cx="0" cy="4" rx="18" ry="5" fill="rgba(0,0,0,0.28)"/>
-        <!-- ── Skirt (static, behind legs) ── -->
-        <path d="M-14,-20 Q-18,2 -15,8 L15,8 Q18,2 14,-20Z" fill="#4a9060"/>
-        <rect x="-15" y="2" width="30" height="5" rx="2" fill="#c84820"/>
-        <path d="M-15,2 Q0,-2 15,2" fill="none" stroke="#d4a030" stroke-width="1" opacity=".6"/>
-        <!-- Skirt floral pattern dots -->
-        <circle cx="-6" cy="-8" r="2.5" fill="#e84888" opacity=".5"/>
-        <circle cx="2" cy="-12" r="2"   fill="#f0c020" opacity=".5"/>
-        <circle cx="8" cy="-6"  r="2.5" fill="#e84888" opacity=".5"/>
-        <!-- ── Left leg ── -->
-        <g class="char-leg-l" style="transform-origin:0px -14px">
-          <rect x="-10" y="-14" width="8" height="22" rx="4" fill="#e8b888"/>
-          <!-- Embroidered shoe -->
-          <ellipse cx="-6" cy="9" rx="6" ry="3.5" fill="#8a5030"/>
-          <ellipse cx="-6" cy="8" rx="4" ry="2" fill="#c87840"/>
-        </g>
-        <!-- ── Right leg ── -->
-        <g class="char-leg-r" style="transform-origin:0px -14px">
-          <rect x="2"  y="-14" width="8" height="22" rx="4" fill="#e8c898"/>
-          <ellipse cx="6" cy="9"  rx="6" ry="3.5" fill="#8a5030"/>
-          <ellipse cx="6" cy="8"  rx="4" ry="2" fill="#c87840"/>
-        </g>
-        <!-- ── Body group ── -->
-        <g class="char-body">
-          <!-- Yellow jacket body -->
-          <rect x="-14" y="-46" width="28" height="28" rx="7" fill="#e8a820"/>
-          <!-- Jacket collar (crossed) -->
-          <path d="M-4,-46 L0,-36 L4,-46" fill="#c88010"/>
-          <!-- Floral embroidery on jacket -->
-          <circle cx="-8" cy="-38" r="2.5" fill="#e84888" opacity=".6"/>
-          <circle cx="-6" cy="-34" r="1.8" fill="#f0c020" opacity=".6"/>
-          <circle cx="7"  cy="-38" r="2.5" fill="#e84888" opacity=".6"/>
-          <circle cx="5"  cy="-34" r="1.8" fill="#60c840" opacity=".6"/>
-          <!-- Jacket buttons (盘扣) -->
-          <circle cx="0" cy="-42" r="2" fill="#c88010" stroke="#a06010" stroke-width=".5"/>
-          <circle cx="0" cy="-36" r="2" fill="#c88010" stroke="#a06010" stroke-width=".5"/>
-          <!-- ── Left arm ── -->
-          <g class="char-arm-l" style="transform-origin:-14px -38px">
-            <rect x="-22" y="-42" width="10" height="20" rx="5" fill="#e8a820"/>
-            <ellipse cx="-17" cy="-22" rx="5" ry="5" fill="#f4c490"/>
-            <!-- Waving gesture -->
-            <line x1="-17" y1="-17" x2="-22" y2="-12" stroke="#f4c490" stroke-width="4" stroke-linecap="round"/>
-          </g>
-          <!-- ── Right arm (holding lantern) ── -->
-          <g class="char-arm-r" style="transform-origin:14px -38px">
-            <rect x="12" y="-42" width="10" height="20" rx="5" fill="#e8a820"/>
-            <ellipse cx="17" cy="-22" rx="5" ry="5" fill="#f4c490"/>
-            <!-- Lantern string -->
-            <line x1="17" y1="-22" x2="17" y2="-16" stroke="#8a4a10" stroke-width="1.5"/>
-            <!-- Lantern body -->
-            <rect x="12" y="-16" width="10" height="14" rx="3" fill="#d4720a" opacity=".92"/>
-            <rect x="11" y="-18" width="12" height="3" rx="1.5" fill="#8a4010"/>
-            <rect x="11" y="-3"  width="12" height="3" rx="1.5" fill="#8a4010"/>
-            <!-- Lantern window glow -->
-            <rect x="14" y="-15" width="6" height="10" rx="2" fill="#f8e060" opacity=".5"/>
-            <!-- Tassels -->
-            <line x1="15" y1="0" x2="14" y2="6"  stroke="#c84820" stroke-width="1.2"/>
-            <line x1="17" y1="0" x2="17" y2="7"  stroke="#e8a020" stroke-width="1.2"/>
-            <line x1="19" y1="0" x2="20" y2="6"  stroke="#c84820" stroke-width="1.2"/>
-          </g>
-          <!-- Neck -->
-          <rect x="-5" y="-50" width="10" height="7" rx="4" fill="#f4c490"/>
-          <!-- Head -->
-          <circle cx="0" cy="-62" r="18" fill="#f4c490"/>
-          <!-- Rosy cheeks (bigger) -->
-          <ellipse cx="-11" cy="-57" rx="6"   ry="4" fill="rgba(255,100,120,.28)"/>
-          <ellipse cx="11"  cy="-57" rx="6"   ry="4" fill="rgba(255,100,120,.28)"/>
-          <!-- Hair base -->
-          <path d="M-17,-70 Q-14,-82 0,-80 Q14,-82 17,-70 Q16,-62 12,-60 Q0,-56 -12,-60 Q-16,-62 -17,-70Z" fill="#1a0e06"/>
-          <!-- Hair buns -->
-          <circle cx="-14" cy="-78" r="7" fill="#1a0e06"/>
-          <circle cx="14"  cy="-78" r="7" fill="#1a0e06"/>
-          <!-- Left bun flower accessories -->
-          <circle cx="-16" cy="-84" r="3.5" fill="#e84888"/>
-          <circle cx="-12" cy="-85" r="2.5" fill="#e84888"/>
-          <circle cx="-14" cy="-83" r="2"   fill="#f8e060"/>
-          <!-- Right bun flower + green ribbon -->
-          <circle cx="12"  cy="-85" r="3"   fill="#60c840"/>
-          <circle cx="16"  cy="-84" r="2.5" fill="#60c840"/>
-          <circle cx="14"  cy="-84" r="1.8" fill="#f8e060"/>
-          <!-- Ribbon streamers left -->
-          <path d="M-20,-78 Q-26,-74 -24,-70" stroke="#e84888" stroke-width="2" fill="none" stroke-linecap="round" opacity=".8"/>
-          <path d="M-20,-78 Q-25,-82 -22,-86" stroke="#60c840" stroke-width="2" fill="none" stroke-linecap="round" opacity=".7"/>
-          <!-- Ribbon streamers right -->
-          <path d="M20,-78 Q26,-74 24,-70" stroke="#60c840" stroke-width="2" fill="none" stroke-linecap="round" opacity=".8"/>
-          <path d="M20,-78 Q25,-82 22,-86" stroke="#e84888" stroke-width="2" fill="none" stroke-linecap="round" opacity=".7"/>
-          <!-- Eyes -->
-          <ellipse cx="-7" cy="-63" rx="5" ry="6" fill="white"/>
-          <ellipse cx="7"  cy="-63" rx="5" ry="6" fill="white"/>
-          <circle cx="-7" cy="-62" r="3.5" fill="#1a0e06"/>
-          <circle cx="7"  cy="-62" r="3.5" fill="#1a0e06"/>
-          <circle cx="-5.5" cy="-63.5" r="1.3" fill="white"/>
-          <circle cx="8.5"  cy="-63.5" r="1.3" fill="white"/>
-          <!-- Eyelashes -->
-          <line x1="-11" y1="-67" x2="-13" y2="-70" stroke="#1a0e06" stroke-width="1.2"/>
-          <line x1="-9"  y1="-69" x2="-9"  y2="-72" stroke="#1a0e06" stroke-width="1.2"/>
-          <line x1="-7"  y1="-69" x2="-6"  y2="-72" stroke="#1a0e06" stroke-width="1.2"/>
-          <!-- Eyebrows (gentle arc) -->
-          <path d="M-13,-70 Q-7,-73 -2,-70" stroke="#1a0e06" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-          <path d="M2,-70 Q7,-73 13,-70"   stroke="#1a0e06" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-          <!-- Smile -->
-          <path d="M-6,-54 Q0,-49 6,-54" stroke="#c05060" stroke-width="2" fill="none" stroke-linecap="round"/>
-          <!-- Small dimples -->
-          <circle cx="-8" cy="-52" r="1.2" fill="rgba(200,80,100,.3)"/>
-          <circle cx="8"  cy="-52" r="1.2" fill="rgba(200,80,100,.3)"/>
-        </g>
-      </svg>
-      </div><!-- end char-girl -->
-
-    </div><!-- end tl-figure -->
+<!-- tl-figure 已删除：原男女探险角色 -->
   </div>
 
   <!-- 旧 legend 已隐藏（mn-legend display:none）— 新版用 stage 卡片导航 -->
@@ -937,8 +736,8 @@
   </div>
 </div>
 
-<script src="./data.js?v=38"></script>
-<script src="./prehistoric.js?v=38"></script>
-<script src="./app.js?v=38"></script>
+<script src="./data.js?v=39"></script>
+<script src="./prehistoric.js?v=39"></script>
+<script src="./app.js?v=39"></script>
 </body>
 </html>
