@@ -4433,16 +4433,43 @@ html, body {
 /* ════════════════════════════════════════════════════
    闯关进度卡片 (PH 页面底部)
 ════════════════════════════════════════════════════ */
+/* 收起 → 悬浮触发条 + 展开内容 */
 .auto-advance-card {
-  position: sticky; bottom: 0;
-  margin: 20px 0 0;
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%) translateY(calc(100% - 32px));
+  width: min(880px, 95vw);
   background: linear-gradient(135deg, #fdf5e0 0%, #f5e8c8 100%);
   border: 2px solid rgba(200,72,32,.3);
-  border-radius: 14px;
-  padding: 16px 20px;
-  box-shadow: 0 -6px 24px rgba(60,30,5,.18);
-  z-index: 50;
+  border-bottom: none;
+  border-radius: 14px 14px 0 0;
+  padding: 14px 20px 16px;
+  box-shadow: 0 -8px 32px rgba(60,30,5,.22);
+  z-index: 100;
+  transition: transform .35s cubic-bezier(.4,0,.2,1), opacity .25s;
+  opacity: .85;
 }
+/* 顶部加一个 32px 高的触发手柄 (一直可见) */
+.auto-advance-card::before {
+  content: '⌄ 学习进度 ⌃';
+  position: absolute;
+  top: -28px; left: 50%; transform: translateX(-50%);
+  background: linear-gradient(135deg, #c84820, #a83a18);
+  color: white;
+  font-size: 12px; font-weight: 700;
+  padding: 6px 18px;
+  border-radius: 10px 10px 0 0;
+  cursor: pointer;
+  box-shadow: 0 -4px 12px rgba(200,72,32,.3);
+  letter-spacing: 1px;
+}
+.auto-advance-card:hover,
+.auto-advance-card:focus-within {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+.auto-advance-card:hover::before { content: '⌄ 收起 ⌄'; }
 .aac-progress {
   display: flex; align-items: center; gap: 8px;
   font-size: 13px; color: #7a5530; margin-bottom: 12px;
