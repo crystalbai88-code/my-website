@@ -1565,6 +1565,11 @@ function renderPreEraGraphMode(p) {
   // Hide accordion layer pills
   $('#preLayerPills').innerHTML = '';
 
+  // 🆕 图片底板模式
+  if (kn.layout === 'image_overlay' && kn.image && kn.hotspots) {
+    return renderImageOverlayMode(p);
+  }
+
   const body = $('#preEraBody');
   body.innerHTML = `
     <div class="kg-page">
@@ -1604,6 +1609,176 @@ function renderPlayArea(p, kn) {
 }
 
 // 构造完整节点列表 — 优先使用显式 x,y；兜底用 angle/ring 计算
+// ══════════════════════════════════════════════════════
+// 🖼 图片底板 + 热点泡泡模式 (Image Overlay Layout)
+// ══════════════════════════════════════════════════════
+function renderImageOverlayMode(p) {
+  const kn = p.knowledge_network;
+  const hotspots = kn.hotspots || [];
+
+  // 渲染热点泡泡 + SVG 连接线
+  const bubbles = hotspots.map((h, i) => `
+    <button class="img-hotspot" data-nid="${h.id}"
+            style="left:${h.pos_x}%;top:${h.pos_y}%;--delay:${i * 0.15}s">
+      <span class="img-hotspot-pulse"></span>
+      <span class="img-hotspot-num">${i + 1}</span>
+      <span class="img-hotspot-label">${h.icon} ${h.label}</span>
+    </button>`).join('');
+
+  // 按时间顺序的连接线（SVG 上）
+  const connections = hotspots.length > 1
+    ? hotspots.slice(0, -1).map((h, i) => {
+        const next = hotspots[i + 1];
+        return `<line x1="${h.pos_x}%" y1="${h.pos_y}%" x2="${next.pos_x}%" y2="${next.pos_y}%"
+          stroke="#c84820" stroke-width="2" stroke-dasharray="5,5" stroke-opacity="0.5"
+          stroke-linecap="round"/>`;
+      }).join('')
+    : '';
+
+  const body = $('#preEraBody');
+  body.innerHTML = `
+    <div class="img-overlay-page">
+
+      <!-- 顶部工具栏 -->
+      <div class="img-overlay-toolbar">
+        <span class="img-overlay-title">🌳 人类起源完整时间轴</span>
+        <span class="img-overlay-hint">点击图上 ① ~ ⑦ 任意泡泡，深入了解每个时代</span>
+        <div class="img-overlay-actions">
+          <button class="img-tool-chip" onclick="showImageOverlayDetail('hub')">📜 总览</button>
+          <button class="img-tool-chip" onclick="showImageOverlayPlay('scenario')">🎮 时光机</button>
+          <button class="img-tool-chip" onclick="showImageOverlayPlay('story')">📖 故事</button>
+          <button class="img-tool-chip" onclick="showImageOverlayPlay('ai')">🤖 问 AI</button>
+        </div>
+      </div>
+
+      <!-- 大图 + 热点叠层 -->
+      <div class="img-overlay-canvas" id="imgOverlayCanvas">
+        <img class="img-overlay-bg" src="${kn.image}" alt="${p.title}"/>
+        <svg class="img-overlay-svg" preserveAspectRatio="none">
+          ${connections}
+        </svg>
+        ${bubbles}
+      </div>
+
+      <!-- 浮动详情卡（点击泡泡后弹出） -->
+      <div class="img-overlay-detail hidden" id="imgOverlayDetail"></div>
+
+    </div>
+  `;
+
+  // 绑定泡泡点击
+  body.querySelectorAll('.img-hotspot').forEach(btn => {
+    btn.addEventListener('click', () => {
+      showImageOverlayDetail(btn.getAttribute('data-nid'));
+    });
+  });
+
+  // ESC 关闭详情
+  document.addEventListener('keydown', escCloseDetail);
+
+  body.scrollTo(0, 0);
+}
+
+function escCloseDetail(e) {
+  if (e.key === 'Escape') {
+    const det = document.getElementById('imgOverlayDetail');
+    if (det) det.classList.add('hidden');
+  }
+}
+
+// 显示某个热点的详情卡
+function showImageOverlayDetail(nodeId) {
+  const p = PREHISTORIC.periods.find(x => x.id === activePreEraId);
+  if (!p) return;
+  const kn = p.knowledge_network;
+
+  // 高亮当前泡泡
+  document.querySelectorAll('.img-hotspot').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-nid') === nodeId);
+  });
+
+  let html;
+  if (nodeId === 'hub') {
+    html = renderHubDetailCard(kn, p);
+  } else {
+    // 从 hotspots 中找节点（用 hotspot 的 meta + 旧 nodes 的 detail）
+    const hotspot = (kn.hotspots || []).find(h => h.id === nodeId);
+    const fullNode = (kn.nodes || []).find(n => n.id === nodeId) || hotspot;
+    if (!fullNode) return;
+    const node = { ...fullNode, ...(hotspot || {}), color: '#c84820' };
+    html = renderConceptDetailCard(node, kn, p);
+  }
+
+  const det = document.getElementById('imgOverlayDetail');
+  det.innerHTML = `
+    <button class="img-detail-close" onclick="document.getElementById('imgOverlayDetail').classList.add('hidden')">✕</button>
+    ${html}
+  `;
+  det.classList.remove('hidden');
+
+  // 绑定相关节点 chip
+  det.querySelectorAll('.kg-related-chip').forEach(btn => {
+    btn.onclick = () => showImageOverlayDetail(btn.getAttribute('data-goto'));
+  });
+
+  // 追踪用户兴趣
+  if (typeof trackUserQuestion === 'function') {
+    trackUserQuestion('查看：' + (hotspot ? hotspot.label : nodeId), p.id);
+  }
+}
+
+// 显示富内容（时光机/故事/AI）
+function showImageOverlayPlay(special) {
+  const p = PREHISTORIC.periods.find(x => x.id === activePreEraId);
+  if (!p) return;
+  const kn = p.knowledge_network;
+
+  let richHtml = '';
+  let title = '';
+  if (special === 'scenario') {
+    richHtml = renderScenarioLayer(p).replace(/<section[^>]*>|<\/section>/g, '');
+    title = '🎮 时光机 · 你是 30 万年前的智人';
+  } else if (special === 'story') {
+    richHtml = renderPreLayer6(p).replace(/<section[^>]*>|<\/section>/g, '');
+    title = '📖 故事讲解';
+  } else if (special === 'ai') {
+    richHtml = renderPreLayer8(p).replace(/<section[^>]*>|<\/section>/g, '');
+    title = '🤖 与 AI 导师对话';
+  }
+
+  const det = document.getElementById('imgOverlayDetail');
+  det.innerHTML = `
+    <button class="img-detail-close" onclick="document.getElementById('imgOverlayDetail').classList.add('hidden')">✕</button>
+    <div class="img-detail-rich">
+      <h3>${title}</h3>
+      <div class="kg-feat-content">${richHtml}</div>
+    </div>
+  `;
+  det.classList.remove('hidden');
+
+  // 绑定富内容交互
+  if (special === 'scenario') bindScenarioInteractions(p);
+  if (special === 'ai') {
+    const aiInp = det.querySelector('#preAIInput');
+    const aiSend = det.querySelector('#preAISend');
+    if (aiSend && aiInp) {
+      aiSend.onclick = () => sendPreAIMsg(p, aiInp, det.querySelector('#preAIMsgs'));
+      aiInp.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendPreAIMsg(p, aiInp, det.querySelector('#preAIMsgs')); } };
+      det.querySelectorAll('.suggestion-chip').forEach(b => {
+        b.onclick = () => { aiInp.value = b.textContent; sendPreAIMsg(p, aiInp, det.querySelector('#preAIMsgs')); };
+      });
+      if (!preAiHistory[p.id]) {
+        preAiHistory[p.id] = [];
+        const uName = (getUserProfile()||{}).nickname || '朋友';
+        addPreAIMsg(det.querySelector('#preAIMsgs'), 'ai', `${uName}你好！我会从维基百科帮${uName}查阅关于<strong>${p.title}</strong>的内容。`);
+      } else {
+        const msgsEl = det.querySelector('#preAIMsgs');
+        preAiHistory[p.id].forEach(m => addPreAIMsg(msgsEl, m.role, m.html));
+      }
+    }
+  }
+}
+
 function computeGraphNodes(kn) {
   const out = [];
   // Hub

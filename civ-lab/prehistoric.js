@@ -315,9 +315,20 @@ const PREHISTORIC = {
       // 🕸 知识网络：所有概念互联成图，点击展开
       // ══════════════════════════════════════════════
       knowledge_network: {
-        layout: 'tree',           // 🌳 树形布局
+        layout: 'image_overlay',  // 🖼 图片底板 + 热点泡泡模式
+        image: 'images/evo-timeline.png',
         viewBox: '0 0 1000 1280',
-        intro: '从上到下，跟随时间脉络深入了解人类的演化历程',
+        intro: '点击图上任意泡泡，深入了解每个时代',
+        // 🆕 图片上热点泡泡坐标 (百分比定位)
+        hotspots: [
+          { id:'origin',  pos_x:73, pos_y:14, icon:'🌳', label:'共同祖先',     sub:'约700万年前' },
+          { id:'biped',   pos_x:73, pos_y:25, icon:'👣', label:'双足行走',     sub:'约600万年前' },
+          { id:'ardi',    pos_x:73, pos_y:36, icon:'🌿', label:'Ardipithecus', sub:'约440万年前' },
+          { id:'lucy',    pos_x:73, pos_y:48, icon:'👩', label:'Lucy',         sub:'约390万年前' },
+          { id:'tools',   pos_x:73, pos_y:60, icon:'🪨', label:'工具使用',     sub:'约280万年前' },
+          { id:'fire',    pos_x:73, pos_y:72, icon:'🔥', label:'Homo erectus', sub:'约190万年前' },
+          { id:'sapiens', pos_x:73, pos_y:86, icon:'🧠', label:'智人出现',     sub:'约30万年前' },
+        ],
         // 中心节点（点击中心显示总览）— 树形布局时作为顶部标题
         hub: { id: 'hub', label: '人类起源', sub: '约30万年前', icon: '🦴', color: '#c84820',
           x: 500, y: 60,  // 顶部装饰位置

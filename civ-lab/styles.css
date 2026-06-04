@@ -3830,3 +3830,211 @@ html, body {
 .kg-svg.kg-tree text {
   font-family: STSong,"Noto Serif SC",serif !important;
 }
+
+/* ════════════════════════════════════════════════════
+   🖼 图片底板 + 热点泡泡模式 Image Overlay Layout
+════════════════════════════════════════════════════ */
+
+.img-overlay-page {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 70px);
+  background: linear-gradient(160deg, #f5ecce 0%, #e8d8b0 100%);
+  position: relative;
+}
+
+/* 顶部工具栏 */
+.img-overlay-toolbar {
+  display: flex; align-items: center; gap: 16px;
+  padding: 12px 24px;
+  background: rgba(253,245,228,.95);
+  border-bottom: 1.5px solid rgba(160,100,30,.25);
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+.img-overlay-title {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--warm);
+  letter-spacing: .06em;
+}
+.img-overlay-hint {
+  font-size: 13px;
+  color: var(--ink2);
+  flex: 1;
+  font-style: italic;
+}
+.img-overlay-actions {
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+.img-tool-chip {
+  background: rgba(212,164,53,.12);
+  border: 1.5px solid rgba(160,100,30,.3);
+  color: var(--warm);
+  padding: 7px 14px;
+  border-radius: 18px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--sans);
+  transition: all .15s;
+}
+.img-tool-chip:hover {
+  background: var(--warm); color: white; border-color: var(--warm);
+  transform: translateY(-1px);
+}
+
+/* 大图画布 */
+.img-overlay-canvas {
+  flex: 1;
+  position: relative;
+  overflow: auto;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 20px;
+}
+.img-overlay-bg {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  height: auto;
+  width: auto;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(60,30,5,.25);
+  background: white;
+}
+
+/* SVG 连接线层 */
+.img-overlay-svg {
+  position: absolute;
+  top: 20px; left: 0; right: 0; bottom: 0;
+  width: 100%; height: calc(100% - 40px);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* 热点泡泡 */
+.img-hotspot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(135deg, #c84820, #b83018);
+  color: white;
+  border: 3px solid white;
+  border-radius: 50%;
+  width: 42px; height: 42px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800;
+  font-size: 16px;
+  font-family: var(--serif);
+  cursor: pointer;
+  z-index: 5;
+  box-shadow: 0 4px 14px rgba(184,48,24,.5);
+  transition: transform .2s, box-shadow .2s;
+  animation: hotspotIn .6s var(--delay, 0s) both;
+}
+@keyframes hotspotIn {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0); }
+  60%  { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+.img-hotspot:hover {
+  transform: translate(-50%, -50%) scale(1.15);
+  box-shadow: 0 6px 22px rgba(184,48,24,.7);
+}
+.img-hotspot.active {
+  background: linear-gradient(135deg, #f0c020, #d4a020);
+  color: #3a1a08;
+  box-shadow: 0 0 24px rgba(240,192,32,.8);
+}
+
+/* 泡泡的脉动光晕 */
+.img-hotspot-pulse {
+  position: absolute; inset: -6px;
+  border: 2px solid #c84820;
+  border-radius: 50%;
+  animation: hotspotPulse 2s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes hotspotPulse {
+  0%   { opacity: 0.8; transform: scale(1); }
+  100% { opacity: 0; transform: scale(2); }
+}
+.img-hotspot.active .img-hotspot-pulse { border-color: #f0c020; }
+.img-hotspot-num { position: relative; z-index: 2; }
+
+/* 泡泡 hover 时显示标签 */
+.img-hotspot-label {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(40,20,8,.92);
+  color: #fff5e8;
+  padding: 5px 12px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  font-family: var(--sans);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .15s, transform .15s;
+}
+.img-hotspot:hover .img-hotspot-label,
+.img-hotspot.active .img-hotspot-label {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-2px);
+}
+
+/* 浮动详情卡 */
+.img-overlay-detail {
+  position: absolute;
+  right: 24px; top: 80px;
+  width: 420px;
+  max-width: calc(100vw - 48px);
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+  background: linear-gradient(135deg, #fdf8ec, #f5e8cc);
+  border: 2px solid var(--warm);
+  border-radius: 14px;
+  padding: 26px 24px 22px;
+  box-shadow: 0 12px 36px rgba(60,30,5,.4);
+  z-index: 100;
+  animation: detailIn .35s cubic-bezier(.4,0,.2,1);
+}
+.img-overlay-detail.hidden { display: none; }
+@keyframes detailIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: none; }
+}
+.img-detail-close {
+  position: absolute;
+  top: 12px; right: 12px;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(160,100,30,.3);
+  background: white;
+  color: var(--ink2);
+  font-size: 15px;
+  cursor: pointer;
+  z-index: 10;
+}
+.img-detail-close:hover { background: var(--warm); color: white; }
+.img-detail-rich h3 {
+  font-family: var(--serif);
+  font-size: 18px;
+  color: var(--warm);
+  margin-bottom: 14px;
+  font-weight: 800;
+}
+
+/* 响应式 */
+@media (max-width: 900px) {
+  .img-overlay-toolbar { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .img-overlay-detail {
+    position: fixed; left: 12px; right: 12px; top: auto; bottom: 12px;
+    width: auto; max-height: 60vh;
+  }
+  .img-hotspot { width: 36px; height: 36px; font-size: 14px; }
+}
