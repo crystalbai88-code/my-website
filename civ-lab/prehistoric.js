@@ -140,15 +140,16 @@ const PREHISTORIC = {
         // 演化时间链 · 每个点是一个化石/重要发现地点（按非洲真实地理分布）
         // SVG viewBox 0 0 600 540 — 非洲填满画布
         // label_dir: 'tl'/'tr'/'bl'/'br'/'l'/'r'/'t'/'b' — 标签摆放方向
+        // 严格按时间从早到晚排序（① 最早 → ⑧ 最晚）
         evolution_path: [
-          { id:'jebel',   name:'摩洛哥 Jebel Irhoud', x:170, y:130, time:'约30万年前',  species:'最早智人化石',           wiki:'Jebel_Irhoud',  label_dir:'l' },
           { id:'sahel',   name:'撒哈拉乍得',           x:295, y:215, time:'约700万年前', species:'Sahelanthropus 萨赫勒人',wiki:'Sahelanthropus',label_dir:'t' },
-          { id:'ardi',    name:'埃塞俄比亚阿法',       x:425, y:240, time:'约440万年前', species:'Ardipithecus 阿尔迪古猿',wiki:'Ardipithecus',  label_dir:'tr' },
-          { id:'omo',     name:'埃塞俄比亚 Omo',      x:445, y:265, time:'约20万年前',  species:'早期智人骨骼',           wiki:'Omo_remains',   label_dir:'r' },
-          { id:'lucy',    name:'埃塞俄比亚哈达',       x:415, y:285, time:'约320万年前', species:'Lucy 南方古猿',          wiki:'Australopithecus_afarensis', label_dir:'br' },
-          { id:'turkana', name:'肯尼亚图尔卡纳湖',     x:380, y:325, time:'约160万年前', species:'Homo erectus 直立人',   wiki:'Homo_erectus',  label_dir:'l' },
           { id:'orrorin', name:'肯尼亚 Tugen',        x:415, y:355, time:'约600万年前', species:'Orrorin 始祖地猿',       wiki:'Orrorin',       label_dir:'r' },
+          { id:'ardi',    name:'埃塞俄比亚阿法',       x:425, y:240, time:'约440万年前', species:'Ardipithecus 阿尔迪古猿',wiki:'Ardipithecus',  label_dir:'tr' },
+          { id:'lucy',    name:'埃塞俄比亚哈达',       x:415, y:285, time:'约320万年前', species:'Lucy 南方古猿',          wiki:'Australopithecus_afarensis', label_dir:'br' },
           { id:'olduvai', name:'坦桑尼亚奥杜瓦伊',     x:395, y:395, time:'约200万年前', species:'早期 Homo + 石器',       wiki:'Olduvai_Gorge', label_dir:'b' },
+          { id:'turkana', name:'肯尼亚图尔卡纳湖',     x:380, y:325, time:'约160万年前', species:'Homo erectus 直立人',   wiki:'Homo_erectus',  label_dir:'l' },
+          { id:'jebel',   name:'摩洛哥 Jebel Irhoud', x:170, y:130, time:'约30万年前',  species:'最早智人化石',           wiki:'Jebel_Irhoud',  label_dir:'l' },
+          { id:'omo',     name:'埃塞俄比亚 Omo',      x:445, y:265, time:'约20万年前',  species:'早期智人骨骼',           wiki:'Omo_remains',   label_dir:'r' },
         ],
       },
 
