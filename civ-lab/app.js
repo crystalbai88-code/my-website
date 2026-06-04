@@ -2385,31 +2385,64 @@ function showFullscreenMap() {
   if (!p || !p.map || !p.map.evolution_path) return;
   const evo = p.map.evolution_path;
 
-  // 按时间从早到晚生成大化石点（半径更大、字号更大）
-  const pathD = evo.map((pt, i) => (i === 0 ? `M ${pt.x},${pt.y}` : `L ${pt.x},${pt.y}`)).join(' ');
-  const labelOffset = {
-    l:  { x: -22, y:   0, anchor: 'end' },
-    r:  { x:  22, y:   0, anchor: 'start' },
-    t:  { x:   0, y: -28, anchor: 'middle' },
-    b:  { x:   0, y:  32, anchor: 'middle' },
-    tl: { x: -18, y: -22, anchor: 'end' },
-    tr: { x:  18, y: -22, anchor: 'start' },
-    bl: { x: -18, y:  24, anchor: 'end' },
-    br: { x:  18, y:  24, anchor: 'start' },
+  // 各时代古人类对应的 emoji 图标（按演化程度递进）
+  const hominidIcons = {
+    sahel:    '🐒',  // 700万年前 ~ 类猿祖先
+    orrorin:  '🦧',  // 600万年前 ~ 类猿但能直立
+    ardi:     '🦍',  // 440万年前 ~ 半直立
+    lucy:     '👣',  // 320万年前 ~ 双足直立的南方古猿
+    olduvai:  '🪨',  // 200万年前 ~ Homo + 石器
+    turkana:  '🏃',  // 160万年前 ~ Homo erectus，长跑者
+    jebel:    '🧔',  // 30万年前 ~ 早期智人
+    omo:      '🧑',  // 20万年前 ~ 解剖学现代人
   };
+
+  // 路径平滑曲线（使用三次贝塞尔让线条更流畅）
+  const pathD = evo.length > 0
+    ? evo.map((pt, i, arr) => {
+        if (i === 0) return `M ${pt.x},${pt.y}`;
+        const prev = arr[i-1];
+        // 简单平滑：用中点作为控制点
+        const mx = (prev.x + pt.x) / 2;
+        const my = (prev.y + pt.y) / 2;
+        return `Q ${prev.x},${prev.y} ${mx},${my} T ${pt.x},${pt.y}`;
+      }).join(' ')
+    : '';
+
+  const labelOffset = {
+    l:  { x: -28, y:   0, anchor: 'end' },
+    r:  { x:  28, y:   0, anchor: 'start' },
+    t:  { x:   0, y: -32, anchor: 'middle' },
+    b:  { x:   0, y:  36, anchor: 'middle' },
+    tl: { x: -20, y: -22, anchor: 'end' },
+    tr: { x:  20, y: -22, anchor: 'start' },
+    bl: { x: -20, y:  24, anchor: 'end' },
+    br: { x:  20, y:  24, anchor: 'start' },
+  };
+
   const dots = evo.map((pt, i) => {
     const off = labelOffset[pt.label_dir || 'r'];
     const lblX = pt.x + off.x;
     const lblY = pt.y + off.y;
+    const icon = hominidIcons[pt.id] || '🦴';
+    const delay = 0.3 + i * 0.45; // 与路径动画同步
     return `
-      <g class="fs-evo-pt" data-id="${pt.id}">
-        <line x1="${pt.x}" y1="${pt.y}" x2="${lblX}" y2="${lblY}"
-              stroke="#c84820" stroke-width="0.8" opacity="0.5"/>
-        <circle cx="${pt.x}" cy="${pt.y}" r="16" fill="white" stroke="#c84820" stroke-width="3.5"
-                filter="drop-shadow(0 3px 6px rgba(200,72,32,.5))"/>
+      <g class="fs-evo-pt" data-id="${pt.id}" style="--appear-delay:${delay}s">
+        <line class="fs-evo-leader" x1="${pt.x}" y1="${pt.y}" x2="${lblX}" y2="${lblY}"
+              stroke="#c84820" stroke-width="0.9" opacity="0.5" stroke-dasharray="2,2"/>
+        <!-- 外发光环 -->
+        <circle class="fs-evo-halo" cx="${pt.x}" cy="${pt.y}" r="24" fill="rgba(240,192,32,0)" stroke="rgba(240,192,32,.6)" stroke-width="2"/>
+        <!-- 主圆 -->
+        <circle class="fs-evo-disk" cx="${pt.x}" cy="${pt.y}" r="18" fill="white" stroke="#c84820" stroke-width="3.5"
+                filter="url(#dotShadow)"/>
+        <!-- 编号 -->
         <text x="${pt.x}" y="${pt.y+6}" text-anchor="middle"
-              font-size="18" font-weight="800" fill="#c84820"
+              font-size="17" font-weight="800" fill="#c84820"
               font-family="serif">${i+1}</text>
+        <!-- 古人类图标（圆下方） -->
+        <text class="fs-evo-hominid" x="${pt.x}" y="${pt.y+38}" text-anchor="middle"
+              font-size="22">${icon}</text>
+        <!-- 标签三行 -->
         <text x="${lblX}" y="${lblY-4}" text-anchor="${off.anchor}"
               font-size="13" fill="#3a1a08" font-weight="700"
               font-family="STSong,serif">${pt.time}</text>
@@ -2434,21 +2467,24 @@ function showFullscreenMap() {
     <text x="200" y="60" font-size="20" fill="#5a3a18" opacity="0.9" font-weight="800"
           font-family="STSong,serif" letter-spacing="10">非　洲</text>`;
 
-  // 路径线（红色虚线，串联 1→2→3→...→8）
-  const pathLine = `<path d="${pathD}" fill="none" stroke="#c84820" stroke-width="3"
-    stroke-dasharray="8,5" stroke-linecap="round" opacity="0.8"/>`;
+  // 路径线（动态绘制）— 红色发光主线 + 暗色描边
+  const pathLine = `
+    <path class="fs-evo-path-glow" d="${pathD}" fill="none" stroke="#ffb060" stroke-width="9"
+      stroke-linecap="round" stroke-linejoin="round" opacity="0.35"/>
+    <path class="fs-evo-path" d="${pathD}" fill="none" stroke="#c84820" stroke-width="3.5"
+      stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="10,6"/>
+  `;
 
-  // 右侧时间表（按时间从早到晚）
+  // 右侧时间表（按时间从早到晚）— 加 emoji 图标和序列动画
   const listRows = evo.map((pt, i) => `
-    <div class="fs-evo-row" data-id="${pt.id}">
+    <div class="fs-evo-row" data-id="${pt.id}" style="--row-index:${i}">
       <div class="fs-evo-num">${i+1}</div>
+      <div class="fs-evo-hominid-lg">${hominidIcons[pt.id] || '🦴'}</div>
       <div class="fs-evo-meta">
         <div class="fs-evo-time">${pt.time}</div>
         <div class="fs-evo-name">${pt.name}</div>
         <div class="fs-evo-species">${pt.species}</div>
       </div>
-      ${pt.wiki ? `<a class="fs-evo-wiki" target="_blank" rel="noreferrer"
-        href="https://en.wikipedia.org/wiki/${pt.wiki}">📖</a>` : ''}
     </div>`).join('');
 
   const modal = document.getElementById('fullscreenMapModal');

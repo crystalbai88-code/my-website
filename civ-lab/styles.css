@@ -4858,3 +4858,121 @@ html, body {
   padding: 14px 18px;
 }
 .img-detail-finale:hover { box-shadow: 0 6px 18px rgba(42,128,56,.5); }
+
+/* ════════════════════════════════════════════════════
+   🗺 地图 3D + 动态轨迹动画
+════════════════════════════════════════════════════ */
+.fs-map-canvas {
+  perspective: 1800px;
+  perspective-origin: 50% 30%;
+  background: radial-gradient(ellipse at 50% 30%, #d8eaf2 0%, #98bcd2 100%);
+  border-radius: 18px;
+  position: relative;
+  overflow: hidden;
+}
+.fs-map-canvas::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 30% 20%, rgba(255,255,255,.4) 0%, transparent 50%);
+  pointer-events: none;
+}
+.fs-map-canvas svg {
+  transform: rotateX(12deg) scale(1.02);
+  transform-origin: center 60%;
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 18px 30px rgba(40,15,5,.35));
+  transition: transform .5s cubic-bezier(.4,0,.2,1);
+}
+.fs-map-canvas:hover svg {
+  transform: rotateX(8deg) scale(1.04);
+}
+
+/* 路径动画：发光底纹脉动 + 主虚线流动 */
+.fs-evo-path-glow {
+  animation: pathGlow 3s ease-in-out infinite alternate;
+}
+@keyframes pathGlow {
+  0%   { opacity: .25; stroke-width: 8; }
+  100% { opacity: .55; stroke-width: 11; }
+}
+.fs-evo-path {
+  stroke-dasharray: 12, 6;
+  stroke-dashoffset: 0;
+  animation: pathDraw 3.5s ease-out forwards, pathFlow 1.2s linear infinite;
+}
+@keyframes pathDraw {
+  from { stroke-dashoffset: 1800; opacity: 0; }
+  to   { stroke-dashoffset: 0; opacity: 1; }
+}
+@keyframes pathFlow {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: -18; }
+}
+
+/* 化石点：按 delay 顺序出现 */
+.fs-evo-pt {
+  opacity: 0;
+  transform-origin: center;
+  animation: fossilAppear .55s cubic-bezier(.34,1.56,.64,1) var(--appear-delay, 0s) forwards;
+  cursor: pointer;
+  transition: transform .25s;
+}
+@keyframes fossilAppear {
+  0%   { opacity: 0; transform: scale(0) translateY(8px); }
+  60%  { opacity: 1; transform: scale(1.25); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.fs-evo-pt:hover {
+  filter: brightness(1.08);
+}
+.fs-evo-pt:hover .fs-evo-disk {
+  fill: #fff5e0;
+}
+.fs-evo-pt:hover .fs-evo-halo {
+  animation: haloPulse 1.2s ease-in-out infinite;
+}
+@keyframes haloPulse {
+  0%, 100% { stroke-opacity: .6; r: 24; }
+  50%      { stroke-opacity: .3; r: 32; }
+}
+
+/* 古人类 emoji 弹跳 */
+.fs-evo-hominid {
+  animation: hominidBob 3s ease-in-out infinite var(--appear-delay, 0s);
+  transform-origin: center;
+}
+@keyframes hominidBob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-3px); }
+}
+
+/* 化石点的连接线引导动画 */
+.fs-evo-leader {
+  stroke-dashoffset: 0;
+  animation: leaderFlow .8s linear infinite;
+}
+@keyframes leaderFlow {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: -4; }
+}
+
+/* 右侧列表项也加序列动画 */
+.fs-evo-row {
+  opacity: 0;
+  animation: rowAppear .4s ease-out forwards;
+  animation-delay: calc(0.3s + var(--row-index, 0) * 0.15s);
+}
+@keyframes rowAppear {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* 右侧列表的 emoji 大图标 */
+.fs-evo-hominid-lg {
+  font-size: 26px;
+  width: 36px;
+  text-align: center;
+  flex-shrink: 0;
+  animation: hominidBob 3.5s ease-in-out infinite var(--row-index, 0) ;
+}
+.fs-evo-row { gap: 10px; }
