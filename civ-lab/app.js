@@ -3327,7 +3327,11 @@ function renderScenarioLayer(p) {
             <div class="scenario-bar"><div class="scenario-bar-fill" style="width:${s.start_survival}%"></div></div>
             <span class="scenario-stat-num">${s.start_survival}/100</span>
           </div>
-          <button class="scenario-start-btn" data-pid="${p.id}">🎬 开始穿越</button>
+          <div class="scenario-start-actions">
+            <button class="scenario-start-btn" data-pid="${p.id}">🎬 开始穿越</button>
+            <button class="scenario-ai-btn" data-pid="${p.id}" title="让 AI 调用知识库重新生成 4 个全新场景">🎲 AI 生成新剧本</button>
+          </div>
+          <p class="scenario-ai-hint">每次 AI 生成都基于课程知识库 + 你的年龄设定，剧情和选择都不一样</p>
         </div>
       </div>
 
@@ -3355,8 +3359,127 @@ let scenarioState = {};
 
 function bindScenarioInteractions(p) {
   const startBtn = document.querySelector('.scenario-start-btn[data-pid="' + p.id + '"]');
-  if (!startBtn) return;
-  startBtn.onclick = () => beginScenario(p);
+  if (startBtn) startBtn.onclick = () => beginScenario(p);
+  const aiBtn = document.querySelector('.scenario-ai-btn[data-pid="' + p.id + '"]');
+  if (aiBtn) aiBtn.onclick = () => generateAIScenarios(p, aiBtn);
+}
+
+// 🎲 调用 AI (千问/Claude) 根据知识库生成全新时光机剧本
+async function generateAIScenarios(p, btn) {
+  if (!state.apiKey || !state.apiKey.startsWith('sk-')) {
+    alert('请先接入 AI（点右下角 🤖 图标 → ⚙ 设置 → 千问免费 Key）');
+    return;
+  }
+  const originalText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '⏳ AI 正在生成剧本…';
+  btn.classList.add('loading');
+
+  try {
+    // 从知识库提取相关上下文
+    let kbCtx = '';
+    if (typeof KB !== 'undefined') {
+      const hits = KB.searchInternal(p.title + ' ' + (p.time || '') + ' 早期人类 智人 生存', { limit: 10, era: p.id });
+      kbCtx = hits.slice(0, 8).map(h => `【${h.type}·${h.title}】${(h.body||'').slice(0,180)}`).join('\n\n');
+    }
+    const user = getUserProfile() || {};
+    const age = user.age || 10;
+    const nick = user.nickname || '小朋友';
+
+    const systemPrompt = `你是史前历史专家+儿童故事作家。基于真实历史和考古证据，为 ${age} 岁的 ${nick} 生成一个 "时光机" 角色扮演剧本。
+
+时代背景：${p.title} · ${p.time}
+玩家身份：30 万年前的早期智人，住在东非草原边缘的小山洞，族群约 20 人
+
+# 知识库参考
+${kbCtx || '（请基于你对早期智人的了解写作）'}
+
+# 输出要求 — 严格 JSON
+{
+  "scenes": [
+    {
+      "emoji": "🌅",
+      "title": "场景标题，10 字内",
+      "situation": "情境描述, 1-2 句, ${age} 岁能懂的话",
+      "choices": [
+        { "text": "选项 A 文字", "effect": +15, "outcome": "选择后结果, 1-2 句", "fact": "📖 真实历史依据" },
+        { "text": "选项 B 文字", "effect": -10, "outcome": "...", "fact": "..." },
+        { "text": "选项 C 文字", "effect": 0, "outcome": "...", "fact": "..." }
+      ]
+    },
+    ... 共 4 个场景
+  ]
+}
+
+# 规则
+- 每个场景 3 个选项，effect 范围 -20 到 +20
+- 不要现代物品（金属/农业/城市/文字）
+- 4 个场景围绕一个主题：食物危机/冲突/迁徙决策/合作传承
+- 用儿童语言（不超过 ${age + 5} 岁），多用比喻
+- fact 字段必须基于真实考古/人类学（火、石器、合作、迁徙、长者智慧）
+
+只输出 JSON，不要其他文字。`;
+
+    const provider = state.aiProvider || 'qwen';
+    let text = '';
+    if (provider === 'qwen') {
+      const res = await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + state.apiKey },
+        body: JSON.stringify({
+          model: state.aiModel || 'qwen-turbo',
+          max_tokens: 2000,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: `请生成 4 个全新的时光机场景。这次的主题随机抽取一个：水源枯竭、外族遭遇、火种危机、孩子受伤、长者去世、新土地探索。要让${nick}做艰难的选择。` },
+          ],
+        }),
+      });
+      if (!res.ok) throw new Error('Qwen ' + res.status + ' · ' + (await res.text()).slice(0,150));
+      const data = await res.json();
+      text = data.choices?.[0]?.message?.content || '';
+    } else {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': state.apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 2000,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: `请生成 4 个全新的时光机场景。主题随机抽：水源枯竭、外族遭遇、火种危机、孩子受伤、长者去世、新土地探索。` }],
+        }),
+      });
+      if (!res.ok) throw new Error('Claude ' + res.status);
+      const data = await res.json();
+      text = data.content[0].text;
+    }
+
+    // 解析 JSON（可能被 ``` 包裹）
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('AI 返回格式不对');
+    const parsed = JSON.parse(jsonMatch[0]);
+    if (!parsed.scenes || !Array.isArray(parsed.scenes) || parsed.scenes.length === 0) {
+      throw new Error('AI 没生成场景');
+    }
+
+    // 替换当前 period 的 scenario.scenes
+    p.scenario._original = p.scenario._original || p.scenario.scenes;
+    p.scenario.scenes = parsed.scenes;
+
+    // 重置游戏状态并启动
+    btn.innerHTML = '✓ 新剧本就绪！';
+    setTimeout(() => beginScenario(p), 600);
+  } catch (e) {
+    btn.disabled = false;
+    btn.classList.remove('loading');
+    btn.innerHTML = originalText;
+    alert('AI 生成失败：' + e.message + '\n继续使用预设剧本。');
+  }
 }
 
 function beginScenario(p) {
