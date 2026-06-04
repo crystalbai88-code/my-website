@@ -2229,11 +2229,12 @@ html, body {
 
 /* 首页改为允许滚动（防内容被裁） */
 #s-home {
-  overflow-y: auto !important;
+  overflow-y: scroll !important;
   justify-content: flex-start !important;
   padding-top: 70px !important;
   padding-bottom: 70px !important;
-  min-height: 100vh;
+  height: 100vh !important;
+  max-height: 100vh !important;
 }
 
 /* 标题区域强制留出充足顶部空间 */
