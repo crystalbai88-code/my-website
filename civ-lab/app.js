@@ -3360,12 +3360,12 @@ function renderPreLayer5(p) {
 
 function renderPreLayer6(p) {
   const s = p.story;
-  // 🎬 仅 PH01 配视频（5 段自然历史纪录片风格短片）
+  // 🎬 仅 PH01 配视频（按用户指定顺序 2-4-3-1-5）
   const videos = p.id === 'PH01' ? [
-    { src: 'videos/ph01-1.mp4', title: '🌅 东非草原·清晨', caption: '智人族群苏醒，开始一天的狩猎与采集' },
     { src: 'videos/ph01-2.mp4', title: '🌊 河边的生活', caption: '河流是早期人类最重要的资源——水、食物、运输' },
-    { src: 'videos/ph01-3.mp4', title: '🔥 围火夜话', caption: '火让人类能御寒、烹饪、抵御野兽，并第一次能聚在一起讲述故事' },
     { src: 'videos/ph01-4.mp4', title: '👥 群体合作', caption: '4-5 人协作打猎、分享食物——这是文明社会的起点' },
+    { src: 'videos/ph01-3.mp4', title: '🔥 围火夜话', caption: '火让人类能御寒、烹饪、抵御野兽，并第一次能聚在一起讲述故事' },
+    { src: 'videos/ph01-1.mp4', title: '🌅 东非草原·清晨', caption: '智人族群苏醒，开始一天的狩猎与采集' },
     { src: 'videos/ph01-5.mp4', title: '🌍 走向远方', caption: '约 7 万年前，智人开始走出非洲，向更广阔的世界扩散' },
   ] : [];
 
