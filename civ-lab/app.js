@@ -1896,7 +1896,7 @@ function renderImageOverlayMode(p) {
         </div>
       </div>
 
-      <!-- 大图 + 热点叠层（图与泡泡同处一个 stage 容器，坐标对齐） -->
+      <!-- 大图 + 热点叠层（图与泡泡同处一个 stage 容器，坐标对齐） + 详情卡侧栏 -->
       <div class="img-overlay-canvas" id="imgOverlayCanvas">
         <div class="img-overlay-stage">
           <img class="img-overlay-bg" src="${kn.image}" alt="${p.title}" loading="eager" decoding="async" fetchpriority="high"/>
@@ -1912,10 +1912,9 @@ function renderImageOverlayMode(p) {
             <div class="walker-cheer hidden" id="walkerCheer">加油！</div>
           </div>
         </div>
+        <!-- 详情卡（在 canvas 内部，hidden 时不占空间） -->
+        <div class="img-overlay-detail hidden" id="imgOverlayDetail"></div>
       </div>
-
-      <!-- 浮动详情卡（点击泡泡后弹出） -->
-      <div class="img-overlay-detail hidden" id="imgOverlayDetail"></div>
 
       <!-- 🗺 全屏迁徙地图 modal（点击工具栏 🗺 地图 弹出）-->
       <div class="fullscreen-map-modal hidden" id="fullscreenMapModal"></div>
@@ -1991,10 +1990,7 @@ function toggleAvatarGender() {
 }
 
 function escCloseDetail(e) {
-  if (e.key === 'Escape') {
-    const det = document.getElementById('imgOverlayDetail');
-    if (det) det.classList.add('hidden');
-  }
+  if (e.key === 'Escape') closeOverlayDetail();
 }
 
 // 显示某个热点的详情卡
@@ -2047,10 +2043,11 @@ function showImageOverlayDetail(nodeId) {
 
   const det = document.getElementById('imgOverlayDetail');
   det.innerHTML = `
-    <button class="img-detail-close" onclick="document.getElementById('imgOverlayDetail').classList.add('hidden')">✕</button>
+    <button class="img-detail-close" onclick="closeOverlayDetail()">✕</button>
     ${html}
     ${navRow}
   `;
+  document.getElementById('imgOverlayCanvas')?.classList.add('detail-open');
   det.classList.remove('hidden');
 
   // 🔄 自动滚动到对应的 hotspot 位置（不只是详情卡）
@@ -2080,8 +2077,14 @@ function showImageOverlayDetail(nodeId) {
 }
 
 function finishHotspotsAndOpenMap() {
-  document.getElementById('imgOverlayDetail')?.classList.add('hidden');
+  closeOverlayDetail();
   showFullscreenMap();
+}
+
+function closeOverlayDetail() {
+  document.getElementById('imgOverlayDetail')?.classList.add('hidden');
+  document.getElementById('imgOverlayCanvas')?.classList.remove('detail-open');
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
 }
 
 // 在屏幕底部短暂显示一个 toast，3 秒后执行回调；可手动取消

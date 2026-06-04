@@ -3892,6 +3892,8 @@ html, body {
   overflow: auto;
   display: flex; align-items: center; justify-content: center;
   padding: 12px;
+  gap: 16px;
+  transition: justify-content .4s cubic-bezier(.4,0,.2,1);
 }
 /* 🆕 stage 容器：自适应屏幕，保持正方形比例，不超出视口 */
 .img-overlay-stage {
@@ -3900,6 +3902,15 @@ html, body {
   width: min(95vw, calc(100vh - 130px), 1300px);
   aspect-ratio: 1 / 1;
   flex-shrink: 0;
+  transition: width .4s cubic-bezier(.4,0,.2,1), transform .4s;
+}
+/* 当详情卡打开时：图整体左移并缩小，卡片在右侧并排显示 */
+.img-overlay-canvas.detail-open {
+  justify-content: flex-start;
+  padding-left: 24px;
+}
+.img-overlay-canvas.detail-open .img-overlay-stage {
+  width: min(55vw, calc(100vh - 130px));
 }
 .img-overlay-bg {
   display: block;
@@ -4003,19 +4014,21 @@ html, body {
 
 /* 浮动详情卡 */
 .img-overlay-detail {
-  position: absolute;
-  right: 24px; top: 80px;
-  width: 420px;
-  max-width: calc(100vw - 48px);
-  max-height: calc(100vh - 140px);
+  /* 内嵌在 canvas 右侧（不再是绝对定位浮窗） */
+  position: relative;
+  width: 38vw;
+  max-width: 520px;
+  min-width: 320px;
+  max-height: calc(100vh - 130px);
   overflow-y: auto;
   background: linear-gradient(135deg, #fdf8ec, #f5e8cc);
   border: 2px solid var(--warm);
   border-radius: 14px;
   padding: 26px 24px 22px;
-  box-shadow: 0 12px 36px rgba(60,30,5,.4);
-  z-index: 100;
-  animation: detailIn .35s cubic-bezier(.4,0,.2,1);
+  box-shadow: 0 12px 36px rgba(60,30,5,.3);
+  z-index: 10;
+  animation: detailIn .4s cubic-bezier(.4,0,.2,1);
+  flex-shrink: 0;
 }
 .img-overlay-detail.hidden { display: none; }
 @keyframes detailIn {
