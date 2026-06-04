@@ -3360,13 +3360,14 @@ function renderPreLayer5(p) {
 
 function renderPreLayer6(p) {
   const s = p.story;
-  // 🎬 仅 PH01 配视频（按用户指定顺序 2-4-3-1-5）
+  // 🎬 仅 PH01 配视频 — 一个完整的迁徙故事：
+  // 河边生活 → 水源枯竭 → 群体讨论 → 阿婆带路 → 走向远方
   const videos = p.id === 'PH01' ? [
-    { src: 'videos/ph01-2.mp4', title: '🌊 河边的生活', caption: '河流是早期人类最重要的资源——水、食物、运输' },
-    { src: 'videos/ph01-4.mp4', title: '👥 群体合作', caption: '4-5 人协作打猎、分享食物——这是文明社会的起点' },
-    { src: 'videos/ph01-3.mp4', title: '🔥 围火夜话', caption: '火让人类能御寒、烹饪、抵御野兽，并第一次能聚在一起讲述故事' },
-    { src: 'videos/ph01-1.mp4', title: '🌅 东非草原·清晨', caption: '智人族群苏醒，开始一天的狩猎与采集' },
-    { src: 'videos/ph01-5.mp4', title: '🌍 走向远方', caption: '约 7 万年前，智人开始走出非洲，向更广阔的世界扩散' },
+    { src: 'videos/ph01-2.mp4', title: '🌊 河边的生活',     caption: '族群依水而居——水、鱼、植物、野兽都靠这条河。这是文明前夜的日常。' },
+    { src: 'videos/ph01-4.mp4', title: '🏜 水源枯竭',       caption: '河变浅，鱼变少，植物枯萎。族群面临生存危机——必须做决定。' },
+    { src: 'videos/ph01-3.mp4', title: '🔥 围火讨论 · 准备迁徙', caption: '夜晚围着火，大家激烈讨论：要不要走？往哪里走？谁带路？这是最早的集体决策。' },
+    { src: 'videos/ph01-1.mp4', title: '👵 阿婆带路',       caption: '部族里最年长的女性记得几十年前找到过另一片水源——她的记忆，就是部落的"地图"。' },
+    { src: 'videos/ph01-5.mp4', title: '🌍 走向远方',       caption: '族群跟随阿婆离开旧河岸，向远方迁徙。几万年后，他们的后代将走遍世界。' },
   ] : [];
 
   const videoHtml = videos.length > 0 ? `
