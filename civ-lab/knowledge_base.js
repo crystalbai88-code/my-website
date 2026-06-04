@@ -202,7 +202,25 @@ const KB = {
       });
     }
 
-    // 4. 加载外部缓存
+    // 4. 索引 PREHISTORIC_KB_INDEX (深度知识库 P01-P10, A级博物馆/学术来源)
+    if (typeof PREHISTORIC_KB_INDEX !== 'undefined') {
+      PREHISTORIC_KB_INDEX.forEach((e, i) => {
+        this.addInternal({
+          id: 'pkb:' + e.node_id + ':' + e.type + ':' + i,
+          type: 'deep_' + e.type,
+          source_id: e.node_id,
+          source_label: e.source ? `${e.source_tier || ''}级 · ${e.source}` : (e.node_id + ' · 深度知识'),
+          era: e.era_hint || e.node_id,
+          title: e.title,
+          body: e.body || '',
+          keywords: e.keywords || [],
+          source_tier: e.source_tier,
+          deep: true,
+        });
+      });
+    }
+
+    // 5. 加载外部缓存
     try { this.external = JSON.parse(localStorage.getItem('civ_kb_external') || '{}'); }
     catch { this.external = {}; }
 

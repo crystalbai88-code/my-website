@@ -80,6 +80,8 @@ function loadPersisted() {
   try { state.completed = JSON.parse(localStorage.getItem('civ_completed') || '[]'); } catch { state.completed = []; }
   try { state.learned = JSON.parse(localStorage.getItem('civ_learned') || '{}'); } catch { state.learned = {}; }
   state.apiKey = localStorage.getItem('civ_api_key') || '';
+  state.aiProvider = localStorage.getItem('civ_ai_provider') || 'qwen';
+  state.aiModel = localStorage.getItem('civ_ai_model') || 'qwen-turbo';
   state.speechRate = parseFloat(localStorage.getItem('civ_speech_rate') || '0.95');
 }
 function savePersisted() {
@@ -935,6 +937,8 @@ function bindSettings() {
 
 function loadSettings() {
   state.apiKey = localStorage.getItem('civ_api_key') || '';
+  state.aiProvider = localStorage.getItem('civ_ai_provider') || 'qwen';
+  state.aiModel = localStorage.getItem('civ_ai_model') || 'qwen-turbo';
   state.speechRate = parseFloat(localStorage.getItem('civ_speech_rate') || '0.95');
   if (state.apiKey) {
     $('#apiKeyInput').value = state.apiKey;
@@ -1649,7 +1653,8 @@ function renderImageOverlayMode(p) {
         <span class="img-overlay-title">🌳 人类起源完整时间轴</span>
         <span class="img-overlay-hint">点击图上 ① ~ ⑦ 任意泡泡，深入了解每个时代</span>
         <div class="img-overlay-actions">
-          <button class="img-tool-chip" onclick="showImageOverlayDetail('hub')">📜 总览</button>
+          <button class="img-tool-chip" onclick="showImageOverlayPlay('hub')">📜 总览</button>
+          <button class="img-tool-chip" onclick="showFullscreenMap()">🗺 地图</button>
           <button class="img-tool-chip" onclick="showImageOverlayPlay('scenario')">🎮 时光机</button>
           <button class="img-tool-chip" onclick="showImageOverlayPlay('story')">📖 故事</button>
           <button class="img-tool-chip" onclick="showImageOverlayPlay('ai')">🤖 问 AI</button>
@@ -1669,6 +1674,9 @@ function renderImageOverlayMode(p) {
 
       <!-- 浮动详情卡（点击泡泡后弹出） -->
       <div class="img-overlay-detail hidden" id="imgOverlayDetail"></div>
+
+      <!-- 🗺 全屏迁徙地图 modal（点击工具栏 🗺 地图 弹出）-->
+      <div class="fullscreen-map-modal hidden" id="fullscreenMapModal"></div>
 
     </div>
   `;
@@ -1734,52 +1742,451 @@ function showImageOverlayDetail(nodeId) {
   }
 }
 
-// 显示富内容（时光机/故事/AI）
+// ════════════════════════════════════════════════════════════════
+// 🗿 化石点深度知识库（每个点的策展式内容，避免给小孩看维基百科原文）
+// 数据来源：A 级（Smithsonian / Nature / Cleveland Museum / 论文）
+// ════════════════════════════════════════════════════════════════
+const FOSSIL_KNOWLEDGE = {
+  sahel: {
+    full_name: 'Sahelanthropus tchadensis · 萨赫勒人乍得种',
+    nickname: 'Toumaï（图迈，乍得语意为"生命的希望"）',
+    discovered: '2001 年，乍得 Djurab 沙漠，由 Michel Brunet 团队',
+    age: '约 700–600 万年前',
+    location: '乍得（中非）',
+    what_we_have: '一个几乎完整的颅骨 (TM 266-01-060-1)、5 块下颌骨碎片、若干牙齿',
+    why_important: [
+      '目前已知最早可能属于人类系谱的化石之一',
+      '位于非洲中部，而不是东非——挑战"东非摇篮"单一假说',
+      '颅底显示枕骨大孔位置可能已经偏前，暗示双足行走的可能',
+    ],
+    body: '700 万年前，人类祖先和黑猩猩祖先刚刚分开不久。这个时期的化石极度稀少。Toumaï 是这个关键时间窗的少数证据。但因为只有颅骨没有下半身，是否已经直立行走仍有争议。',
+    misconceptions: [
+      '❌ 不要说 Toumaï 是"人类"——它可能是人类和黑猩猩共同祖先附近的物种',
+      '❌ 不要说"它会走路"——证据有限，学界仍在争论',
+    ],
+    sources: [
+      'Brunet et al. (2002). A new hominid from the Upper Miocene of Chad. Nature 418.',
+      'Smithsonian Human Origins · Sahelanthropus',
+    ],
+  },
+  orrorin: {
+    full_name: 'Orrorin tugenensis · 千禧人',
+    nickname: 'Millennium Man（千禧人，因 2000 年发现而得名）',
+    discovered: '2000 年，肯尼亚 Tugen Hills，Senut & Pickford 团队',
+    age: '约 610–580 万年前',
+    location: '肯尼亚（东非）',
+    what_we_have: '13 块化石：股骨片段、上臂骨、手指骨、牙齿',
+    why_important: [
+      '股骨形态显示"已经能习惯性双足行走"',
+      '牙齿小而厚珐琅质——更像后来的人类，而不像猿类',
+      '比 Lucy 早 300 万年，可能改写双足直立的起源时间',
+    ],
+    body: '股骨是判断"走不走路"的关键骨头。Orrorin 的股骨颈短而粗，受力方向显示它会用两条腿走路。这是目前最早能直立行走的人类祖先化石证据之一。',
+    misconceptions: [
+      '❌ 不要说"千禧人发明了直立行走"——直立行走是逐渐演化的，不是单一发明',
+    ],
+    sources: [
+      'Senut, Pickford et al. (2001). First hominid from the Miocene. C.R. Acad. Sci. 332.',
+      'Richmond & Jungers (2008). Orrorin tugenensis femoral morphology. Science 319.',
+    ],
+  },
+  ardi: {
+    full_name: 'Ardipithecus ramidus · 始祖地猿',
+    nickname: 'Ardi（阿尔迪，阿法语意为"地面"）',
+    discovered: '1994 年开始发掘，2009 年正式发表。埃塞俄比亚 Afar 地区，Tim White 团队',
+    age: '约 440 万年前',
+    location: '埃塞俄比亚（东非阿法洼地）',
+    what_we_have: '110 多块化石，包括相当完整的女性骨架 ARA-VP-6/500（约 50% 完整度）',
+    why_important: [
+      '能直立行走，但也保留爬树能力——是"过渡形态"',
+      '牙齿、骨盆、脚趾都和今天的黑猩猩很不一样，说明黑猩猩并不代表"原始状态"',
+      '生活在森林环境，挑战了"草原驱动直立"的传统假说',
+    ],
+    body: 'Ardi 改变了我们对早期人类祖先的理解。她没有像黑猩猩那样长长的犬齿，骨盆已经适应双足，但拇趾仍然是分开的（能抓树枝）。她证明"直立行走"和"丛林生活"可以共存。',
+    misconceptions: [
+      '❌ 不要说"Ardi 是 Lucy 的祖母"——她们之间相隔 100 多万年',
+      '❌ 不要说"现代黑猩猩长这样就是原始的人类"——黑猩猩自己也演化了 600 万年',
+    ],
+    sources: [
+      'White et al. (2009). Ardipithecus ramidus and the Paleobiology of Early Hominids. Science 326 (Special Issue).',
+      'Lovejoy (2009). Reexamining Human Origins. Science.',
+    ],
+  },
+  lucy: {
+    full_name: 'Australopithecus afarensis · 阿法南方古猿',
+    nickname: 'Lucy（露西，编号 AL 288-1，1974 年发现时听 Beatles 的"Lucy in the Sky with Diamonds"得名）',
+    discovered: '1974 年 11 月 24 日，埃塞俄比亚 Hadar，Donald Johanson & Tom Gray 发现',
+    age: '约 318 万年前',
+    location: '埃塞俄比亚 Hadar（东非阿法洼地）',
+    what_we_have: '47 块骨头碎片，约 40% 完整骨架——是当时最完整的早期人类化石',
+    why_important: [
+      '骨盆和股骨证明她**完全双足直立**',
+      '脑容量约 380-430 cc，与黑猩猩相当——证明"先直立，后脑大"',
+      '身高约 1.05 米，体重约 28 公斤，可能是年轻女性',
+      '1976 年坦桑尼亚 Laetoli 发现 360 万年前的同种脚印，进一步证实直立',
+    ],
+    body: 'Lucy 是人类古生物学史上最有名的化石。她颠覆了一个旧观念：人类不是先有大脑袋，再学会走路；而是先走路，再过了 200 多万年大脑才开始变大。她让我们知道：使用双手做事、用工具，比"聪明"更早出现。',
+    misconceptions: [
+      '❌ Lucy 不是"第一个人"——她是南方古猿，不是 Homo 属',
+      '❌ Lucy 不是"我们直接的祖先"——她可能是直系祖先的近亲，证据未定',
+      '❌ Lucy 不是孤独一人——同地点出土多个个体（"第一家庭"AL 333）',
+    ],
+    sources: [
+      'Johanson & Edey (1981). Lucy: The Beginnings of Humankind. Simon & Schuster.',
+      'Cleveland Museum of Natural History · Lucy 馆藏',
+      'Kimbel & Delezene (2009). "Lucy" redux. Yearbook of Physical Anthropology 52.',
+    ],
+  },
+  olduvai: {
+    full_name: 'Olduvai Gorge · 奥杜瓦伊峡谷（早期 Homo + Oldowan 石器）',
+    nickname: '"人类的摇篮"（被联合国教科文组织列为世界遗产）',
+    discovered: '1959 年 Mary Leakey 发现 Zinjanthropus；1960 年发现 Homo habilis 化石',
+    age: '约 200–180 万年前（最古老地层 OH 24 约 180 万年）',
+    location: '坦桑尼亚北部（东非）',
+    what_we_have: 'Homo habilis (OH 7, OH 24)、Paranthropus boisei (OH 5 "Zinj")、世界最早成体系石器组合 (Oldowan 工业)',
+    why_important: [
+      '世界上**最早**的成体系石器（Oldowan）出土地之一',
+      'Homo habilis（"能人"）首次被识别——属名 Homo 的起点',
+      '同一地层同时出土多种古人类，说明当时不止一种"人"在地球上',
+      '为"非洲是人类摇篮"理论提供决定性证据',
+    ],
+    body: '奥杜瓦伊峡谷有完整的 200 万年地层序列，像一本翻开的史前书。Mary Leakey 用 30 年时间发掘，证明非洲东部就是早期人类的核心舞台。Oldowan 石器（用一块石头敲另一块，得到锋利边缘）是人类技术的"第一页"。',
+    misconceptions: [
+      '❌ Zinjanthropus（"Zinj"）不是 Homo——是 Paranthropus，旁支',
+      '❌ Oldowan 石器虽简单，但需要规划——不是"随便打个石头"',
+    ],
+    sources: [
+      'Leakey, M.D. (1971). Olduvai Gorge: Excavations in Beds I and II. Cambridge.',
+      'UNESCO World Heritage · Ngorongoro Conservation Area (含 Olduvai)',
+      'Plummer (2004). Flaked stones and old bones. Yearbook of Physical Anthropology 47.',
+    ],
+  },
+  turkana: {
+    full_name: 'Lake Turkana 化石区 · Homo erectus (Turkana Boy)',
+    nickname: 'Turkana Boy（图尔卡纳男孩，编号 KNM-WT 15000）',
+    discovered: '1984 年 Kamoya Kimeu 在肯尼亚 Nariokotome 发现',
+    age: '约 160 万年前',
+    location: '肯尼亚图尔卡纳湖西岸（东非）',
+    what_we_have: 'Homo erectus 青少年男性骨架，约 90% 完整——史上最完整的早期 Homo 化石之一',
+    why_important: [
+      '身高已接近现代人（推测成人 ~1.85 米），骨架比例现代化',
+      '脑容量 ~880 cc，远大于 Lucy，但仍小于现代人 (~1400 cc)',
+      'Homo erectus 是**第一个走出非洲**的人类祖先，扩散到欧亚',
+      '出土处同地层有 Acheulean 石器（手斧）——技术大跃迁',
+    ],
+    body: '图尔卡纳男孩去世时大约 8-12 岁，但身高已超过 1.5 米。Homo erectus 是史前史上的"超级旅行者"——他们从非洲走到了今天的格鲁吉亚、印尼爪哇、中国周口店。他们已经会用火（约 100 万年前的 Wonderwerk 洞证据）。',
+    misconceptions: [
+      '❌ Turkana Boy 不是"成年人"——他是青少年',
+      '❌ Homo erectus 不是"原始智人"——他们是独立物种，在地球上存在 200 万年（比智人长得多）',
+    ],
+    sources: [
+      'Walker & Leakey (1993). The Nariokotome Homo erectus Skeleton. Harvard University Press.',
+      'Smithsonian Human Origins · Turkana Boy',
+      'Anton (2003). Natural history of Homo erectus. Yearbook of Physical Anthropology 46.',
+    ],
+  },
+  jebel: {
+    full_name: 'Jebel Irhoud · 摩洛哥智人 (Homo sapiens)',
+    nickname: '"最古老的智人"（2017 年改写教科书的发现）',
+    discovered: '1961 年首次发现，2017 年由 Jean-Jacques Hublin 团队重新测年并发表 Nature',
+    age: '约 315,000 年前（315 ± 34 ka）',
+    location: '摩洛哥 Jebel Irhoud（北非）',
+    what_we_have: '至少 5 个个体的颅骨、下颌、四肢化石；同地层 Levallois 石器、烧过的动物骨头（用火证据）',
+    why_important: [
+      '将智人起源推前 10 万年（之前认为最早是 Omo Kibish 约 195 ka）',
+      '位于北非，而不是东非——支持"泛非洲起源"模型',
+      '面部已经"现代"（扁平、有下巴雏形），但颅腔仍较长（不完全圆）',
+      '证明智人是在整个非洲不同区域共同演化，不是单一群体突变',
+    ],
+    body: 'Jebel Irhoud 1 颅骨改变了人类起源叙事。2017 年之前，大多数教科书写"智人 20 万年前出现在东非"。这个发现说：30 万年前在北非，已经有了"几乎是我们"的人。同地层有用火痕迹、有 Levallois 技术（需要预先规划的石器制法）。',
+    misconceptions: [
+      '❌ Jebel Irhoud 不是"完全的现代人"——颅腔形状仍是过渡形态',
+      '❌ 不要说"智人 30 万年前突然出现"——是逐渐演化的最早化石证据',
+    ],
+    sources: [
+      'Hublin et al. (2017). New fossils from Jebel Irhoud, Morocco, and the pan-African origin of Homo sapiens. Nature 546:289-292.',
+      'Richter et al. (2017). The age of the hominin fossils from Jebel Irhoud, Morocco. Nature 546.',
+      'Smithsonian Human Origins · Jebel Irhoud',
+    ],
+  },
+  omo: {
+    full_name: 'Omo Kibish · 早期智人',
+    nickname: 'Omo I 与 Omo II（编号化石）',
+    discovered: '1967 年 Richard Leakey 团队发现，2005 年与 2022 年重新测年',
+    age: '约 233,000 年前（2022 年最新研究）',
+    location: '埃塞俄比亚 Omo Kibish（东非）',
+    what_we_have: 'Omo I 颅骨与部分骨骼（解剖学上更"现代"）、Omo II 颅骨（较原始）——同地层但形态不同',
+    why_important: [
+      '此前被认为是最早智人（195 ka），2022 年新测年推至 233 ka',
+      'Omo I 颅腔已经接近现代圆球形，是真正的"解剖学现代人"',
+      '与 Jebel Irhoud 一起，证明智人在 30 万-20 万年间分布于非洲多地',
+    ],
+    body: 'Omo 化石位于火山灰沉积层中，用钾-氩定年和氩-氩定年可以精确测年。2022 年 Vidal 等人通过新的火山灰对比，把年代推到约 23 万年前。Omo I 头骨比 Jebel Irhoud 更"现代"，说明智人形态在 23 万年前已基本完成。',
+    misconceptions: [
+      '❌ Omo I 和 Omo II 不是同一物种——形态差异显著，可能 II 是更早期形态',
+    ],
+    sources: [
+      'McDougall, Brown, Fleagle (2005). Stratigraphic placement and age of modern humans from Kibish, Ethiopia. Nature 433.',
+      'Vidal et al. (2022). Age of the oldest known Homo sapiens from eastern Africa. Nature 601.',
+      'Smithsonian Human Origins · Omo Kibish',
+    ],
+  },
+};
+
+// 🪟 通用全屏 modal 渲染器（所有工具栏按钮统一使用）
+function showFullscreenContent({ icon, title, subtitle, html, sidebarHtml }) {
+  let modal = document.getElementById('fullscreenContentModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'fullscreenContentModal';
+    modal.className = 'fullscreen-content-modal hidden';
+    document.body.appendChild(modal);
+  }
+  modal.innerHTML = `
+    <div class="fs-content-header">
+      <div class="fs-content-title">
+        <span class="fs-content-icon">${icon}</span>
+        <div>
+          <h2>${title}</h2>
+          <p>${subtitle || ''}</p>
+        </div>
+      </div>
+      <button class="fs-content-close" onclick="document.getElementById('fullscreenContentModal').classList.add('hidden')">✕ 关闭</button>
+    </div>
+    <div class="fs-content-body ${sidebarHtml ? 'has-sidebar' : ''}">
+      <div class="fs-content-main">${html}</div>
+      ${sidebarHtml ? `<div class="fs-content-sidebar">${sidebarHtml}</div>` : ''}
+    </div>
+  `;
+  modal.classList.remove('hidden');
+}
+
+// 渲染单个化石点的策展式深度内容
+function renderFossilDetail(fossilId) {
+  const k = FOSSIL_KNOWLEDGE[fossilId];
+  if (!k) return '<p class="fs-empty">这个化石点的深度知识正在整理中。</p>';
+  return `
+    <div class="fossil-detail">
+      <div class="fd-head">
+        <h3 class="fd-name">${k.full_name}</h3>
+        <p class="fd-nick">${k.nickname}</p>
+      </div>
+      <div class="fd-meta-grid">
+        <div class="fd-meta"><span class="fd-meta-label">🕰 年代</span><span class="fd-meta-val">${k.age}</span></div>
+        <div class="fd-meta"><span class="fd-meta-label">📍 地点</span><span class="fd-meta-val">${k.location}</span></div>
+        <div class="fd-meta"><span class="fd-meta-label">🔬 发现</span><span class="fd-meta-val">${k.discovered}</span></div>
+        <div class="fd-meta"><span class="fd-meta-label">🦴 我们有什么</span><span class="fd-meta-val">${k.what_we_have}</span></div>
+      </div>
+      <div class="fd-section">
+        <h4>📖 这个化石告诉我们什么</h4>
+        <p>${k.body}</p>
+      </div>
+      <div class="fd-section">
+        <h4>⭐ 为什么重要</h4>
+        <ul class="fd-list">
+          ${k.why_important.map(p => `<li>${p}</li>`).join('')}
+        </ul>
+      </div>
+      ${k.misconceptions ? `
+      <div class="fd-section fd-misconceptions">
+        <h4>⚠️ 常见误解</h4>
+        <ul class="fd-list">
+          ${k.misconceptions.map(m => `<li>${m}</li>`).join('')}
+        </ul>
+      </div>` : ''}
+      <div class="fd-section fd-sources">
+        <h4>📚 资料来源（A 级 · 博物馆与学术文献）</h4>
+        <ul class="fd-list">
+          ${k.sources.map(s => `<li>${s}</li>`).join('')}
+        </ul>
+      </div>
+    </div>`;
+}
+
+// 🗺 全屏迁徙地图（点击工具栏 🗺 地图 触发）
+function showFullscreenMap() {
+  const p = PREHISTORIC.periods.find(x => x.id === activePreEraId);
+  if (!p || !p.map || !p.map.evolution_path) return;
+  const evo = p.map.evolution_path;
+
+  // 按时间从早到晚生成大化石点（半径更大、字号更大）
+  const pathD = evo.map((pt, i) => (i === 0 ? `M ${pt.x},${pt.y}` : `L ${pt.x},${pt.y}`)).join(' ');
+  const labelOffset = {
+    l:  { x: -22, y:   0, anchor: 'end' },
+    r:  { x:  22, y:   0, anchor: 'start' },
+    t:  { x:   0, y: -28, anchor: 'middle' },
+    b:  { x:   0, y:  32, anchor: 'middle' },
+    tl: { x: -18, y: -22, anchor: 'end' },
+    tr: { x:  18, y: -22, anchor: 'start' },
+    bl: { x: -18, y:  24, anchor: 'end' },
+    br: { x:  18, y:  24, anchor: 'start' },
+  };
+  const dots = evo.map((pt, i) => {
+    const off = labelOffset[pt.label_dir || 'r'];
+    const lblX = pt.x + off.x;
+    const lblY = pt.y + off.y;
+    return `
+      <g class="fs-evo-pt" data-id="${pt.id}">
+        <line x1="${pt.x}" y1="${pt.y}" x2="${lblX}" y2="${lblY}"
+              stroke="#c84820" stroke-width="0.8" opacity="0.5"/>
+        <circle cx="${pt.x}" cy="${pt.y}" r="16" fill="white" stroke="#c84820" stroke-width="3.5"
+                filter="drop-shadow(0 3px 6px rgba(200,72,32,.5))"/>
+        <text x="${pt.x}" y="${pt.y+6}" text-anchor="middle"
+              font-size="18" font-weight="800" fill="#c84820"
+              font-family="serif">${i+1}</text>
+        <text x="${lblX}" y="${lblY-4}" text-anchor="${off.anchor}"
+              font-size="13" fill="#3a1a08" font-weight="700"
+              font-family="STSong,serif">${pt.time}</text>
+        <text x="${lblX}" y="${lblY+10}" text-anchor="${off.anchor}"
+              font-size="12" fill="#5a3a1a" font-weight="600"
+              font-family="STSong,serif">${pt.name}</text>
+        <text x="${lblX}" y="${lblY+24}" text-anchor="${off.anchor}"
+              font-size="10" fill="#7a5530" font-style="italic">${pt.species}</text>
+      </g>`;
+  }).join('');
+
+  const africaShape = `<path d="M 195,80 L 270,75 Q 320,72 360,90 L 410,110 Q 440,140 425,180 L 415,210 Q 420,235 405,260 L 395,290 Q 405,320 385,355 L 360,400 Q 340,440 305,470 L 270,490 Q 240,495 215,475 L 195,440 Q 175,400 165,355 L 155,310 Q 145,275 155,235 L 165,195 Q 175,135 195,80 Z"
+    fill="#e8c890" stroke="#a06840" stroke-width="2.5" stroke-linejoin="round"/>`;
+  const arabia = `<path d="M 410,140 Q 440,135 460,150 Q 470,170 458,190 Q 440,205 420,195 L 410,180 Z"
+    fill="#e8c890" stroke="#a06840" stroke-width="2" opacity="0.85"/>`;
+  const labels = `
+    <text x="80" y="110" font-size="16" fill="#3a6aaa" opacity="0.55" font-style="italic" letter-spacing="3">大 西 洋</text>
+    <text x="500" y="400" font-size="16" fill="#3a6aaa" opacity="0.55" font-style="italic" letter-spacing="3">印 度 洋</text>
+    <text x="490" y="100" font-size="13" fill="#3a6aaa" opacity="0.55" font-style="italic">地中海</text>
+    <text x="285" y="170" font-size="12" fill="#7a5530" opacity="0.65" letter-spacing="2">撒 哈 拉 沙 漠</text>
+    <text x="375" y="320" font-size="11" fill="#7a5530" opacity="0.7" letter-spacing="2">东 非 大 裂 谷</text>
+    <text x="200" y="60" font-size="20" fill="#5a3a18" opacity="0.9" font-weight="800"
+          font-family="STSong,serif" letter-spacing="10">非　洲</text>`;
+
+  // 路径线（红色虚线，串联 1→2→3→...→8）
+  const pathLine = `<path d="${pathD}" fill="none" stroke="#c84820" stroke-width="3"
+    stroke-dasharray="8,5" stroke-linecap="round" opacity="0.8"/>`;
+
+  // 右侧时间表（按时间从早到晚）
+  const listRows = evo.map((pt, i) => `
+    <div class="fs-evo-row" data-id="${pt.id}">
+      <div class="fs-evo-num">${i+1}</div>
+      <div class="fs-evo-meta">
+        <div class="fs-evo-time">${pt.time}</div>
+        <div class="fs-evo-name">${pt.name}</div>
+        <div class="fs-evo-species">${pt.species}</div>
+      </div>
+      ${pt.wiki ? `<a class="fs-evo-wiki" target="_blank" rel="noreferrer"
+        href="https://en.wikipedia.org/wiki/${pt.wiki}">📖</a>` : ''}
+    </div>`).join('');
+
+  const modal = document.getElementById('fullscreenMapModal');
+  modal.innerHTML = `
+    <div class="fs-map-header">
+      <div class="fs-map-title">
+        <span class="fs-map-icon">🗺</span>
+        <div>
+          <h2>人类起源迁徙地图</h2>
+          <p>${p.map.overlay_note || '8 个化石点 · 从 700 万年前到 20 万年前 · 点击任意编号查看深度知识'}</p>
+        </div>
+      </div>
+      <button class="fs-map-close" onclick="document.getElementById('fullscreenMapModal').classList.add('hidden')">✕ 关闭</button>
+    </div>
+    <div class="fs-map-body">
+      <div class="fs-map-canvas">
+        <svg viewBox="0 0 600 540" preserveAspectRatio="xMidYMid meet">
+          <rect width="600" height="540" fill="#a8c8e0"/>
+          ${africaShape}
+          ${arabia}
+          ${labels}
+          ${pathLine}
+          ${dots}
+        </svg>
+      </div>
+      <div class="fs-map-side" id="fsMapSide">
+        <div class="fs-map-side-title">🦴 演化迁徙路径 · 按时间排序</div>
+        <div class="fs-map-side-hint">点击 ① 至 ⑧ 任意编号查看深度知识；红线 1→2→...→${evo.length} 由最古老到最年轻</div>
+        ${listRows}
+      </div>
+    </div>
+    <!-- 化石点深度知识面板（点击编号弹出） -->
+    <div class="fs-fossil-panel hidden" id="fsFossilPanel">
+      <button class="fs-fossil-back" onclick="document.getElementById('fsFossilPanel').classList.add('hidden')">← 返回地图列表</button>
+      <div class="fs-fossil-body" id="fsFossilBody"></div>
+    </div>
+  `;
+  modal.classList.remove('hidden');
+
+  // 绑定 SVG 上的圆点点击
+  modal.querySelectorAll('.fs-evo-pt').forEach(g => {
+    g.style.cursor = 'pointer';
+    g.addEventListener('click', () => openFossilPanel(g.getAttribute('data-id')));
+  });
+  // 绑定右侧列表行点击
+  modal.querySelectorAll('.fs-evo-row').forEach(row => {
+    row.style.cursor = 'pointer';
+    row.addEventListener('click', (e) => {
+      if (e.target.closest('.fs-evo-wiki')) return; // wiki 链接不拦截
+      openFossilPanel(row.getAttribute('data-id'));
+    });
+  });
+}
+
+// 打开化石点深度知识面板
+function openFossilPanel(fossilId) {
+  const panel = document.getElementById('fsFossilPanel');
+  const body = document.getElementById('fsFossilBody');
+  if (!panel || !body) return;
+  body.innerHTML = renderFossilDetail(fossilId);
+  panel.classList.remove('hidden');
+  body.scrollTop = 0;
+}
+
+// 显示富内容（总览/时光机/故事/AI）— 全部使用全屏 modal
 function showImageOverlayPlay(special) {
   const p = PREHISTORIC.periods.find(x => x.id === activePreEraId);
   if (!p) return;
   const kn = p.knowledge_network;
 
-  let richHtml = '';
-  let title = '';
+  let richHtml = '', icon = '📜', title = '', subtitle = '';
   if (special === 'scenario') {
     richHtml = renderScenarioLayer(p).replace(/<section[^>]*>|<\/section>/g, '');
-    title = '🎮 时光机 · 你是 30 万年前的智人';
+    icon = '🎮'; title = '时光机'; subtitle = '你是 30 万年前的智人 · 通过 4 个决定体验早期智人的生存挑战';
   } else if (special === 'story') {
     richHtml = renderPreLayer6(p).replace(/<section[^>]*>|<\/section>/g, '');
-    title = '📖 故事讲解';
+    icon = '📖'; title = '故事讲解'; subtitle = '通过具体故事场景理解智人当时的生活';
   } else if (special === 'ai') {
     richHtml = renderPreLayer8(p).replace(/<section[^>]*>|<\/section>/g, '');
-    title = '🤖 与 AI 导师对话';
+    icon = '🤖'; title = '与 AI 导师对话'; subtitle = `${p.title} · 问任何问题，AI 会优先从课程知识库回答`;
+  } else if (special === 'evolution_map') {
+    richHtml = renderPreLayer2(p).replace(/<section[^>]*>|<\/section>/g, '');
+    icon = '🗺'; title = '人类起源地图'; subtitle = '非洲 8 个化石点 · 演化迁徙路径';
+  } else if (special === 'hub') {
+    const hub = kn.hub || {};
+    const d = hub.detail || {};
+    richHtml = `
+      <div class="overview-card">
+        <h3>${d.title || hub.label || '本节总览'}</h3>
+        <p class="overview-body">${d.body || ''}</p>
+      </div>`;
+    icon = '📜'; title = '本节总览'; subtitle = p.title;
   }
 
-  const det = document.getElementById('imgOverlayDetail');
-  det.innerHTML = `
-    <button class="img-detail-close" onclick="document.getElementById('imgOverlayDetail').classList.add('hidden')">✕</button>
-    <div class="img-detail-rich">
-      <h3>${title}</h3>
-      <div class="kg-feat-content">${richHtml}</div>
-    </div>
-  `;
-  det.classList.remove('hidden');
+  showFullscreenContent({ icon, title, subtitle, html: richHtml });
 
-  // 绑定富内容交互
+  // 绑定富内容交互（在 modal 内查找元素）
+  const modal = document.getElementById('fullscreenContentModal');
   if (special === 'scenario') bindScenarioInteractions(p);
   if (special === 'ai') {
-    const aiInp = det.querySelector('#preAIInput');
-    const aiSend = det.querySelector('#preAISend');
+    const aiInp = modal.querySelector('#preAIInput');
+    const aiSend = modal.querySelector('#preAISend');
     if (aiSend && aiInp) {
-      aiSend.onclick = () => sendPreAIMsg(p, aiInp, det.querySelector('#preAIMsgs'));
-      aiInp.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendPreAIMsg(p, aiInp, det.querySelector('#preAIMsgs')); } };
-      det.querySelectorAll('.suggestion-chip').forEach(b => {
-        b.onclick = () => { aiInp.value = b.textContent; sendPreAIMsg(p, aiInp, det.querySelector('#preAIMsgs')); };
+      aiSend.onclick = () => sendPreAIMsg(p, aiInp, modal.querySelector('#preAIMsgs'));
+      aiInp.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendPreAIMsg(p, aiInp, modal.querySelector('#preAIMsgs')); } };
+      modal.querySelectorAll('.suggestion-chip').forEach(b => {
+        b.onclick = () => { aiInp.value = b.textContent; sendPreAIMsg(p, aiInp, modal.querySelector('#preAIMsgs')); };
       });
       if (!preAiHistory[p.id]) {
         preAiHistory[p.id] = [];
         const uName = (getUserProfile()||{}).nickname || '朋友';
-        addPreAIMsg(det.querySelector('#preAIMsgs'), 'ai', `${uName}你好！我会从维基百科帮${uName}查阅关于<strong>${p.title}</strong>的内容。`);
+        addPreAIMsg(modal.querySelector('#preAIMsgs'), 'ai', `${uName}你好！我会从课程知识库 + 维基百科帮${uName}回答关于<strong>${p.title}</strong>的问题。`);
       } else {
-        const msgsEl = det.querySelector('#preAIMsgs');
+        const msgsEl = modal.querySelector('#preAIMsgs');
         preAiHistory[p.id].forEach(m => addPreAIMsg(msgsEl, m.role, m.html));
       }
     }
@@ -2809,9 +3216,28 @@ function renderPreLayer8(p) {
   const ai = p.ai;
   const chips = ai.suggested_questions.map(q =>
     `<button class="suggestion-chip">${q}</button>`).join('');
+  const hasKey = !!(state.apiKey && state.apiKey.startsWith('sk-'));
+  const provider = state.aiProvider || 'qwen';
+  const providerName = provider === 'qwen' ? '通义千问' : 'Claude';
+  const providerIcon = provider === 'qwen' ? '🟢' : '🔵';
+  const modelName = state.aiModel || (provider === 'qwen' ? 'qwen-turbo' : 'claude-haiku-4-5');
+  const statusBanner = hasKey
+    ? `<div class="ai-status-banner ai-status-on">
+         <span class="ai-status-dot"></span>
+         <strong>${providerIcon} ${providerName} 已连接</strong>
+         <span class="ai-status-model">${modelName}</span>
+         <button class="ai-status-action" onclick="showAIKeySetup()">更换 / 切换</button>
+       </div>`
+    : `<div class="ai-status-banner ai-status-off">
+         <span class="ai-status-dot"></span>
+         <strong>⚠ 当前是知识库模式</strong>
+         <span class="ai-status-hint">只会展示资料，不会真正对话。推荐接入<strong>免费的通义千问</strong> →</span>
+         <button class="ai-status-action ai-status-cta" onclick="showAIKeySetup()">🔑 免费接入 AI</button>
+       </div>`;
   return `<section class="pre-layer" id="pre-ai">
     <div class="pl-header"><span class="pl-icon">🤖</span><div><h3>AI互动</h3><p class="pl-sub">向AI提问、质检、探索</p></div></div>
     <div class="pre-ai-panel pre-ai-panel-large">
+      ${statusBanner}
       <div class="chat-messages chat-messages-large" id="preAIMsgs"></div>
       <div class="chat-suggestions chat-suggestions-large" id="preAISuggestions">${chips}</div>
       <div class="chat-input-row chat-input-row-large">
@@ -2821,6 +3247,182 @@ function renderPreLayer8(p) {
       ${ai.check_prompt ? `<div class="pre-ai-check"><strong>💡 质检提示：</strong>${ai.check_prompt}</div>` : ''}
     </div>
   </section>`;
+}
+
+// 弹出 API Key 设置面板（默认推荐免费的千问 Qwen，也支持 Claude）
+function showAIKeySetup() {
+  const existing = document.getElementById('aiKeySetupOverlay');
+  if (existing) existing.remove();
+  const currentProvider = state.aiProvider || 'qwen';
+  const currentKey = state.apiKey || '';
+  const ov = document.createElement('div');
+  ov.id = 'aiKeySetupOverlay';
+  ov.className = 'ai-key-setup-overlay';
+  ov.innerHTML = `
+    <div class="ai-key-setup-modal">
+      <button class="ai-key-close" onclick="document.getElementById('aiKeySetupOverlay').remove()">✕</button>
+      <div class="ai-key-head">
+        <span class="ai-key-icon">🔑</span>
+        <h3>接入 AI · 让对话真正"活"起来</h3>
+      </div>
+      <div class="ai-key-body">
+        <p class="ai-key-tip">选择一个 AI 提供商。<strong>推荐千问（免费额度大）</strong>，也支持 Claude（按量付费）。</p>
+
+        <div class="ai-provider-tabs">
+          <button class="ai-provider-tab ${currentProvider==='qwen'?'active':''}" data-provider="qwen" onclick="switchAIProviderTab('qwen')">
+            🟢 通义千问（免费推荐）
+          </button>
+          <button class="ai-provider-tab ${currentProvider==='claude'?'active':''}" data-provider="claude" onclick="switchAIProviderTab('claude')">
+            🔵 Claude（付费 · 更深）
+          </button>
+        </div>
+
+        <!-- 千问 Qwen 面板 -->
+        <div class="ai-provider-pane ${currentProvider==='qwen'?'active':'hidden'}" data-pane="qwen">
+          <p><strong>为什么推荐千问？</strong></p>
+          <ul>
+            <li>阿里云通义千问，<strong>每月有免费 token 额度</strong>（qwen-turbo / qwen-plus 等模型）</li>
+            <li>中文表现优秀，特别适合中小学历史/语文场景</li>
+            <li>免费就能跑——不用绑信用卡也能开始</li>
+          </ul>
+          <p><strong>如何获取 API Key（约 3 分钟）：</strong></p>
+          <ol>
+            <li>访问 <a href="https://bailian.console.aliyun.com/" target="_blank" rel="noreferrer">bailian.console.aliyun.com</a>（阿里云百炼控制台），用支付宝/淘宝账号即可登录</li>
+            <li>左侧菜单 → <em>API-KEY 管理</em> → 创建 API Key，复制以 <code>sk-…</code> 开头的字符串</li>
+            <li>首次使用需在控制台"模型广场"激活 <em>qwen-turbo</em> 等免费模型</li>
+          </ol>
+          <p class="ai-key-cost-note">💰 免费额度：qwen-turbo 等模型每月百万 token 免费；超出后按量计费极便宜（人民币计价）</p>
+          <p class="ai-key-privacy">🔒 Key 只保存在本地浏览器 localStorage，不会上传到任何服务器。</p>
+          <label class="ai-key-input-label">
+            <span>粘贴你的千问 API Key</span>
+            <input type="password" id="aiKeyInputQwen" placeholder="sk-…（阿里云百炼控制台获取）" value="${currentProvider==='qwen' ? currentKey : ''}"/>
+          </label>
+          <label class="ai-key-input-label">
+            <span>模型（默认 qwen-turbo，免费额度最大）</span>
+            <select id="aiModelQwen">
+              <option value="qwen-turbo" ${(state.aiModel==='qwen-turbo'||!state.aiModel)?'selected':''}>qwen-turbo（最快 · 免费额度最大）</option>
+              <option value="qwen-plus" ${state.aiModel==='qwen-plus'?'selected':''}>qwen-plus（平衡 · 推荐）</option>
+              <option value="qwen-max" ${state.aiModel==='qwen-max'?'selected':''}>qwen-max（最强 · 限额较小）</option>
+              <option value="qwen3-32b-instruct" ${state.aiModel==='qwen3-32b-instruct'?'selected':''}>qwen3-32b-instruct（最新开源版）</option>
+            </select>
+          </label>
+          <div class="ai-key-actions">
+            <button class="primary-button" onclick="saveAIKeyInline('qwen')">保存并测试连接</button>
+            <button class="secondary-button" onclick="document.getElementById('aiKeySetupOverlay').remove()">取消</button>
+          </div>
+        </div>
+
+        <!-- Claude 面板 -->
+        <div class="ai-provider-pane ${currentProvider==='claude'?'active':'hidden'}" data-pane="claude">
+          <p><strong>Claude（Anthropic）特点：</strong></p>
+          <ul>
+            <li>推理深度强、错误率低、安全性高</li>
+            <li>按量计费（无免费额度，但 haiku 极便宜）</li>
+            <li>需要海外信用卡注册</li>
+          </ul>
+          <p><strong>如何获取（约 2 分钟）：</strong></p>
+          <ol>
+            <li>访问 <a href="https://console.anthropic.com/" target="_blank" rel="noreferrer">console.anthropic.com</a> 注册</li>
+            <li><em>Settings → API Keys → Create Key</em>，复制 <code>sk-ant-…</code></li>
+          </ol>
+          <p class="ai-key-cost-note">💰 claude-haiku-4-5 约 $0.001–0.005 USD/次（一杯咖啡千次对话）</p>
+          <label class="ai-key-input-label">
+            <span>粘贴你的 Anthropic API Key</span>
+            <input type="password" id="aiKeyInputClaude" placeholder="sk-ant-api03-…" value="${currentProvider==='claude' ? currentKey : ''}"/>
+          </label>
+          <div class="ai-key-actions">
+            <button class="primary-button" onclick="saveAIKeyInline('claude')">保存并测试连接</button>
+            <button class="secondary-button" onclick="document.getElementById('aiKeySetupOverlay').remove()">取消</button>
+          </div>
+        </div>
+
+        <div id="aiKeyTestResult" class="ai-key-test"></div>
+      </div>
+    </div>`;
+  document.body.appendChild(ov);
+}
+
+function switchAIProviderTab(provider) {
+  document.querySelectorAll('.ai-provider-tab').forEach(b =>
+    b.classList.toggle('active', b.getAttribute('data-provider') === provider));
+  document.querySelectorAll('.ai-provider-pane').forEach(p => {
+    const active = p.getAttribute('data-pane') === provider;
+    p.classList.toggle('active', active);
+    p.classList.toggle('hidden', !active);
+  });
+}
+
+async function saveAIKeyInline(provider) {
+  const result = document.getElementById('aiKeyTestResult');
+  let key, model, endpoint, headers, body, parseReply;
+
+  if (provider === 'qwen') {
+    key = (document.getElementById('aiKeyInputQwen').value || '').trim();
+    model = document.getElementById('aiModelQwen').value || 'qwen-turbo';
+    if (!key.startsWith('sk-')) {
+      result.innerHTML = '<span class="ai-key-err">❌ 千问 Key 应以 sk- 开头（阿里云百炼控制台获取）</span>';
+      return;
+    }
+    endpoint = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
+    headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key };
+    body = JSON.stringify({
+      model,
+      max_tokens: 32,
+      messages: [{ role: 'user', content: '回复"OK"两个字。' }],
+    });
+    parseReply = d => d.choices?.[0]?.message?.content || '(空)';
+  } else if (provider === 'claude') {
+    key = (document.getElementById('aiKeyInputClaude').value || '').trim();
+    model = 'claude-haiku-4-5-20251001';
+    if (!key.startsWith('sk-ant')) {
+      result.innerHTML = '<span class="ai-key-err">❌ Claude Key 应以 sk-ant 开头</span>';
+      return;
+    }
+    endpoint = 'https://api.anthropic.com/v1/messages';
+    headers = {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+    };
+    body = JSON.stringify({
+      model, max_tokens: 32,
+      messages: [{ role: 'user', content: '回复"OK"两个字。' }],
+    });
+    parseReply = d => d.content?.[0]?.text || '(空)';
+  }
+
+  result.innerHTML = '⏳ 正在测试连接 ' + (provider === 'qwen' ? '通义千问' : 'Claude') + '…';
+
+  try {
+    const res = await fetch(endpoint, { method: 'POST', headers, body });
+    if (!res.ok) {
+      const errBody = await res.text();
+      throw new Error(`HTTP ${res.status} · ${errBody.slice(0, 300)}`);
+    }
+    const data = await res.json();
+    const reply = parseReply(data);
+    // 保存
+    state.apiKey = key;
+    state.aiProvider = provider;
+    state.aiModel = model;
+    localStorage.setItem('civ_api_key', key);
+    localStorage.setItem('civ_ai_provider', provider);
+    localStorage.setItem('civ_ai_model', model);
+    result.innerHTML = `<span class="ai-key-ok">✓ 连接成功！${provider === 'qwen' ? '千问' : 'Claude'} 回复：${reply.slice(0, 50)}</span>
+      <p style="margin-top:8px">关闭此窗口后即可开始真正的 AI 对话。</p>`;
+    setTimeout(() => {
+      const p = PREHISTORIC.periods.find(x => x.id === activePreEraId);
+      const modal = document.getElementById('fullscreenContentModal');
+      if (p && modal && !modal.classList.contains('hidden')) {
+        document.getElementById('aiKeySetupOverlay')?.remove();
+        showImageOverlayPlay('ai');
+      }
+    }, 1500);
+  } catch (e) {
+    result.innerHTML = `<span class="ai-key-err">❌ 连接失败：${e.message}<br>
+      请检查：1) Key 是否正确；2) ${provider === 'qwen' ? '是否激活了对应模型（控制台模型广场）' : '网络能否访问 api.anthropic.com'}；3) 是否有 CORS 阻拦</span>`;
+  }
 }
 
 function renderPreLayer9(p) {
@@ -3137,24 +3739,45 @@ ${fullContext}
 ${p.title} · ${p.time}`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': state.apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true',
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 600,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: msg }],
-      }),
-    });
-    if (!res.ok) throw new Error('API ' + res.status);
-    const data = await res.json();
-    let text = data.content[0].text.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
+    const provider = state.aiProvider || 'qwen';
+    let text;
+    if (provider === 'qwen') {
+      const model = state.aiModel || 'qwen-turbo';
+      const res = await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + state.apiKey },
+        body: JSON.stringify({
+          model,
+          max_tokens: 800,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: msg },
+          ],
+        }),
+      });
+      if (!res.ok) throw new Error('Qwen API ' + res.status + ' · ' + (await res.text()).slice(0,200));
+      const data = await res.json();
+      text = (data.choices?.[0]?.message?.content || '').replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
+    } else {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': state.apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 600,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: msg }],
+        }),
+      });
+      if (!res.ok) throw new Error('Claude API ' + res.status);
+      const data = await res.json();
+      text = data.content[0].text.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
+    }
 
     // 显示知识来源
     const internalChips = kbResult.internal.map(e =>
