@@ -1476,6 +1476,8 @@ function enterPreEra(id) {
     renderStageDetail('STAGE_00');
   };
   logHistory('lesson_view', `史前探索：${period.time} · ${period.title}`);
+  // 刷新闯关进度卡片（timeline 自动标记完成）
+  setTimeout(() => refreshAutoAdvanceCard(), 100);
 }
 
 function renderPreEra(p) {
@@ -1658,6 +1660,9 @@ function renderImageOverlayMode(p) {
           <button class="img-tool-chip" onclick="showImageOverlayPlay('scenario')">🎮 时光机</button>
           <button class="img-tool-chip" onclick="showImageOverlayPlay('story')">📖 故事</button>
           <button class="img-tool-chip" onclick="showImageOverlayPlay('ai')">🤖 问 AI</button>
+          <span class="img-tool-sep">|</span>
+          <button class="img-tool-chip img-tool-nav" onclick="goToPrevLesson()" title="上一课">◀</button>
+          <button class="img-tool-chip img-tool-nav img-tool-next" onclick="goToNextLesson()" title="下一课">下一课 ▶</button>
         </div>
       </div>
 
@@ -1669,6 +1674,33 @@ function renderImageOverlayMode(p) {
             ${connections}
           </svg>
           ${bubbles}
+          <!-- 遮罩：盖住图片里烤进去的 "中文维基/EN" 按钮 (7 个块各一条) -->
+          <div class="wiki-mask" style="top:23%;left:34%;width:28%;height:4%"></div>
+          <div class="wiki-mask" style="top:36.5%;left:34%;width:28%;height:4%"></div>
+          <div class="wiki-mask" style="top:49.5%;left:34%;width:28%;height:4%"></div>
+          <div class="wiki-mask" style="top:63%;left:34%;width:28%;height:4%"></div>
+          <div class="wiki-mask" style="top:75.5%;left:34%;width:28%;height:4%"></div>
+          <div class="wiki-mask" style="top:88%;left:34%;width:28%;height:4%"></div>
+          <div class="wiki-mask" style="top:95.5%;left:34%;width:28%;height:4%"></div>
+        </div>
+      </div>
+
+      <!-- 自动推进卡片 (看完时间轴后引导用户进入下一步) -->
+      <div class="auto-advance-card" id="autoAdvanceCard">
+        <div class="aac-progress">
+          <span class="aac-step active" data-step="timeline">① 时间轴</span>
+          <span class="aac-arrow">→</span>
+          <span class="aac-step" data-step="map">② 地图</span>
+          <span class="aac-arrow">→</span>
+          <span class="aac-step" data-step="story">③ 故事</span>
+          <span class="aac-arrow">→</span>
+          <span class="aac-step" data-step="scenario">④ 时光机</span>
+          <span class="aac-arrow">→</span>
+          <span class="aac-step" data-step="next">⑤ 下一课</span>
+        </div>
+        <div class="aac-actions">
+          <button class="aac-next" onclick="advanceToNextStep('map')">看完时间轴 → 进入 🗺 地图</button>
+          <button class="aac-skip" onclick="goToNextLesson()">跳过本节，下一课 →</button>
         </div>
       </div>
 
@@ -1934,7 +1966,7 @@ const FOSSIL_KNOWLEDGE = {
 };
 
 // 🪟 通用全屏 modal 渲染器（所有工具栏按钮统一使用）
-function showFullscreenContent({ icon, title, subtitle, html, sidebarHtml }) {
+function showFullscreenContent({ icon, title, subtitle, html, sidebarHtml, stepKey }) {
   let modal = document.getElementById('fullscreenContentModal');
   if (!modal) {
     modal = document.createElement('div');
@@ -1942,6 +1974,15 @@ function showFullscreenContent({ icon, title, subtitle, html, sidebarHtml }) {
     modal.className = 'fullscreen-content-modal hidden';
     document.body.appendChild(modal);
   }
+  // 自动推进：根据当前 stepKey 推算下一步
+  const nextMap = { map: 'story', story: 'scenario', scenario: 'next', hub: 'map', ai: 'next', evolution_map: 'story' };
+  const nextStep = stepKey ? nextMap[stepKey] : null;
+  const nextLabels = { map: '🗺 地图', story: '📖 故事', scenario: '🎮 时光机', next: '→ 下一课' };
+  const nextBtn = nextStep ? (nextStep === 'next'
+    ? `<button class="fs-next-btn fs-next-lesson" onclick="goToNextLesson()">${nextLabels.next}</button>`
+    : `<button class="fs-next-btn" onclick="advanceToNextStep('${nextStep}')">继续 → ${nextLabels[nextStep]}</button>`)
+    : '';
+
   modal.innerHTML = `
     <div class="fs-content-header">
       <div class="fs-content-title">
@@ -1951,7 +1992,10 @@ function showFullscreenContent({ icon, title, subtitle, html, sidebarHtml }) {
           <p>${subtitle || ''}</p>
         </div>
       </div>
-      <button class="fs-content-close" onclick="document.getElementById('fullscreenContentModal').classList.add('hidden')">✕ 关闭</button>
+      <div class="fs-content-header-actions">
+        ${nextBtn}
+        <button class="fs-content-close" onclick="closeFullscreenAndMaybeAdvance('${stepKey || ''}')">✕ 关闭</button>
+      </div>
     </div>
     <div class="fs-content-body ${sidebarHtml ? 'has-sidebar' : ''}">
       <div class="fs-content-main">${html}</div>
@@ -1959,6 +2003,102 @@ function showFullscreenContent({ icon, title, subtitle, html, sidebarHtml }) {
     </div>
   `;
   modal.classList.remove('hidden');
+  // 标记进度
+  if (stepKey) markStepCompleted(stepKey);
+}
+
+// ════════════════════════════════════════════════════════════════
+// 🎯 自动推进 / 闯关进度
+// ════════════════════════════════════════════════════════════════
+function markStepCompleted(step) {
+  const p = PREHISTORIC.periods.find(x => x.id === activePreEraId);
+  if (!p) return;
+  const key = 'civ_steps_' + p.id;
+  let steps = {};
+  try { steps = JSON.parse(localStorage.getItem(key) || '{}'); } catch {}
+  steps[step] = Date.now();
+  localStorage.setItem(key, JSON.stringify(steps));
+  // 更新进度条 UI
+  refreshAutoAdvanceCard();
+}
+
+function refreshAutoAdvanceCard() {
+  const card = document.getElementById('autoAdvanceCard');
+  if (!card) return;
+  const p = PREHISTORIC.periods.find(x => x.id === activePreEraId);
+  if (!p) return;
+  let steps = {};
+  try { steps = JSON.parse(localStorage.getItem('civ_steps_' + p.id) || '{}'); } catch {}
+  // timeline 看到就算完成（自动标）
+  steps.timeline = steps.timeline || Date.now();
+  localStorage.setItem('civ_steps_' + p.id, JSON.stringify(steps));
+
+  card.querySelectorAll('.aac-step').forEach(s => {
+    const step = s.getAttribute('data-step');
+    s.classList.toggle('done', !!steps[step]);
+  });
+  // 决定下一步按钮文案
+  const order = ['timeline','map','story','scenario'];
+  let nextStep = null;
+  for (const st of order) { if (!steps[st]) { nextStep = st; break; } }
+  if (!nextStep) nextStep = 'next';
+  const btn = card.querySelector('.aac-next');
+  if (btn) {
+    if (nextStep === 'next') {
+      btn.textContent = '✓ 本节全部完成 → 下一课';
+      btn.onclick = () => goToNextLesson();
+      btn.classList.add('aac-done');
+    } else {
+      const labels = { map: '🗺 地图', story: '📖 故事', scenario: '🎮 时光机' };
+      btn.textContent = `下一步 → ${labels[nextStep]}`;
+      btn.onclick = () => advanceToNextStep(nextStep);
+      btn.classList.remove('aac-done');
+    }
+  }
+}
+
+function advanceToNextStep(step) {
+  if (step === 'map') showFullscreenMap();
+  else if (step === 'story') showImageOverlayPlay('story');
+  else if (step === 'scenario') showImageOverlayPlay('scenario');
+  else if (step === 'next') goToNextLesson();
+}
+
+function closeFullscreenAndMaybeAdvance(stepKey) {
+  const modal = document.getElementById('fullscreenContentModal');
+  modal?.classList.add('hidden');
+  refreshAutoAdvanceCard();
+}
+
+function goToNextLesson() {
+  // 关闭所有 modal
+  document.getElementById('fullscreenContentModal')?.classList.add('hidden');
+  document.getElementById('fullscreenMapModal')?.classList.add('hidden');
+  const periods = PREHISTORIC.periods;
+  const idx = periods.findIndex(x => x.id === activePreEraId);
+  if (idx < 0) return;
+  if (idx + 1 < periods.length) {
+    enterPreEra(periods[idx + 1].id);
+  } else {
+    // 已是最后一课
+    alert('🎉 你已完成史前文明全部 ' + periods.length + ' 课！');
+  }
+}
+
+function goToPrevLesson() {
+  document.getElementById('fullscreenContentModal')?.classList.add('hidden');
+  document.getElementById('fullscreenMapModal')?.classList.add('hidden');
+  const periods = PREHISTORIC.periods;
+  const idx = periods.findIndex(x => x.id === activePreEraId);
+  if (idx > 0) enterPreEra(periods[idx - 1].id);
+}
+
+function closeMapAndAdvance(justClose) {
+  document.getElementById('fullscreenMapModal')?.classList.add('hidden');
+  refreshAutoAdvanceCard();
+  if (!justClose) {
+    setTimeout(() => showImageOverlayPlay('story'), 250);
+  }
 }
 
 // 渲染单个化石点的策展式深度内容
@@ -2085,7 +2225,10 @@ function showFullscreenMap() {
           <p>${p.map.overlay_note || '8 个化石点 · 从 700 万年前到 20 万年前 · 点击任意编号查看深度知识'}</p>
         </div>
       </div>
-      <button class="fs-map-close" onclick="document.getElementById('fullscreenMapModal').classList.add('hidden')">✕ 关闭</button>
+      <div class="fs-map-header-actions">
+        <button class="fs-next-btn" onclick="closeMapAndAdvance()">继续 → 📖 故事</button>
+        <button class="fs-map-close" onclick="closeMapAndAdvance(true)">✕ 关闭</button>
+      </div>
     </div>
     <div class="fs-map-body">
       <div class="fs-map-canvas">
@@ -2111,6 +2254,7 @@ function showFullscreenMap() {
     </div>
   `;
   modal.classList.remove('hidden');
+  markStepCompleted('map');
 
   // 绑定 SVG 上的圆点点击
   modal.querySelectorAll('.fs-evo-pt').forEach(g => {
@@ -2167,7 +2311,7 @@ function showImageOverlayPlay(special) {
     icon = '📜'; title = '本节总览'; subtitle = p.title;
   }
 
-  showFullscreenContent({ icon, title, subtitle, html: richHtml });
+  showFullscreenContent({ icon, title, subtitle, html: richHtml, stepKey: special });
 
   // 绑定富内容交互（在 modal 内查找元素）
   const modal = document.getElementById('fullscreenContentModal');

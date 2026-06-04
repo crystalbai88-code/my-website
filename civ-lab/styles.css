@@ -4416,3 +4416,94 @@ html, body {
   border: 1.5px solid rgba(160,100,30,.35); border-radius: 8px;
   background: white; color: #3a2410; font-family: inherit;
 }
+
+/* ════════════════════════════════════════════════════
+   遮罩图片中的"中文维基/EN"按钮 (evo-timeline.png)
+════════════════════════════════════════════════════ */
+.img-overlay-stage { position: relative; }
+.img-overlay-stage .wiki-mask {
+  position: absolute;
+  background: #f3e5bd;
+  pointer-events: none;
+  z-index: 2;
+  border-radius: 4px;
+  box-shadow: 0 0 6px 3px #f3e5bd;
+}
+
+/* ════════════════════════════════════════════════════
+   闯关进度卡片 (PH 页面底部)
+════════════════════════════════════════════════════ */
+.auto-advance-card {
+  position: sticky; bottom: 0;
+  margin: 20px 0 0;
+  background: linear-gradient(135deg, #fdf5e0 0%, #f5e8c8 100%);
+  border: 2px solid rgba(200,72,32,.3);
+  border-radius: 14px;
+  padding: 16px 20px;
+  box-shadow: 0 -6px 24px rgba(60,30,5,.18);
+  z-index: 50;
+}
+.aac-progress {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: #7a5530; margin-bottom: 12px;
+  flex-wrap: wrap; justify-content: center;
+}
+.aac-step {
+  padding: 6px 12px; background: rgba(255,255,255,.5);
+  border: 1.5px solid rgba(160,100,30,.25); border-radius: 16px;
+  color: #7a5530; font-weight: 600; transition: all .25s;
+}
+.aac-step.done {
+  background: rgba(60,160,80,.15);
+  border-color: rgba(60,160,80,.5);
+  color: #2a6038;
+}
+.aac-step.active { background: #c84820; color: white; border-color: #c84820; }
+.aac-arrow { color: rgba(160,100,30,.4); font-weight: 700; }
+.aac-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.aac-next {
+  background: linear-gradient(135deg, #c84820, #a83a18);
+  color: white; border: none; padding: 12px 28px;
+  font-size: 15px; font-weight: 700; border-radius: 10px;
+  cursor: pointer; box-shadow: 0 4px 12px rgba(200,72,32,.35);
+  transition: all .2s;
+}
+.aac-next:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(200,72,32,.5); }
+.aac-next.aac-done {
+  background: linear-gradient(135deg, #2a8038, #1f6028);
+  box-shadow: 0 4px 12px rgba(42,128,56,.35);
+}
+.aac-skip {
+  background: white; color: #7a5530;
+  border: 1.5px solid rgba(160,100,30,.4); padding: 12px 20px;
+  border-radius: 10px; font-size: 13px; cursor: pointer;
+  transition: all .2s;
+}
+.aac-skip:hover { background: #f5e8c8; border-color: #c84820; color: #c84820; }
+
+/* ════════════════════════════════════════════════════
+   全屏 modal 内的"下一步"按钮 + 上下课导航
+════════════════════════════════════════════════════ */
+.fs-content-header-actions, .fs-map-header-actions {
+  display: flex; align-items: center; gap: 10px;
+}
+.fs-next-btn {
+  background: linear-gradient(135deg, #c84820, #a83a18);
+  color: white; border: none; padding: 10px 20px;
+  font-size: 14px; font-weight: 700; border-radius: 8px;
+  cursor: pointer; box-shadow: 0 3px 10px rgba(200,72,32,.3);
+  transition: all .2s;
+}
+.fs-next-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(200,72,32,.45); }
+.fs-next-lesson { background: linear-gradient(135deg, #2a8038, #1f6028); box-shadow: 0 3px 10px rgba(42,128,56,.3); }
+
+.img-tool-sep { color: rgba(160,100,30,.3); margin: 0 4px; }
+.img-tool-nav {
+  background: rgba(255,255,255,.7) !important;
+}
+.img-tool-next {
+  background: linear-gradient(135deg, #c84820, #a83a18) !important;
+  color: white !important;
+  font-weight: 700 !important;
+}
+.img-tool-next:hover { box-shadow: 0 3px 10px rgba(200,72,32,.4); }
