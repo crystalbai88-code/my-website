@@ -2712,6 +2712,83 @@ function addPreAIMsg(msgsEl, role, html, id) {
 const wikiCache = {};
 
 // 通过 Wikipedia REST API 拉取词条摘要（CORS 友好，无需后端）
+// 🆕 用 Wikipedia 全文搜索 API 找到与问题最相关的词条
+// 策略：清洗问题 → 尝试多个 query 组合 → 取首个有结果的
+async function searchWikiByQuestion(question, lang = 'zh', limit = 4) {
+  if (!question || question.length < 1) return [];
+
+  // 中文不能用 \b 词边界，直接字符串替换去常见疑问词/停用词/填充词
+  const stopwords = [
+    '请问','帮我','告诉我','我想知道','想问','能否','可以','请',
+    '为什么','什么时候','什么意思','什么叫','什么是','是什么','什么样','什么',
+    '哪里','哪个','哪些','哪一','哪',
+    '谁是','谁',
+    '怎么样','怎么','怎样','如何','为何',
+    '多少','几个','几年','多久',
+    '是不是','有没有','是吗','对吗',
+    '啊','呢','吗','了','的','吧','哦',
+    '一下','一点','一些','一直','一种','一样',
+    // 程度副词 / 填充词
+    '这么','那么','这样','那样','这种','那种',
+    '很','非常','特别','比较','更','最','极',
+    '可能','应该','大概','大约','一定','也许',
+    '我','你','他','她','它','我们','你们','他们',
+    '在','是','有','和','与','或','跟','给','把','被','让','使','对',
+  ];
+  let cleaned = (question || '').replace(/[？?。.，,！!~～「」""''《》、；;：:、]/g, ' ');
+  stopwords.forEach(w => { cleaned = cleaned.split(w).join(' '); });
+  cleaned = cleaned.replace(/\s+/g, ' ').trim();
+
+  // 提取关键 token（英文专有名词 + 中文 2-3 字词）
+  const englishTokens = cleaned.match(/[A-Za-z][A-Za-z\s]{2,}/g) || [];
+  const chineseTokens = cleaned.match(/[一-龥]{2,3}/g) || [];
+
+  // 多个候选 query 策略，按精确度排序尝试
+  const candidates = [];
+  // 1. 英文专有名词 + 1-2 个中文关键词（最精确）
+  if (englishTokens.length > 0 && chineseTokens.length > 0) {
+    candidates.push((englishTokens[0] + ' ' + chineseTokens.slice(0, 2).join(' ')).trim());
+  }
+  // 2. 只用英文专有名词
+  if (englishTokens.length > 0) {
+    candidates.push(englishTokens.join(' ').trim());
+  }
+  // 3. 用前 2 个中文 token
+  if (chineseTokens.length > 0) {
+    candidates.push(chineseTokens.slice(0, 2).join(' '));
+  }
+  // 4. 完整清洗后的字符串作为兜底
+  if (cleaned && !candidates.includes(cleaned)) candidates.push(cleaned);
+  // 5. 单个最长中文 token（最宽泛）
+  if (chineseTokens.length > 0) {
+    const longest = chineseTokens.reduce((a, b) => a.length >= b.length ? a : b);
+    if (!candidates.includes(longest)) candidates.push(longest);
+  }
+
+  // 尝试每个 query，找到第一个有结果的
+  for (const q of candidates) {
+    if (!q || q.length < 2) continue;
+    try {
+      const url = `https://${lang}.wikipedia.org/w/rest.php/v1/search/page?q=${encodeURIComponent(q)}&limit=${limit}`;
+      const res = await fetch(url);
+      if (!res.ok) continue;
+      const data = await res.json();
+      if (data.pages && data.pages.length > 0) {
+        console.log('[WikiSearch] hit with query:', JSON.stringify(q), '→', data.pages.length, 'results');
+        return data.pages.map(p => ({
+          title: p.title,
+          key: p.key,
+          excerpt: (p.excerpt || '').replace(/<[^>]+>/g, ''),
+          thumbnail: p.thumbnail?.url ? (p.thumbnail.url.startsWith('//') ? 'https:' + p.thumbnail.url : p.thumbnail.url) : null,
+        }));
+      }
+    } catch (e) {
+      console.warn('[WikiSearch]', q, e);
+    }
+  }
+  return [];
+}
+
 async function fetchWikiSummary(topic, lang = 'zh') {
   const cacheKey = `${lang}:${topic}`;
   if (wikiCache[cacheKey]) return wikiCache[cacheKey];
@@ -2791,20 +2868,53 @@ function pickWikiTopics(question, p) {
 }
 
 // 用 Claude API + 维基百科上下文回答
-async function callPreClaudeAPI(msg, p) {
-  // 1. 拉取相关维基百科摘要（中文优先，缺失则补英文）
-  const topics = pickWikiTopics(msg, p);
-  const wikiResults = [];
-  for (const topic of topics) {
-    let r = await fetchWikiSummary(topic, 'zh');
-    if (!r) r = await fetchWikiSummary(topic, 'en');
-    if (r) wikiResults.push(r);
+// 🆕 统一的 wiki 词条收集流程：
+// 1. 先用 question 全文搜索 Wikipedia（中文 → 英文）找最相关的 3 个词条
+// 2. 拉取这些词条的完整摘要
+// 3. 若没结果，再用 era 的默认 wiki_topics 兜底
+async function gatherWikiContext(question, p, maxArticles = 3) {
+  const out = [];
+  const seenTitles = new Set();
+
+  // Step 1: 先用问题搜索中文维基
+  let hits = await searchWikiByQuestion(question, 'zh', maxArticles);
+  // 中文没结果再搜英文
+  if (hits.length === 0) {
+    hits = await searchWikiByQuestion(question, 'en', maxArticles);
   }
 
-  // 2. 构造权威上下文
+  for (const hit of hits.slice(0, maxArticles)) {
+    if (seenTitles.has(hit.title)) continue;
+    seenTitles.add(hit.title);
+    // 拉完整摘要
+    let r = await fetchWikiSummary(hit.key || hit.title, 'zh');
+    if (!r) r = await fetchWikiSummary(hit.key || hit.title, 'en');
+    if (r) out.push(r);
+  }
+
+  // Step 2: 如果搜索完全没结果，用 era 默认 wiki_topics 兜底
+  if (out.length === 0) {
+    const fallbackTopics = (p.ai && p.ai.wiki_topics) || [p.title];
+    for (const topic of fallbackTopics.slice(0, 2)) {
+      let r = await fetchWikiSummary(topic, 'zh');
+      if (!r) r = await fetchWikiSummary(topic, 'en');
+      if (r && !seenTitles.has(r.title)) {
+        seenTitles.add(r.title);
+        out.push(r);
+      }
+    }
+  }
+
+  return out;
+}
+
+async function callPreClaudeAPI(msg, p) {
+  // 🆕 根据用户问题动态搜索维基百科（不再用固定 topic）
+  const wikiResults = await gatherWikiContext(msg, p, 3);
+
   const wikiContext = wikiResults.length > 0
     ? wikiResults.map(r => `《${r.title}》(维基百科)\n${r.extract}\n来源：${r.url}`).join('\n\n---\n\n')
-    : '（暂未找到相关维基百科词条）';
+    : '（维基百科搜索未返回相关词条，请告诉用户暂时无法查到准确信息）';
 
   const userProfile = getUserProfile() || {};
   const userName = userProfile.nickname || '朋友';
@@ -2813,20 +2923,21 @@ async function callPreClaudeAPI(msg, p) {
   const systemPrompt = `我是 AI 世界文明实验室的史前历史助手，正在和 ${userAge} 岁的 ${userName} 对话。
 
 # 我的回答方式
-- 我用第一人称「我」回答，对方用「${userName}」或「你」称呼
-- 我用 ${userAge} 岁能理解的中文（不用专业术语，多用比喻）
+- 我用第一人称「我」回答，称呼对方为「${userName}」或「你」
+- 我用 ${userAge} 岁能理解的中文（不用专业术语，多用比喻和故事）
 - 我的回答控制在 100-200 字，简洁不啰嗦
-- 我每次回答末尾必须附上维基百科链接（带 📖 emoji）
+- 我严格围绕 ${userName} 实际问的问题作答，不答非所问
 
-# 知识来源规则
-我的回答必须严格基于下方"权威参考资料"（维基百科）。如果资料中没有的内容，我必须明确说"维基百科上未提及，需要查阅其他来源"，绝不编造。
+# 知识来源规则（重要）
+我的回答必须严格基于下方"权威参考资料"（来自维基百科，根据 ${userName} 的问题动态检索）。
+- 如果资料里有相关内容 → 总结回答 + 末尾附维基链接「想了解更多 → 📖 [词条名]」
+- 如果资料里没提到 → 直接说「维基百科上暂时没找到具体答案，可以试试换个问题」，不要编造
 
-# 权威参考资料
+# 权威参考资料（针对本次问题动态检索）
 ${wikiContext}
 
-# 当前课程背景
-${p.title} · ${p.time}
-${p.snapshot || ''}`;
+# 当前课程背景（仅作上下文参考）
+${p.title} · ${p.time}`;
 
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -2847,28 +2958,22 @@ ${p.snapshot || ''}`;
     if (!res.ok) throw new Error('API ' + res.status);
     const data = await res.json();
     let text = data.content[0].text.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
-    // 附上维基百科来源链接（防止 AI 没加）
     const sourceLinks = wikiResults.map(r =>
       `<a href="${r.url}" target="_blank" rel="noreferrer" class="wiki-btn zh">📖 ${r.title}</a>`
     ).join(' ');
-    return `<p>${text}</p>${sourceLinks ? `<div class="ai-wiki-sources"><strong>📚 维基百科原文：</strong> ${sourceLinks}</div>` : ''}`;
+    return `<p>${text}</p>${sourceLinks ? `<div class="ai-wiki-sources"><strong>📚 想看完整原文：</strong> ${sourceLinks}</div>` : ''}`;
   } catch (e) {
-    return `<p>⚠ AI 连接失败（${e.message}），降级使用维基百科原文：</p>${await getPreKBResponse(msg, p)}`;
+    return `<p>⚠ AI 连接失败（${e.message}），降级直接显示维基百科原文：</p>${await getPreKBResponse(msg, p)}`;
   }
 }
 
-// 无 API Key 时，直接展示维基百科原文（不再用我硬编码的内容）
+// 无 API Key 时，直接展示根据问题搜索到的维基百科卡片
 async function getPreKBResponse(q, p) {
-  const topics = pickWikiTopics(q, p);
-  const results = [];
-  for (const topic of topics) {
-    let r = await fetchWikiSummary(topic, 'zh');
-    if (!r) r = await fetchWikiSummary(topic, 'en');
-    if (r) results.push(r);
-  }
+  const results = await gatherWikiContext(q, p, 3);
   if (results.length === 0) {
-    return `<p>没找到相关的维基百科词条。试试改一下问题，或在设置中添加 Claude API Key 获取 AI 解读。</p>
-            <p>建议问题：</p><ul>${(p.ai.suggested_questions || []).map(q => `<li>「${q}」</li>`).join('')}</ul>`;
+    return `<p>🔍 维基百科上没找到关于「${q}」的相关内容。</p>
+            <p>试试换种问法，或者参考这些建议问题：</p>
+            <ul>${(p.ai.suggested_questions || []).map(qq => `<li>「${qq}」</li>`).join('')}</ul>`;
   }
   const cards = results.map(r => `
     <div class="wiki-card">
@@ -2879,8 +2984,8 @@ async function getPreKBResponse(q, p) {
         <a href="${r.url}" target="_blank" rel="noreferrer" class="wiki-btn zh">查看完整词条 →</a>
       </div>
     </div>`).join('');
-  return `<p><em>📚 以下内容直接来自维基百科（非 AI 生成）：</em></p>${cards}
-          <p class="kb-note">💡 想要 AI 用儿童化语言解读？请在设置中添加 Claude API Key。</p>`;
+  return `<p><em>📚 根据「${q}」从维基百科找到这些内容：</em></p>${cards}
+          <p class="kb-note">💡 想要 AI 用 10-12 岁能懂的话解读？请在设置中添加 Claude API Key。</p>`;
 }
 
 // ══════════════════════════════════════════════════════
