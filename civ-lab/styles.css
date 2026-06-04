@@ -5180,3 +5180,33 @@ html { scroll-behavior: smooth; }
 /* 全局动画过渡 */
 .screen { transition: opacity .4s cubic-bezier(.4,0,.2,1), transform .4s; }
 .tab-content { transition: opacity .3s; }
+
+/* 详情卡底部 上一个 / 下一个 导航行 */
+.img-detail-nav-row {
+  display: flex; gap: 8px; margin-top: 16px;
+}
+.img-detail-prev {
+  flex: 0 0 auto;
+  padding: 12px 14px;
+  background: white;
+  color: #7a5530;
+  border: 1.5px solid rgba(160,100,30,.35);
+  border-radius: 10px;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 45%;
+}
+.img-detail-prev:hover {
+  background: #f5e8c8;
+  border-color: #c84820;
+  color: #c84820;
+}
+.img-detail-nav-row .img-detail-next {
+  margin-top: 0;
+  flex: 1;
+  min-width: 0;
+}

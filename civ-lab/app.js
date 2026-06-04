@@ -1968,23 +1968,32 @@ function showImageOverlayDetail(nodeId) {
     html = renderConceptDetailCard(node, kn, p);
   }
 
-  // 计算下一个 hotspot（用于"下一个 →"按钮）
+  // 计算上一个/下一个 hotspot
   const allHotspots = kn.hotspots || [];
   const total = allHotspots.length;
+  const prevHotspot = (hotspotIndex > 0) ? allHotspots[hotspotIndex - 1] : null;
   const nextHotspot = (hotspotIndex >= 0 && hotspotIndex + 1 < total) ? allHotspots[hotspotIndex + 1] : null;
   const isLast = hotspotIndex === total - 1 && total > 0;
 
-  const navBtn = isLast
+  const prevBtn = prevHotspot
+    ? `<button class="img-detail-prev" onclick="showImageOverlayDetail('${prevHotspot.id}')">← 上一个 · ${hotspotIndex}. ${prevHotspot.label}</button>`
+    : '';
+
+  const nextBtnHtml = isLast
     ? `<button class="img-detail-next img-detail-finale" onclick="finishHotspotsAndOpenMap()">🗺 看完全部 · 进入迁徙地图 →</button>`
     : (nextHotspot
         ? `<button class="img-detail-next" onclick="showImageOverlayDetail('${nextHotspot.id}')">下一个 · ${hotspotIndex + 2}. ${nextHotspot.label} →</button>`
         : '');
 
+  const navRow = (prevBtn || nextBtnHtml)
+    ? `<div class="img-detail-nav-row">${prevBtn}${nextBtnHtml}</div>`
+    : '';
+
   const det = document.getElementById('imgOverlayDetail');
   det.innerHTML = `
     <button class="img-detail-close" onclick="document.getElementById('imgOverlayDetail').classList.add('hidden')">✕</button>
     ${html}
-    ${navBtn}
+    ${navRow}
   `;
   det.classList.remove('hidden');
 
