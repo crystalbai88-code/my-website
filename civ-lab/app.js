@@ -3412,7 +3412,7 @@ ${kbCtx || '（请基于你对早期智人的了解写作）'}
 }
 
 # 规则
-- 每个场景 3 个选项，effect 范围 -20 到 +20
+- 每个场景 3 个选项，effect 是数字（范围 -20 到 20，正数不要带 + 号，写 15 不要写 +15）
 - 不要现代物品（金属/农业/城市/文字）
 - 4 个场景围绕一个主题：食物危机/冲突/迁徙决策/合作传承
 - 用儿童语言（不超过 ${age + 5} 岁），多用比喻
@@ -3459,13 +3459,38 @@ ${kbCtx || '（请基于你对早期智人的了解写作）'}
       text = data.content[0].text;
     }
 
-    // 解析 JSON（可能被 ``` 包裹）
+    // 解析 JSON（可能被 ``` 包裹，AI 可能返回 +15 这种非标准格式）
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error('AI 返回格式不对');
-    const parsed = JSON.parse(jsonMatch[0]);
+    // 清理常见非标准 JSON: +数字、尾逗号、//注释
+    let jsonStr = jsonMatch[0]
+      .replace(/:\s*\+(\d)/g, ': $1')                  // +15 → 15
+      .replace(/,(\s*[}\]])/g, '$1')                    // 尾逗号
+      .replace(/\/\/[^\n]*/g, '')                       // 单行注释
+      .replace(/\/\*[\s\S]*?\*\//g, '');                // 多行注释
+    let parsed;
+    try {
+      parsed = JSON.parse(jsonStr);
+    } catch (e) {
+      console.error('[scenario AI] JSON parse failed:', e, '\n--- cleaned ---\n', jsonStr.slice(0,500));
+      throw new Error('AI 返回的 JSON 解析失败：' + e.message);
+    }
     if (!parsed.scenes || !Array.isArray(parsed.scenes) || parsed.scenes.length === 0) {
       throw new Error('AI 没生成场景');
     }
+    // 确保每个 scene 有必需字段
+    parsed.scenes = parsed.scenes.map((sc, i) => ({
+      id: i + 1,
+      emoji: sc.emoji || '🎬',
+      title: sc.title || `第 ${i+1} 场景`,
+      situation: sc.situation || '',
+      choices: (sc.choices || []).slice(0, 3).map(c => ({
+        text: c.text || '选项',
+        effect: Number(c.effect) || 0,
+        outcome: c.outcome || '',
+        fact: c.fact || '',
+      })),
+    }));
 
     // 替换当前 period 的 scenario.scenes
     p.scenario._original = p.scenario._original || p.scenario.scenes;
