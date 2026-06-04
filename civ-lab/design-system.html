@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>设计系统 · Design System · AI 世界文明实验室</title>
+<meta name="description" content="AI 世界文明实验室全站设计规范 — 颜色、字体、组件、模板、知识库 schema 的单一可信源。"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  /* ===== CivLab 国风卷轴设计系统 · 单一可信源 ===== */
+  /* === 暖色面 · paper === */
+  --bg:#f2e4c4;          /* 宣纸米黄主背景 */
+  --bg2:#e8d6b0;
+  --paper:#fdf5e0;       /* 卡片亮米 */
+  --paper2:#f5e8c8;      /* 卡片暗米 */
+
+  /* === 墨 · 文字 3 档 === */
+  --ink:#2c1a08;         /* 深墨棕 */
+  --ink2:#5c3a14;        /* 中棕 */
+  --ink3:#9a6828;        /* 金棕（副文字） */
+
+  /* === 朱砂 · 强调与按钮 === */
+  --warm:#c84820;        /* 主红 (按钮) */
+  --warm-deep:#a83a18;
+  --warm-soft:#e89828;
+  --amber:#c86820;       /* 朱砂橙 */
+  --seal-red:#c02020;    /* 印章红 */
+
+  /* === 辅助色 === */
+  --teal:#1a7890;
+  --sky:#2a90c8;
+  --green:#386830;
+  --done:#2a8038;        /* 完成态绿 */
+
+  --line:rgba(160,100,30,.25);
+  --line-soft:rgba(160,100,30,.15);
+
+  /* === 字体 === */
+  --serif:'STSong','Noto Serif SC','SimSun','Georgia',serif;
+  --sans:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;
+  --mono:'JetBrains Mono','SFMono-Regular',monospace;
+
+  /* === 8px 间距 === */
+  --s-1:4px;  --s-2:8px;  --s-3:12px; --s-4:16px;
+  --s-5:24px; --s-6:32px; --s-7:48px; --s-8:64px;
+  --s-9:96px;
+
+  /* === 圆角 === */
+  --r-sm:4px; --r-md:8px; --r-lg:12px; --r-xl:14px; --r-pill:99px;
+
+  /* === 阴影 === */
+  --sh-1:0 3px 10px rgba(60,30,5,.15);
+  --sh-2:0 8px 28px rgba(60,30,5,.18);
+  --sh-3:0 12px 36px rgba(60,30,5,.25);
+  --sh-3d:
+    drop-shadow(0 1px 0 rgba(0,0,0,.15))
+    drop-shadow(0 3px 4px rgba(60,30,5,.35))
+    drop-shadow(0 8px 12px rgba(60,30,5,.25));
+
+  /* === 动效 === */
+  --t-fast:150ms; --t-base:250ms; --t-slow:400ms;
+  --ease-default:cubic-bezier(.4,0,.2,1);
+  --ease-bounce:cubic-bezier(.34,1.56,.64,1);
+  --ease-walk:cubic-bezier(.34,1.2,.5,1);
+
+  /* === 签名渐变 === */
+  --grad-warm:linear-gradient(135deg,#c84820,#a83a18);
+  --grad-done:linear-gradient(135deg,#2a8038,#1f6028);
+  --grad-paper:linear-gradient(135deg,#fdf5e0,#f5e8c8);
+  --grad-bg:linear-gradient(160deg,#f5ecce 0%,#f2e4c4 40%,#e8d8b0 100%);
+  --grad-gold:linear-gradient(135deg,#f4e4bc,#e8c97c 45%,#d4a858);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--ink);font-family:var(--sans);
+  line-height:1.75;letter-spacing:.005em;-webkit-font-smoothing:antialiased;
+}
+a{color:var(--warm);text-decoration:none}
+a:hover{text-decoration:underline}
+::selection{background:var(--warm);color:#fff}
+
+/* ====== HEADER ====== */
+header{
+  padding:80px 6vw 50px;border-bottom:1px solid var(--line);
+  background:
+    radial-gradient(80% 60% at 90% 0%, rgba(200,72,32,.10), transparent 60%),
+    radial-gradient(70% 60% at 0% 100%, rgba(232,152,40,.10), transparent 60%);
+}
+header .crumb{font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:var(--ink3);text-transform:uppercase;margin-bottom:18px}
+header .crumb a{color:var(--warm)}
+header h1{font-family:var(--serif);font-weight:700;font-size:clamp(36px,5vw,64px);line-height:1.12;margin-bottom:18px}
+header h1 em{font-style:normal;color:var(--warm)}
+header .lede{font-size:16px;color:var(--ink2);max-width:780px;line-height:1.85}
+header .meta{margin-top:24px;display:flex;gap:18px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--ink3);text-transform:uppercase}
+header .meta strong{color:var(--warm);font-weight:500}
+
+/* ====== TOC sticky ====== */
+.toc{
+  position:sticky;top:0;z-index:30;
+  background:rgba(242,228,196,.92);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--line);padding:14px 6vw;
+  display:flex;flex-wrap:wrap;gap:6px;
+}
+.toc a{
+  padding:6px 14px;border-radius:99px;background:#fff;border:1px solid var(--line);
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--ink2);text-transform:uppercase;
+}
+.toc a:hover{background:var(--ink);color:#fff;border-color:var(--ink);text-decoration:none}
+
+/* ====== SECTION ====== */
+section{padding:80px 6vw;border-bottom:1px solid var(--line)}
+.sec-head{max-width:1320px;margin:0 auto 48px}
+section h2{font-family:var(--serif);font-weight:700;font-size:clamp(28px,4vw,48px);line-height:1.1;margin-bottom:14px}
+section h2 .num{font-family:'Georgia',serif;font-style:italic;color:var(--warm);font-weight:500;margin-right:14px}
+.sec-lede{font-size:15px;color:var(--ink2);max-width:760px;line-height:1.85}
+.body-content{max-width:1320px;margin:0 auto}
+
+.subsec-title{
+  font-family:var(--mono);font-size:11px;letter-spacing:.22em;
+  color:var(--warm);text-transform:uppercase;font-weight:500;
+  margin:40px 0 16px;display:flex;align-items:baseline;gap:12px;
+}
+.subsec-title:first-child{margin-top:0}
+.subsec-title em{font-style:normal;color:var(--ink3);font-family:var(--sans);font-size:12px;letter-spacing:.04em;text-transform:none;font-weight:400}
+
+/* ====== Color swatches ====== */
+.color-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:18px}
+.swatch{
+  background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;
+}
+.swatch .chip{height:100px}
+.swatch .info{padding:14px}
+.swatch .name{font-family:var(--sans);font-weight:600;font-size:13px;margin-bottom:4px}
+.swatch .hex{font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:.04em}
+.swatch .desc{font-size:11px;color:var(--ink2);margin-top:6px;font-style:italic}
+
+/* ====== Typography sample ====== */
+.type-row{display:grid;grid-template-columns:200px 1fr;gap:24px;padding:18px 0;border-bottom:1px dashed var(--line-soft);align-items:baseline}
+.type-row:last-child{border-bottom:0}
+.type-row .label{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--ink3);text-transform:uppercase}
+.type-row .label small{display:block;font-size:10px;color:var(--ink3);text-transform:none;letter-spacing:0;font-family:var(--sans);margin-top:4px}
+.type-row .sample{color:var(--ink)}
+
+/* ====== Spec table ====== */
+.spec-table{width:100%;border-collapse:collapse;font-size:13.5px}
+.spec-table thead th{
+  padding:10px 12px;text-align:left;font-family:var(--mono);font-size:10px;
+  letter-spacing:.18em;color:var(--ink3);text-transform:uppercase;font-weight:500;
+  border-bottom:1px solid var(--line);
+}
+.spec-table td{padding:10px 12px;border-bottom:1px solid var(--line-soft);color:var(--ink2)}
+.spec-table td:first-child{font-family:var(--mono);font-size:12px;color:var(--ink);width:160px}
+.spec-table td:nth-child(2){font-family:var(--mono);font-size:11px;color:var(--warm)}
+
+/* ====== Preview stage (live demo) ====== */
+.preview-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:24px;align-items:start;margin-bottom:32px}
+.preview-stage{
+  background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);
+  padding:32px;position:relative;
+}
+.preview-stage .ps-label{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;
+  color:var(--ink3);margin-bottom:18px;text-transform:uppercase;
+}
+.preview-stage.tinted{background:var(--paper2)}
+
+/* ====== Demo components ====== */
+.btn-primary{
+  display:inline-block;padding:12px 22px;
+  background:var(--grad-warm);color:#fff;border:none;border-radius:var(--r-md);
+  font-size:14px;font-weight:700;cursor:pointer;
+  box-shadow:0 4px 12px rgba(200,72,32,.35);
+  transition:all var(--t-base) var(--ease-default);
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(200,72,32,.5)}
+.btn-secondary{
+  display:inline-block;padding:10px 16px;background:#fff;color:var(--ink2);
+  border:1.5px solid var(--line);border-radius:var(--r-md);
+  font-size:13px;font-weight:600;cursor:pointer;
+}
+.btn-secondary:hover{background:var(--paper2);border-color:var(--warm);color:var(--warm)}
+.btn-done{
+  background:var(--grad-done);color:#fff;padding:14px 22px;border:none;border-radius:var(--r-md);
+  font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(42,128,56,.35);
+}
+.chip-mono{display:inline-block;padding:6px 14px;border-radius:99px;background:#fff;border:1px solid var(--line);font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--ink2);text-transform:uppercase}
+.chip-tag{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;background:rgba(60,160,80,.15);border:1.5px solid rgba(60,160,80,.5);color:#2a6038;border-radius:16px;font-size:12px;font-weight:600}
+
+/* Number badge (hotspot) */
+.dot-num{
+  width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,rgba(255,250,235,.96),rgba(245,232,200,.96));
+  color:#8a3010;border:2px solid var(--warm);
+  display:inline-flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:15px;font-family:var(--serif);
+  box-shadow:0 3px 10px rgba(60,30,5,.35),inset 0 1px 0 rgba(255,255,255,.6);
+}
+.dot-num.active{background:var(--grad-warm);color:#fff;box-shadow:0 0 0 4px rgba(200,72,32,.25)}
+
+/* Card example */
+.demo-card{
+  background:var(--grad-paper);border:2px solid var(--warm);
+  border-radius:var(--r-xl);padding:22px 20px;
+  box-shadow:var(--sh-3);max-width:380px;
+}
+.demo-card h4{font-family:var(--serif);font-size:18px;color:var(--warm);font-weight:800;margin-bottom:8px}
+.demo-card .sub{font-size:12px;color:var(--ink3);margin-bottom:14px;font-style:italic}
+.demo-card p{font-size:13px;color:var(--ink);line-height:1.7;margin-bottom:12px}
+.demo-card .nav-row{display:flex;gap:8px;margin-top:14px}
+
+/* spacing visualizer */
+.space-grid{display:grid;grid-template-columns:80px 1fr;gap:12px 18px;align-items:center}
+.space-grid .token{font-family:var(--mono);font-size:11px;color:var(--ink2)}
+.space-grid .bar{background:var(--warm);height:14px;border-radius:2px}
+
+/* shadow visualizer */
+.shadow-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:24px}
+.shadow-box{
+  background:#fff;border-radius:var(--r-lg);height:90px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:center;
+}
+.shadow-box.s1{box-shadow:var(--sh-1)}
+.shadow-box.s2{box-shadow:var(--sh-2)}
+.shadow-box.s3{box-shadow:var(--sh-3)}
+.shadow-box.s3d{filter:var(--sh-3d)}
+
+/* Code block */
+pre.code{
+  background:#fdf8ec;border:1px solid var(--line-soft);
+  border-radius:var(--r-md);padding:16px 18px;font-family:var(--mono);
+  font-size:12px;color:var(--ink);line-height:1.7;overflow-x:auto;
+  white-space:pre;
+}
+
+/* Spec lists */
+ul.spec-list{list-style:none;display:grid;gap:8px;font-size:14px;color:var(--ink2);line-height:1.7}
+ul.spec-list li{padding-left:14px;position:relative}
+ul.spec-list li::before{content:'·';position:absolute;left:0;color:var(--warm);font-weight:800}
+
+/* Module map (sitemap-like) */
+.module-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.module{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:18px 16px;text-align:center}
+.module .icon{font-size:32px;margin-bottom:8px}
+.module .name{font-family:var(--serif);font-weight:700;color:var(--warm);font-size:15px;margin-bottom:4px}
+.module .desc{font-size:11px;color:var(--ink3);line-height:1.6}
+
+/* footer */
+footer{padding:60px 6vw;text-align:center;background:var(--paper2);border-top:1px solid var(--line);font-size:13px;color:var(--ink2)}
+footer a{color:var(--warm)}
+
+/* mobile */
+@media (max-width:768px){
+  header{padding:60px 5vw 40px}
+  section{padding:60px 5vw}
+  .type-row{grid-template-columns:1fr;gap:8px}
+  .preview-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="crumb"><a href="./">← AI 世界文明实验室</a> / 设计系统</div>
+  <h1>设计系统 · <em>Design System</em></h1>
+  <p class="lede">AI 世界文明实验室全站设计规范——颜色、字体、组件、模板、知识库 schema 的<strong>单一可信源</strong>。所有新课、新页面必须遵循此处的 token，不可自行偏离。</p>
+  <div class="meta">
+    <span>VERSION · <strong>v1.0</strong></span>
+    <span>UPDATED · <strong>2026-06-04</strong></span>
+    <span>THEME · <strong>国风卷轴 Chinese Scroll</strong></span>
+  </div>
+</header>
+
+<nav class="toc">
+  <a href="#colors">01 · 颜色</a>
+  <a href="#typography">02 · 字体</a>
+  <a href="#spacing">03 · 间距</a>
+  <a href="#radius">04 · 圆角</a>
+  <a href="#shadows">05 · 阴影</a>
+  <a href="#motion">06 · 动效</a>
+  <a href="#buttons">07 · 按钮</a>
+  <a href="#chips">08 · Chip · 标签</a>
+  <a href="#numbers">09 · 数字标记</a>
+  <a href="#cards">10 · 卡片</a>
+  <a href="#avatar">11 · 角色</a>
+  <a href="#layouts">12 · 布局</a>
+  <a href="#modules">13 · 学习模块</a>
+  <a href="#kb-schema">14 · 知识库 Schema</a>
+  <a href="#a11y">15 · 无障碍</a>
+</nav>
+
+<!-- ============ 01 · COLORS ============ -->
+<section id="colors">
+  <div class="sec-head">
+    <h2><span class="num">01.</span>颜色</h2>
+    <p class="sec-lede">所有颜色都从 <code>:root</code> CSS 变量取，不在组件中写死 hex。米黄+朱砂的国风暖色调，墨色文字 3 档。</p>
+  </div>
+  <div class="body-content">
+
+    <div class="subsec-title">纸面 · Surfaces <em>背景色阶</em></div>
+    <div class="color-grid">
+      <div class="swatch"><div class="chip" style="background:#f2e4c4"></div><div class="info"><div class="name">--bg</div><div class="hex">#F2E4C4</div><div class="desc">宣纸米黄主背景</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#e8d6b0"></div><div class="info"><div class="name">--bg2</div><div class="hex">#E8D6B0</div><div class="desc">页面背景深一档</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#fdf5e0"></div><div class="info"><div class="name">--paper</div><div class="hex">#FDF5E0</div><div class="desc">卡片亮米</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#f5e8c8"></div><div class="info"><div class="name">--paper2</div><div class="hex">#F5E8C8</div><div class="desc">卡片暗米</div></div></div>
+    </div>
+
+    <div class="subsec-title">墨 · Ink <em>文字 3 档</em></div>
+    <div class="color-grid">
+      <div class="swatch"><div class="chip" style="background:#2c1a08"></div><div class="info"><div class="name">--ink</div><div class="hex">#2C1A08</div><div class="desc">主文字（标题、正文）</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#5c3a14"></div><div class="info"><div class="name">--ink2</div><div class="hex">#5C3A14</div><div class="desc">次级文字</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#9a6828"></div><div class="info"><div class="name">--ink3</div><div class="hex">#9A6828</div><div class="desc">提示、元数据</div></div></div>
+    </div>
+
+    <div class="subsec-title">朱砂 · Accent <em>主按钮、强调</em></div>
+    <div class="color-grid">
+      <div class="swatch"><div class="chip" style="background:#c84820"></div><div class="info"><div class="name">--warm</div><div class="hex">#C84820</div><div class="desc">主红（按钮、链接）</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#a83a18"></div><div class="info"><div class="name">--warm-deep</div><div class="hex">#A83A18</div><div class="desc">按钮渐变深色端</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#e89828"></div><div class="info"><div class="name">--warm-soft</div><div class="hex">#E89828</div><div class="desc">温暖橙黄</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#c86820"></div><div class="info"><div class="name">--amber</div><div class="hex">#C86820</div><div class="desc">朱砂橙</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#c02020"></div><div class="info"><div class="name">--seal-red</div><div class="hex">#C02020</div><div class="desc">印章红（少用）</div></div></div>
+    </div>
+
+    <div class="subsec-title">辅助 · Semantic <em>状态色</em></div>
+    <div class="color-grid">
+      <div class="swatch"><div class="chip" style="background:#2a8038"></div><div class="info"><div class="name">--done</div><div class="hex">#2A8038</div><div class="desc">完成态绿</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#1a7890"></div><div class="info"><div class="name">--teal</div><div class="hex">#1A7890</div><div class="desc">石青</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#2a90c8"></div><div class="info"><div class="name">--sky</div><div class="hex">#2A90C8</div><div class="desc">天蓝</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#386830"></div><div class="info"><div class="name">--green</div><div class="hex">#386830</div><div class="desc">墨绿</div></div></div>
+    </div>
+
+    <div class="subsec-title">渐变 · Gradients <em>签名背景</em></div>
+    <div class="color-grid">
+      <div class="swatch"><div class="chip" style="background:linear-gradient(135deg,#c84820,#a83a18)"></div><div class="info"><div class="name">--grad-warm</div><div class="hex">主按钮</div></div></div>
+      <div class="swatch"><div class="chip" style="background:linear-gradient(135deg,#2a8038,#1f6028)"></div><div class="info"><div class="name">--grad-done</div><div class="hex">完成态</div></div></div>
+      <div class="swatch"><div class="chip" style="background:linear-gradient(135deg,#fdf5e0,#f5e8c8)"></div><div class="info"><div class="name">--grad-paper</div><div class="hex">卡片</div></div></div>
+      <div class="swatch"><div class="chip" style="background:linear-gradient(135deg,#f4e4bc,#e8c97c 45%,#d4a858)"></div><div class="info"><div class="name">--grad-gold</div><div class="hex">金</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 02 · TYPOGRAPHY ============ -->
+<section id="typography">
+  <div class="sec-head">
+    <h2><span class="num">02.</span>字体</h2>
+    <p class="sec-lede">三种字体：<strong>STSong / Noto Serif SC</strong> 用于古风标题，<strong>Noto Sans SC</strong> 用于正文，<strong>JetBrains Mono</strong> 用于元数据小标签。</p>
+  </div>
+  <div class="body-content">
+    <div class="type-row"><div class="label">H1 · 页面大标题<small>serif 700, 36-64px</small></div><div class="sample" style="font-family:var(--serif);font-size:42px;font-weight:700;line-height:1.1">人类从哪里来？</div></div>
+    <div class="type-row"><div class="label">H2 · 章节标题<small>serif 700, 28-48px</small></div><div class="sample" style="font-family:var(--serif);font-size:32px;font-weight:700">先学会双足行走</div></div>
+    <div class="type-row"><div class="label">H3 · 卡片标题<small>serif 800, 18-19px</small></div><div class="sample" style="font-family:var(--serif);font-size:19px;font-weight:800;color:var(--warm)">Lucy · Australopithecus afarensis</div></div>
+    <div class="type-row"><div class="label">H4 · 小标题<small>sans 700, 14-15px</small></div><div class="sample" style="font-size:15px;font-weight:700">这个化石告诉我们什么</div></div>
+    <div class="type-row"><div class="label">Body · 正文<small>sans 400, 13-14px, lh 1.7</small></div><div class="sample" style="font-size:14px;line-height:1.7;color:var(--ink2)">Lucy 不是"第一个人"，但她改变了我们对人类起源的理解。1974 年 11 月 24 日，在埃塞俄比亚 Hadar 地区被发现。</div></div>
+    <div class="type-row"><div class="label">Sub · 副标题<small>italic 12px, ink3</small></div><div class="sample" style="font-size:12px;font-style:italic;color:var(--ink3)">约 320 万年前 · 早期智人化石</div></div>
+    <div class="type-row"><div class="label">Mono · 元标签<small>mono 11px, letter-spacing .22em, UPPERCASE</small></div><div class="sample"><span style="font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:var(--warm);text-transform:uppercase">EVIDENCE · 化石证据</span></div></div>
+    <div class="type-row"><div class="label">Italic Number<small>georgia italic, accent</small></div><div class="sample" style="font-family:Georgia,serif;font-style:italic;font-size:48px;color:var(--warm);font-weight:500">01.</div></div>
+  </div>
+</section>
+
+<!-- ============ 03 · SPACING ============ -->
+<section id="spacing">
+  <div class="sec-head">
+    <h2><span class="num">03.</span>间距 · 8 倍数阶梯</h2>
+    <p class="sec-lede">所有 padding/margin/gap 必须从这 9 档里选，不用任意数值。</p>
+  </div>
+  <div class="body-content">
+    <div class="space-grid">
+      <div class="token">--s-1 · 4px</div><div class="bar" style="width:4px"></div>
+      <div class="token">--s-2 · 8px</div><div class="bar" style="width:8px"></div>
+      <div class="token">--s-3 · 12px</div><div class="bar" style="width:12px"></div>
+      <div class="token">--s-4 · 16px</div><div class="bar" style="width:16px"></div>
+      <div class="token">--s-5 · 24px</div><div class="bar" style="width:24px"></div>
+      <div class="token">--s-6 · 32px</div><div class="bar" style="width:32px"></div>
+      <div class="token">--s-7 · 48px</div><div class="bar" style="width:48px"></div>
+      <div class="token">--s-8 · 64px</div><div class="bar" style="width:64px"></div>
+      <div class="token">--s-9 · 96px</div><div class="bar" style="width:96px"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 04 · RADIUS ============ -->
+<section id="radius">
+  <div class="sec-head">
+    <h2><span class="num">04.</span>圆角 · 5 档</h2>
+    <p class="sec-lede">小按钮 sm-md，卡片 lg-xl，胶囊标签 pill。</p>
+  </div>
+  <div class="body-content">
+    <table class="spec-table">
+      <thead><tr><th>Token</th><th>Value</th><th>用途</th></tr></thead>
+      <tbody>
+        <tr><td>--r-sm</td><td>4px</td><td>代码块、小输入框</td></tr>
+        <tr><td>--r-md</td><td>8px</td><td>按钮、输入框</td></tr>
+        <tr><td>--r-lg</td><td>12px</td><td>卡片、面板</td></tr>
+        <tr><td>--r-xl</td><td>14px</td><td>主要卡片（hotspot 详情卡）</td></tr>
+        <tr><td>--r-pill</td><td>99px</td><td>chip 胶囊、圆形按钮</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 05 · SHADOWS ============ -->
+<section id="shadows">
+  <div class="sec-head">
+    <h2><span class="num">05.</span>阴影 · 4 档浮起</h2>
+    <p class="sec-lede">从轻到重。3D 投影 (drop-shadow) 用于抠图角色立体效果。</p>
+  </div>
+  <div class="body-content">
+    <div class="shadow-grid">
+      <div class="shadow-box s1">--sh-1<br/>4px / .12</div>
+      <div class="shadow-box s2">--sh-2<br/>24px / .18</div>
+      <div class="shadow-box s3">--sh-3<br/>36px / .25</div>
+      <div class="shadow-box s3d">--sh-3d<br/>3D 立体投影</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 06 · MOTION ============ -->
+<section id="motion">
+  <div class="sec-head">
+    <h2><span class="num">06.</span>动效 · 3 档时长 + 3 种缓动</h2>
+    <p class="sec-lede">默认所有过渡都用 <code>--ease-default</code>。弹性反馈用 <code>--ease-bounce</code>，角色走路用 <code>--ease-walk</code>。</p>
+  </div>
+  <div class="body-content">
+    <table class="spec-table">
+      <thead><tr><th>Token</th><th>Value</th><th>用途</th></tr></thead>
+      <tbody>
+        <tr><td>--t-fast</td><td>150ms</td><td>hover 反馈、按钮按下</td></tr>
+        <tr><td>--t-base</td><td>250ms</td><td>默认过渡、卡片浮起</td></tr>
+        <tr><td>--t-slow</td><td>400ms</td><td>modal 入场、内容切换</td></tr>
+        <tr><td>--ease-default</td><td>cubic-bezier(.4,0,.2,1)</td><td>默认所有过渡</td></tr>
+        <tr><td>--ease-bounce</td><td>cubic-bezier(.34,1.56,.64,1)</td><td>弹性入场（hotspot pop）</td></tr>
+        <tr><td>--ease-walk</td><td>cubic-bezier(.34,1.2,.5,1)</td><td>角色 1.5s 走位</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 07 · BUTTONS ============ -->
+<section id="buttons">
+  <div class="sec-head">
+    <h2><span class="num">07.</span>按钮</h2>
+    <p class="sec-lede">主按钮 = 朱砂渐变 + 阴影 + hover 浮起；副按钮 = 白底加边；完成态 = 墨绿渐变。</p>
+  </div>
+  <div class="body-content">
+    <div class="preview-grid">
+      <div class="preview-stage">
+        <div class="ps-label">PRIMARY · 主按钮</div>
+        <button class="btn-primary">继续 → 📖 故事</button>
+        <pre class="code" style="margin-top:18px">background: var(--grad-warm);
+color: #fff;
+padding: 12px 22px;
+border-radius: var(--r-md);
+font-size: 14px; font-weight: 700;
+box-shadow: 0 4px 12px rgba(200,72,32,.35);
+/* hover: translateY(-2px) + 阴影加深 */</pre>
+      </div>
+      <div class="preview-stage">
+        <div class="ps-label">SECONDARY · 副按钮</div>
+        <button class="btn-secondary">← 上一个 · 2. 分家时间</button>
+        <pre class="code" style="margin-top:18px">background: #fff;
+color: var(--ink2);
+border: 1.5px solid var(--line);
+padding: 10px 16px;
+border-radius: var(--r-md);
+/* hover: 米黄 bg + 红边 */</pre>
+      </div>
+      <div class="preview-stage">
+        <div class="ps-label">FINALE · 完成态按钮</div>
+        <button class="btn-done">🎉 本节全部完成 · 进入下一课</button>
+        <pre class="code" style="margin-top:18px">background: var(--grad-done);
+/* 同主按钮但绿色, 表示一个模块结束 */</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 08 · CHIPS ============ -->
+<section id="chips">
+  <div class="sec-head">
+    <h2><span class="num">08.</span>Chip · 标签</h2>
+    <p class="sec-lede">导航 chip、分类标签、状态徽章。</p>
+  </div>
+  <div class="body-content">
+    <div class="preview-stage">
+      <div class="ps-label">CHIPS · 三种风格</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+        <span class="chip-mono">EVIDENCE · 化石证据</span>
+        <span class="chip-tag">✓ 已完成</span>
+        <a class="chip-mono" style="cursor:pointer">SECTION · 01</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 09 · NUMBER BADGES ============ -->
+<section id="numbers">
+  <div class="sec-head">
+    <h2><span class="num">09.</span>数字标记 · Hotspot</h2>
+    <p class="sec-lede">36×36 米色 + 红描边 + 红数字。激活态变红色实心。</p>
+  </div>
+  <div class="body-content">
+    <div class="preview-stage" style="display:flex;gap:24px;align-items:center;justify-content:center;flex-wrap:wrap">
+      <span class="dot-num">1</span>
+      <span class="dot-num">2</span>
+      <span class="dot-num active">3</span>
+      <span class="dot-num">4</span>
+      <span class="dot-num">5</span>
+    </div>
+    <pre class="code">.dot-num {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255,250,235,.96), rgba(245,232,200,.96));
+  border: 2px solid var(--warm);
+  color: #8a3010; font-weight: 800; font-family: var(--serif);
+  box-shadow: 0 3px 10px rgba(60,30,5,.35);
+}
+.dot-num.active { background: var(--grad-warm); color: #fff; }</pre>
+  </div>
+</section>
+
+<!-- ============ 10 · CARDS ============ -->
+<section id="cards">
+  <div class="sec-head">
+    <h2><span class="num">10.</span>知识卡片</h2>
+    <p class="sec-lede">米黄渐变背景 + 朱红描边 + 标题用 serif + 200-500 字策展正文 + 上/下导航。</p>
+  </div>
+  <div class="body-content">
+    <div class="preview-stage" style="background:var(--bg)">
+      <div class="ps-label">KNOWLEDGE CARD · 知识详情卡</div>
+      <div class="demo-card">
+        <h4>👩 Lucy · 南方古猿</h4>
+        <div class="sub">约 320 万年前 · 早期智人化石</div>
+        <p><strong>Lucy 不是"第一个人"</strong>，但她改变了我们对人类起源的理解。1974 年发现，骨架 40% 完整。</p>
+        <p>她证明：先直立，后脑大。</p>
+        <div class="nav-row">
+          <button class="btn-secondary">← 上一个</button>
+          <button class="btn-primary" style="flex:1">下一个 · 5. 大脑变大 →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 11 · AVATAR ============ -->
+<section id="avatar">
+  <div class="sec-head">
+    <h2><span class="num">11.</span>角色 · 走路头像</h2>
+    <p class="sec-lede">古风手绘男孩/女孩 PNG 抠图，多层 drop-shadow 3D 立体感，脚下椭圆阴影同步缩放。1.5s 走位动画。</p>
+  </div>
+  <div class="body-content">
+    <div class="preview-grid">
+      <div class="preview-stage tinted" style="text-align:center;padding:40px">
+        <div class="ps-label">CHARACTER · 古风男孩</div>
+        <img src="images/avatar-boy.png" style="height:160px;filter:var(--sh-3d)"/>
+        <div style="margin:20px auto 0;width:90px;height:14px;border-radius:50%;background:radial-gradient(ellipse,rgba(60,30,5,.45),transparent);opacity:.8"></div>
+      </div>
+      <div class="preview-stage tinted" style="text-align:center;padding:40px">
+        <div class="ps-label">CHARACTER · 古风女孩</div>
+        <img src="images/avatar-girl.png" style="height:160px;filter:var(--sh-3d)"/>
+        <div style="margin:20px auto 0;width:90px;height:14px;border-radius:50%;background:radial-gradient(ellipse,rgba(60,30,5,.45),transparent);opacity:.8"></div>
+      </div>
+    </div>
+    <pre class="code">/* 角色 3D 立体感（多层 drop-shadow + 地面椭圆阴影）*/
+filter:
+  drop-shadow(0 1px 0 rgba(0,0,0,.15))
+  drop-shadow(0 3px 4px rgba(60,30,5,.35))
+  drop-shadow(0 8px 12px rgba(60,30,5,.25));
+
+/* 走路动画 */
+transition: left 1.5s var(--ease-walk), top 1.5s var(--ease-walk);</pre>
+  </div>
+</section>
+
+<!-- ============ 12 · LAYOUTS ============ -->
+<section id="layouts">
+  <div class="sec-head">
+    <h2><span class="num">12.</span>布局规则</h2>
+    <p class="sec-lede">每种场景对应一种布局。手机端 ≤768px 自动改单列、抽屉式。</p>
+  </div>
+  <div class="body-content">
+    <table class="spec-table">
+      <thead><tr><th>场景</th><th>桌面</th><th>手机</th></tr></thead>
+      <tbody>
+        <tr><td>首页</td><td>7 阶段卡 / 3 列网格</td><td>单列</td></tr>
+        <tr><td>阶段详情</td><td>8 lesson 卡 / 4 列网格</td><td>2 列</td></tr>
+        <tr><td>时间轴</td><td>主图 55vw + 详情 38vw 并排</td><td>主图 100% + 详情底部抽屉</td></tr>
+        <tr><td>地图</td><td>主图 + 380px 化石列表</td><td>单列堆叠</td></tr>
+        <tr><td>故事</td><td>正文 + 5 视频 2×3 网格</td><td>视频单列</td></tr>
+        <tr><td>浮动 AI</td><td>右下 420×580</td><td>底部抽屉 85vh</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 13 · MODULES ============ -->
+<section id="modules">
+  <div class="sec-head">
+    <h2><span class="num">13.</span>学习模块 · 6 步闯关</h2>
+    <p class="sec-lede">每节课固定 6 个模块，按这个顺序串联。每步有"← 返回 / 下一个 →"。</p>
+  </div>
+  <div class="body-content">
+    <div class="module-grid">
+      <div class="module"><div class="icon">📜</div><div class="name">总览</div><div class="desc">核心问题概括</div></div>
+      <div class="module"><div class="icon">🌳</div><div class="name">时间轴</div><div class="desc">10-12 数字标记点 + 走路角色</div></div>
+      <div class="module"><div class="icon">🗺</div><div class="name">迁徙地图</div><div class="desc">3D 透视 + 动态轨迹 + 8 化石点</div></div>
+      <div class="module"><div class="icon">📖</div><div class="name">故事</div><div class="desc">叙事 + 5 段视频</div></div>
+      <div class="module"><div class="icon">🎮</div><div class="name">时光机</div><div class="desc">4 决策角色扮演 + AI 生成新剧本</div></div>
+      <div class="module"><div class="icon">🤖</div><div class="name">AI 助手</div><div class="desc">浮动按钮全站可问，流式输出</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 14 · KB SCHEMA ============ -->
+<section id="kb-schema">
+  <div class="sec-head">
+    <h2><span class="num">14.</span>知识库 Schema</h2>
+    <p class="sec-lede">每个 P 节点（PH01/PH02/...）必填的 11 个字段。<strong>A 级博物馆/Nature 来源</strong>，B 级 DK / NatGeo Kids 语言，C 级课程设计。</p>
+  </div>
+  <div class="body-content">
+    <pre class="code">{
+  "node_id":         "P01_homo_sapiens_origin",
+  "title":           "30万年前：现代人类的出现",
+  "time_range":      "约30万年前-5万年前",
+  "core_question":   "什么是现代人类？我们从哪里来？",
+  "fact_base":       [],  // A级事实, 每条带具体论文/博物馆出处
+  "child_explanation": [],  // B级 (DK / NatGeo Kids) 儿童语言
+  "map_points":      [],  // 实际遗址点带经纬度
+  "evidence_objects":[],  // 真实馆藏 (含编号、展馆)
+  "key_events":      [],  // 时间线
+  "key_people_or_groups": [],  // 学者/古人群
+  "civilization_connection": [],  // 与文明的因果链
+  "common_misconceptions":   [],  // 反幻觉常识
+  "ai_tasks":        [],  // 现成的 AI 任务题
+  "anti_hallucination_rules":[],  // AI 不能说什么
+  "sources":         []   // A/B 级来源带 URL
+}</pre>
+
+    <div class="subsec-title">来源分级 <em>什么算 A/B/C/D</em></div>
+    <table class="spec-table">
+      <thead><tr><th>级别</th><th>来源</th><th>用途</th></tr></thead>
+      <tbody>
+        <tr><td>A 级</td><td>博物馆、Nature、Britannica、UNESCO、大学教材</td><td>事实底板</td></tr>
+        <tr><td>B 级</td><td>DK、National Geographic Kids、博物馆儿童教育</td><td>儿童语言</td></tr>
+        <tr><td>C 级</td><td>自己的课程模型、AI 任务、作品集任务</td><td>教学转化</td></tr>
+        <tr><td>D 级</td><td>短视频、公众号、未标注网页、AI 编造的细节</td><td>❌ 禁止依赖</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 15 · A11Y ============ -->
+<section id="a11y">
+  <div class="sec-head">
+    <h2><span class="num">15.</span>无障碍 · 朗读 · 演示</h2>
+    <p class="sec-lede">每个知识卡有 🔊 朗读按钮（Web Speech API 中文）。演示模式可隐藏所有设置入口。</p>
+  </div>
+  <div class="body-content">
+    <ul class="spec-list">
+      <li><strong>语音朗读</strong> · 每个详情卡右上角 🔊 按钮，自动 strip HTML，播放时变绿色脉冲，再点暂停</li>
+      <li><strong>键盘导航</strong> · 所有按钮支持 Tab + Enter，:focus-visible 显示金色聚焦环</li>
+      <li><strong>触摸目标</strong> · 移动端最小 44×44px，加 tap-highlight 反馈</li>
+      <li><strong>对比度</strong> · 主文字 #2C1A08 on #F2E4C4 = 11.2:1（WCAG AAA）</li>
+      <li><strong>演示模式</strong> · 普通 URL 隐藏所有 ⚙ 设置按钮；<code>?admin=1</code> 显示</li>
+      <li><strong>课程锁定</strong> · <code>DEMO_UNLOCKED_LESSONS</code> 数组控制可访问课程，锁定显示 🔒 + 灰色斜纹</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <p><strong>AI 世界文明实验室 · 设计系统 v1.0</strong></p>
+  <p style="margin-top:8px">由 <a href="./">civ-lab</a> 项目维护 · 更新于 2026-06-04</p>
+  <p style="margin-top:8px;font-size:11px;color:var(--ink3)">所有新课、新页面必须遵循此处的 token 与组件，不可自行偏离。</p>
+</footer>
+
+</body>
+</html>

@@ -1,123 +1,41 @@
 /* ── Reset & Base ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ════════════════════════════════════════════════════════
-   永乐教育设计系统 · DESIGN TOKENS (单一可信源)
-   字体: Noto Serif SC + Noto Sans SC + Cormorant + JetBrains Mono
-   ════════════════════════════════════════════════════════ */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=JetBrains+Mono:wght@400;500&family=Ma+Shan+Zheng&display=swap');
-
 :root {
-  /* === SKY GRADIENT · 夜→晨 === */
-  --night-0:#050B22;
-  --night-1:#0E1F4D;
-  --night-2:#1A3A7A;
-  --night-3:#2E1F4D;
-  --blue:#2D4FAF;
-  --blue-2:#5984D6;
-  --blue-soft:#8FAAD5;
-  --dusk:#B59FBE;
-  --sunset:#E89970;
-  --sunset-2:#F2B58F;
-  --dawn:#FAD0B0;
-
-  /* === 纸面色阶 === */
-  --paper:#F7F2E8;
-  --paper-2:#EFE7D5;
-  --paper-3:#E4DBC1;
-  --bg:#F4EFE3;
-  --bg-2:#EDE6D3;
-
-  /* === 墨色 3 档 === */
-  --ink:#0E1218;
-  --ink-soft:#2A3142;
-  --ink-mute:#5C6577;
-  --line-soft:rgba(14,18,24,.10);
-  --line:rgba(14,18,24,.16);
-
-  /* === 品牌色 === */
-  --accent:#4A75E5;        /* 主蓝 */
-  --accent-deep:#1E3A7A;
-  --accent-light:#8FAAD5;
-  --gold:#D4A858;
-  --gold-light:#E8C97C;
-  --gold-deep:#A8842E;
-  --red:#C8472C;           /* 仅 logo / 印章 */
-  --red-deep:#7A2818;
-  --red-bright:#E1361C;
-
-  /* === 字体 === */
-  --serif:'Noto Serif SC','Source Han Serif SC',serif;
-  --sans:'Noto Sans SC','Source Han Sans SC','PingFang SC',sans-serif;
-  --latin:'Cormorant Garamond','Georgia',serif;
-  --mono:'JetBrains Mono','SFMono-Regular',monospace;
-  --hand:'Ma Shan Zheng',cursive;
-
-  /* === 8px 间距阶梯 === */
-  --s-1:4px;  --s-2:8px;  --s-3:12px; --s-4:16px;
-  --s-5:24px; --s-6:32px; --s-7:48px; --s-8:64px;
-  --s-9:96px; --s-10:128px;
-
-  /* === 圆角 5 档 === */
-  --r-sm:4px; --r-md:8px; --r-lg:12px; --r-xl:18px; --r-pill:99px;
-
-  /* === 阴影 4 档 === */
-  --sh-1:0 4px 12px -4px rgba(14,18,24,.12);
-  --sh-2:0 8px 24px -10px rgba(14,18,24,.18);
-  --sh-3:0 18px 50px -25px rgba(14,18,24,.25);
-  --sh-4:0 30px 80px -30px rgba(14,18,24,.35);
-
-  /* === 动效 === */
-  --t-fast:150ms; --t-base:250ms; --t-slow:400ms;
-  --ease-default:cubic-bezier(.4,1,.6,1);
-  --ease-bounce:cubic-bezier(.45,1.5,.55,1);
-
-  /* === 签名渐变 === */
-  --grad-night:linear-gradient(180deg,#06091A 0%,#0A1530 38%,#1A2B5E 70%,#2E1F4D 100%);
-  --grad-dawn:linear-gradient(180deg,#1A2B5E 0%,#7A3C8A 55%,#E8A65C 85%,#F4E4BC 100%);
-  --grad-gold:linear-gradient(135deg,#F4E4BC 0%,#E8C97C 45%,#D4A858 100%);
-  --grad-accent:linear-gradient(135deg,#4A75E5 0%,#2D4FB3 100%);
-
-  /* === 旧别名（向后兼容，逐步替换为新 token）=== */
-  --bg2:var(--paper-2);
-  --ink2:var(--ink-soft);
-  --ink3:var(--ink-mute);
-  --amber:var(--accent);
-  --amber2:var(--gold);
-  --warm:var(--red-deep);
-  --teal:var(--blue);
-  --sky:var(--blue-2);
-  --green:#386830;
-  --seal-red:var(--red);
-  --dot-done:var(--accent);
-  --dot-active:var(--red);
-  --dot-locked:#c8b898;
-  --era-land:var(--gold);
-  --era-water:var(--blue-soft);
-  --era-sky:var(--paper);
-  --panel-bg:rgba(247,242,232,0.96);
-  --surface:#fff;
-  --surface2:var(--paper-2);
-  --surface3:var(--paper-3);
-  --border:var(--line-soft);
-  --amber-dim:var(--accent-deep);
-  --amber-glow:rgba(74,117,229,.10);
-  --terracotta:var(--red-deep);
-  --river:var(--blue);
-  --text:var(--ink);
-  --text2:var(--ink-soft);
-  --text3:var(--ink-mute);
-  --radius:var(--r-md);
-}
-
-html,body{font-family:var(--sans);font-weight:400;line-height:1.75;letter-spacing:.005em;-webkit-font-smoothing:antialiased}
-::selection{background:var(--accent);color:#fff}
-
-/* 全站 :focus-visible 金色聚焦环 */
-:focus{outline:none}
-a:focus-visible, button:focus-visible, [tabindex]:focus-visible,
-input:focus-visible, textarea:focus-visible, select:focus-visible{
-  outline:2px solid var(--gold-light);outline-offset:2px;border-radius:var(--r-sm);
+  /* ── 国风卷轴 · Chinese Scroll Theme ── */
+  --bg: #f2e4c4;
+  --bg2: #e8d6b0;
+  --ink: #2c1a08;
+  --ink2: #5c3a14;
+  --ink3: #9a6828;
+  --amber: #c86820;
+  --amber2: #e89828;
+  --warm: #b83018;
+  --teal: #1a7890;
+  --sky: #2a90c8;
+  --green: #386830;
+  --seal-red: #c02020;
+  --dot-done: #c86820;
+  --dot-active: #b83018;
+  --dot-locked: #c8b898;
+  --era-land: #c8aa60;
+  --era-water: #6898c8;
+  --era-sky: #f2e4c4;
+  --panel-bg: rgba(242,228,196,0.96);
+  --serif: 'STSong','Noto Serif SC','SimSun','Georgia',serif;
+  --sans: 'STHeiti','PingFang SC','Microsoft YaHei',sans-serif;
+  --surface: rgba(255,248,228,0.95);
+  --surface2: rgba(240,225,195,0.9);
+  --surface3: rgba(228,210,175,0.85);
+  --border: rgba(160,100,30,0.2);
+  --amber-dim: #a05810;
+  --amber-glow: rgba(200,104,32,0.1);
+  --terracotta: #b83018;
+  --river: #1a7890;
+  --text: var(--ink);
+  --text2: var(--ink2);
+  --text3: var(--ink3);
+  --radius: 4px;
 }
 
 /* ── Walking character animation ── */
