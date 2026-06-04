@@ -1651,13 +1651,15 @@ function renderImageOverlayMode(p) {
         </div>
       </div>
 
-      <!-- 大图 + 热点叠层 -->
+      <!-- 大图 + 热点叠层（图与泡泡同处一个 stage 容器，坐标对齐） -->
       <div class="img-overlay-canvas" id="imgOverlayCanvas">
-        <img class="img-overlay-bg" src="${kn.image}" alt="${p.title}"/>
-        <svg class="img-overlay-svg" preserveAspectRatio="none">
-          ${connections}
-        </svg>
-        ${bubbles}
+        <div class="img-overlay-stage">
+          <img class="img-overlay-bg" src="${kn.image}" alt="${p.title}"/>
+          <svg class="img-overlay-svg" preserveAspectRatio="none">
+            ${connections}
+          </svg>
+          ${bubbles}
+        </div>
       </div>
 
       <!-- 浮动详情卡（点击泡泡后弹出） -->
