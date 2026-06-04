@@ -1906,7 +1906,7 @@ function renderImageOverlayMode(p) {
       <!-- 大图 + 热点叠层（图与泡泡同处一个 stage 容器，坐标对齐） -->
       <div class="img-overlay-canvas" id="imgOverlayCanvas">
         <div class="img-overlay-stage">
-          <img class="img-overlay-bg" src="${kn.image}" alt="${p.title}"/>
+          <img class="img-overlay-bg" src="${kn.image}" alt="${p.title}" loading="eager" decoding="async" fetchpriority="high"/>
           <svg class="img-overlay-svg" preserveAspectRatio="none">
             ${connections}
           </svg>

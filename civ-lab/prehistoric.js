@@ -44,7 +44,7 @@ const PREHISTORIC = {
         scale_note: '从这一刻到公元前3000年的第一座城市，中间隔了约27万年。文明只是这段旅程最后2%的故事。',
         teacher_note: '人类不是从今天的猴子直接变来的，而是和其他灵长类有共同祖先。演化像一棵树，不是一条直线——文明的第一步是会合作、会学习、会制造工具、会适应环境的人类出现了。',
         // 🖼 大图模式：有 image 时整段用图替代文字
-        image: 'images/evo-timeline.png',
+        image: 'images/evo-timeline.jpg',
         image_alt: '人类起源完整时间轴：从700万年前到现代人类出现',
         // 维基百科 quick-link 行（只保留必要交互）
         wiki_quick_links: [
@@ -316,7 +316,7 @@ const PREHISTORIC = {
       // ══════════════════════════════════════════════
       knowledge_network: {
         layout: 'image_overlay',  // 🖼 图片底板 + 热点泡泡模式
-        image: 'images/evo-timeline.png',
+        image: 'images/evo-timeline.jpg',
         viewBox: '0 0 1000 1280',
         intro: '点击图上任意泡泡，深入了解每个时代',
         // 🆕 图片上热点泡泡坐标 (百分比定位)
