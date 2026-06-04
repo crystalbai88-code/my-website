@@ -3360,6 +3360,36 @@ function renderPreLayer5(p) {
 
 function renderPreLayer6(p) {
   const s = p.story;
+  // 🎬 仅 PH01 配视频（5 段自然历史纪录片风格短片）
+  const videos = p.id === 'PH01' ? [
+    { src: 'videos/ph01-1.mp4', title: '🌅 东非草原·清晨', caption: '智人族群苏醒，开始一天的狩猎与采集' },
+    { src: 'videos/ph01-2.mp4', title: '🌊 河边的生活', caption: '河流是早期人类最重要的资源——水、食物、运输' },
+    { src: 'videos/ph01-3.mp4', title: '🔥 围火夜话', caption: '火让人类能御寒、烹饪、抵御野兽，并第一次能聚在一起讲述故事' },
+    { src: 'videos/ph01-4.mp4', title: '👥 群体合作', caption: '4-5 人协作打猎、分享食物——这是文明社会的起点' },
+    { src: 'videos/ph01-5.mp4', title: '🌍 走向远方', caption: '约 7 万年前，智人开始走出非洲，向更广阔的世界扩散' },
+  ] : [];
+
+  const videoHtml = videos.length > 0 ? `
+    <div class="pst-video-section">
+      <div class="pst-video-title">
+        <span>🎬 视觉化：30 万年前的世界</span>
+        <span class="pst-video-hint">点击任意视频播放</span>
+      </div>
+      <div class="pst-video-grid">
+        ${videos.map((v, i) => `
+          <div class="pst-video-card">
+            <div class="pst-video-wrap">
+              <video class="pst-video" src="${v.src}" preload="metadata" playsinline controls></video>
+              <div class="pst-video-mask"></div>
+            </div>
+            <div class="pst-video-meta">
+              <div class="pst-video-name">${i+1}. ${v.title}</div>
+              <div class="pst-video-cap">${v.caption}</div>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>` : '';
+
   return `<section class="pre-layer" id="pre-story">
     <div class="pl-header"><span class="pl-icon">📖</span><div><h3>故事讲解</h3><p class="pl-sub">${s.title} · ${s.setting}</p></div></div>
     <div class="pst-card">
@@ -3370,6 +3400,7 @@ function renderPreLayer6(p) {
       <div class="pst-insight">💡 ${s.key_insight}</div>
       <div class="pst-q">🗣 ${s.discussion_question}</div>
       <button class="sl-btn" onclick="speakText('${esc(s.paragraphs.join(' '))}')">🔊 朗读故事</button>
+      ${videoHtml}
     </div>
   </section>`;
 }

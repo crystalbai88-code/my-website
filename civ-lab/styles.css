@@ -4608,3 +4608,60 @@ html, body {
   color: #a86840 !important;
   font-weight: 700;
 }
+
+/* ════════════════════════════════════════════════════
+   🎬 故事页视频网格 (5 段自然历史纪录片)
+════════════════════════════════════════════════════ */
+.pst-video-section {
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 2px dashed rgba(160,100,30,.3);
+}
+.pst-video-title {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 16px; font-weight: 700; color: #5a3a18;
+  margin-bottom: 14px;
+  font-family: var(--serif, serif);
+}
+.pst-video-hint { font-size: 12px; color: #8a6a40; font-weight: 500; font-family: inherit; }
+.pst-video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+.pst-video-card {
+  background: white;
+  border: 1.5px solid rgba(160,100,30,.25);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(60,30,5,.12);
+  transition: transform .2s, box-shadow .2s;
+}
+.pst-video-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 22px rgba(60,30,5,.22);
+}
+.pst-video-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #1a120a;
+  overflow: hidden;
+}
+.pst-video {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* 遮盖 即梦 AI 水印 (右下角约 13% × 8%) */
+.pst-video-mask {
+  position: absolute;
+  right: 0; bottom: 0;
+  width: 14%; height: 9%;
+  background: linear-gradient(135deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.85) 35%, #000 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+.pst-video-meta { padding: 12px 14px 14px; }
+.pst-video-name { font-size: 14px; font-weight: 700; color: #3a2410; margin-bottom: 4px; }
+.pst-video-cap { font-size: 12px; color: #7a5530; line-height: 1.6; }
