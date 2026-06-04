@@ -2,7 +2,7 @@
 
 // 🔒 样板演示模式 — 只解锁这些课程，其余显示锁
 // 等准备好内容后，把更多 lesson id 加进数组即可
-const DEMO_UNLOCKED_LESSONS = ['PH01'];
+const DEMO_UNLOCKED_LESSONS = ['PH01', 'PH02'];
 
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => [...document.querySelectorAll(sel)];
