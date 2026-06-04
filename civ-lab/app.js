@@ -1907,10 +1907,17 @@ function renderImageOverlayMode(p) {
       <div class="img-overlay-canvas" id="imgOverlayCanvas">
         <div class="img-overlay-stage">
           <img class="img-overlay-bg" src="${kn.image}" alt="${p.title}" loading="eager" decoding="async" fetchpriority="high"/>
+          <!-- 遮罩：盖住图上原来烤进去的小男孩 -->
+          <div class="boy-mask"></div>
           <svg class="img-overlay-svg" preserveAspectRatio="none">
             ${connections}
           </svg>
           ${bubbles}
+          <!-- 用户头像角色 (会从 ① 走到当前学习位置) — 点击切换男孩/女孩 -->
+          <div class="user-avatar-walker" id="userAvatarWalker" onclick="toggleAvatarGender()" title="点我切换男孩/女孩">
+            <span class="walker-emoji" id="walkerEmoji">🧑</span>
+            <div class="walker-cheer hidden" id="walkerCheer">加油！</div>
+          </div>
         </div>
       </div>
 
@@ -1930,10 +1937,61 @@ function renderImageOverlayMode(p) {
     });
   });
 
+  // 初始化用户角色头像 (从存储读 gender) + 走到 ① 的位置
+  initUserAvatarWalker(p);
+
   // ESC 关闭详情
   document.addEventListener('keydown', escCloseDetail);
 
   body.scrollTo(0, 0);
+}
+
+// 初始化用户的角色头像
+function initUserAvatarWalker(p) {
+  const walker = document.getElementById('userAvatarWalker');
+  const emojiEl = document.getElementById('walkerEmoji');
+  if (!walker || !emojiEl) return;
+  // 如果没有选择性别，弹出选择
+  const profile = getUserProfile() || {};
+  let gender = profile.gender;
+  if (!gender || gender === 'other') {
+    // 先用默认 boy，但显示一个温和提示让用户切换
+    gender = localStorage.getItem('civ_avatar_gender') || 'boy';
+  } else {
+    localStorage.setItem('civ_avatar_gender', gender);
+  }
+  emojiEl.textContent = gender === 'girl' ? '👧' : '👦';
+  // 先放到 ① 的位置
+  const first = p.knowledge_network?.hotspots?.[0];
+  if (first) moveWalkerTo(first.pos_x, first.pos_y + 8);
+}
+
+// 移动 walker 到指定 % 坐标
+function moveWalkerTo(xPct, yPct) {
+  const walker = document.getElementById('userAvatarWalker');
+  if (!walker) return;
+  walker.style.left = xPct + '%';
+  walker.style.top = yPct + '%';
+}
+
+// 切换性别（点击 walker 时弹出选择）
+function toggleAvatarGender() {
+  const cur = localStorage.getItem('civ_avatar_gender') || 'boy';
+  const next = cur === 'boy' ? 'girl' : 'boy';
+  localStorage.setItem('civ_avatar_gender', next);
+  const emojiEl = document.getElementById('walkerEmoji');
+  if (emojiEl) emojiEl.textContent = next === 'girl' ? '👧' : '👦';
+  // 也同步更新 profile.gender
+  const prof = getUserProfile() || {};
+  prof.gender = next;
+  try { localStorage.setItem('civ_user_profile', JSON.stringify(prof)); } catch {}
+  // 显示小提示
+  const cheer = document.getElementById('walkerCheer');
+  if (cheer) {
+    cheer.textContent = next === 'girl' ? '我是小女孩!' : '我是小男孩!';
+    cheer.classList.remove('hidden');
+    setTimeout(() => cheer.classList.add('hidden'), 1500);
+  }
 }
 
 function escCloseDetail(e) {
@@ -1966,6 +2024,8 @@ function showImageOverlayDetail(nodeId) {
     if (!fullNode) return;
     const node = { ...fullNode, ...(hotspot || {}), color: '#c84820' };
     html = renderConceptDetailCard(node, kn, p);
+    // 让用户角色"走"到这个 hotspot
+    if (hotspot) moveWalkerTo(hotspot.pos_x, hotspot.pos_y + 8);
   }
 
   // 计算上一个/下一个 hotspot
