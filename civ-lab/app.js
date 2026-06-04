@@ -106,6 +106,13 @@ function markLessonComplete(id) {
 function init() {
   loadPersisted();
   loadSettings();
+  // 🔓 admin 模式: URL 加 ?admin=1 显示所有设置入口（仅自己用）
+  if (new URLSearchParams(location.search).get('admin') === '1') {
+    document.body.classList.add('admin-mode');
+    localStorage.setItem('civ_admin', '1');
+  } else if (localStorage.getItem('civ_admin') === '1') {
+    document.body.classList.add('admin-mode');
+  }
   // 🧠 初始化统一知识库（内部 + 外部 Wiki 缓存）
   if (typeof KB !== 'undefined') {
     KB.init();

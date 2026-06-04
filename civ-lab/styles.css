@@ -5388,3 +5388,20 @@ html { scroll-behavior: smooth; }
   box-shadow: 0 3px 10px rgba(42,128,56,.3);
 }
 .fs-fossil-finale:hover { box-shadow: 0 6px 16px rgba(42,128,56,.5); }
+
+/* 🔒 演示模式：隐藏所有 API/设置入口，防止访客修改 */
+/* 顶栏齿轮按钮 */
+#settingsBtn { display: none !important; }
+/* 浮动 AI 面板里的设置齿轮 */
+.aifp-settings { display: none !important; }
+/* 时光机 AI 设置弹窗的所有"接入/切换"按钮 */
+.ai-status-action { display: none !important; }
+/* AI 状态横幅也藏掉 (PH AI 对话页) */
+.ai-status-banner { display: none !important; }
+
+/* 临时显示设置 (开发者用): 在 URL 末尾加 ?admin=1 即可看到 */
+body.admin-mode #settingsBtn,
+body.admin-mode .aifp-settings,
+body.admin-mode .ai-status-action,
+body.admin-mode .ai-status-banner { display: inline-flex !important; }
+body.admin-mode .ai-status-banner { display: flex !important; }
