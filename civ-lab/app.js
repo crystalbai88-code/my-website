@@ -2464,7 +2464,7 @@ async function sendPreAIMsg(p, inputEl, msgsEl) {
   if (state.apiKey) {
     resp = await callPreClaudeAPI(text, p);
   } else {
-    resp = getPreKBResponse(text, p);
+    resp = await getPreKBResponse(text, p);
   }
 
   document.getElementById(thinkId)?.closest('.chat-message')?.remove();
@@ -2482,7 +2482,125 @@ function addPreAIMsg(msgsEl, role, html, id) {
   msgsEl.scrollTop = msgsEl.scrollHeight;
 }
 
+// ══════════════════════════════════════════════════════
+// 📖 维基百科作为权威知识源 · Wikipedia as Source of Truth
+// ══════════════════════════════════════════════════════
+
+// 缓存维基百科摘要（避免重复请求）
+const wikiCache = {};
+
+// 通过 Wikipedia REST API 拉取词条摘要（CORS 友好，无需后端）
+async function fetchWikiSummary(topic, lang = 'zh') {
+  const cacheKey = `${lang}:${topic}`;
+  if (wikiCache[cacheKey]) return wikiCache[cacheKey];
+  try {
+    const url = `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topic)}`;
+    const res = await fetch(url);
+    if (!res.ok) {
+      // Try alternative: search API to find correct title
+      const searchUrl = `https://${lang}.wikipedia.org/w/rest.php/v1/search/title?q=${encodeURIComponent(topic)}&limit=1`;
+      const sr = await fetch(searchUrl);
+      if (!sr.ok) { wikiCache[cacheKey] = null; return null; }
+      const sd = await sr.json();
+      if (!sd.pages || !sd.pages.length) { wikiCache[cacheKey] = null; return null; }
+      // Refetch with correct title
+      const correctTitle = sd.pages[0].key;
+      const url2 = `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(correctTitle)}`;
+      const r2 = await fetch(url2);
+      if (!r2.ok) { wikiCache[cacheKey] = null; return null; }
+      const d = await r2.json();
+      const out = {
+        title: d.title, extract: d.extract,
+        url: d.content_urls?.desktop?.page || `https://${lang}.wikipedia.org/wiki/${encodeURIComponent(d.title)}`,
+        thumbnail: d.thumbnail?.source,
+      };
+      wikiCache[cacheKey] = out;
+      return out;
+    }
+    const data = await res.json();
+    const out = {
+      title: data.title, extract: data.extract,
+      url: data.content_urls?.desktop?.page || `https://${lang}.wikipedia.org/wiki/${encodeURIComponent(data.title)}`,
+      thumbnail: data.thumbnail?.source,
+    };
+    wikiCache[cacheKey] = out;
+    return out;
+  } catch (e) {
+    console.warn('[Wiki]', topic, e);
+    return null;
+  }
+}
+
+// 从用户问题 + 课程主题 提取最相关的维基词条名
+function pickWikiTopics(question, p) {
+  // 优先使用课程数据里定义的 wiki_topics；否则用 era 标题
+  const baseTopics = (p.ai && p.ai.wiki_topics) || [p.title];
+  // 简单关键词匹配：把 question 中出现的概念也加进来
+  // 注意：必须用中文维基百科的准确条目名（避免搜索误命中同名乐队/电影等）
+  const candidateMap = {
+    'lucy': '阿法南方古猿', '露西': '阿法南方古猿', '南方古猿': '阿法南方古猿',
+    '智人': '智人', 'homo sapiens': '智人', 'sapiens': '智人',
+    '直立人': '直立人', 'erectus': '直立人',
+    '直立行走': '双足步行', '双足': '双足步行',
+    '工具': '石器', '石器': '石器',
+    '火': '用火',
+    '非洲': '走出非洲假说', '迁徙': '人类迁徙', '走出': '走出非洲假说',
+    '洞穴': '洞穴壁画', '壁画': '洞穴壁画', '艺术': '洞穴壁画',
+    '农业': '农业革命', '种地': '农业革命', '驯化': '驯化',
+    '村落': '加泰土丘', '定居': '加泰土丘', '耶利哥': '杰里科',
+    '城市': '乌鲁克',
+    '楔形': '楔形文字', '文字': '文字',
+    '埃及': '古埃及', '法老': '法老', '金字塔': '吉萨金字塔',
+    '两河': '美索不达米亚', '苏美尔': '苏美尔', '美索不达米亚': '美索不达米亚',
+    '青铜': '青铜时代', '青铜时代': '青铜时代',
+    '孔子': '孔子', '佛陀': '釋迦牟尼', '苏格拉底': '苏格拉底',
+    '罗马': '罗马帝国', '丝绸': '丝绸之路', '丝路': '丝绸之路',
+    '哥贝克力': '哥贝克力石阵', '良渚': '良渚文化',
+    '冰河': '末次冰期', '冰期': '末次冰期', '猛犸': '猛犸象',
+  };
+  const extra = [];
+  const lower = question.toLowerCase();
+  Object.entries(candidateMap).forEach(([kw, topic]) => {
+    if (lower.includes(kw.toLowerCase()) && !baseTopics.includes(topic)) {
+      extra.push(topic);
+    }
+  });
+  return [...extra, ...baseTopics].slice(0, 3); // 最多 3 个，避免 prompt 过长
+}
+
+// 用 Claude API + 维基百科上下文回答
 async function callPreClaudeAPI(msg, p) {
+  // 1. 拉取相关维基百科摘要（中文优先，缺失则补英文）
+  const topics = pickWikiTopics(msg, p);
+  const wikiResults = [];
+  for (const topic of topics) {
+    let r = await fetchWikiSummary(topic, 'zh');
+    if (!r) r = await fetchWikiSummary(topic, 'en');
+    if (r) wikiResults.push(r);
+  }
+
+  // 2. 构造权威上下文
+  const wikiContext = wikiResults.length > 0
+    ? wikiResults.map(r => `《${r.title}》(维基百科)\n${r.extract}\n来源：${r.url}`).join('\n\n---\n\n')
+    : '（暂未找到相关维基百科词条）';
+
+  const systemPrompt = `你是 AI 世界文明实验室的史前历史助手，面向 10-12 岁中国学生。
+
+# 知识来源规则
+你的回答必须严格基于下方"权威参考资料"（维基百科）。如果资料中没有的内容，必须明确说"维基百科上未提及，需要查阅其他来源"，不要编造。
+
+# 回答风格
+- 用 10-12 岁能理解的中文
+- 控制在 100-200 字
+- 末尾必须附上维基百科链接（带 📖 emoji）
+
+# 权威参考资料
+${wikiContext}
+
+# 当前课程背景
+${p.title} · ${p.time}
+${p.snapshot || ''}`;
+
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -2494,35 +2612,48 @@ async function callPreClaudeAPI(msg, p) {
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 500,
-        system: p.ai.system_context + '\n\n注意事项：' + (p.ai.guardrails || []).join('；'),
+        max_tokens: 600,
+        system: systemPrompt,
         messages: [{ role: 'user', content: msg }],
       }),
     });
+    if (!res.ok) throw new Error('API ' + res.status);
     const data = await res.json();
-    return data.content[0].text.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
+    let text = data.content[0].text.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
+    // 附上维基百科来源链接（防止 AI 没加）
+    const sourceLinks = wikiResults.map(r =>
+      `<a href="${r.url}" target="_blank" rel="noreferrer" class="wiki-btn zh">📖 ${r.title}</a>`
+    ).join(' ');
+    return `<p>${text}</p>${sourceLinks ? `<div class="ai-wiki-sources"><strong>📚 维基百科原文：</strong> ${sourceLinks}</div>` : ''}`;
   } catch (e) {
-    return `<p>API连接失败，知识库模式：</p><p>${getPreKBResponse(msg, p)}</p>`;
+    return `<p>⚠ AI 连接失败（${e.message}），降级使用维基百科原文：</p>${await getPreKBResponse(msg, p)}`;
   }
 }
 
-function getPreKBResponse(q, p) {
-  const lower = q.toLowerCase();
-  for (const ev of p.evidence) {
-    if (lower.includes(ev.name.slice(0, 3)) || ev.name.toLowerCase().split(/\s+/).some(w => lower.includes(w) && w.length > 1))
-      return `<p><strong>${ev.name}</strong></p><p>${ev.description}</p><p><em>能告诉我们：</em>${ev.tells}</p>`;
+// 无 API Key 时，直接展示维基百科原文（不再用我硬编码的内容）
+async function getPreKBResponse(q, p) {
+  const topics = pickWikiTopics(q, p);
+  const results = [];
+  for (const topic of topics) {
+    let r = await fetchWikiSummary(topic, 'zh');
+    if (!r) r = await fetchWikiSummary(topic, 'en');
+    if (r) results.push(r);
   }
-  for (const t of p.themes) {
-    if (lower.includes(t.title.slice(0, 3)) || t.content.some(c => c.slice(0, 8).toLowerCase().split('').some(ch => lower.includes(ch))))
-      return `<p><strong>${t.title}</strong></p><p>${t.summary}</p><ul>${t.content.map(c => `<li>${c}</li>`).join('')}</ul>`;
+  if (results.length === 0) {
+    return `<p>没找到相关的维基百科词条。试试改一下问题，或在设置中添加 Claude API Key 获取 AI 解读。</p>
+            <p>建议问题：</p><ul>${(p.ai.suggested_questions || []).map(q => `<li>「${q}」</li>`).join('')}</ul>`;
   }
-  for (const r of p.regions) {
-    if (lower.includes(r.name.split('·')[0].slice(0, 3)))
-      return `<p><strong>${r.name}</strong></p><p>${r.description}</p>`;
-  }
-  if (lower.includes('故事') || lower.includes('当时') || lower.includes('那时'))
-    return `<p><strong>${p.story.title}</strong></p><p>${p.story.paragraphs[0]}</p><p>💡 ${p.story.key_insight}</p>`;
-  return `<p>关于「${p.time}·${p.title}」，可以问我：</p><ul>${p.ai.suggested_questions.map(q => `<li>「${q}」</li>`).join('')}</ul>`;
+  const cards = results.map(r => `
+    <div class="wiki-card">
+      ${r.thumbnail ? `<img src="${r.thumbnail}" class="wiki-card-img" alt=""/>` : ''}
+      <div class="wiki-card-body">
+        <h5>📖 ${r.title} <span class="wiki-card-src">维基百科</span></h5>
+        <p>${r.extract}</p>
+        <a href="${r.url}" target="_blank" rel="noreferrer" class="wiki-btn zh">查看完整词条 →</a>
+      </div>
+    </div>`).join('');
+  return `<p><em>📚 以下内容直接来自维基百科（非 AI 生成）：</em></p>${cards}
+          <p class="kb-note">💡 想要 AI 用儿童化语言解读？请在设置中添加 Claude API Key。</p>`;
 }
 
 // ── BOOT ──────────────────────────────────────────
