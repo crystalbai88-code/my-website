@@ -150,42 +150,29 @@ function renderMainKnowledgeNetwork() {
   if (!container) return;
 
   const N = MAIN_NETWORK;
-  const W = 1500, H = 980;
+  const W = 1820, H = 1380;
 
-  // ── 7 个 STAGE 横向带（背景 + 标签）──
+  // ── 7 个 STAGE 横向带（每行 180px 高，背景 + 简洁标签）──
   const stageBands = N.stages.map(s => `
-    <rect x="40" y="${s.y - 55}" width="${W - 80}" height="110"
-          fill="${s.color}" fill-opacity="${s.status === 'coming_soon' ? 0.02 : 0.05}"/>
-    <line x1="40" y1="${s.y + 55}" x2="${W - 40}" y2="${s.y + 55}"
-          stroke="${s.color}" stroke-opacity="0.18" stroke-width="1" stroke-dasharray="4,4"/>
-    <g class="mn-stage-label" data-stage="${s.id}" style="cursor:pointer">
-      <rect x="50" y="${s.y - 36}" width="220" height="72" rx="10"
-            fill="white" fill-opacity="0.7" stroke="${s.color}" stroke-width="1.5"
-            stroke-opacity="${s.status === 'coming_soon' ? 0.35 : 0.6}"/>
-      <text x="62" y="${s.y - 14}" font-size="13" font-weight="800"
-            fill="${s.color}" font-family="STSong,serif">
-        ${s.icon} ${s.title}
-        ${s.status === 'coming_soon' ? '<tspan font-size="9" fill="#9c8a70" font-weight="600"> · 即将上线</tspan>' : ''}
-      </text>
-      <text x="62" y="${s.y + 4}" font-size="10" fill="#7a4830" font-family="STSong,serif">
-        ${s.time_range}
-      </text>
-      <text x="62" y="${s.y + 22}" font-size="10" fill="#5c4e38" opacity="0.78"
-            font-family="STSong,serif" font-style="italic">
-        ${s.core_question}
-      </text>
-    </g>
+    <rect x="40" y="${s.y - 85}" width="${W - 80}" height="170"
+          fill="${s.color}" fill-opacity="${s.status === 'coming_soon' ? 0.025 : 0.05}"/>
+    <text x="60" y="${s.y - 50}" font-size="16" font-weight="700"
+          fill="${s.color}" opacity="${s.status === 'coming_soon' ? 0.45 : 0.7}"
+          font-family="STSong,serif" letter-spacing="2">
+      ${s.icon} ${s.title}${s.status === 'coming_soon' ? ' · 即将上线' : ''}
+    </text>
+    <text x="60" y="${s.y - 30}" font-size="12" fill="#7a4830"
+          opacity="${s.status === 'coming_soon' ? 0.45 : 0.6}"
+          font-family="STSong,serif">${s.time_range}</text>
+    <text x="60" y="${s.y - 12}" font-size="11" fill="#5c4e38"
+          opacity="${s.status === 'coming_soon' ? 0.45 : 0.55}"
+          font-style="italic" font-family="STSong,serif">${s.core_question}</text>
   `).join('');
 
-  // ── X 轴时间刻度（底部）──
-  const timeAxis = N.time_axis.map(t => `
-    <line x1="${t.x}" y1="${H - 45}" x2="${t.x}" y2="${H - 36}"
-          stroke="rgba(160,100,30,.35)" stroke-width="1"/>
-    <text x="${t.x}" y="${H - 20}" text-anchor="middle"
-          font-size="11" font-weight="600" fill="#7a4830" font-family="STSong,serif">${t.label}</text>
-  `).join('');
-  const axisLine = `<line x1="40" y1="${H - 45}" x2="${W - 40}" y2="${H - 45}"
-    stroke="rgba(160,100,30,.4)" stroke-width="1.5"/>`;
+  // ── X 轴时间刻度：每个 stage 内时间从左到右 ──
+  // 仅画一条底部辅助线，不再标全局时间刻度（避免误导）
+  const timeAxis = '';
+  const axisLine = '';
 
   // ── 节点查找表（按 id）──
   const byId = {};
@@ -197,22 +184,28 @@ function renderMainKnowledgeNetwork() {
 
   // ── 边样式 ──
   const edgeStyle = (t) => {
-    if (t === 'time')    return { stroke:'#c86820', width:2,   dash:'0',   op:0.55 };
-    if (t === 'concept') return { stroke:'#8a5a90', width:1.5, dash:'5,4', op:0.45 };
-    return { stroke:'#a07840', width:1.2, dash:'3,5', op:0.32 };
+    if (t === 'time')    return { stroke:'#c86820', width:2.5, dash:'0',   op:0.5 };
+    if (t === 'concept') return { stroke:'#8a5a90', width:1.8, dash:'6,5', op:0.4 };
+    return { stroke:'#a07840', width:1.5, dash:'4,5', op:0.3 };
   };
-  const edges = N.edges.map(e => {
+  // 只画同 stage 内 time 类型边（清晰水平箭头），跨 stage 概念边在新布局下视觉效果差
+  const edges = N.edges.filter(e => {
     const a = byId[e.from], b = byId[e.to];
-    if (!a || !b) return '';
+    return a && b && a.y === b.y && e.type === 'time';
+  }).map(e => {
+    const a = byId[e.from], b = byId[e.to];
     const s = edgeStyle(e.type);
-    const mid_x = (a.x + b.x) / 2;
-    const mid_y = Math.min(a.y, b.y) - Math.abs(b.x - a.x) * 0.06 - 8;
-    const path = (a.y === b.y)
-      ? `M ${a.x},${a.y} L ${b.x},${b.y}`
-      : `M ${a.x},${a.y} Q ${mid_x},${mid_y} ${b.x},${b.y}`;
-    return `<path d="${path}" fill="none"
+    // 同 y → 直线，从 a 节点边缘到 b 节点边缘
+    const dx = b.x - a.x;
+    const dist = Math.abs(dx);
+    if (dist < 60) return ''; // 太近不画
+    const r = 32; // 节点半径
+    const x1 = a.x + r * (dx > 0 ? 1 : -1);
+    const x2 = b.x + r * (dx > 0 ? -1 : 1);
+    return `<line x1="${x1}" y1="${a.y}" x2="${x2}" y2="${a.y}"
       stroke="${s.stroke}" stroke-width="${s.width}"
-      stroke-opacity="${s.op}" stroke-dasharray="${s.dash}" stroke-linecap="round"/>`;
+      stroke-opacity="${s.op}" stroke-dasharray="${s.dash}" stroke-linecap="round"
+      marker-end="url(#mn-arrow)"/>`;
   }).join('');
 
   // ── 节点渲染 ──
@@ -230,48 +223,50 @@ function renderMainKnowledgeNetwork() {
       isLinked ? 'linked' : '',
       done ? 'done' : '',
     ].filter(Boolean).join(' ');
+    const cursor = isLinked ? 'pointer' : 'default';
     return `
       <g class="${cls}" data-id="${n.id}" data-linked="${n.linked_lesson || ''}"
-         style="cursor:${isComingSoon ? 'help' : 'pointer'};opacity:${opacity}">
-        <circle cx="${node.x}" cy="${node.y}" r="22"
-                fill="white" stroke="${node.stageColor}" stroke-width="${done ? 3 : 2}"
-                stroke-dasharray="${isComingSoon ? '3,3' : '0'}"
-                filter="drop-shadow(0 2px 6px rgba(60,30,5,.2))"/>
-        <circle cx="${node.x}" cy="${node.y}" r="19"
-                fill="${node.stageColor}" fill-opacity="${done ? 0.22 : (isLinked ? 0.1 : 0.06)}"/>
-        <text x="${node.x}" y="${node.y + 5}" text-anchor="middle"
-              font-size="20" pointer-events="none">${n.emoji}</text>
-        ${done ? `<circle cx="${node.x + 16}" cy="${node.y - 16}" r="7" fill="#4a8030"/>
-                  <text x="${node.x + 16}" y="${node.y - 13}" text-anchor="middle"
-                        font-size="9" fill="white" pointer-events="none">✓</text>` : ''}
-        ${isLinked && !done ? `<circle cx="${node.x + 16}" cy="${node.y - 16}" r="6" fill="${node.stageColor}"/>
-                  <text x="${node.x + 16}" y="${node.y - 13}" text-anchor="middle"
-                        font-size="9" fill="white" font-weight="700" pointer-events="none">▸</text>` : ''}
+         style="cursor:${cursor};opacity:${opacity}">
+        <circle cx="${node.x}" cy="${node.y}" r="32"
+                fill="white" stroke="${node.stageColor}" stroke-width="${done ? 3.5 : 2.5}"
+                stroke-dasharray="${isComingSoon ? '4,4' : '0'}"
+                filter="drop-shadow(0 3px 8px rgba(60,30,5,.22))"/>
+        <circle cx="${node.x}" cy="${node.y}" r="28"
+                fill="${node.stageColor}" fill-opacity="${done ? 0.22 : (isLinked ? 0.12 : 0.07)}"/>
+        <text x="${node.x}" y="${node.y + 8}" text-anchor="middle"
+              font-size="28" pointer-events="none">${n.emoji}</text>
+        ${done ? `<circle cx="${node.x + 24}" cy="${node.y - 24}" r="10" fill="#4a8030"/>
+                  <text x="${node.x + 24}" y="${node.y - 20}" text-anchor="middle"
+                        font-size="12" fill="white" pointer-events="none">✓</text>` : ''}
+        ${isLinked && !done ? `<circle cx="${node.x + 24}" cy="${node.y - 24}" r="9" fill="${node.stageColor}"/>
+                  <text x="${node.x + 24}" y="${node.y - 20}" text-anchor="middle"
+                        font-size="12" fill="white" font-weight="700" pointer-events="none">▸</text>` : ''}
         <!-- 标签 -->
-        <text x="${node.x}" y="${node.y + 36}" text-anchor="middle"
-              font-size="11" font-weight="700" fill="#2c1a08"
+        <text x="${node.x}" y="${node.y + 52}" text-anchor="middle"
+              font-size="14" font-weight="700" fill="#2c1a08"
               font-family="STSong,serif" pointer-events="none">${n.label}</text>
-        <text x="${node.x}" y="${node.y + 48}" text-anchor="middle"
-              font-size="9" fill="#7a4830" pointer-events="none">${n.time}</text>
+        <text x="${node.x}" y="${node.y + 68}" text-anchor="middle"
+              font-size="11" fill="#7a4830" pointer-events="none">${n.time}</text>
       </g>
     `;
   }).join('');
 
-  // ── 双轴标签 ──
+  // ── 双轴标签（左侧纵向标签） ──
   const axisLabels = `
-    <text x="${W/2}" y="${H-3}" text-anchor="middle" font-size="11"
-          fill="#5a3a18" font-weight="700" font-family="STSong,serif" opacity="0.6"
-          letter-spacing="3">← 时 间 →</text>
-    <text x="22" y="${H/2}" transform="rotate(-90, 22, ${H/2})" text-anchor="middle"
-          font-size="11" fill="#5a3a18" font-weight="700" font-family="STSong,serif"
-          opacity="0.6" letter-spacing="3">← 7 个 文 明 阶 段 →</text>`;
+    <text x="20" y="${H/2}" transform="rotate(-90, 20, ${H/2})" text-anchor="middle"
+          font-size="13" fill="#5a3a18" font-weight="700" font-family="STSong,serif"
+          opacity="0.6" letter-spacing="4">← 7 个 文 明 阶 段 ·  时 间 顺 序 →</text>`;
 
   container.innerHTML = `
     <svg viewBox="0 0 ${W} ${H}" class="mn-svg" preserveAspectRatio="xMidYMid meet">
       <defs>
-        <pattern id="mn-grid" width="80" height="120" patternUnits="userSpaceOnUse">
-          <path d="M 80 0 L 0 0 0 120" fill="none" stroke="rgba(160,100,30,.06)" stroke-width="1"/>
+        <pattern id="mn-grid" width="100" height="150" patternUnits="userSpaceOnUse">
+          <path d="M 100 0 L 0 0 0 150" fill="none" stroke="rgba(160,100,30,.05)" stroke-width="1"/>
         </pattern>
+        <marker id="mn-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#c86820" opacity="0.5"/>
+        </marker>
       </defs>
       <rect width="${W}" height="${H}" fill="url(#mn-grid)"/>
       ${stageBands}
@@ -283,20 +278,12 @@ function renderMainKnowledgeNetwork() {
     </svg>
   `;
 
-  // ── 节点点击：linked → 进入；coming_soon → 提示 ──
+  // ── 节点点击：保留原版交互 — linked → 进入课程；其他节点不响应 ──
   container.querySelectorAll('.mn-node').forEach(g => {
     g.addEventListener('click', () => {
       const linked = g.getAttribute('data-linked');
-      const id = g.getAttribute('data-id');
-      if (g.classList.contains('coming-soon')) {
-        alert('⏳ 这个节点正在制作中，敬请期待！\n\nID: ' + id);
-        return;
-      }
-      if (linked) {
-        enterLesson(linked);
-      } else {
-        alert('📚 这个知识点详情正在填充中，敬请期待！\n\n节点：' + id);
-      }
+      // 只有 linked 节点才有点击效果（保留原版「点击进入课程」的简洁交互）
+      if (linked) enterLesson(linked);
     });
     g.addEventListener('mouseenter', () => {
       g.classList.add('hover');
@@ -305,18 +292,6 @@ function renderMainKnowledgeNetwork() {
     g.addEventListener('mouseleave', () => {
       g.classList.remove('hover');
       highlightRelatedNodes(g.getAttribute('data-id'), false);
-    });
-  });
-
-  // Stage label click → 提示 stage 简介
-  container.querySelectorAll('.mn-stage-label').forEach(g => {
-    g.addEventListener('click', () => {
-      const sid = g.getAttribute('data-stage');
-      const s = MAIN_NETWORK.stages.find(x => x.id === sid);
-      if (!s) return;
-      const nodeCount = MAIN_NETWORK.nodes.filter(n => n.stage === sid).length;
-      const linkedCount = MAIN_NETWORK.nodes.filter(n => n.stage === sid && n.linked_lesson).length;
-      alert(`${s.icon} ${s.title}\n时间范围：${s.time_range}\n核心问题：${s.core_question}\n\n节点数：${nodeCount}（已有详情：${linkedCount}）`);
     });
   });
 }

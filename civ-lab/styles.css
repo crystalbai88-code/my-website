@@ -2536,7 +2536,7 @@ html, body {
 .mn-svg {
   width: 100%; height: auto;
   display: block;
-  min-height: 480px;
+  min-height: 1100px;
 }
 
 /* 节点交互 */
