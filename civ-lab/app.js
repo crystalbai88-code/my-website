@@ -1718,11 +1718,13 @@ function showImageOverlayDetail(nodeId) {
   });
 
   let html;
+  let hotspotIndex = -1;
   if (nodeId === 'hub') {
     html = renderHubDetailCard(kn, p);
   } else {
     // 从 hotspots 中找节点（用 hotspot 的 meta + 旧 nodes 的 detail）
     const hotspot = (kn.hotspots || []).find(h => h.id === nodeId);
+    hotspotIndex = (kn.hotspots || []).findIndex(h => h.id === nodeId);
     const fullNode = (kn.nodes || []).find(n => n.id === nodeId) || hotspot;
     if (!fullNode) return;
     const node = { ...fullNode, ...(hotspot || {}), color: '#c84820' };
@@ -1736,6 +1738,18 @@ function showImageOverlayDetail(nodeId) {
   `;
   det.classList.remove('hidden');
 
+  // 🔄 自动滚动：如果详情卡不在视口内（点了下面的泡泡），把它滚到可视范围
+  requestAnimationFrame(() => {
+    const rect = det.getBoundingClientRect();
+    const vh = window.innerHeight;
+    if (rect.top < 0 || rect.top > vh * 0.6 || rect.bottom > vh) {
+      // 滚到让详情卡顶部在视口 80px 处
+      const scrollContainer = det.closest('.screen, .pre-era-body, body') || document.scrollingElement;
+      const detTopAbs = rect.top + scrollContainer.scrollTop;
+      scrollContainer.scrollTo({ top: detTopAbs - 100, behavior: 'smooth' });
+    }
+  });
+
   // 绑定相关节点 chip
   det.querySelectorAll('.kg-related-chip').forEach(btn => {
     btn.onclick = () => showImageOverlayDetail(btn.getAttribute('data-goto'));
@@ -1743,8 +1757,52 @@ function showImageOverlayDetail(nodeId) {
 
   // 追踪用户兴趣
   if (typeof trackUserQuestion === 'function') {
+    const hotspot = (kn.hotspots || []).find(h => h.id === nodeId);
     trackUserQuestion('查看：' + (hotspot ? hotspot.label : nodeId), p.id);
   }
+
+  // 🎯 自动推进：点击最后一个泡泡（⑦）→ 3 秒后自动打开地图
+  const total = (kn.hotspots || []).length;
+  if (hotspotIndex === total - 1 && total > 0) {
+    showAutoAdvanceHint('看完最后一个时代了 · 3 秒后自动打开 🗺 迁徙地图', () => {
+      document.getElementById('imgOverlayDetail')?.classList.add('hidden');
+      showFullscreenMap();
+    });
+  }
+}
+
+// 在屏幕底部短暂显示一个 toast，3 秒后执行回调；可手动取消
+let _autoAdvanceTimer = null;
+function showAutoAdvanceHint(text, onFire, delayMs = 3000) {
+  clearTimeout(_autoAdvanceTimer);
+  let toast = document.getElementById('autoAdvanceToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'autoAdvanceToast';
+    toast.className = 'auto-advance-toast';
+    document.body.appendChild(toast);
+  }
+  toast.innerHTML = `
+    <span class="aat-text">${text}</span>
+    <button class="aat-go" onclick="fireAutoAdvanceNow()">立即进入</button>
+    <button class="aat-cancel" onclick="cancelAutoAdvance()">取消</button>
+  `;
+  toast.classList.add('visible');
+  window._aaCallback = onFire;
+  _autoAdvanceTimer = setTimeout(() => {
+    toast.classList.remove('visible');
+    if (window._aaCallback) { window._aaCallback(); window._aaCallback = null; }
+  }, delayMs);
+}
+function fireAutoAdvanceNow() {
+  clearTimeout(_autoAdvanceTimer);
+  document.getElementById('autoAdvanceToast')?.classList.remove('visible');
+  if (window._aaCallback) { window._aaCallback(); window._aaCallback = null; }
+}
+function cancelAutoAdvance() {
+  clearTimeout(_autoAdvanceTimer);
+  document.getElementById('autoAdvanceToast')?.classList.remove('visible');
+  window._aaCallback = null;
 }
 
 // ════════════════════════════════════════════════════════════════

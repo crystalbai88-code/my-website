@@ -4548,3 +4548,39 @@ html, body {
   opacity: 0.85;
   margin-top: 4px;
 }
+
+/* 自动推进 toast (3 秒倒计时进入下一步) */
+.auto-advance-toast {
+  position: fixed;
+  left: 50%; bottom: 28px;
+  transform: translateX(-50%) translateY(120%);
+  background: linear-gradient(135deg, #fdf5e0, #f5e8c8);
+  border: 2px solid #c84820;
+  border-radius: 12px;
+  padding: 14px 22px;
+  box-shadow: 0 8px 28px rgba(60,30,5,.3);
+  display: flex; align-items: center; gap: 14px;
+  z-index: 800;
+  opacity: 0;
+  transition: transform .35s cubic-bezier(.4,0,.2,1), opacity .25s;
+  max-width: 560px;
+}
+.auto-advance-toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.aat-text {
+  font-size: 14px; color: #5a3a18; font-weight: 600; flex: 1;
+}
+.aat-go {
+  background: linear-gradient(135deg, #c84820, #a83a18);
+  color: white; border: none; padding: 8px 16px;
+  border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer;
+}
+.aat-go:hover { box-shadow: 0 3px 10px rgba(200,72,32,.4); }
+.aat-cancel {
+  background: white; color: #7a5530;
+  border: 1px solid rgba(160,100,30,.35); padding: 7px 12px;
+  border-radius: 6px; font-size: 12px; cursor: pointer;
+}
+.aat-cancel:hover { background: #f5e8c8; }
