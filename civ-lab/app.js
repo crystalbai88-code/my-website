@@ -1677,25 +1677,6 @@ function renderImageOverlayMode(p) {
         </div>
       </div>
 
-      <!-- 自动推进卡片 (看完时间轴后引导用户进入下一步) -->
-      <div class="auto-advance-card" id="autoAdvanceCard">
-        <div class="aac-progress">
-          <span class="aac-step active" data-step="timeline">① 时间轴</span>
-          <span class="aac-arrow">→</span>
-          <span class="aac-step" data-step="map">② 地图</span>
-          <span class="aac-arrow">→</span>
-          <span class="aac-step" data-step="story">③ 故事</span>
-          <span class="aac-arrow">→</span>
-          <span class="aac-step" data-step="scenario">④ 时光机</span>
-          <span class="aac-arrow">→</span>
-          <span class="aac-step" data-step="next">⑤ 下一课</span>
-        </div>
-        <div class="aac-actions">
-          <button class="aac-next" onclick="advanceToNextStep('map')">看完时间轴 → 进入 🗺 地图</button>
-          <button class="aac-skip" onclick="goToNextLesson()">跳过本节，下一课 →</button>
-        </div>
-      </div>
-
       <!-- 浮动详情卡（点击泡泡后弹出） -->
       <div class="img-overlay-detail hidden" id="imgOverlayDetail"></div>
 
