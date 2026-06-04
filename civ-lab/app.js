@@ -100,6 +100,11 @@ function markLessonComplete(id) {
 function init() {
   loadPersisted();
   loadSettings();
+  // 🧠 初始化统一知识库（内部 + 外部 Wiki 缓存）
+  if (typeof KB !== 'undefined') {
+    KB.init();
+    window.KB = KB; // 暴露给控制台调试
+  }
   createStars();
   renderHomeTimeline();
   loadCharacterPref();
@@ -3086,12 +3091,24 @@ async function gatherWikiContext(question, p, maxArticles = 3) {
 }
 
 async function callPreClaudeAPI(msg, p) {
-  // 🆕 根据用户问题动态搜索维基百科（不再用固定 topic）
-  const wikiResults = await gatherWikiContext(msg, p, 3);
+  // 🧠 用统一知识库检索（内部课程内容 + 外部维基百科）
+  const kbResult = KB && KB.search
+    ? await KB.search(msg, { era: p.id })
+    : { internal: [], external: await gatherWikiContext(msg, p, 3) };
 
-  const wikiContext = wikiResults.length > 0
-    ? wikiResults.map(r => `《${r.title}》(维基百科)\n${r.extract}\n来源：${r.url}`).join('\n\n---\n\n')
-    : '（维基百科搜索未返回相关词条，请告诉用户暂时无法查到准确信息）';
+  const internalContext = kbResult.internal.length > 0
+    ? kbResult.internal.map(e =>
+        `[内部·${e.type}·${e.source_label}] 《${e.title}》\n${e.body.slice(0, 300)}`
+      ).join('\n\n')
+    : '';
+  const externalContext = kbResult.external.length > 0
+    ? kbResult.external.map(r =>
+        `[维基百科]《${r.title}》\n${r.body}\n来源：${r.url}`
+      ).join('\n\n---\n\n')
+    : '';
+
+  const fullContext = [internalContext, externalContext].filter(Boolean).join('\n\n═══\n\n')
+    || '（知识库未找到相关内容，请告诉用户暂时无法查到准确信息，建议换个问法）';
 
   const userProfile = getUserProfile() || {};
   const userName = userProfile.nickname || '朋友';
@@ -3100,20 +3117,23 @@ async function callPreClaudeAPI(msg, p) {
   const systemPrompt = `我是 AI 世界文明实验室的史前历史助手，正在和 ${userAge} 岁的 ${userName} 对话。
 
 # 我的回答方式
-- 我用第一人称「我」回答，称呼对方为「${userName}」或「你」
+- 我用第一人称「我」回答，称呼对方为「${userName}」
 - 我用 ${userAge} 岁能理解的中文（不用专业术语，多用比喻和故事）
 - 我的回答控制在 100-200 字，简洁不啰嗦
 - 我严格围绕 ${userName} 实际问的问题作答，不答非所问
 
 # 知识来源规则（重要）
-我的回答必须严格基于下方"权威参考资料"（来自维基百科，根据 ${userName} 的问题动态检索）。
-- 如果资料里有相关内容 → 总结回答 + 末尾附维基链接「想了解更多 → 📖 [词条名]」
-- 如果资料里没提到 → 直接说「维基百科上暂时没找到具体答案，可以试试换个问题」，不要编造
+我的回答必须严格基于下方"知识库参考资料"。资料分两类：
+- [内部] 课程本身的内容（${userName} 已在课程中接触过）
+- [维基百科] 外部权威资料（根据 ${userName} 问题动态检索）
 
-# 权威参考资料（针对本次问题动态检索）
-${wikiContext}
+如果资料里有内容 → 整合回答 + 末尾标注「💡 课程提到」或「📖 维基百科」来源
+如果资料里没提到 → 直接说"知识库里暂时没找到具体答案"，绝不编造
 
-# 当前课程背景（仅作上下文参考）
+# 知识库参考资料（针对本次问题动态检索）
+${fullContext}
+
+# 当前课程背景
 ${p.title} · ${p.time}`;
 
   try {
@@ -3135,34 +3155,61 @@ ${p.title} · ${p.time}`;
     if (!res.ok) throw new Error('API ' + res.status);
     const data = await res.json();
     let text = data.content[0].text.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
-    const sourceLinks = wikiResults.map(r =>
-      `<a href="${r.url}" target="_blank" rel="noreferrer" class="wiki-btn zh">📖 ${r.title}</a>`
+
+    // 显示知识来源
+    const internalChips = kbResult.internal.map(e =>
+      `<span class="kb-chip internal" title="${esc(e.source_label)}">💡 ${e.title}</span>`
     ).join(' ');
-    return `<p>${text}</p>${sourceLinks ? `<div class="ai-wiki-sources"><strong>📚 想看完整原文：</strong> ${sourceLinks}</div>` : ''}`;
+    const externalChips = kbResult.external.map(r =>
+      `<a href="${r.url}" target="_blank" rel="noreferrer" class="kb-chip external">📖 ${r.title}</a>`
+    ).join(' ');
+
+    return `<p>${text}</p>
+      <div class="ai-kb-sources">
+        <strong>🧠 知识来源：</strong>
+        ${internalChips ? `<div class="kb-src-row"><span class="kb-src-label">课程</span>${internalChips}</div>` : ''}
+        ${externalChips ? `<div class="kb-src-row"><span class="kb-src-label">维基</span>${externalChips}</div>` : ''}
+      </div>`;
   } catch (e) {
-    return `<p>⚠ AI 连接失败（${e.message}），降级直接显示维基百科原文：</p>${await getPreKBResponse(msg, p)}`;
+    return `<p>⚠ AI 连接失败（${e.message}），降级显示知识库原文：</p>${await getPreKBResponse(msg, p)}`;
   }
 }
 
-// 无 API Key 时，直接展示根据问题搜索到的维基百科卡片
+// 无 API Key 时，直接展示根据问题搜索到的知识库内容（内部 + 维基）
 async function getPreKBResponse(q, p) {
-  const results = await gatherWikiContext(q, p, 3);
-  if (results.length === 0) {
-    return `<p>🔍 维基百科上没找到关于「${q}」的相关内容。</p>
-            <p>试试换种问法，或者参考这些建议问题：</p>
+  const kbResult = KB && KB.search
+    ? await KB.search(q, { era: p.id })
+    : { internal: [], external: await gatherWikiContext(q, p, 3) };
+
+  if (kbResult.internal.length === 0 && kbResult.external.length === 0) {
+    return `<p>🔍 知识库里没找到关于「${q}」的内容。</p>
+            <p>试试换种问法，或参考这些建议问题：</p>
             <ul>${(p.ai.suggested_questions || []).map(qq => `<li>「${qq}」</li>`).join('')}</ul>`;
   }
-  const cards = results.map(r => `
-    <div class="wiki-card">
-      ${r.thumbnail ? `<img src="${r.thumbnail}" class="wiki-card-img" alt=""/>` : ''}
-      <div class="wiki-card-body">
-        <h5>📖 ${r.title} <span class="wiki-card-src">维基百科</span></h5>
-        <p>${r.extract}</p>
-        <a href="${r.url}" target="_blank" rel="noreferrer" class="wiki-btn zh">查看完整词条 →</a>
-      </div>
-    </div>`).join('');
-  return `<p><em>📚 根据「${q}」从维基百科找到这些内容：</em></p>${cards}
-          <p class="kb-note">💡 想要 AI 用 10-12 岁能懂的话解读？请在设置中添加 Claude API Key。</p>`;
+
+  let html = '';
+  if (kbResult.internal.length > 0) {
+    html += '<p><strong>💡 课程内部知识：</strong></p>';
+    html += kbResult.internal.map(e => `
+      <div class="kb-internal-card">
+        <div class="kb-card-meta">${e.type} · ${e.source_label}</div>
+        <h5>${e.title}</h5>
+        <p>${e.body.slice(0, 240)}${e.body.length > 240 ? '…' : ''}</p>
+      </div>`).join('');
+  }
+  if (kbResult.external.length > 0) {
+    html += '<p><strong>📖 维基百科外部知识：</strong></p>';
+    html += kbResult.external.map(r => `
+      <div class="wiki-card">
+        ${r.thumbnail ? `<img src="${r.thumbnail}" class="wiki-card-img" alt=""/>` : ''}
+        <div class="wiki-card-body">
+          <h5>📖 ${r.title} <span class="wiki-card-src">维基百科</span></h5>
+          <p>${r.body}</p>
+          <a href="${r.url}" target="_blank" rel="noreferrer" class="wiki-btn zh">查看完整词条 →</a>
+        </div>
+      </div>`).join('');
+  }
+  return html + '<p class="kb-note">💡 想要 AI 用 10-12 岁能懂的话解读？请在设置中添加 Claude API Key。</p>';
 }
 
 // ══════════════════════════════════════════════════════

@@ -4043,3 +4043,86 @@ html, body {
   }
   .img-hotspot { width: 36px; height: 36px; font-size: 14px; }
 }
+
+/* ════════════════════════════════════════════════════
+   🧠 知识库 (KB) 来源标注 / 内部卡片
+════════════════════════════════════════════════════ */
+.ai-kb-sources {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: rgba(212,164,53,.08);
+  border-left: 3px solid var(--amber);
+  border-radius: 0 6px 6px 0;
+  font-size: 12px;
+}
+.ai-kb-sources strong {
+  color: var(--ink2);
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+.kb-src-row {
+  display: flex; flex-wrap: wrap; gap: 5px;
+  align-items: center;
+  margin: 4px 0;
+}
+.kb-src-label {
+  font-size: 10px;
+  background: var(--warm); color: white;
+  padding: 2px 8px; border-radius: 10px;
+  font-weight: 700;
+  margin-right: 4px;
+}
+.kb-chip {
+  display: inline-flex; align-items: center;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(160,100,30,.3);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all .15s;
+}
+.kb-chip.internal {
+  background: rgba(74,128,48,.1);
+  color: #4a8030;
+  border-color: rgba(74,128,48,.3);
+}
+.kb-chip.internal:hover {
+  background: #4a8030; color: white;
+}
+.kb-chip.external {
+  background: rgba(58,120,170,.1);
+  color: #3a78aa;
+  border-color: rgba(58,120,170,.3);
+}
+.kb-chip.external:hover {
+  background: #3a78aa; color: white;
+}
+
+.kb-internal-card {
+  background: linear-gradient(135deg, rgba(74,128,48,.05), white);
+  border: 1px solid rgba(74,128,48,.2);
+  border-left: 4px solid #4a8030;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin: 8px 0;
+}
+.kb-internal-card .kb-card-meta {
+  font-size: 10px;
+  color: #4a8030;
+  font-weight: 700;
+  margin-bottom: 4px;
+  letter-spacing: .03em;
+}
+.kb-internal-card h5 {
+  font-family: var(--serif);
+  font-size: 14px;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+.kb-internal-card p {
+  font-size: 13px;
+  color: var(--ink2);
+  line-height: 1.7;
+}
