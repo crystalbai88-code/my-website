@@ -5339,3 +5339,52 @@ html { scroll-behavior: smooth; }
   from { opacity: 0; transform: translateX(-50%) scale(.5); }
   to   { opacity: 1; transform: translateX(-50%) scale(1); }
 }
+
+/* 化石点详情面板底部 上一个 / 下一个 */
+.fs-fossil-nav-row {
+  display: flex; gap: 8px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px dashed rgba(160,100,30,.3);
+}
+.fs-fossil-prev {
+  flex: 0 0 auto;
+  padding: 11px 14px;
+  background: white;
+  color: #7a5530;
+  border: 1.5px solid rgba(160,100,30,.35);
+  border-radius: 10px;
+  font-size: 12px; font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 45%;
+  transition: all .2s;
+}
+.fs-fossil-prev:hover {
+  background: #f5e8c8;
+  border-color: #c84820;
+  color: #c84820;
+}
+.fs-fossil-next {
+  flex: 1; min-width: 0;
+  padding: 11px 16px;
+  background: linear-gradient(135deg, #c84820, #a83a18);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px; font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(200,72,32,.3);
+  transition: all .2s;
+}
+.fs-fossil-next:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(200,72,32,.45);
+}
+.fs-fossil-finale {
+  background: linear-gradient(135deg, #2a8038, #1f6028);
+  box-shadow: 0 3px 10px rgba(42,128,56,.3);
+}
+.fs-fossil-finale:hover { box-shadow: 0 6px 16px rgba(42,128,56,.5); }

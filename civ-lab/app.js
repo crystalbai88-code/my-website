@@ -2731,7 +2731,26 @@ function openFossilPanel(fossilId) {
   const panel = document.getElementById('fsFossilPanel');
   const body = document.getElementById('fsFossilBody');
   if (!panel || !body) return;
-  body.innerHTML = renderFossilDetail(fossilId);
+
+  // 计算上一个/下一个化石点
+  const p = PREHISTORIC.periods.find(x => x.id === activePreEraId);
+  const evo = p?.map?.evolution_path || [];
+  const idx = evo.findIndex(e => e.id === fossilId);
+  const prev = (idx > 0) ? evo[idx - 1] : null;
+  const next = (idx >= 0 && idx + 1 < evo.length) ? evo[idx + 1] : null;
+  const isLast = idx === evo.length - 1;
+
+  const prevBtn = prev
+    ? `<button class="fs-fossil-prev" onclick="openFossilPanel('${prev.id}')">← 上一个 · ${idx}. ${prev.name}</button>`
+    : '';
+  const nextBtn = isLast
+    ? `<button class="fs-fossil-next fs-fossil-finale" onclick="closeMapAndAdvance()">✓ 看完全部 · 继续 → 📖 故事</button>`
+    : (next
+        ? `<button class="fs-fossil-next" onclick="openFossilPanel('${next.id}')">下一个 · ${idx + 2}. ${next.name} →</button>`
+        : '');
+
+  body.innerHTML = renderFossilDetail(fossilId) + `
+    <div class="fs-fossil-nav-row">${prevBtn}${nextBtn}</div>`;
   panel.classList.remove('hidden');
   body.scrollTop = 0;
 }
