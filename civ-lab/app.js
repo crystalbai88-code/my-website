@@ -3947,7 +3947,7 @@ function renderPreLayer6(p) {
         ${videos.map((v, i) => `
           <div class="pst-video-card">
             <div class="pst-video-wrap">
-              <video class="pst-video" src="${v.src}" preload="metadata" playsinline controls></video>
+              <video class="pst-video" src="${v.src}" preload="none" playsinline controls poster=""></video>
               <div class="pst-video-mask"></div>
             </div>
             <div class="pst-video-meta">
