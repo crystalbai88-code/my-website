@@ -321,58 +321,58 @@ const PREHISTORIC = {
         intro: '点击图上任意泡泡，深入了解每个时代',
         // 🆕 图片上热点泡泡坐标 (百分比定位)
         hotspots: [
-          // 11 个知识点对应"人类从哪里来"卡通示意图，位置 (pos_x%, pos_y%)
-          { id:'primates', pos_x:34, pos_y:25, icon:'🌳', label:'灵长类家族',  sub:'共同祖先',
+          // 11 个知识点 — 每个 hotspot 精确对齐图中相应的标签/图标位置
+          { id:'primates', pos_x:30, pos_y:24, icon:'🌳', label:'灵长类家族',  sub:'共同祖先',
             detail: {
               title:'我们都是灵长类——同一个祖先的后代',
               body:'生命像一棵大树。猴子、黑猩猩、人类——我们看上去差别很大，但都是从同一个祖先慢慢分开的。<br><br>大约 6000-7000 万年前，最早的灵长类动物出现。它们体型小、住在树上、有抓握能力的手指。后来这棵树长出很多分支：猴子是一支、大猩猩是一支、黑猩猩是一支、人类也是一支。<br><br><strong>关键事实</strong>：人类不是从今天的猴子或黑猩猩变来的。我们和黑猩猩在大约 600-700 万年前分开演化，从那时起黑猩猩也演化了 600 多万年——它们不是"原始版的人类"。'
             }},
-          { id:'split', pos_x:84, pos_y:15, icon:'📅', label:'分家时间',  sub:'约600-700万年前',
+          { id:'split', pos_x:85, pos_y:16, icon:'📅', label:'分家时间',  sub:'约600-700万年前',
             detail: {
               title:'约 600-700 万年前 · 人类祖先与黑猩猩祖先分开',
               body:'科学家通过化石和 DNA 证据，推算出在大约 600-700 万年前，人类和黑猩猩的共同祖先分成了两支。<br><br><strong>分开后他们做了什么？</strong><br>- 黑猩猩祖先 → 留在森林，演化成今天的黑猩猩和倭黑猩猩<br>- 人类祖先 → 走向草原，慢慢学会双足行走、用工具、合作<br><br><strong>已发现的早期化石</strong>：<br>- Sahelanthropus tchadensis（萨赫勒人，约 700 万年前，乍得）<br>- Orrorin tugenensis（千禧人，约 600 万年前，肯尼亚）<br>这些化石的颅骨已经显示一些"偏向人类"的特征。'
             }},
-          { id:'biped', pos_x:39, pos_y:45, icon:'👣', label:'先学会双足行走',  sub:'文明的起点',
+          { id:'biped', pos_x:40, pos_y:37, icon:'👣', label:'先学会双足行走',  sub:'文明的起点',
             detail: {
               title:'先学会双足行走，大脑才慢慢变大',
               body:'这是人类演化最颠覆常识的事实之一：<strong>不是因为我们变聪明了才直立，而是因为我们直立了，才有机会变聪明。</strong><br><br><strong>双足行走带来什么改变？</strong><br>1. <strong>双手空出来了</strong>——可以拿工具、搬食物、抱孩子<br>2. <strong>能看得更远</strong>——草原上能提前发现猛兽和食物<br>3. <strong>能跑得更远</strong>——人类是动物界最强的长跑者之一<br>4. <strong>语言准备</strong>——直立姿势改变喉部结构，为后来的语言做好准备<br><br><strong>科学证据</strong>：Lucy 化石（320 万年前）的骨盆和脚已经完全是直立行走的结构，但她的大脑只有 400cc——和黑猩猩差不多大！这证明直立比脑大早 200 万年。'
             }},
-          { id:'lucy', pos_x:67, pos_y:55, icon:'👩', label:'Lucy · 南方古猿',  sub:'约320万年前',
+          { id:'lucy', pos_x:68, pos_y:45, icon:'👩', label:'Lucy · 南方古猿',  sub:'约320万年前',
             detail: {
               title:'Lucy · Australopithecus afarensis（阿法南方古猿）',
               body:'<strong>Lucy 不是"第一个人"，但她改变了我们对人类起源的理解。</strong><br><br>1974 年 11 月 24 日，在埃塞俄比亚 Hadar 地区，古人类学家 Donald Johanson 团队发现了一具 40% 完整的女性骨架（编号 AL 288-1）。当晚他们听 Beatles 的《Lucy in the Sky with Diamonds》庆祝，于是给她起名 <strong>Lucy</strong>。<br><br><strong>Lucy 告诉了我们什么？</strong><br>- 她约 320 万年前生活在东非<br>- 身高约 1.05 米，体重约 28 公斤<br>- 已经<strong>完全双足直立行走</strong>（骨盆+股骨证明）<br>- 但脑容量只有 380-430 cc（和黑猩猩相当）<br>- 这证明：<strong>先直立，后脑大</strong><br><br><strong>常见误解</strong>：<br>❌ Lucy 不是"我们的直接祖先"——她可能是某个表亲<br>❌ Lucy 不是孤独一人——同地点出土多个个体（"第一家庭"AL 333）<br>❌ Lucy 不是 Homo 属（人属）——是南方古猿（Australopithecus）'
             }},
-          { id:'brain', pos_x:91, pos_y:33, icon:'🧠', label:'大脑慢慢变大',  sub:'200万年的变化',
+          { id:'brain', pos_x:92, pos_y:31, icon:'🧠', label:'大脑慢慢变大',  sub:'200万年的变化',
             detail: {
               title:'大脑变大的代价与收益',
               body:'<strong>人类大脑从 Lucy 的 400 cc 一路涨到现代人的 1400 cc——但这不是"越大越好"的免费午餐。</strong><br><br><strong>大脑变大的时间表</strong>：<br>- Lucy（320 万年前）：400 cc<br>- Homo habilis（约 230 万年前）：600 cc<br>- Homo erectus（约 180 万年前）：900 cc<br>- 智人（约 30 万年前至今）：1400 cc<br>- 尼安德特人：1500 cc（比我们还大！）<br><br><strong>大脑变大带来什么？</strong><br>1. 解决复杂问题、规划未来<br>2. 语言和符号思维<br>3. 大规模合作（部落 → 城市）<br>4. 文化的累积传承<br><br><strong>大脑变大的代价</strong>：<br>- 婴儿出生时颅骨小，要"早产"才能通过产道 → 婴儿期长，需要父母长期照顾<br>- 大脑消耗身体 20% 的能量，需要更多高质量食物<br>- 这就是为什么<strong>火、烹饪、肉食、合作打猎</strong>这么重要——它们一起支撑了大脑的发展'
             }},
-          { id:'tools', pos_x:11, pos_y:62, icon:'🪨', label:'使用工具解决问题',  sub:'约260万年前起',
+          { id:'tools', pos_x:11, pos_y:58, icon:'🪨', label:'使用工具解决问题',  sub:'约260万年前起',
             detail: {
               title:'工具：人类最古老的"超能力"',
               body:'<strong>目前已知最早的石器距今约 260 万年</strong>（埃塞俄比亚 Gona 遗址）。但更惊人的是 330 万年前在 Lomekwi 发现的可能工具——比 Homo 属还早！<br><br><strong>"使用工具"不只是用石头</strong>：<br>- <strong>动物也会用工具</strong>：黑猩猩用棍子钓白蚁、海獭用石头砸贝壳<br>- <strong>人类的不同在于</strong>：<br>  1. 制造工具来制造工具（meta-toolmaking）<br>  2. 教别人怎么做（文化传承）<br>  3. 越做越精——从粗糙石片到精致手斧到现代手术刀<br><br><strong>主要石器文化阶段</strong>：<br>- <strong>Oldowan</strong>（260-170 万年前）：简单敲打的石片，Homo habilis 使用<br>- <strong>Acheulean</strong>（170 万-20 万年前）：精美对称的手斧，Homo erectus 使用<br>- <strong>Mousterian</strong>（20-3 万年前）：尼安德特人的复合工具<br><br><strong>为什么重要？</strong>工具让人类突破了身体限制。我们没有锋利的牙齿和爪子，但我们有"延伸的手"——这是文明的第一步。'
             }},
-          { id:'homo_genus', pos_x:23, pos_y:89, icon:'🪨', label:'Homo 属出现',  sub:'约200万年前',
+          { id:'homo_genus', pos_x:24, pos_y:86, icon:'🪨', label:'Homo 属出现',  sub:'约200万年前',
             detail: {
               title:'Homo 属（人属）出现 · 约 200 万年前',
               body:'<strong>"Homo"是拉丁文"人"的意思。被分到这个属，意味着这个物种已经够"像人"了。</strong><br><br>大约 230 万年前，非洲出现了 <strong>Homo habilis（能人）</strong>——属名 Homo 的第一个成员。<br><br><strong>Homo habilis 和 Lucy 的差别？</strong><br>- 脑容量更大：约 600 cc（vs Lucy 的 400 cc）<br>- 牙齿更小（开始吃更软的食物，包括肉）<br>- <strong>会制造工具</strong>——Oldowan 石器和它一起被发现<br><br>"habilis"意为"灵巧"——因为它的手骨证明它能精细操作。<br><br><strong>同时期还有其他人种</strong>：<br>- <strong>Paranthropus</strong>（傍人）——大牙齿、强壮咀嚼肌，吃硬植物，与 habilis 并存数十万年<br>- <strong>Homo rudolfensis</strong>——脑更大但身材更壮<br><br>这是个"实验室"般的时期：地球上同时存在 3-4 种"早期人"。最后只有 Homo 这一支延续下来。'
             }},
-          { id:'erectus', pos_x:46, pos_y:89, icon:'🚶', label:'Homo erectus 直立人',  sub:'约180万年前',
+          { id:'erectus', pos_x:46, pos_y:86, icon:'🚶', label:'Homo erectus 直立人',  sub:'约180万年前',
             detail: {
               title:'Homo erectus（直立人）· 约 180 万年前 · 第一个全球旅行者',
               body:'<strong>Homo erectus 是人类演化的"超级英雄"——他们在地球上存在了 200 万年，比智人长 7 倍！</strong><br><br><strong>关键创新</strong>：<br>1. <strong>身高接近现代人</strong>（Turkana Boy 化石身高 1.6 米，预计成人 1.85 米）<br>2. <strong>大脑约 900 cc</strong>（接近现代人 2/3）<br>3. <strong>会用火</strong>——South Africa 的 Wonderwerk 洞约 100 万年前用火证据<br>4. <strong>精美的 Acheulean 手斧</strong>——对称双面修整，需要预先规划<br>5. <strong>第一个走出非洲的人</strong>！<br><br><strong>走遍欧亚大陆</strong>：<br>- 格鲁吉亚 Dmanisi（约 180 万年前）<br>- 中国周口店"北京人"（约 70-30 万年前）<br>- 印度尼西亚爪哇"爪哇人"（约 150 万年前）<br><br><strong>为什么能走这么远？</strong>身体适合长跑、能用火取暖、会做更复杂工具、会狩猎大型动物——他们已经具备了"探险家"的所有装备。'
             }},
-          { id:'out_of_africa', pos_x:57, pos_y:62, icon:'🌍', label:'走向更广阔的世界',  sub:'多次扩散',
+          { id:'out_of_africa', pos_x:58, pos_y:60, icon:'🌍', label:'走向更广阔的世界',  sub:'多次扩散',
             detail: {
               title:'走出非洲 · 人类的全球大扩散',
               body:'<strong>人类不止一次走出非洲——而是至少 3 次：</strong><br><br><strong>第 1 次：Homo erectus 大扩散</strong>（约 180-150 万年前）<br>- 从非洲走到欧亚大陆，但绝大多数支系最终灭绝<br><br><strong>第 2 次：早期智人尝试</strong>（约 12-18 万年前）<br>- 以色列 Misliya 洞穴化石（约 19 万年前）<br>- 中国出土早期智人化石（约 10 万年前）<br>- 这一批基本"失败"了，没留下今天的后代<br><br><strong>第 3 次：成功的大扩散</strong>（约 6-7 万年前）<br>- 这是今天所有非非洲裔人类的祖先<br>- 经 Bab el-Mandeb 海峡走出非洲<br>- 6.5 万年前到达澳大利亚（船！）<br>- 5 万年前到达欧洲<br>- 1.5-2 万年前到达美洲<br><br><strong>为什么要走？</strong>气候变化（水源枯竭，就像我们故事里"阿婆带路"）、人口增长、好奇心、追逐猎物——可能都是原因。'
             }},
-          { id:'sapiens', pos_x:78, pos_y:89, icon:'🧬', label:'Homo sapiens 智人',  sub:'约30万年前',
+          { id:'sapiens', pos_x:78, pos_y:86, icon:'🧬', label:'Homo sapiens 智人',  sub:'约30万年前',
             detail: {
               title:'Homo sapiens（智人）· 约 30 万年前 · 我们',
               body:'<strong>"sapiens"是拉丁文"智慧"的意思。我们是地球上唯一活着的人类物种。</strong><br><br><strong>最早的智人化石</strong>：<br>- 摩洛哥 Jebel Irhoud（约 31.5 万年前）—— Hublin 2017 年 Nature 论文将智人起源推前 10 万年<br>- 埃塞俄比亚 Omo Kibish（约 23 万年前）<br>- 这些化石的面部已经像现代人，但颅腔还略长<br><br><strong>智人的独特之处</strong>：<br>1. 高、圆的颅骨 + 有"下巴"（其他人种都没有真正的下巴）<br>2. 长距离合作能力——上百人协作打猎、迁徙<br>3. 抽象艺术——洞穴壁画、雕像、装饰品<br>4. 符号语言——能讲"不存在"的故事（神话、未来计划）<br><br><strong>30 万年前的智人 ≠ 现代生活</strong>：<br>- 还没有农业、城市、文字（这些要 25-29 万年后才出现！）<br>- 用石器和木器、靠采集狩猎、住山洞或临时营地<br>- 但他们已经有了构建文明的全部能力——只需要时间和气候变化的契机'
             }},
-          { id:'four_abilities', pos_x:91, pos_y:69, icon:'⭐', label:'文明的四种关键能力',  sub:'合作 · 学习 · 工具 · 适应',
+          { id:'four_abilities', pos_x:92, pos_y:66, icon:'⭐', label:'文明的四种关键能力',  sub:'合作 · 学习 · 工具 · 适应',
             detail: {
               title:'⭐ 文明的第一步 · 四种关键能力',
               body:'<strong>智人之所以最终建立了文明，不是因为我们个体很聪明（黑猩猩个体也很聪明），而是因为我们有这四种叠加的能力：</strong><br><br><strong>1. 🤝 合作（Cooperation）</strong><br>不止是家人合作。智人能和"陌生人"合作——通过共同的故事、规则、信仰建立信任。这让我们能组织 100、1000、100 万人做同一件事。<br><br><strong>2. 📚 学习（Learning）</strong><br>"累积文化"。每一代不必从零开始——孩子学会父母的全部知识，再加一点点新发现。一万代累积下来，就是文明。<br><br><strong>3. 🔨 制造工具（Toolmaking）</strong><br>不是用工具，是<strong>制造工具来制造工具</strong>。我们用石头做石器，用石器做木器，用木器做骨器，用骨器做织布机，用织布机做衣服……一层层叠加。<br><br><strong>4. 🌱 适应环境（Adaptation）</strong><br>不是身体进化去适应环境，而是<strong>用文化去适应</strong>：冷了做衣服、缺水了挖井、食物少了种地。这让我们能住进北极、沙漠、海岛、高原。<br><br><strong>这四种能力一起出现，文明才开始萌芽。</strong>从 30 万年前到 5000 年前的第一座城市，正好用了 29.5 万年——慢慢累积，没有跳跃。'
