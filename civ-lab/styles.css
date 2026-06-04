@@ -4584,3 +4584,27 @@ html, body {
   border-radius: 6px; font-size: 12px; cursor: pointer;
 }
 .aat-cancel:hover { background: #f5e8c8; }
+
+/* 🔒 样板模式：未解锁课程 */
+.lesson-card.demo-locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(255,255,255,.5),
+    rgba(255,255,255,.5) 8px,
+    rgba(200,72,32,.05) 8px,
+    rgba(200,72,32,.05) 16px
+  );
+  filter: grayscale(0.4);
+}
+.lesson-card.demo-locked:hover {
+  opacity: 0.65;
+  transform: none;
+  box-shadow: none;
+}
+.lesson-card.demo-locked .lesson-card-icon { filter: grayscale(1) opacity(0.7); }
+.lesson-card.demo-locked .lesson-card-status {
+  color: #a86840 !important;
+  font-weight: 700;
+}

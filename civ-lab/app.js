@@ -1,5 +1,9 @@
 // AI世界文明实验室 · 应用逻辑 (merged v2 + existing)
 
+// 🔒 样板演示模式 — 只解锁这些课程，其余显示锁
+// 等准备好内容后，把更多 lesson id 加进数组即可
+const DEMO_UNLOCKED_LESSONS = ['PH01'];
+
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => [...document.querySelectorAll(sel)];
 
@@ -245,21 +249,24 @@ function renderStageDetail(stageId) {
       ${nodes.map((n, i) => {
         const isLinked = !!n.linked_lesson;
         const isComing = n.status === 'coming_soon' || stage.status === 'coming_soon';
+        // 🔒 样板演示模式：只解锁白名单课程
+        const demoLocked = isLinked && !DEMO_UNLOCKED_LESSONS.includes(n.linked_lesson);
         const done = isLinked && completed.includes(n.linked_lesson);
         const cls = ['lesson-card',
           isComing ? 'coming-soon' : '',
-          isLinked ? 'linked' : '',
+          isLinked && !demoLocked ? 'linked' : '',
           done ? 'done' : '',
+          demoLocked ? 'demo-locked' : '',
         ].filter(Boolean).join(' ');
         return `
           <button class="${cls}" style="--stage-color:${stage.color}"
-                  data-linked="${n.linked_lesson || ''}" data-id="${n.id}">
+                  data-linked="${demoLocked ? '' : (n.linked_lesson || '')}" data-id="${n.id}">
             <div class="lesson-card-num">${String(i + 1).padStart(2, '0')}</div>
-            <div class="lesson-card-icon">${n.emoji}</div>
+            <div class="lesson-card-icon">${demoLocked ? '🔒' : n.emoji}</div>
             <h4 class="lesson-card-title">${n.label}</h4>
             <p class="lesson-card-time">${n.time}</p>
             <div class="lesson-card-status">
-              ${done ? '✓ 已学过' : (isLinked ? '▸ 点击进入' : (isComing ? '⏳ 敬请期待' : '📖 资料填充中'))}
+              ${done ? '✓ 已学过' : (demoLocked ? '🔒 即将上线' : (isLinked ? '▸ 点击进入' : (isComing ? '⏳ 敬请期待' : '📖 资料填充中')))}
             </div>
           </button>`;
       }).join('')}
@@ -2122,12 +2129,15 @@ function goToNextLesson() {
   const periods = PREHISTORIC.periods;
   const idx = periods.findIndex(x => x.id === activePreEraId);
   if (idx < 0) return;
-  if (idx + 1 < periods.length) {
-    enterPreEra(periods[idx + 1].id);
-  } else {
-    // 已是最后一课
-    alert('🎉 你已完成史前文明全部 ' + periods.length + ' 课！');
+  // 找下一个解锁的课
+  for (let i = idx + 1; i < periods.length; i++) {
+    if (DEMO_UNLOCKED_LESSONS.includes(periods[i].id)) {
+      enterPreEra(periods[i].id);
+      return;
+    }
   }
+  // 没有更多解锁课程
+  alert('🎉 这是当前样板版本最后一课！\n更多内容正在准备中，敬请期待。');
 }
 
 function goToPrevLesson() {
