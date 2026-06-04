@@ -1674,14 +1674,6 @@ function renderImageOverlayMode(p) {
             ${connections}
           </svg>
           ${bubbles}
-          <!-- 遮罩：盖住图片里烤进去的 "中文维基/EN" 按钮 (7 个块各一条) -->
-          <div class="wiki-mask" style="top:23%;left:34%;width:28%;height:4%"></div>
-          <div class="wiki-mask" style="top:36.5%;left:34%;width:28%;height:4%"></div>
-          <div class="wiki-mask" style="top:49.5%;left:34%;width:28%;height:4%"></div>
-          <div class="wiki-mask" style="top:63%;left:34%;width:28%;height:4%"></div>
-          <div class="wiki-mask" style="top:75.5%;left:34%;width:28%;height:4%"></div>
-          <div class="wiki-mask" style="top:88%;left:34%;width:28%;height:4%"></div>
-          <div class="wiki-mask" style="top:95.5%;left:34%;width:28%;height:4%"></div>
         </div>
       </div>
 
