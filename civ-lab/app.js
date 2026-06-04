@@ -458,7 +458,12 @@ function positionFigure() {
 // ENTER LESSON
 // ════════════════════════════════════════════════
 function enterLesson(id) {
-  // 史前文明单元：P01 跳转到 8 时代总览
+  // 🆕 PH## ID 直接进入对应史前知识网络（跳过冗余的总览层）
+  if (/^PH\d+$/.test(id)) {
+    enterPreEra(id);
+    return;
+  }
+  // 兼容：旧的 P01 入口仍跳转到 8 时代总览
   if (id === 'P01') {
     showPreOverview();
     return;
@@ -1474,7 +1479,12 @@ function enterPreEra(id) {
   if (!period) return;
   showScreen('s-pre-era');
   renderPreEra(period);
-  $('#preEraBackBtn').onclick = () => showPreOverview();
+  $('#preEraBackBtn').onclick = () => {
+    // 直接返回到首页的「史前文明阶段详情」（保持用户在阶段卡片视图）
+    homeViewState = { mode: 'stage', stageId: 'STAGE_00' };
+    showScreen('s-home');
+    renderStageDetail('STAGE_00');
+  };
   logHistory('lesson_view', `史前探索：${period.time} · ${period.title}`);
 }
 

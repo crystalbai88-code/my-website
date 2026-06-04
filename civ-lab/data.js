@@ -1686,13 +1686,15 @@ const MAIN_NETWORK = {
   // 节点 — 每个 stage 内节点均匀分布（间距 130-220px，绝不重叠）
   // 节点 X 区域：280 → 1780（共 1500px 宽）
   nodes: [
-    // ═══════ STAGE_00 史前文明 6 个（间距 214）═══════
-    { id:'P01_homo_sapiens', stage:'STAGE_00', x:494,  label:'现代人类',     time:'30万年前',  emoji:'🦴', linked_lesson:'P01' },
-    { id:'P02_migration',    stage:'STAGE_00', x:708,  label:'走出非洲',     time:'7万年前',   emoji:'🚶' },
-    { id:'P04_cave_art',     stage:'STAGE_00', x:922,  label:'洞穴艺术',     time:'4万年前',   emoji:'🎨' },
-    { id:'P06_agriculture',  stage:'STAGE_00', x:1136, label:'农业出现',     time:'1万年前',   emoji:'🌾' },
-    { id:'P07_settlement',   stage:'STAGE_00', x:1350, label:'定居村落',     time:'9000年前',  emoji:'🏘' },
-    { id:'P10_city',         stage:'STAGE_00', x:1564, label:'走向城市',     time:'4000年前',  emoji:'🏛' },
+    // ═══════ STAGE_00 史前文明 8 个 — 每个直接对应一个 PH 知识网络 ═══════
+    { id:'PH01_node', stage:'STAGE_00', label:'现代人类出现',        time:'约30万年前',  emoji:'🦴', linked_lesson:'PH01' },
+    { id:'PH02_node', stage:'STAGE_00', label:'人类走向世界',        time:'约7万年前',   emoji:'🚶', linked_lesson:'PH02' },
+    { id:'PH03_node', stage:'STAGE_00', label:'洞穴艺术与象征思维',  time:'约4万年前',   emoji:'🎨', linked_lesson:'PH03' },
+    { id:'PH04_node', stage:'STAGE_00', label:'冰河时代结束',        time:'约1.2万年前', emoji:'🌊', linked_lesson:'PH04' },
+    { id:'PH05_node', stage:'STAGE_00', label:'农业出现',            time:'约1万年前',   emoji:'🌾', linked_lesson:'PH05' },
+    { id:'PH06_node', stage:'STAGE_00', label:'定居村落',            time:'约9000年前',  emoji:'🏘', linked_lesson:'PH06' },
+    { id:'PH07_node', stage:'STAGE_00', label:'分工·贸易·信仰',      time:'约7000年前',  emoji:'💎', linked_lesson:'PH07' },
+    { id:'PH08_node', stage:'STAGE_00', label:'走向城市',            time:'约5000年前',  emoji:'🏛', linked_lesson:'PH08' },
 
     // ═══════ STAGE_01 早期文明 8 个（间距 167）═══════
     { id:'K3000_mesopotamia', stage:'STAGE_01', x:447,  label:'两河流域',     time:'前3000', emoji:'📜', linked_lesson:'L01' },
@@ -1757,9 +1759,9 @@ const MAIN_NETWORK = {
   // 跨 stage 概念关联（虚线）— 显示思想/技术/制度的延续
   edges: [
     // 主时间脉络（横向 — 每 stage 内时间顺序）
-    { from:'P01_homo_sapiens', to:'P02_migration', type:'time' },
-    { from:'P06_agriculture',  to:'P07_settlement', type:'time' },
-    { from:'P10_city',         to:'K3000_mesopotamia', type:'time' },
+    { from:'PH01_node', to:'PH02_node', type:'time' },
+    { from:'PH05_node', to:'PH06_node', type:'time' },
+    { from:'PH08_node', to:'K3000_mesopotamia', type:'time' },
     { from:'K3000_egypt',      to:'K2500_pyramids', type:'time' },
     { from:'K1200_collapse',   to:'AXIAL_age', type:'time' },
     { from:'CHN_qin',          to:'SILK_road', type:'time' },
