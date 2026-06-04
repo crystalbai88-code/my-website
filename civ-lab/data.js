@@ -1634,81 +1634,153 @@ const MAP_DATA = [
 ];
 
 // ════════════════════════════════════════════════════
-// 🕸 主知识网络 · MAIN KNOWLEDGE NETWORK
-// 双轴布局：X = 时间，Y = 主题
+// 🕸 主知识网络 · MAIN KNOWLEDGE NETWORK (Stage-based)
+// 基于「世界历史上下五千年知识库蓝图」7 个 STAGE 重构
+// 双轴布局：X = 时间（30万年前→AI 时代）, Y = 7 个 STAGE 横向带
 // ════════════════════════════════════════════════════
 const MAIN_NETWORK = {
-  intro: '从 30 万年前到公元 1000 年 · 点击任意节点深入学习',
+  intro: '从 30 万年前到 AI 时代 · 7 个文明阶段 · 点击任意节点深入学习',
 
-  // Y 轴主题分层（横向条带）
-  themes: [
-    { id:'origin', label:'演化 · 起源',  icon:'🌳', y: 110, color:'#7a5530' },
-    { id:'civil',  label:'城市 · 文明',  icon:'🏛', y: 230, color:'#c86820' },
-    { id:'empire', label:'王权 · 帝国',  icon:'⚔️', y: 350, color:'#b83018' },
-    { id:'idea',   label:'思想 · 信仰',  icon:'💡', y: 470, color:'#8a5a90' },
+  // Y 轴：7 个 STAGE 横向带（覆盖完整世界史 5000+ 年）
+  stages: [
+    { id:'STAGE_00', title:'史前文明准备', icon:'🦴', y:120, color:'#7a5530',
+      time_range:'30万年前-前3000', core_question:'人类如何走向文明？',
+      status:'active' },
+    { id:'STAGE_01', title:'早期文明',     icon:'🏛', y:240, color:'#c86820',
+      time_range:'前3000-前1000',  core_question:'城市、文字、王权如何出现？',
+      status:'active' },
+    { id:'STAGE_02', title:'古典思想与帝国', icon:'💡', y:360, color:'#b83018',
+      time_range:'前1000-公元500',  core_question:'思想、帝国、宗教如何塑造世界？',
+      status:'active' },
+    { id:'STAGE_03', title:'中世纪多中心',  icon:'🌍', y:480, color:'#8a5a90',
+      time_range:'500-1500',        core_question:'世界如何通过宗教、贸易、城市连接？',
+      status:'active' },
+    { id:'STAGE_04', title:'全球连接时代',  icon:'⛵', y:600, color:'#3a7868',
+      time_range:'1500-1800',       core_question:'航海、殖民、贸易如何重组世界？',
+      status:'coming_soon' },
+    { id:'STAGE_05', title:'工业与现代世界', icon:'⚙️', y:720, color:'#506890',
+      time_range:'1750-1945',       core_question:'工业、民族国家、战争如何创造现代世界？',
+      status:'coming_soon' },
+    { id:'STAGE_06', title:'当代与未来文明', icon:'🤖', y:840, color:'#6a4a90',
+      time_range:'1945-至今',       core_question:'科技、全球化、AI 如何改变文明？',
+      status:'coming_soon' },
   ],
 
-  // X 轴时间刻度
+  // X 轴时间刻度（对数尺度感 — 史前压缩，近代展开）
   time_axis: [
-    { x: 80,   label: '约30万年前' },
-    { x: 240,  label: '前3000' },
-    { x: 350,  label: '前2500' },
-    { x: 460,  label: '前1600' },
-    { x: 560,  label: '前1200' },
-    { x: 680,  label: '前500' },
-    { x: 800,  label: '前221' },
-    { x: 920,  label: '公元1年' },
-    { x: 1040, label: '300' },
-    { x: 1140, label: '600' },
-    { x: 1240, label: '800' },
-    { x: 1340, label: '1000' },
+    { x:80,   label:'30万年前' },
+    { x:160,  label:'1万年前' },
+    { x:240,  label:'前3000' },
+    { x:340,  label:'前2000' },
+    { x:430,  label:'前1200' },
+    { x:540,  label:'前500' },
+    { x:650,  label:'公元1年' },
+    { x:760,  label:'500' },
+    { x:880,  label:'1000' },
+    { x:990,  label:'1500' },
+    { x:1110, label:'1800' },
+    { x:1230, label:'1900' },
+    { x:1340, label:'AI 时代' },
   ],
 
-  // 13 个课程节点
+  // 节点 — 每个 stage 4-8 个核心节点，按真实时间分布
   nodes: [
-    { id:'P01', x:80,   theme:'origin', label:'人类从哪里来',          time:'约30万年前', emoji:'🦴' },
-    { id:'L01', x:240,  theme:'civil',  label:'文明从哪里开始',         time:'公元前3000', emoji:'🌾' },
-    { id:'L02', x:350,  theme:'civil',  label:'金字塔与城市国家',       time:'公元前2500', emoji:'🔺' },
-    { id:'L03', x:460,  theme:'empire', label:'青铜与早期王国',         time:'公元前1600', emoji:'⚔️' },
-    { id:'L04', x:560,  theme:'empire', label:'青铜时代的崩溃',         time:'公元前1200', emoji:'💫' },
-    { id:'L05', x:680,  theme:'idea',   label:'思想大爆发时代',         time:'公元前500',  emoji:'💡' },
-    { id:'L06', x:800,  theme:'empire', label:'统一帝国诞生',           time:'公元前221',  emoji:'🏛' },
-    { id:'L07', x:920,  theme:'civil',  label:'丝绸之路与帝国网络',     time:'公元1年',    emoji:'🐫' },
-    { id:'L08', x:1040, theme:'empire', label:'帝国危机与转型',         time:'公元300年',  emoji:'🔄' },
-    { id:'L09', x:1140, theme:'idea',   label:'宗教迁徙与新秩序',       time:'公元600年',  emoji:'☪️' },
-    { id:'L10', x:1240, theme:'civil',  label:'黄金时代 · 知识与城市',   time:'公元800年',  emoji:'✨' },
-    { id:'L11', x:1340, theme:'civil',  label:'中世纪 · 多极世界',       time:'公元1000年', emoji:'🌍' },
-    { id:'L12', x:1340, theme:'idea',   label:'文明博览会 · 综合展示',   time:'综合',       emoji:'🎨' },
+    // ═══════ STAGE_00 史前文明（已有 PH01 课程链接）═══════
+    { id:'P01_homo_sapiens', stage:'STAGE_00', x:80,  label:'现代人类出现',  time:'30万年前',  emoji:'🦴', linked_lesson:'P01' },
+    { id:'P02_migration',    stage:'STAGE_00', x:120, label:'走出非洲',      time:'7万年前',   emoji:'🚶' },
+    { id:'P04_cave_art',     stage:'STAGE_00', x:140, label:'洞穴艺术',      time:'4万年前',   emoji:'🎨' },
+    { id:'P06_agriculture',  stage:'STAGE_00', x:170, label:'农业出现',      time:'1万年前',   emoji:'🌾' },
+    { id:'P07_settlement',   stage:'STAGE_00', x:195, label:'定居村落',      time:'9000年前',  emoji:'🏘' },
+    { id:'P10_city',         stage:'STAGE_00', x:225, label:'走向城市',      time:'4000-3000年前', emoji:'🏛' },
+
+    // ═══════ STAGE_01 早期文明（前3000 - 前1000）═══════
+    { id:'K3000_mesopotamia', stage:'STAGE_01', x:255, label:'两河流域',     time:'前3000', emoji:'📜', linked_lesson:'L01' },
+    { id:'K3000_uruk',        stage:'STAGE_01', x:275, label:'乌鲁克',       time:'前3000', emoji:'🏛' },
+    { id:'K3000_cuneiform',   stage:'STAGE_01', x:295, label:'楔形文字',     time:'前3300', emoji:'✍️' },
+    { id:'K3000_egypt',       stage:'STAGE_01', x:315, label:'古埃及',       time:'前3000', emoji:'🌅' },
+    { id:'K2500_pyramids',    stage:'STAGE_01', x:345, label:'金字塔',       time:'前2500', emoji:'🔺', linked_lesson:'L02' },
+    { id:'K2600_indus',       stage:'STAGE_01', x:380, label:'印度河文明',   time:'前2600', emoji:'🧱' },
+    { id:'K1600_shang',       stage:'STAGE_01', x:415, label:'商朝青铜',     time:'前1600', emoji:'⚱️', linked_lesson:'L03' },
+    { id:'K1200_collapse',    stage:'STAGE_01', x:440, label:'青铜崩溃',     time:'前1200', emoji:'💫', linked_lesson:'L04' },
+
+    // ═══════ STAGE_02 古典思想与帝国（前1000 - 公元500）═══════
+    { id:'AXIAL_age',         stage:'STAGE_02', x:510, label:'轴心时代',     time:'前600',  emoji:'💡', linked_lesson:'L05' },
+    { id:'CHN_confucius',     stage:'STAGE_02', x:530, label:'孔子',         time:'前551',  emoji:'📚' },
+    { id:'IND_buddha',        stage:'STAGE_02', x:548, label:'佛陀',         time:'前500',  emoji:'☸️' },
+    { id:'GRC_city_states',   stage:'STAGE_02', x:565, label:'希腊城邦',     time:'前500',  emoji:'🏛' },
+    { id:'PER_persian',       stage:'STAGE_02', x:580, label:'波斯帝国',     time:'前550',  emoji:'👑' },
+    { id:'CHN_qin',           stage:'STAGE_02', x:620, label:'秦汉帝国',     time:'前221',  emoji:'🐉', linked_lesson:'L06' },
+    { id:'ROM_empire',        stage:'STAGE_02', x:650, label:'罗马帝国',     time:'前27',   emoji:'🏛' },
+    { id:'SILK_road',         stage:'STAGE_02', x:680, label:'丝绸之路',     time:'公元1年', emoji:'🐫', linked_lesson:'L07' },
+    { id:'CHRISTIAN_early',   stage:'STAGE_02', x:720, label:'基督教兴起',   time:'公元1-300', emoji:'✝️' },
+    { id:'ROM_crisis',        stage:'STAGE_02', x:755, label:'帝国危机',     time:'300',    emoji:'🔄', linked_lesson:'L08' },
+
+    // ═══════ STAGE_03 中世纪多中心（500 - 1500）═══════
+    { id:'BYZANTINE',         stage:'STAGE_03', x:790, label:'拜占庭',       time:'500',    emoji:'⛪' },
+    { id:'ISLAM_rise',        stage:'STAGE_03', x:815, label:'伊斯兰兴起',   time:'620',    emoji:'☪️', linked_lesson:'L09' },
+    { id:'TANG_changan',      stage:'STAGE_03', x:850, label:'唐朝长安',     time:'700',    emoji:'🏯' },
+    { id:'ABBASID_baghdad',   stage:'STAGE_03', x:875, label:'巴格达智慧宫', time:'800',    emoji:'📖', linked_lesson:'L10' },
+    { id:'SONG_commerce',     stage:'STAGE_03', x:910, label:'宋朝商业',     time:'1000',   emoji:'💰', linked_lesson:'L11' },
+    { id:'MEDIEVAL_europe',   stage:'STAGE_03', x:945, label:'欧洲中世纪',   time:'1000',   emoji:'⚔️' },
+    { id:'MONGOL_empire',     stage:'STAGE_03', x:975, label:'蒙古帝国',     time:'1200',   emoji:'🐎' },
+    { id:'MAYA_aztec_inca',   stage:'STAGE_03', x:990, label:'美洲文明',     time:'1300-1500', emoji:'🗿' },
+
+    // ═══════ STAGE_04 全球连接（1500 - 1800）⏳ 即将上线 ═══════
+    { id:'ZHENG_he',          stage:'STAGE_04', x:1010, label:'郑和下西洋',    time:'1405', emoji:'⛵', status:'coming_soon' },
+    { id:'COLUMBUS_1492',     stage:'STAGE_04', x:1030, label:'哥伦布航行',    time:'1492', emoji:'⛵', status:'coming_soon' },
+    { id:'AGE_exploration',   stage:'STAGE_04', x:1060, label:'大航海时代',    time:'1500', emoji:'🗺', status:'coming_soon' },
+    { id:'COLUMBIAN_exchange',stage:'STAGE_04', x:1080, label:'哥伦布大交换',  time:'1500-', emoji:'🌽', status:'coming_soon' },
+    { id:'OTTOMAN_empire',    stage:'STAGE_04', x:1090, label:'奥斯曼帝国',    time:'1500', emoji:'☪️', status:'coming_soon' },
+    { id:'SILVER_trade',      stage:'STAGE_04', x:1110, label:'白银贸易',      time:'1600', emoji:'🪙', status:'coming_soon' },
+    { id:'SCIENTIFIC_rev',    stage:'STAGE_04', x:1130, label:'科学革命',      time:'1600', emoji:'🔬', status:'coming_soon' },
+
+    // ═══════ STAGE_05 工业与现代（1750 - 1945）⏳ ═══════
+    { id:'INDUSTRIAL_rev',    stage:'STAGE_05', x:1170, label:'工业革命',      time:'1760', emoji:'⚙️', status:'coming_soon' },
+    { id:'STEAM_engine',      stage:'STAGE_05', x:1185, label:'蒸汽机',        time:'1769', emoji:'🚂', status:'coming_soon' },
+    { id:'FRENCH_revolution', stage:'STAGE_05', x:1205, label:'法国大革命',    time:'1789', emoji:'⚜️', status:'coming_soon' },
+    { id:'IMPERIALISM',       stage:'STAGE_05', x:1240, label:'帝国主义',      time:'1800-1900', emoji:'🗺', status:'coming_soon' },
+    { id:'MEIJI_restoration', stage:'STAGE_05', x:1265, label:'明治维新',      time:'1868', emoji:'🏯', status:'coming_soon' },
+    { id:'WWI',               stage:'STAGE_05', x:1285, label:'一战',          time:'1914', emoji:'⚔️', status:'coming_soon' },
+    { id:'WWII',              stage:'STAGE_05', x:1305, label:'二战',          time:'1939', emoji:'💥', status:'coming_soon' },
+
+    // ═══════ STAGE_06 当代与未来（1945 - 至今）⏳ ═══════
+    { id:'UN_1945',           stage:'STAGE_06', x:1320, label:'联合国',        time:'1945', emoji:'🌐', status:'coming_soon' },
+    { id:'COLD_war',          stage:'STAGE_06', x:1335, label:'冷战',          time:'1947', emoji:'❄️', status:'coming_soon' },
+    { id:'GLOBALIZATION',     stage:'STAGE_06', x:1360, label:'全球化',        time:'1980', emoji:'🌏', status:'coming_soon' },
+    { id:'INTERNET',          stage:'STAGE_06', x:1380, label:'互联网',        time:'1990', emoji:'🕸', status:'coming_soon' },
+    { id:'AI_modern',         stage:'STAGE_06', x:1400, label:'AI 时代',       time:'2020', emoji:'🤖', status:'coming_soon' },
+    { id:'CLIMATE_change',    stage:'STAGE_06', x:1410, label:'气候变化',      time:'持续', emoji:'🌡️', status:'coming_soon' },
+    { id:'SPACE',             stage:'STAGE_06', x:1430, label:'太空探索',      time:'1957-', emoji:'🚀', status:'coming_soon' },
   ],
 
-  // 概念关联边 · 显示跨课的思路串联
+  // 跨 stage 概念关联（虚线）— 显示思想/技术/制度的延续
   edges: [
-    // ── 主时间脉络（演化→城市→...）橙色实线
-    { from:'P01', to:'L01', type:'time' },
-    { from:'L01', to:'L02', type:'time' },
-    { from:'L02', to:'L03', type:'time' },
-    { from:'L03', to:'L04', type:'time' },
-    { from:'L04', to:'L05', type:'time' },
-    { from:'L05', to:'L06', type:'time' },
-    { from:'L06', to:'L07', type:'time' },
-    { from:'L07', to:'L08', type:'time' },
-    { from:'L08', to:'L09', type:'time' },
-    { from:'L09', to:'L10', type:'time' },
-    { from:'L10', to:'L11', type:'time' },
-    // ── 概念串联 · 跨课关联（虚线）
-    { from:'L01', to:'L02', type:'concept', label:'城市' },
-    { from:'L02', to:'L06', type:'concept', label:'王权' },
-    { from:'L02', to:'L07', type:'concept', label:'贸易' },
-    { from:'L07', to:'L10', type:'concept', label:'贸易' },
-    { from:'L10', to:'L11', type:'concept', label:'城市' },
-    { from:'L04', to:'L08', type:'concept', label:'危机' },
-    { from:'L05', to:'L09', type:'concept', label:'思想' },
-    { from:'L09', to:'L10', type:'concept', label:'信仰' },
-    { from:'L03', to:'L06', type:'concept', label:'帝国' },
-    { from:'L06', to:'L08', type:'concept', label:'帝国' },
-    // L12 是综合，连接到所有重要节点（淡色聚合线）
-    { from:'L11', to:'L12', type:'capstone' },
-    { from:'P01', to:'L12', type:'capstone' },
-    { from:'L05', to:'L12', type:'capstone' },
+    // 主时间脉络（横向 — 每 stage 内时间顺序）
+    { from:'P01_homo_sapiens', to:'P02_migration', type:'time' },
+    { from:'P06_agriculture',  to:'P07_settlement', type:'time' },
+    { from:'P10_city',         to:'K3000_mesopotamia', type:'time' },
+    { from:'K3000_egypt',      to:'K2500_pyramids', type:'time' },
+    { from:'K1200_collapse',   to:'AXIAL_age', type:'time' },
+    { from:'CHN_qin',          to:'SILK_road', type:'time' },
+    { from:'ROM_crisis',       to:'BYZANTINE', type:'time' },
+    { from:'ISLAM_rise',       to:'ABBASID_baghdad', type:'time' },
+    { from:'MONGOL_empire',    to:'ZHENG_he', type:'time' },
+    { from:'COLUMBUS_1492',    to:'AGE_exploration', type:'time' },
+    { from:'INDUSTRIAL_rev',   to:'WWI', type:'time' },
+    { from:'WWII',             to:'UN_1945', type:'time' },
+    { from:'INTERNET',         to:'AI_modern', type:'time' },
+
+    // 跨 stage 概念串联（虚线）
+    { from:'K3000_cuneiform',  to:'AXIAL_age', type:'concept', label:'文字' },
+    { from:'K3000_uruk',       to:'TANG_changan', type:'concept', label:'城市' },
+    { from:'K1600_shang',      to:'CHN_qin', type:'concept', label:'中国' },
+    { from:'SILK_road',        to:'MONGOL_empire', type:'concept', label:'贸易' },
+    { from:'IND_buddha',       to:'ISLAM_rise', type:'concept', label:'信仰' },
+    { from:'CHRISTIAN_early',  to:'MEDIEVAL_europe', type:'concept', label:'信仰' },
+    { from:'ZHENG_he',         to:'COLUMBUS_1492', type:'concept', label:'航海' },
+    { from:'SCIENTIFIC_rev',   to:'INDUSTRIAL_rev', type:'concept', label:'科技' },
+    { from:'GRC_city_states',  to:'FRENCH_revolution', type:'concept', label:'民主' },
+    { from:'INDUSTRIAL_rev',   to:'GLOBALIZATION', type:'concept', label:'工业' },
+    { from:'STEAM_engine',     to:'AI_modern', type:'concept', label:'技术革命' },
   ],
 };

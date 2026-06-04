@@ -3103,3 +3103,54 @@ html, body {
   .chat-suggestions-large .suggestion-chip { font-size: 13px !important; padding: 7px 14px !important; }
   .chat-input-row-large textarea { font-size: 14px !important; min-height: 60px; }
 }
+
+/* ════════════════════════════════════════════════════
+   7-STAGE 主网络新样式
+════════════════════════════════════════════════════ */
+
+/* 即将上线节点 — 淡色虚线边框 + 不可点击感 */
+.mn-node.coming-soon {
+  transition: opacity .25s;
+}
+.mn-node.coming-soon:hover circle:first-child {
+  filter: drop-shadow(0 0 8px rgba(160,100,30,.4));
+  opacity: 0.8;
+}
+.mn-node.coming-soon:hover {
+  opacity: 0.85 !important;
+}
+
+/* 已链接到课程的节点 — 有明显的进入指示 */
+.mn-node.linked circle:first-child {
+  transition: r .2s, stroke-width .2s, filter .2s;
+}
+.mn-node.linked:hover circle:first-child {
+  filter: drop-shadow(0 5px 16px rgba(184,48,24,.5));
+}
+
+/* Stage 标签可点击 */
+.mn-stage-label rect {
+  transition: fill-opacity .2s, stroke-width .2s;
+}
+.mn-stage-label:hover rect {
+  fill-opacity: 0.95;
+  stroke-width: 2.5;
+}
+
+/* 主页提示信息 */
+.main-network-container {
+  max-width: 1600px;
+}
+.mn-svg {
+  min-height: 700px;
+}
+
+/* 图例区添加新说明 */
+.mn-legend > span.mn-leg-coming {
+  color: var(--ink3);
+  font-style: italic;
+}
+
+@media (max-width: 1100px) {
+  .mn-svg { min-height: 560px; }
+}

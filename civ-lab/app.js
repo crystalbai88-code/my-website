@@ -150,49 +150,63 @@ function renderMainKnowledgeNetwork() {
   if (!container) return;
 
   const N = MAIN_NETWORK;
-  const W = 1420, H = 580;
+  const W = 1500, H = 980;
 
-  // 主题分层背景条带
-  const themeBands = N.themes.map(t => `
-    <rect x="40" y="${t.y - 50}" width="${W - 80}" height="100"
-          fill="${t.color}" fill-opacity="0.04"/>
-    <text x="60" y="${t.y - 28}" font-size="11" font-weight="700"
-          fill="${t.color}" opacity="0.55" font-family="STSong,serif"
-          letter-spacing="2">${t.icon} ${t.label}</text>
+  // ── 7 个 STAGE 横向带（背景 + 标签）──
+  const stageBands = N.stages.map(s => `
+    <rect x="40" y="${s.y - 55}" width="${W - 80}" height="110"
+          fill="${s.color}" fill-opacity="${s.status === 'coming_soon' ? 0.02 : 0.05}"/>
+    <line x1="40" y1="${s.y + 55}" x2="${W - 40}" y2="${s.y + 55}"
+          stroke="${s.color}" stroke-opacity="0.18" stroke-width="1" stroke-dasharray="4,4"/>
+    <g class="mn-stage-label" data-stage="${s.id}" style="cursor:pointer">
+      <rect x="50" y="${s.y - 36}" width="220" height="72" rx="10"
+            fill="white" fill-opacity="0.7" stroke="${s.color}" stroke-width="1.5"
+            stroke-opacity="${s.status === 'coming_soon' ? 0.35 : 0.6}"/>
+      <text x="62" y="${s.y - 14}" font-size="13" font-weight="800"
+            fill="${s.color}" font-family="STSong,serif">
+        ${s.icon} ${s.title}
+        ${s.status === 'coming_soon' ? '<tspan font-size="9" fill="#9c8a70" font-weight="600"> · 即将上线</tspan>' : ''}
+      </text>
+      <text x="62" y="${s.y + 4}" font-size="10" fill="#7a4830" font-family="STSong,serif">
+        ${s.time_range}
+      </text>
+      <text x="62" y="${s.y + 22}" font-size="10" fill="#5c4e38" opacity="0.78"
+            font-family="STSong,serif" font-style="italic">
+        ${s.core_question}
+      </text>
+    </g>
   `).join('');
 
-  // X 轴时间刻度
+  // ── X 轴时间刻度（底部）──
   const timeAxis = N.time_axis.map(t => `
-    <line x1="${t.x}" y1="${H - 38}" x2="${t.x}" y2="${H - 30}"
-          stroke="rgba(160,100,30,.3)" stroke-width="1"/>
-    <text x="${t.x}" y="${H - 14}" text-anchor="middle"
-          font-size="10" fill="#7a4830" font-family="STSong,serif">${t.label}</text>
+    <line x1="${t.x}" y1="${H - 45}" x2="${t.x}" y2="${H - 36}"
+          stroke="rgba(160,100,30,.35)" stroke-width="1"/>
+    <text x="${t.x}" y="${H - 20}" text-anchor="middle"
+          font-size="11" font-weight="600" fill="#7a4830" font-family="STSong,serif">${t.label}</text>
   `).join('');
-  const axisLine = `<line x1="40" y1="${H - 38}" x2="${W - 40}" y2="${H - 38}"
-    stroke="rgba(160,100,30,.4)" stroke-width="1.2"/>`;
+  const axisLine = `<line x1="40" y1="${H - 45}" x2="${W - 40}" y2="${H - 45}"
+    stroke="rgba(160,100,30,.4)" stroke-width="1.5"/>`;
 
-  // 节点查找表
+  // ── 节点查找表（按 id）──
   const byId = {};
   N.nodes.forEach(n => {
-    const theme = N.themes.find(t => t.id === n.theme);
-    byId[n.id] = { ...n, y: theme.y, color: theme.color };
+    const stage = N.stages.find(s => s.id === n.stage);
+    if (!stage) return;
+    byId[n.id] = { ...n, y: stage.y, stageColor: stage.color, stageStatus: stage.status };
   });
 
-  // 边 (按 type 不同样式)
+  // ── 边样式 ──
   const edgeStyle = (t) => {
-    if (t === 'time') return { stroke: '#c86820', width: 2,   dash: '0',   op: 0.6 };
-    if (t === 'capstone') return { stroke: '#8a5a90', width: 1.2, dash: '2,5', op: 0.35 };
-    return { stroke: '#8a5a90', width: 1.5, dash: '5,4', op: 0.55 };
+    if (t === 'time')    return { stroke:'#c86820', width:2,   dash:'0',   op:0.55 };
+    if (t === 'concept') return { stroke:'#8a5a90', width:1.5, dash:'5,4', op:0.45 };
+    return { stroke:'#a07840', width:1.2, dash:'3,5', op:0.32 };
   };
   const edges = N.edges.map(e => {
     const a = byId[e.from], b = byId[e.to];
     if (!a || !b) return '';
     const s = edgeStyle(e.type);
-    // 弧线连接，更优雅
-    const dx = b.x - a.x;
     const mid_x = (a.x + b.x) / 2;
-    const mid_y = Math.min(a.y, b.y) - Math.abs(dx) * 0.08 - 10;
-    // 同主题（同y）画直线，跨主题画弧
+    const mid_y = Math.min(a.y, b.y) - Math.abs(b.x - a.x) * 0.06 - 8;
     const path = (a.y === b.y)
       ? `M ${a.x},${a.y} L ${b.x},${b.y}`
       : `M ${a.x},${a.y} Q ${mid_x},${mid_y} ${b.x},${b.y}`;
@@ -201,44 +215,56 @@ function renderMainKnowledgeNetwork() {
       stroke-opacity="${s.op}" stroke-dasharray="${s.dash}" stroke-linecap="round"/>`;
   }).join('');
 
-  // 节点
+  // ── 节点渲染 ──
   const completed = state.completed || [];
   const nodes = N.nodes.map(n => {
     const node = byId[n.id];
-    const done = completed.includes(n.id);
+    if (!node) return '';
+    const isComingSoon = n.status === 'coming_soon' || node.stageStatus === 'coming_soon';
+    const isLinked = !!n.linked_lesson;
+    const done = isLinked && completed.includes(n.linked_lesson);
+    const opacity = isComingSoon ? 0.55 : 1;
+    const cls = [
+      'mn-node',
+      isComingSoon ? 'coming-soon' : '',
+      isLinked ? 'linked' : '',
+      done ? 'done' : '',
+    ].filter(Boolean).join(' ');
     return `
-      <g class="mn-node ${done ? 'done' : ''}" data-id="${n.id}" style="cursor:pointer">
-        <circle cx="${node.x}" cy="${node.y}" r="32"
-                fill="white" stroke="${node.color}" stroke-width="${done ? 3 : 2.5}"
-                filter="drop-shadow(0 3px 8px rgba(60,30,5,.22))"/>
-        <circle cx="${node.x}" cy="${node.y}" r="28"
-                fill="${node.color}" fill-opacity="${done ? 0.2 : 0.08}"/>
-        <text x="${node.x}" y="${node.y - 4}" text-anchor="middle"
+      <g class="${cls}" data-id="${n.id}" data-linked="${n.linked_lesson || ''}"
+         style="cursor:${isComingSoon ? 'help' : 'pointer'};opacity:${opacity}">
+        <circle cx="${node.x}" cy="${node.y}" r="22"
+                fill="white" stroke="${node.stageColor}" stroke-width="${done ? 3 : 2}"
+                stroke-dasharray="${isComingSoon ? '3,3' : '0'}"
+                filter="drop-shadow(0 2px 6px rgba(60,30,5,.2))"/>
+        <circle cx="${node.x}" cy="${node.y}" r="19"
+                fill="${node.stageColor}" fill-opacity="${done ? 0.22 : (isLinked ? 0.1 : 0.06)}"/>
+        <text x="${node.x}" y="${node.y + 5}" text-anchor="middle"
               font-size="20" pointer-events="none">${n.emoji}</text>
-        <text x="${node.x}" y="${node.y + 14}" text-anchor="middle"
-              font-size="9" fill="${node.color}" font-weight="700"
-              font-family="STSong,serif" pointer-events="none">${n.id}</text>
-        ${done ? `<circle cx="${node.x + 22}" cy="${node.y - 22}" r="9" fill="#4a8030"/>
-                  <text x="${node.x + 22}" y="${node.y - 18}" text-anchor="middle"
-                        font-size="11" fill="white" pointer-events="none">✓</text>` : ''}
-        <!-- 节点下方标题 -->
-        <text x="${node.x}" y="${node.y + 50}" text-anchor="middle"
+        ${done ? `<circle cx="${node.x + 16}" cy="${node.y - 16}" r="7" fill="#4a8030"/>
+                  <text x="${node.x + 16}" y="${node.y - 13}" text-anchor="middle"
+                        font-size="9" fill="white" pointer-events="none">✓</text>` : ''}
+        ${isLinked && !done ? `<circle cx="${node.x + 16}" cy="${node.y - 16}" r="6" fill="${node.stageColor}"/>
+                  <text x="${node.x + 16}" y="${node.y - 13}" text-anchor="middle"
+                        font-size="9" fill="white" font-weight="700" pointer-events="none">▸</text>` : ''}
+        <!-- 标签 -->
+        <text x="${node.x}" y="${node.y + 36}" text-anchor="middle"
               font-size="11" font-weight="700" fill="#2c1a08"
               font-family="STSong,serif" pointer-events="none">${n.label}</text>
-        <text x="${node.x}" y="${node.y + 63}" text-anchor="middle"
+        <text x="${node.x}" y="${node.y + 48}" text-anchor="middle"
               font-size="9" fill="#7a4830" pointer-events="none">${n.time}</text>
       </g>
     `;
   }).join('');
 
-  // 双轴标签
+  // ── 双轴标签 ──
   const axisLabels = `
-    <text x="${W/2}" y="${H-2}" text-anchor="middle" font-size="11"
+    <text x="${W/2}" y="${H-3}" text-anchor="middle" font-size="11"
           fill="#5a3a18" font-weight="700" font-family="STSong,serif" opacity="0.6"
           letter-spacing="3">← 时 间 →</text>
     <text x="22" y="${H/2}" transform="rotate(-90, 22, ${H/2})" text-anchor="middle"
           font-size="11" fill="#5a3a18" font-weight="700" font-family="STSong,serif"
-          opacity="0.6" letter-spacing="3">← 主 题 →</text>`;
+          opacity="0.6" letter-spacing="3">← 7 个 文 明 阶 段 →</text>`;
 
   container.innerHTML = `
     <svg viewBox="0 0 ${W} ${H}" class="mn-svg" preserveAspectRatio="xMidYMid meet">
@@ -248,7 +274,7 @@ function renderMainKnowledgeNetwork() {
         </pattern>
       </defs>
       <rect width="${W}" height="${H}" fill="url(#mn-grid)"/>
-      ${themeBands}
+      ${stageBands}
       ${axisLine}
       ${timeAxis}
       ${axisLabels}
@@ -257,11 +283,20 @@ function renderMainKnowledgeNetwork() {
     </svg>
   `;
 
-  // 节点点击 → 进入对应课程
+  // ── 节点点击：linked → 进入；coming_soon → 提示 ──
   container.querySelectorAll('.mn-node').forEach(g => {
     g.addEventListener('click', () => {
+      const linked = g.getAttribute('data-linked');
       const id = g.getAttribute('data-id');
-      enterLesson(id);
+      if (g.classList.contains('coming-soon')) {
+        alert('⏳ 这个节点正在制作中，敬请期待！\n\nID: ' + id);
+        return;
+      }
+      if (linked) {
+        enterLesson(linked);
+      } else {
+        alert('📚 这个知识点详情正在填充中，敬请期待！\n\n节点：' + id);
+      }
     });
     g.addEventListener('mouseenter', () => {
       g.classList.add('hover');
@@ -270,6 +305,18 @@ function renderMainKnowledgeNetwork() {
     g.addEventListener('mouseleave', () => {
       g.classList.remove('hover');
       highlightRelatedNodes(g.getAttribute('data-id'), false);
+    });
+  });
+
+  // Stage label click → 提示 stage 简介
+  container.querySelectorAll('.mn-stage-label').forEach(g => {
+    g.addEventListener('click', () => {
+      const sid = g.getAttribute('data-stage');
+      const s = MAIN_NETWORK.stages.find(x => x.id === sid);
+      if (!s) return;
+      const nodeCount = MAIN_NETWORK.nodes.filter(n => n.stage === sid).length;
+      const linkedCount = MAIN_NETWORK.nodes.filter(n => n.stage === sid && n.linked_lesson).length;
+      alert(`${s.icon} ${s.title}\n时间范围：${s.time_range}\n核心问题：${s.core_question}\n\n节点数：${nodeCount}（已有详情：${linkedCount}）`);
     });
   });
 }
