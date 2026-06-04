@@ -314,24 +314,19 @@ function renderMainKnowledgeNetwork() {
     if (t === 'concept') return { stroke:'#8a5a90', width:1.8, dash:'6,5', op:0.4 };
     return { stroke:'#a07840', width:1.5, dash:'4,5', op:0.3 };
   };
-  // 只画同 stage 内 time 类型边（清晰水平箭头），跨 stage 概念边在新布局下视觉效果差
-  const edges = N.edges.filter(e => {
+  // 边渲染（树形布局：所有 edges；普通：仅 same-stage time）
+  const edges = (kn.edges || []).map(e => {
     const a = byId[e.from], b = byId[e.to];
-    return a && b && a.y === b.y && e.type === 'time';
-  }).map(e => {
-    const a = byId[e.from], b = byId[e.to];
+    if (!a || !b) return '';
+    if (!isTree && (a.y !== b.y || e.type !== 'time')) return '';
     const s = edgeStyle(e.type);
-    // 同 y → 直线，从 a 节点边缘到 b 节点边缘
-    const dx = b.x - a.x;
-    const dist = Math.abs(dx);
-    if (dist < 60) return ''; // 太近不画
-    const r = 32; // 节点半径
-    const x1 = a.x + r * (dx > 0 ? 1 : -1);
-    const x2 = b.x + r * (dx > 0 ? -1 : 1);
-    return `<line x1="${x1}" y1="${a.y}" x2="${x2}" y2="${a.y}"
-      stroke="${s.stroke}" stroke-width="${s.width}"
-      stroke-opacity="${s.op}" stroke-dasharray="${s.dash}" stroke-linecap="round"
-      marker-end="url(#mn-arrow)"/>`;
+    // 边的可见性：两端节点都已 revealed 才显示
+    const isRevealed = revealed.has(e.from) && revealed.has(e.to);
+    const cls = `kg-edge ${isRevealed ? '' : 'hidden-edge'}`;
+    return `<path class="${cls}"
+      d="M ${a.x},${a.y} L ${b.x},${b.y}"
+      fill="none" stroke="${s.stroke}" stroke-width="${s.width}"
+      stroke-opacity="${s.op}" stroke-dasharray="${s.dash}" stroke-linecap="round"/>`;
   }).join('');
 
   // ── 节点渲染 ──
@@ -1551,7 +1546,8 @@ function renderPreEra(p) {
     // init welcome
     if (!preAiHistory[p.id]) {
       preAiHistory[p.id] = [];
-      addPreAIMsg(body.querySelector('#preAIMsgs'), 'ai', `你好！我是史前探索助手 🌍<br>我了解<strong>${p.time}·${p.title}</strong>的所有内容。<br>试试问我：<em>${p.ai.suggested_questions[0]}</em>`);
+      const userName = (getUserProfile()||{}).nickname || '朋友';
+      addPreAIMsg(body.querySelector('#preAIMsgs'), 'ai', `${userName}你好！我是史前探索助手 🌍<br>我会从维基百科帮${userName}查阅关于<strong>${p.time}·${p.title}</strong>的内容。<br>${userName}可以问我：<em>${p.ai.suggested_questions[0]}</em>`);
     } else {
       const msgsEl = body.querySelector('#preAIMsgs');
       preAiHistory[p.id].forEach(m => addPreAIMsg(msgsEl, m.role, m.html));
@@ -1654,6 +1650,15 @@ function renderGraphSvg(p, kn) {
   const isTree = kn.layout === 'tree';
   const viewBox = kn.viewBox || (isTree ? '0 0 900 1100' : '0 0 800 720');
 
+  // 🆕 渐进式显现：初始只显示 hub，点击后逐个揭开邻居
+  const revealKey = 'civ_revealed_' + p.id;
+  if (!window._revealedNodes) window._revealedNodes = {};
+  if (!window._revealedNodes[p.id]) {
+    try { window._revealedNodes[p.id] = new Set(JSON.parse(localStorage.getItem(revealKey) || '["hub"]')); }
+    catch { window._revealedNodes[p.id] = new Set(['hub']); }
+  }
+  const revealed = window._revealedNodes[p.id];
+
   const edgeStyle = (t) => {
     if (t === 'time')    return { c:'#c84820', w:3,   d:'0',   o:0.7 };
     if (t === 'place')   return { c:'#3a7868', w:2,   d:'6,5', o:0.55 };
@@ -1699,23 +1704,74 @@ function renderGraphSvg(p, kn) {
               fill="#7a4830" opacity=".75" pointer-events="none">${n.sub}</text>
       </g>`;
     }
-    // 普通节点 — 节点圆更大、字号更大
+    // 普通节点 — 字号更大；根据 reveal 状态决定可见性
     const isFeature = n.special != null;
-    const r = isFeature ? 60 : 66;
-    const cls = isFeature ? 'kg-node feature' : 'kg-node concept';
+    const r = isFeature ? 64 : 72;       // 半径再 +10%
+    const isRevealed = revealed.has(n.id);
+    // 判断这个节点是否「下一个可揭开的」（连接到已揭开节点的边）
+    const isNext = !isRevealed && (kn.edges || []).some(e =>
+      (e.from === n.id && revealed.has(e.to)) ||
+      (e.to === n.id && revealed.has(e.from))
+    );
+    const cls = [
+      isFeature ? 'kg-node feature' : 'kg-node concept',
+      !isRevealed && !isNext ? 'hidden-node' : '',
+      isNext ? 'has-next revealing' : '',
+    ].filter(Boolean).join(' ');
     return `<g class="${cls}" data-nid="${n.id}" style="cursor:pointer">
       <circle cx="${n.x}" cy="${n.y}" r="${r}"
-              fill="white" stroke="${n.color}" stroke-width="3.5"
-              filter="drop-shadow(0 4px 12px rgba(60,30,5,.28))"/>
+              fill="white" stroke="${n.color}" stroke-width="${isNext ? 5 : 4}"
+              filter="drop-shadow(0 5px 14px rgba(60,30,5,.3))"/>
       <circle cx="${n.x}" cy="${n.y}" r="${r-4}"
-              fill="${n.color}" fill-opacity="0.13"/>
-      <text x="${n.x}" y="${n.y-14}" text-anchor="middle" font-size="34" pointer-events="none">${n.icon}</text>
-      <text x="${n.x}" y="${n.y+14}" text-anchor="middle" font-size="17" font-weight="700"
+              fill="${n.color}" fill-opacity="${isNext ? 0.2 : 0.13}"/>
+      <text x="${n.x}" y="${n.y-16}" text-anchor="middle" font-size="40" pointer-events="none">${n.icon}</text>
+      <text x="${n.x}" y="${n.y+16}" text-anchor="middle" font-size="20" font-weight="700"
             fill="#2c1a08" font-family="STSong,serif" pointer-events="none">${n.label}</text>
-      <text x="${n.x}" y="${n.y+34}" text-anchor="middle" font-size="13"
+      <text x="${n.x}" y="${n.y+38}" text-anchor="middle" font-size="15"
             fill="#7a4830" opacity=".85" pointer-events="none">${n.sub || ''}</text>
+      ${isNext ? `<text x="${n.x}" y="${n.y - r - 18}" text-anchor="middle" font-size="14" class="kg-next-hint" pointer-events="none">👆 点我继续</text>` : ''}
     </g>`;
   }).join('');
+
+  // 树形布局时：在背景画一棵大树（trunk + leaves）
+  const treeSilhouette = isTree ? `
+    <defs>
+      <linearGradient id="kg-trunk-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#8a5530" stop-opacity="0.6"/>
+        <stop offset="100%" stop-color="#5a3818" stop-opacity="0.4"/>
+      </linearGradient>
+      <radialGradient id="kg-leaves-grad" cx="50%" cy="50%">
+        <stop offset="0%" stop-color="#6a8c30" stop-opacity="0.35"/>
+        <stop offset="100%" stop-color="#3a5a18" stop-opacity="0.05"/>
+      </radialGradient>
+    </defs>
+    <!-- 树冠（淡绿色椭圆） -->
+    <ellipse cx="500" cy="100" rx="240" ry="55" class="kg-tree-leaves"/>
+    <!-- 主树干（自上而下波浪曲线） -->
+    <path d="M 480,80 Q 470,300 478,500 Q 490,700 482,900 Q 480,1000 470,1100"
+          stroke="url(#kg-trunk-grad)" stroke-width="32"
+          fill="none" stroke-linecap="round"/>
+    <!-- 分支（伸向右侧 content 节点）-->
+    <path d="M 478,200 Q 600,210 750,250"
+          stroke="url(#kg-trunk-grad)" stroke-width="8"
+          fill="none" stroke-linecap="round" opacity="0.5"/>
+    <path d="M 480,490 Q 620,500 750,580"
+          stroke="url(#kg-trunk-grad)" stroke-width="8"
+          fill="none" stroke-linecap="round" opacity="0.5"/>
+    <path d="M 480,750 Q 620,750 750,780"
+          stroke="url(#kg-trunk-grad)" stroke-width="8"
+          fill="none" stroke-linecap="round" opacity="0.5"/>
+    <path d="M 470,920 Q 600,930 750,970"
+          stroke="url(#kg-trunk-grad)" stroke-width="8"
+          fill="none" stroke-linecap="round" opacity="0.5"/>
+    <!-- 底部根（分到 africa / coop）-->
+    <path d="M 470,1050 Q 380,1090 280,1170"
+          stroke="url(#kg-trunk-grad)" stroke-width="10"
+          fill="none" stroke-linecap="round" opacity="0.5"/>
+    <path d="M 490,1050 Q 600,1090 700,1170"
+          stroke="url(#kg-trunk-grad)" stroke-width="10"
+          fill="none" stroke-linecap="round" opacity="0.5"/>
+  ` : '';
 
   return `<svg class="kg-svg ${isTree ? 'kg-tree' : ''}" viewBox="${viewBox}" preserveAspectRatio="xMidYMid meet">
     <defs>
@@ -1724,6 +1780,7 @@ function renderGraphSvg(p, kn) {
         <stop offset="100%" stop-color="#f5e2c0"/>
       </radialGradient>
     </defs>
+    ${treeSilhouette}
     ${edges}${nodes}
   </svg>
   <div class="kg-legend">
@@ -1731,7 +1788,18 @@ function renderGraphSvg(p, kn) {
     <span><i class="mn-leg-line dashed" style="background:#3a7868"></i>地点关联</span>
     <span><i class="mn-leg-line dashed" style="background:#8a5a90"></i>概念关联</span>
     <span><i class="mn-leg-line dashed" style="background:#a07840"></i>内容分支</span>
+    <button class="kg-reset-btn" onclick="resetGraphReveal('${p.id}')">🔄 重新探索</button>
   </div>`;
+}
+
+// 重置某个 PH 的揭示进度
+function resetGraphReveal(periodId) {
+  if (!confirm('确定要重置探索进度，从头开始吗？')) return;
+  localStorage.removeItem('civ_revealed_' + periodId);
+  if (window._revealedNodes) delete window._revealedNodes[periodId];
+  // 重新进入这个 era
+  const p = PREHISTORIC.periods.find(x => x.id === periodId);
+  if (p) enterPreEra(periodId);
 }
 
 // 中心 hub 的详情卡（默认显示）
@@ -1830,6 +1898,31 @@ function bindGraphPage(p) {
   const kn = p.knowledge_network;
 
   function focusNode(nodeId) {
+    // 🌳 渐进显现：把这个节点加入 revealed，下一次渲染时它的邻居自动变成 "下一个可点"
+    if (!window._revealedNodes) window._revealedNodes = {};
+    const set = window._revealedNodes[p.id] || new Set(['hub']);
+    const wasNew = !set.has(nodeId);
+    set.add(nodeId);
+    window._revealedNodes[p.id] = set;
+    localStorage.setItem('civ_revealed_' + p.id, JSON.stringify([...set]));
+
+    // 如果点的是「新揭开」的节点，重渲染网络以显示新邻居
+    if (wasNew) {
+      const graphPane = document.getElementById('kgGraphPane');
+      if (graphPane) {
+        // 保留 play area，只替换 svg + legend
+        const playHtml = graphPane.querySelector('.kg-play-area')?.outerHTML || '';
+        graphPane.innerHTML = playHtml + renderGraphSvg(p, kn);
+        // 重新绑定 SVG 节点点击
+        document.querySelectorAll('.kg-node').forEach(g => {
+          g.addEventListener('click', () => focusNode(g.getAttribute('data-nid')));
+        });
+        document.querySelectorAll('.kg-play-card').forEach(btn => {
+          btn.addEventListener('click', () => focusNode(btn.getAttribute('data-nid')));
+        });
+      }
+    }
+
     // 1. 高亮 SVG 中的节点
     document.querySelectorAll('.kg-node').forEach(g => {
       g.classList.toggle('active', g.getAttribute('data-nid') === nodeId);
@@ -1871,7 +1964,8 @@ function bindGraphPage(p) {
         });
         if (!preAiHistory[p.id]) {
           preAiHistory[p.id] = [];
-          addPreAIMsg(pane.querySelector('#preAIMsgs'), 'ai', `你好！问我任何关于 <strong>${p.title}</strong> 的问题。`);
+          const userName2 = (getUserProfile()||{}).nickname || '朋友';
+          addPreAIMsg(pane.querySelector('#preAIMsgs'), 'ai', `${userName2}你好！${userName2}可以问我任何关于 <strong>${p.title}</strong> 的问题，我会帮${userName2}查阅维基百科。`);
         } else {
           const msgsEl = pane.querySelector('#preAIMsgs');
           preAiHistory[p.id].forEach(m => addPreAIMsg(msgsEl, m.role, m.html));
@@ -1891,6 +1985,11 @@ function bindGraphPage(p) {
   // 互动·娱乐节点点击
   document.querySelectorAll('.kg-play-card').forEach(btn => {
     btn.addEventListener('click', () => focusNode(btn.getAttribute('data-nid')));
+  });
+
+  // 🆕 初始绑定详情卡里的「相关节点」chip（之前缺失，导致初次点击无效）
+  document.querySelectorAll('#kgDetailPane .kg-related-chip').forEach(btn => {
+    btn.onclick = () => focusNode(btn.getAttribute('data-goto'));
   });
 
   // 暴露给全局，供详情卡内的相关 chip 调用
@@ -2592,6 +2691,7 @@ async function sendPreAIMsg(p, inputEl, msgsEl) {
   preAiHistory[p.id] = preAiHistory[p.id] || [];
   preAiHistory[p.id].push({ role: 'user', html: text });
   logHistory('chat', `史前AI(${p.time})：${text}`);
+  trackUserQuestion(text, p.id + ' · ' + p.title);  // 🆕 学习画像追踪
 
   const thinkId = 'prethink-' + Date.now();
   addPreAIMsg(msgsEl, 'ai', '<em>正在思考…</em>', thinkId);
@@ -2720,15 +2820,20 @@ async function callPreClaudeAPI(msg, p) {
     ? wikiResults.map(r => `《${r.title}》(维基百科)\n${r.extract}\n来源：${r.url}`).join('\n\n---\n\n')
     : '（暂未找到相关维基百科词条）';
 
-  const systemPrompt = `你是 AI 世界文明实验室的史前历史助手，面向 10-12 岁中国学生。
+  const userProfile = getUserProfile() || {};
+  const userName = userProfile.nickname || '朋友';
+  const userAge = userProfile.age || 10;
+
+  const systemPrompt = `我是 AI 世界文明实验室的史前历史助手，正在和 ${userAge} 岁的 ${userName} 对话。
+
+# 我的回答方式
+- 我用第一人称「我」回答，对方用「${userName}」或「你」称呼
+- 我用 ${userAge} 岁能理解的中文（不用专业术语，多用比喻）
+- 我的回答控制在 100-200 字，简洁不啰嗦
+- 我每次回答末尾必须附上维基百科链接（带 📖 emoji）
 
 # 知识来源规则
-你的回答必须严格基于下方"权威参考资料"（维基百科）。如果资料中没有的内容，必须明确说"维基百科上未提及，需要查阅其他来源"，不要编造。
-
-# 回答风格
-- 用 10-12 岁能理解的中文
-- 控制在 100-200 字
-- 末尾必须附上维基百科链接（带 📖 emoji）
+我的回答必须严格基于下方"权威参考资料"（维基百科）。如果资料中没有的内容，我必须明确说"维基百科上未提及，需要查阅其他来源"，绝不编造。
 
 # 权威参考资料
 ${wikiContext}
@@ -2792,5 +2897,154 @@ async function getPreKBResponse(q, p) {
           <p class="kb-note">💡 想要 AI 用儿童化语言解读？请在设置中添加 Claude API Key。</p>`;
 }
 
+// ══════════════════════════════════════════════════════
+// 👤 用户档案 · 学习画像追踪
+// ══════════════════════════════════════════════════════
+
+function getUserProfile() {
+  try { return JSON.parse(localStorage.getItem('civ_user_profile') || 'null'); }
+  catch { return null; }
+}
+function saveUserProfile(p) { localStorage.setItem('civ_user_profile', JSON.stringify(p)); }
+
+function getUserActivity() {
+  try { return JSON.parse(localStorage.getItem('civ_user_activity') || '{}'); }
+  catch { return {}; }
+}
+function saveUserActivity(a) { localStorage.setItem('civ_user_activity', JSON.stringify(a)); }
+
+function trackUserQuestion(question, era) {
+  const a = getUserActivity();
+  if (!a.questions) a.questions = [];
+  a.questions.unshift({
+    q: question.slice(0, 100),
+    era: era || '',
+    time: Date.now(),
+  });
+  a.questions = a.questions.slice(0, 200);
+  // 统计关键词出现频率（粗略反映兴趣倾向）
+  if (!a.keywords) a.keywords = {};
+  const themes = {
+    人物: ['谁','是谁','Lucy','孔子','佛陀','秦','罗马人','法老'],
+    战争: ['战','打','征服','武器','军队','帝国'],
+    文化: ['艺术','画','音乐','宗教','信仰','哲学','思想'],
+    科技: ['工具','发明','技术','武器','船','农具'],
+    生活: ['吃','住','穿','日常','一天','生活','家'],
+    探索: ['迁徙','发现','航海','旅行','远方','地图'],
+  };
+  Object.entries(themes).forEach(([k, words]) => {
+    if (words.some(w => question.includes(w))) {
+      a.keywords[k] = (a.keywords[k] || 0) + 1;
+    }
+  });
+  saveUserActivity(a);
+}
+
+function bindRegisterForm() {
+  const form = document.getElementById('registerForm');
+  if (!form) return;
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const interests = [...form.querySelectorAll('[name="interest"]:checked')].map(i => i.value);
+    const profile = {
+      nickname: fd.get('nickname').trim(),
+      age: parseInt(fd.get('age')) || 10,
+      gender: fd.get('gender') || 'other',
+      grade: fd.get('grade') || '',
+      interests,
+      registered_at: Date.now(),
+    };
+    saveUserProfile(profile);
+    document.getElementById('registerOverlay').classList.add('hidden');
+    renderUserBadge();
+  });
+}
+
+function renderUserBadge() {
+  const p = getUserProfile();
+  const badge = document.getElementById('userBadge');
+  if (!p) { badge.classList.add('hidden'); return; }
+  const avatar = p.gender === 'boy' ? '👦' : (p.gender === 'girl' ? '👧' : '🧑');
+  document.getElementById('userAvatar').textContent = avatar;
+  document.getElementById('userNickname').textContent = p.nickname;
+  badge.classList.remove('hidden');
+}
+
+function showUserProfile() {
+  const p = getUserProfile();
+  const a = getUserActivity();
+  if (!p) return;
+  const totalQ = (a.questions || []).length;
+  const kws = a.keywords || {};
+  const sorted = Object.entries(kws).sort((x,y) => y[1] - x[1]);
+  const top = sorted[0];
+  const learningStyle = top ? (
+    top[0] === '人物' ? '📖 你对历史人物特别感兴趣 — 喜欢通过故事和人物理解时代' :
+    top[0] === '战争' ? '⚔️ 你关注战争与帝国 — 善于从冲突中看清历史动力' :
+    top[0] === '文化' ? '🎨 你偏爱艺术与文化 — 喜欢通过创造看人类精神' :
+    top[0] === '科技' ? '🔬 你着迷于科技与发明 — 喜欢看人类如何解决问题' :
+    top[0] === '生活' ? '🏘 你关心普通人的日常 — 从生活细节理解大历史' :
+    top[0] === '探索' ? '🗺 你喜欢探险与发现 — 跟着先人脚步走遍世界' :
+    '🌟 你的学习方式独一无二'
+  ) : '🌱 多问几个问题，AI 就能为你画出学习画像';
+
+  const top3Recent = (a.questions || []).slice(0, 5);
+  const body = document.getElementById('profileBody');
+  body.innerHTML = `
+    <div class="profile-section">
+      <h3>👤 基本信息</h3>
+      <div class="profile-info-row">
+        <span><strong>昵称：</strong>${p.nickname}</span>
+        <span><strong>年龄：</strong>${p.age} 岁</span>
+        ${p.grade ? `<span><strong>年级：</strong>${p.grade}</span>` : ''}
+      </div>
+      ${p.interests.length ? `<div class="profile-tags">${p.interests.map(i => `<span class="profile-tag">${i}</span>`).join('')}</div>` : ''}
+    </div>
+
+    <div class="profile-section">
+      <h3>🎯 我的学习方式</h3>
+      <div class="profile-style-card">${learningStyle}</div>
+      ${sorted.length ? `
+      <div class="profile-stats-grid">
+        ${sorted.map(([k, n]) => `
+          <div class="profile-stat">
+            <div class="profile-stat-key">${k}</div>
+            <div class="profile-stat-bar"><div class="profile-stat-fill" style="width:${Math.min(100, n*20)}%"></div></div>
+            <div class="profile-stat-num">${n} 次</div>
+          </div>`).join('')}
+      </div>` : '<p class="profile-empty">还没有提问记录哦，多和 AI 聊聊就能看到画像啦。</p>'}
+    </div>
+
+    <div class="profile-section">
+      <h3>💬 最近问的问题（${totalQ} 个）</h3>
+      ${top3Recent.length ? `
+        <ul class="profile-q-list">
+          ${top3Recent.map(q => `<li><span class="profile-q-time">${new Date(q.time).toLocaleString('zh-CN', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}</span> ${q.q}</li>`).join('')}
+        </ul>` : '<p class="profile-empty">还没有问过问题。打开任意课程，点 AI 互动开始提问吧。</p>'}
+    </div>
+
+    <div class="profile-section">
+      <button class="profile-clear" onclick="if(confirm('确定要清空我的所有数据并重新注册吗？')){localStorage.removeItem('civ_user_profile');localStorage.removeItem('civ_user_activity');location.reload();}">🗑 清空数据，重新注册</button>
+    </div>
+  `;
+  document.getElementById('profileOverlay').classList.remove('hidden');
+}
+
+function hideUserProfile() {
+  document.getElementById('profileOverlay').classList.add('hidden');
+}
+
+function checkRegistration() {
+  const p = getUserProfile();
+  if (!p) {
+    document.getElementById('registerOverlay').classList.remove('hidden');
+  } else {
+    renderUserBadge();
+  }
+}
+
 // ── BOOT ──────────────────────────────────────────
 init();
+bindRegisterForm();
+checkRegistration();
