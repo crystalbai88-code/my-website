@@ -1875,15 +1875,8 @@ function renderImageOverlayMode(p) {
       <span class="img-hotspot-label">${h.icon} ${h.label}</span>
     </button>`).join('');
 
-  // 按时间顺序的连接线（SVG 上）
-  const connections = hotspots.length > 1
-    ? hotspots.slice(0, -1).map((h, i) => {
-        const next = hotspots[i + 1];
-        return `<line x1="${h.pos_x}%" y1="${h.pos_y}%" x2="${next.pos_x}%" y2="${next.pos_y}%"
-          stroke="#c84820" stroke-width="2" stroke-dasharray="5,5" stroke-opacity="0.5"
-          stroke-linecap="round"/>`;
-      }).join('')
-    : '';
+  // 连接线已移除（看起来太杂乱）
+  const connections = '';
 
   const body = $('#preEraBody');
   body.innerHTML = `

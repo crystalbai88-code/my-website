@@ -5249,27 +5249,50 @@ html { scroll-behavior: smooth; }
   border-radius: 50%;
 }
 
-/* 用户的角色头像 (会"走"到当前学习的 hotspot) — 古风手绘男孩/女孩 */
+/* 用户的角色头像 (会"走"到当前学习的 hotspot) — 抠图古风手绘男孩/女孩 */
 .user-avatar-walker {
   position: absolute;
-  width: 70px; height: 90px;
+  width: 78px; height: 100px;
   transform: translate(-50%, -100%);
   z-index: 4;
   cursor: pointer;
   transition: left 1.5s cubic-bezier(.34,1.2,.5,1), top 1.5s cubic-bezier(.34,1.2,.5,1);
   display: flex; align-items: flex-end; justify-content: center;
-  filter: drop-shadow(0 6px 8px rgba(60,30,5,.4));
+  /* 3D 立体效果：地面阴影 */
+}
+/* 脚下的椭圆阴影（地面投影）— 让人物显得有立体感 */
+.user-avatar-walker::after {
+  content: '';
+  position: absolute;
+  bottom: -4px; left: 50%;
+  width: 50px; height: 10px;
+  background: radial-gradient(ellipse at center,
+    rgba(60,30,5,.45) 0%,
+    rgba(60,30,5,.25) 50%,
+    rgba(60,30,5,0) 100%);
+  transform: translateX(-50%);
+  z-index: -1;
+  animation: shadowBob 1.8s ease-in-out infinite;
+}
+@keyframes shadowBob {
+  0%, 100% { transform: translateX(-50%) scale(1); opacity: .8; }
+  50%      { transform: translateX(-50%) scale(.7); opacity: .5; }
 }
 .walker-emoji {
   /* 用背景图代替 emoji */
   display: block;
-  width: 70px; height: 90px;
+  width: 78px; height: 100px;
   background-image: url('images/avatar-boy.png');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center bottom;
   animation: walkerBob 1.8s ease-in-out infinite;
   font-size: 0; /* 隐藏旧 emoji 文字 */
+  /* 多层阴影做出 3D 浮起来的效果 */
+  filter:
+    drop-shadow(0 1px 0 rgba(0,0,0,.15))
+    drop-shadow(0 3px 4px rgba(60,30,5,.35))
+    drop-shadow(0 8px 12px rgba(60,30,5,.25));
 }
 .user-avatar-walker[data-gender="girl"] .walker-emoji {
   background-image: url('images/avatar-girl.png');
