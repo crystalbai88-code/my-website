@@ -5210,3 +5210,22 @@ html { scroll-behavior: smooth; }
   flex: 1;
   min-width: 0;
 }
+
+/* 全屏 modal 的返回按钮 */
+.fs-back-btn {
+  background: white;
+  color: #7a5530;
+  border: 1.5px solid rgba(160,100,30,.4);
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+  white-space: nowrap;
+}
+.fs-back-btn:hover {
+  background: #f5e8c8;
+  border-color: #c84820;
+  color: #c84820;
+  transform: translateY(-1px);
+}

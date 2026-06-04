@@ -2262,13 +2262,19 @@ function showFullscreenContent({ icon, title, subtitle, html, sidebarHtml, stepK
     modal.className = 'fullscreen-content-modal hidden';
     document.body.appendChild(modal);
   }
-  // 自动推进：根据当前 stepKey 推算下一步
+  // 自动推进 + 返回逻辑
   const nextMap = { map: 'story', story: 'scenario', scenario: 'next', hub: 'map', ai: 'next', evolution_map: 'story' };
+  const prevMap = { map: 'timeline', story: 'map', scenario: 'story', evolution_map: 'timeline' };
+  const stepLabels = { timeline: '🌳 时间轴', map: '🗺 地图', story: '📖 故事', scenario: '🎮 时光机', next: '→ 下一课' };
   const nextStep = stepKey ? nextMap[stepKey] : null;
-  const nextLabels = { map: '🗺 地图', story: '📖 故事', scenario: '🎮 时光机', next: '→ 下一课' };
+  const prevStep = stepKey ? prevMap[stepKey] : null;
+
+  const backBtn = prevStep
+    ? `<button class="fs-back-btn" onclick="goBackFromStep('${prevStep}')">← 返回 ${stepLabels[prevStep]}</button>`
+    : '';
   const nextBtn = nextStep ? (nextStep === 'next'
-    ? `<button class="fs-next-btn fs-next-lesson" onclick="goToNextLesson()">${nextLabels.next}</button>`
-    : `<button class="fs-next-btn" onclick="advanceToNextStep('${nextStep}')">继续 → ${nextLabels[nextStep]}</button>`)
+    ? `<button class="fs-next-btn fs-next-lesson" onclick="goToNextLesson()">${stepLabels.next}</button>`
+    : `<button class="fs-next-btn" onclick="advanceToNextStep('${nextStep}')">继续 → ${stepLabels[nextStep]}</button>`)
     : '';
 
   modal.innerHTML = `
@@ -2281,6 +2287,7 @@ function showFullscreenContent({ icon, title, subtitle, html, sidebarHtml, stepK
         </div>
       </div>
       <div class="fs-content-header-actions">
+        ${backBtn}
         ${nextBtn}
         <button class="fs-content-close" onclick="closeFullscreenAndMaybeAdvance('${stepKey || ''}')">✕ 关闭</button>
       </div>
@@ -2364,6 +2371,22 @@ function advanceToNextStep(step) {
   else if (step === 'story') showImageOverlayPlay('story');
   else if (step === 'scenario') showImageOverlayPlay('scenario');
   else if (step === 'next') goToNextLesson();
+}
+
+// 返回上一步
+function goBackFromStep(prevStep) {
+  // 先关闭当前所有 modal
+  document.getElementById('fullscreenContentModal')?.classList.add('hidden');
+  document.getElementById('fullscreenMapModal')?.classList.add('hidden');
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  // 跳到上一步
+  if (prevStep === 'timeline') {
+    // 回到时间轴主页（关闭所有 modal 即可）
+  } else if (prevStep === 'map') {
+    setTimeout(() => showFullscreenMap(), 200);
+  } else if (prevStep === 'story') {
+    setTimeout(() => showImageOverlayPlay('story'), 200);
+  }
 }
 
 function closeFullscreenAndMaybeAdvance(stepKey) {
@@ -2581,6 +2604,7 @@ function showFullscreenMap() {
         </div>
       </div>
       <div class="fs-map-header-actions">
+        <button class="fs-back-btn" onclick="goBackFromStep('timeline')">← 返回 🌳 时间轴</button>
         <button class="fs-next-btn" onclick="closeMapAndAdvance()">继续 → 📖 故事</button>
         <button class="fs-map-close" onclick="closeMapAndAdvance(true)">✕ 关闭</button>
       </div>
