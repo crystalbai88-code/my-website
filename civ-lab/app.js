@@ -259,7 +259,12 @@ async function sendFloatingAIMsg() {
   try {
     let resp;
     if (state.apiKey && state.apiKey.startsWith('sk-')) {
-      resp = await callPreClaudeAPI(text, p);
+      // 🚀 流式：边接收边显示
+      const bubble = tempMsg.querySelector('.aifp-msg-bubble');
+      resp = await callPreClaudeAPI(text, p, (partial) => {
+        bubble.innerHTML = '<p>' + partial + '</p>';
+        msgs.scrollTop = msgs.scrollHeight;
+      });
     } else {
       resp = await getPreKBResponse(text, p);
     }
@@ -4490,11 +4495,20 @@ async function gatherWikiContext(question, p, maxArticles = 3) {
   return out;
 }
 
-async function callPreClaudeAPI(msg, p) {
-  // 🧠 用统一知识库检索（内部课程内容 + 外部维基百科）
-  const kbResult = KB && KB.search
-    ? await KB.search(msg, { era: p.id })
-    : { internal: [], external: await gatherWikiContext(msg, p, 3) };
+async function callPreClaudeAPI(msg, p, onStream) {
+  // 🧠 优化：先只查内部，只有命中很少时才查维基百科（省时间）
+  let kbResult;
+  if (KB && KB.search) {
+    const internal = KB.searchInternal(msg, { limit: 6, era: p.id });
+    if (internal.length >= 3) {
+      // 内部知识够用 — 跳过 Wikipedia 查询省 1-3 秒
+      kbResult = { internal, external: [] };
+    } else {
+      kbResult = await KB.search(msg, { era: p.id });
+    }
+  } else {
+    kbResult = { internal: [], external: await gatherWikiContext(msg, p, 3) };
+  }
 
   const internalContext = kbResult.internal.length > 0
     ? kbResult.internal.map(e =>
@@ -4541,12 +4555,14 @@ ${p.title} · ${p.time}`;
     let text;
     if (provider === 'qwen') {
       const model = state.aiModel || 'qwen-turbo';
+      // 🚀 流式输出：边接收边显示文字（手机感知速度快 5-10 倍）
       const res = await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + state.apiKey },
         body: JSON.stringify({
           model,
-          max_tokens: 800,
+          max_tokens: 400,
+          stream: true,
           messages: [
             { role: 'system', content: systemPrompt },
             { role: 'user', content: msg },
@@ -4554,8 +4570,33 @@ ${p.title} · ${p.time}`;
         }),
       });
       if (!res.ok) throw new Error('Qwen API ' + res.status + ' · ' + (await res.text()).slice(0,200));
-      const data = await res.json();
-      text = (data.choices?.[0]?.message?.content || '').replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
+      // SSE 流读取
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let raw = '';
+      let buffer = '';
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        let nl;
+        while ((nl = buffer.indexOf('\n')) >= 0) {
+          const line = buffer.slice(0, nl).trim();
+          buffer = buffer.slice(nl + 1);
+          if (!line.startsWith('data:')) continue;
+          const payload = line.slice(5).trim();
+          if (payload === '[DONE]') break;
+          try {
+            const json = JSON.parse(payload);
+            const delta = json.choices?.[0]?.delta?.content || '';
+            if (delta) {
+              raw += delta;
+              if (onStream) onStream(raw.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>'));
+            }
+          } catch {}
+        }
+      }
+      text = raw.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
     } else {
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
