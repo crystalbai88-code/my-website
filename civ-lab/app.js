@@ -1838,7 +1838,6 @@ function renderImageOverlayMode(p) {
           <button class="img-tool-chip" onclick="showFullscreenMap()">🗺 地图</button>
           <button class="img-tool-chip" onclick="showImageOverlayPlay('scenario')">🎮 时光机</button>
           <button class="img-tool-chip" onclick="showImageOverlayPlay('story')">📖 故事</button>
-          <button class="img-tool-chip" onclick="showImageOverlayPlay('ai')">🤖 问 AI</button>
           <span class="img-tool-sep">|</span>
           <button class="img-tool-chip img-tool-nav" onclick="goToPrevLesson()" title="上一课">◀</button>
           <button class="img-tool-chip img-tool-nav img-tool-next" onclick="goToNextLesson()" title="下一课">下一课 ▶</button>
