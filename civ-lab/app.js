@@ -137,8 +137,134 @@ function showScreen(id) {
 // HOME TIMELINE
 // ════════════════════════════════════════════════
 function renderHomeTimeline() {
-  // 🕸 新版：渲染知识网络替代时间轴
-  renderMainKnowledgeNetwork();
+  // 🆕 两级导航：默认显示 7 个 stage 大卡片；点进去看子节点
+  if (homeViewState.mode === 'stage') {
+    renderStageDetail(homeViewState.stageId);
+  } else {
+    renderStageCards();
+  }
+}
+
+// 视图状态：'home' 显示 7 卡片，'stage' 显示某 stage 的子节点
+let homeViewState = { mode: 'home', stageId: null };
+
+// ════════════════════════════════════════════════════
+// Home Level 0：7 个 STAGE 大卡片
+// ════════════════════════════════════════════════════
+function renderStageCards() {
+  const container = document.getElementById('mainNetworkContainer');
+  if (!container) return;
+  const N = MAIN_NETWORK;
+
+  container.innerHTML = `
+    <div class="stage-cards-intro">
+      <p>🌍 七个文明阶段 · 从 30 万年前到 AI 时代</p>
+      <p class="intro-sub">点击任意阶段卡片，深入了解这个时期的关键课程</p>
+    </div>
+    <div class="stage-cards-grid">
+      ${N.stages.map((stage, i) => {
+        const nodes = N.nodes.filter(n => n.stage === stage.id);
+        const linkedCount = nodes.filter(n => n.linked_lesson).length;
+        const total = nodes.length;
+        const completed = (state.completed || []).filter(c =>
+          nodes.some(n => n.linked_lesson === c)).length;
+        const isComing = stage.status === 'coming_soon';
+        return `
+          <button class="stage-card ${isComing ? 'coming-soon' : ''}"
+                  style="--stage-color:${stage.color}"
+                  data-stage="${stage.id}">
+            <div class="stage-card-num">阶段 ${i}</div>
+            <div class="stage-card-icon">${stage.icon}</div>
+            <h3 class="stage-card-title">${stage.title}</h3>
+            <p class="stage-card-time">${stage.time_range}</p>
+            <p class="stage-card-question">「${stage.core_question}」</p>
+            <div class="stage-card-stats">
+              <span class="stage-card-count">📚 ${total} 个知识点</span>
+              ${linkedCount > 0 ? `<span class="stage-card-ready">${linkedCount} 已开放${completed > 0 ? ` · ${completed} 已学` : ''}</span>` : ''}
+              ${isComing ? '<span class="stage-card-badge">⏳ 即将上线</span>' : ''}
+            </div>
+            <div class="stage-card-cta">${isComing ? '敬请期待' : '进入探索 →'}</div>
+          </button>`;
+      }).join('')}
+    </div>
+  `;
+
+  container.querySelectorAll('.stage-card').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const sid = btn.getAttribute('data-stage');
+      enterStage(sid);
+    });
+  });
+}
+
+// ════════════════════════════════════════════════════
+// Home Level 1：某 stage 的子节点详情页
+// ════════════════════════════════════════════════════
+function enterStage(stageId) {
+  const stage = MAIN_NETWORK.stages.find(s => s.id === stageId);
+  if (!stage) return;
+  homeViewState = { mode: 'stage', stageId };
+  renderStageDetail(stageId);
+  document.getElementById('s-home').scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function backToStageHome() {
+  homeViewState = { mode: 'home', stageId: null };
+  renderStageCards();
+  document.getElementById('s-home').scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderStageDetail(stageId) {
+  const container = document.getElementById('mainNetworkContainer');
+  if (!container) return;
+  const stage = MAIN_NETWORK.stages.find(s => s.id === stageId);
+  const nodes = MAIN_NETWORK.nodes.filter(n => n.stage === stageId);
+  if (!stage) return;
+
+  const completed = state.completed || [];
+  container.innerHTML = `
+    <div class="stage-detail-header" style="--stage-color:${stage.color}">
+      <button class="stage-back-btn" onclick="backToStageHome()">← 返回七个阶段</button>
+      <div class="stage-detail-title">
+        <span class="stage-detail-icon">${stage.icon}</span>
+        <div>
+          <h2>${stage.title}</h2>
+          <p class="stage-detail-meta">${stage.time_range}　·　${stage.core_question}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage-detail-grid">
+      ${nodes.map((n, i) => {
+        const isLinked = !!n.linked_lesson;
+        const isComing = n.status === 'coming_soon' || stage.status === 'coming_soon';
+        const done = isLinked && completed.includes(n.linked_lesson);
+        const cls = ['lesson-card',
+          isComing ? 'coming-soon' : '',
+          isLinked ? 'linked' : '',
+          done ? 'done' : '',
+        ].filter(Boolean).join(' ');
+        return `
+          <button class="${cls}" style="--stage-color:${stage.color}"
+                  data-linked="${n.linked_lesson || ''}" data-id="${n.id}">
+            <div class="lesson-card-num">${String(i + 1).padStart(2, '0')}</div>
+            <div class="lesson-card-icon">${n.emoji}</div>
+            <h4 class="lesson-card-title">${n.label}</h4>
+            <p class="lesson-card-time">${n.time}</p>
+            <div class="lesson-card-status">
+              ${done ? '✓ 已学过' : (isLinked ? '▸ 点击进入' : (isComing ? '⏳ 敬请期待' : '📖 资料填充中'))}
+            </div>
+          </button>`;
+      }).join('')}
+    </div>
+  `;
+
+  container.querySelectorAll('.lesson-card').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const linked = btn.getAttribute('data-linked');
+      if (linked) enterLesson(linked);
+    });
+  });
 }
 
 // ════════════════════════════════════════════════════
