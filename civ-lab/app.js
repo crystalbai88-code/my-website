@@ -2035,16 +2035,30 @@ function refreshAutoAdvanceCard() {
   for (const st of order) { if (!steps[st]) { nextStep = st; break; } }
   if (!nextStep) nextStep = 'next';
   const btn = card.querySelector('.aac-next');
+  const skipBtn = card.querySelector('.aac-skip');
+  // 显示下一课信息
+  const periods = PREHISTORIC.periods;
+  const idx = periods.findIndex(x => x.id === activePreEraId);
+  const nextLesson = (idx >= 0 && idx + 1 < periods.length) ? periods[idx + 1] : null;
+  const nextLessonLabel = nextLesson ? `${nextLesson.title}（${nextLesson.time}）` : '完成全部课程 🎉';
+
   if (btn) {
     if (nextStep === 'next') {
-      btn.textContent = '✓ 本节全部完成 → 下一课';
+      // 全部完成 — 大按钮 + 显示具体下一课名 + 隐藏跳过按钮
+      btn.innerHTML = `🎉 本节全部完成 · 进入下一课<br><span class="aac-next-sub">${nextLessonLabel}</span>`;
       btn.onclick = () => goToNextLesson();
       btn.classList.add('aac-done');
+      if (skipBtn) skipBtn.style.display = 'none';
     } else {
       const labels = { map: '🗺 地图', story: '📖 故事', scenario: '🎮 时光机' };
       btn.textContent = `下一步 → ${labels[nextStep]}`;
       btn.onclick = () => advanceToNextStep(nextStep);
       btn.classList.remove('aac-done');
+      // 跳过按钮显示具体下一课
+      if (skipBtn) {
+        skipBtn.style.display = '';
+        skipBtn.textContent = nextLesson ? `跳过 → ${nextLesson.title}` : '完成本节';
+      }
     }
   }
 }

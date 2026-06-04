@@ -4507,3 +4507,17 @@ html, body {
   font-weight: 700 !important;
 }
 .img-tool-next:hover { box-shadow: 0 3px 10px rgba(200,72,32,.4); }
+
+/* 全部完成时的大按钮 + 副标题 */
+.aac-next.aac-done {
+  padding: 16px 36px;
+  font-size: 17px;
+  line-height: 1.4;
+}
+.aac-next-sub {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.85;
+  margin-top: 4px;
+}
