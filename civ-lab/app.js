@@ -1960,7 +1960,8 @@ function initUserAvatarWalker(p) {
   } else {
     localStorage.setItem('civ_avatar_gender', gender);
   }
-  emojiEl.textContent = gender === 'girl' ? '👧' : '👦';
+  walker.setAttribute('data-gender', gender === 'girl' ? 'girl' : 'boy');
+  emojiEl.textContent = ''; // 隐藏旧 emoji（用图片代替）
   // 先放到 ① 的位置
   const first = p.knowledge_network?.hotspots?.[0];
   if (first) moveWalkerTo(first.pos_x, first.pos_y + 8);
@@ -1979,8 +1980,10 @@ function toggleAvatarGender() {
   const cur = localStorage.getItem('civ_avatar_gender') || 'boy';
   const next = cur === 'boy' ? 'girl' : 'boy';
   localStorage.setItem('civ_avatar_gender', next);
+  const walker = document.getElementById('userAvatarWalker');
+  if (walker) walker.setAttribute('data-gender', next);
   const emojiEl = document.getElementById('walkerEmoji');
-  if (emojiEl) emojiEl.textContent = next === 'girl' ? '👧' : '👦';
+  if (emojiEl) emojiEl.textContent = '';
   // 也同步更新 profile.gender
   const prof = getUserProfile() || {};
   prof.gender = next;

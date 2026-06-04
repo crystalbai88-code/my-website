@@ -5249,22 +5249,30 @@ html { scroll-behavior: smooth; }
   border-radius: 50%;
 }
 
-/* 用户的角色头像 (会"走"到当前学习的 hotspot) */
+/* 用户的角色头像 (会"走"到当前学习的 hotspot) — 古风手绘男孩/女孩 */
 .user-avatar-walker {
   position: absolute;
-  width: 56px; height: 56px;
-  transform: translate(-50%, -50%);
+  width: 70px; height: 90px;
+  transform: translate(-50%, -100%);
   z-index: 4;
   cursor: pointer;
   transition: left 1.5s cubic-bezier(.34,1.2,.5,1), top 1.5s cubic-bezier(.34,1.2,.5,1);
-  display: flex; align-items: center; justify-content: center;
-  filter: drop-shadow(0 4px 8px rgba(60,30,5,.35));
+  display: flex; align-items: flex-end; justify-content: center;
+  filter: drop-shadow(0 6px 8px rgba(60,30,5,.4));
 }
 .walker-emoji {
-  font-size: 48px;
-  line-height: 1;
+  /* 用背景图代替 emoji */
+  display: block;
+  width: 70px; height: 90px;
+  background-image: url('images/avatar-boy.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center bottom;
   animation: walkerBob 1.8s ease-in-out infinite;
-  display: inline-block;
+  font-size: 0; /* 隐藏旧 emoji 文字 */
+}
+.user-avatar-walker[data-gender="girl"] .walker-emoji {
+  background-image: url('images/avatar-girl.png');
 }
 @keyframes walkerBob {
   0%, 100% { transform: translateY(0) rotate(-3deg); }
