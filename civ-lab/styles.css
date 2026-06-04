@@ -4665,3 +4665,162 @@ html, body {
 .pst-video-meta { padding: 12px 14px 14px; }
 .pst-video-name { font-size: 14px; font-weight: 700; color: #3a2410; margin-bottom: 4px; }
 .pst-video-cap { font-size: 12px; color: #7a5530; line-height: 1.6; }
+
+/* ════════════════════════════════════════════════════
+   🤖 全局浮动 AI 助手 — FAB + 浮窗
+════════════════════════════════════════════════════ */
+.ai-float-fab {
+  position: fixed;
+  right: 24px; bottom: 24px;
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #c84820, #a83a18);
+  color: white;
+  border: 3px solid white;
+  box-shadow: 0 8px 24px rgba(200,72,32,.4);
+  cursor: pointer;
+  z-index: 1500;
+  font-size: 26px;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .25s, box-shadow .25s;
+}
+.ai-float-fab:hover { transform: scale(1.08); box-shadow: 0 12px 32px rgba(200,72,32,.6); }
+.ai-float-fab.active { transform: rotate(45deg); }
+.ai-float-fab.active .ai-fab-icon { content: '✕'; }
+.ai-fab-icon { font-size: 26px; line-height: 1; }
+.ai-fab-pulse {
+  position: absolute; inset: -3px;
+  border-radius: 50%; border: 2px solid #c84820;
+  animation: fabPulse 2s ease-out infinite;
+  pointer-events: none;
+}
+@keyframes fabPulse {
+  0% { transform: scale(1); opacity: .6; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+.ai-float-panel {
+  position: fixed;
+  right: 24px; bottom: 100px;
+  width: 420px; height: 580px;
+  background: linear-gradient(160deg, #fefaf0, #f5e8cc);
+  border: 2px solid rgba(200,72,32,.4);
+  border-radius: 16px;
+  box-shadow: 0 16px 48px rgba(40,15,5,.35);
+  z-index: 1499;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  animation: aifpIn .25s cubic-bezier(.4,0,.2,1);
+}
+.ai-float-panel.hidden { display: none; }
+@keyframes aifpIn {
+  from { opacity: 0; transform: translateY(20px) scale(.96); }
+  to   { opacity: 1; transform: none; }
+}
+.aifp-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #c84820, #a83a18);
+  color: white;
+  cursor: move;
+  user-select: none;
+}
+.aifp-title { display: flex; align-items: center; gap: 10px; }
+.aifp-avatar {
+  font-size: 22px; padding: 6px 8px;
+  background: rgba(255,255,255,.2); border-radius: 50%;
+}
+.aifp-title strong { font-size: 14px; display: block; }
+.aifp-title small { font-size: 11px; opacity: .9; display: block; margin-top: 2px; }
+.aifp-actions { display: flex; gap: 6px; }
+.aifp-actions button {
+  width: 28px; height: 28px; border-radius: 6px;
+  background: rgba(255,255,255,.2); color: white;
+  border: none; font-size: 16px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s;
+}
+.aifp-actions button:hover { background: rgba(255,255,255,.35); }
+
+.aifp-msgs {
+  flex: 1; overflow-y: auto; padding: 14px;
+  background: rgba(255,250,235,.5);
+}
+.aifp-msg {
+  display: flex; gap: 8px; margin-bottom: 12px;
+  animation: aifpMsgIn .2s ease;
+}
+@keyframes aifpMsgIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.aifp-msg.user { flex-direction: row-reverse; }
+.aifp-msg-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: white; border: 1px solid rgba(160,100,30,.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+}
+.aifp-msg.user .aifp-msg-avatar { background: #c84820; color: white; border-color: #c84820; }
+.aifp-msg-bubble {
+  max-width: 78%;
+  background: white;
+  padding: 9px 12px; border-radius: 10px;
+  font-size: 13px; line-height: 1.6; color: #3a2410;
+  border: 1px solid rgba(160,100,30,.18);
+}
+.aifp-msg.user .aifp-msg-bubble {
+  background: linear-gradient(135deg, #f5e0c0, #e8d09a);
+  border-color: rgba(160,100,30,.3);
+}
+.aifp-msg-bubble p { margin: 0 0 6px; }
+.aifp-msg-bubble p:last-child { margin-bottom: 0; }
+.aifp-msg-bubble .ai-kb-sources { margin-top: 8px; font-size: 11px; }
+.aifp-msg-bubble .kb-chip { font-size: 10px; padding: 2px 6px; }
+
+.aifp-suggest {
+  padding: 0 14px 8px;
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.aifp-suggest button {
+  font-size: 11px; padding: 6px 10px;
+  background: rgba(255,255,255,.7);
+  border: 1px solid rgba(160,100,30,.3);
+  color: #5a3a18; border-radius: 12px; cursor: pointer;
+}
+.aifp-suggest button:hover { background: #c84820; color: white; border-color: #c84820; }
+.aifp-sug-btn { font-size: 11px; padding: 6px 10px; }
+
+.aifp-input-row {
+  display: flex; gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid rgba(160,100,30,.2);
+  background: white;
+}
+.aifp-input-row textarea {
+  flex: 1; resize: none;
+  padding: 8px 10px; font-size: 13px;
+  border: 1px solid rgba(160,100,30,.3); border-radius: 8px;
+  font-family: inherit;
+}
+.aifp-input-row textarea:focus { outline: none; border-color: #c84820; }
+.aifp-send {
+  background: linear-gradient(135deg, #c84820, #a83a18);
+  color: white; border: none;
+  padding: 0 18px; border-radius: 8px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  transition: box-shadow .2s;
+}
+.aifp-send:hover { box-shadow: 0 3px 10px rgba(200,72,32,.4); }
+.aifp-foot {
+  padding: 6px 14px; font-size: 11px; color: #8a6a40;
+  text-align: center; background: rgba(255,240,210,.4);
+  border-top: 1px solid rgba(160,100,30,.15);
+}
+
+/* 移动端适配 */
+@media (max-width: 600px) {
+  .ai-float-panel {
+    right: 0; bottom: 0; left: 0;
+    width: 100%; height: 80vh;
+    border-radius: 16px 16px 0 0;
+  }
+  .ai-float-fab { right: 16px; bottom: 16px; }
+}

@@ -123,6 +123,178 @@ function init() {
   initDrawingCanvas();
   renderHistoryStats();
   logHistory('app_open', '打开了AI世界文明实验室');
+  // 注入全局浮动 AI 助手
+  injectFloatingAI();
+}
+
+// ════════════════════════════════════════════════════════════════
+// 🤖 全局浮动 AI 助手（任何页面都能呼出）
+// ════════════════════════════════════════════════════════════════
+function injectFloatingAI() {
+  if (document.getElementById('aiFloatFab')) return; // 防止重复
+  // 浮动按钮 (FAB)
+  const fab = document.createElement('button');
+  fab.id = 'aiFloatFab';
+  fab.className = 'ai-float-fab';
+  fab.title = '问 AI 助手';
+  fab.innerHTML = `<span class="ai-fab-icon">🤖</span><span class="ai-fab-pulse"></span>`;
+  fab.onclick = () => toggleAIFloat();
+  document.body.appendChild(fab);
+
+  // 浮动窗口
+  const panel = document.createElement('div');
+  panel.id = 'aiFloatPanel';
+  panel.className = 'ai-float-panel hidden';
+  panel.innerHTML = `
+    <div class="aifp-header">
+      <div class="aifp-title">
+        <span class="aifp-avatar">🤖</span>
+        <div>
+          <strong>AI 文明助手</strong>
+          <small id="aifpStatus">未连接</small>
+        </div>
+      </div>
+      <div class="aifp-actions">
+        <button class="aifp-settings" onclick="showAIKeySetup()" title="切换/接入 AI">⚙</button>
+        <button class="aifp-min" onclick="toggleAIFloat()" title="最小化">－</button>
+      </div>
+    </div>
+    <div class="aifp-msgs" id="aifpMsgs"></div>
+    <div class="aifp-suggest" id="aifpSuggest"></div>
+    <div class="aifp-input-row">
+      <textarea id="aifpInput" rows="2" placeholder="问任何关于人类/文明/历史的问题…"></textarea>
+      <button id="aifpSend" class="aifp-send">发送</button>
+    </div>
+    <div class="aifp-foot">
+      💡 我会先查课程深度知识库 (272 条 A 级来源) + 维基百科，再回答
+    </div>
+  `;
+  document.body.appendChild(panel);
+
+  // 拖动手柄 (header)
+  enableDrag(panel, panel.querySelector('.aifp-header'));
+
+  // 绑定发送
+  panel.querySelector('#aifpSend').onclick = sendFloatingAIMsg;
+  panel.querySelector('#aifpInput').onkeydown = e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendFloatingAIMsg(); }
+  };
+
+  refreshFloatingAIStatus();
+}
+
+function toggleAIFloat() {
+  const panel = document.getElementById('aiFloatPanel');
+  const fab = document.getElementById('aiFloatFab');
+  if (!panel) return;
+  const isHidden = panel.classList.contains('hidden');
+  panel.classList.toggle('hidden');
+  fab.classList.toggle('active', isHidden);
+  if (isHidden) {
+    refreshFloatingAIStatus();
+    // 首次打开发个欢迎语
+    const msgs = document.getElementById('aifpMsgs');
+    if (msgs && !msgs.dataset.welcomed) {
+      const uName = (getUserProfile()||{}).nickname || '朋友';
+      addFloatingAIMsg('ai', `${uName}你好 🌍 我是 AI 文明助手。你正在看的页面我都了解，可以问我任何关于人类、史前、文明、历史的问题！`);
+      // 提示几个示例
+      const sug = document.getElementById('aifpSuggest');
+      sug.innerHTML = [
+        '为什么说 Lucy 重要？',
+        '智人和黑猩猩是什么关系？',
+        '人类为什么要走出非洲？',
+        '阿婆为什么能带路？',
+      ].map(q => `<button class="aifp-sug-btn">${q}</button>`).join('');
+      sug.querySelectorAll('button').forEach(b => {
+        b.onclick = () => {
+          document.getElementById('aifpInput').value = b.textContent;
+          sendFloatingAIMsg();
+        };
+      });
+      msgs.dataset.welcomed = '1';
+    }
+    setTimeout(() => document.getElementById('aifpInput')?.focus(), 200);
+  }
+}
+
+function refreshFloatingAIStatus() {
+  const s = document.getElementById('aifpStatus');
+  if (!s) return;
+  const hasKey = !!(state.apiKey && state.apiKey.startsWith('sk-'));
+  if (!hasKey) {
+    s.innerHTML = '<span style="color:#c84820">⚠ 未连接 · 点 ⚙ 接入免费千问</span>';
+    return;
+  }
+  const provider = state.aiProvider || 'qwen';
+  const name = provider === 'qwen' ? '通义千问' : 'Claude';
+  s.innerHTML = `<span style="color:#2a8038">🟢 ${name} · ${state.aiModel || ''}</span>`;
+}
+
+function addFloatingAIMsg(role, html) {
+  const msgs = document.getElementById('aifpMsgs');
+  if (!msgs) return;
+  const div = document.createElement('div');
+  div.className = 'aifp-msg ' + role;
+  div.innerHTML = `<div class="aifp-msg-avatar">${role === 'ai' ? '🤖' : '👤'}</div>
+    <div class="aifp-msg-bubble">${html}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+async function sendFloatingAIMsg() {
+  const inp = document.getElementById('aifpInput');
+  const text = (inp.value || '').trim();
+  if (!text) return;
+  inp.value = '';
+  addFloatingAIMsg('user', text);
+
+  // 根据当前页面推断上下文 period
+  let p = PREHISTORIC.periods.find(x => x.id === activePreEraId)
+       || PREHISTORIC.periods[0]; // 默认 PH01
+
+  addFloatingAIMsg('ai', '<em>⏳ 思考中…</em>');
+  const msgs = document.getElementById('aifpMsgs');
+  const tempMsg = msgs.lastElementChild;
+
+  try {
+    let resp;
+    if (state.apiKey && state.apiKey.startsWith('sk-')) {
+      resp = await callPreClaudeAPI(text, p);
+    } else {
+      resp = await getPreKBResponse(text, p);
+    }
+    tempMsg.querySelector('.aifp-msg-bubble').innerHTML = resp;
+    msgs.scrollTop = msgs.scrollHeight;
+  } catch (e) {
+    tempMsg.querySelector('.aifp-msg-bubble').innerHTML = '⚠ 出错：' + e.message;
+  }
+}
+
+// 通用拖动 (从 header 处拖动整个 panel)
+function enableDrag(panel, handle) {
+  let startX, startY, origX, origY, dragging = false;
+  handle.addEventListener('mousedown', (e) => {
+    if (e.target.closest('button')) return; // 不要拦截按钮
+    dragging = true;
+    startX = e.clientX; startY = e.clientY;
+    const r = panel.getBoundingClientRect();
+    origX = r.left; origY = r.top;
+    panel.style.transition = 'none';
+    document.body.style.userSelect = 'none';
+  });
+  document.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+    const dx = e.clientX - startX, dy = e.clientY - startY;
+    panel.style.left = (origX + dx) + 'px';
+    panel.style.top = (origY + dy) + 'px';
+    panel.style.right = 'auto';
+    panel.style.bottom = 'auto';
+  });
+  document.addEventListener('mouseup', () => {
+    dragging = false;
+    panel.style.transition = '';
+    document.body.style.userSelect = '';
+  });
 }
 
 // ── 星空 ─────────────────────────────────────────
