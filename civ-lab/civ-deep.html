@@ -101,6 +101,11 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 
 /* 连线 (center → orbs) */
 .spoke{stroke:rgba(212,168,88,.18);stroke-width:1;stroke-dasharray:3 5;fill:none}
+/* 时间轴标签 */
+.region-axis-label{font-family:var(--mono);fill:rgba(212,168,88,.55);font-size:11px;letter-spacing:.12em;font-weight:700;text-transform:uppercase}
+.axis-tick{font-family:var(--mono);fill:rgba(212,168,88,.5);font-size:10px;text-anchor:middle;letter-spacing:.04em}
+.axis-end{font-family:var(--mono);fill:rgba(212,168,88,.4);font-size:10px}
+.float-orb .orb-year{font-family:var(--mono);fill:rgba(212,168,88,.6);pointer-events:none}
 
 /* tooltip */
 .tooltip{position:fixed;z-index:50;background:rgba(15,15,28,.95);backdrop-filter:blur(20px);border:1px solid rgba(212,168,88,.35);border-radius:12px;padding:14px 18px;max-width:340px;display:none;pointer-events:none;box-shadow:0 12px 36px rgba(0,0,0,.7)}
@@ -404,7 +409,38 @@ function handleOrbClick(action){
 }
 
 // ════════════════════════════════════════
-// 文明 cosmic hub
+// 年份解析 + 文明时间跨度
+// ════════════════════════════════════════
+const CIV_SPAN = {
+  sumer:[-3500,-2004], akkad:[-2334,-2154], babylon:[-1894,-1595],
+  egypt_predynastic:[-3500,-3100], egypt_old:[-2686,-2181], egypt_new:[-1550,-1077],
+  indus_early:[-3300,-2600], indus:[-2600,-1900],
+  minoan:[-2700,-1450], mycenaean:[-1750,-1050],
+  hittite:[-1650,-1180], shang:[-1600,-1046],
+};
+function parseYear(str){
+  if (!str) return null;
+  let m = str.match(/前\s*(\d+)/);          // 中文 "前 3200"
+  if (m) return -parseInt(m[1]);
+  m = str.match(/~?\s*(\d+)\s*BCE/i);        // 英文 "~5400 BCE"
+  if (m) return -parseInt(m[1]);
+  return null;
+}
+function eventYear(e){
+  const d = e.deep;
+  if (d?.what_happened?.length){ const y=parseYear(d.what_happened[0]); if(y)return y; }
+  if (d?.one_liner){ const y=parseYear(d.one_liner); if(y)return y; }
+  return null;
+}
+function personYear(p){
+  const d = p.deep;
+  return parseYear(d?.lifespan_real) || parseYear(d?.lifespan_mythic) || null;
+}
+
+// ════════════════════════════════════════
+// 文明小宇宙 · 时间轴布局
+//   顶部：文明中心球 + 一排主题章节球
+//   下部：横向时间轴 → 事件(上) + 人物(下) 按年份排列
 // ════════════════════════════════════════
 function renderCivCosmic(civId){
   const info = getCivInfo(civId);
@@ -412,55 +448,150 @@ function renderCivCosmic(civId){
   const chs = findCivChapters(civId);
   const events = findEventsOfCiv(civId);
   const people = findPeopleOfCiv(civId);
-
   if (chs.length === 0 && !deep) return renderError(`未找到文明：${civId}`);
   renderCrumb('civ', civId, info.name);
 
-  const oneLiner = chs[0]?.active_civs.find(cv=>cv.id===civId)?.L1 || '';
   const timeRange = deep?.time_range || (chs.length?`${chs[0].range} – ${chs[chs.length-1].range.split('–')[1]} BCE`:'');
+  const color = info.color;
 
-  const center = {
-    icon: info.icon, name: info.name, color: info.color,
-    meta: timeRange, size: 75,
-  };
+  // 时间跨度
+  let span = CIV_SPAN[civId];
+  if (!span && chs.length){ span = [chs[0].range_y?.[0]||-3000, chs[chs.length-1].range_y?.[1]||-1000]; }
+  if (!span) span = [-3500,-1000];
+  const [sStart, sEnd] = span;
+  const AXIS_X0 = 250, AXIS_X1 = 1360, AXIS_Y = 560;
+  function yr2x(y){
+    if (y==null) return (AXIS_X0+AXIS_X1)/2;
+    const t = (y - sStart)/((sEnd - sStart)||1);
+    return AXIS_X0 + Math.max(0,Math.min(1,t)) * (AXIS_X1 - AXIS_X0);
+  }
 
-  const orbs = [];
-  // 概念性的章节 orbs
-  if (deep?.opening_narrative) orbs.push({icon:'📖',name:'文明叙事',color:'#d4a858',typeLabel:'NARRATIVE',size:40,
-    action:{type:'showText',payload:{kind:'narrative',civId}}});
-  if (deep) orbs.push({icon:'🏛',name:'基础事实',color:'#a8a060',typeLabel:'BASICS',size:36,
-    action:{type:'showText',payload:{kind:'basics',civId}}});
-  if (chs.length) orbs.push({icon:'📅',name:'演化阶段',color:'#c8a070',typeLabel:'TIMELINE',size:38,
-    action:{type:'showText',payload:{kind:'timeline',civId}}});
+  // 主题章节球 (顶部一排, 无时间)
+  const themes = [];
+  if (deep?.opening_narrative) themes.push({icon:'📖',name:'文明叙事',color:'#d4a858',action:{type:'showText',payload:{kind:'narrative',civId}}});
+  if (deep) themes.push({icon:'🏛',name:'基础事实',color:'#a8a060',action:{type:'showText',payload:{kind:'basics',civId}}});
+  if (chs.length) themes.push({icon:'📅',name:'演化阶段',color:'#c8a070',action:{type:'showText',payload:{kind:'timeline',civId}}});
+  if (deep?.nine_inventions) themes.push({icon:'💡',name:'关键发明',color:'#e8a020',action:{type:'showText',payload:{kind:'inventions',civId}}});
+  themes.push({icon:'🌍',name:'文明关系',color:'#7a60b0',action:{type:'showText',payload:{kind:'relations',civId}}});
+  if (deep?.collapse_chain) themes.push({icon:'⏳',name:'崩溃过程',color:'#b04848',action:{type:'showText',payload:{kind:'collapse',civId}}});
+  if (FINAL_OVERVIEW.civs.find(c=>c.id===civId)?.legacy) themes.push({icon:'🎁',name:'今天遗产',color:'#3a8868',action:{type:'showText',payload:{kind:'legacy',civId}}});
 
-  // 事件 orbs (每个独立)
-  events.forEach(e=>{
-    const title = e.deep?.full_title || e.id;
-    orbs.push({icon:'📅',name:title.length>10?title.slice(0,10)+'...':title,color:'#c8732a',
-      typeLabel:'EVENT',size:36,
-      action:{type:'navigate',to:{type:'event',id:e.id}}});
+  // 事件 + 人物 → 时间排序
+  const evItems = events.map(e=>({
+    id:e.id, year:eventYear(e), color:'#c8732a', icon:'📅',
+    name:(e.deep?.full_title||e.id).slice(0,9),
+    action:{type:'navigate',to:{type:'event',id:e.id}}
+  })).sort((a,b)=>(a.year||0)-(b.year||0));
+  const ppItems = people.map(p=>({
+    id:p.id, year:personYear(p), color:'#6080b0', icon:'👤',
+    name:(p.deep?.full_name||p.id).split(' ')[0],
+    action:{type:'navigate',to:{type:'person',id:p.id}}
+  })).sort((a,b)=>(a.year||0)-(b.year||0));
+
+  // 防重叠：同排相邻 x<100 则上下交错
+  function layout(items, baseY, dir){
+    items.forEach((it,i)=>{ it.x = yr2x(it.year); it.y = baseY; });
+    for (let i=1;i<items.length;i++){
+      if (items[i].x - items[i-1].x < 95){
+        items[i].y = items[i-1].y === baseY ? baseY + dir*72 : baseY;
+      }
+    }
+  }
+  layout(evItems, AXIS_Y - 90, -1);
+  layout(ppItems, AXIS_Y + 90, 1);
+
+  // ── 组装 SVG ──
+  const allOrbs = [...themes, ...evItems, ...ppItems];
+  let defs = `<defs>
+    <radialGradient id="centerGrad" cx="35%" cy="30%"><stop offset="0%" stop-color="rgba(255,255,255,.95)"/><stop offset="30%" stop-color="${color}"/><stop offset="100%" stop-color="${darken(color,0.5)}"/></radialGradient>
+    <radialGradient id="centerHalo"><stop offset="0%" stop-color="${color}" stop-opacity=".5"/><stop offset="100%" stop-color="${color}" stop-opacity="0"/></radialGradient>
+    ${allOrbs.map((o,i)=>`<radialGradient id="og${i}" cx="35%" cy="30%"><stop offset="0%" stop-color="rgba(255,255,255,.88)"/><stop offset="30%" stop-color="${o.color}"/><stop offset="100%" stop-color="${darken(o.color,0.5)}"/></radialGradient>`).join('')}
+  </defs>`;
+
+  let svg = defs;
+
+  // 中心文明球 (顶部居中)
+  const CXc = 800, CYc = 150, cr = 56;
+  svg += `<g class="center-orb" transform="translate(${CXc},${CYc})">
+    <circle cx="0" cy="0" r="${cr*1.8}" fill="url(#centerHalo)"/>
+    <circle class="ring1" cx="0" cy="0" r="${cr+22}" stroke-dasharray="6 10"/>
+    <g class="body">
+      <circle cx="0" cy="0" r="${cr}" fill="url(#centerGrad)" stroke="rgba(255,255,255,.4)" stroke-width="2"/>
+      <ellipse cx="${-cr*0.18}" cy="${-cr*0.32}" rx="${cr*0.4}" ry="${cr*0.17}" fill="rgba(255,255,255,.5)" transform="rotate(-25)"/>
+      <text text-anchor="middle" dominant-baseline="central" font-size="${cr*0.7}" style="pointer-events:none">${info.icon}</text>
+    </g>
+    <text class="label" y="${cr+26}" font-size="19">${info.name}</text>
+    <text class="meta" y="${cr+46}" font-size="11">${timeRange}</text>
+  </g>`;
+
+  // 主题章节球 (第二排, 居中横排)
+  const themeY = 320, themeGap = Math.min(150, 1100/themes.length), themeR=30;
+  const themeStartX = 800 - (themes.length-1)*themeGap/2;
+  themes.forEach((t,i)=>{ t.x = themeStartX + i*themeGap; t.y = themeY; });
+  themes.forEach((t)=>{
+    const gi = allOrbs.indexOf(t);
+    svg += floatOrb(t, gi, themeR, true);
+  });
+  // 章节区与时间轴分隔标题
+  svg += `<text x="60" y="${themeY+4}" class="region-axis-label">主题</text>`;
+
+  // 时间轴
+  svg += `<line x1="${AXIS_X0}" y1="${AXIS_Y}" x2="${AXIS_X1}" y2="${AXIS_Y}" stroke="rgba(212,168,88,.4)" stroke-width="2"/>`;
+  // 刻度
+  const tickStep = (sEnd-sStart) > 1200 ? 500 : 250;
+  for (let y=Math.ceil(sStart/tickStep)*tickStep; y<=sEnd; y+=tickStep){
+    const x = yr2x(y);
+    svg += `<line x1="${x}" y1="${AXIS_Y-6}" x2="${x}" y2="${AXIS_Y+6}" stroke="rgba(212,168,88,.5)" stroke-width="1.5"/>`;
+    svg += `<text x="${x}" y="${AXIS_Y+24}" class="axis-tick">前${Math.abs(y)}</text>`;
+  }
+  svg += `<text x="${AXIS_X0-16}" y="${AXIS_Y+4}" class="axis-end" text-anchor="end">起</text>`;
+  svg += `<text x="${AXIS_X1+16}" y="${AXIS_Y+4}" class="axis-end" text-anchor="start">终</text>`;
+  svg += `<text x="60" y="${AXIS_Y-94}" class="region-axis-label">📅 事件</text>`;
+  svg += `<text x="60" y="${AXIS_Y+94}" class="region-axis-label">👤 人物</text>`;
+
+  // 事件/人物 连线到时间轴 + orb
+  [...evItems, ...ppItems].forEach((it)=>{
+    const ax = yr2x(it.year);
+    svg += `<line x1="${ax}" y1="${AXIS_Y}" x2="${it.x}" y2="${it.y}" stroke="${it.color}" stroke-width="1" stroke-opacity="0.4" stroke-dasharray="2 3"/>`;
+    svg += `<circle cx="${ax}" cy="${AXIS_Y}" r="3.5" fill="${it.color}"/>`;
+    const gi = allOrbs.indexOf(it);
+    svg += floatOrb(it, gi, 30, false);
   });
 
-  // 人物 orbs
-  people.forEach(p=>{
-    const name = p.deep?.full_name?.split(' ')[0] || p.id;
-    orbs.push({icon:'👤',name:name,color:'#6080b0',
-      typeLabel:'PERSON',size:38,
-      action:{type:'navigate',to:{type:'person',id:p.id}}});
-  });
+  if (evItems.length===0 && ppItems.length===0){
+    svg += `<text x="800" y="${AXIS_Y}" text-anchor="middle" class="region-axis-label" style="font-size:13px">此文明的事件 / 人物深度内容正在补充中</text>`;
+  }
 
-  // 其它章节 orbs
-  if (deep?.nine_inventions) orbs.push({icon:'💡',name:'关键发明',color:'#e8a020',typeLabel:'INVENTIONS',size:36,
-    action:{type:'showText',payload:{kind:'inventions',civId}}});
-  orbs.push({icon:'🌍',name:'文明关系',color:'#7a60b0',typeLabel:'RELATIONS',size:36,
-    action:{type:'showText',payload:{kind:'relations',civId}}});
-  if (deep?.collapse_chain) orbs.push({icon:'⏳',name:'崩溃过程',color:'#b04848',typeLabel:'COLLAPSE',size:34,
-    action:{type:'showText',payload:{kind:'collapse',civId}}});
-  if (FINAL_OVERVIEW.civs.find(c=>c.id===civId)?.legacy) orbs.push({icon:'🎁',name:'今天遗产',color:'#3a8868',typeLabel:'LEGACY',size:34,
-    action:{type:'showText',payload:{kind:'legacy',civId}}});
-
-  renderCosmic(center, orbs);
+  document.getElementById('canvas').innerHTML = svg;
+  bindFloatOrbs();
   document.title = info.name + ' · 文明小宇宙';
+}
+
+// 单个浮动球 SVG (timeline 版用)
+function floatOrb(orb, gradIdx, r, isTheme){
+  return `<g class="float-orb" data-action='${JSON.stringify(orb.action)}' transform="translate(${orb.x},${orb.y})" style="color:${orb.color}">
+    <circle cx="0" cy="0" r="${r*1.5}" fill="${orb.color}" opacity="0.12"/>
+    <g class="body">
+      <circle cx="0" cy="0" r="${r}" fill="url(#og${gradIdx})" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
+      <ellipse cx="${-r*0.18}" cy="${-r*0.32}" rx="${r*0.4}" ry="${r*0.17}" fill="rgba(255,255,255,.5)" transform="rotate(-25)"/>
+      <text text-anchor="middle" dominant-baseline="central" font-size="${r*0.9}" style="pointer-events:none">${orb.icon}</text>
+    </g>
+    <g transform="translate(0,${r+16})">
+      <rect class="label-bg" x="${-orb.name.length*7-7}" y="${-11}" width="${orb.name.length*14+14}" height="21" rx="10"/>
+      <text class="name" y="3" font-size="12">${orb.name}</text>
+    </g>
+    ${orb.year!=null?`<text class="orb-year" y="${r+34}" text-anchor="middle" font-size="9">前${Math.abs(orb.year)}</text>`:''}
+  </g>`;
+}
+
+function bindFloatOrbs(){
+  document.querySelectorAll('.float-orb').forEach(el=>{
+    const action = JSON.parse(el.dataset.action);
+    el.addEventListener('click', ()=>handleOrbClick(action));
+    el.addEventListener('mouseenter', e=>showTooltip(e, action));
+    el.addEventListener('mousemove', moveTooltip);
+    el.addEventListener('mouseleave', hideTooltip);
+  });
 }
 
 // ════════════════════════════════════════
