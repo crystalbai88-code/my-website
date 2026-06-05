@@ -494,21 +494,22 @@ function renderHome(){
   svg.innerHTML = svgHtml;
   bindNodes();
   document.getElementById('helpbar').innerHTML = `<button class="close-help" onclick="document.getElementById('helpbar').style.display='none'">✕</button>
-    <strong>🌐 总览</strong><br/>
+    <strong>🌐 L0 · 时间轴总览</strong><br/>
     <span style="color:var(--ink3);font-size:11px">
-    10 个文明按 <strong>地理</strong>(纵)和 <strong>时间</strong>(横)排列。<br/>
-    单击任一文明 → 展开它的人物和事件。
+    10 个文明按 <strong>地理</strong>(纵) × <strong>时间</strong>(横) 排列。<br/>
+    分层阅读：L0 时间轴 → L1 事件 → L2 人物 → L3 关系。<br/>
+    单击任一文明 → 进入 L1。
     </span>`;
   document.getElementById('helpbar').style.display = 'block';
 }
 
-// ── CIV VIEW · 单一文明 + 人物 + 事件 ──
+// ── CIV VIEW · L1 · 只看历史事件 (不显示人物) ──
 function renderCivView(civId){
   const c = D.civilizations.find(x => x.id === civId);
   if (!c) return;
 
   const events = D.events.filter(e => e.civ === c.id);
-  const people = D.people.filter(p => p.civ === c.id);
+  const people = []; // L1 不显示人物 - 严格分层
 
   // 文明节点在屏幕中上方，时间轴对应位置
   const cx = yearToX((c.start + c.end) / 2);
@@ -522,19 +523,14 @@ function renderCivView(civId){
   // 文明时间带
   svgHtml += `<rect x="${yearToX(c.start)}" y="${cy-1}" width="${yearToX(c.end)-yearToX(c.start)}" height="2" fill="${c.color}" opacity=".5" rx="1"/>`;
 
-  // 事件位置 (横排 lane 2)
-  const evtY = TOP_PAD + 200;
+  // 事件位置 — 居中
+  const evtY = H/2 + 30;
   events.forEach(e => {
     e._x = yearToX(e.year);
     e._y = evtY;
   });
 
-  // 人物位置 (横排 lane 3)
-  const personY = TOP_PAD + 360;
-  people.forEach(p => {
-    p._x = yearToX((p.born + p.died) / 2);
-    p._y = personY;
-  });
+  const personY = 0; // 不使用
 
   // 处理重叠 (同年附近的人物错开 y)
   function spread(items, baseY, step){
@@ -608,100 +604,93 @@ function renderCivView(civId){
 
   // 层级标签
   svgHtml += `<text x="14" y="${evtY+5}" font-family="var(--mono)" font-size="10" fill="rgba(232,152,112,.5)">📅 事件</text>`;
-  svgHtml += `<text x="14" y="${personY+5}" font-family="var(--mono)" font-size="10" fill="rgba(232,152,112,.5)">👤 人物</text>`;
 
   svg.innerHTML = svgHtml;
   bindNodes();
 
   // helpbar
   document.getElementById('helpbar').innerHTML = `<button class="close-help" onclick="document.getElementById('helpbar').style.display='none'">✕</button>
-    <strong>📜 ${c.name}</strong> · 前 ${Math.abs(c.start)}-${Math.abs(c.end)} BCE<br/>
+    <strong>📜 L1 · ${c.name}</strong> · 前 ${Math.abs(c.start)}-${Math.abs(c.end)} BCE<br/>
     <span style="color:var(--ink3);font-size:11px">
-    事件 ${events.length} 个，人物 ${people.length} 个。<br/>
-    单击 📅 事件 / 👤 人物 → 深入看。
+    ${events.length} 个关键历史事件，按时间排列。<br/>
+    单击 📅 任一事件 → 看该事件中的人物。
     </span>`;
   document.getElementById('helpbar').style.display = 'block';
 
   showSideForCiv(c);
 }
 
-// ── EVENT VIEW · 前因 + 此事件 + 后果 ──
+// ── EVENT VIEW · L2 · 此事件中的相关人物 ──
 function renderEventView(eventId){
   const e = D.events.find(x => x.id === eventId);
   if (!e) return;
 
   const civ = e.civ ? D.civilizations.find(c => c.id === e.civ) : null;
   const color = civ ? civ.color : '#7a2818';
-  const causes = (e.caused_by || []).map(id => D.events.find(x => x.id === id)).filter(Boolean);
-  const leads = (e.leads_to || []).map(id => D.events.find(x => x.id === id)).filter(Boolean);
 
-  const cx = yearToX(e.year), cy = H/2;
+  // 找出与此事件相关的人物：同文明 + 生卒年覆盖事件年份 ± 80 年
+  const relatedPeople = D.people.filter(p => {
+    if (p.civ !== e.civ) return false;
+    return p.born <= e.year + 80 && p.died >= e.year - 80;
+  });
+
+  const cx = yearToX(e.year), cy = TOP_PAD + 100;
 
   let svgHtml = `<defs>
     <radialGradient id="civGlow"><stop offset="0%" stop-color="rgba(232,152,112,.5)"/><stop offset="100%" stop-color="transparent"/></radialGradient>
-    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#e89870"/></marker>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="${color}"/></marker>
   </defs>`;
 
-  // 起因 (左侧)
-  causes.forEach((c, i) => {
-    c._x = yearToX(c.year);
-    c._y = cy - 100 + i * 70;
-    svgHtml += curvePath(c._x, c._y, cx, cy, 'cause', '导致', {arrow:true});
-    svgHtml += `<g class="node node-event" data-id="e_${c.id}" transform="translate(${c._x},${c._y})">
-      <circle class="bg" r="14" fill="rgba(232,152,112,.18)"/>
-      <text y="5" font-size="14" text-anchor="middle">📅</text>
-      <rect class="label-bg" x="${-c.title.length*5-5}" y="20" width="${c.title.length*10+10}" height="18" rx="9" fill="rgba(15,15,22,.9)" stroke="rgba(232,152,112,.3)"/>
-      <text class="label" y="32" font-size="10">${c.title}</text>
-      <text class="year-tag" y="46" font-family="var(--mono)" font-size="9" fill="var(--ink3)" text-anchor="middle">前 ${Math.abs(c.year)}</text>
-    </g>`;
-  });
-
-  // 后果 (右侧)
-  leads.forEach((l, i) => {
-    l._x = yearToX(l.year);
-    l._y = cy - 100 + i * 70;
-    svgHtml += curvePath(cx, cy, l._x, l._y, 'cause', '导致', {arrow:true});
-    svgHtml += `<g class="node node-event" data-id="e_${l.id}" transform="translate(${l._x},${l._y})">
-      <circle class="bg" r="14" fill="rgba(232,152,112,.18)"/>
-      <text y="5" font-size="14" text-anchor="middle">📅</text>
-      <rect class="label-bg" x="${-l.title.length*5-5}" y="20" width="${l.title.length*10+10}" height="18" rx="9" fill="rgba(15,15,22,.9)" stroke="rgba(232,152,112,.3)"/>
-      <text class="label" y="32" font-size="10">${l.title}</text>
-      <text class="year-tag" y="46" font-family="var(--mono)" font-size="9" fill="var(--ink3)" text-anchor="middle">前 ${Math.abs(l.year)}</text>
-    </g>`;
-  });
-
-  // 中心事件 (大)
+  // 中心事件 (顶部，时间轴对应位置)
   svgHtml += `<g class="node node-event" data-id="e_${e.id}" transform="translate(${cx},${cy})">
-    <circle class="halo" r="42" fill="url(#civGlow)"/>
-    <circle class="bg" r="28" fill="${color}" opacity=".4"/>
-    <text y="10" font-size="28" text-anchor="middle">📅</text>
-    <rect class="label-bg" x="${-e.title.length*7-7}" y="38" width="${e.title.length*14+14}" height="22" rx="11" fill="rgba(15,15,22,.95)" stroke="${color}" stroke-width="1.5"/>
-    <text class="label" y="53" font-size="13">${e.title}</text>
-    <text class="year-tag" y="72" font-family="var(--mono)" font-size="11" fill="${color}" text-anchor="middle">前 ${Math.abs(e.year)} · ${e.type}</text>
+    <circle class="halo" r="50" fill="url(#civGlow)"/>
+    <circle class="bg" r="32" fill="${color}" opacity=".5"/>
+    <text y="10" font-size="30" text-anchor="middle">📅</text>
+    <rect class="label-bg" x="${-e.title.length*7-7}" y="42" width="${e.title.length*14+14}" height="22" rx="11" fill="rgba(15,15,22,.95)" stroke="${color}" stroke-width="1.5"/>
+    <text class="label" y="57" font-size="13">${e.title}</text>
+    <text class="year-tag" y="76" font-family="var(--mono)" font-size="11" fill="${color}" text-anchor="middle">前 ${Math.abs(e.year)} · ${e.type}</text>
   </g>`;
 
-  // 文明节点 (右上角小)
-  if (civ) {
-    svgHtml += `<g class="node node-civ" data-id="c_${civ.id}" transform="translate(${cx + 200},${cy - 200})">
-      <circle class="bg" r="24" fill="${civ.color}"/>
-      <text y="6" font-size="18" text-anchor="middle">${civ.icon}</text>
-      <text class="label" y="46" font-size="11">${civ.name}</text>
-    </g>`;
-    svgHtml += `<path d="M ${cx + 200} ${cy - 200} Q ${cx + 50} ${cy - 100} ${cx} ${cy}" stroke="rgba(240,192,96,.3)" stroke-width="1" fill="none" stroke-dasharray="3,3"/>`;
-  }
+  // 人物排成一行，按出生年排序
+  const peopleY = H/2 + 60;
+  relatedPeople.sort((a,b) => a.born - b.born);
+  relatedPeople.forEach((p, i) => {
+    p._x = yearToX((p.born + p.died) / 2);
+    p._y = peopleY + (i % 2 === 0 ? 0 : 70);
+  });
 
-  // 左右标签
-  if (causes.length) svgHtml += `<text x="60" y="${cy + 5}" font-family="var(--mono)" font-size="10" fill="rgba(232,152,112,.6)">⬅ 起因</text>`;
-  if (leads.length) svgHtml += `<text x="${W - 80}" y="${cy + 5}" font-family="var(--mono)" font-size="10" fill="rgba(232,152,112,.6)">➡ 后果</text>`;
+  // 事件 → 人物连线
+  relatedPeople.forEach(p => {
+    svgHtml += curvePath(cx, cy, p._x, p._y, 'member', '');
+  });
+
+  // 人物节点 (大)
+  relatedPeople.forEach(p => {
+    svgHtml += `<g class="node node-person" data-id="p_${p.id}" transform="translate(${p._x},${p._y})">
+      <circle class="halo" r="36" fill="url(#civGlow)" opacity=".7"/>
+      <circle class="bg" r="28" fill="rgba(240,192,96,.2)" stroke="${color}" stroke-width="2"/>
+      <text y="10" font-size="28" text-anchor="middle">${p.portrait}</text>
+      <rect class="label-bg" x="${-p.name.split(' ')[0].length*7-6}" y="36" width="${p.name.split(' ')[0].length*14+12}" height="20" rx="10"/>
+      <text class="label" y="50" font-size="12">${p.name.split(' ')[0]}</text>
+      <text class="year-tag" y="65" font-family="var(--mono)" font-size="9" fill="${color}" text-anchor="middle">前 ${Math.abs(p.born)}-${Math.abs(p.died)}</text>
+    </g>`;
+  });
+
+  // 层级标签
+  svgHtml += `<text x="14" y="${peopleY+5}" font-family="var(--mono)" font-size="10" fill="rgba(232,152,112,.5)">👤 此事件中的关键人物</text>`;
+
+  if (relatedPeople.length === 0) {
+    svgHtml += `<text x="${W/2}" y="${peopleY+40}" text-anchor="middle" font-size="13" fill="rgba(232,152,112,.6)">该事件未关联具名人物。可在右侧卡片继续阅读。</text>`;
+  }
 
   svg.innerHTML = svgHtml;
   bindNodes();
 
   document.getElementById('helpbar').innerHTML = `<button class="close-help" onclick="document.getElementById('helpbar').style.display='none'">✕</button>
-    <strong>📅 ${e.title}</strong> · 前 ${Math.abs(e.year)}<br/>
+    <strong>📅 L2 · ${e.title}</strong> · 前 ${Math.abs(e.year)} BCE<br/>
     <span style="color:var(--ink3);font-size:11px">
-    左侧 ${causes.length} 个起因 → 中间该事件 → 右侧 ${leads.length} 个后果。<br/>
-    点起因/后果可继续深入。
+    此时活跃于 ${civ?.name||'该地'} 的 ${relatedPeople.length} 位关键人物。<br/>
+    单击 👤 任一人物 → 看 ta 的关系网。
     </span>`;
   document.getElementById('helpbar').style.display = 'block';
 
@@ -774,9 +763,9 @@ function renderPersonView(personId){
   bindNodes();
 
   document.getElementById('helpbar').innerHTML = `<button class="close-help" onclick="document.getElementById('helpbar').style.display='none'">✕</button>
-    <strong>${p.portrait} ${p.name}</strong> · ${civ.name}<br/>
+    <strong>${p.portrait} L3 · ${p.name}</strong> · ${civ.name}<br/>
     <span style="color:var(--ink3);font-size:11px">
-    周围是他 <strong>直接关系</strong> 的 ${friends.length} 个人。<br/>
+    周围是他 <strong>直接关系</strong> 的 ${friends.length} 个人 (人与人之间的关系)。<br/>
     每个朋友按 <strong>出生年</strong> 在时间轴上的位置。<br/>
     点任意朋友继续看他的朋友圈。
     </span>`;
@@ -940,7 +929,7 @@ function showSideForCiv(c){
   const pp = D.people.filter(p=>p.civ===c.id).sort((a,b)=>a.born-b.born);
   const kb = getKB(c.id);
 
-  document.getElementById('sideHead').innerHTML = buildHead('CIVILIZATION · 文明', c.icon, c.name, c.color);
+  document.getElementById('sideHead').innerHTML = buildHead('CIVILIZATION · L1 · 文明', c.icon, c.name, c.color);
 
   let factsHTML = '', missHTML = '', childHTML = '', srcHTML = '';
   if (kb) {
@@ -973,10 +962,8 @@ function showSideForCiv(c){
     ${factsHTML}
     ${childHTML}
     ${missHTML}
-    <h3>📅 关键事件 (${ev.length})</h3>
+    <h3>📅 关键历史事件 (${ev.length}) · 点击进入 L2</h3>
     ${ev.map(e=>`<div class="conn" tabindex="0" onclick="onNodeClick('e_${e.id}')" onkeydown="if(event.key==='Enter')onNodeClick('e_${e.id}')"><span class="ico">📅</span><div class="info"><div class="name">${e.title}</div><div class="note">前 ${Math.abs(e.year)} · ${e.type}</div></div></div>`).join('')||'<p>暂无事件数据</p>'}
-    <h3>👤 关键人物 (${pp.length})</h3>
-    ${pp.map(p=>`<div class="conn" tabindex="0" onclick="onNodeClick('p_${p.id}')" onkeydown="if(event.key==='Enter')onNodeClick('p_${p.id}')"><span class="ico">${p.portrait}</span><div class="info"><div class="name">${p.name}</div><div class="note">${p.role}</div></div></div>`).join('')||'<p>无具名人物</p>'}
     ${srcHTML}
   `;
   renderNav();
@@ -986,10 +973,12 @@ function showSideForEvent(e){
   const side=document.getElementById('side'); side.classList.add('open');
   currentNode = {type:'event', id:e.id};
   const civ = e.civ ? D.civilizations.find(c=>c.id===e.civ) : null;
+  const relatedPeople = D.people.filter(p => p.civ===e.civ && p.born<=e.year+80 && p.died>=e.year-80)
+    .sort((a,b)=>a.born-b.born);
   const causes = (e.caused_by||[]).map(id=>D.events.find(x=>x.id===id)).filter(Boolean);
   const leads = (e.leads_to||[]).map(id=>D.events.find(x=>x.id===id)).filter(Boolean);
 
-  document.getElementById('sideHead').innerHTML = buildHead('EVENT · 事件', '📅', e.title, civ?.color);
+  document.getElementById('sideHead').innerHTML = buildHead('EVENT · L2 · 事件', '📅', e.title, civ?.color);
   document.getElementById('sideContent').innerHTML = `
     <div class="meta">
       <span>前 ${Math.abs(e.year)} BCE</span>
@@ -997,9 +986,11 @@ function showSideForEvent(e){
       ${civ?`<span class="civ-tag" style="background:${civ.color}">${civ.icon} ${civ.name}</span>`:''}
     </div>
     ${e.desc?`<div class="core-q">${e.desc}</div>`:''}
-    ${civ?`<h3>🏛 所属文明</h3><div class="conn" tabindex="0" onclick="onNodeClick('c_${civ.id}')"><span class="ico">${civ.icon}</span><div class="info"><div class="name">${civ.name}</div><div class="note">${civ.region}</div></div><span class="tag" style="background:${civ.color}">归属</span></div>`:''}
-    ${causes.length?`<h3>⬅ 起因 (${causes.length})</h3>${causes.map(c=>`<div class="conn" tabindex="0" onclick="onNodeClick('e_${c.id}')"><span class="ico">📅</span><div class="info"><div class="name">${c.title}</div><div class="note">前 ${Math.abs(c.year)} · ${c.type}</div></div><span class="tag" style="background:#c84820">起因</span></div>`).join('')}`:''}
-    ${leads.length?`<h3>➡ 后果 (${leads.length})</h3>${leads.map(c=>`<div class="conn" tabindex="0" onclick="onNodeClick('e_${c.id}')"><span class="ico">📅</span><div class="info"><div class="name">${c.title}</div><div class="note">前 ${Math.abs(c.year)} · ${c.type}</div></div><span class="tag" style="background:#2a8038">后果</span></div>`).join('')}`:''}
+    <h3>👤 此事件中的人物 (${relatedPeople.length}) · 点击进入 L3</h3>
+    ${relatedPeople.map(p=>`<div class="conn" tabindex="0" onclick="onNodeClick('p_${p.id}')" onkeydown="if(event.key==='Enter')onNodeClick('p_${p.id}')"><span class="ico">${p.portrait}</span><div class="info"><div class="name">${p.name}</div><div class="note">${p.role} · 前 ${Math.abs(p.born)}-${Math.abs(p.died)}</div></div></div>`).join('')||'<p style="color:#7a5530;font-size:12.5px">该事件未关联具名人物。</p>'}
+    ${causes.length?`<h3>⬅ 此事件的起因 (${causes.length})</h3>${causes.map(c=>`<div class="conn" tabindex="0" onclick="onNodeClick('e_${c.id}')"><span class="ico">📅</span><div class="info"><div class="name">${c.title}</div><div class="note">前 ${Math.abs(c.year)} · ${c.type}</div></div><span class="tag" style="background:#c84820">起因</span></div>`).join('')}`:''}
+    ${leads.length?`<h3>➡ 此事件的后果 (${leads.length})</h3>${leads.map(c=>`<div class="conn" tabindex="0" onclick="onNodeClick('e_${c.id}')"><span class="ico">📅</span><div class="info"><div class="name">${c.title}</div><div class="note">前 ${Math.abs(c.year)} · ${c.type}</div></div><span class="tag" style="background:#2a8038">后果</span></div>`).join('')}`:''}
+    ${civ?`<h3>🏛 返回所属文明</h3><div class="conn" tabindex="0" onclick="onNodeClick('c_${civ.id}')"><span class="ico">${civ.icon}</span><div class="info"><div class="name">${civ.name}</div><div class="note">回到 L1</div></div><span class="tag" style="background:${civ.color}">L1</span></div>`:''}
   `;
   renderNav();
 }
@@ -1009,7 +1000,7 @@ function showSideForPerson(p){
   currentNode = {type:'person', id:p.id};
   const civ = D.civilizations.find(c=>c.id===p.civ) || {color:'#888',name:p.civ,icon:'❓'};
 
-  document.getElementById('sideHead').innerHTML = buildHead('PERSON · 人物', p.portrait, p.name, civ.color);
+  document.getElementById('sideHead').innerHTML = buildHead('PERSON · L3 · 人物关系', p.portrait, p.name, civ.color);
   document.getElementById('sideContent').innerHTML = `
     <div class="meta">
       <span class="civ-tag" style="background:${civ.color}">${civ.icon} ${civ.name}</span>
