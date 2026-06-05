@@ -5,123 +5,182 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>早期文明关系图谱 · AI 世界文明实验室</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@400;500;700&family=Cinzel:wght@500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 :root{
-  --bg:#f4efe3; --paper:#fdf5e0; --paper2:#f5e8c8;
-  --ink:#2c1a08; --ink2:#5c3a14; --ink3:#9a6828;
-  --warm:#c84820; --warm-deep:#a83a18; --gold:#d4a858;
-  --line:rgba(160,100,30,.25); --line-soft:rgba(160,100,30,.12);
-  --serif:'Noto Serif SC','STSong',serif;
+  --bg:#0a0a0e; --bg2:#15151c;
+  --paper:#1a1a22; --paper2:#22222c;
+  --ink:#f0e8d5; --ink2:#c8bca0; --ink3:#888070;
+  --warm:#e89870; --warm-deep:#c05820; --gold:#f0c060; --glow:#ff9844;
+  --line:rgba(232,152,112,.25);
+  --serif:'Noto Serif SC',serif;
   --sans:'Noto Sans SC','PingFang SC',sans-serif;
   --mono:'JetBrains Mono',monospace;
+  --latin:'Cinzel',Georgia,serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--ink);overflow:hidden}
 .app{display:flex;flex-direction:column;height:100vh}
 
 /* TOP */
-.top{display:flex;align-items:center;gap:14px;padding:10px 20px;background:rgba(253,245,228,.95);border-bottom:1px solid var(--line);flex-shrink:0;z-index:10}
-.top .back{font-family:var(--mono);font-size:11px;color:var(--warm);text-decoration:none;letter-spacing:.18em}
-.top h1{font-family:var(--serif);font-size:16px;font-weight:700}
-.top h1 em{font-style:italic;color:var(--warm);margin-right:8px;font-family:Georgia,serif}
-.top .subtitle{font-size:10px;color:var(--ink3);font-family:var(--mono);letter-spacing:.1em}
+.top{
+  display:flex;align-items:center;gap:14px;padding:12px 22px;
+  background:rgba(15,15,22,.92);backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(232,152,112,.15);flex-shrink:0;z-index:10;
+}
+.top .back{font-family:var(--mono);font-size:11px;color:var(--warm);text-decoration:none;letter-spacing:.2em}
+.top h1{font-family:var(--serif);font-size:16px;font-weight:700;color:var(--ink)}
+.top h1 em{font-style:italic;color:var(--warm);margin-right:8px;font-family:var(--latin);font-weight:500}
+.top .subtitle{font-size:10px;color:var(--ink3);font-family:var(--mono);letter-spacing:.12em}
 
 /* FILTERS */
 .filters{display:flex;gap:6px;margin-left:auto;align-items:center}
 .filters .label{font-family:var(--mono);font-size:9px;color:var(--ink3);letter-spacing:.15em;margin-right:4px}
-.filter{padding:5px 11px;background:white;border:1.5px solid var(--line);border-radius:99px;font-size:11px;font-weight:600;color:var(--ink2);cursor:pointer;transition:all .15s;font-family:var(--sans)}
-.filter:hover{transform:translateY(-1px)}
-.filter.on{background:var(--warm);color:white;border-color:var(--warm);box-shadow:0 2px 8px rgba(200,72,32,.3)}
+.filter{
+  padding:5px 11px;background:rgba(255,255,255,.05);border:1px solid rgba(232,152,112,.2);
+  border-radius:99px;font-size:11px;font-weight:500;color:var(--ink2);cursor:pointer;
+  transition:all .2s;font-family:var(--sans);
+}
+.filter:hover{background:rgba(232,152,112,.15);color:var(--warm)}
+.filter.on{background:linear-gradient(135deg,var(--warm),var(--warm-deep));color:white;border-color:var(--warm);box-shadow:0 2px 12px rgba(232,152,112,.35)}
 
 /* MAIN */
 .main{flex:1;display:flex;overflow:hidden;position:relative}
 
 /* GRAPH */
-.graph{flex:1;position:relative;background:radial-gradient(ellipse at center,#fffaf0 0%,#f4efe3 100%);cursor:grab;overflow:hidden}
+.graph{
+  flex:1;position:relative;
+  background:
+    radial-gradient(ellipse at 30% 30%, rgba(74,55,180,.15) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 80%, rgba(232,152,112,.08) 0%, transparent 60%),
+    radial-gradient(ellipse at center, #18141c 0%, #0a0a10 100%);
+  cursor:grab;overflow:hidden;
+}
 .graph:active{cursor:grabbing}
 .graph svg{width:100%;height:100%;display:block}
 
-/* SIDE PANEL (滑入式) */
+/* Stars background */
+.stars{position:absolute;inset:0;pointer-events:none;opacity:.4}
+.stars::before,.stars::after{
+  content:'';position:absolute;inset:0;
+  background-image:
+    radial-gradient(1.5px 1.5px at 20% 30%, #fff, transparent 60%),
+    radial-gradient(1.2px 1.2px at 70% 18%, #f0c060, transparent 60%),
+    radial-gradient(.9px .9px at 40% 70%, #fff, transparent 60%),
+    radial-gradient(1.3px 1.3px at 85% 55%, #fff, transparent 60%),
+    radial-gradient(.8px .8px at 25% 85%, #fff, transparent 60%),
+    radial-gradient(1px 1px at 60% 90%, #f0c060, transparent 60%),
+    radial-gradient(1px 1px at 15% 55%, #fff, transparent 60%);
+}
+
+/* SIDE PANEL */
 .side{
-  width:380px;background:linear-gradient(135deg,var(--paper),var(--paper2));
-  border-left:1.5px solid var(--line);overflow-y:auto;padding:22px;
+  width:380px;background:linear-gradient(135deg,var(--paper),var(--bg2));
+  border-left:1px solid rgba(232,152,112,.2);overflow-y:auto;padding:22px;
   transform:translateX(100%);transition:transform .35s cubic-bezier(.4,1,.6,1);
   position:absolute;top:0;right:0;bottom:0;z-index:5;
-  box-shadow:-12px 0 36px rgba(60,30,5,.18);
+  box-shadow:-12px 0 36px rgba(0,0,0,.4);color:var(--ink);
 }
 .side.open{transform:translateX(0)}
-.side .close{position:absolute;top:14px;right:14px;background:white;border:1px solid var(--line);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:14px;color:var(--ink2)}
-.side .ps-label{font-family:var(--mono);font-size:9px;color:var(--ink3);letter-spacing:.22em;text-transform:uppercase;margin-bottom:6px;margin-top:8px}
+.side .close{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.08);border:1px solid rgba(232,152,112,.2);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:14px;color:var(--ink)}
+.side .ps-label{font-family:var(--mono);font-size:9px;color:var(--warm);letter-spacing:.22em;text-transform:uppercase;margin:6px 0}
 .side h2{font-family:var(--serif);font-size:22px;color:var(--warm);font-weight:700;margin-bottom:8px}
-.side h3{font-family:var(--serif);font-size:14px;color:var(--ink);margin:18px 0 10px;padding-bottom:6px;border-bottom:1px dashed var(--line)}
+.side h3{font-family:var(--serif);font-size:14px;color:var(--gold);margin:18px 0 10px;padding-bottom:6px;border-bottom:1px dashed rgba(232,152,112,.2)}
 .side .meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-.side .meta span{padding:3px 9px;background:white;border:1px solid var(--line);border-radius:6px;font-family:var(--mono);font-size:10px;color:var(--ink2)}
+.side .meta span{padding:3px 9px;background:rgba(232,152,112,.08);border:1px solid rgba(232,152,112,.2);border-radius:6px;font-family:var(--mono);font-size:10px;color:var(--ink2)}
 .side p{font-size:13px;line-height:1.7;color:var(--ink2);margin-bottom:10px}
 .side .conn{
-  background:white;border:1px solid var(--line);border-radius:8px;padding:8px 10px;cursor:pointer;
-  display:flex;align-items:center;gap:8px;margin-bottom:6px;transition:all .15s;
+  background:rgba(255,255,255,.04);border:1px solid rgba(232,152,112,.15);border-radius:10px;padding:10px;cursor:pointer;
+  display:flex;align-items:center;gap:10px;margin-bottom:6px;transition:all .15s;
 }
-.side .conn:hover{border-color:var(--warm);transform:translateX(-2px);background:var(--paper)}
-.side .conn .ico{font-size:18px}
+.side .conn:hover{border-color:var(--warm);background:rgba(232,152,112,.1);transform:translateX(-2px)}
+.side .conn .ico{font-size:20px;flex-shrink:0}
 .side .conn .info{flex:1;min-width:0}
-.side .conn .name{font-size:12px;font-weight:600;color:var(--ink)}
-.side .conn .note{font-size:10px;color:var(--ink3);margin-top:1px}
-.side .conn .tag{font-family:var(--mono);font-size:8px;padding:2px 6px;border-radius:3px;color:white;letter-spacing:.1em;text-transform:uppercase}
-.tag-friend{background:#2a8038} .tag-family{background:#8a4090} .tag-enemy{background:#c84820}
-.tag-mentor{background:#1a7890} .tag-cause{background:#2a8038} .tag-effect{background:#c84820}
-.tag-member{background:var(--gold);color:#3a2410}
+.side .conn .name{font-size:13px;font-weight:600;color:var(--ink)}
+.side .conn .note{font-size:10px;color:var(--ink3);margin-top:2px}
+.side .conn .tag{font-family:var(--mono);font-size:8px;padding:2px 6px;border-radius:3px;color:#0a0a0e;letter-spacing:.1em;text-transform:uppercase;font-weight:700}
+.tag-friend{background:#7ad896} .tag-family{background:#c898e0} .tag-enemy{background:#ff7858}
+.tag-mentor{background:#7adcf0} .tag-cause{background:#7ad896} .tag-effect{background:#ff7858}
+.tag-member{background:var(--gold)}
 
-/* GRAPH ELEMENTS */
-.node{cursor:pointer;transition:filter .15s}
-.node:hover{filter:brightness(1.1)}
-.node.focused{filter:drop-shadow(0 0 12px var(--warm))}
-.node.dim{opacity:.2}
-.node-civ circle{stroke:white;stroke-width:3}
-.node-event circle{stroke:white;stroke-width:2}
-.node-person circle{stroke:white;stroke-width:2}
-.node text{pointer-events:none;font-family:var(--sans);text-anchor:middle;fill:var(--ink);font-weight:600}
-.edge{stroke-opacity:.35;transition:all .15s;pointer-events:none}
-.edge.relate{stroke:#8a4090;stroke-width:2;stroke-dasharray:none}
-.edge.cause{stroke:#c84820;stroke-width:1.5;marker-end:url(#arrowhead)}
-.edge.member{stroke:rgba(160,100,30,.2);stroke-width:1;stroke-dasharray:2,3}
-.edge.contemporary{stroke:#9a6828;stroke-width:1;stroke-dasharray:1,3;opacity:.25}
-.edge.highlight{stroke-opacity:.9;stroke-width:3}
-.edge.dim{stroke-opacity:.05}
+/* GRAPH NODES */
+.node{cursor:pointer}
+.node circle.bg{transition:r .3s,filter .3s}
+.node:hover circle.bg{filter:brightness(1.15)}
+
+.node.dim{opacity:.18;pointer-events:none}
+.node.focused circle.bg{filter:drop-shadow(0 0 24px var(--glow)) drop-shadow(0 0 12px var(--glow))}
+
+.node-civ circle.bg{stroke:var(--glow);stroke-width:2.5}
+.node-civ .label{font-family:var(--serif);font-weight:700;font-size:13px;fill:var(--ink);text-anchor:middle}
+.node-civ .label-bg{fill:rgba(15,15,22,.85);stroke:rgba(232,152,112,.4)}
+
+.node-event circle.bg{stroke:var(--warm);stroke-width:2}
+.node-event .label{font-family:var(--sans);font-weight:500;font-size:10px;fill:var(--ink2);text-anchor:middle}
+
+.node-person circle.bg{stroke:var(--glow);stroke-width:2}
+.node-person.focused circle.bg{stroke-width:3}
+.node-person .label{font-family:var(--serif);font-weight:600;font-size:12px;fill:var(--ink);text-anchor:middle}
+.node-person .label-bg{fill:rgba(15,15,22,.85);stroke:rgba(232,152,112,.3)}
+
+/* EDGES — curved bezier */
+.edge{stroke-opacity:.5;transition:all .2s;pointer-events:none;fill:none}
+.edge.relate{stroke:#c898e0;stroke-width:1.5}
+.edge.cause{stroke:var(--warm);stroke-width:1.5}
+.edge.member{stroke:rgba(240,192,96,.25);stroke-width:1;stroke-dasharray:3,4}
+.edge.contemporary{stroke:rgba(120,200,180,.2);stroke-width:.8;stroke-dasharray:1,4}
+.edge.dim{stroke-opacity:.08}
+.edge.highlight{stroke-opacity:1;stroke-width:2.5;filter:drop-shadow(0 0 4px currentColor)}
+
+/* EDGE LABEL (on curve midpoint) */
+.edge-label{
+  font-family:var(--sans);font-size:9.5px;fill:var(--ink2);font-weight:500;
+  text-anchor:middle;pointer-events:none;letter-spacing:.02em;
+}
+.edge-label-bg{
+  fill:rgba(15,15,22,.85);stroke:rgba(232,152,112,.2);stroke-width:.5;
+}
+.edge-label.dim,.edge-label-bg.dim{opacity:.15}
 
 /* TOOLTIP */
 .tip{
-  position:absolute;background:rgba(40,20,8,.92);color:white;padding:6px 10px;border-radius:6px;
-  font-size:11px;pointer-events:none;opacity:0;transition:opacity .15s;z-index:20;
-  font-family:var(--sans);max-width:200px;line-height:1.4;
+  position:absolute;background:rgba(20,15,10,.95);color:var(--ink);
+  padding:8px 12px;border-radius:8px;font-size:11px;pointer-events:none;
+  opacity:0;transition:opacity .15s;z-index:20;border:1px solid rgba(232,152,112,.3);
+  max-width:220px;line-height:1.5;backdrop-filter:blur(10px);
 }
 .tip.show{opacity:1}
 
 /* LEGEND */
 .legend{
-  position:absolute;bottom:18px;left:18px;background:rgba(255,255,255,.95);
-  border:1px solid var(--line);border-radius:10px;padding:10px 14px;
-  font-family:var(--mono);font-size:10px;color:var(--ink2);
+  position:absolute;bottom:18px;left:18px;
+  background:rgba(15,15,22,.85);backdrop-filter:blur(20px);
+  border:1px solid rgba(232,152,112,.2);border-radius:12px;
+  padding:10px 14px;font-family:var(--mono);font-size:10px;color:var(--ink2);
   display:flex;gap:14px;flex-wrap:wrap;align-items:center;
-  box-shadow:var(--sh-1);
 }
 .legend .lit{display:flex;align-items:center;gap:5px}
-.legend .dot{width:12px;height:12px;border-radius:50%;display:inline-block;border:1.5px solid white;box-shadow:0 1px 3px rgba(0,0,0,.15)}
-.legend .line{width:20px;height:2px;display:inline-block}
+.legend .dot{width:12px;height:12px;border-radius:50%;display:inline-block;border:1.5px solid var(--glow)}
+.legend .line{width:24px;height:2px;display:inline-block;border-radius:2px}
 
 /* CONTROLS */
 .controls{position:absolute;top:18px;right:18px;display:flex;flex-direction:column;gap:6px;z-index:4}
 .ctrl{
-  width:36px;height:36px;background:white;border:1px solid var(--line);border-radius:50%;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;
-  color:var(--ink2);box-shadow:var(--sh-1);transition:all .15s;
+  width:38px;height:38px;background:rgba(15,15,22,.85);backdrop-filter:blur(10px);
+  border:1px solid rgba(232,152,112,.25);border-radius:50%;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:14px;
+  color:var(--ink);transition:all .15s;
 }
-.ctrl:hover{background:var(--warm);color:white;border-color:var(--warm)}
+.ctrl:hover{background:var(--warm);color:#0a0a0e;border-color:var(--warm);box-shadow:0 0 16px rgba(232,152,112,.4)}
 
-/* HEADER HELP BANNER */
-.helpbar{position:absolute;top:18px;left:18px;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:11px;color:var(--ink2);max-width:280px;line-height:1.5;box-shadow:var(--sh-1)}
+.helpbar{
+  position:absolute;top:18px;left:18px;max-width:300px;
+  background:rgba(15,15,22,.85);backdrop-filter:blur(10px);
+  border:1px solid rgba(232,152,112,.25);border-radius:12px;padding:12px 16px;
+  font-size:12px;color:var(--ink2);line-height:1.6;
+}
 .helpbar strong{color:var(--warm);font-family:var(--serif)}
-.helpbar .close-help{float:right;cursor:pointer;color:var(--ink3);font-size:14px;margin-left:8px;background:none;border:none}
+.helpbar .close-help{float:right;cursor:pointer;color:var(--ink3);font-size:16px;background:none;border:none;margin-left:8px}
 
 @media(max-width:900px){
   .side{width:100%;left:0;right:0}
@@ -136,7 +195,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 
   <header class="top">
     <a href="./" class="back">← 返回主站</a>
-    <h1><em>Stage 1</em>早期文明关系图谱</h1>
+    <h1><em>STAGE 1</em>早期文明关系图谱</h1>
     <span class="subtitle">前 3500 — 前 1000 BCE</span>
     <div class="filters">
       <span class="label">显示：</span>
@@ -148,36 +207,40 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
       <button class="filter on" data-edge="cause">事件因果</button>
       <button class="filter" data-edge="member">文明归属</button>
       <button class="filter" data-edge="contemporary">同时代</button>
+      <span class="label" style="margin-left:14px">标签：</span>
+      <button class="filter on" data-show="labels">显示</button>
     </div>
   </header>
 
   <div class="main">
     <div class="graph" id="graph">
+      <div class="stars"></div>
       <svg id="svg"></svg>
 
       <div class="helpbar" id="helpbar">
         <button class="close-help" onclick="document.getElementById('helpbar').style.display='none'">✕</button>
         <strong>🌐 关系图谱</strong><br/>
         所有文明、事件、人物都是节点。<br/>
-        · 拖拽节点重新排列<br/>
-        · 鼠标滚轮缩放<br/>
-        · 单击查看详情<br/>
-        · 双击聚焦该节点
+        <span style="color:var(--ink3);font-size:11px">
+        · 单击节点 → 该节点变为中心，其他放射排列<br/>
+        · 关系线上有标签（"朋友"/"起因"/"归属"）<br/>
+        · 拖拽节点 / 滚轮缩放 / 拖空白平移
+        </span>
       </div>
 
       <div class="legend">
         <div class="lit"><span class="dot" style="background:#c84820;width:18px;height:18px"></span>文明</div>
-        <div class="lit"><span class="dot" style="background:white;border-color:#c84820"></span>事件</div>
-        <div class="lit"><span class="dot" style="background:#fff5e0;border-color:#9a6828;width:9px;height:9px"></span>人物</div>
-        <div class="lit"><span class="line" style="background:#8a4090"></span>人物关系</div>
-        <div class="lit"><span class="line" style="background:#c84820"></span>事件因果</div>
+        <div class="lit"><span class="dot" style="background:rgba(232,152,112,.15)"></span>事件</div>
+        <div class="lit"><span class="dot" style="background:rgba(240,192,96,.15)"></span>人物</div>
+        <div class="lit"><span class="line" style="background:#c898e0"></span>人物关系</div>
+        <div class="lit"><span class="line" style="background:#e89870"></span>事件因果</div>
+        <div class="lit"><span class="line" style="background:#f0c060;opacity:.4"></span>归属</div>
       </div>
 
       <div class="controls">
         <button class="ctrl" onclick="zoom(1.2)" title="放大">+</button>
         <button class="ctrl" onclick="zoom(0.833)" title="缩小">−</button>
         <button class="ctrl" onclick="resetView()" title="重置">⟳</button>
-        <button class="ctrl" onclick="restartSim()" title="重新布局">⚄</button>
       </div>
 
       <div class="tip" id="tip"></div>
@@ -195,56 +258,57 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 <script>
 const D = EARLY_CIV_EXPLORER;
 
+// 关系类型 → 中文标签
+const REL_LABEL = {
+  friend:'朋友', family:'家人', enemy:'敌人', mentor:'师承',
+  contemporary:'同时代', successor:'继承'
+};
+
 // ════════════════════════════════════════════════════════════════
-// 构建节点 + 边
+// 节点 + 边
 // ════════════════════════════════════════════════════════════════
 const nodes = [];
 const edges = [];
 
 D.civilizations.filter(c => !c.isEvent).forEach(c => {
-  nodes.push({id:'c_'+c.id, type:'civ', civ:c.id, label:c.name, icon:c.icon, color:c.color, r:24, data:c});
+  nodes.push({id:'c_'+c.id, type:'civ', civ:c.id, label:c.name, icon:c.icon, color:c.color, r:30, data:c});
 });
 D.events.forEach(e => {
   const civ = D.civilizations.find(c => c.id === e.civ);
-  nodes.push({id:'e_'+e.id, type:'event', civ:e.civ, label:e.title, color:civ?civ.color:'#7a2818', year:e.year, r:8, data:e});
+  nodes.push({id:'e_'+e.id, type:'event', civ:e.civ, label:e.title, color:civ?civ.color:'#7a2818', year:e.year, r:11, data:e});
 });
 D.people.filter(p => p.civ !== 'modern').forEach(p => {
   const civ = D.civilizations.find(c => c.id === p.civ);
-  nodes.push({id:'p_'+p.id, type:'person', civ:p.civ, label:p.name.split(' ')[0], color:civ?civ.color:'#888', portrait:p.portrait, r:11, data:p});
+  nodes.push({id:'p_'+p.id, type:'person', civ:p.civ, label:p.name.split(' ')[0], color:civ?civ.color:'#888', portrait:p.portrait, r:22, data:p});
 });
 
-// 边类型：
-// 1. relate (人物关系)
+// 边
 D.people.forEach(p => {
   (p.relationships || []).forEach(r => {
-    edges.push({source:'p_'+p.id, target:'p_'+r.to, type:'relate', subtype:r.type, note:r.note});
+    edges.push({source:'p_'+p.id, target:'p_'+r.to, type:'relate', subtype:r.type, label:REL_LABEL[r.type] || r.type, note:r.note});
   });
 });
-// 2. cause (事件因果)
 D.events.forEach(e => {
   (e.leads_to || []).forEach(toId => {
-    edges.push({source:'e_'+e.id, target:'e_'+toId, type:'cause'});
+    edges.push({source:'e_'+e.id, target:'e_'+toId, type:'cause', label:'导致'});
   });
 });
-// 3. member (文明归属)
-D.events.forEach(e => { if (e.civ) edges.push({source:'c_'+e.civ, target:'e_'+e.id, type:'member'}); });
-D.people.forEach(p => { if (p.civ && p.civ !== 'modern') edges.push({source:'c_'+p.civ, target:'p_'+p.id, type:'member'}); });
+D.events.forEach(e => { if (e.civ) edges.push({source:'c_'+e.civ, target:'e_'+e.id, type:'member', label:'事件'}); });
+D.people.forEach(p => { if (p.civ && p.civ !== 'modern') edges.push({source:'c_'+p.civ, target:'p_'+p.id, type:'member', label:'人物'}); });
 
-// 4. contemporary (同时代人物，自动计算)
 for (let i=0; i<D.people.length; i++) {
   for (let j=i+1; j<D.people.length; j++) {
     const a = D.people[i], b = D.people[j];
     if (a.civ === 'modern' || b.civ === 'modern') continue;
-    if (a.civ === b.civ) continue;  // 同文明已通过 member 连
-    // 生卒年重叠
+    if (a.civ === b.civ) continue;
     if (a.born < b.died && b.born < a.died) {
-      edges.push({source:'p_'+a.id, target:'p_'+b.id, type:'contemporary'});
+      edges.push({source:'p_'+a.id, target:'p_'+b.id, type:'contemporary', label:'同代'});
     }
   }
 }
 
 // ════════════════════════════════════════════════════════════════
-// SVG 渲染 + 力导向布局
+// SVG 渲染 + 力导向
 // ════════════════════════════════════════════════════════════════
 const svg = document.getElementById('svg');
 const graph = document.getElementById('graph');
@@ -254,76 +318,31 @@ let viewBox = {x:0, y:0, w:W, h:H};
 const idToNode = {};
 nodes.forEach(n => idToNode[n.id] = n);
 
-// 初始位置 (按 civ 聚类)
+const filterTypes = new Set(['civ','event','person']);
+const filterEdges = new Set(['relate','cause']);
+let showLabels = true;
+let focusedId = null;
+
+// 初始按文明聚类
 const civPositions = {
-  sumer:     [W*0.20, H*0.30],
-  akkad:     [W*0.28, H*0.30],
-  babylon:   [W*0.36, H*0.30],
-  egypt_old: [W*0.20, H*0.62],
-  egypt_mid: [W*0.28, H*0.62],
-  egypt_new: [W*0.36, H*0.62],
-  indus:     [W*0.55, H*0.45],
-  shang:     [W*0.78, H*0.50],
-  minoan:    [W*0.55, H*0.20],
-  mycenae:   [W*0.65, H*0.20],
-  hittite:   [W*0.45, H*0.30],
+  sumer:     [W*0.20, H*0.35],
+  akkad:     [W*0.30, H*0.30],
+  babylon:   [W*0.40, H*0.32],
+  egypt_old: [W*0.18, H*0.65],
+  egypt_mid: [W*0.28, H*0.68],
+  egypt_new: [W*0.38, H*0.65],
+  indus:     [W*0.55, H*0.48],
+  shang:     [W*0.82, H*0.52],
+  minoan:    [W*0.55, H*0.22],
+  mycenae:   [W*0.65, H*0.22],
+  hittite:   [W*0.48, H*0.34],
 };
 nodes.forEach(n => {
   const cp = civPositions[n.civ] || [W/2, H/2];
-  n.x = cp[0] + (Math.random()-.5)*120;
-  n.y = cp[1] + (Math.random()-.5)*120;
+  n.x = cp[0] + (Math.random()-.5)*100;
+  n.y = cp[1] + (Math.random()-.5)*100;
   n.vx = 0; n.vy = 0;
-  if (n.type === 'civ') { n.x = cp[0]; n.y = cp[1]; n.fx = cp[0]; n.fy = cp[1]; }
 });
-
-// 力导向模拟 (简化版)
-let simRunning = true;
-function simStep(){
-  if (!simRunning) return;
-  const K = 0.04, REP = 1800, LINK = 0.015;
-
-  // 排斥力
-  for (let i=0; i<nodes.length; i++) {
-    const a = nodes[i];
-    if (a.fx != null) continue;
-    for (let j=i+1; j<nodes.length; j++) {
-      const b = nodes[j];
-      const dx = b.x - a.x, dy = b.y - a.y;
-      const dist2 = dx*dx + dy*dy + 1;
-      const force = REP / dist2;
-      const fx = (dx/Math.sqrt(dist2)) * force, fy = (dy/Math.sqrt(dist2)) * force;
-      a.vx -= fx; a.vy -= fy;
-      if (b.fx == null) { b.vx += fx; b.vy += fy; }
-    }
-  }
-  // 连接吸引力
-  edges.forEach(e => {
-    if (filteredEdge(e)) return;
-    const a = idToNode[e.source], b = idToNode[e.target];
-    if (!a || !b) return;
-    const dx = b.x - a.x, dy = b.y - a.y;
-    const dist = Math.sqrt(dx*dx+dy*dy) + 1;
-    const targetDist = e.type === 'member' ? 120 : (e.type === 'cause' ? 100 : 80);
-    const force = (dist - targetDist) * LINK;
-    const fx = (dx/dist)*force, fy = (dy/dist)*force;
-    if (a.fx == null) { a.vx += fx; a.vy += fy; }
-    if (b.fx == null) { b.vx -= fx; b.vy -= fy; }
-  });
-  // 居中力
-  nodes.forEach(n => {
-    if (n.fx != null) return;
-    n.vx += (W/2 - n.x) * 0.002;
-    n.vy += (H/2 - n.y) * 0.002;
-  });
-  // 更新位置 + 阻尼
-  nodes.forEach(n => {
-    if (n.fx != null) { n.x = n.fx; n.y = n.fy; return; }
-    n.vx *= 0.85; n.vy *= 0.85;
-    n.x += n.vx; n.y += n.vy;
-  });
-  draw();
-  requestAnimationFrame(simStep);
-}
 
 function filteredEdge(e){
   const a = idToNode[e.source], b = idToNode[e.target];
@@ -334,46 +353,180 @@ function filteredEdge(e){
 }
 function filteredNode(n){ return !filterTypes.has(n.type); }
 
-const filterTypes = new Set(['civ','event','person']);
-const filterEdges = new Set(['relate','cause']);
+let radialMode = false;
+let simRunning = true;
+function simStep(){
+  if (!simRunning) return;
+  const K = 0.04, REP = 2200, LINK = 0.018;
+
+  if (radialMode && focusedId) {
+    // 放射模式 — 中心节点居中，其他按距离分层
+    const center = idToNode[focusedId];
+    center.fx = W/2; center.fy = H/2;
+    // 找直接连接的节点
+    const connected = new Set();
+    edges.forEach(e => {
+      if (e.source === focusedId) connected.add(e.target);
+      if (e.target === focusedId) connected.add(e.source);
+    });
+    const connList = [...connected].filter(id => !filteredNode(idToNode[id]));
+    const angleStep = (Math.PI * 2) / Math.max(connList.length, 1);
+    connList.forEach((id, i) => {
+      const n = idToNode[id];
+      const ringRadius = 250;
+      const tx = W/2 + Math.cos(angleStep * i - Math.PI/2) * ringRadius;
+      const ty = H/2 + Math.sin(angleStep * i - Math.PI/2) * ringRadius;
+      // 不直接 fx, 用拉力慢慢拉到位
+      n.vx += (tx - n.x) * 0.05;
+      n.vy += (ty - n.y) * 0.05;
+    });
+    // 第二圈：通过 connected 间接连的
+    const secondRing = new Set();
+    connected.forEach(id => {
+      edges.forEach(e => {
+        if (e.source === id && !connected.has(e.target) && e.target !== focusedId) secondRing.add(e.target);
+        if (e.target === id && !connected.has(e.source) && e.source !== focusedId) secondRing.add(e.source);
+      });
+    });
+    const secondList = [...secondRing].filter(id => !filteredNode(idToNode[id]));
+    const angleStep2 = (Math.PI * 2) / Math.max(secondList.length, 1);
+    secondList.forEach((id, i) => {
+      const n = idToNode[id];
+      const ringRadius = 480;
+      const tx = W/2 + Math.cos(angleStep2 * i - Math.PI/2) * ringRadius;
+      const ty = H/2 + Math.sin(angleStep2 * i - Math.PI/2) * ringRadius;
+      n.vx += (tx - n.x) * 0.025;
+      n.vy += (ty - n.y) * 0.025;
+    });
+    // 其他节点远离中心
+    nodes.forEach(n => {
+      if (n.id === focusedId || connected.has(n.id) || secondRing.has(n.id)) return;
+      const dx = n.x - W/2, dy = n.y - H/2;
+      const dist = Math.sqrt(dx*dx+dy*dy) + 1;
+      if (dist < 700) {
+        n.vx += (dx/dist) * 1.5;
+        n.vy += (dy/dist) * 1.5;
+      }
+    });
+  } else {
+    // 自由力导向
+    for (let i=0; i<nodes.length; i++) {
+      const a = nodes[i]; if (a.fx != null) continue;
+      for (let j=i+1; j<nodes.length; j++) {
+        const b = nodes[j];
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const dist2 = dx*dx + dy*dy + 1;
+        const force = REP / dist2;
+        const f = Math.sqrt(dist2);
+        const fx = (dx/f) * force, fy = (dy/f) * force;
+        a.vx -= fx; a.vy -= fy;
+        if (b.fx == null) { b.vx += fx; b.vy += fy; }
+      }
+    }
+    edges.forEach(e => {
+      if (filteredEdge(e)) return;
+      const a = idToNode[e.source], b = idToNode[e.target];
+      const dx = b.x - a.x, dy = b.y - a.y;
+      const dist = Math.sqrt(dx*dx+dy*dy) + 1;
+      const targetDist = e.type === 'member' ? 130 : 100;
+      const force = (dist - targetDist) * LINK;
+      const fx = (dx/dist)*force, fy = (dy/dist)*force;
+      if (a.fx == null) { a.vx += fx; a.vy += fy; }
+      if (b.fx == null) { b.vx -= fx; b.vy -= fy; }
+    });
+    nodes.forEach(n => {
+      if (n.fx != null) return;
+      n.vx += (W/2 - n.x) * 0.002;
+      n.vy += (H/2 - n.y) * 0.002;
+    });
+  }
+
+  nodes.forEach(n => {
+    if (n.fx != null) { n.x = n.fx; n.y = n.fy; return; }
+    n.vx *= 0.82; n.vy *= 0.82;
+    n.x += n.vx; n.y += n.vy;
+  });
+  draw();
+  requestAnimationFrame(simStep);
+}
 
 // 渲染
 function draw(){
   let svgContent = `<defs>
     <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
-      <path d="M0,0 L0,6 L7,3 z" fill="#c84820"/>
+      <path d="M0,0 L0,6 L7,3 z" fill="#e89870"/>
     </marker>
+    <radialGradient id="civGlow">
+      <stop offset="0%" stop-color="rgba(232,152,112,.5)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
   </defs>
   <g transform="translate(${-viewBox.x},${-viewBox.y}) scale(${W/viewBox.w})">`;
 
-  // 边
-  edges.forEach(e => {
+  // 边 (曲线 bezier)
+  edges.forEach((e, i) => {
     if (filteredEdge(e)) return;
     const a = idToNode[e.source], b = idToNode[e.target];
-    const cls = `edge ${e.type}` + (focusedId && (e.source===focusedId||e.target===focusedId) ? ' highlight' : '') + (focusedId && e.source!==focusedId && e.target!==focusedId ? ' dim' : '');
-    svgContent += `<line class="${cls}" x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"/>`;
+    const isHighlight = focusedId && (e.source === focusedId || e.target === focusedId);
+    const isDim = focusedId && !isHighlight;
+    const cls = `edge ${e.type}${isHighlight?' highlight':''}${isDim?' dim':''}`;
+    // 曲线控制点 (偏移到一侧)
+    const dx = b.x - a.x, dy = b.y - a.y;
+    const dist = Math.sqrt(dx*dx+dy*dy);
+    const mx = (a.x+b.x)/2, my = (a.y+b.y)/2;
+    const nx = -dy/dist, ny = dx/dist;  // 法向量
+    const curve = Math.min(dist * 0.15, 40);
+    const cx = mx + nx*curve, cy = my + ny*curve;
+    const path = `M ${a.x},${a.y} Q ${cx},${cy} ${b.x},${b.y}`;
+    svgContent += `<path class="${cls}" d="${path}" ${e.type==='cause'?'marker-end="url(#arrowhead)"':''}/>`;
+
+    // 边标签 (只在高亮或显示全部时显示)
+    if (showLabels && (isHighlight || (!focusedId && (e.type==='relate' || e.type==='cause')))) {
+      const lblText = e.label || '';
+      const lblW = lblText.length * 11 + 12;
+      svgContent += `
+        <rect class="edge-label-bg${isDim?' dim':''}" x="${cx - lblW/2}" y="${cy - 8}" width="${lblW}" height="16" rx="8"/>
+        <text class="edge-label${isDim?' dim':''}" x="${cx}" y="${cy + 4}">${lblText}</text>`;
+    }
   });
 
   // 节点
   nodes.forEach(n => {
     if (filteredNode(n)) return;
-    const cls = `node node-${n.type}` + (focusedId === n.id ? ' focused' : '') + (focusedId && !isConnectedTo(n.id) ? ' dim' : '');
+    const isFocused = focusedId === n.id;
+    const isDim = focusedId && !isConnectedTo(n.id);
+    const cls = `node node-${n.type}${isFocused?' focused':''}${isDim?' dim':''}`;
+
     if (n.type === 'civ') {
+      // 文明大圆 + 光晕
       svgContent += `<g class="${cls}" data-id="${n.id}" transform="translate(${n.x},${n.y})">
-        <circle r="${n.r}" fill="${n.color}"/>
-        <text y="6" font-size="18">${n.icon}</text>
-        <text y="${n.r+16}" font-size="11" fill="${n.color}" font-weight="700">${n.label}</text>
+        <circle class="halo" r="${n.r + 12}" fill="url(#civGlow)"/>
+        <circle class="bg" r="${n.r}" fill="${n.color}"/>
+        <text y="8" font-size="22" text-anchor="middle">${n.icon}</text>
+        ${showLabels ? `
+          <rect class="label-bg" x="${-n.label.length*7-6}" y="${n.r+6}" width="${n.label.length*14+12}" height="20" rx="10"/>
+          <text class="label" y="${n.r+19}">${n.label}</text>
+        ` : ''}
       </g>`;
     } else if (n.type === 'event') {
       svgContent += `<g class="${cls}" data-id="${n.id}" transform="translate(${n.x},${n.y})">
-        <circle r="${n.r}" fill="white" stroke="${n.color}" stroke-width="2.5"/>
-        ${focusedId === n.id || idToNode[focusedId]?.type==='event' ? `<text y="${n.r+12}" font-size="9" font-weight="600">${n.label.slice(0,12)}</text>` : ''}
+        <circle class="bg" r="${n.r}" fill="rgba(232,152,112,.18)"/>
+        <text y="3" font-size="11" text-anchor="middle" fill="${n.color}">📅</text>
+        ${showLabels && isFocused ? `
+          <rect class="label-bg" x="${-n.label.length*5-5}" y="${n.r+4}" width="${n.label.length*10+10}" height="16" rx="8"/>
+          <text class="label" y="${n.r+15}">${n.label.slice(0,18)}</text>
+        ` : ''}
       </g>`;
     } else if (n.type === 'person') {
+      // 人物大圆 + emoji 头像
       svgContent += `<g class="${cls}" data-id="${n.id}" transform="translate(${n.x},${n.y})">
-        <circle r="${n.r}" fill="#fff5e0" stroke="${n.color}" stroke-width="2"/>
-        <text y="4" font-size="13">${n.portrait}</text>
-        ${focusedId === n.id || idToNode[focusedId]?.type==='person' ? `<text y="${n.r+12}" font-size="9" font-weight="600">${n.label}</text>` : ''}
+        <circle class="halo" r="${n.r + 6}" fill="url(#civGlow)" opacity=".6"/>
+        <circle class="bg" r="${n.r}" fill="rgba(240,192,96,.12)"/>
+        <text y="7" font-size="22" text-anchor="middle">${n.portrait}</text>
+        ${showLabels ? `
+          <rect class="label-bg" x="${-n.label.length*6-5}" y="${n.r+4}" width="${n.label.length*12+10}" height="18" rx="9"/>
+          <text class="label" y="${n.r+16}">${n.label}</text>
+        ` : ''}
       </g>`;
     }
   });
@@ -381,70 +534,74 @@ function draw(){
   svgContent += `</g>`;
   svg.innerHTML = svgContent;
 
-  // 绑定事件
   svg.querySelectorAll('.node').forEach(el => {
     const id = el.getAttribute('data-id');
     el.addEventListener('mouseenter', e => showTip(e, id));
     el.addEventListener('mouseleave', () => hideTip());
-    el.addEventListener('click', () => focusNode(id));
+    el.addEventListener('click', e => { e.stopPropagation(); focusNode(id); });
     el.addEventListener('mousedown', e => startDrag(e, id));
   });
 }
 
-let focusedId = null;
+function isConnectedTo(nid){
+  if (nid === focusedId) return true;
+  return edges.some(e =>
+    !filteredEdge(e) &&
+    ((e.source === focusedId && e.target === nid) || (e.target === focusedId && e.source === nid))
+  );
+}
+
 function focusNode(id){
+  if (focusedId === id) {
+    // 再点一次取消
+    focusedId = null; radialMode = false;
+    closeSide();
+    return;
+  }
   focusedId = id;
+  radialMode = true;
+  // 解除当前所有锚定
+  nodes.forEach(n => { if (n.id !== id) { n.fx = null; n.fy = null; }});
   showSide(id);
   draw();
 }
 
-function isConnectedTo(nid){
-  if (nid === focusedId) return true;
-  return edges.some(e => (e.source === focusedId && e.target === nid) || (e.target === focusedId && e.source === nid));
-}
-
 // ════════════════════════════════════════════════════════════════
-// 拖拽 + 缩放
+// 拖拽 / 缩放 / 平移
 // ════════════════════════════════════════════════════════════════
 let dragNode = null, dragStart = null;
 function startDrag(e, id){
   e.stopPropagation();
   const n = idToNode[id];
-  if (!n || n.type === 'civ') return;  // civ 固定
+  if (!n) return;
   dragNode = n;
-  const r = svg.getBoundingClientRect();
   dragStart = {x: e.clientX, y: e.clientY, nx: n.x, ny: n.y};
   n.fx = n.x; n.fy = n.y;
 }
 window.addEventListener('mousemove', e => {
   if (!dragNode) return;
   const scale = W / viewBox.w;
-  const dx = (e.clientX - dragStart.x) / scale;
-  const dy = (e.clientY - dragStart.y) / scale;
-  dragNode.fx = dragStart.nx + dx;
-  dragNode.fy = dragStart.ny + dy;
+  dragNode.fx = dragStart.nx + (e.clientX - dragStart.x) / scale;
+  dragNode.fy = dragStart.ny + (e.clientY - dragStart.y) / scale;
   dragNode.x = dragNode.fx; dragNode.y = dragNode.fy;
 });
 window.addEventListener('mouseup', () => {
-  if (dragNode) { dragNode.fx = null; dragNode.fy = null; dragNode = null; }
+  if (dragNode) { setTimeout(() => { if (dragNode) { dragNode.fx = null; dragNode.fy = null; dragNode = null; }}, 50); }
 });
 
-// 滚轮缩放
 graph.addEventListener('wheel', e => {
   e.preventDefault();
-  const delta = e.deltaY > 0 ? 1.1 : 0.9;
+  const delta = e.deltaY > 0 ? 1.12 : 0.89;
   const rect = graph.getBoundingClientRect();
   const mx = (e.clientX - rect.left) / W;
   const my = (e.clientY - rect.top) / H;
-  const newW = viewBox.w * delta;
-  const newH = viewBox.h * delta;
+  const newW = viewBox.w * delta, newH = viewBox.h * delta;
   viewBox.x += (viewBox.w - newW) * mx;
   viewBox.y += (viewBox.h - newH) * my;
   viewBox.w = newW; viewBox.h = newH;
   draw();
 }, {passive:false});
 
-// 画布平移
 let panStart = null;
 graph.addEventListener('mousedown', e => {
   if (e.target.closest('.node')) return;
@@ -459,38 +616,44 @@ window.addEventListener('mousemove', e => {
 });
 window.addEventListener('mouseup', () => panStart = null);
 
+graph.addEventListener('click', e => {
+  if (e.target.closest('.node')) return;
+  // 点空白处取消聚焦
+  focusedId = null; radialMode = false;
+  closeSide();
+});
+
 function zoom(factor){
   const cx = viewBox.x + viewBox.w/2, cy = viewBox.y + viewBox.h/2;
   viewBox.w /= factor; viewBox.h /= factor;
   viewBox.x = cx - viewBox.w/2; viewBox.y = cy - viewBox.h/2;
   draw();
 }
-function resetView(){ viewBox = {x:0,y:0,w:W,h:H}; focusedId = null; draw(); }
-function restartSim(){
-  nodes.forEach(n => { if (n.fx == null) { n.vx = (Math.random()-.5)*20; n.vy = (Math.random()-.5)*20; }});
+function resetView(){
+  viewBox = {x:0,y:0,w:W,h:H};
+  focusedId = null; radialMode = false;
+  nodes.forEach(n => { n.fx = null; n.fy = null; });
+  closeSide();
 }
 
 // ════════════════════════════════════════════════════════════════
-// Tooltip
+// Tooltip + Side panel
 // ════════════════════════════════════════════════════════════════
 function showTip(e, id){
   const n = idToNode[id];
   if (!n) return;
   let t = '';
-  if (n.type === 'civ') t = `<strong>${n.icon} ${n.data.name}</strong><br>${n.data.region}<br>前 ${Math.abs(n.data.start)} - 前 ${Math.abs(n.data.end)}`;
-  else if (n.type === 'event') t = `<strong>📅 ${n.data.title}</strong><br>前 ${Math.abs(n.data.year)} BCE · ${n.data.type}`;
-  else if (n.type === 'person') t = `<strong>${n.data.portrait} ${n.data.name}</strong><br>${n.data.role}<br>前 ${Math.abs(n.data.born)} - 前 ${Math.abs(n.data.died)}`;
+  if (n.type === 'civ') t = `<strong>${n.icon} ${n.data.name}</strong><br><span style="color:var(--ink3)">${n.data.region}</span><br>前 ${Math.abs(n.data.start)} - 前 ${Math.abs(n.data.end)}`;
+  else if (n.type === 'event') t = `<strong>📅 ${n.data.title}</strong><br><span style="color:var(--ink3)">前 ${Math.abs(n.data.year)} BCE · ${n.data.type}</span>`;
+  else if (n.type === 'person') t = `<strong>${n.data.portrait} ${n.data.name}</strong><br><span style="color:var(--ink3)">${n.data.role}</span><br>前 ${Math.abs(n.data.born)} - 前 ${Math.abs(n.data.died)}`;
   tip.innerHTML = t;
   tip.classList.add('show');
   const r = graph.getBoundingClientRect();
-  tip.style.left = (e.clientX - r.left + 12) + 'px';
-  tip.style.top = (e.clientY - r.top + 12) + 'px';
+  tip.style.left = (e.clientX - r.left + 14) + 'px';
+  tip.style.top = (e.clientY - r.top + 14) + 'px';
 }
 function hideTip(){ tip.classList.remove('show'); }
 
-// ════════════════════════════════════════════════════════════════
-// 详情侧栏
-// ════════════════════════════════════════════════════════════════
 function showSide(id){
   const n = idToNode[id];
   if (!n) return;
@@ -543,46 +706,39 @@ function showSide(id){
         <span>前 ${Math.abs(p.born)} - 前 ${Math.abs(p.died)}</span>
       </div>
       <p>${p.desc}</p>
-      ${p.inventions?.length ? `<h3>🏆 贡献</h3>${p.inventions.map(i=>`<div style="font-size:12px;padding:6px 10px;background:white;border-radius:6px;margin-bottom:4px;border-left:3px solid ${civ.color}">${i}</div>`).join('')}` : ''}
+      ${p.inventions?.length ? `<h3>🏆 贡献</h3>${p.inventions.map(i=>`<div style="font-size:12px;padding:6px 10px;background:rgba(240,192,96,.1);border-radius:6px;margin-bottom:4px;border-left:3px solid ${civ.color};color:var(--ink)">${i}</div>`).join('')}` : ''}
       <div class="conn" onclick="focusNode('c_${p.civ}')"><span class="ico">${civ.icon}</span><div class="info"><div class="name">所属: ${civ.name}</div></div><span class="tag tag-member">归属</span></div>
-      ${p.relationships?.length ? `<h3>🤝 朋友圈 (${p.relationships.length})</h3>${p.relationships.map(r=>{const o=D.people.find(x=>x.id===r.to);if(!o)return'';return `<div class="conn" onclick="focusNode('p_${o.id}')"><span class="ico">${o.portrait}</span><div class="info"><div class="name">${o.name}</div><div class="note">${r.note||o.role}</div></div><span class="tag tag-${r.type}">${r.type}</span></div>`;}).join('')}` : ''}
+      ${p.relationships?.length ? `<h3>🤝 朋友圈 (${p.relationships.length})</h3>${p.relationships.map(r=>{const o=D.people.find(x=>x.id===r.to);if(!o)return'';return `<div class="conn" onclick="focusNode('p_${o.id}')"><span class="ico">${o.portrait}</span><div class="info"><div class="name">${o.name}</div><div class="note">${r.note||o.role}</div></div><span class="tag tag-${r.type}">${REL_LABEL[r.type]||r.type}</span></div>`;}).join('')}` : ''}
     `;
   }
 }
-function closeSide(){ document.getElementById('side').classList.remove('open'); focusedId = null; draw(); }
+function closeSide(){ document.getElementById('side').classList.remove('open'); }
 
-// 过滤器
+// 过滤
 document.querySelectorAll('.filter').forEach(btn => {
   btn.onclick = () => {
     btn.classList.toggle('on');
-    const t = btn.dataset.type, e = btn.dataset.edge;
-    if (t) {
-      if (btn.classList.contains('on')) filterTypes.add(t); else filterTypes.delete(t);
-    }
-    if (e) {
-      if (btn.classList.contains('on')) filterEdges.add(e); else filterEdges.delete(e);
-    }
+    const t = btn.dataset.type, e = btn.dataset.edge, l = btn.dataset.show;
+    if (t) { btn.classList.contains('on') ? filterTypes.add(t) : filterTypes.delete(t); }
+    if (e) { btn.classList.contains('on') ? filterEdges.add(e) : filterEdges.delete(e); }
+    if (l === 'labels') { showLabels = btn.classList.contains('on'); }
     draw();
   };
 });
 
-// resize
 window.addEventListener('resize', () => {
   W = graph.clientWidth; H = graph.clientHeight;
   viewBox.w = W; viewBox.h = H;
   draw();
 });
 
-// 启动
 draw();
 simStep();
 
-// 暴露
 window.focusNode = focusNode;
 window.closeSide = closeSide;
 window.zoom = zoom;
 window.resetView = resetView;
-window.restartSim = restartSim;
 </script>
 
 </body>
