@@ -2360,4 +2360,84 @@ Object.assign(PERSON_DEEP, {
   },
 });
 
-if (typeof module !== 'undefined') module.exports = { CIV_DEEP, EVENT_DEEP, PERSON_DEEP };
+// ════════════════════════════════════════════════════════════════
+// 知识库填充 · 遗址地图坐标 (lat, lng) — 每个文明的主要遗址/古迹
+// ════════════════════════════════════════════════════════════════
+const CIV_MAP = {
+  sumer: [
+    { name:'乌鲁克 Uruk', coords:[31.322, 45.636], note:'世界最早的超级城市，楔形文字诞生地，吉尔伽美什之城。' },
+    { name:'埃利都 Eridu', coords:[30.816, 45.996], note:'苏美尔传统中"世界第一座城"，神庙连续叠建 18 层。' },
+    { name:'乌尔 Ur', coords:[30.963, 46.103], note:'乌尔王陵(普阿比墓)、大金字形神塔所在；Ur-Nammu 法典之都。' },
+    { name:'尼普尔 Nippur', coords:[32.126, 45.232], note:'苏美尔宗教中心，主神 Enlil 圣城。' },
+    { name:'拉格什 Lagash', coords:[31.417, 46.408], note:'最早详细记录的城邦，秃鹫碑、古地亚雕像出土地。' },
+    { name:'基什 Kish', coords:[32.543, 44.604], note:'苏美尔王表中"洪水后第一王朝"所在，Sargon 起家之地。' },
+  ],
+  akkad: [
+    { name:'阿卡德 Akkad', coords:[33.30, 44.40], note:'帝国首都，确切位置至今未找到(推测在巴格达附近)。' },
+    { name:'尼普尔 Nippur', coords:[32.126, 45.232], note:'帝国重要宗教中心。' },
+    { name:'苏萨 Susa', coords:[32.189, 48.257], note:'Elam 首都；Naram-Sin 胜利石碑后被掳至此(故出土于此)。' },
+  ],
+  babylon: [
+    { name:'巴比伦 Babylon', coords:[32.542, 44.421], note:'汉谟拉比之都，"以眼还眼"法典颁布地，前 1595 被赫梯洗劫。' },
+    { name:'马里 Mari', coords:[34.549, 40.889], note:'幼发拉底河中游大城，被汉谟拉比征服。' },
+    { name:'苏萨 Susa', coords:[32.189, 48.257], note:'汉谟拉比法典原碑出土地(被 Elam 王掳走)。' },
+  ],
+  egypt_predynastic: [
+    { name:'希拉孔波利斯 Hierakonpolis', coords:[25.099, 32.779], note:'上埃及王权中心，那尔迈调色板出土地。' },
+    { name:'阿拜多斯 Abydos', coords:[26.185, 31.919], note:'早期象形文字标签 + 第一王朝王陵。' },
+    { name:'纳卡达 Naqada', coords:[25.898, 32.726], note:'前王朝 Naqada 文化命名地。' },
+  ],
+  egypt_old: [
+    { name:'孟菲斯 Memphis', coords:[29.845, 31.250], note:'古王国首都，位于上下埃及交界。' },
+    { name:'吉萨 Giza', coords:[29.979, 31.134], note:'胡夫/哈夫拉/门卡拉三大金字塔 + 狮身人面像。' },
+    { name:'萨卡拉 Saqqara', coords:[29.871, 31.216], note:'左塞尔阶梯金字塔(人类第一座金字塔)。' },
+    { name:'阿拜多斯 Abydos', coords:[26.185, 31.919], note:'冥神 Osiris 圣地，王室墓地。' },
+  ],
+  egypt_new: [
+    { name:'底比斯/卢克索 Thebes', coords:[25.700, 32.640], note:'新王国首都，卡纳克与卢克索神庙所在。' },
+    { name:'帝王谷 Valley of the Kings', coords:[25.740, 32.601], note:'图坦卡蒙、拉美西斯等法老陵墓。' },
+    { name:'阿马尔纳 Amarna', coords:[27.646, 30.896], note:'阿肯那顿的一神教新都(娜芙蒂蒂半身像出土地)。' },
+    { name:'阿布辛贝 Abu Simbel', coords:[22.337, 31.626], note:'拉美西斯二世凿山而建的巨像神庙。' },
+    { name:'卡迭石 Kadesh', coords:[34.571, 36.523], note:'拉美西斯二世与赫梯的古代最大战车战(今叙利亚)。' },
+  ],
+  indus_early: [
+    { name:'梅赫尔格尔 Mehrgarh', coords:[29.381, 67.625], note:'南亚最早农业村落之一，印度河文明的根。' },
+    { name:'哈拉帕 Harappa(早期)', coords:[30.628, 72.864], note:'早期城镇，文明以此命名(哈拉帕文化)。' },
+  ],
+  indus: [
+    { name:'摩亨佐-达罗 Mohenjo-daro', coords:[27.329, 68.139], note:'最大城市，大浴池、网格街道、地下排水的奇迹。' },
+    { name:'哈拉帕 Harappa', coords:[30.628, 72.864], note:'另一大城，文明命名地。' },
+    { name:'多拉维拉 Dholavira', coords:[23.887, 70.215], note:'有大型蓄水系统的城市(今印度古吉拉特)。' },
+    { name:'洛塔尔 Lothal', coords:[22.521, 72.249], note:'已知最早的人工码头/船坞，海洋贸易港。' },
+  ],
+  minoan: [
+    { name:'克诺索斯 Knossos', coords:[35.298, 25.163], note:'最大宫殿，"米诺陶迷宫"原型，室内供排水。' },
+    { name:'费斯托斯 Phaistos', coords:[35.051, 24.814], note:'第二大宫殿，神秘的"费斯托斯圆盘"出土地。' },
+    { name:'阿克罗蒂里 Akrotiri', coords:[36.351, 25.404], note:'Thera 岛(圣托里尼)被火山灰封存的"爱琴海庞贝"。' },
+  ],
+  mycenaean: [
+    { name:'迈锡尼 Mycenae', coords:[37.731, 22.756], note:'狮子门、黄金面具王陵，阿伽门农之城。' },
+    { name:'皮洛斯 Pylos', coords:[36.908, 21.695], note:'"涅斯托耳宫殿"，大量线性文字B泥板出土地。' },
+    { name:'梯林斯 Tiryns', coords:[37.599, 22.800], note:'巨石城墙(被希腊人传为独眼巨人所建)。' },
+    { name:'特洛伊 Troy', coords:[39.957, 26.239], note:'荷马史诗特洛伊战争的城址(今土耳其)。' },
+  ],
+  hittite: [
+    { name:'哈图沙 Hattusa', coords:[40.019, 34.615], note:'赫梯首都，上万楔形泥板 + 狮门，前 1180 被烧毁。' },
+    { name:'卡迭石 Kadesh', coords:[34.571, 36.523], note:'与埃及决战 + 签订最早国际和约之地。' },
+    { name:'卡尔凯美什 Carchemish', coords:[36.829, 38.015], note:'赫梯控制的幼发拉底河战略要地。' },
+  ],
+  shang: [
+    { name:'殷墟 Yinxu(安阳)', coords:[36.127, 114.314], note:'商朝晚期都城，甲骨文 + 妇好墓 + 司母戊鼎所在。' },
+    { name:'郑州商城 Zhengzhou', coords:[34.757, 113.665], note:'商朝早期都城候选(亳或嚣)，7000 米城墙。' },
+    { name:'二里头 Erlitou', coords:[34.690, 112.689], note:'夏末商初都邑(夏朝?)，中国最早宫殿基址。' },
+    { name:'偃师商城 Yanshi', coords:[34.730, 112.789], note:'商朝早期都城候选，与郑州商城同期。' },
+  ],
+  collapse: [
+    { name:'乌加里特 Ugarit', coords:[35.602, 35.782], note:'叙利亚国际贸易港，留"敌船在我们海岸"泥板后被毁。' },
+    { name:'哈图沙 Hattusa', coords:[40.019, 34.615], note:'赫梯首都，前 1180 被烧毁废弃。' },
+    { name:'迈锡尼 Mycenae', coords:[37.731, 22.756], note:'希腊宫殿被焚，进入 400 年黑暗时代。' },
+    { name:'麦地那哈布 Medinet Habu', coords:[25.719, 32.601], note:'Ramesses III 神庙，详绘击退海上民族的浮雕。' },
+  ],
+};
+
+if (typeof module !== 'undefined') module.exports = { CIV_DEEP, EVENT_DEEP, PERSON_DEEP, CIV_MAP };

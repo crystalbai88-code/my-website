@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>文明小宇宙 · 早期文明实验室</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Cinzel:wght@500;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 :root{
   --bg:#02030a; --bg2:#080a20; --paper:#fbf6e9;
@@ -107,6 +109,17 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 .axis-end{font-family:var(--mono);fill:rgba(240,200,130,.55);font-size:12px}
 .axis-flow{font-family:var(--mono);font-size:14.5px;letter-spacing:.1em;font-weight:700}
 .float-orb .orb-year{font-family:var(--mono);fill:rgba(240,200,130,.82);pointer-events:none}
+/* 遗址地图 */
+.scroll-card .map-note{font-size:13px;color:var(--paper-ink2);margin-bottom:8px;line-height:1.6}
+.scroll-card .site-map{height:480px;border-radius:12px;overflow:hidden;border:1px solid rgba(184,136,48,.35);margin:6px 0 18px;background:#dfe8ee}
+.scroll-card .site-list{display:flex;flex-direction:column;gap:8px}
+.scroll-card .site-item{background:white;border:1px solid rgba(184,136,48,.2);border-left:4px solid #3a8868;border-radius:8px;padding:10px 14px;font-size:13px;line-height:1.65;color:var(--paper-ink)}
+.scroll-card .site-item b{color:#2a6850}
+.scroll-card .site-item .coord{font-family:var(--mono);font-size:10.5px;color:var(--paper-ink3);margin-left:6px}
+.site-tip{background:rgba(44,26,8,.9)!important;color:#fff!important;border:none!important;border-radius:4px!important;font-size:11px!important;font-weight:600;padding:2px 7px!important;box-shadow:0 2px 6px rgba(0,0,0,.4)!important}
+.site-tip::before{display:none!important}
+.leaflet-popup-content{font-family:'Noto Sans SC',sans-serif;font-size:12.5px;line-height:1.6}
+.leaflet-popup-content b{color:#c84820}
 /* 延伸阅读 · 百科链接 */
 .scroll-card .wiki-section{margin-top:24px;padding-top:18px;border-top:1.5px dashed rgba(184,136,48,.35)}
 .scroll-card .wiki-h{font-family:var(--mono);font-size:11px;color:var(--vermilion);letter-spacing:.1em;font-weight:700;margin-bottom:5px;text-transform:uppercase}
@@ -545,6 +558,7 @@ function renderCivCosmic(civId){
   if (deep) themes.push({icon:'🏛',name:'基础事实',color:'#a8a060',action:{type:'showText',payload:{kind:'basics',civId}}});
   if (deep?.nine_inventions) themes.push({icon:'💡',name:'关键发明',color:'#e8a020',action:{type:'showText',payload:{kind:'inventions',civId}}});
   themes.push({icon:'🌍',name:'文明关系',color:'#7a60b0',action:{type:'showText',payload:{kind:'relations',civId}}});
+  if (typeof CIV_MAP!=='undefined' && CIV_MAP[civId]?.length) themes.push({icon:'🗺',name:'遗址地图',color:'#3a8868',action:{type:'showText',payload:{kind:'map',civId}}});
   if (deep?.collapse_chain) themes.push({icon:'⏳',name:'崩溃过程',color:'#b04848',action:{type:'showText',payload:{kind:'collapse',civId}}});
   if (FINAL_OVERVIEW.civs.find(c=>c.id===civId)?.legacy) themes.push({icon:'🎁',name:'今天遗产',color:'#3a8868',action:{type:'showText',payload:{kind:'legacy',civId}}});
 
@@ -840,6 +854,15 @@ function openTextPanel(payload){
         return `<div class="tl-item"><div class="yr">${yr.trim()}</div><div class="ds">${rest.join('·').trim()}</div></div>`;
       }).join('')}`;
   }
+  else if (payload.kind === 'map') {
+    const info = getCivInfo(payload.civId);
+    const pts = (typeof CIV_MAP!=='undefined' ? CIV_MAP[payload.civId] : []) || [];
+    html += `<div class="type-tag civ">${info.icon} ${info.name}</div>
+      <h1>🗺 遗址地图</h1>
+      <div class="map-note">该文明的主要遗址 / 古迹真实地理位置（拖动缩放，点标点看说明）：</div>
+      <div id="siteMap" class="site-map"></div>
+      <div class="site-list">${pts.map(p=>`<div class="site-item"><b>${p.name}</b><span class="coord">${p.coords[0].toFixed(2)}°, ${p.coords[1].toFixed(2)}°</span><br>${p.note||''}</div>`).join('')}</div>`;
+  }
   else if (payload.kind === 'legacy') {
     const info = getCivInfo(payload.civId);
     const legacyStr = FINAL_OVERVIEW.civs.find(c=>c.id===payload.civId)?.legacy || '';
@@ -942,8 +965,31 @@ function openTextPanel(payload){
   card.innerHTML = html;
   card.scrollTop = 0;
   document.getElementById('textPanel').classList.add('open');
+  if (payload.kind === 'map') setTimeout(()=>initSiteMap(payload.civId), 80);
 }
-function closeTextPanel(){ document.getElementById('textPanel').classList.remove('open'); stopSpeak(); }
+function closeTextPanel(){ document.getElementById('textPanel').classList.remove('open'); stopSpeak(); if(_siteMap){ _siteMap.remove(); _siteMap=null; } }
+
+// 遗址地图 (Leaflet + OpenStreetMap)
+let _siteMap = null;
+function initSiteMap(civId){
+  const pts = (typeof CIV_MAP!=='undefined' ? CIV_MAP[civId] : null) || [];
+  if (!pts.length || typeof L==='undefined') return;
+  if (_siteMap){ _siteMap.remove(); _siteMap=null; }
+  const el = document.getElementById('siteMap');
+  if (!el) return;
+  _siteMap = L.map(el, { scrollWheelZoom:true, attributionControl:true });
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:13, minZoom:2, attribution:'© OpenStreetMap' }).addTo(_siteMap);
+  pts.forEach(p=>{
+    L.circleMarker(p.coords, { radius:8, color:'#c84820', weight:2.5, fillColor:'#d4a858', fillOpacity:.95 })
+      .addTo(_siteMap)
+      .bindPopup('<b>'+p.name+'</b><br>'+(p.note||''))
+      .bindTooltip(p.name, { permanent:true, direction:'right', offset:[8,0], className:'site-tip' });
+  });
+  if (pts.length===1) _siteMap.setView(pts[0].coords, 8);
+  else _siteMap.fitBounds(pts.map(p=>p.coords), { padding:[45,45], maxZoom:9 });
+  setTimeout(()=>_siteMap && _siteMap.invalidateSize(), 120);
+  setTimeout(()=>{ if(_siteMap){ _siteMap.invalidateSize(); if(pts.length>1) _siteMap.fitBounds(pts.map(p=>p.coords),{padding:[45,45],maxZoom:9}); } }, 480);
+}
 
 // ════════════════════════════════════════
 // 维基百科链接 (中文 + 英文双语)
