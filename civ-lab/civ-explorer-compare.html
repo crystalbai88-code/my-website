@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>方向对比 · 早期文明关系图谱</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'Noto Sans SC',sans-serif;background:#0a0a0e;color:#f0e8d5;min-height:100vh;padding:32px 24px}
+h1{font-family:'Noto Serif SC',serif;font-size:28px;margin-bottom:8px;color:#f0c060}
+.sub{color:#888070;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.1em;margin-bottom:32px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:20px;max-width:1400px;margin:0 auto}
+.card{background:#15151c;border:1px solid #2a2a36;border-radius:16px;overflow:hidden;transition:all .25s;cursor:pointer}
+.card:hover{border-color:#f0c060;transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.5)}
+.card .preview{height:200px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.card .body{padding:20px}
+.card h2{font-family:'Noto Serif SC',serif;font-size:20px;margin-bottom:6px}
+.card .tag{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:10px;opacity:.7}
+.card p{font-size:13px;line-height:1.6;color:#c8bca0;margin-bottom:12px}
+.card .keywords{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.card .kw{font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 8px;border-radius:99px;background:rgba(255,255,255,.06);color:#c8bca0;letter-spacing:.08em}
+.card .go{display:inline-block;margin-top:14px;padding:8px 16px;background:#f0c060;color:#0a0a0e;font-weight:700;border-radius:8px;text-decoration:none;font-size:13px}
+
+/* A */
+.a .preview{background:radial-gradient(ellipse at 25% 25%, rgba(120,90,255,.4), transparent 55%),radial-gradient(ellipse at 75% 70%, rgba(255,170,90,.2), transparent 50%),#02050a}
+.a .preview::after{content:'🪐';font-size:60px;filter:drop-shadow(0 0 20px rgba(122,168,255,.8))}
+.a h2{color:#7aa8ff} .a .tag{color:#ffd47a}
+
+/* B */
+.b .preview{background:linear-gradient(rgba(0,255,208,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,208,.08) 1px,transparent 1px),#000;background-size:20px 20px}
+.b .preview::after{content:'⬡';font-size:80px;color:#00ffd0;text-shadow:0 0 30px rgba(0,255,208,.8);font-family:'Orbitron'}
+.b h2{color:#00ffd0;font-family:'Orbitron'} .b .tag{color:#ff00aa}
+
+/* C */
+.c .preview{background:radial-gradient(ellipse at 30% 20%, rgba(212,168,88,.25), transparent 55%),radial-gradient(ellipse at 80% 75%, rgba(200,72,32,.15), transparent 55%),#0a0604}
+.c .preview::after{content:'📜';font-size:60px;filter:drop-shadow(0 0 20px rgba(240,192,104,.6))}
+.c h2{color:#f0c068} .c .tag{color:#d4a858}
+
+/* D */
+.d .preview{background:radial-gradient(ellipse at 25% 20%, rgba(160,112,255,.2), transparent 55%),radial-gradient(ellipse at 80% 80%, rgba(90,122,255,.18), transparent 55%),#fafbff}
+.d .preview::after{content:'◉';font-size:80px;background:linear-gradient(135deg,#5a7aff,#a070ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 4px 16px rgba(90,122,255,.4))}
+.d h2{color:#5a7aff} .d .tag{color:#a070ff}
+.d.card{background:#f4f6fc;border-color:#e0e6f4} .d p{color:#4a5278} .d .kw{background:rgba(90,122,255,.1);color:#4a5278}
+
+.back{display:inline-block;margin-bottom:16px;color:#888;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;text-decoration:none}
+.back:hover{color:#f0c060}
+</style>
+</head>
+<body>
+<a href="./civ-explorer.html" class="back">← 返回当前版本</a>
+<h1>4 个视觉方向 · 横向对比</h1>
+<div class="sub">FUNCTIONALITY IDENTICAL · ONLY VISUAL SKIN VARIES</div>
+
+<div class="grid">
+
+  <div class="card a" onclick="location='./civ-explorer-a.html'">
+    <div class="preview"></div>
+    <div class="body">
+      <div class="tag">方向 A</div>
+      <h2>🌌 天文台 Observatory</h2>
+      <p>深空蓝黑 + 极光渐变 + 闪烁星点。文明像行星，事件像超新星，散发金色 / 蓝紫光晕。最有"网络感"——文明像星座互相联结。</p>
+      <div class="keywords">
+        <span class="kw">DEEP SPACE</span><span class="kw">NEBULA</span><span class="kw">GLOW</span><span class="kw">STARS</span>
+      </div>
+      <a class="go" href="./civ-explorer-a.html">打开 A →</a>
+    </div>
+  </div>
+
+  <div class="card b" onclick="location='./civ-explorer-b.html'">
+    <div class="preview"></div>
+    <div class="body">
+      <div class="tag">方向 B</div>
+      <h2>🧬 赛博图谱 Cyber Atlas</h2>
+      <p>纯黑背景 + 霓虹青/品红 + 网格 + 全等宽字体。卡片是 HUD 仪表盘风格，方角无圆，最酷最有"科技感"——但可能离 10 岁稍远。</p>
+      <div class="keywords">
+        <span class="kw">NEON</span><span class="kw">GRID</span><span class="kw">HUD</span><span class="kw">MONO</span>
+      </div>
+      <a class="go" href="./civ-explorer-b.html">打开 B →</a>
+    </div>
+  </div>
+
+  <div class="card c" onclick="location='./civ-explorer-c.html'">
+    <div class="preview"></div>
+    <div class="body">
+      <div class="tag">方向 C</div>
+      <h2>📜 古卷 Scroll</h2>
+      <p>深咖暗调 + 烫金 + 朱砂 + 大字衬线。米黄卡片在深咖底下完美契合，最像博物馆策展，人文厚重。</p>
+      <div class="keywords">
+        <span class="kw">GOLD</span><span class="kw">VERMILLION</span><span class="kw">SERIF</span><span class="kw">SCROLL</span>
+      </div>
+      <a class="go" href="./civ-explorer-c.html">打开 C →</a>
+    </div>
+  </div>
+
+  <div class="card d" onclick="location='./civ-explorer-d.html'">
+    <div class="preview"></div>
+    <div class="body">
+      <div class="tag">方向 D</div>
+      <h2>🧠 神经网络 Neural</h2>
+      <p>白底 + 蓝紫渐变 + 玻璃磨砂质感。借鉴 OpenAI / Anthropic 风格，最现代、克制、信息密度高，"高级感"最强。</p>
+      <div class="keywords">
+        <span class="kw">WHITE</span><span class="kw">GRADIENT</span><span class="kw">GLASS</span><span class="kw">MODERN</span>
+      </div>
+      <a class="go" href="./civ-explorer-d.html">打开 D →</a>
+    </div>
+  </div>
+
+</div>
+
+<div style="max-width:900px;margin:48px auto 0;padding:24px;background:#15151c;border-radius:12px;border:1px solid #2a2a36">
+  <h3 style="font-family:'Noto Serif SC',serif;color:#f0c060;margin-bottom:12px">🎯 选择建议</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;font-size:13px;line-height:1.7;color:#c8bca0">
+    <div><strong style="color:#7aa8ff">A 天文台</strong> · 推荐给：想要"文明像星辰"的诗意叙事 + 暗色系</div>
+    <div><strong style="color:#00ffd0">B 赛博</strong> · 推荐给：教大孩子（13+），强调"数据驱动"、Hacker 风</div>
+    <div><strong style="color:#f0c068">C 古卷</strong> · 推荐给：人文气质优先，配合学校 / 博物馆场景</div>
+    <div><strong style="color:#5a7aff">D 神经</strong> · 推荐给：现代教育产品标准，最贴近 AI 产品高端感</div>
+  </div>
+  <p style="margin-top:14px;font-size:12px;color:#888070;line-height:1.6">每个变体功能完全一致：4 层分层、KB 卡片、🔊 朗读、🤖 浮动 AI 流式输出。看完后告诉我哪个方向，或哪两个混合（比如"D 的卡片 + A 的图"），我就把主版本定稿。</p>
+</div>
+
+</body>
+</html>
