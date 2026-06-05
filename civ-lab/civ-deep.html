@@ -314,8 +314,29 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 .error-page h1{font-family:var(--serif);font-size:32px;color:var(--ink);margin-bottom:14px}
 
 @media (max-width:768px){
-  .topbar-cosmos{flex-wrap:wrap;gap:6px;padding:10px}
-  .ai-panel{right:8px!important;left:8px!important;width:auto!important}
+  .topbar-cosmos{flex-wrap:wrap;gap:6px;padding:9px 10px}
+  .topbar-cosmos a,.topbar-cosmos button{font-size:10px;padding:6px 10px}
+  .theme-switch{margin-left:0;order:5}
+  .theme-switch button{width:20px!important;height:20px!important}
+  .ai-panel{right:8px!important;left:8px!important;width:auto!important;bottom:130px!important}
+  /* 人物/事件宇宙图: SVG 缩小后放大字号 */
+  .float-orb .name{font-size:22px}
+  .float-orb .type-tag{font-size:15px}
+  .float-orb .orb-year{font-size:16px}
+  .center-orb .label{font-size:30px}
+  .center-orb .meta{font-size:17px}
+  /* 文明页: 卡片两列, hero 缩小 */
+  .civ-page{top:96px;padding:6px 14px 60px}
+  .civ-hero{padding:18px 0 16px}
+  .civ-hero h1{font-size:30px}
+  .civ-hero .ic{width:68px;height:68px;font-size:34px}
+  .aspects{grid-template-columns:repeat(2,1fr);gap:9px}
+  .era-block{padding:13px 14px}
+  .era-row{flex-direction:column;gap:6px}
+  .era-row .rl{width:auto;padding-top:0}
+  .scroll-card{padding:22px 16px!important}
+  .scroll-card h1{font-size:24px}
+  .site-map{height:340px!important}
 }
 
 /* 前进/返回按钮 */
@@ -424,13 +445,20 @@ function navigate(type, id, section){
 // ════════════════════════════════════════
 // 工具
 // ════════════════════════════════════════
+// 文明专属图标 (统一、贴切、避免出戏)
+const CIV_ICON = {
+  sumer:'📜', akkad:'👑', babylon:'⚖️',
+  egypt_predynastic:'🌅', egypt_old:'🔺', egypt_new:'🏛️',
+  indus_early:'🏘️', indus:'🧱',
+  minoan:'🐂', mycenaean:'🦁',
+  hittite:'🛡️', shang:'🏺', collapse:'💥',
+};
 function getCivInfo(id){
-  if (typeof EARLY_CIV_EXPLORER!=='undefined') {
-    const f = EARLY_CIV_EXPLORER.civilizations.find(c=>c.id===id);
-    if (f) return f;
-  }
-  const fb = {egypt_predynastic:{name:'古埃及·前王朝',icon:'🌅',color:'#d4b870'},indus_early:{name:'印度河早期',icon:'🏘',color:'#a070d4'}};
-  return fb[id] || {name:id,icon:'🏛',color:'#888'};
+  let base = null;
+  if (typeof EARLY_CIV_EXPLORER!=='undefined') base = EARLY_CIV_EXPLORER.civilizations.find(c=>c.id===id);
+  const fb = {egypt_predynastic:{name:'古埃及·前王朝',color:'#d4b870'},egypt_new:{name:'古埃及·新王国',color:'#e0a850'},indus_early:{name:'印度河早期',color:'#a070d4'},mycenaean:{name:'迈锡尼',color:'#1880b0'},collapse:{name:'青铜时代崩溃',color:'#888'}};
+  base = base || fb[id] || {name:id,color:'#888'};
+  return {...base, icon: CIV_ICON[id] || base.icon || '🏛'};
 }
 // 人物专属图标 (按身份, 比全用 👤 更贴切)
 const PERSON_ICON = {
@@ -442,6 +470,17 @@ const PERSON_ICON = {
   minos:'🐂', agamemnon:'🛡️', suppiluliuma:'👑', muwatalli:'🏹', hattusili:'🕊️',
 };
 function personIcon(id){ return PERSON_ICON[id] || '👤'; }
+// 事件专属图标 (避免 📅 在苹果系统渲染成"JUL 17"日历)
+const EVENT_ICON = {
+  evt_eridu_first:'🏛️', evt_uruk_period:'🏙️', evt_cuneiform_invented:'✍️', evt_royal_tombs_ur:'⚱️',
+  evt_lagash_umma_war:'⚔️', evt_urnammu_law:'⚖️', evt_sargon_conquest:'⚔️', evt_naramsin_empire:'⭐',
+  evt_great_pyramid:'🔺', evt_giza_complex:'🦁', evt_egypt_unification:'👑', evt_hyksos_expulsion:'🏹',
+  evt_akhenaten_reform:'☀️', evt_kadesh:'⚔️', evt_indus_peak:'🏙️', evt_indus_decline:'🌊',
+  evt_knossos_palace:'🏛️', evt_thera_eruption:'🌋', evt_trojan_war:'🐴', evt_hittite_sack_babylon:'🔥',
+  evt_sea_peoples:'⛵', evt_bronze_collapse:'💥', evt_shang_founding:'👑', evt_pangeng_relocate:'🏙️',
+  evt_wuding_peak:'👑', evt_battle_muye:'⚔️',
+};
+function eventIcon(id){ return EVENT_ICON[id] || '⭐'; }
 function findCivChapters(civId){return CHAPTERS.filter(ch=>ch.active_civs.some(cv=>cv.id===civId))}
 function findEventsOfCiv(civId){
   const evs = [];
@@ -664,7 +703,7 @@ function renderCivCosmic(civId){
   const bucketKeys = Object.keys(buckets).map(Number).sort((a,b)=>b-a); // 大->小 = 早->晚 (因为是"前X")
   bucketKeys.forEach(k=>{ buckets[k].ev.sort((a,b)=>(a.year||0)-(b.year||0)); buckets[k].pe.sort((a,b)=>(a.year||0)-(b.year||0)); });
 
-  const chip = it => `<div class="tl-chip ${it.type==='event'?'ev':'pe'}" onclick="navigate('${it.type}','${it.id}')"><span class="nm">${it.type==='event'?'📅 ':personIcon(it.id)+' '}${it.name}</span>${it.year!=null?`<span class="yr">前${Math.abs(it.year)}</span>`:''}</div>`;
+  const chip = it => `<div class="tl-chip ${it.type==='event'?'ev':'pe'}" onclick="navigate('${it.type}','${it.id}')"><span class="nm">${(it.type==='event'?eventIcon(it.id):personIcon(it.id))+' '}${it.name}</span>${it.year!=null?`<span class="yr">前${Math.abs(it.year)}</span>`:''}</div>`;
 
   let timelineHtml = '';
   if (bucketKeys.length){
@@ -673,8 +712,8 @@ function renderCivCosmic(civId){
       const hi = k, lo = k-500; // 前 hi – 前 lo
       return `<div class="era-block">
         <div class="era-head">前 ${hi} – 前 ${lo} BCE<span class="era-line"></span></div>
-        ${b.ev.length?`<div class="era-row"><div class="rl">📅 事件</div><div class="era-items">${b.ev.map(chip).join('')}</div></div>`:''}
-        ${b.pe.length?`<div class="era-row"><div class="rl">👤 人物</div><div class="era-items">${b.pe.map(chip).join('')}</div></div>`:''}
+        ${b.ev.length?`<div class="era-row"><div class="rl">历史事件</div><div class="era-items">${b.ev.map(chip).join('')}</div></div>`:''}
+        ${b.pe.length?`<div class="era-row"><div class="rl">关键人物</div><div class="era-items">${b.pe.map(chip).join('')}</div></div>`:''}
       </div>`;
     }).join('');
   } else {
@@ -775,7 +814,7 @@ function renderPersonCosmic(pid){
   const involved = Object.entries(EVENT_DEEP).filter(([eid, e]) => e.related_people?.includes(pid));
   involved.forEach(([eid, e])=>{
     const title = e.full_title;
-    orbs.push({icon:'📅',name:title.length>10?title.slice(0,10)+'...':title,color:'#c8732a',typeLabel:'EVENT',size:34,
+    orbs.push({icon:eventIcon(eid),name:title.length>10?title.slice(0,10)+'...':title,color:'#c8732a',typeLabel:'参与事件',size:34,
       action:{type:'navigate',to:{type:'event',id:eid}}});
   });
 
@@ -797,7 +836,7 @@ function renderEventCosmic(eid){
   renderCrumb('event', eid, e.full_title);
 
   const center = {
-    icon: '📅', name: e.full_title, color: '#c8732a',
+    icon: eventIcon(eid), name: e.full_title, color: '#c8732a',
     meta: e.what_happened?.[0]?.split('·')[0]?.trim() || '',
     size: 75,
   };
@@ -811,7 +850,7 @@ function renderEventCosmic(eid){
     action:{type:'showText',payload:{kind:'three',eid}}});
   if (e.narrative) orbs.push({icon:'📖',name:'完整叙事',color:'#d4a858',typeLabel:'NARRATIVE',size:42,
     action:{type:'showText',payload:{kind:'enarrative',eid}}});
-  if (e.what_happened?.length) orbs.push({icon:'📅',name:'时间线',color:'#c8a070',typeLabel:'TIMELINE',size:36,
+  if (e.what_happened?.length) orbs.push({icon:'🕰️',name:'时间线',color:'#c8a070',typeLabel:'TIMELINE',size:36,
     action:{type:'showText',payload:{kind:'ewhat',eid}}});
 
   // 关键人物
@@ -866,7 +905,7 @@ function openTextPanel(payload){
     const chs = findCivChapters(payload.civId);
     const info = getCivInfo(payload.civId);
     html += `<div class="type-tag civ">${info.icon} ${info.name}</div>
-      <h1>📅 演化阶段</h1>
+      <h1>🕰️ 演化阶段</h1>
       ${chs.map(ch=>{
         const cv = ch.active_civs.find(x=>x.id===payload.civId);
         return `<div class="tl-item"><div class="yr">${ch.range} BCE</div><div class="ds"><strong>${ch.title} · ${cv.state}</strong><br/>${cv.in_period_summary||cv.L2||''}</div></div>`;
@@ -969,19 +1008,19 @@ function openTextPanel(payload){
   }
   else if (payload.kind === 'oneliner') {
     const e = EVENT_DEEP[payload.eid];
-    html += `<div class="type-tag event">📅 ${e.full_title}</div>
+    html += `<div class="type-tag event">${eventIcon(payload.eid)} ${e.full_title}</div>
       <h1>💡 一句话总结</h1>
       <div class="narrative" style="font-size:20px;line-height:1.7;text-align:center;padding:24px 0"><p>${e.one_liner}</p></div>`;
   }
   else if (payload.kind === 'chain') {
     const e = EVENT_DEEP[payload.eid];
-    html += `<div class="type-tag event">📅 ${e.full_title}</div>
+    html += `<div class="type-tag event">${eventIcon(payload.eid)} ${e.full_title}</div>
       <h1>🔗 因果链</h1>
       ${renderChainHtml(e)}`;
   }
   else if (payload.kind === 'three') {
     const e = EVENT_DEEP[payload.eid];
-    html += `<div class="type-tag event">📅 ${e.full_title}</div>
+    html += `<div class="type-tag event">${eventIcon(payload.eid)} ${e.full_title}</div>
       <h1>📜 之前 · 当时 · 之后</h1>
       <div class="three-col">
         <div class="three-col-card"><div class="lbl">之前</div><div class="txt">${e.context_before||'-'}</div></div>
@@ -991,15 +1030,15 @@ function openTextPanel(payload){
   }
   else if (payload.kind === 'enarrative') {
     const e = EVENT_DEEP[payload.eid];
-    html += `<div class="type-tag event">📅 ${e.full_title}</div>
+    html += `<div class="type-tag event">${eventIcon(payload.eid)} ${e.full_title}</div>
       <h1>📖 事件完整叙事</h1>
       <div class="one-liner">💡 ${e.one_liner||''}</div>
       <div class="narrative">${e.narrative.trim().split(/\n\s*\n/).map(p=>'<p>'+p.trim()+'</p>').join('')}</div>`;
   }
   else if (payload.kind === 'ewhat') {
     const e = EVENT_DEEP[payload.eid];
-    html += `<div class="type-tag event">📅 ${e.full_title}</div>
-      <h1>📅 事件时间线</h1>
+    html += `<div class="type-tag event">${eventIcon(payload.eid)} ${e.full_title}</div>
+      <h1>🕰️ 事件时间线</h1>
       ${e.what_happened.map(t=>{
         const [yr,...rest] = t.split('·');
         return `<div class="tl-item"><div class="yr">${yr.trim()}</div><div class="ds">${rest.join('·').trim()}</div></div>`;
@@ -1007,7 +1046,7 @@ function openTextPanel(payload){
   }
   else if (payload.kind === 'evidence') {
     const e = EVENT_DEEP[payload.eid];
-    html += `<div class="type-tag event">📅 ${e.full_title}</div>
+    html += `<div class="type-tag event">${eventIcon(payload.eid)} ${e.full_title}</div>
       <h1>🏺 考古证据</h1>
       ${e.evidence.map(ev=>`<div class="ev-card">
         <div class="nm">${ev.artifact}</div>
@@ -1017,7 +1056,7 @@ function openTextPanel(payload){
   }
   else if (payload.kind === 'significance') {
     const e = EVENT_DEEP[payload.eid];
-    html += `<div class="type-tag event">📅 ${e.full_title}</div>
+    html += `<div class="type-tag event">${eventIcon(payload.eid)} ${e.full_title}</div>
       <h1>🎯 历史意义</h1>
       <div class="narrative"><p>${e.significance}</p></div>`;
   }
@@ -1255,7 +1294,7 @@ function showTooltip(e, action){
         <div class="desc">${(p?.biography||'').slice(0,90).trim()}…</div>`;
     } else if (t === 'event') {
       const ev = EVENT_DEEP[id];
-      html = `<div class="nm">📅 ${ev?.full_title||id}</div>
+      html = `<div class="nm">${eventIcon(id)} ${ev?.full_title||id}</div>
         <div class="meta">${(ev?.what_happened?.[0]||'').split('·')[0].trim()}</div>
         <div class="desc">${ev?.one_liner||''}</div>`;
     } else if (t === 'civ') {
@@ -1270,13 +1309,13 @@ function showTooltip(e, action){
   moveTooltip(e);
 }
 const SECTION_HINTS = {
-  narrative:'📖 完整文明叙事', basics:'🏛 基础事实', timeline:'📅 演化阶段',
+  narrative:'📖 完整文明叙事', basics:'🏛 基础事实', timeline:'🕰️ 演化阶段',
   inventions:'💡 关键发明', relations:'🌍 与其他文明的关系', collapse:'⏳ 崩溃过程',
   legacy:'🎁 今天的遗产',
   biography:'📖 完整传记', childhood:'👶 童年出身', achievements:'🏆 主要成就',
   death:'⚰️ 死亡晚年', plegacy:'🌟 历史遗产',
   oneliner:'💡 一句话总结', chain:'🔗 事件因果链', three:'📜 之前·当时·之后',
-  enarrative:'📖 事件完整叙事', ewhat:'📅 事件时间线',
+  enarrative:'📖 事件完整叙事', ewhat:'🕰️ 事件时间线',
   evidence:'🏺 考古证据', significance:'🎯 历史意义',
 };
 function moveTooltip(e){
