@@ -938,7 +938,7 @@ function openTextPanel(payload){
       <div class="narrative"><p>${e.significance}</p></div>`;
   }
 
-  html += renderWikiSection(payload);
+  html += renderWikiSection(html);
   card.innerHTML = html;
   card.scrollTop = 0;
   document.getElementById('textPanel').classList.add('open');
@@ -1000,55 +1000,83 @@ const CIV_WIKI = {
 // 抽象/普通名词 → 不链接 (维基查不到具体词条 或 非专名知识点)
 const SKIP = new Set(['学校','法律','医学','贸易','城市规划','灌溉系统','帝国','神王制','度量衡','水利工程','十二进制时间','代数学','天文学','石质建筑技术','历法','一神教','六十进制','60进制','区域交流','南亚交通','帝国道路网络','帝国秩序','宗教思考','哲学','公民政治']);
 
-function collectTerms(payload){
-  const out = []; const seen = new Set();
-  const add = t => {
-    if (!t) return;
-    const key = t.zh || t.en; if (!key || key.length < 2) return;
-    if (SKIP.has(key)) return;
-    if (seen.has(key)) return;        // 严格去重
-    seen.add(key); out.push(t);
+// ── 历史知识点词典 (维基真能查到的专名 + 重要历史概念/文物) ──
+// match: 在正文里匹配的词 (可多个别名); zh/en: 维基条目名
+const KB_DICT = (function(){
+  const list = [];
+  const seen = new Set();
+  const add = (zh, en, match) => {
+    const key = zh || en; if (!key || seen.has(key)) return; seen.add(key);
+    list.push({zh, en, match: match || [zh].filter(Boolean)});
   };
-  const addName = n => add(parseTerm(n));   // 人物/事件/文物 (含英文名, 可解析)
+  // 文明
+  add('苏美尔','Sumer'); add('阿卡德帝国','Akkadian Empire',['阿卡德']); add('巴比伦','Babylon',['巴比伦','古巴比伦']);
+  add('古王国时期','Old Kingdom of Egypt',['古王国','古王國']); add('新王国时期','New Kingdom of Egypt',['新王国','新王國']);
+  add('古埃及','Ancient Egypt'); add('印度河流域文明','Indus Valley Civilisation',['印度河']);
+  add('米诺斯文明','Minoan civilization',['米诺斯']); add('迈锡尼文明','Mycenaean Greece',['迈锡尼']);
+  add('赫梯','Hittites',['赫梯']); add('商朝','Shang dynasty',['商朝','商王']); add('夏朝','Xia dynasty'); add('周朝','Zhou dynasty',['周朝','西周','周武王','周']);
+  add('青铜时代晚期崩溃','Late Bronze Age collapse',['青铜时代大崩溃','青铜时代崩溃','青铜崩溃']);
+  // 重要历史概念 / 文物类型 (需要解释的知识点)
+  add('楔形文字','Cuneiform'); add('象形文字','Egyptian hieroglyphs',['象形文字']); add('甲骨文','Oracle bone script',['甲骨文','甲骨']);
+  add('金字塔','Egyptian pyramids',['金字塔']); add('金字形神塔','Ziggurat',['金字形神塔','塔庙','ziggurat']);
+  add('莎草纸','Papyrus'); add('木乃伊','Mummy'); add('青金石','Lapis lazuli'); add('红玉髓','Carnelian');
+  add('青铜','Bronze',['青铜']); add('战车','Chariot',['战车']); add('铁器','Iron metallurgy',['铁器','铁']);
+  add('占卜','Divination',['占卜','卜辞']); add('青铜礼器','Chinese ritual bronzes',['青铜礼器','礼器','司母戊鼎','妇好墓']);
+  add('汉谟拉比法典','Code of Hammurabi',['汉谟拉比法典','以眼还眼']); add('乌尔纳姆法典','Code of Ur-Nammu',['乌尔纳姆法典','Ur-Nammu 法典','Ur-Nammu法典']);
+  add('吉尔伽美什史诗','Epic of Gilgamesh',['吉尔伽美什史诗','《吉尔伽美什》','吉尔伽美什史诗']);
+  add('大洪水','Flood myth',['大洪水','洪水']); add('海上民族','Sea Peoples',['海上民族','Sea Peoples']);
+  add('线性文字B','Linear B',['线性文字B','线性文字 B']);
+  // 遗址 / 城市 / 古迹
+  add('乌鲁克','Uruk'); add('乌尔','Ur',['乌尔']); add('埃利都','Eridu',['埃利都','埃里都','Eridu']);
+  add('尼普尔','Nippur'); add('拉格什','Lagash'); add('基什','Kish (Sumer)',['基什']);
+  add('孟菲斯','Memphis, Egypt',['孟菲斯','Memphis']); add('底比斯','Thebes, Egypt',['底比斯']);
+  add('吉萨','Giza',['吉萨']); add('卡纳克神庙','Karnak',['卡纳克']); add('阿布辛贝','Abu Simbel',['阿布辛贝']);
+  add('帝王谷','Valley of the Kings',['帝王谷']); add('阿马尔纳','Amarna',['阿马尔纳','Amarna']);
+  add('殷墟','Yinxu',['殷墟','殷','安阳']); add('二里头','Erlitou',['二里头']); add('郑州商城','Zhengzhou Shang City',['郑州商城']);
+  add('克诺索斯','Knossos',['克诺索斯','Knossos']); add('哈拉帕','Harappa',['哈拉帕','Harappa']);
+  add('摩亨佐-达罗','Mohenjo-daro',['摩亨佐-达罗','摩亨佐达罗','Mohenjo-Daro','Mohenjo-daro']);
+  add('哈图沙','Hattusa',['哈图沙','Hattusa']); add('卡迭石','Kadesh',['卡迭石']);
+  // 人物 (从 PERSON_DEEP 自动补)
+  if (typeof PERSON_DEEP!=='undefined') Object.values(PERSON_DEEP).forEach(p=>{
+    const t = parseTerm(p.full_name); if(t) add(t.zh, t.en, [t.zh, t.en].filter(Boolean));
+  });
+  // 重要事件 (从 EVENT_DEEP 自动补, 用核心标题)
+  if (typeof EVENT_DEEP!=='undefined') Object.values(EVENT_DEEP).forEach(e=>{
+    const zh = cleanTerm(e.full_title); if(zh) add(zh, null, [zh]);
+  });
+  return list;
+})();
 
-  if (payload.civId){
-    add(CIV_WIKI[payload.civId] || parseTerm(getCivInfo(payload.civId).name));
-    const c = CIV_DEEP[payload.civId];
-    if (c?.capital_at_peak) addName(c.capital_at_peak);  // 首都/遗址 (古迹)
-    // 事件 + 人物 + 文物 (专名实体)
-    findEventsOfCiv(payload.civId).forEach(e=>{
-      if (e.deep){ addName(e.deep.full_title); (e.deep.evidence||[]).forEach(ev=>addName(ev.artifact)); }
-    });
-    findPeopleOfCiv(payload.civId).forEach(p=>{ if(p.deep) addName(p.deep.full_name); });
-  }
-  if (payload.pid){
-    const p = PERSON_DEEP[payload.pid];
-    if (p){ addName(p.full_name); (p.related||[]).forEach(r=>{ const o=PERSON_DEEP[r.id]; if(o)addName(o.full_name); }); }
-    // 注: 成就名是描述短语, 非维基条目, 不链接
-  }
-  if (payload.eid){
-    const e = EVENT_DEEP[payload.eid];
-    if (e){ addName(e.full_title); (e.evidence||[]).forEach(ev=>addName(ev.artifact)); (e.related_people||[]).forEach(pid=>{ const p=PERSON_DEEP[pid]; if(p)addName(p.full_name); }); }
-  }
-  return out.slice(0,20);
+// 扫描一段正文文本, 只返回文本里真出现的知识点 (按出现顺序, 去重)
+function scanKnowledge(text){
+  const found = [];
+  KB_DICT.forEach(t=>{
+    let pos = -1;
+    for (const m of t.match){ if(m){ const i = text.indexOf(m); if(i>=0 && (pos<0||i<pos)) pos=i; } }
+    if (pos<0 && t.en){ const i=text.indexOf(t.en); if(i>=0) pos=i; }
+    if (pos>=0) found.push({zh:t.zh, en:t.en, _pos:pos});
+  });
+  found.sort((a,b)=>a._pos-b._pos);
+  return found;
 }
 function wikiChip(t){
   const label = t.zh || t.en;
   const zhUrl = t.zh ? `https://zh.wikipedia.org/wiki/${encodeURIComponent(t.zh)}` : '';
-  const enWord = t.en || t.zh;
-  const enUrl = `https://en.wikipedia.org/wiki/${encodeURIComponent(enWord.replace(/ /g,'_'))}`;
+  const enUrl = t.en ? `https://en.wikipedia.org/wiki/${encodeURIComponent(t.en.replace(/ /g,'_'))}` : '';
   return `<span class="wiki-term">
     <span class="label">${label}</span>
     ${t.zh?`<a class="zh" href="${zhUrl}" target="_blank" rel="noopener" title="中文维基：${t.zh}">中文</a>`:''}
-    <a class="en" href="${enUrl}" target="_blank" rel="noopener" title="English Wikipedia: ${enWord}">EN</a>
+    ${t.en?`<a class="en" href="${enUrl}" target="_blank" rel="noopener" title="English Wikipedia: ${t.en}">EN</a>`:''}
   </span>`;
 }
-function renderWikiSection(payload){
-  const terms = collectTerms(payload);
-  if (!terms.length) return '';
+// 基于"这块内容的实际文字"扫描知识点 → 有才挂, 没有不挂
+function renderWikiSection(htmlStr){
+  const text = String(htmlStr).replace(/<[^>]+>/g,' ');
+  const terms = scanKnowledge(text);
+  if (!terms.length) return '';   // 没有可解释的历史知识点 → 不挂维基
   return `<div class="wiki-section">
-    <div class="wiki-h">🔗 延伸阅读 · 维基百科 (双语)</div>
-    <div class="wiki-sub">每个知识点都可查中文 / 英文维基，对照学习：</div>
+    <div class="wiki-h">🔗 这段提到的历史知识点 · 维基百科 (双语)</div>
+    <div class="wiki-sub">点击查中文 / 英文维基，对照了解：</div>
     <div class="wiki-chips">${terms.map(t=>wikiChip(t)).join('')}</div>
   </div>`;
 }
