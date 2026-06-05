@@ -3,212 +3,241 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>文明深度页 · 早期文明实验室</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Cinzel:wght@500&display=swap" rel="stylesheet"/>
+<title>文明小宇宙 · 早期文明实验室</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Cinzel:wght@500;700&display=swap" rel="stylesheet"/>
 <style>
 :root{
-  --paper:#fbf6e9; --paper2:#f5e8c8;
-  --ink:#2c1a08; --ink2:#5c4530; --ink3:#8a7050;
-  --gold:#b88830; --gold-deep:#8a6028; --vermilion:#c84820;
-  --line:#c8b08a;
-  --serif:'Noto Serif SC',serif; --sans:'Noto Sans SC',sans-serif; --mono:'JetBrains Mono',monospace;
+  --bg:#02030a; --bg2:#080a20; --paper:#fbf6e9;
+  --ink:#f0e8d5; --ink2:#a8b0c8; --ink3:#5a6080;
+  --paper-ink:#2c1a08; --paper-ink2:#5c4530; --paper-ink3:#8a7050;
+  --gold:#d4a858; --warm:#e89870; --vermilion:#c84820;
+  --cyan:#7adcf0; --purple:#a070ff;
+  --serif:'Noto Serif SC',serif; --sans:'Noto Sans SC',sans-serif;
+  --mono:'JetBrains Mono',monospace; --latin:'Cinzel',serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{min-height:100%;font-family:var(--sans);background:var(--paper);color:var(--ink);scroll-behavior:smooth}
+html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--ink);overflow:hidden}
 
-/* 顶栏 */
-.topbar{position:sticky;top:0;height:60px;z-index:30;background:rgba(251,246,233,.96);backdrop-filter:blur(20px);border-bottom:1px solid rgba(184,136,48,.22);display:flex;align-items:center;gap:14px;padding:0 22px}
-.topbar .back-btn{display:flex;align-items:center;gap:6px;background:white;border:1.5px solid var(--gold);color:var(--gold-deep);padding:8px 16px;border-radius:99px;cursor:pointer;font-family:var(--serif);font-size:13.5px;font-weight:700;text-decoration:none;transition:all .15s}
-.topbar .back-btn:hover{background:var(--gold);color:white}
-.topbar .home-link{font-family:var(--mono);font-size:11px;color:var(--ink3);text-decoration:none;letter-spacing:.16em}
-.topbar .home-link:hover{color:var(--vermilion)}
-.crumb{display:flex;align-items:center;gap:6px;color:var(--ink3);font-family:var(--mono);font-size:11px;letter-spacing:.08em;flex-wrap:wrap}
-.crumb a{color:var(--ink2);text-decoration:none;padding:3px 8px;border-radius:6px;transition:all .15s;cursor:pointer}
-.crumb a:hover{background:rgba(184,136,48,.12);color:var(--vermilion)}
-.crumb .cur{color:var(--gold-deep);font-weight:700;background:rgba(184,136,48,.12);padding:3px 10px;border-radius:99px}
-.crumb .sep{color:var(--ink3)}
-
-.page{max-width:1080px;margin:0 auto;padding:0 24px 80px}
-
-/* HERO */
-.hero{padding:40px 0 28px;border-bottom:2px solid rgba(184,136,48,.18);margin-bottom:28px}
-.hero .type-tag{display:inline-block;font-family:var(--mono);font-size:11px;color:white;background:var(--gold);padding:4px 12px;border-radius:99px;letter-spacing:.18em;font-weight:700;margin-bottom:12px;text-transform:uppercase}
-.hero .type-tag.civ{background:var(--vermilion)}
-.hero .type-tag.event{background:#c8732a}
-.hero .type-tag.person{background:#6080b0}
-.hero h1{font-family:var(--serif);font-size:42px;font-weight:900;color:var(--ink);line-height:1.1;margin-bottom:6px}
-.hero h1 .icon{margin-right:12px;vertical-align:middle}
-.hero .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
-.hero .meta span{font-family:var(--mono);font-size:11.5px;color:var(--gold-deep);background:rgba(184,136,48,.12);padding:5px 12px;border-radius:99px;letter-spacing:.06em;font-weight:600}
-.hero .one-liner{font-family:var(--serif);font-size:17px;line-height:1.65;color:var(--ink2);margin-top:18px;padding:14px 18px;background:rgba(184,136,48,.08);border-left:4px solid var(--gold);border-radius:0 10px 10px 0;font-style:italic}
-
-/* HUB · 章节选择网格 (核心交互) */
-.hub-title{font-family:var(--serif);font-size:18px;font-weight:700;color:var(--vermilion);margin:0 0 6px;display:flex;align-items:center;gap:8px}
-.hub-sub{font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:.12em;margin-bottom:18px;text-transform:uppercase}
-.hub-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
-.hub-card{
-  background:white;border:1.5px solid rgba(184,136,48,.22);border-radius:14px;
-  padding:20px 22px;cursor:pointer;
-  display:flex;flex-direction:column;gap:8px;
-  transition:all .2s ease;position:relative;overflow:hidden;
+/* 宇宙背景 (与首页一致) */
+.cosmos{position:fixed;inset:0;z-index:0;pointer-events:none}
+.nebula{position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 40% 50% at 15% 20%, rgba(120,90,200,.28) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 85% 80%, rgba(200,120,60,.22) 0%, transparent 60%),
+    radial-gradient(ellipse 30% 30% at 70% 30%, rgba(80,140,200,.15) 0%, transparent 50%),
+    radial-gradient(ellipse 30% 30% at 30% 70%, rgba(60,180,140,.12) 0%, transparent 50%),
+    radial-gradient(ellipse 80% 80% at 50% 50%, transparent 0%, rgba(0,0,0,.4) 100%),
+    linear-gradient(180deg, #02030a 0%, #050818 50%, #02030a 100%);
 }
-.hub-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--gold);opacity:0;transition:opacity .2s}
-.hub-card:hover{border-color:var(--vermilion);transform:translateY(-3px);box-shadow:0 10px 28px rgba(184,136,48,.18)}
-.hub-card:hover::before{opacity:1}
-.hub-card .ic{font-size:32px;margin-bottom:4px}
-.hub-card .ti{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--ink);line-height:1.3}
-.hub-card .ds{font-size:12.5px;line-height:1.6;color:var(--ink2);flex:1}
-.hub-card .more{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:8px;border-top:1px dashed rgba(184,136,48,.2)}
-.hub-card .more .label{font-family:var(--mono);font-size:10.5px;color:var(--vermilion);letter-spacing:.1em;font-weight:700}
-.hub-card .more .count{font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.06em}
-.hub-card.disabled{opacity:.4;cursor:not-allowed}
-.hub-card.disabled:hover{transform:none;box-shadow:none;border-color:rgba(184,136,48,.22)}
-
-/* SECTION view (子章节内容) */
-.section-back{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:8px 16px;background:white;border:1.5px solid var(--gold);color:var(--gold-deep);
-  border-radius:99px;cursor:pointer;font-family:var(--serif);font-size:13.5px;font-weight:700;
-  margin-bottom:24px;transition:all .15s;
+.stars-back{position:absolute;inset:0;opacity:.4;
+  background-image:
+    radial-gradient(1px 1px at 5% 12%,#fff,transparent),
+    radial-gradient(1.2px 1.2px at 15% 25%,#fff,transparent),
+    radial-gradient(.8px .8px at 28% 8%,#ffd47a,transparent),
+    radial-gradient(1px 1px at 42% 18%,#fff,transparent),
+    radial-gradient(1.5px 1.5px at 55% 32%,#fff,transparent),
+    radial-gradient(1px 1px at 68% 11%,#c8d4ff,transparent),
+    radial-gradient(1.2px 1.2px at 82% 24%,#fff,transparent),
+    radial-gradient(.9px .9px at 95% 16%,#ffd47a,transparent),
+    radial-gradient(1px 1px at 8% 45%,#fff,transparent),
+    radial-gradient(1.3px 1.3px at 22% 58%,#fff,transparent),
+    radial-gradient(1px 1px at 38% 65%,#c8d4ff,transparent),
+    radial-gradient(1.5px 1.5px at 52% 72%,#fff,transparent),
+    radial-gradient(1px 1px at 65% 48%,#ffd47a,transparent),
+    radial-gradient(1.2px 1.2px at 78% 64%,#fff,transparent),
+    radial-gradient(.8px .8px at 92% 52%,#fff,transparent),
+    radial-gradient(1px 1px at 12% 88%,#fff,transparent),
+    radial-gradient(1.4px 1.4px at 28% 82%,#c8d4ff,transparent),
+    radial-gradient(1px 1px at 45% 95%,#fff,transparent),
+    radial-gradient(1.2px 1.2px at 62% 88%,#ffd47a,transparent),
+    radial-gradient(.9px .9px at 78% 92%,#fff,transparent),
+    radial-gradient(1.5px 1.5px at 91% 85%,#fff,transparent);
 }
-.section-back:hover{background:var(--gold);color:white}
-.section-title{font-family:var(--serif);font-size:26px;font-weight:900;color:var(--ink);margin-bottom:8px;display:flex;align-items:center;gap:10px}
-.section-title .ic{font-size:32px}
-.section-intro{font-size:13.5px;color:var(--ink2);margin-bottom:24px;line-height:1.7;max-width:780px}
+.stars-front{position:absolute;inset:0;opacity:.7;animation:twinkle 8s ease-in-out infinite;
+  background-image:
+    radial-gradient(2px 2px at 18% 18%,#fff,transparent 40%),
+    radial-gradient(2.5px 2.5px at 42% 28%,#ffd47a,transparent 40%),
+    radial-gradient(2px 2px at 72% 38%,#fff,transparent 40%),
+    radial-gradient(2.2px 2.2px at 92% 12%,#c8d4ff,transparent 40%),
+    radial-gradient(2px 2px at 22% 55%,#fff,transparent 40%),
+    radial-gradient(2.4px 2.4px at 58% 68%,#ffd47a,transparent 40%),
+    radial-gradient(2px 2px at 82% 78%,#fff,transparent 40%),
+    radial-gradient(2.3px 2.3px at 15% 82%,#fff,transparent 40%),
+    radial-gradient(2.1px 2.1px at 65% 92%,#c8d4ff,transparent 40%);
+}
+@keyframes twinkle{0%,100%{opacity:.7}50%{opacity:.4}}
 
-/* 叙事段 */
-.narrative{background:white;border:1px solid rgba(184,136,48,.18);border-radius:14px;padding:24px 28px;font-family:var(--serif);font-size:15.5px;line-height:1.95;color:var(--ink)}
-.narrative p{margin-bottom:16px}
-.narrative p:last-child{margin-bottom:0}
-.narrative strong{color:var(--vermilion);font-weight:700}
+/* 顶部覆盖层 */
+.topbar-cosmos{position:fixed;top:0;left:0;right:0;z-index:30;padding:14px 24px;display:flex;align-items:center;gap:14px;pointer-events:none;flex-wrap:wrap}
+.topbar-cosmos > *{pointer-events:auto}
+.topbar-cosmos a, .topbar-cosmos button{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.16em;background:rgba(0,0,0,.55);backdrop-filter:blur(10px);padding:8px 14px;border-radius:99px;border:1px solid rgba(212,168,88,.3);transition:all .2s;cursor:pointer}
+.topbar-cosmos a:hover, .topbar-cosmos button:hover{background:var(--gold);color:#02030a;border-color:var(--gold)}
+.crumb-cosmos{display:flex;align-items:center;gap:6px;color:var(--ink2);font-family:var(--mono);font-size:11px;letter-spacing:.08em;flex-wrap:wrap;background:rgba(0,0,0,.5);backdrop-filter:blur(10px);padding:7px 14px;border-radius:99px;border:1px solid rgba(212,168,88,.2)}
+.crumb-cosmos a{background:none;border:none;padding:0;color:var(--ink2)}
+.crumb-cosmos a:hover{color:var(--gold);background:none}
+.crumb-cosmos .cur{color:var(--gold);font-weight:700}
+.crumb-cosmos .sep{color:var(--ink3)}
 
-/* 信息卡 */
-.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
-.info-card{background:white;border:1px solid rgba(184,136,48,.18);border-radius:10px;padding:14px 16px}
-.info-card .lbl{font-family:var(--mono);font-size:9.5px;color:var(--gold);letter-spacing:.14em;font-weight:700;text-transform:uppercase;margin-bottom:5px}
-.info-card .val{font-family:var(--serif);font-size:14px;color:var(--ink);line-height:1.55}
+/* 主画布 (cosmic hub) */
+.universe-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:10}
+.universe-canvas.hidden{display:none}
 
-/* 时间线 */
-.timeline{display:flex;flex-direction:column;gap:10px}
-.tl-item{display:flex;gap:14px;background:white;border:1px solid rgba(184,136,48,.18);border-radius:12px;padding:14px 18px;transition:all .2s}
-.tl-item.clickable{cursor:pointer}
-.tl-item.clickable:hover{border-color:var(--vermilion);background:rgba(251,246,233,.8);transform:translateX(-3px)}
-.tl-item .yr{font-family:var(--mono);font-size:11.5px;color:var(--gold-deep);font-weight:700;letter-spacing:.04em;flex-shrink:0;width:130px}
-.tl-item .info{flex:1;min-width:0}
-.tl-item .ti{font-family:var(--serif);font-size:14.5px;font-weight:700;color:var(--ink);margin-bottom:3px}
-.tl-item .ds{font-size:12.5px;line-height:1.6;color:var(--ink2)}
+/* 中心+悬浮节点 */
+.center-orb{cursor:default}
+.center-orb .ring1{fill:none;stroke:rgba(212,168,88,.3);stroke-width:1.5;animation:orbitRing 30s linear infinite}
+.center-orb .ring2{fill:none;stroke:rgba(212,168,88,.18);stroke-width:1}
+@keyframes orbitRing{from{stroke-dashoffset:0}to{stroke-dashoffset:600}}
+.center-orb .body{filter:drop-shadow(0 8px 30px rgba(212,168,88,.5))}
+.center-orb .label{font-family:var(--serif);font-weight:900;fill:#fff;text-anchor:middle;pointer-events:none;text-shadow:0 4px 12px rgba(0,0,0,.8)}
+.center-orb .meta{font-family:var(--mono);fill:rgba(255,255,255,.7);text-anchor:middle;pointer-events:none;letter-spacing:.1em}
 
-/* 实体网格 */
-.entity-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
-.entity-card{background:white;border:1.5px solid rgba(184,136,48,.22);border-radius:14px;padding:16px 18px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:8px}
-.entity-card:hover{border-color:var(--vermilion);transform:translateY(-3px);box-shadow:0 8px 20px rgba(184,136,48,.15)}
-.entity-card .top{display:flex;align-items:center;gap:10px}
-.entity-card .ic{width:42px;height:42px;border-radius:50%;background:rgba(184,136,48,.15);color:var(--gold-deep);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.entity-card.person .ic{background:rgba(96,128,176,.18);color:#3a5078}
-.entity-card.event .ic{background:rgba(200,115,42,.18);color:#a05818}
-.entity-card .nm{flex:1;font-family:var(--serif);font-size:15.5px;font-weight:700;color:var(--ink);line-height:1.2}
-.entity-card .yr{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.06em}
-.entity-card .desc{font-size:12.5px;line-height:1.65;color:var(--ink2)}
-.entity-card .more{margin-top:auto;font-family:var(--mono);font-size:10.5px;color:var(--vermilion);letter-spacing:.08em;font-weight:700}
-.entity-card .more::after{content:' →';opacity:.7}
+.float-orb{cursor:pointer;transition:transform .35s cubic-bezier(.4,1,.6,1)}
+.float-orb:hover{transform:scale(1.12)}
+.float-orb .body{filter:drop-shadow(0 4px 16px rgba(0,0,0,.4))}
+.float-orb .name{font-family:var(--serif);font-weight:700;fill:#fff;text-anchor:middle;pointer-events:none;text-shadow:0 2px 6px rgba(0,0,0,.8)}
+.float-orb .type-tag{font-family:var(--mono);fill:rgba(255,255,255,.65);text-anchor:middle;pointer-events:none;letter-spacing:.06em}
+.float-orb .label-bg{fill:rgba(0,0,0,.7);stroke:currentColor;stroke-width:1;stroke-opacity:.35}
 
-/* 朋友圈 SVG */
-.friend-circle{background:white;border:1px solid rgba(184,136,48,.2);border-radius:14px;padding:18px;text-align:center}
-.fc-svg{display:block;margin:0 auto;max-width:100%}
+/* 连线 (center → orbs) */
+.spoke{stroke:rgba(212,168,88,.18);stroke-width:1;stroke-dasharray:3 5;fill:none}
+
+/* tooltip */
+.tooltip{position:fixed;z-index:50;background:rgba(15,15,28,.95);backdrop-filter:blur(20px);border:1px solid rgba(212,168,88,.35);border-radius:12px;padding:14px 18px;max-width:340px;display:none;pointer-events:none;box-shadow:0 12px 36px rgba(0,0,0,.7)}
+.tooltip.show{display:block}
+.tooltip .nm{font-family:var(--serif);font-size:16px;font-weight:900;color:var(--gold);margin-bottom:4px}
+.tooltip .meta{font-family:var(--mono);font-size:10px;color:var(--ink2);letter-spacing:.06em;margin-bottom:8px;text-transform:uppercase}
+.tooltip .desc{font-size:12.5px;line-height:1.65;color:var(--ink);margin-bottom:8px}
+.tooltip .cta{font-family:var(--mono);font-size:10px;color:var(--vermilion);letter-spacing:.12em;font-weight:700}
+
+/* 文字内容面板 (slides in from bottom) */
+.text-panel{
+  position:fixed;inset:0;z-index:40;display:none;
+  background:rgba(2,3,10,.85);backdrop-filter:blur(12px);
+  align-items:flex-start;justify-content:center;
+  padding:80px 24px 24px;
+  overflow-y:auto;
+}
+.text-panel.open{display:flex;animation:fadeIn .4s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.scroll-card{
+  background:var(--paper);color:var(--paper-ink);
+  border-radius:18px;max-width:880px;width:100%;
+  padding:36px 44px;margin:auto;position:relative;
+  box-shadow:0 24px 60px rgba(0,0,0,.6);
+  border:2px solid rgba(212,168,88,.35);
+  animation:slideUp .4s cubic-bezier(.4,1,.6,1);
+}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.scroll-card .close-x{position:absolute;top:18px;right:18px;width:42px;height:42px;border-radius:50%;background:white;border:1.5px solid rgba(184,136,48,.3);cursor:pointer;font-size:18px;color:var(--paper-ink2);display:flex;align-items:center;justify-content:center;transition:all .15s}
+.scroll-card .close-x:hover{background:var(--vermilion);color:white;border-color:var(--vermilion)}
+
+.scroll-card .type-tag{display:inline-block;font-family:var(--mono);font-size:10px;color:white;background:var(--gold);padding:4px 12px;border-radius:99px;letter-spacing:.18em;font-weight:700;margin-bottom:10px;text-transform:uppercase}
+.scroll-card .type-tag.civ{background:var(--vermilion)}
+.scroll-card .type-tag.event{background:#c8732a}
+.scroll-card .type-tag.person{background:#6080b0}
+.scroll-card h1{font-family:var(--serif);font-size:32px;font-weight:900;color:var(--paper-ink);line-height:1.15;margin-bottom:8px}
+.scroll-card .one-liner{font-family:var(--serif);font-size:15px;line-height:1.7;color:var(--paper-ink2);margin:14px 0 20px;padding:12px 16px;background:rgba(184,136,48,.08);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;font-style:italic}
+
+.scroll-card .narrative{font-family:var(--serif);font-size:15px;line-height:1.95;color:var(--paper-ink)}
+.scroll-card .narrative p{margin-bottom:14px}
+.scroll-card .narrative p:last-child{margin-bottom:0}
+.scroll-card .narrative strong{color:var(--vermilion);font-weight:700}
+
+.scroll-card .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:10px}
+.scroll-card .info-card{background:white;border:1px solid rgba(184,136,48,.18);border-radius:10px;padding:12px 14px}
+.scroll-card .info-card .lbl{font-family:var(--mono);font-size:9.5px;color:var(--gold);letter-spacing:.14em;font-weight:700;text-transform:uppercase;margin-bottom:5px}
+.scroll-card .info-card .val{font-family:var(--serif);font-size:13.5px;color:var(--paper-ink);line-height:1.55}
+
+.scroll-card .tl-item{display:flex;gap:14px;background:white;border:1px solid rgba(184,136,48,.18);border-radius:10px;padding:12px 16px;margin-bottom:8px}
+.scroll-card .tl-item .yr{font-family:var(--mono);font-size:11px;color:var(--gold);font-weight:700;letter-spacing:.04em;flex-shrink:0;width:130px}
+.scroll-card .tl-item .ds{flex:1;font-size:13px;line-height:1.7;color:var(--paper-ink)}
+
+.scroll-card .chain-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:white;border:1px solid rgba(184,136,48,.2);border-radius:12px;padding:14px}
+.scroll-card .chain-pill{padding:7px 14px;background:var(--paper);border:1.5px solid rgba(184,136,48,.35);border-radius:99px;font-family:var(--serif);font-size:13px;color:var(--paper-ink)}
+.scroll-card .chain-pill.center{background:var(--gold);color:white;border-color:#8a6028;font-weight:700}
+.scroll-card .chain-arrow{color:var(--gold);font-size:14px;font-weight:700}
+
+.scroll-card .three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.scroll-card .three-col-card{background:white;border:1px solid rgba(184,136,48,.2);border-radius:10px;padding:14px}
+.scroll-card .three-col-card .lbl{font-family:var(--serif);font-size:15px;font-weight:900;color:var(--vermilion);margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid rgba(200,72,32,.2)}
+.scroll-card .three-col-card .txt{font-size:12.5px;line-height:1.7;color:var(--paper-ink2)}
+
+.scroll-card .ev-card{background:white;border:1px solid rgba(184,136,48,.2);border-left:4px solid var(--gold);border-radius:8px;padding:12px 14px;margin-bottom:8px}
+.scroll-card .ev-card .nm{font-family:var(--serif);font-size:13.5px;font-weight:700;color:#8a6028;margin-bottom:4px}
+.scroll-card .ev-card .ds{font-size:12.5px;line-height:1.6;color:var(--paper-ink)}
+.scroll-card .ev-card .ho{font-family:var(--mono);font-size:10px;color:var(--paper-ink3);letter-spacing:.04em;margin-top:4px}
+
+.scroll-card .rel-list{display:flex;flex-direction:column;gap:8px}
+.scroll-card .rel-card{background:white;border:1px solid rgba(184,136,48,.2);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .15s}
+.scroll-card .rel-card:hover{border-color:var(--vermilion);transform:translateX(-2px)}
+.scroll-card .rel-card .pair{font-family:var(--serif);font-size:13.5px;font-weight:700;color:var(--paper-ink);margin-bottom:4px}
+.scroll-card .rel-card .pair .arrow{color:var(--vermilion);margin:0 6px}
+.scroll-card .rel-card .typ{display:inline-block;font-family:var(--mono);font-size:9px;color:white;background:var(--gold);padding:2px 7px;border-radius:99px;letter-spacing:.08em;margin-bottom:5px;font-weight:700}
+.scroll-card .rel-card .typ.war{background:#cc4040}.scroll-card .rel-card .typ.trade{background:#3a8868}.scroll-card .rel-card .typ.influence{background:#7a60b0}
+.scroll-card .rel-card .desc{font-size:12px;line-height:1.6;color:var(--paper-ink2)}
+
+.scroll-card .legacy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.scroll-card .legacy-card{background:rgba(184,136,48,.06);border:1px solid rgba(184,136,48,.2);border-radius:10px;padding:12px 14px}
+.scroll-card .legacy-card .what{font-family:var(--serif);font-size:14.5px;font-weight:700;color:var(--vermilion);margin-bottom:3px}
+
+.scroll-card .friend-circle{background:white;border:1px solid rgba(184,136,48,.2);border-radius:14px;padding:16px;text-align:center}
+.scroll-card .fc-svg{display:block;margin:0 auto;max-width:100%}
 .fc-link{stroke:rgba(184,136,48,.55);stroke-width:1.5;fill:none}
 .fc-link.family{stroke:#a070ff}
 .fc-link.enemy{stroke:#ff7878;stroke-dasharray:5 3}
 .fc-link.mentor{stroke:var(--gold)}
-.fc-center{fill:var(--gold);filter:drop-shadow(0 4px 10px rgba(184,136,48,.4))}
-.fc-node{cursor:pointer;transition:transform .2s}
-.fc-node:hover{transform:scale(1.1)}
+.fc-center-svg{fill:var(--gold);filter:drop-shadow(0 4px 10px rgba(184,136,48,.4))}
+.fc-node-svg{cursor:pointer;transition:transform .2s}
+.fc-node-svg:hover{transform:scale(1.1)}
 .fc-node-bg{fill:#6080b0;filter:drop-shadow(0 3px 8px rgba(96,128,176,.4))}
-.fc-name{font-family:var(--serif);font-size:11px;fill:var(--ink);text-anchor:middle;pointer-events:none;font-weight:700}
+.fc-name{font-family:var(--serif);font-size:11px;fill:var(--paper-ink);text-anchor:middle;pointer-events:none;font-weight:700}
 .fc-center-name{font-family:var(--serif);font-size:13px;fill:white;text-anchor:middle;dominant-baseline:central;pointer-events:none;font-weight:700}
-.fc-rel-label{font-family:var(--mono);font-size:9.5px;fill:var(--gold-deep);text-anchor:middle;pointer-events:none;letter-spacing:.04em;font-weight:700}
+.fc-rel-label{font-family:var(--mono);font-size:9.5px;fill:#8a6028;text-anchor:middle;pointer-events:none;letter-spacing:.04em;font-weight:700}
 .fc-rel-bg{fill:var(--paper);stroke:rgba(184,136,48,.3);stroke-width:1}
-.fc-legend{font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.06em;margin-top:10px;display:flex;justify-content:center;gap:18px;flex-wrap:wrap}
-.fc-legend span{display:inline-flex;align-items:center;gap:6px}
-.fc-legend span::before{content:'';width:18px;height:2px;background:rgba(184,136,48,.55)}
-.fc-legend .family::before{background:#a070ff}
-.fc-legend .enemy::before{background:#ff7878}
-.fc-legend .mentor::before{background:var(--gold)}
 
-/* 事件因果链 */
-.chain-box{background:white;border:1px solid rgba(184,136,48,.2);border-radius:14px;padding:18px}
-.chain-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.chain-pill{padding:8px 16px;background:var(--paper);border:1.5px solid rgba(184,136,48,.35);border-radius:99px;font-family:var(--serif);font-size:13px;color:var(--ink)}
-.chain-pill.center{background:var(--gold);color:white;border-color:var(--gold-deep);font-weight:700}
-.chain-arrow{color:var(--gold);font-size:16px;font-weight:700}
-
-/* 三栏 */
-.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.three-col-card{background:white;border:1px solid rgba(184,136,48,.2);border-radius:12px;padding:16px}
-.three-col-card .lbl{font-family:var(--serif);font-size:16px;font-weight:900;color:var(--vermilion);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(200,72,32,.2)}
-.three-col-card .txt{font-size:13px;line-height:1.7;color:var(--ink2)}
-
-/* 证据卡 */
-.evidence-card{background:white;border:1px solid rgba(184,136,48,.2);border-left:4px solid var(--gold);border-radius:10px;padding:12px 16px;margin-bottom:8px}
-.evidence-card .nm{font-family:var(--serif);font-size:14px;font-weight:700;color:var(--gold-deep);margin-bottom:4px}
-.evidence-card .ds{font-size:13px;line-height:1.65;color:var(--ink2);margin-bottom:4px}
-.evidence-card .ho{font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.04em}
-
-/* 国与国关系 */
-.relations-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}
-.rel-card{background:white;border:1px solid rgba(184,136,48,.2);border-radius:12px;padding:14px 16px;cursor:pointer;transition:all .2s}
-.rel-card:hover{border-color:var(--vermilion);transform:translateX(-2px)}
-.rel-card .pair{font-family:var(--serif);font-size:14px;font-weight:700;color:var(--ink);margin-bottom:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.rel-card .pair .arrow{color:var(--vermilion)}
-.rel-card .typ{display:inline-block;font-family:var(--mono);font-size:9.5px;color:white;background:var(--gold);padding:2px 8px;border-radius:99px;letter-spacing:.08em;margin-bottom:6px;font-weight:700}
-.rel-card .typ.war{background:#cc4040}.rel-card .typ.trade{background:#3a8868}.rel-card .typ.influence{background:#7a60b0}
-.rel-card .desc{font-size:12.5px;line-height:1.65;color:var(--ink2)}
-
-/* 遗产 */
-.legacy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
-.legacy-card{background:rgba(184,136,48,.06);border:1px solid rgba(184,136,48,.2);border-radius:10px;padding:14px 16px}
-.legacy-card .what{font-family:var(--serif);font-size:15px;font-weight:700;color:var(--vermilion);margin-bottom:3px}
-.legacy-card .why{font-size:12px;line-height:1.6;color:var(--ink2)}
-
-/* 同时代速览 */
-.contemp-strip{background:linear-gradient(135deg,rgba(184,136,48,.1),rgba(200,72,32,.08));border:1px solid rgba(184,136,48,.25);border-radius:14px;padding:18px}
-.contemp-strip h3{font-family:var(--serif);font-size:16px;font-weight:700;color:var(--vermilion);margin-bottom:8px}
-.contemp-strip p{font-size:13px;color:var(--ink2);line-height:1.7;margin-bottom:10px}
-.contemp-items{display:flex;flex-wrap:wrap;gap:8px}
-.contemp-chip{padding:6px 14px;background:white;border:1px solid rgba(184,136,48,.3);border-radius:99px;font-family:var(--serif);font-size:13px;color:var(--ink);cursor:pointer;transition:all .15s}
-.contemp-chip:hover{border-color:var(--vermilion);color:var(--vermilion)}
-
-.todo-note{background:rgba(200,72,32,.06);border:1px dashed rgba(200,72,32,.35);border-radius:10px;padding:14px 18px;font-size:13px;color:var(--ink2);line-height:1.7;margin-top:18px}
+.todo-note{background:rgba(200,72,32,.06);border:1px dashed rgba(200,72,32,.35);border-radius:10px;padding:14px 18px;font-size:13px;color:var(--paper-ink2);line-height:1.7;margin-top:14px}
 .todo-note::before{content:'📝 ';color:var(--vermilion);font-weight:700}
 
-.error-page{text-align:center;padding:80px 20px}
-.error-page h1{font-family:var(--serif);font-size:32px;color:var(--ink2);margin-bottom:12px}
+.error-page{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:20}
+.error-page h1{font-family:var(--serif);font-size:32px;color:var(--ink);margin-bottom:14px}
 
 @media (max-width:768px){
-  .hero h1{font-size:30px}
-  .three-col{grid-template-columns:1fr}
-  .topbar{flex-wrap:wrap;height:auto;padding:10px 14px;gap:8px}
-  .crumb{font-size:10px}
-  .section-title{font-size:22px}
+  .topbar-cosmos{flex-wrap:wrap;gap:6px;padding:10px}
+  .scroll-card{padding:24px 20px}
+  .scroll-card h1{font-size:24px}
+  .scroll-card .three-col{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <a href="./civ-explorer-d.html" class="back-btn">◀ 返回时间入口</a>
-  <a href="./civ-explorer-compare.html" class="home-link">⌂ 首页</a>
-  <div class="crumb" id="crumb"></div>
+<div class="cosmos">
+  <div class="nebula"></div>
+  <div class="stars-back"></div>
+  <div class="stars-front"></div>
 </div>
 
-<main class="page" id="page"></main>
+<div class="topbar-cosmos">
+  <a href="./civ-explorer-d.html">◀ 历史宇宙</a>
+  <a href="./civ-explorer-compare.html">⌂ 首页</a>
+  <div class="crumb-cosmos" id="crumb"></div>
+</div>
+
+<svg class="universe-canvas" id="canvas" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet"></svg>
+
+<div class="tooltip" id="tooltip"></div>
+
+<div class="text-panel" id="textPanel">
+  <div class="scroll-card" id="scrollCard"></div>
+</div>
 
 <script src="./early_civ_deep.js"></script>
 <script src="./early_civ_explorer_data.js"></script>
 <script src="./chapters_data.js"></script>
 <script>
-// ════════════════════════════════════════════════
-// 路由：#/civ/sumer 或 #/civ/sumer/narrative
-// ════════════════════════════════════════════════
+const W = 1600, H = 900;
+const CX = W/2, CY = H/2 - 30;
+
 function parseHash(){
   const h = location.hash.replace(/^#\/?/, '');
   const parts = h.split('/').filter(x=>x);
@@ -218,642 +247,524 @@ function navigate(type, id, section){
   location.hash = section ? `#/${type}/${id}/${section}` : `#/${type}/${id}`;
 }
 
-// ════════════════════════════════════════════════
+// ════════════════════════════════════════
 // 工具
-// ════════════════════════════════════════════════
+// ════════════════════════════════════════
 function getCivInfo(id){
   if (typeof EARLY_CIV_EXPLORER!=='undefined') {
     const f = EARLY_CIV_EXPLORER.civilizations.find(c=>c.id===id);
     if (f) return f;
   }
-  const fb = {egypt_predynastic:{name:'古埃及·前王朝',icon:'🌅',color:'#d4b870',region:'尼罗河'},indus_early:{name:'印度河早期',icon:'🏘',color:'#a070d4',region:'印度河'}};
-  return fb[id] || {name:id,icon:'🏛',color:'#888',region:''};
+  const fb = {egypt_predynastic:{name:'古埃及·前王朝',icon:'🌅',color:'#d4b870'},indus_early:{name:'印度河早期',icon:'🏘',color:'#a070d4'}};
+  return fb[id] || {name:id,icon:'🏛',color:'#888'};
 }
-function findCivChapters(civId){
-  return CHAPTERS.filter(ch => ch.active_civs.some(cv=>cv.id===civId));
-}
+function findCivChapters(civId){return CHAPTERS.filter(ch=>ch.active_civs.some(cv=>cv.id===civId))}
 function findEventsOfCiv(civId){
   const evs = [];
-  CHAPTERS.forEach(ch => {
-    const cv = ch.active_civs.find(x=>x.id===civId);
-    if (!cv) return;
-    (cv.L3_events||[]).forEach(eid => {
-      if (!evs.find(x=>x.id===eid)) evs.push({id:eid, deep:EVENT_DEEP[eid], ch});
-    });
-  });
+  CHAPTERS.forEach(ch=>{const cv=ch.active_civs.find(x=>x.id===civId);if(!cv)return;(cv.L3_events||[]).forEach(eid=>{if(!evs.find(x=>x.id===eid))evs.push({id:eid,deep:EVENT_DEEP[eid]})})});
   return evs;
 }
 function findPeopleOfCiv(civId){
   const ps = [];
-  CHAPTERS.forEach(ch => {
-    const cv = ch.active_civs.find(x=>x.id===civId);
-    if (!cv) return;
-    (cv.L4_people||[]).forEach(pid => {
-      if (!ps.find(x=>x.id===pid)) ps.push({id:pid, deep:PERSON_DEEP[pid], ch});
-    });
-  });
+  CHAPTERS.forEach(ch=>{const cv=ch.active_civs.find(x=>x.id===civId);if(!cv)return;(cv.L4_people||[]).forEach(pid=>{if(!ps.find(x=>x.id===pid))ps.push({id:pid,deep:PERSON_DEEP[pid]})})});
   return ps;
 }
-function findEventCiv(eid){
-  for (const ch of CHAPTERS){
-    for (const cv of ch.active_civs){
-      if (cv.L3_events?.includes(eid)) return {civId:cv.id, chId:ch.id};
-    }
-  }
-  return null;
-}
-function findPersonCiv(pid){
-  for (const ch of CHAPTERS){
-    for (const cv of ch.active_civs){
-      if (cv.L4_people?.includes(pid)) return {civId:cv.id, chId:ch.id};
-    }
-  }
-  return null;
+function findEventCiv(eid){for(const ch of CHAPTERS)for(const cv of ch.active_civs)if(cv.L3_events?.includes(eid))return{civId:cv.id,chId:ch.id};return null}
+function findPersonCiv(pid){for(const ch of CHAPTERS)for(const cv of ch.active_civs)if(cv.L4_people?.includes(pid))return{civId:cv.id,chId:ch.id};return null}
+
+function darken(hex, amount){
+  if (!hex || !hex.startsWith('#')) return '#444';
+  const c = hex.replace('#','');
+  const r = Math.max(0, parseInt(c.slice(0,2),16) - Math.round(255*amount));
+  const g = Math.max(0, parseInt(c.slice(2,4),16) - Math.round(255*amount));
+  const b = Math.max(0, parseInt(c.slice(4,6),16) - Math.round(255*amount));
+  return '#' + [r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
 }
 
-// ════════════════════════════════════════════════
+// ════════════════════════════════════════
 // 面包屑
-// ════════════════════════════════════════════════
-function renderCrumb(type, id, name, section){
+// ════════════════════════════════════════
+function renderCrumb(type, id, name){
   const c = document.getElementById('crumb');
-  let html = `<a onclick="location.href='./civ-explorer-d.html'">⌂ 时间入口</a><span class="sep">›</span>`;
+  let html = `<a onclick="location.href='./civ-explorer-d.html'">⌂ 历史宇宙</a><span class="sep">›</span>`;
   if (type === 'civ') {
-    if (section) {
-      html += `<a onclick="navigate('civ','${id}')">${name}</a><span class="sep">›</span>`;
-      html += `<span class="cur">${SECTION_NAMES[section]||section}</span>`;
-    } else {
-      html += `<span class="cur">${name}</span>`;
-    }
+    html += `<span class="cur">${name}</span>`;
   } else if (type === 'event' || type === 'person') {
     const ctx = type==='event' ? findEventCiv(id) : findPersonCiv(id);
     if (ctx) {
       const civ = getCivInfo(ctx.civId);
       html += `<a onclick="navigate('civ','${ctx.civId}')">${civ.icon} ${civ.name}</a><span class="sep">›</span>`;
     }
-    if (section) {
-      html += `<a onclick="navigate('${type}','${id}')">${name}</a><span class="sep">›</span>`;
-      html += `<span class="cur">${SECTION_NAMES[section]||section}</span>`;
-    } else {
-      html += `<span class="cur">${name}</span>`;
-    }
+    html += `<span class="cur">${name}</span>`;
   }
   c.innerHTML = html;
 }
 
-const SECTION_NAMES = {
-  narrative:'📖 完整叙事', basics:'🏛 基础事实', timeline:'📅 演化阶段',
-  events:'📅 历史事件', people:'👤 关键人物', inventions:'💡 发明遗产',
-  relations:'🌍 与其他文明关系', collapse:'⏳ 崩溃过程',
-  legacy:'🎁 今天保留', contemporary:'🌍 同时代世界',
-  biography:'📖 完整传记', childhood:'👶 童年出身', achievements:'🏆 详细成就',
-  friends:'🤝 朋友圈', involved:'📅 参与事件', death:'⚰️ 死亡晚年',
-  oneliner:'💡 一句话', chain:'🔗 因果链', three:'📜 之前·当时·之后',
-  what_happened:'📅 事件时间线', evidence:'🏺 考古证据', significance:'🎯 历史意义',
-};
+// ════════════════════════════════════════
+// 通用 cosmic 渲染：center + 周围 orbs
+// ════════════════════════════════════════
+function renderCosmic(centerData, orbs){
+  // 给 orb 计算位置
+  const N = orbs.length;
+  const ringSize = N <= 8 ? N : (N <= 16 ? Math.ceil(N/2) : Math.ceil(N/3));
+  const rings = Math.ceil(N / ringSize);
 
-// ════════════════════════════════════════════════
-// HUB: 文明 - 章节选择网格
-// ════════════════════════════════════════════════
-function renderCivHub(civId){
+  orbs.forEach((orb, i)=>{
+    const ring = Math.floor(i / ringSize);
+    const idx = i % ringSize;
+    const items = (ring === rings - 1) ? (N - ring * ringSize) : ringSize;
+    const angleOffset = ring * 0.2;
+    const angle = -Math.PI/2 + angleOffset + idx * (Math.PI * 2 / items);
+    const r = 240 + ring * 150;
+    orb.x = CX + Math.cos(angle) * r;
+    orb.y = CY + Math.sin(angle) * r * 0.85; // 椭圆轨道
+  });
+
+  let svg = `<defs>
+    <radialGradient id="centerGrad" cx="35%" cy="30%">
+      <stop offset="0%" stop-color="rgba(255,255,255,.95)"/>
+      <stop offset="30%" stop-color="${centerData.color}" stop-opacity=".95"/>
+      <stop offset="100%" stop-color="${darken(centerData.color,0.5)}"/>
+    </radialGradient>
+    <radialGradient id="centerHalo">
+      <stop offset="0%" stop-color="${centerData.color}" stop-opacity=".5"/>
+      <stop offset="100%" stop-color="${centerData.color}" stop-opacity="0"/>
+    </radialGradient>
+    ${orbs.map((o,i)=>`<radialGradient id="orbGrad${i}" cx="35%" cy="30%">
+      <stop offset="0%" stop-color="rgba(255,255,255,.85)"/>
+      <stop offset="30%" stop-color="${o.color}" stop-opacity=".9"/>
+      <stop offset="100%" stop-color="${darken(o.color,0.5)}"/>
+    </radialGradient>`).join('')}
+  </defs>`;
+
+  // 轨道虚线圈
+  for (let r=1; r<=rings; r++){
+    const radius = 240 + (r-1) * 150;
+    svg += `<ellipse cx="${CX}" cy="${CY}" rx="${radius}" ry="${radius*0.85}" fill="none" stroke="rgba(212,168,88,.08)" stroke-width="1" stroke-dasharray="3 6"/>`;
+  }
+
+  // spokes (从中心到每个 orb)
+  orbs.forEach(orb=>{
+    svg += `<line class="spoke" x1="${CX}" y1="${CY}" x2="${orb.x}" y2="${orb.y}"/>`;
+  });
+
+  // orbs
+  orbs.forEach((orb,i)=>{
+    const r = orb.size || 36;
+    svg += `<g class="float-orb" data-action='${JSON.stringify(orb.action)}' transform="translate(${orb.x},${orb.y})" style="color:${orb.color}">
+      <circle cx="0" cy="0" r="${r*1.6}" fill="${orb.color}" opacity="0.12"/>
+      <g class="body">
+        <circle cx="0" cy="0" r="${r}" fill="url(#orbGrad${i})" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
+        <ellipse cx="${-r*0.18}" cy="${-r*0.32}" rx="${r*0.4}" ry="${r*0.17}" fill="rgba(255,255,255,.5)" transform="rotate(-25)"/>
+        <text text-anchor="middle" dominant-baseline="central" font-size="${r*0.9}" style="pointer-events:none">${orb.icon}</text>
+      </g>
+      <text class="type-tag" y="${r+18}" font-size="9">${orb.typeLabel}</text>
+      <g transform="translate(0,${r+38})">
+        <rect class="label-bg" x="${-orb.name.length*7-8}" y="${-11}" width="${orb.name.length*14+16}" height="22" rx="11"/>
+        <text class="name" y="3" font-size="12.5">${orb.name}</text>
+      </g>
+    </g>`;
+  });
+
+  // center orb
+  const cr = centerData.size || 70;
+  svg += `<g class="center-orb" transform="translate(${CX},${CY})">
+    <circle cx="0" cy="0" r="${cr*2}" fill="url(#centerHalo)"/>
+    <circle class="ring1" cx="0" cy="0" r="${cr+25}" stroke-dasharray="6 10"/>
+    <circle class="ring2" cx="0" cy="0" r="${cr+45}" stroke-dasharray="2 16"/>
+    <g class="body">
+      <circle cx="0" cy="0" r="${cr}" fill="url(#centerGrad)" stroke="rgba(255,255,255,.4)" stroke-width="2"/>
+      <ellipse cx="${-cr*0.18}" cy="${-cr*0.32}" rx="${cr*0.4}" ry="${cr*0.17}" fill="rgba(255,255,255,.5)" transform="rotate(-25)"/>
+      <text text-anchor="middle" dominant-baseline="central" font-size="${cr*0.7}" style="pointer-events:none">${centerData.icon}</text>
+    </g>
+    <text class="label" y="${cr+30}" font-size="20">${centerData.name}</text>
+    ${centerData.meta?`<text class="meta" y="${cr+52}" font-size="11">${centerData.meta}</text>`:''}
+  </g>`;
+
+  document.getElementById('canvas').innerHTML = svg;
+
+  // 绑定
+  document.querySelectorAll('.float-orb').forEach(el=>{
+    const action = JSON.parse(el.dataset.action);
+    el.addEventListener('click', ()=>handleOrbClick(action));
+    el.addEventListener('mouseenter', e=>showTooltip(e, action));
+    el.addEventListener('mousemove', moveTooltip);
+    el.addEventListener('mouseleave', hideTooltip);
+  });
+}
+
+function handleOrbClick(action){
+  hideTooltip();
+  if (action.type === 'navigate') {
+    navigate(action.to.type, action.to.id);
+  } else if (action.type === 'showText') {
+    openTextPanel(action.payload);
+  }
+}
+
+// ════════════════════════════════════════
+// 文明 cosmic hub
+// ════════════════════════════════════════
+function renderCivCosmic(civId){
   const info = getCivInfo(civId);
   const deep = CIV_DEEP[civId];
   const chs = findCivChapters(civId);
   const events = findEventsOfCiv(civId);
   const people = findPeopleOfCiv(civId);
+
   if (chs.length === 0 && !deep) return renderError(`未找到文明：${civId}`);
-
   renderCrumb('civ', civId, info.name);
-  const firstCh = chs[0];
-  const cv = firstCh?.active_civs.find(cv=>cv.id===civId);
-  const oneLiner = cv?.L1 || (deep?.opening_narrative||'').split(/\n\s*\n/)[0].trim().slice(0,120)+'...' || '';
 
-  // 章节卡片列表
-  const cards = [
-    {key:'narrative', icon:'📖', title:'完整文明叙事', desc:'读这个文明的故事 ── 它怎么开始、巅峰、消失的',
-     enabled: !!deep?.opening_narrative, count: deep?.opening_narrative ? '约 '+Math.ceil(deep.opening_narrative.length/100)*100+' 字' : '待补'},
-    {key:'basics', icon:'🏛', title:'基础事实',  desc:'首都、人口、语言、文字、宗教、经济 6 个维度速览',
-     enabled: !!deep, count: '6 维度'},
-    {key:'timeline', icon:'📅', title:'演化阶段', desc:'按 500 年分段，看这个文明在不同时期的状态变化',
-     enabled: chs.length>0, count: chs.length+' 个阶段'},
-    {key:'events', icon:'📅', title:'关键历史事件',  desc:'点击进入每个事件的全屏页面（含因果链、证据、人物）',
-     enabled: events.length>0, count: events.length+' 个事件'},
-    {key:'people',  icon:'👤', title:'关键人物', desc:'点击进入每个人物的全屏传记（含朋友圈、成就、遗产）',
-     enabled: people.length>0, count: people.length+' 个人物'},
-    {key:'inventions', icon:'💡', title:'关键发明', desc:'这个文明给人类带来了哪些"第一次"',
-     enabled: deep?.nine_inventions?.length>0, count: (deep?.nine_inventions?.length||0)+' 项发明'},
-    {key:'relations', icon:'🌍', title:'与其他文明的关系', desc:'征服、贸易、影响、战争和约 — 跨国互动',
-     enabled: findCivRelations(civId).length>0, count: findCivRelations(civId).length+' 条关系'},
-    {key:'collapse', icon:'⏳', title:'崩溃过程', desc:'这个文明是怎么消失的？背后的因果链条',
-     enabled: !!deep?.collapse_chain, count: (deep?.collapse_chain?.length||0)+' 步'},
-    {key:'contemporary', icon:'🌍', title:'同时代世界', desc:'此文明存在时，世界上还有哪些文明在并行',
-     enabled: chs.length>0, count: '跨 '+chs.length+' 章'},
-    {key:'legacy', icon:'🎁', title:'今天我们保留了什么', desc:'这个文明的遗产如何影响今天的我们',
-     enabled: !!FINAL_OVERVIEW.civs.find(c=>c.id===civId)?.legacy, count:''},
-  ];
+  const oneLiner = chs[0]?.active_civs.find(cv=>cv.id===civId)?.L1 || '';
+  const timeRange = deep?.time_range || (chs.length?`${chs[0].range} – ${chs[chs.length-1].range.split('–')[1]} BCE`:'');
 
-  let html = `
-    <div class="hero">
-      <div class="type-tag civ">CIVILIZATION · 文明</div>
-      <h1><span class="icon">${info.icon}</span>${info.name}</h1>
-      <div class="meta">
-        ${info.region?`<span>📍 ${info.region}</span>`:''}
-        ${deep?.time_range?`<span>📅 ${deep.time_range}</span>`:(chs.length?`<span>📅 ${chs[0].range} – ${chs[chs.length-1].range.split('–')[1]} BCE</span>`:'')}
-        ${deep?.capital_at_peak?`<span>🏛 ${deep.capital_at_peak}</span>`:''}
-      </div>
-      <div class="one-liner">${oneLiner}</div>
-    </div>
+  const center = {
+    icon: info.icon, name: info.name, color: info.color,
+    meta: timeRange, size: 75,
+  };
 
-    <h2 class="hub-title">🗂 选择你想探索的方面 ↓</h2>
-    <div class="hub-sub">CLICK A CARD TO DIVE IN · 点击任意卡片进入</div>
-    <div class="hub-grid">
-      ${cards.map(c=>`<div class="hub-card ${c.enabled?'':'disabled'}" ${c.enabled?`onclick="navigate('civ','${civId}','${c.key}')"`:''}>
-        <div class="ic">${c.icon}</div>
-        <div class="ti">${c.title}</div>
-        <div class="ds">${c.desc}</div>
-        <div class="more"><span class="label">${c.enabled?'点击进入 →':'待补'}</span><span class="count">${c.count}</span></div>
-      </div>`).join('')}
-    </div>
+  const orbs = [];
+  // 概念性的章节 orbs
+  if (deep?.opening_narrative) orbs.push({icon:'📖',name:'文明叙事',color:'#d4a858',typeLabel:'NARRATIVE',size:40,
+    action:{type:'showText',payload:{kind:'narrative',civId}}});
+  if (deep) orbs.push({icon:'🏛',name:'基础事实',color:'#a8a060',typeLabel:'BASICS',size:36,
+    action:{type:'showText',payload:{kind:'basics',civId}}});
+  if (chs.length) orbs.push({icon:'📅',name:'演化阶段',color:'#c8a070',typeLabel:'TIMELINE',size:38,
+    action:{type:'showText',payload:{kind:'timeline',civId}}});
 
-    ${!deep ? `<div class="todo-note">该文明（${info.name}）的完整深度叙事正在按《世界上下五千年》框架补写中。当前可探索：演化阶段 / 关联事件人物 / 跨文明关系。已完成深度版的文明：<strong>苏美尔</strong>、<strong>古埃及·古王国</strong>、<strong>古埃及·新王国</strong>、<strong>印度河</strong>、<strong>阿卡德</strong>、<strong>古巴比伦</strong>。</div>` : ''}
-  `;
-  document.getElementById('page').innerHTML = html;
-  window.scrollTo({top:0});
-  document.title = info.name + ' · 早期文明实验室';
+  // 事件 orbs (每个独立)
+  events.forEach(e=>{
+    const title = e.deep?.full_title || e.id;
+    orbs.push({icon:'📅',name:title.length>10?title.slice(0,10)+'...':title,color:'#c8732a',
+      typeLabel:'EVENT',size:36,
+      action:{type:'navigate',to:{type:'event',id:e.id}}});
+  });
+
+  // 人物 orbs
+  people.forEach(p=>{
+    const name = p.deep?.full_name?.split(' ')[0] || p.id;
+    orbs.push({icon:'👤',name:name,color:'#6080b0',
+      typeLabel:'PERSON',size:38,
+      action:{type:'navigate',to:{type:'person',id:p.id}}});
+  });
+
+  // 其它章节 orbs
+  if (deep?.nine_inventions) orbs.push({icon:'💡',name:'关键发明',color:'#e8a020',typeLabel:'INVENTIONS',size:36,
+    action:{type:'showText',payload:{kind:'inventions',civId}}});
+  orbs.push({icon:'🌍',name:'文明关系',color:'#7a60b0',typeLabel:'RELATIONS',size:36,
+    action:{type:'showText',payload:{kind:'relations',civId}}});
+  if (deep?.collapse_chain) orbs.push({icon:'⏳',name:'崩溃过程',color:'#b04848',typeLabel:'COLLAPSE',size:34,
+    action:{type:'showText',payload:{kind:'collapse',civId}}});
+  if (FINAL_OVERVIEW.civs.find(c=>c.id===civId)?.legacy) orbs.push({icon:'🎁',name:'今天遗产',color:'#3a8868',typeLabel:'LEGACY',size:34,
+    action:{type:'showText',payload:{kind:'legacy',civId}}});
+
+  renderCosmic(center, orbs);
+  document.title = info.name + ' · 文明小宇宙';
 }
 
-// ════════════════════════════════════════════════
-// SECTION: 文明的某个子章节
-// ════════════════════════════════════════════════
-function renderCivSection(civId, section){
-  const info = getCivInfo(civId);
-  const deep = CIV_DEEP[civId];
-  const chs = findCivChapters(civId);
-  const events = findEventsOfCiv(civId);
-  const people = findPeopleOfCiv(civId);
-
-  renderCrumb('civ', civId, info.name, section);
-
-  const sectionName = SECTION_NAMES[section] || section;
-  let content = '';
-
-  if (section === 'narrative') {
-    content = deep?.opening_narrative ?
-      `<div class="narrative">${deep.opening_narrative.trim().split(/\n\s*\n/).map(p=>'<p>'+p.trim()+'</p>').join('')}</div>` :
-      `<div class="todo-note">完整叙事正在补写中。</div>`;
-  }
-  else if (section === 'basics') {
-    if (deep) {
-      const basics = [];
-      if (deep.capital_at_peak) basics.push(['首都', deep.capital_at_peak]);
-      if (deep.territory_max) basics.push(['领土', deep.territory_max]);
-      if (deep.population_peak) basics.push(['人口', deep.population_peak]);
-      if (deep.language) basics.push(['语言', deep.language]);
-      if (deep.writing) basics.push(['文字', deep.writing]);
-      if (deep.religion) basics.push(['宗教', deep.religion]);
-      if (deep.economy) basics.push(['经济', deep.economy]);
-      content = `<div class="info-grid">${basics.map(([k,v])=>`<div class="info-card"><div class="lbl">${k}</div><div class="val">${v}</div></div>`).join('')}</div>`;
-    } else content = `<div class="todo-note">基础事实待补。</div>`;
-  }
-  else if (section === 'timeline') {
-    content = `<div class="timeline">${chs.map(ch=>{
-      const cv = ch.active_civs.find(x=>x.id===civId);
-      return `<div class="tl-item"><div class="yr">${ch.range} BCE</div><div class="info"><div class="ti">${ch.title} · <span style="color:var(--gold-deep)">${cv.state}</span></div><div class="ds">${cv.in_period_summary||cv.L2||''}</div></div></div>`;
-    }).join('')}</div>`;
-  }
-  else if (section === 'events') {
-    content = events.length ? `<div class="entity-grid">${events.map(e=>{
-      const ev = e.deep;
-      const title = ev?.full_title || e.id;
-      const oneLine = ev?.one_liner || '深度待补';
-      const yr = ev?.what_happened?.[0]?.split('·')[0]?.trim() || e.ch.range;
-      return `<div class="entity-card event" onclick="navigate('event','${e.id}')">
-        <div class="top"><div class="ic">📅</div><div class="nm">${title}</div></div>
-        <div class="yr">${yr}</div>
-        <div class="desc">${oneLine}</div>
-        <div class="more">读完整事件</div>
-      </div>`;
-    }).join('')}</div>` : `<div class="todo-note">此文明的关键事件正在补充。</div>`;
-  }
-  else if (section === 'people') {
-    content = people.length ? `<div class="entity-grid">${people.map(p=>{
-      const pe = p.deep;
-      const name = pe?.full_name || p.id;
-      const desc = pe?.biography?.slice(0,100).trim()+'...' || '深度待补';
-      const ls = pe?.lifespan_real || pe?.lifespan_mythic || '';
-      return `<div class="entity-card person" onclick="navigate('person','${p.id}')">
-        <div class="top"><div class="ic">👤</div><div class="nm">${name}</div></div>
-        <div class="yr">${ls}</div>
-        <div class="desc">${desc}</div>
-        <div class="more">读完整传记</div>
-      </div>`;
-    }).join('')}</div>` : `<div class="todo-note">此文明的关键人物正在补充。</div>`;
-  }
-  else if (section === 'inventions') {
-    content = deep?.nine_inventions ? `<div class="entity-grid">${deep.nine_inventions.map(inv=>`<div class="entity-card" style="cursor:default">
-      <div class="top"><div class="ic" style="background:rgba(184,136,48,.2);color:var(--vermilion)">💡</div><div class="nm">${inv.name}</div></div>
-      <div class="yr">${inv.year||''}</div>
-      <div class="desc">${inv.body}</div>
-    </div>`).join('')}</div>` : `<div class="todo-note">发明待补。</div>`;
-  }
-  else if (section === 'relations') {
-    const rels = findCivRelations(civId);
-    content = rels.length ? `<div class="relations-grid">${rels.map(r=>`<div class="rel-card" onclick="navigate('civ','${r.targetId}')">
-      <div class="typ ${r.type}">${r.typeLabel||r.type}</div>
-      <div class="pair">${r.from}<span class="arrow">${r.symbol||'→'}</span>${r.to}</div>
-      <div class="desc">${r.desc}</div>
-      <div style="margin-top:8px;font-family:var(--mono);font-size:10px;color:var(--vermilion);letter-spacing:.08em">点击查看 →</div>
-    </div>`).join('')}</div>` : `<div class="todo-note">跨文明关系待补。</div>`;
-  }
-  else if (section === 'collapse') {
-    content = deep?.collapse_chain ? `<div class="timeline">${deep.collapse_chain.map(t=>{
-      const [yr,...rest] = t.split('·');
-      return `<div class="tl-item"><div class="yr">${yr.trim()}</div><div class="info"><div class="ds">${rest.join('·').trim()}</div></div></div>`;
-    }).join('')}</div>` : `<div class="todo-note">崩溃过程待补。</div>`;
-  }
-  else if (section === 'contemporary') {
-    content = chs.map(ch=>{
-      const otherCivs = ch.active_civs.filter(cv=>cv.id!==civId);
-      if (!otherCivs.length) return '';
-      return `<div class="contemp-strip" style="margin-bottom:14px">
-        <h3>${ch.range} BCE · ${ch.title}</h3>
-        <p>${ch.world_context||''}</p>
-        <div class="contemp-items">
-          ${otherCivs.map(cv=>{const i=getCivInfo(cv.id);return `<span class="contemp-chip" onclick="navigate('civ','${cv.id}')">${i.icon} ${i.name} · ${cv.state}</span>`;}).join('')}
-        </div>
-      </div>`;
-    }).join('');
-    if (!content) content = `<div class="todo-note">同时代信息正在补充。</div>`;
-  }
-  else if (section === 'legacy') {
-    const legacyStr = FINAL_OVERVIEW.civs.find(c=>c.id===civId)?.legacy;
-    if (legacyStr) {
-      const items = legacyStr.split(/\s*[·•|]\s*/).filter(x=>x.trim());
-      content = `<div class="legacy-grid">${items.map(it=>`<div class="legacy-card"><div class="what">${it}</div></div>`).join('')}</div>`;
-    } else content = `<div class="todo-note">遗产清单待补。</div>`;
-  }
-
-  let html = `
-    <div class="hero" style="padding:24px 0 14px;border-bottom-width:1px">
-      <div class="type-tag civ" style="background:${info.color}">${info.icon} ${info.name}</div>
-      <h1 style="font-size:28px;margin-top:6px">${sectionName.replace(/[^一-鿿]/g,'').trim()||sectionName}</h1>
-    </div>
-    <button class="section-back" onclick="navigate('civ','${civId}')">◀ 返回 ${info.name} 概览</button>
-    ${content}
-  `;
-  document.getElementById('page').innerHTML = html;
-  window.scrollTo({top:0});
-  document.title = sectionName + ' · ' + info.name;
-}
-
-// ════════════════════════════════════════════════
-// HUB: 人物
-// ════════════════════════════════════════════════
-function renderPersonHub(pid){
+// ════════════════════════════════════════
+// 人物 cosmic hub
+// ════════════════════════════════════════
+function renderPersonCosmic(pid){
   const p = PERSON_DEEP[pid];
   if (!p) return renderError(`未找到人物：${pid}`);
   const name = p.full_name || pid;
   renderCrumb('person', pid, name.split(' ')[0]);
 
-  // 找朋友圈数量
+  const center = {
+    icon: '👤', name: name.split(' ')[0], color: '#6080b0',
+    meta: p.lifespan_real || p.lifespan_mythic || '',
+    size: 70,
+  };
+
+  const orbs = [];
+  if (p.biography) orbs.push({icon:'📖',name:'完整传记',color:'#d4a858',typeLabel:'BIOGRAPHY',size:42,
+    action:{type:'showText',payload:{kind:'biography',pid}}});
+  if (p.childhood) orbs.push({icon:'👶',name:'童年出身',color:'#c8a080',typeLabel:'CHILDHOOD',size:34,
+    action:{type:'showText',payload:{kind:'childhood',pid}}});
+  if (p.achievements_detail?.length) orbs.push({icon:'🏆',name:`成就 ×${p.achievements_detail.length}`,color:'#e8a020',typeLabel:'ACHIEVEMENTS',size:38,
+    action:{type:'showText',payload:{kind:'achievements',pid}}});
+
+  // 朋友圈：每个朋友单独一个 orb (可跳转)
   const direct = p.related || [];
   const incoming = [];
   Object.entries(PERSON_DEEP).forEach(([oid, o])=>{
     if (oid===pid) return;
     (o.related||[]).forEach(r=>{
-      if (r.id===pid && !direct.find(x=>x.id===oid)) incoming.push({id:oid});
+      if (r.id===pid && !direct.find(x=>x.id===oid)) incoming.push({id:oid, relation:r.relation});
     });
   });
-  const friendCount = direct.length + incoming.length;
+  const allFriends = [...direct, ...incoming];
+  allFriends.forEach(f=>{
+    const other = PERSON_DEEP[f.id];
+    const fname = (other?.full_name || f.id).split(' ')[0];
+    orbs.push({icon:'👤',name:fname,color:'#7080b0',typeLabel:f.relation||'关系',size:34,
+      action:{type:'navigate',to:{type:'person',id:f.id}}});
+  });
 
-  // 找参与的事件
-  const involved = Object.entries(EVENT_DEEP).filter(([eid, e]) =>
-    e.related_people?.includes(pid)
-  );
+  // 参与事件
+  const involved = Object.entries(EVENT_DEEP).filter(([eid, e]) => e.related_people?.includes(pid));
+  involved.forEach(([eid, e])=>{
+    const title = e.full_title;
+    orbs.push({icon:'📅',name:title.length>10?title.slice(0,10)+'...':title,color:'#c8732a',typeLabel:'EVENT',size:34,
+      action:{type:'navigate',to:{type:'event',id:eid}}});
+  });
 
-  const cards = [
-    {key:'biography', icon:'📖', title:'完整传记', desc:'从童年到死亡的人生故事',
-     enabled: !!p.biography, count: '约 '+Math.ceil((p.biography||'').length/100)*100+' 字'},
-    {key:'childhood', icon:'👶', title:'童年 · 出身', desc:'他/她的早年背景',
-     enabled: !!p.childhood, count:''},
-    {key:'achievements', icon:'🏆', title:'详细成就', desc:'每项成就 + 考古/文献证据',
-     enabled: p.achievements_detail?.length>0, count: (p.achievements_detail?.length||0)+' 项'},
-    {key:'friends', icon:'🤝', title:'朋友圈 · 关系网', desc:'家人、师承、敌友 — 可视化关系图，点击跳转其它人物',
-     enabled: friendCount>0, count: friendCount+' 人'},
-    {key:'involved', icon:'📅', title:'参与的历史事件', desc:'此人涉及的历史事件 (可点击进入事件页)',
-     enabled: involved.length>0, count: involved.length+' 个'},
-    {key:'death', icon:'⚰️', title:'死亡 · 晚年', desc:'怎么死的、葬在哪里',
-     enabled: !!p.death, count:''},
-    {key:'legacy', icon:'🌟', title:'历史遗产', desc:'死后影响了什么 / 后世如何评价',
-     enabled: !!p.legacy, count:''},
-    {key:'contemporary', icon:'🌍', title:'同时代世界', desc:'他活着时全世界还有谁',
-     enabled: !!findPersonCiv(pid), count:''},
-  ];
+  if (p.death) orbs.push({icon:'⚰️',name:'死亡晚年',color:'#7a5050',typeLabel:'DEATH',size:32,
+    action:{type:'showText',payload:{kind:'death',pid}}});
+  if (p.legacy) orbs.push({icon:'🌟',name:'历史遗产',color:'#e8c860',typeLabel:'LEGACY',size:36,
+    action:{type:'showText',payload:{kind:'plegacy',pid}}});
 
-  let html = `
-    <div class="hero">
-      <div class="type-tag person">PERSON · 历史人物</div>
-      <h1><span class="icon">👤</span>${name}</h1>
-      <div class="meta">
-        ${p.pronunciation?`<span>🔉 ${p.pronunciation}</span>`:''}
-        ${p.lifespan_real?`<span>📅 ${p.lifespan_real}</span>`:''}
-        ${p.lifespan_mythic?`<span>📜 ${p.lifespan_mythic}</span>`:''}
-      </div>
-      <div class="one-liner">${p.historical_or_mythic||''}</div>
-    </div>
-
-    <h2 class="hub-title">🗂 选择你想了解的方面 ↓</h2>
-    <div class="hub-sub">CLICK A CARD TO DIVE IN</div>
-    <div class="hub-grid">
-      ${cards.map(c=>`<div class="hub-card ${c.enabled?'':'disabled'}" ${c.enabled?`onclick="navigate('person','${pid}','${c.key}')"`:''}>
-        <div class="ic">${c.icon}</div>
-        <div class="ti">${c.title}</div>
-        <div class="ds">${c.desc}</div>
-        <div class="more"><span class="label">${c.enabled?'点击进入 →':'待补'}</span><span class="count">${c.count}</span></div>
-      </div>`).join('')}
-    </div>
-  `;
-  document.getElementById('page').innerHTML = html;
-  window.scrollTo({top:0});
-  document.title = name + ' · 早期文明实验室';
+  renderCosmic(center, orbs);
+  document.title = name + ' · 人物小宇宙';
 }
 
-// ════════════════════════════════════════════════
-// SECTION: 人物的某个子章节
-// ════════════════════════════════════════════════
-function renderPersonSection(pid, section){
-  const p = PERSON_DEEP[pid];
-  if (!p) return renderError(`未找到人物：${pid}`);
-  const name = p.full_name || pid;
-  renderCrumb('person', pid, name.split(' ')[0], section);
-
-  const sectionName = SECTION_NAMES[section] || section;
-  let content = '';
-
-  if (section === 'biography') {
-    content = `<div class="narrative">${(p.biography||'').trim().split(/\n\s*\n/).map(par=>'<p>'+par.trim()+'</p>').join('')}</div>`;
-  }
-  else if (section === 'childhood') {
-    content = `<div class="narrative">${p.childhood||'待补'}</div>`;
-  }
-  else if (section === 'achievements') {
-    content = p.achievements_detail?.length ? p.achievements_detail.map(a=>`<div class="evidence-card">
-      <div class="nm">${a.name}</div>
-      <div class="ds">${a.detail}</div>
-      ${a.proof?`<div class="ho">📜 证据 · ${a.proof}</div>`:''}
-    </div>`).join('') : `<div class="todo-note">成就待补。</div>`;
-  }
-  else if (section === 'friends') {
-    content = renderFriendCircle(pid, p);
-  }
-  else if (section === 'involved') {
-    const involved = Object.entries(EVENT_DEEP).filter(([eid, e]) => e.related_people?.includes(pid));
-    content = involved.length ? `<div class="entity-grid">${involved.map(([eid, e])=>`<div class="entity-card event" onclick="navigate('event','${eid}')">
-      <div class="top"><div class="ic">📅</div><div class="nm">${e.full_title}</div></div>
-      <div class="desc">${e.one_liner||''}</div>
-      <div class="more">读事件</div>
-    </div>`).join('')}</div>` : `<div class="todo-note">参与事件待补。</div>`;
-  }
-  else if (section === 'death') {
-    content = `<div class="narrative">${p.death||'待补'}</div>`;
-  }
-  else if (section === 'legacy') {
-    content = `<div class="narrative">${(p.legacy||'').trim().split(/\n\s*\n/).map(par=>'<p>'+par.trim()+'</p>').join('')}</div>`;
-  }
-  else if (section === 'contemporary') {
-    const ctx = findPersonCiv(pid);
-    if (ctx) {
-      const ch = CHAPTERS.find(c=>c.id===ctx.chId);
-      const others = ch.active_civs.filter(cv=>cv.id!==ctx.civId);
-      content = `<div class="contemp-strip">
-        <h3>${ch.range} BCE · ${ch.title}</h3>
-        <p>${ch.world_context||''}</p>
-        <div class="contemp-items">
-          ${others.map(cv=>{const i=getCivInfo(cv.id);return `<span class="contemp-chip" onclick="navigate('civ','${cv.id}')">${i.icon} ${i.name} · ${cv.state}</span>`;}).join('')}
-        </div>
-      </div>`;
-    } else content = `<div class="todo-note">同时代信息待补。</div>`;
-  }
-
-  let html = `
-    <div class="hero" style="padding:24px 0 14px;border-bottom-width:1px">
-      <div class="type-tag person">👤 ${name}</div>
-      <h1 style="font-size:28px;margin-top:6px">${sectionName.replace(/[^一-鿿]/g,'').trim()||sectionName}</h1>
-    </div>
-    <button class="section-back" onclick="navigate('person','${pid}')">◀ 返回 ${name.split(' ')[0]} 概览</button>
-    ${content}
-  `;
-  document.getElementById('page').innerHTML = html;
-  window.scrollTo({top:0});
-  document.title = sectionName + ' · ' + name;
-}
-
-function renderFriendCircle(pid, p){
-  const direct = p.related || [];
-  const incoming = [];
-  Object.entries(PERSON_DEEP).forEach(([oid, o])=>{
-    if (oid === pid) return;
-    (o.related||[]).forEach(r=>{
-      if (r.id === pid && !direct.find(x=>x.id===oid)) {
-        incoming.push({id:oid, relation:r.relation, note:r.note});
-      }
-    });
-  });
-  const all = [...direct, ...incoming];
-  if (all.length === 0) return `<div class="friend-circle"><p style="color:var(--ink2);font-size:13px">关系网正在补充中。</p></div>`;
-  const W = 700, H = 380;
-  const cx = W/2, cy = H/2;
-  const r = 130;
-  const n = all.length;
-  let svg = `<svg class="fc-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">`;
-  all.forEach((rel, i)=>{
-    const angle = -Math.PI/2 + (i - (n-1)/2) * (Math.PI*1.4/Math.max(n,1));
-    const x = cx + Math.cos(angle)*r;
-    const y = cy + Math.sin(angle)*r;
-    const relCls = (rel.relation==='家人'||rel.relation==='妻子'||rel.relation==='丈夫'||rel.relation==='母亲'||rel.relation==='儿子'||rel.relation==='父亲'||rel.relation==='女儿')?'family':
-                   rel.relation==='敌人'?'enemy':
-                   (rel.relation==='师承'||rel.relation==='宰相'||rel.relation==='主君'||rel.relation==='继母'||rel.relation==='继子')?'mentor':'';
-    svg += `<line class="fc-link ${relCls}" x1="${cx}" y1="${cy}" x2="${x}" y2="${y}"/>`;
-    const mx = (cx+x)/2, my = (cy+y)/2;
-    const labelW = rel.relation.length*12+12;
-    svg += `<rect class="fc-rel-bg" x="${mx-labelW/2}" y="${my-9}" width="${labelW}" height="18" rx="9"/>`;
-    svg += `<text class="fc-rel-label" x="${mx}" y="${my+3}">${rel.relation}</text>`;
-  });
-  svg += `<circle class="fc-center" cx="${cx}" cy="${cy}" r="40"/>`;
-  svg += `<text class="fc-center-name" x="${cx}" y="${cy}">${(p.full_name||pid).split(' ')[0]}</text>`;
-  all.forEach((rel, i)=>{
-    const angle = -Math.PI/2 + (i - (n-1)/2) * (Math.PI*1.4/Math.max(n,1));
-    const x = cx + Math.cos(angle)*r;
-    const y = cy + Math.sin(angle)*r;
-    const other = PERSON_DEEP[rel.id];
-    const otherName = (other?.full_name || rel.id).split(' ')[0];
-    svg += `<g class="fc-node" onclick="navigate('person','${rel.id}')">`;
-    svg += `<circle class="fc-node-bg" cx="${x}" cy="${y}" r="28"/>`;
-    svg += `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="16" style="pointer-events:none" fill="white">👤</text>`;
-    svg += `<text class="fc-name" x="${x}" y="${y+44}">${otherName}</text>`;
-    svg += `</g>`;
-  });
-  svg += `</svg>`;
-  return `<div class="friend-circle">${svg}
-    <div class="fc-legend">
-      <span>归属/同事</span><span class="family">家人</span><span class="mentor">师承/上司</span><span class="enemy">敌对</span>
-    </div>
-  </div>`;
-}
-
-// ════════════════════════════════════════════════
-// HUB: 事件
-// ════════════════════════════════════════════════
-function renderEventHub(eid){
+// ════════════════════════════════════════
+// 事件 cosmic hub
+// ════════════════════════════════════════
+function renderEventCosmic(eid){
   const e = EVENT_DEEP[eid];
   if (!e) return renderError(`未找到事件：${eid}`);
   renderCrumb('event', eid, e.full_title);
-  const civCtx = findEventCiv(eid);
-  const civInfo = civCtx ? getCivInfo(civCtx.civId) : null;
-  const peopleInvolved = (e.related_people||[]).map(pid=>({id:pid, deep:PERSON_DEEP[pid]})).filter(x=>x.deep);
 
-  const cards = [
-    {key:'oneliner', icon:'💡', title:'一句话总结', desc:'最简版：这件事是什么',
-     enabled: !!e.one_liner, count:''},
-    {key:'chain', icon:'🔗', title:'因果链', desc:'起因 → 此事件 → 后果',
-     enabled: !!(e.context_before || e.leads_to), count:''},
-    {key:'three', icon:'📜', title:'之前 · 当时 · 之后', desc:'3 栏对比这件事前后的世界',
-     enabled: true, count: '3 栏'},
-    {key:'narrative', icon:'📖', title:'完整叙事', desc:'读这件事的完整故事',
-     enabled: !!e.narrative, count: '约 '+Math.ceil((e.narrative||'').length/100)*100+' 字'},
-    {key:'what_happened', icon:'📅', title:'事件时间线', desc:'分阶段展开这件事的发生过程',
-     enabled: e.what_happened?.length>0, count: (e.what_happened?.length||0)+' 节点'},
-    {key:'people', icon:'👤', title:'关键人物', desc:'参与这件事的历史人物 (可点击)',
-     enabled: peopleInvolved.length>0, count: peopleInvolved.length+' 人'},
-    {key:'evidence', icon:'🏺', title:'考古证据', desc:'真实馆藏文物 + 出处',
-     enabled: e.evidence?.length>0, count: (e.evidence?.length||0)+' 件'},
-    {key:'significance', icon:'🎯', title:'历史意义', desc:'为什么这件事重要 / 长远影响',
-     enabled: !!e.significance, count:''},
-  ];
+  const center = {
+    icon: '📅', name: e.full_title, color: '#c8732a',
+    meta: e.what_happened?.[0]?.split('·')[0]?.trim() || '',
+    size: 75,
+  };
 
-  let html = `
-    <div class="hero">
-      <div class="type-tag event">EVENT · 历史事件</div>
-      <h1><span class="icon">📅</span>${e.full_title}</h1>
-      <div class="meta">
-        ${e.what_happened?.[0]?`<span>📅 ${e.what_happened[0].split('·')[0].trim()}</span>`:''}
-        ${civInfo?`<span>🏛 ${civInfo.icon} ${civInfo.name}</span>`:''}
-      </div>
+  const orbs = [];
+  if (e.one_liner) orbs.push({icon:'💡',name:'一句话',color:'#e8b820',typeLabel:'ONE-LINER',size:34,
+    action:{type:'showText',payload:{kind:'oneliner',eid}}});
+  if (e.context_before || e.leads_to) orbs.push({icon:'🔗',name:'因果链',color:'#d4a858',typeLabel:'CHAIN',size:36,
+    action:{type:'showText',payload:{kind:'chain',eid}}});
+  orbs.push({icon:'📜',name:'之前·当时·之后',color:'#b88830',typeLabel:'BEFORE-NOW-AFTER',size:36,
+    action:{type:'showText',payload:{kind:'three',eid}}});
+  if (e.narrative) orbs.push({icon:'📖',name:'完整叙事',color:'#d4a858',typeLabel:'NARRATIVE',size:42,
+    action:{type:'showText',payload:{kind:'enarrative',eid}}});
+  if (e.what_happened?.length) orbs.push({icon:'📅',name:'时间线',color:'#c8a070',typeLabel:'TIMELINE',size:36,
+    action:{type:'showText',payload:{kind:'ewhat',eid}}});
+
+  // 关键人物
+  (e.related_people||[]).forEach(pid=>{
+    const p = PERSON_DEEP[pid];
+    if (!p) return;
+    const fname = (p.full_name||pid).split(' ')[0];
+    orbs.push({icon:'👤',name:fname,color:'#6080b0',typeLabel:'KEY PERSON',size:36,
+      action:{type:'navigate',to:{type:'person',id:pid}}});
+  });
+
+  if (e.evidence?.length) orbs.push({icon:'🏺',name:`证据 ×${e.evidence.length}`,color:'#a07840',typeLabel:'EVIDENCE',size:34,
+    action:{type:'showText',payload:{kind:'evidence',eid}}});
+  if (e.significance) orbs.push({icon:'🎯',name:'历史意义',color:'#c84820',typeLabel:'SIGNIFICANCE',size:36,
+    action:{type:'showText',payload:{kind:'significance',eid}}});
+
+  renderCosmic(center, orbs);
+  document.title = e.full_title + ' · 事件小宇宙';
+}
+
+// ════════════════════════════════════════
+// 文字面板 (slides up from bottom)
+// ════════════════════════════════════════
+function openTextPanel(payload){
+  const card = document.getElementById('scrollCard');
+  let html = `<button class="close-x" onclick="closeTextPanel()">✕</button>`;
+
+  if (payload.kind === 'narrative') {
+    const c = CIV_DEEP[payload.civId];
+    const info = getCivInfo(payload.civId);
+    html += `<div class="type-tag civ">${info.icon} ${info.name} · 完整叙事</div>
+      <h1>📖 文明叙事</h1>
+      <div class="narrative">${c.opening_narrative.trim().split(/\n\s*\n/).map(p=>'<p>'+p.trim()+'</p>').join('')}</div>`;
+  }
+  else if (payload.kind === 'basics') {
+    const c = CIV_DEEP[payload.civId];
+    const info = getCivInfo(payload.civId);
+    const basics = [];
+    if (c.capital_at_peak) basics.push(['首都', c.capital_at_peak]);
+    if (c.territory_max) basics.push(['领土', c.territory_max]);
+    if (c.population_peak) basics.push(['人口', c.population_peak]);
+    if (c.language) basics.push(['语言', c.language]);
+    if (c.writing) basics.push(['文字', c.writing]);
+    if (c.religion) basics.push(['宗教', c.religion]);
+    if (c.economy) basics.push(['经济', c.economy]);
+    html += `<div class="type-tag civ">${info.icon} ${info.name}</div>
+      <h1>🏛 基础事实</h1>
+      <div class="info-grid">${basics.map(([k,v])=>`<div class="info-card"><div class="lbl">${k}</div><div class="val">${v}</div></div>`).join('')}</div>`;
+  }
+  else if (payload.kind === 'timeline') {
+    const chs = findCivChapters(payload.civId);
+    const info = getCivInfo(payload.civId);
+    html += `<div class="type-tag civ">${info.icon} ${info.name}</div>
+      <h1>📅 演化阶段</h1>
+      ${chs.map(ch=>{
+        const cv = ch.active_civs.find(x=>x.id===payload.civId);
+        return `<div class="tl-item"><div class="yr">${ch.range} BCE</div><div class="ds"><strong>${ch.title} · ${cv.state}</strong><br/>${cv.in_period_summary||cv.L2||''}</div></div>`;
+      }).join('')}`;
+  }
+  else if (payload.kind === 'inventions') {
+    const c = CIV_DEEP[payload.civId];
+    const info = getCivInfo(payload.civId);
+    html += `<div class="type-tag civ">${info.icon} ${info.name}</div>
+      <h1>💡 关键发明</h1>
+      ${c.nine_inventions.map(inv=>`<div class="ev-card">
+        <div class="nm">${inv.name} <span style="font-family:var(--mono);font-size:10px;color:var(--paper-ink3);font-weight:400">· ${inv.year||''}</span></div>
+        <div class="ds">${inv.body}</div>
+      </div>`).join('')}`;
+  }
+  else if (payload.kind === 'relations') {
+    const info = getCivInfo(payload.civId);
+    const rels = findCivRelations(payload.civId);
+    html += `<div class="type-tag civ">${info.icon} ${info.name}</div>
+      <h1>🌍 与其他文明的关系</h1>
+      ${rels.length?`<div class="rel-list">${rels.map(r=>`<div class="rel-card" onclick="closeTextPanel();navigate('civ','${r.targetId}')">
+        <span class="typ ${r.type}">${r.typeLabel||r.type}</span>
+        <div class="pair">${r.from}<span class="arrow">${r.symbol||'→'}</span>${r.to}</div>
+        <div class="desc">${r.desc}</div>
+      </div>`).join('')}</div>`:`<div class="todo-note">跨文明关系待补</div>`}`;
+  }
+  else if (payload.kind === 'collapse') {
+    const c = CIV_DEEP[payload.civId];
+    const info = getCivInfo(payload.civId);
+    html += `<div class="type-tag civ">${info.icon} ${info.name}</div>
+      <h1>⏳ 崩溃过程</h1>
+      ${c.collapse_chain.map(t=>{
+        const [yr,...rest] = t.split('·');
+        return `<div class="tl-item"><div class="yr">${yr.trim()}</div><div class="ds">${rest.join('·').trim()}</div></div>`;
+      }).join('')}`;
+  }
+  else if (payload.kind === 'legacy') {
+    const info = getCivInfo(payload.civId);
+    const legacyStr = FINAL_OVERVIEW.civs.find(c=>c.id===payload.civId)?.legacy || '';
+    const items = legacyStr.split(/\s*[·•|]\s*/).filter(x=>x.trim());
+    html += `<div class="type-tag civ">${info.icon} ${info.name}</div>
+      <h1>🎁 今天我们保留了什么</h1>
+      <div class="legacy-grid">${items.map(it=>`<div class="legacy-card"><div class="what">${it}</div></div>`).join('')}</div>`;
+  }
+  else if (payload.kind === 'biography') {
+    const p = PERSON_DEEP[payload.pid];
+    html += `<div class="type-tag person">👤 ${p.full_name}</div>
+      <h1>📖 完整传记</h1>
+      ${p.historical_or_mythic?`<div class="one-liner">${p.historical_or_mythic}</div>`:''}
+      <div class="narrative">${p.biography.trim().split(/\n\s*\n/).map(par=>'<p>'+par.trim()+'</p>').join('')}</div>`;
+  }
+  else if (payload.kind === 'childhood') {
+    const p = PERSON_DEEP[payload.pid];
+    html += `<div class="type-tag person">👤 ${p.full_name}</div>
+      <h1>👶 童年 · 出身</h1>
+      <div class="narrative"><p>${p.childhood}</p></div>`;
+  }
+  else if (payload.kind === 'achievements') {
+    const p = PERSON_DEEP[payload.pid];
+    html += `<div class="type-tag person">👤 ${p.full_name}</div>
+      <h1>🏆 主要成就</h1>
+      ${p.achievements_detail.map(a=>`<div class="ev-card">
+        <div class="nm">${a.name}</div>
+        <div class="ds">${a.detail}</div>
+        ${a.proof?`<div class="ho">📜 ${a.proof}</div>`:''}
+      </div>`).join('')}`;
+  }
+  else if (payload.kind === 'death') {
+    const p = PERSON_DEEP[payload.pid];
+    html += `<div class="type-tag person">👤 ${p.full_name}</div>
+      <h1>⚰️ 死亡 · 晚年</h1>
+      <div class="narrative"><p>${p.death}</p></div>`;
+  }
+  else if (payload.kind === 'plegacy') {
+    const p = PERSON_DEEP[payload.pid];
+    html += `<div class="type-tag person">👤 ${p.full_name}</div>
+      <h1>🌟 历史遗产</h1>
+      <div class="narrative">${p.legacy.trim().split(/\n\s*\n/).map(par=>'<p>'+par.trim()+'</p>').join('')}</div>`;
+  }
+  else if (payload.kind === 'oneliner') {
+    const e = EVENT_DEEP[payload.eid];
+    html += `<div class="type-tag event">📅 ${e.full_title}</div>
+      <h1>💡 一句话总结</h1>
+      <div class="narrative" style="font-size:20px;line-height:1.7;text-align:center;padding:24px 0"><p>${e.one_liner}</p></div>`;
+  }
+  else if (payload.kind === 'chain') {
+    const e = EVENT_DEEP[payload.eid];
+    html += `<div class="type-tag event">📅 ${e.full_title}</div>
+      <h1>🔗 因果链</h1>
+      ${renderChainHtml(e)}`;
+  }
+  else if (payload.kind === 'three') {
+    const e = EVENT_DEEP[payload.eid];
+    html += `<div class="type-tag event">📅 ${e.full_title}</div>
+      <h1>📜 之前 · 当时 · 之后</h1>
+      <div class="three-col">
+        <div class="three-col-card"><div class="lbl">之前</div><div class="txt">${e.context_before||'-'}</div></div>
+        <div class="three-col-card"><div class="lbl">当时</div><div class="txt">${e.significance||e.one_liner||'-'}</div></div>
+        <div class="three-col-card"><div class="lbl">之后</div><div class="txt">${e.leads_to||'-'}</div></div>
+      </div>`;
+  }
+  else if (payload.kind === 'enarrative') {
+    const e = EVENT_DEEP[payload.eid];
+    html += `<div class="type-tag event">📅 ${e.full_title}</div>
+      <h1>📖 事件完整叙事</h1>
       <div class="one-liner">💡 ${e.one_liner||''}</div>
-    </div>
+      <div class="narrative">${e.narrative.trim().split(/\n\s*\n/).map(p=>'<p>'+p.trim()+'</p>').join('')}</div>`;
+  }
+  else if (payload.kind === 'ewhat') {
+    const e = EVENT_DEEP[payload.eid];
+    html += `<div class="type-tag event">📅 ${e.full_title}</div>
+      <h1>📅 事件时间线</h1>
+      ${e.what_happened.map(t=>{
+        const [yr,...rest] = t.split('·');
+        return `<div class="tl-item"><div class="yr">${yr.trim()}</div><div class="ds">${rest.join('·').trim()}</div></div>`;
+      }).join('')}`;
+  }
+  else if (payload.kind === 'evidence') {
+    const e = EVENT_DEEP[payload.eid];
+    html += `<div class="type-tag event">📅 ${e.full_title}</div>
+      <h1>🏺 考古证据</h1>
+      ${e.evidence.map(ev=>`<div class="ev-card">
+        <div class="nm">${ev.artifact}</div>
+        <div class="ds">${ev.what}</div>
+        <div class="ho">📍 ${ev.held}</div>
+      </div>`).join('')}`;
+  }
+  else if (payload.kind === 'significance') {
+    const e = EVENT_DEEP[payload.eid];
+    html += `<div class="type-tag event">📅 ${e.full_title}</div>
+      <h1>🎯 历史意义</h1>
+      <div class="narrative"><p>${e.significance}</p></div>`;
+  }
 
-    <h2 class="hub-title">🗂 选择你想了解的方面 ↓</h2>
-    <div class="hub-sub">CLICK A CARD TO DIVE IN</div>
-    <div class="hub-grid">
-      ${cards.map(c=>`<div class="hub-card ${c.enabled?'':'disabled'}" ${c.enabled?`onclick="navigate('event','${eid}','${c.key}')"`:''}>
-        <div class="ic">${c.icon}</div>
-        <div class="ti">${c.title}</div>
-        <div class="ds">${c.desc}</div>
-        <div class="more"><span class="label">${c.enabled?'点击进入 →':'待补'}</span><span class="count">${c.count}</span></div>
-      </div>`).join('')}
-    </div>
-  `;
-  document.getElementById('page').innerHTML = html;
-  window.scrollTo({top:0});
-  document.title = e.full_title + ' · 早期文明实验室';
+  card.innerHTML = html;
+  document.getElementById('textPanel').classList.add('open');
 }
+function closeTextPanel(){ document.getElementById('textPanel').classList.remove('open'); }
 
-// ════════════════════════════════════════════════
-// SECTION: 事件的某个子章节
-// ════════════════════════════════════════════════
-function renderEventSection(eid, section){
-  const e = EVENT_DEEP[eid];
-  if (!e) return renderError(`未找到事件：${eid}`);
-  renderCrumb('event', eid, e.full_title, section);
-
-  const sectionName = SECTION_NAMES[section] || section;
-  let content = '';
-
-  if (section === 'oneliner') {
-    content = `<div class="narrative" style="font-size:20px;line-height:1.7;text-align:center">💡 ${e.one_liner||''}</div>`;
-  }
-  else if (section === 'chain') {
-    content = `<div class="chain-box">${renderChainPills(e)}</div>`;
-  }
-  else if (section === 'three') {
-    content = `<div class="three-col">
-      <div class="three-col-card"><div class="lbl">之前</div><div class="txt">${e.context_before||'-'}</div></div>
-      <div class="three-col-card"><div class="lbl">当时</div><div class="txt">${e.significance||e.one_liner||'-'}</div></div>
-      <div class="three-col-card"><div class="lbl">之后</div><div class="txt">${e.leads_to||'-'}</div></div>
-    </div>`;
-  }
-  else if (section === 'narrative') {
-    content = `<div class="narrative">${(e.narrative||'').trim().split(/\n\s*\n/).map(p=>'<p>'+p.trim()+'</p>').join('')}</div>`;
-  }
-  else if (section === 'what_happened') {
-    content = `<div class="timeline">${(e.what_happened||[]).map(t=>{
-      const [yr,...rest] = t.split('·');
-      return `<div class="tl-item"><div class="yr">${yr.trim()}</div><div class="info"><div class="ds">${rest.join('·').trim()}</div></div></div>`;
-    }).join('')}</div>`;
-  }
-  else if (section === 'people') {
-    const peopleInvolved = (e.related_people||[]).map(pid=>({id:pid, deep:PERSON_DEEP[pid]})).filter(x=>x.deep);
-    content = peopleInvolved.length ? `<div class="entity-grid">${peopleInvolved.map(p=>`<div class="entity-card person" onclick="navigate('person','${p.id}')">
-      <div class="top"><div class="ic">👤</div><div class="nm">${p.deep.full_name}</div></div>
-      <div class="yr">${p.deep.lifespan_real||''}</div>
-      <div class="desc">${(p.deep.biography||'').slice(0,100).trim()}...</div>
-      <div class="more">读完整传记</div>
-    </div>`).join('')}</div>` : `<div class="todo-note">关键人物待补。</div>`;
-  }
-  else if (section === 'evidence') {
-    content = e.evidence?.length ? e.evidence.map(ev=>`<div class="evidence-card">
-      <div class="nm">${ev.artifact}</div>
-      <div class="ds">${ev.what}</div>
-      <div class="ho">📍 ${ev.held}</div>
-    </div>`).join('') : `<div class="todo-note">考古证据待补。</div>`;
-  }
-  else if (section === 'significance') {
-    content = `<div class="narrative">${e.significance||'待补'}</div>`;
-  }
-
-  let html = `
-    <div class="hero" style="padding:24px 0 14px;border-bottom-width:1px">
-      <div class="type-tag event">📅 ${e.full_title}</div>
-      <h1 style="font-size:28px;margin-top:6px">${sectionName.replace(/[^一-鿿·]/g,'').trim()||sectionName}</h1>
-    </div>
-    <button class="section-back" onclick="navigate('event','${eid}')">◀ 返回 ${e.full_title} 概览</button>
-    ${content}
-  `;
-  document.getElementById('page').innerHTML = html;
-  window.scrollTo({top:0});
-  document.title = sectionName + ' · ' + e.full_title;
-}
-
-function renderChainPills(e){
+function renderChainHtml(e){
   const before = e.context_before ? e.context_before.split(/[。，]/)[0].slice(0,20) : null;
   const after = e.leads_to ? e.leads_to.split(/[→;；]/).map(s=>s.trim().slice(0,18)).filter(s=>s.length>0).slice(0,3) : [];
-  const center = e.full_title;
   let html = '<div class="chain-row">';
   if (before) html += `<span class="chain-pill">${before}</span><span class="chain-arrow">→</span>`;
-  html += `<span class="chain-pill center">${center}</span>`;
-  after.forEach((a)=>{
+  html += `<span class="chain-pill center">${e.full_title}</span>`;
+  after.forEach(a=>{
     html += `<span class="chain-arrow">→</span><span class="chain-pill">${a}</span>`;
   });
   html += '</div>';
   return html;
 }
 
-// ════════════════════════════════════════════════
-// 文明关系
-// ════════════════════════════════════════════════
+// ════════════════════════════════════════
+// 跨文明关系
+// ════════════════════════════════════════
 const CIV_RELATIONS = [
-  {from:'akkad', to:'sumer', type:'war', typeLabel:'征服', symbol:'⚔', desc:'Sargon 大帝约前 2350 年征服苏美尔，建立人类第一个多民族帝国，但保留了苏美尔语言+文化。'},
-  {from:'babylon', to:'sumer', type:'influence', typeLabel:'继承', symbol:'⇒', desc:'巴比伦全套继承了苏美尔的法律、文学、宗教、占星术；汉谟拉比法典直接基于 Ur-Nammu 法典。'},
-  {from:'sumer', to:'indus', type:'trade', typeLabel:'贸易', symbol:'⇄', desc:'苏美尔商人通过波斯湾与印度河文明远程贸易，进口红玉髓、象牙、孔雀；考古发现印度河印章出现在 Ur 王陵。'},
-  {from:'sumer', to:'egypt_old', type:'influence', typeLabel:'间接影响', symbol:'⇢', desc:'苏美尔的城市化模型 + 文字概念可能通过黎凡特间接影响埃及前王朝；但埃及发展出完全独立的象形文字。'},
-  {from:'hittite', to:'egypt_new', type:'war', typeLabel:'战争+和约', symbol:'⚔', desc:'前 1274 年卡迭石战役（古代最大战车战，5000-6000 战车）；前 1259 年签订人类已知最早的国际和约。'},
+  {from:'akkad', to:'sumer', type:'war', typeLabel:'征服', symbol:'⚔', desc:'Sargon 大帝约前 2350 年征服苏美尔，建立人类第一个多民族帝国。'},
+  {from:'babylon', to:'sumer', type:'influence', typeLabel:'继承', symbol:'⇒', desc:'巴比伦全套继承了苏美尔的法律、文学、宗教、占星术。'},
+  {from:'sumer', to:'indus', type:'trade', typeLabel:'贸易', symbol:'⇄', desc:'苏美尔商人通过波斯湾与印度河文明远程贸易青金石+红玉髓。'},
+  {from:'sumer', to:'egypt_old', type:'influence', typeLabel:'间接影响', symbol:'⇢', desc:'苏美尔的城市化模型 + 文字概念可能通过黎凡特间接影响埃及。'},
+  {from:'hittite', to:'egypt_new', type:'war', typeLabel:'战争+和约', symbol:'⚔', desc:'卡迭石战役 (前 1274) + 人类已知最早国际和约 (前 1259)。'},
   {from:'mycenaean', to:'minoan', type:'war', typeLabel:'取代', symbol:'⇒', desc:'约前 1450 年迈锡尼人征服米诺斯文明，继承爱琴海贸易主导权。'},
-  {from:'mycenaean', to:'hittite', type:'trade', typeLabel:'贸易+冲突', symbol:'⇄', desc:'两国通过爱琴海贸易（特别是青铜原料），赫梯文献记载"阿希亚瓦"（可能就是迈锡尼）多次干涉小亚细亚事务。'},
-  {from:'shang', to:'sumer', type:'influence', typeLabel:'平行发展', symbol:'∥', desc:'商朝与苏美尔完全独立发展，无直接联系；但都独立发明了：青铜冶炼、城市、占卜、王权宗教融合。'},
-  {from:'collapse', to:'hittite', type:'war', typeLabel:'毁灭', symbol:'✕', desc:'约前 1180 年 Sea Peoples 加干旱链使赫梯首都 Hattusa 被烧毁，赫梯帝国瓦解。'},
-  {from:'collapse', to:'mycenaean', type:'war', typeLabel:'毁灭', symbol:'✕', desc:'前 1180 年迈锡尼宫殿全部被烧毁，希腊进入 400 年"黑暗时代"。'},
-  {from:'collapse', to:'egypt_new', type:'war', typeLabel:'削弱', symbol:'⚠', desc:'埃及虽击退 Sea Peoples (Ramesses III, 前 1177)，但元气大伤，新王国从此衰落。'},
+  {from:'mycenaean', to:'hittite', type:'trade', typeLabel:'贸易', symbol:'⇄', desc:'两国通过爱琴海贸易青铜原料。'},
+  {from:'shang', to:'sumer', type:'influence', typeLabel:'平行发展', symbol:'∥', desc:'商朝与苏美尔完全独立发展，无直接联系。'},
+  {from:'collapse', to:'hittite', type:'war', typeLabel:'毁灭', symbol:'✕', desc:'约前 1180 年 Sea Peoples 加干旱链使赫梯首都被烧毁。'},
+  {from:'collapse', to:'mycenaean', type:'war', typeLabel:'毁灭', symbol:'✕', desc:'前 1180 年迈锡尼宫殿被烧，希腊进入 400 年黑暗时代。'},
+  {from:'collapse', to:'egypt_new', type:'war', typeLabel:'削弱', symbol:'⚠', desc:'埃及虽击退 Sea Peoples，但元气大伤。'},
 ];
-
 function findCivRelations(civId){
   const result = [];
   CIV_RELATIONS.forEach(r=>{
@@ -866,36 +777,83 @@ function findCivRelations(civId){
   return result;
 }
 
-// ════════════════════════════════════════════════
+// ════════════════════════════════════════
+// Tooltip
+// ════════════════════════════════════════
+function showTooltip(e, action){
+  const tip = document.getElementById('tooltip');
+  let html = '';
+  if (action.type === 'navigate') {
+    const t = action.to.type, id = action.to.id;
+    if (t === 'person') {
+      const p = PERSON_DEEP[id];
+      html = `<div class="nm">👤 ${p?.full_name||id}</div>
+        <div class="meta">${p?.lifespan_real||p?.lifespan_mythic||''}</div>
+        <div class="desc">${(p?.biography||'').slice(0,100).trim()}...</div>
+        <div class="cta">点击 → 进入小宇宙</div>`;
+    } else if (t === 'event') {
+      const ev = EVENT_DEEP[id];
+      html = `<div class="nm">📅 ${ev?.full_title||id}</div>
+        <div class="meta">${(ev?.what_happened?.[0]||'').split('·')[0].trim()}</div>
+        <div class="desc">${ev?.one_liner||''}</div>
+        <div class="cta">点击 → 进入小宇宙</div>`;
+    } else if (t === 'civ') {
+      const info = getCivInfo(id);
+      html = `<div class="nm">${info.icon} ${info.name}</div>
+        <div class="cta">点击 → 进入小宇宙</div>`;
+    }
+  } else if (action.type === 'showText') {
+    html = `<div class="nm">${SECTION_HINTS[action.payload.kind]||'阅读'}</div>
+      <div class="cta">点击 → 展开文字内容</div>`;
+  }
+  tip.innerHTML = html;
+  tip.classList.add('show');
+  moveTooltip(e);
+}
+const SECTION_HINTS = {
+  narrative:'📖 完整文明叙事', basics:'🏛 基础事实', timeline:'📅 演化阶段',
+  inventions:'💡 关键发明', relations:'🌍 与其他文明的关系', collapse:'⏳ 崩溃过程',
+  legacy:'🎁 今天的遗产',
+  biography:'📖 完整传记', childhood:'👶 童年出身', achievements:'🏆 主要成就',
+  death:'⚰️ 死亡晚年', plegacy:'🌟 历史遗产',
+  oneliner:'💡 一句话总结', chain:'🔗 事件因果链', three:'📜 之前·当时·之后',
+  enarrative:'📖 事件完整叙事', ewhat:'📅 事件时间线',
+  evidence:'🏺 考古证据', significance:'🎯 历史意义',
+};
+function moveTooltip(e){
+  const tip = document.getElementById('tooltip');
+  const x = Math.min(e.clientX + 16, window.innerWidth - 360);
+  const y = Math.min(e.clientY + 16, window.innerHeight - 200);
+  tip.style.left = x+'px';
+  tip.style.top = y+'px';
+}
+function hideTooltip(){ document.getElementById('tooltip').classList.remove('show'); }
+
+// ════════════════════════════════════════
 // 路由 + 错误
-// ════════════════════════════════════════════════
+// ════════════════════════════════════════
 function renderError(msg){
-  document.getElementById('page').innerHTML = `<div class="error-page">
+  document.getElementById('canvas').innerHTML = '';
+  document.body.insertAdjacentHTML('beforeend', `<div class="error-page" id="errorPage">
     <h1>🚧 ${msg}</h1>
-    <a href="./civ-explorer-d.html" class="back-btn" style="display:inline-flex;margin-top:20px">◀ 返回时间入口</a>
-  </div>`;
+    <a href="./civ-explorer-d.html" style="color:var(--gold);text-decoration:none;background:rgba(212,168,88,.15);padding:10px 20px;border-radius:99px;border:1px solid var(--gold);margin-top:14px">◀ 返回历史宇宙</a>
+  </div>`);
 }
 
 function route(){
-  const {type, id, section} = parseHash();
-  if (!type || !id) return renderError('请通过时间入口选择实体');
-  if (type==='civ') {
-    if (section) return renderCivSection(id, section);
-    return renderCivHub(id);
-  }
-  if (type==='person') {
-    if (section) return renderPersonSection(id, section);
-    return renderPersonHub(id);
-  }
-  if (type==='event') {
-    if (section) return renderEventSection(id, section);
-    return renderEventHub(id);
-  }
+  document.getElementById('errorPage')?.remove();
+  closeTextPanel();
+  const {type, id} = parseHash();
+  if (!type || !id) return renderError('请通过历史宇宙选择实体');
+  if (type==='civ') return renderCivCosmic(id);
+  if (type==='person') return renderPersonCosmic(id);
+  if (type==='event') return renderEventCosmic(id);
   renderError(`未知类型：${type}`);
 }
 
 window.addEventListener('hashchange', route);
 window.navigate = navigate;
+window.closeTextPanel = closeTextPanel;
 route();
 </script>
 </body>
