@@ -457,11 +457,8 @@ function render(){
     const nameX = rightSide ? xp - r - 12 : xp + r + 12;
     const nameAnchor = rightSide ? 'end' : 'start';
     svg += `<g class="civ-row" data-id="${c.id}" data-region="${c.region}">
-      <!-- 时间跨度光条 -->
+      <!-- 时间跨度光条 (起止年改到悬浮提示里, 避免与名字重叠) -->
       <rect class="civ-span" x="${x1}" y="${y-8}" width="${x2-x1}" height="16" rx="8" fill="url(#span_${c.id})" stroke="${color}" stroke-opacity="0.35" stroke-width="1" style="color:${color}"/>
-      <!-- 起止年标 -->
-      <text class="civ-years" x="${x1-8}" y="${y}" text-anchor="end">前${Math.abs(c.start)}</text>
-      <text class="civ-years" x="${x2+8}" y="${y}" text-anchor="start">前${Math.abs(c.end)}</text>
       <!-- 巅峰球 (内层缩放修复浮动 bug：fill-box 绕自身中心) -->
       <g class="orb-inner">
         <g class="civ-orb-body">
