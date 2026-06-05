@@ -432,6 +432,16 @@ function getCivInfo(id){
   const fb = {egypt_predynastic:{name:'古埃及·前王朝',icon:'🌅',color:'#d4b870'},indus_early:{name:'印度河早期',icon:'🏘',color:'#a070d4'}};
   return fb[id] || {name:id,icon:'🏛',color:'#888'};
 }
+// 人物专属图标 (按身份, 比全用 👤 更贴切)
+const PERSON_ICON = {
+  gilgamesh:'👑', enkidu:'🐂', enheduanna:'🌙', sargon:'👑', naramsin:'⭐', urnammu:'⚖️',
+  puabi:'💎', eannatum:'🦅', gudea:'🗿', hammurabi:'⚖️',
+  narmer:'👑', imhotep:'📐', djoser:'🔺', khufu:'🔺', khafre:'🦁',
+  hatshepsut:'👑', thutmose3:'⚔️', akhenaten:'☀️', nefertiti:'💎', tutankhamun:'🪙', ramesses2:'🏛️',
+  shangtang:'👑', yiyin:'📜', wuding:'👑', fuhao:'⚔️', fushuo:'📜', dixin:'🔥', zhou_wu:'⚔️',
+  minos:'🐂', agamemnon:'🛡️', suppiluliuma:'👑', muwatalli:'🏹', hattusili:'🕊️',
+};
+function personIcon(id){ return PERSON_ICON[id] || '👤'; }
 function findCivChapters(civId){return CHAPTERS.filter(ch=>ch.active_civs.some(cv=>cv.id===civId))}
 function findEventsOfCiv(civId){
   const evs = [];
@@ -481,20 +491,20 @@ function renderCosmic(centerData, orbs){
   // 人物/事件页用 SVG 宇宙图：显示 canvas, 隐藏文明页
   document.getElementById('canvas').classList.remove('hidden');
   document.getElementById('civPage').classList.remove('active');
-  // 给 orb 计算位置
+  // 给 orb 计算位置 (更大半径 + 每环更少, 避免标签互相遮挡)
   const N = orbs.length;
-  const ringSize = N <= 8 ? N : (N <= 16 ? Math.ceil(N/2) : Math.ceil(N/3));
+  const ringSize = N <= 7 ? N : Math.ceil(N/2);
   const rings = Math.ceil(N / ringSize);
 
   orbs.forEach((orb, i)=>{
     const ring = Math.floor(i / ringSize);
     const idx = i % ringSize;
     const items = (ring === rings - 1) ? (N - ring * ringSize) : ringSize;
-    const angleOffset = ring * 0.2;
+    const angleOffset = ring * 0.4;  // 内外环错开角度, 防止径向标签叠在一起
     const angle = -Math.PI/2 + angleOffset + idx * (Math.PI * 2 / items);
-    const r = 240 + ring * 150;
+    const r = 255 + ring * 185;
     orb.x = CX + Math.cos(angle) * r;
-    orb.y = CY + Math.sin(angle) * r * 0.85; // 椭圆轨道
+    orb.y = CY + Math.sin(angle) * r * 0.78; // 椭圆轨道(纵向压扁)
   });
 
   let svg = `<defs>
@@ -516,8 +526,8 @@ function renderCosmic(centerData, orbs){
 
   // 轨道虚线圈
   for (let r=1; r<=rings; r++){
-    const radius = 240 + (r-1) * 150;
-    svg += `<ellipse cx="${CX}" cy="${CY}" rx="${radius}" ry="${radius*0.85}" fill="none" stroke="rgba(212,168,88,.08)" stroke-width="1" stroke-dasharray="3 6"/>`;
+    const radius = 255 + (r-1) * 185;
+    svg += `<ellipse cx="${CX}" cy="${CY}" rx="${radius}" ry="${radius*0.78}" fill="none" stroke="var(--panel-line)" stroke-width="1" stroke-dasharray="3 6" opacity=".5"/>`;
   }
 
   // spokes (从中心到每个 orb)
@@ -654,7 +664,7 @@ function renderCivCosmic(civId){
   const bucketKeys = Object.keys(buckets).map(Number).sort((a,b)=>b-a); // 大->小 = 早->晚 (因为是"前X")
   bucketKeys.forEach(k=>{ buckets[k].ev.sort((a,b)=>(a.year||0)-(b.year||0)); buckets[k].pe.sort((a,b)=>(a.year||0)-(b.year||0)); });
 
-  const chip = it => `<div class="tl-chip ${it.type==='event'?'ev':'pe'}" onclick="navigate('${it.type}','${it.id}')"><span class="nm">${it.type==='event'?'📅 ':'👤 '}${it.name}</span>${it.year!=null?`<span class="yr">前${Math.abs(it.year)}</span>`:''}</div>`;
+  const chip = it => `<div class="tl-chip ${it.type==='event'?'ev':'pe'}" onclick="navigate('${it.type}','${it.id}')"><span class="nm">${it.type==='event'?'📅 ':personIcon(it.id)+' '}${it.name}</span>${it.year!=null?`<span class="yr">前${Math.abs(it.year)}</span>`:''}</div>`;
 
   let timelineHtml = '';
   if (bucketKeys.length){
@@ -731,7 +741,7 @@ function renderPersonCosmic(pid){
   renderCrumb('person', pid, name.split(' ')[0]);
 
   const center = {
-    icon: '👤', name: name.split(' ')[0], color: '#6080b0',
+    icon: personIcon(pid), name: name.split(' ')[0], color: '#6080b0',
     meta: p.lifespan_real || p.lifespan_mythic || '',
     size: 70,
   };
@@ -757,7 +767,7 @@ function renderPersonCosmic(pid){
   allFriends.forEach(f=>{
     const other = PERSON_DEEP[f.id];
     const fname = (other?.full_name || f.id).split(' ')[0];
-    orbs.push({icon:'👤',name:fname,color:'#7080b0',typeLabel:f.relation||'关系',size:34,
+    orbs.push({icon:personIcon(f.id),name:fname,color:'#7080b0',typeLabel:f.relation||'关系',size:34,
       action:{type:'navigate',to:{type:'person',id:f.id}}});
   });
 
@@ -809,7 +819,7 @@ function renderEventCosmic(eid){
     const p = PERSON_DEEP[pid];
     if (!p) return;
     const fname = (p.full_name||pid).split(' ')[0];
-    orbs.push({icon:'👤',name:fname,color:'#6080b0',typeLabel:'KEY PERSON',size:36,
+    orbs.push({icon:personIcon(pid),name:fname,color:'#6080b0',typeLabel:'关键人物',size:36,
       action:{type:'navigate',to:{type:'person',id:pid}}});
   });
 
@@ -1453,7 +1463,7 @@ function applyTheme(t){
 document.getElementById('themeSwitch').addEventListener('click', e=>{
   const b = e.target.closest('button'); if(b) applyTheme(b.dataset.t);
 });
-applyTheme(localStorage.getItem('civ_theme') || 'deepblue');
+applyTheme(localStorage.getItem('civ_theme') || 'textbook');
 
 route();
 recordNav();
