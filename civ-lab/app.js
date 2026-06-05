@@ -380,7 +380,7 @@ function renderStageCards() {
             <p class="stage-card-question">「${stage.core_question}」</p>
             <div class="stage-card-stats">
               <span class="stage-card-count">📚 ${total} 个知识点</span>
-              ${stage.featured ? '<span class="stage-card-ready">12 文明 · 27 事件 · 34 人物</span>' : (linkedCount > 0 ? `<span class="stage-card-ready">${linkedCount} 已开放${completed > 0 ? ` · ${completed} 已学` : ''}</span>` : '')}
+              ${stage.featured ? `<span class="stage-card-ready">${stage.featured_stat || ''}</span>` : (linkedCount > 0 ? `<span class="stage-card-ready">${linkedCount} 已开放${completed > 0 ? ` · ${completed} 已学` : ''}</span>` : '')}
               ${isComing ? '<span class="stage-card-badge">⏳ 即将上线</span>' : ''}
             </div>
             <div class="stage-card-cta">${isComing ? '敬请期待' : (stage.featured ? '进入历史宇宙 →' : '进入探索 →')}</div>
@@ -406,6 +406,11 @@ function enterStage(stageId) {
   // 「早期文明」正式版 → 进入历史宇宙深度探索应用
   if (stageId === 'STAGE_01') {
     window.location.href = './civ-explorer-d.html';
+    return;
+  }
+  // 「古典思想与帝国」正式版 → 进入时间长河探索页
+  if (stageId === 'STAGE_02') {
+    window.location.href = './classical-explorer.html';
     return;
   }
   homeViewState = { mode: 'stage', stageId };
