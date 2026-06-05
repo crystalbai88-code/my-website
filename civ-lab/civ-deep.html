@@ -320,12 +320,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
   .theme-switch{margin-left:0;order:5}
   .theme-switch button{width:20px!important;height:20px!important}
   .ai-panel{right:8px!important;left:8px!important;width:auto!important;bottom:130px!important}
-  /* 人物/事件宇宙图: SVG 缩小后放大字号 */
-  .float-orb .name{font-size:22px}
-  .float-orb .type-tag{font-size:15px}
-  .float-orb .orb-year{font-size:16px}
-  .center-orb .label{font-size:30px}
-  .center-orb .meta{font-size:17px}
+  /* 人物/事件宇宙图字号由 JS 按屏幕计算 (renderCosmic), 此处不覆盖 */
   /* 文明页: 卡片两列, hero 缩小 */
   .civ-page{top:96px;padding:6px 14px 60px}
   .civ-hero{padding:18px 0 16px}
@@ -536,15 +531,16 @@ function renderCosmic(centerData, orbs){
   const ringSize = N <= 7 ? N : Math.ceil(N/2);
   const rings = Math.ceil(N / ringSize);
 
+  // 半径放大, 让节点铺满画面不显空
   orbs.forEach((orb, i)=>{
     const ring = Math.floor(i / ringSize);
     const idx = i % ringSize;
     const items = (ring === rings - 1) ? (N - ring * ringSize) : ringSize;
     const angleOffset = ring * 0.4;  // 内外环错开角度, 防止径向标签叠在一起
     const angle = -Math.PI/2 + angleOffset + idx * (Math.PI * 2 / items);
-    const r = 255 + ring * 185;
+    const r = 300 + ring * 215;
     orb.x = CX + Math.cos(angle) * r;
-    orb.y = CY + Math.sin(angle) * r * 0.78; // 椭圆轨道(纵向压扁)
+    orb.y = CY + Math.sin(angle) * r * 0.8;
   });
 
   let svg = `<defs>
@@ -566,8 +562,8 @@ function renderCosmic(centerData, orbs){
 
   // 轨道虚线圈
   for (let r=1; r<=rings; r++){
-    const radius = 255 + (r-1) * 185;
-    svg += `<ellipse cx="${CX}" cy="${CY}" rx="${radius}" ry="${radius*0.78}" fill="none" stroke="var(--panel-line)" stroke-width="1" stroke-dasharray="3 6" opacity=".5"/>`;
+    const radius = 300 + (r-1) * 215;
+    svg += `<ellipse cx="${CX}" cy="${CY}" rx="${radius}" ry="${radius*0.8}" fill="none" stroke="var(--panel-line)" stroke-width="1" stroke-dasharray="3 6" opacity=".5"/>`;
   }
 
   // spokes (从中心到每个 orb)
@@ -575,36 +571,45 @@ function renderCosmic(centerData, orbs){
     svg += `<line class="spoke" x1="${CX}" y1="${CY}" x2="${orb.x}" y2="${orb.y}"/>`;
   });
 
+  // 尺寸随屏幕: 手机上 SVG 被压缩, 需更大字号+球
+  const mobile = window.matchMedia('(max-width:768px)').matches;
+  const nameFs = mobile ? 26 : 18;
+  const orbScale = mobile ? 1.7 : 1.45;
+  const cScale = mobile ? 1.6 : 1.38;
+  const cLabelFs = mobile ? 40 : 28;
+  const cMetaFs = mobile ? 23 : 15;
+
   // orbs
   orbs.forEach((orb,i)=>{
-    const r = orb.size || 36;
+    const r = (orb.size || 36) * orbScale;
+    const h = nameFs + 14, w = orb.name.length*nameFs + nameFs + 14;
     svg += `<g class="float-orb" data-action='${JSON.stringify(orb.action)}' transform="translate(${orb.x},${orb.y})" style="color:${orb.color}">
-      <circle cx="0" cy="0" r="${r*1.6}" fill="${orb.color}" opacity="0.12"/>
+      <circle cx="0" cy="0" r="${r*1.55}" fill="${orb.color}" opacity="0.12"/>
       <g class="body">
-        <circle cx="0" cy="0" r="${r}" fill="url(#orbGrad${i})" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="${r}" fill="url(#orbGrad${i})" stroke="rgba(255,255,255,.3)" stroke-width="2"/>
         <ellipse cx="${-r*0.18}" cy="${-r*0.32}" rx="${r*0.4}" ry="${r*0.17}" fill="rgba(255,255,255,.5)" transform="rotate(-25)"/>
         <text text-anchor="middle" dominant-baseline="central" font-size="${r*0.9}" style="pointer-events:none">${orb.icon}</text>
       </g>
-      <g transform="translate(0,${r+22})">
-        <rect class="label-bg" x="${-orb.name.length*7-8}" y="${-11}" width="${orb.name.length*14+16}" height="22" rx="11"/>
-        <text class="name" y="3" font-size="12.5">${orb.name}</text>
+      <g transform="translate(0,${r+h/2+8})">
+        <rect class="label-bg" x="${-w/2}" y="${-h/2}" width="${w}" height="${h}" rx="${h/2}"/>
+        <text class="name" y="0" dominant-baseline="central" font-size="${nameFs}">${orb.name}</text>
       </g>
     </g>`;
   });
 
   // center orb
-  const cr = centerData.size || 70;
+  const cr = (centerData.size || 70) * cScale;
   svg += `<g class="center-orb" transform="translate(${CX},${CY})">
     <circle cx="0" cy="0" r="${cr*2}" fill="url(#centerHalo)"/>
-    <circle class="ring1" cx="0" cy="0" r="${cr+25}" stroke-dasharray="6 10"/>
-    <circle class="ring2" cx="0" cy="0" r="${cr+45}" stroke-dasharray="2 16"/>
+    <circle class="ring1" cx="0" cy="0" r="${cr+28}" stroke-dasharray="6 10"/>
+    <circle class="ring2" cx="0" cy="0" r="${cr+52}" stroke-dasharray="2 16"/>
     <g class="body">
-      <circle cx="0" cy="0" r="${cr}" fill="url(#centerGrad)" stroke="rgba(255,255,255,.4)" stroke-width="2"/>
+      <circle cx="0" cy="0" r="${cr}" fill="url(#centerGrad)" stroke="rgba(255,255,255,.4)" stroke-width="2.5"/>
       <ellipse cx="${-cr*0.18}" cy="${-cr*0.32}" rx="${cr*0.4}" ry="${cr*0.17}" fill="rgba(255,255,255,.5)" transform="rotate(-25)"/>
-      <text text-anchor="middle" dominant-baseline="central" font-size="${cr*0.7}" style="pointer-events:none">${centerData.icon}</text>
+      <text text-anchor="middle" dominant-baseline="central" font-size="${cr*0.66}" style="pointer-events:none">${centerData.icon}</text>
     </g>
-    <text class="label" y="${cr+30}" font-size="20">${centerData.name}</text>
-    ${centerData.meta?`<text class="meta" y="${cr+52}" font-size="11">${centerData.meta}</text>`:''}
+    <text class="label" y="${cr+cLabelFs}" font-size="${cLabelFs}">${centerData.name}</text>
+    ${centerData.meta?`<text class="meta" y="${cr+cLabelFs+cMetaFs+6}" font-size="${cMetaFs}">${centerData.meta}</text>`:''}
   </g>`;
 
   document.getElementById('canvas').innerHTML = svg;
@@ -1480,6 +1485,12 @@ async function sendAI(){
 }
 
 window.addEventListener('hashchange', ()=>{ route(); recordNav(); });
+// 跨越手机/桌面断点时重新渲染 (字号随屏幕变), 避免地址栏伸缩频繁重绘
+let _lastMobile = window.matchMedia('(max-width:768px)').matches;
+window.addEventListener('resize', ()=>{
+  const m = window.matchMedia('(max-width:768px)').matches;
+  if (m !== _lastMobile){ _lastMobile = m; const {type}=parseHash(); if(type) route(); }
+});
 document.getElementById('aiForm').addEventListener('submit', e=>{ e.preventDefault(); sendAI(); });
 
 window.navigate = navigate;
