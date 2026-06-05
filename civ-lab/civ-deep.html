@@ -447,12 +447,12 @@ const CIV_ICON = {
   egypt_predynastic:'🌅', egypt_old:'🔺', egypt_new:'🏛️',
   indus_early:'🏘️', indus:'🧱',
   minoan:'🐂', mycenaean:'🦁',
-  hittite:'🛡️', shang:'🏺', collapse:'💥',
+  hittite:'🛡️', xia:'🐉', shang:'🏺', collapse:'💥',
 };
 function getCivInfo(id){
   let base = null;
   if (typeof EARLY_CIV_EXPLORER!=='undefined') base = EARLY_CIV_EXPLORER.civilizations.find(c=>c.id===id);
-  const fb = {egypt_predynastic:{name:'古埃及·前王朝',color:'#d4b870'},egypt_new:{name:'古埃及·新王国',color:'#e0a850'},indus_early:{name:'印度河早期',color:'#a070d4'},mycenaean:{name:'迈锡尼',color:'#1880b0'},collapse:{name:'青铜时代崩溃',color:'#888'}};
+  const fb = {egypt_predynastic:{name:'古埃及·前王朝',color:'#d4b870'},egypt_new:{name:'古埃及·新王国',color:'#e0a850'},indus_early:{name:'印度河早期',color:'#a070d4'},mycenaean:{name:'迈锡尼',color:'#1880b0'},xia:{name:'夏朝',color:'#6f8f5a'},collapse:{name:'青铜时代崩溃',color:'#888'}};
   base = base || fb[id] || {name:id,color:'#888'};
   return {...base, icon: CIV_ICON[id] || base.icon || '🏛'};
 }
@@ -463,6 +463,7 @@ const PERSON_ICON = {
   narmer:'👑', imhotep:'📐', djoser:'🔺', khufu:'🔺', khafre:'🦁',
   hatshepsut:'👑', thutmose3:'⚔️', akhenaten:'☀️', nefertiti:'💎', tutankhamun:'🪙', ramesses2:'🏛️',
   shangtang:'👑', yiyin:'📜', wuding:'👑', fuhao:'⚔️', fushuo:'📜', dixin:'🔥', zhou_wu:'⚔️',
+  yu_the_great:'🌊', qi_xia:'👑', jie_xia:'🔥',
   minos:'🐂', agamemnon:'🛡️', suppiluliuma:'👑', muwatalli:'🏹', hattusili:'🕊️',
 };
 function personIcon(id){ return PERSON_ICON[id] || '👤'; }
@@ -475,6 +476,7 @@ const EVENT_ICON = {
   evt_knossos_palace:'🏛️', evt_thera_eruption:'🌋', evt_trojan_war:'🐴', evt_hittite_sack_babylon:'🔥',
   evt_sea_peoples:'⛵', evt_bronze_collapse:'💥', evt_shang_founding:'👑', evt_pangeng_relocate:'🏙️',
   evt_wuding_peak:'👑', evt_battle_muye:'⚔️',
+  evt_yu_flood:'🌊', evt_qi_hereditary:'👑', evt_shaokang:'🗡️',
 };
 function eventIcon(id){ return EVENT_ICON[id] || '⭐'; }
 function findCivChapters(civId){return CHAPTERS.filter(ch=>ch.active_civs.some(cv=>cv.id===civId))}
