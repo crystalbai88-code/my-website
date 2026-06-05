@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>早期文明全景 · AI 世界文明实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#f2e4c4; --paper:#fdf5e0; --paper2:#f5e8c8;
+  --ink:#2c1a08; --ink2:#5c3a14; --ink3:#9a6828;
+  --warm:#c84820; --warm-deep:#a83a18; --gold:#d4a858;
+  --line:rgba(160,100,30,.25); --line-soft:rgba(160,100,30,.12);
+  --serif:'Noto Serif SC','STSong',serif;
+  --sans:'Noto Sans SC','PingFang SC',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--ink);overflow:hidden}
+
+.app{display:flex;flex-direction:column;height:100vh}
+
+/* HEADER */
+.top{
+  display:flex;align-items:center;gap:16px;padding:12px 24px;
+  background:rgba(253,245,228,.95);border-bottom:1.5px solid var(--line);
+}
+.top .back{font-family:var(--mono);font-size:11px;color:var(--warm);text-decoration:none;letter-spacing:.18em}
+.top h1{font-family:var(--serif);font-size:18px;font-weight:700;color:var(--ink)}
+.top h1 em{font-style:italic;color:var(--warm);margin-right:8px;font-family:Georgia,serif}
+.top .subtitle{font-size:11px;color:var(--ink3);font-family:var(--mono);letter-spacing:.1em}
+
+/* MODE TABS */
+.modes{display:flex;gap:6px;margin-left:auto}
+.mode{
+  padding:8px 16px;border-radius:99px;background:white;border:1.5px solid var(--line);
+  font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer;transition:all .2s;
+}
+.mode:hover{background:var(--paper2);color:var(--warm);border-color:var(--warm)}
+.mode.active{background:linear-gradient(135deg,var(--warm),var(--warm-deep));color:white;border-color:var(--warm)}
+
+/* MAIN */
+.main{flex:1;display:grid;grid-template-columns:1fr 380px;overflow:hidden}
+
+/* CANVAS */
+.canvas{position:relative;overflow:auto;background:var(--bg);padding:16px}
+.canvas svg{display:block;background:#fff;border-radius:14px;box-shadow:0 8px 30px rgba(60,30,5,.15)}
+
+/* SIDE PANEL */
+.side{
+  background:linear-gradient(135deg,var(--paper),var(--paper2));
+  border-left:1.5px solid var(--line);overflow-y:auto;padding:24px;
+}
+.side .ps-label{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.22em;text-transform:uppercase;margin-bottom:8px}
+.side h2{font-family:var(--serif);font-size:22px;color:var(--warm);font-weight:700;margin-bottom:12px}
+.side .meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;font-size:11px;font-family:var(--mono)}
+.side .meta span{padding:3px 8px;background:white;border:1px solid var(--line);border-radius:6px;color:var(--ink2)}
+.side p{font-size:13px;line-height:1.8;color:var(--ink2);margin-bottom:10px}
+.side h3{font-size:14px;font-weight:700;color:var(--ink);margin:18px 0 8px;border-bottom:1px dashed var(--line);padding-bottom:6px}
+.side .friends{display:flex;flex-direction:column;gap:8px}
+.side .friend{
+  background:white;border:1px solid var(--line);border-radius:8px;padding:10px 12px;
+  display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .2s;
+}
+.side .friend:hover{border-color:var(--warm);transform:translateX(-3px);background:var(--paper)}
+.side .friend .face{font-size:22px}
+.side .friend .info{flex:1;min-width:0}
+.side .friend .name{font-size:13px;font-weight:600;color:var(--ink)}
+.side .friend .note{font-size:11px;color:var(--ink3);margin-top:2px;font-style:italic}
+.side .friend .tag{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:4px;color:white;letter-spacing:.1em}
+.tag-friend{background:#2a8038} .tag-family{background:#8a4090} .tag-enemy{background:#c84820}
+.tag-mentor{background:#1a7890} .tag-contemporary{background:#9a6828} .tag-successor{background:#506890}
+
+.side .invent{font-size:12px;color:var(--ink2);padding-left:14px;position:relative;margin:4px 0}
+.side .invent::before{content:'★';position:absolute;left:0;color:var(--gold)}
+
+/* compare grid */
+.cmp-table{width:100%;border-collapse:collapse;font-size:12px;background:white;border-radius:8px;overflow:hidden;box-shadow:var(--sh-1)}
+.cmp-table th{padding:8px 12px;text-align:left;background:var(--paper2);font-family:var(--mono);font-size:10px;letter-spacing:.15em;color:var(--ink2);text-transform:uppercase;border-bottom:1px solid var(--line)}
+.cmp-table td{padding:10px 12px;border-bottom:1px solid var(--line-soft);color:var(--ink2);vertical-align:top;line-height:1.6}
+.cmp-table tr:hover td{background:var(--paper)}
+.cmp-civ-name{font-weight:700;color:var(--warm);font-family:var(--serif);white-space:nowrap}
+
+/* SVG style */
+.civ-lane{transition:opacity .2s}
+.civ-lane:hover{filter:brightness(1.05)}
+.civ-lane.dim{opacity:.25}
+.civ-bar{cursor:pointer;transition:all .2s}
+.civ-bar:hover{filter:brightness(1.1);stroke-width:3}
+.event-dot{cursor:pointer;transition:all .2s}
+.event-dot:hover{r:9;filter:drop-shadow(0 0 8px currentColor)}
+.event-line{stroke-dasharray:3,3;opacity:.5;pointer-events:none}
+.person-dot{cursor:pointer;transition:all .2s}
+.person-dot:hover circle{r:16;stroke-width:3}
+.person-link{stroke:var(--warm);stroke-width:1.5;opacity:.4;pointer-events:none}
+.year-tick{font-family:var(--mono);font-size:9px;fill:var(--ink3);text-anchor:middle}
+.civ-name-label{font-family:var(--serif);font-size:11px;font-weight:700;fill:var(--ink)}
+
+@media(max-width:900px){
+  .main{grid-template-columns:1fr}
+  .side{border-left:none;border-top:1.5px solid var(--line)}
+  .modes{margin-left:0;flex-wrap:wrap}
+  .top h1{font-size:14px}
+  .top .subtitle{display:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- TOP -->
+  <header class="top">
+    <a href="./" class="back">← 返回主站</a>
+    <h1><em>Stage 1</em>早期文明全景</h1>
+    <span class="subtitle">前 3500 — 前 1000 BCE</span>
+    <div class="modes">
+      <button class="mode active" data-mode="timeline">🌍 时间带</button>
+      <button class="mode" data-mode="people">👥 人物朋友圈</button>
+      <button class="mode" data-mode="events">⛓ 事件因果</button>
+      <button class="mode" data-mode="compare">📊 对比卡</button>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="canvas" id="canvas"></div>
+    <aside class="side" id="side">
+      <div class="ps-label">点击任意元素</div>
+      <h2>欢迎来到早期文明全景</h2>
+      <p>这是前 3500 - 前 1000 BCE 的 <strong>10 个文明</strong>、<strong>50+ 历史人物</strong>、<strong>40+ 重大事件</strong> 的全景视图。</p>
+      <p>切换上方 4 个模式：</p>
+      <h3>4 种探索方式</h3>
+      <div class="invent"><strong>🌍 时间带</strong> — 看 10 个文明谁在什么时候活着</div>
+      <div class="invent"><strong>👥 人物朋友圈</strong> — 每个历史人物不是孤立的，看他认识谁</div>
+      <div class="invent"><strong>⛓ 事件因果</strong> — 看每个大事是什么引起的、又导致什么</div>
+      <div class="invent"><strong>📊 对比卡</strong> — 8 个维度横向比较 10 个文明</div>
+      <h3>互动方式</h3>
+      <p>点任意 <strong>文明带</strong> / <strong>人物头像</strong> / <strong>事件圆点</strong> → 这里会显示详情 + 相关连接。</p>
+    </aside>
+  </div>
+</div>
+
+<!-- 数据 -->
+<script src="./early_civ_kb.js"></script>
+<script src="./early_civ_explorer_data.js"></script>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+// 🌐 早期文明全景浏览器 · 核心渲染
+// ════════════════════════════════════════════════════════════════
+const D = EARLY_CIV_EXPLORER;
+const YEAR_MIN = -3600, YEAR_MAX = -950;
+
+// 时间 → x 坐标 (canvas 宽度自适应)
+function yearToX(year, w){
+  return 80 + ((year - YEAR_MIN) / (YEAR_MAX - YEAR_MIN)) * (w - 160);
+}
+function xToYear(x, w){
+  return YEAR_MIN + ((x - 80) / (w - 160)) * (YEAR_MAX - YEAR_MIN);
+}
+
+// ── 模式切换 ──
+document.querySelectorAll('.mode').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('.mode').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    render(btn.dataset.mode);
+  };
+});
+
+function render(mode){
+  const canvas = document.getElementById('canvas');
+  if (mode === 'timeline') renderTimeline(canvas);
+  else if (mode === 'people') renderPeople(canvas);
+  else if (mode === 'events') renderEvents(canvas);
+  else if (mode === 'compare') renderCompare(canvas);
+}
+
+// ════════════════════════════════════════════════════════════════
+// MODE 1 · 时间带 (10 文明并行)
+// ════════════════════════════════════════════════════════════════
+function renderTimeline(canvas){
+  const W = Math.max(1600, canvas.clientWidth - 32);
+  const laneHeight = 50;
+  const lanes = 7;
+  const H = lanes * laneHeight + 130;
+
+  let svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`;
+
+  // 背景区域 (按地理 lane 染色)
+  const laneColors = ['#fff6e8','#fff','#fff6e8','#fff','#fff6e8','#fff','#fff6e8'];
+  for (let i=0; i<lanes; i++) {
+    svg += `<rect x="0" y="${80 + i*laneHeight}" width="${W}" height="${laneHeight}" fill="${laneColors[i]}"/>`;
+  }
+
+  // 年份刻度
+  for (let y=-3500; y<=-1000; y+=500) {
+    const x = yearToX(y, W);
+    svg += `<line x1="${x}" y1="80" x2="${x}" y2="${H-30}" stroke="rgba(0,0,0,.08)" stroke-dasharray="2,4"/>`;
+    svg += `<text class="year-tick" x="${x}" y="${H-12}">前${Math.abs(y)}</text>`;
+  }
+
+  // 地区标签 (左侧)
+  const laneNames = ['','美索不达米亚','尼罗河','印度河','黄河','爱琴海','安纳托利亚','地中海'];
+  D.civilizations.forEach(c => {
+    if (c.lane && laneNames[c.lane]) {
+      // 只在第一个匹配 civ 时画区域标签
+    }
+  });
+  laneNames.forEach((name, i) => {
+    if (!name || i === 0) return;
+    svg += `<text x="6" y="${80 + (i-0.5)*laneHeight + 4}" font-size="10" fill="#5c3a14" font-family="var(--mono)" font-weight="500">${name}</text>`;
+  });
+
+  // 文明带
+  D.civilizations.forEach(c => {
+    const x1 = yearToX(c.start, W);
+    const x2 = yearToX(c.end, W);
+    const y = 80 + (c.lane - 1) * laneHeight + 10;
+    const h = laneHeight - 20;
+    const w = x2 - x1;
+
+    svg += `
+      <g class="civ-bar" data-type="civ" data-id="${c.id}">
+        <rect x="${x1}" y="${y}" width="${w}" height="${h}" rx="6"
+              fill="${c.color}" fill-opacity=".85" stroke="${c.color}" stroke-width="1.5"/>
+        <text x="${x1 + 8}" y="${y + h/2 + 4}" fill="white" font-size="12" font-weight="700">
+          ${c.icon} ${c.name}
+        </text>
+        <text x="${x2 - 6}" y="${y - 3}" text-anchor="end" font-size="9" fill="${c.color}" font-weight="600">
+          ${Math.abs(c.start)}-${Math.abs(c.end)}
+        </text>
+      </g>`;
+  });
+
+  // 事件圆点
+  D.events.forEach(e => {
+    if (!e.civ) return;  // 全局事件单独处理
+    const civ = D.civilizations.find(c => c.id === e.civ);
+    if (!civ) return;
+    const x = yearToX(e.year, W);
+    const y = 80 + (civ.lane - 1) * laneHeight + 25;
+    svg += `<circle class="event-dot" data-type="event" data-id="${e.id}"
+            cx="${x}" cy="${y}" r="6"
+            fill="white" stroke="${civ.color}" stroke-width="2.5"
+            style="color:${civ.color}"/>`;
+  });
+
+  // 全局事件 (气候、崩溃) 画一条竖线
+  D.events.filter(e => !e.civ).forEach(e => {
+    const x = yearToX(e.year, W);
+    svg += `<line x1="${x}" y1="80" x2="${x}" y2="${H-35}"
+            stroke="#7a2818" stroke-width="2" stroke-dasharray="6,4" opacity=".6"/>`;
+    svg += `<circle class="event-dot" data-type="event" data-id="${e.id}"
+            cx="${x}" cy="76" r="7" fill="#7a2818"/>`;
+    svg += `<text x="${x}" y="65" text-anchor="middle" font-size="9" fill="#7a2818" font-weight="700">${e.title}</text>`;
+  });
+
+  // 标题
+  svg += `<text x="20" y="30" font-family="var(--serif)" font-size="20" font-weight="700" fill="#2c1a08">10 个文明的时间带</text>`;
+  svg += `<text x="20" y="50" font-family="var(--mono)" font-size="10" fill="#9a6828" letter-spacing=".12em">CIVILIZATIONS TIMELINE · 前 3500 → 前 1000 BCE</text>`;
+
+  svg += `</svg>`;
+  canvas.innerHTML = svg;
+
+  // 绑定点击
+  canvas.querySelectorAll('[data-type]').forEach(el => {
+    el.addEventListener('click', () => showDetail(el.dataset.type, el.dataset.id));
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+// MODE 2 · 人物朋友圈
+// ════════════════════════════════════════════════════════════════
+function renderPeople(canvas){
+  const W = Math.max(1600, canvas.clientWidth - 32);
+  const H = 850;
+
+  let svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`;
+  svg += `<text x="20" y="30" font-family="var(--serif)" font-size="20" font-weight="700" fill="#2c1a08">历史人物朋友圈</text>`;
+  svg += `<text x="20" y="50" font-family="var(--mono)" font-size="10" fill="#9a6828" letter-spacing=".12em">PEOPLE NETWORK · 同时在线 + 关系网</text>`;
+
+  // 按生年分 lane (类似时间带，但 y 是 civ)
+  const civLanes = {};
+  D.civilizations.forEach((c, i) => civLanes[c.id] = i);
+  const laneH = 55;
+
+  // 年份刻度
+  for (let y=-3500; y<=-1000; y+=500) {
+    const x = yearToX(y, W);
+    svg += `<line x1="${x}" y1="70" x2="${x}" y2="${H-30}" stroke="rgba(0,0,0,.06)" stroke-dasharray="2,4"/>`;
+    svg += `<text class="year-tick" x="${x}" y="${H-12}">前${Math.abs(y)}</text>`;
+  }
+
+  // 文明 lane 标签
+  D.civilizations.filter(c => !c.isEvent).forEach((c, i) => {
+    const y = 90 + i * laneH;
+    svg += `<text x="6" y="${y + 4}" font-size="11" fill="${c.color}" font-weight="600">${c.icon} ${c.name}</text>`;
+  });
+
+  // 人物关系线 (先画在底下)
+  const peopleByCiv = {};
+  D.people.forEach(p => {
+    const civIdx = D.civilizations.findIndex(c => c.id === p.civ);
+    if (civIdx < 0) return;
+    const x = yearToX((p.born + p.died) / 2, W);
+    const y = 90 + civIdx * laneH;
+    peopleByCiv[p.id] = {x, y, person: p};
+  });
+
+  // 画关系连线
+  D.people.forEach(p => {
+    (p.relationships || []).forEach(r => {
+      const a = peopleByCiv[p.id];
+      const b = peopleByCiv[r.to];
+      if (!a || !b) return;
+      svg += `<line class="person-link" x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"/>`;
+    });
+  });
+
+  // 画人物头像
+  Object.values(peopleByCiv).forEach(({x, y, person}) => {
+    const civ = D.civilizations.find(c => c.id === person.civ) || {color:'#888'};
+    svg += `
+      <g class="person-dot" data-type="person" data-id="${person.id}">
+        <circle cx="${x}" cy="${y}" r="14" fill="white" stroke="${civ.color}" stroke-width="2"/>
+        <text x="${x}" y="${y+5}" text-anchor="middle" font-size="14">${person.portrait}</text>
+        <text x="${x}" y="${y+28}" text-anchor="middle" font-size="9" fill="#2c1a08" font-weight="600">${person.name.split(' ')[0]}</text>
+      </g>`;
+  });
+
+  svg += `</svg>`;
+  canvas.innerHTML = svg;
+  canvas.querySelectorAll('[data-type]').forEach(el => {
+    el.addEventListener('click', () => showDetail(el.dataset.type, el.dataset.id));
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+// MODE 3 · 事件因果链
+// ════════════════════════════════════════════════════════════════
+function renderEvents(canvas){
+  const W = Math.max(1600, canvas.clientWidth - 32);
+  const H = 700;
+
+  let svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`;
+  svg += `<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+    <path d="M0,0 L0,6 L9,3 z" fill="#c84820"/></marker></defs>`;
+  svg += `<text x="20" y="30" font-family="var(--serif)" font-size="20" font-weight="700" fill="#2c1a08">事件因果链</text>`;
+  svg += `<text x="20" y="50" font-family="var(--mono)" font-size="10" fill="#9a6828" letter-spacing=".12em">EVENT CAUSATION · 看大事如何引发大事</text>`;
+
+  // 按类型分 lane
+  const typeOrder = ['气候','城市','文字','政治','宗教','法律','战争','外交','建筑','技术','文化','文学','灾难','王权','人物','入侵','崩溃'];
+  const typeY = {};
+  typeOrder.forEach((t, i) => typeY[t] = 90 + i * 35);
+
+  // 年份刻度
+  for (let y=-3500; y<=-1000; y+=500) {
+    const x = yearToX(y, W);
+    svg += `<line x1="${x}" y1="70" x2="${x}" y2="${H-30}" stroke="rgba(0,0,0,.06)"/>`;
+    svg += `<text class="year-tick" x="${x}" y="${H-12}">前${Math.abs(y)}</text>`;
+  }
+
+  // Type lane labels
+  typeOrder.forEach(t => {
+    if (D.events.some(e => e.type === t)) {
+      svg += `<text x="6" y="${typeY[t] + 4}" font-size="10" fill="#5c3a14" font-weight="500">${t}</text>`;
+    }
+  });
+
+  // 事件位置
+  const evtPos = {};
+  D.events.forEach(e => {
+    evtPos[e.id] = { x: yearToX(e.year, W), y: typeY[e.type] || 600 };
+  });
+
+  // 因果连线 (caused_by, leads_to)
+  D.events.forEach(e => {
+    (e.leads_to || []).forEach(toId => {
+      const a = evtPos[e.id];
+      const b = evtPos[toId];
+      if (!a || !b) return;
+      // 曲线
+      const dx = b.x - a.x, dy = b.y - a.y;
+      const midX = a.x + dx/2;
+      svg += `<path d="M ${a.x},${a.y} Q ${midX},${a.y} ${midX},${(a.y+b.y)/2} T ${b.x},${b.y}"
+              fill="none" stroke="#c84820" stroke-width="1.5" opacity=".4"
+              marker-end="url(#arrow)"/>`;
+    });
+  });
+
+  // 事件圆点
+  D.events.forEach(e => {
+    const pos = evtPos[e.id];
+    const civ = e.civ ? D.civilizations.find(c => c.id === e.civ) : null;
+    const color = civ ? civ.color : '#7a2818';
+    svg += `
+      <g class="event-dot" data-type="event" data-id="${e.id}">
+        <circle cx="${pos.x}" cy="${pos.y}" r="6" fill="white" stroke="${color}" stroke-width="2.5"/>
+      </g>`;
+  });
+
+  svg += `</svg>`;
+  canvas.innerHTML = svg;
+  canvas.querySelectorAll('[data-type]').forEach(el => {
+    el.addEventListener('click', () => showDetail(el.dataset.type, el.dataset.id));
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+// MODE 4 · 对比卡矩阵
+// ════════════════════════════════════════════════════════════════
+function renderCompare(canvas){
+  let html = `<div style="padding:0">
+    <h2 style="font-family:var(--serif);font-size:24px;color:var(--ink);margin:12px 0 6px">📊 文明对比卡 · 8 维度 × 10 文明</h2>
+    <p style="font-size:12px;color:var(--ink3);margin-bottom:18px;font-family:var(--mono);letter-spacing:.1em">COMPARISON MATRIX · 横向比较每个文明的核心特征</p>
+    <table class="cmp-table"><thead><tr><th style="position:sticky;left:0;background:var(--paper2);z-index:2">维度</th>`;
+  D.civilizations.filter(c => !c.isEvent).forEach(c => {
+    html += `<th style="min-width:160px;color:${c.color}">${c.icon} ${c.name}</th>`;
+  });
+  html += `</tr></thead><tbody>`;
+
+  D.comparison_dimensions.forEach(dim => {
+    html += `<tr><td class="cmp-civ-name" style="position:sticky;left:0;background:#fff;z-index:1;white-space:nowrap">${dim.name}</td>`;
+    D.civilizations.filter(c => !c.isEvent).forEach(c => {
+      html += `<td>${dim.values[c.id] || '—'}</td>`;
+    });
+    html += `</tr>`;
+  });
+
+  html += `</tbody></table></div>`;
+  canvas.innerHTML = html;
+}
+
+// ════════════════════════════════════════════════════════════════
+// 详情面板
+// ════════════════════════════════════════════════════════════════
+function showDetail(type, id){
+  const side = document.getElementById('side');
+
+  if (type === 'civ') {
+    const c = D.civilizations.find(x => x.id === id);
+    if (!c) return;
+    const events = D.events.filter(e => e.civ === c.id);
+    const people = D.people.filter(p => p.civ === c.id);
+    side.innerHTML = `
+      <div class="ps-label">CIVILIZATION · 文明</div>
+      <h2>${c.icon} ${c.name}</h2>
+      <div class="meta">
+        <span>区域: ${c.region}</span>
+        <span>时期: 前${Math.abs(c.start)} - 前${Math.abs(c.end)}</span>
+        <span>持续: ${c.start - c.end | 0} 年</span>
+      </div>
+      <h3>关键人物 (${people.length})</h3>
+      <div class="friends">
+        ${people.slice(0, 8).map(p => `
+          <div class="friend" onclick="showDetail('person','${p.id}')">
+            <span class="face">${p.portrait}</span>
+            <div class="info">
+              <div class="name">${p.name}</div>
+              <div class="note">${p.role}</div>
+            </div>
+          </div>`).join('') || '<p style="color:var(--ink3);font-size:12px">无具名人物</p>'}
+      </div>
+      <h3>重大事件 (${events.length})</h3>
+      <div class="friends">
+        ${events.slice(0, 6).map(e => `
+          <div class="friend" onclick="showDetail('event','${e.id}')">
+            <span class="face">📅</span>
+            <div class="info">
+              <div class="name">${e.title}</div>
+              <div class="note">前 ${Math.abs(e.year)} · ${e.type}</div>
+            </div>
+          </div>`).join('')}
+      </div>`;
+  }
+  else if (type === 'person') {
+    const p = D.people.find(x => x.id === id);
+    if (!p) return;
+    const civ = D.civilizations.find(c => c.id === p.civ) || {color:'#888',name:p.civ};
+
+    // 找出所有同时代人物
+    const contemporary = D.people.filter(x =>
+      x.id !== p.id &&
+      x.born < p.died + 50 &&
+      x.died > p.born - 50
+    ).slice(0, 12);
+
+    side.innerHTML = `
+      <div class="ps-label">PERSON · 历史人物</div>
+      <h2 style="color:${civ.color}">${p.portrait} ${p.name}</h2>
+      <div class="meta">
+        <span>${civ.name}</span>
+        <span>${p.role}</span>
+        <span>生卒: ${Math.abs(p.born)} - ${Math.abs(p.died)} BCE</span>
+      </div>
+      <p>${p.desc}</p>
+      ${p.inventions?.length ? `<h3>🏆 发明 / 贡献</h3>` + p.inventions.map(i => `<div class="invent">${i}</div>`).join('') : ''}
+      ${p.relationships?.length ? `<h3>🤝 朋友圈 (直接关系)</h3>
+        <div class="friends">
+          ${p.relationships.map(r => {
+            const other = D.people.find(x => x.id === r.to);
+            if (!other) return '';
+            return `<div class="friend" onclick="showDetail('person','${other.id}')">
+              <span class="face">${other.portrait}</span>
+              <div class="info">
+                <div class="name">${other.name}</div>
+                <div class="note">${r.note || other.role}</div>
+              </div>
+              <span class="tag tag-${r.type}">${r.type.toUpperCase()}</span>
+            </div>`;
+          }).join('')}
+        </div>` : ''}
+      ${contemporary.length ? `<h3>⏳ 同时代人 (前 ${Math.abs(p.died)} 时还活着)</h3>
+        <div class="friends">
+          ${contemporary.map(c => `<div class="friend" onclick="showDetail('person','${c.id}')">
+            <span class="face">${c.portrait}</span>
+            <div class="info">
+              <div class="name">${c.name}</div>
+              <div class="note">${(D.civilizations.find(x=>x.id===c.civ)||{}).name||''} · ${c.role}</div>
+            </div>
+          </div>`).join('')}
+        </div>` : ''}`;
+  }
+  else if (type === 'event') {
+    const e = D.events.find(x => x.id === id);
+    if (!e) return;
+    const civ = e.civ ? D.civilizations.find(c => c.id === e.civ) : null;
+    const causes = (e.caused_by || []).map(id => D.events.find(x => x.id === id)).filter(Boolean);
+    const leads = (e.leads_to || []).map(id => D.events.find(x => x.id === id)).filter(Boolean);
+
+    side.innerHTML = `
+      <div class="ps-label">EVENT · 重大事件</div>
+      <h2>📅 ${e.title}</h2>
+      <div class="meta">
+        <span>年份: 前 ${Math.abs(e.year)} BCE</span>
+        <span>类型: ${e.type}</span>
+        ${civ ? `<span>文明: ${civ.icon} ${civ.name}</span>` : `<span style="background:#7a2818;color:white">🌍 全局事件</span>`}
+      </div>
+      ${causes.length ? `<h3>⬅ 起因 (caused by)</h3>
+        <div class="friends">
+          ${causes.map(c => `<div class="friend" onclick="showDetail('event','${c.id}')">
+            <span class="face">📅</span>
+            <div class="info">
+              <div class="name">${c.title}</div>
+              <div class="note">前 ${Math.abs(c.year)} · ${c.type}</div>
+            </div>
+          </div>`).join('')}
+        </div>` : '<p style="font-size:12px;color:var(--ink3)">无直接起因记录</p>'}
+      ${leads.length ? `<h3>➡ 后果 (leads to)</h3>
+        <div class="friends">
+          ${leads.map(c => `<div class="friend" onclick="showDetail('event','${c.id}')">
+            <span class="face">📅</span>
+            <div class="info">
+              <div class="name">${c.title}</div>
+              <div class="note">前 ${Math.abs(c.year)} · ${c.type}</div>
+            </div>
+          </div>`).join('')}
+        </div>` : '<p style="font-size:12px;color:var(--ink3)">无后续直接连锁</p>'}`;
+  }
+}
+
+// 初始
+render('timeline');
+window.showDetail = showDetail;  // 暴露给 inline onclick
+</script>
+
+</body>
+</html>
