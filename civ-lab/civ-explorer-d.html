@@ -3,172 +3,205 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>形态 D · 时间入口 · 早期文明</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<title>历史宇宙 · 早期文明网络</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Cinzel:wght@500;700&display=swap" rel="stylesheet"/>
 <style>
 :root{
-  --paper:#fbf6e9; --paper2:#f5e8c8;
-  --ink:#2c1a08; --ink2:#5c4530; --ink3:#8a7050;
-  --gold:#b88830; --gold-deep:#8a6028; --vermilion:#c84820;
-  --line:#c8b08a;
-  --serif:'Noto Serif SC',serif; --sans:'Noto Sans SC',sans-serif; --mono:'JetBrains Mono',monospace;
+  --bg:#02030a; --bg2:#080a20;
+  --ink:#f0e8d5; --ink2:#a8b0c8; --ink3:#5a6080;
+  --gold:#d4a858; --warm:#e89870; --vermilion:#c84820;
+  --cyan:#7adcf0; --magenta:#e878d8; --purple:#a070ff;
+  --serif:'Noto Serif SC',serif; --sans:'Noto Sans SC',sans-serif;
+  --mono:'JetBrains Mono',monospace; --latin:'Cinzel',serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{min-height:100%;font-family:var(--sans);background:var(--paper);color:var(--ink);scroll-behavior:smooth}
+html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--ink);overflow:hidden}
 
-.topbar{position:sticky;top:0;height:54px;z-index:30;background:rgba(251,246,233,.95);backdrop-filter:blur(10px);border-bottom:1px solid rgba(184,136,48,.18);display:flex;align-items:center;gap:14px;padding:0 22px}
-.topbar .home{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.18em}
-.topbar h1{font-family:var(--serif);font-size:14px;font-weight:700;color:var(--ink)}
-.topbar h1 em{color:var(--gold);font-style:normal;margin-left:8px;font-family:var(--mono);font-size:11px;letter-spacing:.2em}
-.topbar .progress{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--gold);letter-spacing:.1em;background:rgba(184,136,48,.1);padding:6px 12px;border-radius:99px;border:1px solid rgba(184,136,48,.2)}
-.topbar .reset{background:transparent;border:1px solid rgba(184,136,48,.3);color:var(--gold);padding:6px 12px;border-radius:8px;cursor:pointer;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em}
-.topbar .reset:hover{background:var(--gold);color:white}
-
-/* 入口介绍 */
-.wrap{max-width:1100px;margin:0 auto;padding:28px 24px 100px}
-.intro{margin-bottom:30px}
-.intro .hint{font-family:var(--mono);font-size:11px;color:var(--gold);letter-spacing:.2em;margin-bottom:8px;text-transform:uppercase}
-.intro h2{font-family:var(--serif);font-size:30px;font-weight:900;color:var(--ink);margin-bottom:8px}
-.intro p{font-size:14px;line-height:1.75;color:var(--ink2);max-width:780px}
-.intro p strong{color:var(--vermilion)}
-
-/* 章节段落 (5 段) */
-.chapters{display:flex;flex-direction:column;gap:18px}
-.chapter{
-  background:white;border:1px solid rgba(184,136,48,.22);border-radius:16px;
-  padding:24px 26px;
-  transition:opacity .6s ease, transform .6s ease, border-color .6s ease;
+/* ════ 宇宙背景：深空 + 多层星云 + 闪烁星点 ════ */
+.cosmos{position:fixed;inset:0;z-index:0;pointer-events:none}
+.nebula{position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 40% 50% at 15% 20%, rgba(120,90,200,.28) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 85% 80%, rgba(200,120,60,.22) 0%, transparent 60%),
+    radial-gradient(ellipse 30% 30% at 70% 30%, rgba(80,140,200,.15) 0%, transparent 50%),
+    radial-gradient(ellipse 30% 30% at 30% 70%, rgba(60,180,140,.12) 0%, transparent 50%),
+    radial-gradient(ellipse 80% 80% at 50% 50%, transparent 0%, rgba(0,0,0,.4) 100%),
+    linear-gradient(180deg, #02030a 0%, #050818 50%, #02030a 100%);
 }
-.chapter.locked{opacity:.18;pointer-events:none}
-
-.ch-head{display:flex;align-items:center;gap:16px;margin-bottom:18px}
-.ch-head .num{
-  width:54px;height:54px;border-radius:14px;background:var(--gold);color:white;
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--serif);font-size:22px;font-weight:900;
-  box-shadow:0 4px 12px rgba(184,136,48,.3);flex-shrink:0;
+.stars-back{position:absolute;inset:0;opacity:.4;
+  background-image:
+    radial-gradient(1px 1px at 5% 12%,#fff,transparent),
+    radial-gradient(1.2px 1.2px at 15% 25%,#fff,transparent),
+    radial-gradient(.8px .8px at 28% 8%,#ffd47a,transparent),
+    radial-gradient(1px 1px at 42% 18%,#fff,transparent),
+    radial-gradient(1.5px 1.5px at 55% 32%,#fff,transparent),
+    radial-gradient(1px 1px at 68% 11%,#c8d4ff,transparent),
+    radial-gradient(1.2px 1.2px at 82% 24%,#fff,transparent),
+    radial-gradient(.9px .9px at 95% 16%,#ffd47a,transparent),
+    radial-gradient(1px 1px at 8% 45%,#fff,transparent),
+    radial-gradient(1.3px 1.3px at 22% 58%,#fff,transparent),
+    radial-gradient(1px 1px at 38% 65%,#c8d4ff,transparent),
+    radial-gradient(1.5px 1.5px at 52% 72%,#fff,transparent),
+    radial-gradient(1px 1px at 65% 48%,#ffd47a,transparent),
+    radial-gradient(1.2px 1.2px at 78% 64%,#fff,transparent),
+    radial-gradient(.8px .8px at 92% 52%,#fff,transparent),
+    radial-gradient(1px 1px at 12% 88%,#fff,transparent),
+    radial-gradient(1.4px 1.4px at 28% 82%,#c8d4ff,transparent),
+    radial-gradient(1px 1px at 45% 95%,#fff,transparent),
+    radial-gradient(1.2px 1.2px at 62% 88%,#ffd47a,transparent),
+    radial-gradient(.9px .9px at 78% 92%,#fff,transparent),
+    radial-gradient(1.5px 1.5px at 91% 85%,#fff,transparent);
 }
-.ch-head .info{flex:1;min-width:0}
-.ch-head .range{font-family:var(--mono);font-size:11px;color:var(--gold);letter-spacing:.18em;text-transform:uppercase;margin-bottom:2px}
-.ch-head h3{font-family:var(--serif);font-size:22px;font-weight:900;color:var(--ink)}
-.ch-head .ic{font-size:36px;flex-shrink:0;opacity:.85}
-
-.ch-summary{font-family:var(--serif);font-size:14px;line-height:1.75;color:var(--ink2);padding:12px 16px;background:rgba(184,136,48,.06);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;margin-bottom:18px}
-
-/* 文明卡片网格 */
-.civs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-.civ-card{
-  background:rgba(251,246,233,.7);border:1.5px solid rgba(184,136,48,.25);border-radius:14px;
-  padding:16px 18px;cursor:pointer;
-  display:flex;flex-direction:column;gap:8px;
-  transition:all .2s ease;
-  position:relative;
+.stars-front{position:absolute;inset:0;opacity:.7;animation:twinkle 8s ease-in-out infinite;
+  background-image:
+    radial-gradient(2px 2px at 18% 18%,#fff,transparent 40%),
+    radial-gradient(2.5px 2.5px at 42% 28%,#ffd47a,transparent 40%),
+    radial-gradient(2px 2px at 72% 38%,#fff,transparent 40%),
+    radial-gradient(2.2px 2.2px at 92% 12%,#c8d4ff,transparent 40%),
+    radial-gradient(2px 2px at 22% 55%,#fff,transparent 40%),
+    radial-gradient(2.4px 2.4px at 58% 68%,#ffd47a,transparent 40%),
+    radial-gradient(2px 2px at 82% 78%,#fff,transparent 40%),
+    radial-gradient(2.3px 2.3px at 15% 82%,#fff,transparent 40%),
+    radial-gradient(2.1px 2.1px at 65% 92%,#c8d4ff,transparent 40%);
 }
-.civ-card:hover{border-color:var(--vermilion);background:white;transform:translateY(-3px);box-shadow:0 8px 24px rgba(184,136,48,.15)}
-.civ-card .top{display:flex;align-items:center;gap:10px}
-.civ-card .ic{
-  width:42px;height:42px;border-radius:10px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;color:white;font-size:20px;
-  box-shadow:0 3px 8px rgba(0,0,0,.1);
-}
-.civ-card .nm{font-family:var(--serif);font-size:15px;font-weight:700;color:var(--ink);line-height:1.2;flex:1;min-width:0}
-.civ-card .state{font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:99px;letter-spacing:.06em;font-weight:700;background:rgba(184,136,48,.15);color:#8a6028;flex-shrink:0}
-.civ-card .state[data-state="巅峰"]{background:rgba(60,160,80,.15);color:#2a6038}
-.civ-card .state[data-state*="崩溃"]{background:rgba(200,72,32,.15);color:var(--vermilion)}
-.civ-card .l1{font-size:12.5px;color:var(--ink2);line-height:1.55}
-.civ-card .enter-btn{
-  margin-top:auto;padding:8px 12px;border-radius:8px;
-  background:var(--gold);color:white;font-family:var(--serif);font-size:12px;font-weight:700;
-  text-align:center;letter-spacing:.04em;
-  transition:background .15s;
-}
-.civ-card:hover .enter-btn{background:var(--vermilion)}
+@keyframes twinkle{0%,100%{opacity:.7}50%{opacity:.4}}
 
-/* 章节下方"继承自上一章"提示 */
-.bridge{
-  margin-top:14px;padding:10px 14px;
-  background:rgba(184,136,48,.08);border:1px dashed rgba(184,136,48,.3);border-radius:10px;
-  font-family:var(--mono);font-size:11px;color:var(--ink2);letter-spacing:.04em;
-}
-.bridge::before{content:'⤴ ';color:var(--gold);font-weight:700}
+/* ════ 顶部覆盖层：标题 + 链接 ════ */
+.topbar-cosmos{position:fixed;top:0;left:0;right:0;z-index:30;padding:18px 28px;display:flex;align-items:center;gap:18px;pointer-events:none}
+.topbar-cosmos > *{pointer-events:auto}
+.topbar-cosmos .home{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.18em;background:rgba(0,0,0,.5);backdrop-filter:blur(10px);padding:8px 14px;border-radius:99px;border:1px solid rgba(212,168,88,.25);transition:all .2s}
+.topbar-cosmos .home:hover{background:var(--gold);color:#02030a;border-color:var(--gold)}
+.topbar-cosmos h1{font-family:var(--serif);font-size:18px;font-weight:900;color:#fff;letter-spacing:.02em;text-shadow:0 4px 20px rgba(0,0,0,.6)}
+.topbar-cosmos h1 em{color:var(--gold);font-style:normal;font-family:var(--latin);margin-right:10px;letter-spacing:.18em}
+.topbar-cosmos .hint{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink2);letter-spacing:.1em;text-align:right;line-height:1.55}
+.topbar-cosmos .hint strong{color:var(--gold);font-weight:700}
 
-/* 下一步按钮 */
-.next-btn{
-  display:block;margin:24px auto 0;padding:14px 32px;
-  background:white;color:var(--gold);border:2px dashed var(--gold);
-  font-family:var(--serif);font-size:14px;font-weight:700;letter-spacing:.04em;
-  border-radius:99px;cursor:pointer;
-  transition:all .2s ease;
-}
-.next-btn:hover{background:var(--gold);color:white;border-style:solid}
-.next-btn:disabled{opacity:.3;cursor:not-allowed}
+/* ════ 图例 (左下) ════ */
+.legend{position:fixed;bottom:48px;left:24px;z-index:25;background:rgba(0,0,0,.55);backdrop-filter:blur(12px);border:1px solid rgba(212,168,88,.22);border-radius:14px;padding:14px 18px}
+.legend .ti{font-family:var(--mono);font-size:10px;color:var(--gold);letter-spacing:.18em;margin-bottom:8px;text-transform:uppercase;font-weight:700}
+.legend .items{display:flex;flex-direction:column;gap:6px;font-family:var(--mono);font-size:10.5px;color:var(--ink2);letter-spacing:.04em}
+.legend .items span{display:flex;align-items:center;gap:8px}
+.legend .items span::before{content:'';width:24px;height:2.5px;border-radius:1px;flex-shrink:0}
+.legend .war::before{background:#ff7878}
+.legend .trade::before{background:#7ad896}
+.legend .influence::before{background:#a070ff}
+.legend .continuation::before{background:#d4a858}
+.legend .destruction::before{background:#ff4040;background-image:repeating-linear-gradient(90deg, transparent, transparent 3px, #ff4040 3px, #ff4040 6px)}
 
-/* 总汇按钮 */
-.summary-btn{
-  display:block;margin:40px auto 0;padding:18px 36px;
-  background:linear-gradient(135deg,var(--gold),var(--vermilion));color:white;border:none;
-  font-family:var(--serif);font-size:16px;font-weight:700;letter-spacing:.04em;
-  border-radius:99px;cursor:pointer;
-  box-shadow:0 8px 24px rgba(184,136,48,.4);
-  transition:transform .2s ease;
-}
-.summary-btn:hover{transform:translateY(-2px)}
-.summary-btn:disabled{opacity:.4;cursor:not-allowed}
+/* ════ 时间轴 (底部) ════ */
+.time-bar{position:fixed;bottom:14px;left:0;right:0;z-index:24;display:flex;justify-content:space-between;align-items:center;padding:6px 200px;font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.12em;pointer-events:none}
+.time-bar::before{content:'';position:absolute;left:200px;right:200px;top:50%;height:1px;background:linear-gradient(90deg,transparent,rgba(212,168,88,.3),transparent);z-index:-1}
+.time-bar span{background:rgba(0,0,0,.7);padding:4px 10px;border-radius:99px;border:1px solid rgba(212,168,88,.2)}
 
-/* 总汇模态 */
-.summary-modal{position:fixed;inset:0;z-index:40;background:rgba(44,26,8,.7);backdrop-filter:blur(8px);display:none;align-items:flex-start;justify-content:center;padding:24px;overflow-y:auto}
+/* ════ 主画布 ════ */
+.canvas-svg{position:fixed;inset:0;width:100%;height:100%;z-index:10}
+
+/* ════ 文明球 ════ */
+.civ-orb{cursor:pointer;transition:transform .35s cubic-bezier(.4,1,.6,1)}
+.civ-orb:hover{transform:scale(1.12)}
+.civ-orb .halo-outer{transition:opacity .35s ease,r .35s ease}
+.civ-orb .halo-inner{transition:opacity .35s ease,r .35s ease}
+.civ-orb:hover .halo-outer{opacity:.5}
+.civ-orb:hover .halo-inner{opacity:.7}
+.civ-orb .body{filter:drop-shadow(0 6px 20px rgba(0,0,0,.5))}
+.civ-orb .label{font-family:var(--serif);font-weight:700;fill:#fff;text-anchor:middle;pointer-events:none;text-shadow:0 2px 6px rgba(0,0,0,.8)}
+.civ-orb .yr{font-family:var(--mono);fill:var(--ink2);text-anchor:middle;pointer-events:none;letter-spacing:.08em}
+.civ-orb .label-bg{fill:rgba(0,0,0,.65);stroke:currentColor;stroke-width:1;stroke-opacity:.4}
+
+/* ════ 连接线 ════ */
+.relation-path{fill:none;stroke-width:1.5;opacity:.45;transition:opacity .3s ease, stroke-width .3s ease;cursor:pointer}
+.relation-path:hover{opacity:1;stroke-width:2.5}
+.relation-path.war{stroke:#ff7878}
+.relation-path.trade{stroke:#7ad896;stroke-dasharray:5 3}
+.relation-path.influence{stroke:#a070ff;stroke-dasharray:7 3}
+.relation-path.continuation{stroke:#d4a858}
+.relation-path.destruction{stroke:#ff4040;stroke-dasharray:3 3}
+
+/* ════ 区域标签 (lane labels 左侧, 极淡) ════ */
+.region-label{font-family:var(--mono);fill:rgba(212,168,88,.35);text-anchor:start;pointer-events:none;letter-spacing:.16em;font-size:11px;font-weight:600;text-transform:uppercase}
+
+/* ════ 悬浮提示 ════ */
+.tooltip{position:fixed;z-index:50;background:rgba(15,15,28,.95);backdrop-filter:blur(20px);border:1px solid rgba(212,168,88,.35);border-radius:12px;padding:14px 18px;max-width:340px;display:none;pointer-events:none;box-shadow:0 12px 36px rgba(0,0,0,.6)}
+.tooltip.show{display:block}
+.tooltip .nm{font-family:var(--serif);font-size:17px;font-weight:900;color:var(--gold);margin-bottom:4px}
+.tooltip .yr{font-family:var(--mono);font-size:10.5px;color:var(--ink2);letter-spacing:.06em;margin-bottom:8px}
+.tooltip .desc{font-size:12.5px;line-height:1.65;color:var(--ink);margin-bottom:8px}
+.tooltip .cta{font-family:var(--mono);font-size:10px;color:var(--vermilion);letter-spacing:.12em;font-weight:700}
+
+/* ════ 总汇按钮 (右下) ════ */
+.summary-btn-cosmos{position:fixed;bottom:48px;right:24px;z-index:25;background:linear-gradient(135deg,var(--gold),var(--vermilion));color:white;border:none;padding:14px 22px;border-radius:99px;cursor:pointer;font-family:var(--serif);font-size:14px;font-weight:700;letter-spacing:.04em;box-shadow:0 8px 24px rgba(212,168,88,.5);transition:transform .2s}
+.summary-btn-cosmos:hover{transform:translateY(-3px)}
+
+/* 总汇模态 (同前) */
+.summary-modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.85);backdrop-filter:blur(10px);display:none;align-items:flex-start;justify-content:center;padding:24px;overflow-y:auto}
 .summary-modal.open{display:flex}
-.summary-content{background:white;color:var(--ink);border-radius:18px;max-width:1100px;width:100%;padding:32px;margin:auto;position:relative}
+.summary-content{background:#fdf8ed;color:#1a1410;border-radius:18px;max-width:1100px;width:100%;padding:32px;margin:auto;position:relative}
 .summary-content .sh{text-align:center;margin-bottom:24px}
 .summary-content h2{font-family:var(--serif);font-size:30px;font-weight:900}
-.summary-content .ss{font-family:var(--mono);letter-spacing:.3em;color:var(--gold);font-size:11px;margin-top:4px;text-transform:uppercase}
-.summary-content .close-x{position:absolute;top:24px;right:24px;width:38px;height:38px;border-radius:50%;background:var(--paper);border:1px solid rgba(184,136,48,.3);cursor:pointer;font-size:14px}
-.gantt{display:grid;grid-template-columns:140px repeat(5,1fr) 1.6fr;background:var(--paper);border-radius:12px;overflow:hidden;border:1px solid rgba(184,136,48,.25);margin-bottom:24px}
-.gh{padding:10px;background:rgba(184,136,48,.2);font-family:var(--mono);font-size:10px;font-weight:700;color:var(--vermilion);letter-spacing:.08em;text-align:center;border-bottom:1px solid rgba(184,136,48,.2)}
+.summary-content .ss{font-family:var(--mono);letter-spacing:.3em;color:#d4a858;font-size:11px;margin-top:4px;text-transform:uppercase}
+.summary-content .close-x{position:absolute;top:24px;right:24px;width:38px;height:38px;border-radius:50%;background:#fbf6e9;border:1px solid rgba(184,136,48,.3);cursor:pointer;font-size:14px}
+.gantt{display:grid;grid-template-columns:140px repeat(5,1fr) 1.6fr;background:#fbf6e9;border-radius:12px;overflow:hidden;border:1px solid rgba(184,136,48,.25);margin-bottom:24px}
+.gh{padding:10px;background:rgba(184,136,48,.2);font-family:var(--mono);font-size:10px;font-weight:700;color:#c84820;letter-spacing:.08em;text-align:center;border-bottom:1px solid rgba(184,136,48,.2)}
 .gh:first-child{text-align:left}.gh.legacy{background:rgba(200,72,32,.15)}
 .gc{padding:10px;border-bottom:1px solid rgba(184,136,48,.08);min-height:48px;display:flex;align-items:center;background:white}
-.gc.civ-name{font-family:var(--serif);font-weight:700;font-size:12.5px;background:rgba(184,136,48,.05)}
+.gc.civ-name{font-family:var(--serif);font-weight:700;font-size:12.5px;background:rgba(184,136,48,.05);cursor:pointer}
+.gc.civ-name:hover{background:rgba(184,136,48,.15);color:#c84820}
 .gc.block{position:relative;padding:0}
 .gc .bar{position:absolute;left:8%;right:8%;top:30%;bottom:30%;border-radius:4px}
 .gc .bar.peak{opacity:1}.gc .bar.rise,.gc .bar.fade{opacity:.55}
-.gc.legacy-cell{font-size:11px;color:var(--ink2);line-height:1.5;background:rgba(200,72,32,.04)}
+.gc.legacy-cell{font-size:11px;color:#5c4530;line-height:1.5;background:rgba(200,72,32,.04)}
 .legacy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:20px}
-.legacy-card{background:var(--paper);border:1px solid rgba(184,136,48,.22);border-radius:12px;padding:14px 16px}
-.legacy-card .what{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--vermilion);margin-bottom:3px}
-.legacy-card .from{font-family:var(--mono);font-size:10px;color:var(--gold);letter-spacing:.08em;margin-bottom:6px}
-.legacy-card .why{font-size:12.5px;line-height:1.6;color:var(--ink2)}
+.legacy-card{background:#fbf6e9;border:1px solid rgba(184,136,48,.22);border-radius:12px;padding:14px 16px}
+.legacy-card .what{font-family:var(--serif);font-size:17px;font-weight:700;color:#c84820;margin-bottom:3px}
+.legacy-card .from{font-family:var(--mono);font-size:10px;color:#d4a858;letter-spacing:.08em;margin-bottom:6px}
+.legacy-card .why{font-size:12.5px;line-height:1.6;color:#5c4530}
 .legacy-h{font-family:var(--serif);font-size:22px;font-weight:900;margin:24px 0 12px;text-align:center}
 
 @media (max-width:768px){
-  .wrap{padding:18px 14px 80px}
-  .chapter{padding:18px}
-  .ch-head h3{font-size:18px}
-  .ch-head .num{width:44px;height:44px;font-size:18px}
+  .topbar-cosmos h1{font-size:14px} .topbar-cosmos .hint{display:none}
+  .legend{bottom:80px}
 }
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <a href="./civ-explorer-compare.html" class="home">← 对比页</a>
-  <h1>早期文明 · 时间入口 <em>FORM D</em></h1>
-  <div class="progress" id="progress">1 / 5 段已展开</div>
-  <button class="reset" onclick="resetAll()">↻ 重置</button>
+<div class="cosmos">
+  <div class="nebula"></div>
+  <div class="stars-back"></div>
+  <div class="stars-front"></div>
 </div>
 
-<div class="wrap">
-  <div class="intro">
-    <div class="hint">STEP 1 · 时间入口（D）  →  STEP 2 · 实体钻深（E）</div>
-    <h2>📜 一步一步看 2500 年的文明</h2>
-    <p>每个 500 年是一段，点击"<strong>展开下一段</strong>"按钮 → 下一段的文明出现。看到任何感兴趣的文明，点击它的<strong>「进入深度 →」</strong>按钮，会跳到形态 E，可以一直钻 5-6 层（人物 → 朋友 → 事件 → 因果链 → 概念...）。</p>
+<div class="topbar-cosmos">
+  <a href="./civ-explorer-compare.html" class="home">⌂ 首页</a>
+  <h1><em>EARLY CIVILIZATIONS</em>历史宇宙 · 早期文明网络</h1>
+  <div class="hint">
+    <strong>点击任一文明 ✦</strong> 进入它的深度页<br/>
+    悬浮文明 → 显示关联连线 · 5-6 层钻深
   </div>
-
-  <div class="chapters" id="chapters"></div>
-
-  <button class="next-btn" id="nextBtn" onclick="revealNext()">⤓ 展开下一段 500 年 ↓</button>
-
-  <button class="summary-btn" id="summaryBtn" disabled onclick="openSummary()">🏁 看 2500 年全景总汇</button>
 </div>
+
+<svg class="canvas-svg" id="canvas" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice"></svg>
+
+<div class="time-bar">
+  <span>前 3500 BCE</span>
+  <span style="margin-left:auto;margin-right:auto">前 2250 BCE</span>
+  <span>前 1000 BCE</span>
+</div>
+
+<div class="legend">
+  <div class="ti">关系类型 · LINKS</div>
+  <div class="items">
+    <span class="war">⚔ 战争 / 征服</span>
+    <span class="continuation">→ 延续 / 同体</span>
+    <span class="influence">⇒ 文化影响</span>
+    <span class="trade">⇄ 贸易</span>
+    <span class="destruction">✕ 毁灭</span>
+  </div>
+</div>
+
+<button class="summary-btn-cosmos" onclick="openSummary()">🏁 全景总汇表</button>
+
+<div class="tooltip" id="tooltip"></div>
 
 <div class="summary-modal" id="summary"><div class="summary-content" id="summaryContent"></div></div>
 
@@ -176,94 +209,227 @@ html,body{min-height:100%;font-family:var(--sans);background:var(--paper);color:
 <script src="./early_civ_explorer_data.js"></script>
 <script src="./chapters_data.js"></script>
 <script>
-let revealedCount = 1;
+const W = 1600, H = 900;
 
-function getCivInfo(id){
+// ════ 文明在宇宙中的位置 ════
+// 横坐标 = 时间中心点（前 3500 ~ 前 1000 映射到 100~1500）
+function yearToX(year){
+  const x0 = -3500, x1 = -1000;
+  const padL = 150, padR = 100;
+  return padL + ((year - x0)/(x1 - x0)) * (W - padL - padR);
+}
+
+// 区域 lane（纵向）
+const REGIONS = {
+  aegean:       {y: 130, name:'EGE 爱琴海',    color:'#5aa0c0'},
+  anatolia:     {y: 220, name:'ANA 安纳托利亚', color:'#b88060'},
+  mesopotamia:  {y: 340, name:'MES 美索不达米亚',color:'#e8a070'},
+  egypt:        {y: 460, name:'NIL 尼罗河',     color:'#d4b870'},
+  indus:        {y: 580, name:'IND 印度河',     color:'#a070d4'},
+  china:        {y: 700, name:'YEL 黄河',       color:'#a0b890'},
+};
+
+// 10 个文明节点
+const CIVS = [
+  {id:'sumer',             year:-2750, region:'mesopotamia', size:42, name:'苏美尔',          peak:'前 2700 巅峰'},
+  {id:'egypt_predynastic', year:-3300, region:'egypt',       size:28, name:'埃及·前王朝',     peak:'前 3300'},
+  {id:'egypt_old',         year:-2433, region:'egypt',       size:38, name:'埃及·古王国',     peak:'前 2560 大金字塔'},
+  {id:'indus_early',       year:-2950, region:'indus',       size:26, name:'印度河·早期',     peak:'前 2950'},
+  {id:'indus',             year:-2250, region:'indus',       size:40, name:'印度河文明',       peak:'前 2500 Mohenjo-Daro'},
+  {id:'akkad',             year:-2244, region:'mesopotamia', size:36, name:'阿卡德帝国',       peak:'前 2334 Sargon'},
+  {id:'babylon',           year:-1745, region:'mesopotamia', size:36, name:'古巴比伦',         peak:'前 1750 Hammurabi'},
+  {id:'egypt_new',         year:-1313, region:'egypt',       size:42, name:'埃及·新王国',     peak:'前 1279 Ramesses II'},
+  {id:'minoan',            year:-2000, region:'aegean',      size:34, name:'米诺斯文明',       peak:'前 1700 Knossos'},
+  {id:'mycenaean',         year:-1425, region:'aegean',      size:32, name:'迈锡尼文明',       peak:'前 1300'},
+  {id:'hittite',           year:-1390, region:'anatolia',    size:34, name:'赫梯帝国',         peak:'前 1274 卡迭石'},
+  {id:'shang',             year:-1323, region:'china',       size:40, name:'商朝',             peak:'前 1250 武丁'},
+  {id:'collapse',          year:-1180, region:'egypt',       size:32, name:'青铜时代崩溃',     peak:'前 1177', special:true},
+];
+
+// 11 条关系连线
+const RELATIONS = [
+  {from:'akkad',     to:'sumer',     type:'war',          label:'征服'},
+  {from:'babylon',   to:'akkad',     type:'continuation', label:'延续'},
+  {from:'babylon',   to:'sumer',     type:'influence',    label:'继承文化'},
+  {from:'sumer',     to:'indus',     type:'trade',        label:'青金石/红玉髓贸易'},
+  {from:'sumer',     to:'egypt_old', type:'influence',    label:'间接影响'},
+  {from:'egypt_predynastic', to:'egypt_old', type:'continuation', label:'同一文明'},
+  {from:'egypt_old', to:'egypt_new', type:'continuation', label:'同一文明'},
+  {from:'indus_early', to:'indus',   type:'continuation', label:'同一文明'},
+  {from:'hittite',   to:'egypt_new', type:'war',          label:'卡迭石战役 + 和约'},
+  {from:'mycenaean', to:'minoan',    type:'war',          label:'征服取代'},
+  {from:'mycenaean', to:'hittite',   type:'trade',        label:'爱琴贸易'},
+  {from:'collapse',  to:'hittite',   type:'destruction',  label:'毁灭'},
+  {from:'collapse',  to:'mycenaean', type:'destruction',  label:'毁灭'},
+  {from:'collapse',  to:'egypt_new', type:'destruction',  label:'削弱'},
+];
+
+// 准备节点坐标
+const NODES = {};
+CIVS.forEach(c=>{
+  NODES[c.id] = {...c, x: yearToX(c.year), y: REGIONS[c.region].y};
+});
+// 特殊：青铜崩溃放在 collapse 标的位置，但 y 拉到中间
+NODES.collapse.y = 470;
+
+// ════ 渲染 ════
+function getCivColor(id){
+  const fb = {egypt_predynastic:'#d4b870', indus_early:'#a070d4', collapse:'#666'};
+  if (fb[id]) return fb[id];
   if (typeof EARLY_CIV_EXPLORER!=='undefined') {
     const f = EARLY_CIV_EXPLORER.civilizations.find(c=>c.id===id);
-    if (f) return f;
+    if (f) return f.color;
   }
-  const fb = {egypt_predynastic:{name:'古埃及·前王朝',icon:'🌅',color:'#d4b870'},indus_early:{name:'印度河早期',icon:'🏘',color:'#a070d4'}};
-  return fb[id] || {name:id,icon:'🏛',color:'#888'};
+  return '#888';
+}
+function getCivIcon(id){
+  const fb = {egypt_predynastic:'🌅', indus_early:'🏘', collapse:'💀'};
+  if (fb[id]) return fb[id];
+  if (typeof EARLY_CIV_EXPLORER!=='undefined') {
+    const f = EARLY_CIV_EXPLORER.civilizations.find(c=>c.id===id);
+    if (f) return f.icon;
+  }
+  return '🏛';
 }
 
-function renderChapters(){
-  const html = CHAPTERS.map((ch, idx)=>{
-    const lockedCls = (idx >= revealedCount) ? 'locked' : '';
+function render(){
+  let svg = `<defs>
+    <!-- 球体渐变（每个文明独立颜色） -->
+    ${CIVS.map(c=>{
+      const color = getCivColor(c.id);
+      return `<radialGradient id="orb_${c.id}" cx="35%" cy="30%">
+        <stop offset="0%" stop-color="rgba(255,255,255,.9)"/>
+        <stop offset="25%" stop-color="${color}" stop-opacity=".95"/>
+        <stop offset="100%" stop-color="${darken(color,0.5)}"/>
+      </radialGradient>`;
+    }).join('')}
+    <!-- halo 渐变 -->
+    ${CIVS.map(c=>{
+      const color = getCivColor(c.id);
+      return `<radialGradient id="halo_${c.id}">
+        <stop offset="0%" stop-color="${color}" stop-opacity=".4"/>
+        <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+      </radialGradient>`;
+    }).join('')}
+    <!-- 阴影 -->
+    <filter id="orbShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="6"/>
+      <feOffset dx="0" dy="6"/>
+      <feFlood flood-color="#000" flood-opacity=".6"/>
+      <feComposite in2="SourceAlpha" operator="in"/>
+      <feComposite in2="SourceGraphic" operator="over"/>
+    </filter>
+  </defs>`;
 
-    // 找上一章和本章重合的文明 (继承提示)
-    let bridge = '';
-    if (idx > 0) {
-      const prev = CHAPTERS[idx-1];
-      const carriedOver = ch.active_civs.filter(cv => prev.active_civs.some(pcv=>pcv.id===cv.id));
-      if (carriedOver.length) {
-        bridge = `<div class="bridge">上一章的 ${carriedOver.map(c=>getCivInfo(c.id).icon+' '+getCivInfo(c.id).name).join(' · ')} 继续</div>`;
-      }
-    }
-
-    return `<div class="chapter ${lockedCls}" id="ch-${idx}">
-      <div class="ch-head">
-        <div class="num">${ch.no}</div>
-        <div class="info">
-          <div class="range">${ch.range} BCE</div>
-          <h3>${ch.title}</h3>
-        </div>
-        <div class="ic">${ch.icon}</div>
-      </div>
-      <div class="ch-summary">${ch.one_line}</div>
-      <div class="civs-grid">
-        ${ch.active_civs.map(cv=>{
-          const info = getCivInfo(cv.id);
-          return `<div class="civ-card" onclick="enterDeep('${cv.id}')">
-            <div class="top">
-              <div class="ic" style="background:${info.color}">${info.icon}</div>
-              <div class="nm">${info.name}</div>
-              <div class="state" data-state="${cv.state}">${cv.state}</div>
-            </div>
-            <div class="l1">${cv.L1||cv.in_period_summary||''}</div>
-            <div class="enter-btn">深入了解 →</div>
-          </div>`;
-        }).join('')}
-      </div>
-      ${bridge}
-    </div>`;
-  }).join('');
-  document.getElementById('chapters').innerHTML = html;
-  updateBtns();
-}
-
-function updateBtns(){
-  document.getElementById('progress').textContent = `${revealedCount} / 5 段已展开`;
-  document.getElementById('summaryBtn').disabled = revealedCount < 5;
-  const nextBtn = document.getElementById('nextBtn');
-  if (revealedCount >= 5) { nextBtn.style.display = 'none'; }
-  else { nextBtn.style.display = 'block'; nextBtn.textContent = `⤓ 展开下一段 (CH${revealedCount+1}: ${CHAPTERS[revealedCount].title}) ↓`; }
-}
-
-function revealNext(){
-  if (revealedCount >= 5) return;
-  revealedCount++;
-  document.getElementById('ch-'+(revealedCount-1)).classList.remove('locked');
-  updateBtns();
-  setTimeout(()=>{
-    document.getElementById('ch-'+(revealedCount-1)).scrollIntoView({behavior:'smooth', block:'center'});
-  }, 100);
-}
-
-function resetAll(){
-  revealedCount = 1;
-  document.querySelectorAll('.chapter').forEach((el, idx)=>{
-    el.classList.toggle('locked', idx >= 1);
+  // Region 标签 (左侧)
+  Object.entries(REGIONS).forEach(([k,r])=>{
+    svg += `<text class="region-label" x="24" y="${r.y+4}">${r.name}</text>`;
+    // 地区横向虚线
+    svg += `<line x1="120" y1="${r.y}" x2="${W-40}" y2="${r.y}" stroke="rgba(212,168,88,.06)" stroke-width="1" stroke-dasharray="2 8"/>`;
   });
-  updateBtns();
-  window.scrollTo({top:0, behavior:'smooth'});
+
+  // 关系连线
+  RELATIONS.forEach(r=>{
+    const a = NODES[r.from], b = NODES[r.to];
+    if (!a||!b) return;
+    // 自然弧度的 bezier
+    const dx = b.x - a.x, dy = b.y - a.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    const curveStrength = Math.min(dist*0.3, 120);
+    // 控制点偏移方向：垂直于连线
+    const nx = -dy/dist, ny = dx/dist;
+    const cx = (a.x+b.x)/2 + nx*curveStrength*0.4;
+    const cy = (a.y+b.y)/2 + ny*curveStrength*0.4;
+    svg += `<path class="relation-path ${r.type}" d="M ${a.x} ${a.y} Q ${cx} ${cy} ${b.x} ${b.y}" data-from="${r.from}" data-to="${r.to}">
+      <title>${r.label}</title>
+    </path>`;
+  });
+
+  // 文明球
+  CIVS.forEach(c=>{
+    const node = NODES[c.id];
+    const color = getCivColor(c.id);
+    const icon = getCivIcon(c.id);
+    const r = c.size;
+    svg += `<g class="civ-orb" data-id="${c.id}" transform="translate(${node.x},${node.y})" style="color:${color}">
+      <!-- 外光晕 -->
+      <circle class="halo-outer" cx="0" cy="0" r="${r*2.2}" fill="url(#halo_${c.id})" opacity="0.25"/>
+      <circle class="halo-inner" cx="0" cy="0" r="${r*1.5}" fill="url(#halo_${c.id})" opacity="0.4"/>
+      <!-- 球体 -->
+      <g class="body" filter="url(#orbShadow)">
+        <circle cx="0" cy="0" r="${r}" fill="url(#orb_${c.id})" stroke="rgba(255,255,255,.25)" stroke-width="1.5"/>
+        <!-- 顶部光泽 -->
+        <ellipse cx="${-r*0.18}" cy="${-r*0.35}" rx="${r*0.4}" ry="${r*0.18}" fill="rgba(255,255,255,.55)" transform="rotate(-25)"/>
+        <!-- 图标 -->
+        <text text-anchor="middle" dominant-baseline="central" font-size="${r*0.85}" style="pointer-events:none">${icon}</text>
+      </g>
+      <!-- 名字标签 -->
+      <g transform="translate(0,${r+22})">
+        <rect class="label-bg" x="${-c.name.length*7.5-8}" y="${-12}" width="${c.name.length*15+16}" height="22" rx="11"/>
+        <text class="label" y="3" font-size="13">${c.name}</text>
+      </g>
+      <text class="yr" y="${r+50}" font-size="10">${c.peak}</text>
+    </g>`;
+  });
+
+  document.getElementById('canvas').innerHTML = svg;
+
+  // 绑定点击 + 悬浮
+  document.querySelectorAll('.civ-orb').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const id = el.dataset.id;
+      location.href = `./civ-deep.html#/civ/${id}`;
+    });
+    el.addEventListener('mouseenter', e=>showTooltip(e, el.dataset.id));
+    el.addEventListener('mousemove', moveTooltip);
+    el.addEventListener('mouseleave', hideTooltip);
+  });
 }
 
-// 进入文明完整深度页
-function enterDeep(civId){
-  location.href = `./civ-deep.html#/civ/${civId}`;
+function darken(hex, amount){
+  if (!hex || !hex.startsWith('#')) return '#444';
+  const c = hex.replace('#','');
+  const r = Math.max(0, parseInt(c.slice(0,2),16) - Math.round(255*amount));
+  const g = Math.max(0, parseInt(c.slice(2,4),16) - Math.round(255*amount));
+  const b = Math.max(0, parseInt(c.slice(4,6),16) - Math.round(255*amount));
+  return '#' + [r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
 }
 
+// ════ Tooltip ════
+function showTooltip(e, civId){
+  const civ = CIVS.find(c=>c.id===civId);
+  if (!civ) return;
+  const deep = CIV_DEEP?.[civId];
+  const chs = CHAPTERS.filter(ch=>ch.active_civs.some(cv=>cv.id===civId));
+  const events = []; const people = [];
+  chs.forEach(ch=>{
+    const cv = ch.active_civs.find(x=>x.id===civId);
+    (cv?.L3_events||[]).forEach(e=>{if(!events.includes(e))events.push(e)});
+    (cv?.L4_people||[]).forEach(p=>{if(!people.includes(p))people.push(p)});
+  });
+  const summary = deep?.opening_narrative?.split(/\n\s*\n/)[0].trim().slice(0,90)+'...'
+    || chs[0]?.active_civs.find(x=>x.id===civId)?.L1
+    || civ.name;
+  const tip = document.getElementById('tooltip');
+  tip.innerHTML = `
+    <div class="nm">${getCivIcon(civId)} ${civ.name}</div>
+    <div class="yr">${civ.peak}</div>
+    <div class="desc">${summary}</div>
+    <div class="cta">点击 → 进入深度页 (${events.length} 事件 · ${people.length} 人物)</div>
+  `;
+  tip.classList.add('show');
+  moveTooltip(e);
+}
+function moveTooltip(e){
+  const tip = document.getElementById('tooltip');
+  const x = Math.min(e.clientX + 16, window.innerWidth - 360);
+  const y = Math.min(e.clientY + 16, window.innerHeight - 200);
+  tip.style.left = x+'px';
+  tip.style.top = y+'px';
+}
+function hideTooltip(){ document.getElementById('tooltip').classList.remove('show'); }
+
+// ════ 总汇 ════
 function openSummary(){
   document.getElementById('summaryContent').innerHTML = `
     <button class="close-x" onclick="closeSummary()">✕</button>
@@ -273,7 +439,7 @@ function openSummary(){
       <div class="gh">CH1<br>3500-3000</div><div class="gh">CH2<br>3000-2500</div><div class="gh">CH3<br>2500-2000</div><div class="gh">CH4<br>2000-1500</div><div class="gh">CH5<br>1500-1000</div>
       <div class="gh legacy">今天保留</div>
       ${FINAL_OVERVIEW.civs.map(cv=>{
-        let row = `<div class="gc civ-name">${cv.name}</div>`;
+        let row = `<div class="gc civ-name" onclick="location.href='./civ-deep.html#/civ/${cv.id}'">${cv.name}</div>`;
         for (let ch=1; ch<=5; ch++){
           const s = cv.spans.find(x=>x[0]===ch);
           if (s) row += `<div class="gc block"><div class="bar ${s[1].split('_')[0]}" style="background:${cv.color}"></div></div>`;
@@ -292,10 +458,7 @@ function openSummary(){
 }
 function closeSummary(){ document.getElementById('summary').classList.remove('open'); }
 
-renderChapters();
-window.revealNext = revealNext;
-window.resetAll = resetAll;
-window.enterDeep = enterDeep;
+render();
 window.openSummary = openSummary;
 window.closeSummary = closeSummary;
 </script>
