@@ -331,22 +331,23 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 /* AI 浮动按钮 + 面板 */
 .ai-fab{position:fixed;right:24px;bottom:78px;z-index:45;width:58px;height:58px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,var(--gold),var(--vermilion));color:white;font-size:26px;box-shadow:0 8px 24px rgba(212,168,88,.5);transition:transform .2s}
 .ai-fab:hover{transform:scale(1.08)}
-.ai-panel{position:fixed;right:24px;bottom:148px;z-index:46;width:380px;max-width:calc(100vw - 48px);height:520px;max-height:calc(100vh - 200px);background:rgba(15,15,28,.97);backdrop-filter:blur(24px);border:1px solid rgba(212,168,88,.4);border-radius:16px;display:none;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.7)}
+.ai-panel{position:fixed;right:24px;bottom:148px;z-index:46;width:380px;max-width:calc(100vw - 48px);height:520px;max-height:calc(100vh - 200px);background:var(--bg);backdrop-filter:blur(24px);border:1.5px solid var(--panel-line);border-radius:16px;display:none;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.3)}
 .ai-panel.open{display:flex}
-.ai-panel .pnl-head{padding:14px 16px;border-bottom:1px solid rgba(212,168,88,.25);display:flex;align-items:center;gap:8px}
+.ai-panel .pnl-head{padding:14px 16px;border-bottom:1px solid var(--panel-line);display:flex;align-items:center;gap:8px}
 .ai-panel .pnl-head h4{font-family:var(--serif);font-size:15px;color:var(--gold);flex:1;font-weight:700}
-.ai-panel .pnl-head .ctx-chip{font-family:var(--mono);font-size:9px;color:var(--ink2);background:rgba(212,168,88,.12);padding:3px 8px;border-radius:99px;letter-spacing:.04em}
-.ai-panel .pnl-head button{width:30px;height:30px;border-radius:7px;border:1px solid rgba(212,168,88,.3);background:transparent;cursor:pointer;color:var(--ink2);font-size:13px}
+.ai-panel .pnl-head .ctx-chip{font-family:var(--mono);font-size:9px;color:var(--ink2);background:rgba(128,128,128,.14);padding:3px 8px;border-radius:99px;letter-spacing:.04em}
+.ai-panel .pnl-head button{width:30px;height:30px;border-radius:7px;border:1px solid var(--panel-line);background:transparent;cursor:pointer;color:var(--ink2);font-size:13px}
 .ai-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
 .ai-msg{padding:10px 13px;border-radius:12px;font-size:13px;line-height:1.7;max-width:90%}
-.ai-msg.user{align-self:flex-end;background:var(--gold);color:#1a1410;border-bottom-right-radius:4px}
-.ai-msg.bot{align-self:flex-start;background:rgba(212,168,88,.1);color:var(--ink);border:1px solid rgba(212,168,88,.2);border-bottom-left-radius:4px}
+.ai-msg.user{align-self:flex-end;background:var(--gold);color:#fff;border-bottom-right-radius:4px}
+.ai-msg.bot{align-self:flex-start;background:var(--panel-bg);color:var(--ink);border:1px solid var(--panel-line);border-bottom-left-radius:4px}
 .ai-msg.bot .cursor{display:inline-block;width:6px;height:14px;background:var(--gold);margin-left:2px;animation:blink 1s steps(2) infinite;vertical-align:middle}
 @keyframes blink{50%{opacity:0}}
-.ai-form{padding:10px 12px;border-top:1px solid rgba(212,168,88,.25);display:flex;gap:8px}
-.ai-form input{flex:1;min-height:42px;padding:0 12px;border-radius:8px;border:1px solid rgba(212,168,88,.3);background:rgba(0,0,0,.3);color:var(--ink);font-family:inherit;font-size:13px}
+.ai-form{padding:10px 12px;border-top:1px solid var(--panel-line);display:flex;gap:8px}
+.ai-form input{flex:1;min-height:42px;padding:0 12px;border-radius:8px;border:1px solid var(--panel-line);background:rgba(128,128,128,.12);color:var(--ink);font-family:inherit;font-size:13px}
+.ai-form input::placeholder{color:var(--ink3)}
 .ai-form input:focus{outline:none;border-color:var(--gold)}
-.ai-form button{min-width:56px;border-radius:8px;border:none;background:var(--gold);color:#1a1410;font-weight:700;cursor:pointer}
+.ai-form button{min-width:56px;border-radius:8px;border:none;background:var(--gold);color:#fff;font-weight:700;cursor:pointer}
 .ai-form button:disabled{opacity:.5}
 @media(max-width:768px){
   .scroll-card .speak-btn{right:64px}
