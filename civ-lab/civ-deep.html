@@ -105,6 +105,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 .region-axis-label{font-family:var(--mono);fill:rgba(212,168,88,.55);font-size:11px;letter-spacing:.12em;font-weight:700;text-transform:uppercase}
 .axis-tick{font-family:var(--mono);fill:rgba(212,168,88,.5);font-size:10px;text-anchor:middle;letter-spacing:.04em}
 .axis-end{font-family:var(--mono);fill:rgba(212,168,88,.4);font-size:10px}
+.axis-flow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;font-weight:700}
 .float-orb .orb-year{font-family:var(--mono);fill:rgba(212,168,88,.6);pointer-events:none}
 
 /* tooltip */
@@ -459,24 +460,38 @@ function renderCivCosmic(civId){
   if (!span && chs.length){ span = [chs[0].range_y?.[0]||-3000, chs[chs.length-1].range_y?.[1]||-1000]; }
   if (!span) span = [-3500,-1000];
   const [sStart, sEnd] = span;
-  const AXIS_X0 = 250, AXIS_X1 = 1360, AXIS_Y = 560;
+
+  // ── 布局坐标 ──
+  const CXc = 270, CYc = 460, cr = 62;           // 中心文明球 (左侧)
+  const AXIS_Y = CYc;                            // 时间主轴与中心球同高
+  const AXIS_X0 = CXc + cr + 60;                 // 时间轴起点 (中心球右侧)
+  const AXIS_X1 = 1470;                          // 时间轴终点
+  const EV_Y = CYc - 150, PP_Y = CYc + 150;      // 事件上 / 人物下
   function yr2x(y){
     if (y==null) return (AXIS_X0+AXIS_X1)/2;
     const t = (y - sStart)/((sEnd - sStart)||1);
-    return AXIS_X0 + Math.max(0,Math.min(1,t)) * (AXIS_X1 - AXIS_X0);
+    return AXIS_X0 + 20 + Math.max(0,Math.min(1,t)) * (AXIS_X1 - AXIS_X0 - 60);
   }
 
-  // 主题章节球 (顶部一排, 无时间)
+  // 通识章节球 (无时间 → 环绕中心球, 连线直达宇宙核心)
   const themes = [];
   if (deep?.opening_narrative) themes.push({icon:'📖',name:'文明叙事',color:'#d4a858',action:{type:'showText',payload:{kind:'narrative',civId}}});
   if (deep) themes.push({icon:'🏛',name:'基础事实',color:'#a8a060',action:{type:'showText',payload:{kind:'basics',civId}}});
-  if (chs.length) themes.push({icon:'📅',name:'演化阶段',color:'#c8a070',action:{type:'showText',payload:{kind:'timeline',civId}}});
   if (deep?.nine_inventions) themes.push({icon:'💡',name:'关键发明',color:'#e8a020',action:{type:'showText',payload:{kind:'inventions',civId}}});
   themes.push({icon:'🌍',name:'文明关系',color:'#7a60b0',action:{type:'showText',payload:{kind:'relations',civId}}});
   if (deep?.collapse_chain) themes.push({icon:'⏳',name:'崩溃过程',color:'#b04848',action:{type:'showText',payload:{kind:'collapse',civId}}});
   if (FINAL_OVERVIEW.civs.find(c=>c.id===civId)?.legacy) themes.push({icon:'🎁',name:'今天遗产',color:'#3a8868',action:{type:'showText',payload:{kind:'legacy',civId}}});
 
-  // 事件 + 人物 → 时间排序
+  // 通识球沿中心球左侧弧线分布 (避开右侧时间轴出口)
+  const R = 165;
+  const aStart = Math.PI*0.5, aEnd = Math.PI*1.5; // 下 → 左 → 上
+  themes.forEach((t,i)=>{
+    const a = themes.length>1 ? aStart + i*(aEnd-aStart)/(themes.length-1) : Math.PI;
+    t.x = CXc + Math.cos(a)*R;
+    t.y = CYc + Math.sin(a)*R;
+  });
+
+  // 事件 + 人物 → 按时间排序
   const evItems = events.map(e=>({
     id:e.id, year:eventYear(e), color:'#c8732a', icon:'📅',
     name:(e.deep?.full_title||e.id).slice(0,9),
@@ -488,78 +503,71 @@ function renderCivCosmic(civId){
     action:{type:'navigate',to:{type:'person',id:p.id}}
   })).sort((a,b)=>(a.year||0)-(b.year||0));
 
-  // 防重叠：同排相邻 x<100 则上下交错
   function layout(items, baseY, dir){
-    items.forEach((it,i)=>{ it.x = yr2x(it.year); it.y = baseY; });
+    items.forEach((it)=>{ it.x = yr2x(it.year); it.y = baseY; });
     for (let i=1;i<items.length;i++){
-      if (items[i].x - items[i-1].x < 95){
-        items[i].y = items[i-1].y === baseY ? baseY + dir*72 : baseY;
+      if (items[i].x - items[i-1].x < 100){
+        items[i].y = items[i-1].y === baseY ? baseY + dir*78 : baseY;
       }
     }
   }
-  layout(evItems, AXIS_Y - 90, -1);
-  layout(ppItems, AXIS_Y + 90, 1);
+  layout(evItems, EV_Y, -1);
+  layout(ppItems, PP_Y, 1);
 
   // ── 组装 SVG ──
   const allOrbs = [...themes, ...evItems, ...ppItems];
-  let defs = `<defs>
+  let svg = `<defs>
     <radialGradient id="centerGrad" cx="35%" cy="30%"><stop offset="0%" stop-color="rgba(255,255,255,.95)"/><stop offset="30%" stop-color="${color}"/><stop offset="100%" stop-color="${darken(color,0.5)}"/></radialGradient>
     <radialGradient id="centerHalo"><stop offset="0%" stop-color="${color}" stop-opacity=".5"/><stop offset="100%" stop-color="${color}" stop-opacity="0"/></radialGradient>
+    <linearGradient id="axisGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="${color}" stop-opacity="0.2"/><stop offset="15%" stop-color="${color}" stop-opacity="0.9"/><stop offset="100%" stop-color="${color}" stop-opacity="0.9"/></linearGradient>
+    <marker id="axisArrow" markerWidth="14" markerHeight="14" refX="3" refY="5" orient="auto"><path d="M0,0 L9,5 L0,10 Z" fill="${color}"/></marker>
     ${allOrbs.map((o,i)=>`<radialGradient id="og${i}" cx="35%" cy="30%"><stop offset="0%" stop-color="rgba(255,255,255,.88)"/><stop offset="30%" stop-color="${o.color}"/><stop offset="100%" stop-color="${darken(o.color,0.5)}"/></radialGradient>`).join('')}
   </defs>`;
 
-  let svg = defs;
+  // ── 醒目时间主轴 (粗发光线 + 箭头流向) ──
+  svg += `<line x1="${AXIS_X0}" y1="${AXIS_Y}" x2="${AXIS_X1}" y2="${AXIS_Y}" stroke="url(#axisGrad)" stroke-width="5" stroke-linecap="round" marker-end="url(#axisArrow)" filter="drop-shadow(0 0 8px ${color}88)"/>`;
+  // 时间流向标注
+  svg += `<text x="${AXIS_X0+10}" y="${AXIS_Y-16}" class="axis-flow" fill="${color}">⏳ 时间流向 · 早 → 晚</text>`;
+  // 刻度年份
+  const tickStep = (sEnd-sStart) > 1200 ? 500 : 250;
+  for (let y=Math.ceil(sStart/tickStep)*tickStep; y<=sEnd; y+=tickStep){
+    const x = yr2x(y);
+    svg += `<line x1="${x}" y1="${AXIS_Y-8}" x2="${x}" y2="${AXIS_Y+8}" stroke="${color}" stroke-opacity="0.6" stroke-width="2"/>`;
+    svg += `<text x="${x}" y="${AXIS_Y+26}" class="axis-tick">前${Math.abs(y)}</text>`;
+  }
+  // 行标签
+  svg += `<text x="${AXIS_X0}" y="${EV_Y-50}" class="region-axis-label">📅 历史事件（按时间）</text>`;
+  svg += `<text x="${AXIS_X0}" y="${PP_Y+54}" class="region-axis-label">👤 关键人物（按时间）</text>`;
 
-  // 中心文明球 (顶部居中)
-  const CXc = 800, CYc = 150, cr = 56;
+  // ── 事件/人物：连线到时间轴对应年份点 + orb ──
+  [...evItems, ...ppItems].forEach((it)=>{
+    const ax = yr2x(it.year);
+    svg += `<line x1="${ax}" y1="${AXIS_Y}" x2="${it.x}" y2="${it.y}" stroke="${it.color}" stroke-width="1.2" stroke-opacity="0.5" stroke-dasharray="2 3"/>`;
+    svg += `<circle cx="${ax}" cy="${AXIS_Y}" r="4" fill="${it.color}"/>`;
+    svg += floatOrb(it, allOrbs.indexOf(it), 30, false);
+  });
+
+  // ── 通识球：实线连到中心宇宙核心 ──
+  themes.forEach((t)=>{
+    svg += `<line x1="${CXc}" y1="${CYc}" x2="${t.x}" y2="${t.y}" stroke="rgba(212,168,88,.3)" stroke-width="1.5"/>`;
+  });
+  themes.forEach((t)=>{ svg += floatOrb(t, allOrbs.indexOf(t), 30, false); });
+
+  // ── 中心文明球 (宇宙核心) ──
   svg += `<g class="center-orb" transform="translate(${CXc},${CYc})">
-    <circle cx="0" cy="0" r="${cr*1.8}" fill="url(#centerHalo)"/>
-    <circle class="ring1" cx="0" cy="0" r="${cr+22}" stroke-dasharray="6 10"/>
+    <circle cx="0" cy="0" r="${cr*1.7}" fill="url(#centerHalo)"/>
+    <circle class="ring1" cx="0" cy="0" r="${cr+20}" stroke-dasharray="6 10"/>
     <g class="body">
       <circle cx="0" cy="0" r="${cr}" fill="url(#centerGrad)" stroke="rgba(255,255,255,.4)" stroke-width="2"/>
       <ellipse cx="${-cr*0.18}" cy="${-cr*0.32}" rx="${cr*0.4}" ry="${cr*0.17}" fill="rgba(255,255,255,.5)" transform="rotate(-25)"/>
       <text text-anchor="middle" dominant-baseline="central" font-size="${cr*0.7}" style="pointer-events:none">${info.icon}</text>
     </g>
-    <text class="label" y="${cr+26}" font-size="19">${info.name}</text>
+    <text class="label" y="${cr+26}" font-size="20">${info.name}</text>
     <text class="meta" y="${cr+46}" font-size="11">${timeRange}</text>
   </g>`;
 
-  // 主题章节球 (第二排, 居中横排)
-  const themeY = 320, themeGap = Math.min(150, 1100/themes.length), themeR=30;
-  const themeStartX = 800 - (themes.length-1)*themeGap/2;
-  themes.forEach((t,i)=>{ t.x = themeStartX + i*themeGap; t.y = themeY; });
-  themes.forEach((t)=>{
-    const gi = allOrbs.indexOf(t);
-    svg += floatOrb(t, gi, themeR, true);
-  });
-  // 章节区与时间轴分隔标题
-  svg += `<text x="60" y="${themeY+4}" class="region-axis-label">主题</text>`;
-
-  // 时间轴
-  svg += `<line x1="${AXIS_X0}" y1="${AXIS_Y}" x2="${AXIS_X1}" y2="${AXIS_Y}" stroke="rgba(212,168,88,.4)" stroke-width="2"/>`;
-  // 刻度
-  const tickStep = (sEnd-sStart) > 1200 ? 500 : 250;
-  for (let y=Math.ceil(sStart/tickStep)*tickStep; y<=sEnd; y+=tickStep){
-    const x = yr2x(y);
-    svg += `<line x1="${x}" y1="${AXIS_Y-6}" x2="${x}" y2="${AXIS_Y+6}" stroke="rgba(212,168,88,.5)" stroke-width="1.5"/>`;
-    svg += `<text x="${x}" y="${AXIS_Y+24}" class="axis-tick">前${Math.abs(y)}</text>`;
-  }
-  svg += `<text x="${AXIS_X0-16}" y="${AXIS_Y+4}" class="axis-end" text-anchor="end">起</text>`;
-  svg += `<text x="${AXIS_X1+16}" y="${AXIS_Y+4}" class="axis-end" text-anchor="start">终</text>`;
-  svg += `<text x="60" y="${AXIS_Y-94}" class="region-axis-label">📅 事件</text>`;
-  svg += `<text x="60" y="${AXIS_Y+94}" class="region-axis-label">👤 人物</text>`;
-
-  // 事件/人物 连线到时间轴 + orb
-  [...evItems, ...ppItems].forEach((it)=>{
-    const ax = yr2x(it.year);
-    svg += `<line x1="${ax}" y1="${AXIS_Y}" x2="${it.x}" y2="${it.y}" stroke="${it.color}" stroke-width="1" stroke-opacity="0.4" stroke-dasharray="2 3"/>`;
-    svg += `<circle cx="${ax}" cy="${AXIS_Y}" r="3.5" fill="${it.color}"/>`;
-    const gi = allOrbs.indexOf(it);
-    svg += floatOrb(it, gi, 30, false);
-  });
-
   if (evItems.length===0 && ppItems.length===0){
-    svg += `<text x="800" y="${AXIS_Y}" text-anchor="middle" class="region-axis-label" style="font-size:13px">此文明的事件 / 人物深度内容正在补充中</text>`;
+    svg += `<text x="${(AXIS_X0+AXIS_X1)/2}" y="${AXIS_Y-50}" text-anchor="middle" class="region-axis-label" style="font-size:13px">此文明的事件 / 人物深度内容正在补充中</text>`;
   }
 
   document.getElementById('canvas').innerHTML = svg;
