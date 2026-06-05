@@ -153,7 +153,27 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 .legacy-card .why{font-size:12.5px;line-height:1.6;color:#5c4530}
 .legacy-h{font-family:var(--serif);font-size:22px;font-weight:900;margin:24px 0 12px;text-align:center}
 
-@media (max-width:768px){.topbar h1{font-size:13px}.topbar .hint{display:none}}
+@media (max-width:768px){.topbar h1{font-size:13px}.topbar .hint{display:none}.ai-panel{right:8px!important;left:8px!important;width:auto!important}}
+
+/* AI 浮动按钮 + 面板 */
+.ai-fab{position:fixed;right:24px;bottom:78px;z-index:45;width:58px;height:58px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,var(--gold),var(--vermilion));color:white;font-size:26px;box-shadow:0 8px 24px rgba(212,168,88,.5);transition:transform .2s}
+.ai-fab:hover{transform:scale(1.08)}
+.ai-panel{position:fixed;right:24px;bottom:148px;z-index:46;width:380px;max-width:calc(100vw - 48px);height:500px;max-height:calc(100vh - 200px);background:rgba(15,15,28,.97);backdrop-filter:blur(24px);border:1px solid rgba(212,168,88,.4);border-radius:16px;display:none;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.7)}
+.ai-panel.open{display:flex}
+.ai-panel .pnl-head{padding:14px 16px;border-bottom:1px solid rgba(212,168,88,.25);display:flex;align-items:center;gap:8px}
+.ai-panel .pnl-head h4{font-family:var(--serif);font-size:15px;color:var(--gold);flex:1;font-weight:700}
+.ai-panel .pnl-head button{width:30px;height:30px;border-radius:7px;border:1px solid rgba(212,168,88,.3);background:transparent;cursor:pointer;color:var(--ink2);font-size:13px}
+.ai-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.ai-msg{padding:10px 13px;border-radius:12px;font-size:13px;line-height:1.7;max-width:90%}
+.ai-msg.user{align-self:flex-end;background:var(--gold);color:#1a1410;border-bottom-right-radius:4px}
+.ai-msg.bot{align-self:flex-start;background:rgba(212,168,88,.1);color:var(--ink);border:1px solid rgba(212,168,88,.2);border-bottom-left-radius:4px}
+.ai-msg.bot .cursor{display:inline-block;width:6px;height:14px;background:var(--gold);margin-left:2px;animation:blink 1s steps(2) infinite;vertical-align:middle}
+@keyframes blink{50%{opacity:0}}
+.ai-form{padding:10px 12px;border-top:1px solid rgba(212,168,88,.25);display:flex;gap:8px}
+.ai-form input{flex:1;min-height:42px;padding:0 12px;border-radius:8px;border:1px solid rgba(212,168,88,.3);background:rgba(0,0,0,.3);color:var(--ink);font-family:inherit;font-size:13px}
+.ai-form input:focus{outline:none;border-color:var(--gold)}
+.ai-form button{min-width:56px;border-radius:8px;border:none;background:var(--gold);color:#1a1410;font-weight:700;cursor:pointer}
+.ai-form button:disabled{opacity:.5}
 </style>
 </head>
 <body>
@@ -183,6 +203,21 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 </div>
 
 <button class="summary-btn" onclick="openSummary()">🏁 全景总汇表</button>
+
+<button class="ai-fab" id="aiFab" title="AI 助手" onclick="toggleAI()">🤖</button>
+<div class="ai-panel" id="aiPanel">
+  <div class="pnl-head">
+    <h4>🤖 文明实验室 AI</h4>
+    <button onclick="toggleAI()">✕</button>
+  </div>
+  <div class="ai-msgs" id="aiMsgs">
+    <div class="ai-msg bot">你好！我是文明实验室 AI。问我任何关于前 3500–1000 年早期文明的问题，比如「为什么文明先在两河流域出现？」</div>
+  </div>
+  <form class="ai-form" id="aiForm">
+    <input type="text" id="aiInput" placeholder="问我任何问题..." autocomplete="off"/>
+    <button type="submit" id="aiSend">发送</button>
+  </form>
+</div>
 
 <div class="tooltip" id="tooltip"></div>
 <div class="summary-modal" id="summary"><div class="summary-content" id="summaryContent"></div></div>
@@ -445,6 +480,38 @@ function openSummary(){
 function closeSummary(){ document.getElementById('summary').classList.remove('open'); }
 
 render();
+// ── AI 问答 (千问 SSE) ──
+const AI_KEY='civ_qwen_key';
+function toggleAI(){ document.getElementById('aiPanel').classList.toggle('open'); document.getElementById('aiInput')?.focus(); }
+function aiAppend(role, html, cursor){
+  const box=document.getElementById('aiMsgs'); const d=document.createElement('div');
+  d.className='ai-msg '+role; d.innerHTML=html+(cursor?'<span class="cursor"></span>':'');
+  box.appendChild(d); box.scrollTop=box.scrollHeight; return d;
+}
+async function sendAI(){
+  const input=document.getElementById('aiInput'); const q=input.value.trim(); if(!q)return;
+  const btn=document.getElementById('aiSend'); input.value=''; btn.disabled=true;
+  aiAppend('user', q.replace(/</g,'&lt;'));
+  let key=localStorage.getItem(AI_KEY);
+  if(!key){ key=prompt('输入千问 API Key (一次性, 存本地)： https://dashscope.console.aliyun.com/'); if(!key){btn.disabled=false;return;} localStorage.setItem(AI_KEY,key); }
+  const bot=aiAppend('bot','',true); let acc='';
+  const sys='你是 AI 世界文明实验室助手，面向 10-15 岁中学生，用生动语言。覆盖前 3500–1000 年早期文明（苏美尔/埃及/印度河/阿卡德/巴比伦/米诺斯/迈锡尼/赫梯/商朝/青铜崩溃）。只用学界共识事实，不编造，不知道就说不知道，200 字内。';
+  try{
+    const resp=await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',{
+      method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify({model:'qwen-turbo',messages:[{role:'system',content:sys},{role:'user',content:q}],stream:true,max_tokens:500})});
+    if(!resp.ok)throw new Error('HTTP '+resp.status);
+    const reader=resp.body.getReader(); const dec=new TextDecoder(); let buf='';
+    while(true){const {done,value}=await reader.read(); if(done)break; buf+=dec.decode(value,{stream:true});
+      const lines=buf.split('\n'); buf=lines.pop();
+      for(const line of lines){ if(!line.startsWith('data: '))continue; const data=line.slice(6).trim(); if(data==='[DONE]')continue;
+        try{const j=JSON.parse(data); const ch=j.choices?.[0]?.delta?.content||''; if(ch){acc+=ch; bot.innerHTML=acc.replace(/\n/g,'<br>')+'<span class="cursor"></span>'; document.getElementById('aiMsgs').scrollTop=99999;}}catch(_){}
+      }}
+    bot.innerHTML=acc.replace(/\n/g,'<br>');
+  }catch(err){ bot.innerHTML='⚠️ 出错：'+err.message; }finally{ btn.disabled=false; input.focus(); }
+}
+document.getElementById('aiForm').addEventListener('submit', e=>{ e.preventDefault(); sendAI(); });
+window.toggleAI = toggleAI;
 window.openSummary = openSummary;
 window.closeSummary = closeSummary;
 </script>
