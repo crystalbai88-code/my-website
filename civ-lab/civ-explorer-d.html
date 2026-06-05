@@ -15,15 +15,15 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{min-height:100%;font-family:var(--sans);background:var(--bg);color:var(--ink)}
 
-/* 背景：深空 + 静态星点（不闪烁） */
+/* 背景：深空 + 静态星点 + 大气透视层 */
 body{
   background:
-    radial-gradient(ellipse at 25% 10%, rgba(120,90,200,.15) 0%, transparent 50%),
-    radial-gradient(ellipse at 75% 90%, rgba(200,120,60,.1) 0%, transparent 50%),
-    #04050c;
+    radial-gradient(ellipse at 25% 10%, rgba(120,90,200,.18) 0%, transparent 50%),
+    radial-gradient(ellipse at 75% 90%, rgba(200,120,60,.12) 0%, transparent 50%),
+    linear-gradient(180deg, #04050c 0%, #08091a 100%);
 }
 body::before{
-  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.4;
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.35;
   background-image:
     radial-gradient(1px 1px at 8% 15%,#fff,transparent),
     radial-gradient(1.2px 1.2px at 22% 38%,#fff,transparent),
@@ -35,8 +35,8 @@ body::before{
     radial-gradient(1.2px 1.2px at 92% 32%,#fff,transparent);
 }
 
-/* 顶栏 sticky */
-.topbar{position:sticky;top:0;height:54px;z-index:30;background:rgba(4,5,12,.85);backdrop-filter:blur(20px);border-bottom:1px solid rgba(212,168,88,.18);display:flex;align-items:center;gap:14px;padding:0 22px}
+/* 顶栏 */
+.topbar{position:sticky;top:0;height:54px;z-index:30;background:rgba(4,5,12,.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(212,168,88,.18);display:flex;align-items:center;gap:14px;padding:0 22px}
 .topbar .home{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.18em}
 .topbar h1{font-family:var(--serif);font-size:14px;font-weight:700}
 .topbar h1 em{color:var(--gold);font-style:normal;margin-left:8px;font-family:var(--mono);font-size:11px;letter-spacing:.2em}
@@ -46,78 +46,66 @@ body::before{
 
 /* 主舞台 */
 .wrap{position:relative;z-index:1;max-width:1480px;margin:0 auto;padding:20px 16px 80px}
-.intro{padding:24px 28px;background:linear-gradient(135deg,rgba(212,168,88,.08),rgba(120,90,200,.06));border:1px solid rgba(212,168,88,.2);border-radius:14px;margin-bottom:30px}
+.intro{padding:24px 28px;background:linear-gradient(135deg,rgba(212,168,88,.08),rgba(120,90,200,.06));border:1px solid rgba(212,168,88,.22);border-radius:14px;margin-bottom:30px;box-shadow:0 8px 32px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.06)}
 .intro h2{font-family:var(--serif);font-size:22px;font-weight:900;margin-bottom:6px;color:var(--gold)}
 .intro p{font-size:13.5px;line-height:1.75;color:var(--ink2);max-width:880px}
 
-/* SVG 全图 */
 .map-svg{width:100%;height:auto;display:block;background:transparent}
 
-/* 节点 + 连线样式 */
-.ring-outline{fill:none;stroke:rgba(212,168,88,.5);stroke-width:2;transition:opacity .6s ease,stroke .6s ease}
-.ring-fill{fill:rgba(212,168,88,.04);transition:opacity .6s ease}
-.ring-label-bg{fill:rgba(15,15,28,.85);stroke:rgba(212,168,88,.4);stroke-width:1.5}
-.ring-label-title{font-family:var(--serif);font-weight:900;fill:var(--gold)}
-.ring-label-range{font-family:var(--mono);fill:var(--ink2);letter-spacing:.1em}
-.ring-label-icon{font-size:24px}
-
-.ring-group{transition:opacity .6s ease, transform .6s ease}
-.ring-group.locked{opacity:.18;pointer-events:none;transform:translateY(8px)}
+/* ════ 节点状态：用 CSS class 控制，不重新渲染 SVG ════ */
+.ring-group{transition:opacity .8s ease;}
+.ring-group.locked{opacity:.12;pointer-events:none}
 
 .civ-dot{cursor:pointer;transition:transform .25s ease}
-.civ-dot:hover{transform:scale(1.12)}
-.civ-circle{transition:filter .3s ease, stroke-width .3s ease}
-.civ-dot:hover .civ-circle{filter:drop-shadow(0 0 18px currentColor) brightness(1.15)}
-.civ-dot.studied .civ-circle{stroke:#7ad896;stroke-width:3}
+.civ-dot:hover{transform:scale(1.10)}
+.civ-circle{transition:filter .3s ease}
+.civ-dot:hover .civ-circle{filter:brightness(1.18) drop-shadow(0 0 22px currentColor)}
+
+.civ-dot .studied-mark{opacity:0;transition:opacity .4s ease}
+.civ-dot.studied .studied-mark{opacity:1}
+.civ-dot.studied .civ-circle{stroke:#7ad896 !important;stroke-width:3 !important;filter:drop-shadow(0 0 16px rgba(122,216,150,.6))}
 
 .civ-label{font-family:var(--serif);font-weight:700;fill:white;text-anchor:middle;pointer-events:none}
 .civ-state{font-family:var(--mono);text-anchor:middle;pointer-events:none;letter-spacing:.06em}
-.civ-state.peak{fill:#7ad896}
-.civ-state.collapse{fill:#ff7878}
-.civ-state.rise, .civ-state.fade{fill:var(--ink2)}
 
-.studied-tick{fill:#7ad896;stroke:white;stroke-width:1.5}
-.studied-tick-text{fill:white;font-family:var(--mono);font-size:9px;font-weight:700;text-anchor:middle;dominant-baseline:central}
-
-/* 连线：垂直传承（同一文明跨越两个 ring） */
+/* 传承连线：默认隐藏，CSS class 控制显示 */
 .carryover-line{
-  fill:none;stroke:rgba(212,168,88,.45);stroke-width:2;
-  stroke-linecap:round;
-  transition:stroke .6s ease, opacity .6s ease;
+  fill:none;stroke:rgba(212,168,88,.6);stroke-width:2.5;stroke-linecap:round;
+  filter:drop-shadow(0 2px 6px rgba(212,168,88,.3));
+  opacity:0;transition:opacity .8s ease;
 }
-.carryover-line.dim{opacity:.15}
+.carryover-line.visible{opacity:1}
 
-/* 下一段按钮（嵌入在每个 ring 下方的"间隔区" SVG 内部） */
-.reveal-btn-bg{fill:rgba(212,168,88,.1);stroke:var(--gold);stroke-width:1.5;stroke-dasharray:5 3;cursor:pointer}
-.reveal-btn-bg:hover{fill:var(--gold)}
-.reveal-btn-text{font-family:var(--serif);font-weight:700;fill:var(--gold);text-anchor:middle;dominant-baseline:central;pointer-events:none;font-size:14px}
-.reveal-btn-bg:hover + text{fill:#1a1410}
-.reveal-btn-group:hover .reveal-btn-text{fill:#1a1410}
+/* 按钮 */
+.reveal-btn-group{cursor:pointer;transition:opacity .4s ease}
+.reveal-btn-group.hidden{opacity:0;pointer-events:none}
+.reveal-btn-bg{fill:rgba(212,168,88,.15);stroke:var(--gold);stroke-width:1.5;stroke-dasharray:5 3;transition:fill .25s ease}
 .reveal-btn-group:hover .reveal-btn-bg{fill:var(--gold)}
+.reveal-btn-text{font-family:var(--serif);font-weight:700;fill:var(--gold);text-anchor:middle;dominant-baseline:central;pointer-events:none;font-size:14px;transition:fill .25s ease}
+.reveal-btn-group:hover .reveal-btn-text{fill:#1a1410}
 
-/* 总汇按钮 (最底部) */
 .summary-btn{
   display:block;margin:40px auto 0;padding:18px 36px;border:none;
   background:linear-gradient(135deg,var(--gold),var(--warm));color:#1a1410;
   font-family:var(--serif);font-size:16px;font-weight:700;letter-spacing:.04em;
   border-radius:99px;cursor:pointer;
-  box-shadow:0 12px 32px rgba(212,168,88,.4);
+  box-shadow:0 12px 32px rgba(212,168,88,.4),inset 0 1px 0 rgba(255,255,255,.4);
   transition:transform .25s ease, box-shadow .25s ease;
 }
-.summary-btn:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(212,168,88,.55)}
+.summary-btn:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(212,168,88,.55),inset 0 1px 0 rgba(255,255,255,.4)}
 .summary-btn:disabled{opacity:.4;cursor:not-allowed}
 
 /* 详情侧栏 */
 .detail{
-  position:fixed;right:18px;top:74px;width:380px;max-width:calc(100vw - 36px);max-height:calc(100vh - 110px);z-index:28;
-  background:rgba(15,15,28,.96);backdrop-filter:blur(20px);
+  position:fixed;right:18px;top:74px;width:420px;max-width:calc(100vw - 36px);max-height:calc(100vh - 110px);z-index:28;
+  background:rgba(15,15,28,.97);backdrop-filter:blur(24px);
   border:1px solid rgba(212,168,88,.35);border-radius:16px;
   display:none;flex-direction:column;
-  box-shadow:0 24px 60px rgba(0,0,0,.65);
+  box-shadow:0 24px 60px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.06);
 }
 .detail.open{display:flex}
 .detail-head{padding:18px 20px 14px;border-bottom:1px solid rgba(212,168,88,.2);display:flex;align-items:center;gap:10px}
-.detail-head .ic{font-size:30px;flex-shrink:0;width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center}
+.detail-head .ic{font-size:30px;flex-shrink:0;width:54px;height:54px;border-radius:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.3)}
 .detail-head .ti{flex:1;min-width:0}
 .detail-head .ki{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;color:var(--gold);font-weight:700;margin-bottom:3px}
 .detail-head h3{font-family:var(--serif);font-size:18px;color:var(--ink);font-weight:700;line-height:1.2}
@@ -129,19 +117,58 @@ body::before{
 .detail-meta .state{background:rgba(122,216,150,.15);color:#7ad896}
 .detail-q{font-family:var(--serif);font-size:14px;line-height:1.7;color:var(--ink);background:rgba(212,168,88,.08);border-left:3px solid var(--gold);padding:12px 14px;border-radius:0 8px 8px 0;margin-bottom:14px}
 .detail-section{margin-bottom:14px}
-.detail-section .h{font-family:var(--mono);font-size:9.5px;color:var(--warm);letter-spacing:.18em;font-weight:700;margin-bottom:8px;text-transform:uppercase}
+.detail-section .h{font-family:var(--mono);font-size:9.5px;color:var(--warm);letter-spacing:.18em;font-weight:700;margin-bottom:8px;text-transform:uppercase;display:flex;align-items:center;gap:6px}
 .detail-section .b{font-family:var(--serif);font-size:13.5px;line-height:1.85;color:var(--ink2)}
 .detail-narrative{background:rgba(212,168,88,.05);border-radius:10px;padding:14px;border:1px solid rgba(212,168,88,.15)}
 .detail-narrative p{font-family:var(--serif);font-size:13px;line-height:1.85;color:var(--ink);margin-bottom:10px}
 .detail-narrative p:last-child{margin-bottom:0}
 
+/* 子项：事件 / 人物 (可点击进入详情) */
 .evt-mini, .person-mini{
-  background:rgba(232,152,112,.08);border:1px solid rgba(232,152,112,.25);border-radius:8px;
-  padding:10px 12px;margin-bottom:6px;font-size:12.5px;line-height:1.55;color:var(--ink);
+  background:rgba(232,152,112,.08);border:1px solid rgba(232,152,112,.25);border-radius:10px;
+  padding:11px 14px;margin-bottom:7px;font-size:12.5px;line-height:1.55;color:var(--ink);cursor:pointer;
+  transition:all .2s ease;
 }
-.evt-mini .t, .person-mini .t{font-family:var(--serif);font-weight:700;color:var(--warm);margin-bottom:3px}
+.evt-mini:hover, .person-mini:hover{background:rgba(232,152,112,.15);border-color:var(--warm);transform:translateX(-3px)}
+.evt-mini .t, .person-mini .t{font-family:var(--serif);font-weight:700;color:var(--warm);margin-bottom:3px;font-size:13.5px}
 .person-mini{border-color:rgba(122,220,240,.25);background:rgba(122,220,240,.06)}
+.person-mini:hover{background:rgba(122,220,240,.14);border-color:var(--cyan)}
 .person-mini .t{color:var(--cyan)}
+
+/* 事件链条可视化 */
+.chain{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.chain-row{display:flex;align-items:stretch;gap:6px}
+.chain-row .chain-label{font-family:var(--mono);font-size:9px;color:var(--ink3);letter-spacing:.1em;min-width:50px;display:flex;align-items:center;font-weight:700;text-transform:uppercase}
+.chain-row .chain-items{flex:1;display:flex;flex-wrap:wrap;gap:6px}
+.chain-item{
+  padding:8px 12px;border-radius:8px;font-size:12px;line-height:1.4;
+  background:rgba(212,168,88,.1);border:1px solid rgba(212,168,88,.25);
+  cursor:pointer;transition:all .2s ease;
+}
+.chain-item:hover{background:rgba(212,168,88,.22);border-color:var(--gold);transform:translateY(-1px)}
+.chain-item.cause{background:rgba(232,120,120,.08);border-color:rgba(232,120,120,.3);color:#ffb0b0}
+.chain-item.cause:hover{background:rgba(232,120,120,.18);border-color:#ff7878}
+.chain-item.effect{background:rgba(120,200,140,.08);border-color:rgba(120,200,140,.3);color:#a8e0bc}
+.chain-item.effect:hover{background:rgba(120,200,140,.18);border-color:#7ad896}
+.chain-item.center{background:linear-gradient(135deg,var(--gold),var(--warm));color:#1a1410;font-weight:700;border-color:var(--gold);cursor:default}
+
+/* 朋友圈可视化 (mini SVG 关系图) */
+.friend-circle{
+  background:rgba(122,220,240,.04);border:1px solid rgba(122,220,240,.2);border-radius:12px;
+  padding:14px;margin-top:8px;text-align:center;
+}
+.friend-circle-svg{display:block;margin:0 auto 8px;max-width:100%;height:auto}
+.friend-circle .legend{font-family:var(--mono);font-size:10px;color:var(--ink2);letter-spacing:.06em}
+.fc-link{stroke:rgba(122,220,240,.5);stroke-width:1.5;fill:none}
+.fc-link.family{stroke:rgba(232,120,216,.6)}
+.fc-link.enemy{stroke:rgba(232,120,120,.6);stroke-dasharray:4 2}
+.fc-link.mentor{stroke:rgba(212,168,88,.6)}
+.fc-center{fill:var(--gold);filter:drop-shadow(0 0 12px rgba(212,168,88,.6))}
+.fc-node{cursor:pointer;transition:transform .2s ease}
+.fc-node:hover{transform:scale(1.1)}
+.fc-node-bg{fill:var(--cyan);filter:drop-shadow(0 0 8px rgba(122,220,240,.5))}
+.fc-name{font-family:var(--serif);font-size:10px;fill:white;text-anchor:middle;pointer-events:none;font-weight:700}
+.fc-rel-label{font-family:var(--mono);font-size:8px;fill:var(--cyan);text-anchor:middle;pointer-events:none;letter-spacing:.06em}
 
 /* 总汇模态 */
 .summary-modal{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);display:none;align-items:flex-start;justify-content:center;padding:24px;overflow-y:auto}
@@ -187,7 +214,7 @@ body::before{
   <div class="intro">
     <h2>🌌 从前 3500 到前 1000 · 一张连续的历史地图</h2>
     <p>每个椭圆 = 一个 500 年时期，里面是当时活跃的文明。
-    点击任何 ◯ 文明 → 看它的故事。
+    点击任何 ◯ 文明 → 看它的故事 + 事件链 + 人物朋友圈。
     同一个文明跨越多个时期 → 自动用<strong style="color:var(--gold)">金色线</strong>连接上下。
     点击下方"<strong>展开下一段 500 年 ↓</strong>"按钮，地图慢慢长出来，最后看到完整 2500 年。</p>
   </div>
@@ -216,20 +243,17 @@ body::before{
 <script src="./chapters_data.js"></script>
 <script>
 // ════════════════════════════════════════════════
-// 布局参数 · 一张连续长图
+// 布局
 // ════════════════════════════════════════════════
 const SVG_W = 1400;
-const RING_H = 200;           // 椭圆高
-const RING_W = 1080;          // 椭圆宽
-const RING_GAP = 200;         // 椭圆之间的纵向间距
-const RING_X = SVG_W/2;       // 椭圆中心 x
-
-// 每个 ring 高度 + gap，但 ring center 在 (RING_H/2 + i * (RING_H + RING_GAP)) + topPad
-const TOP_PAD = 80;
+const RING_H = 220;
+const RING_W = 1100;
+const RING_GAP = 200;
+const RING_X = SVG_W/2;
+const TOP_PAD = 90;
 function ringCenterY(i){ return TOP_PAD + RING_H/2 + i * (RING_H + RING_GAP); }
 const SVG_H = TOP_PAD + 5 * RING_H + 4 * RING_GAP + 80;
 
-// 文明 → 通道号 (lane)，跨越多个 ring 时占同一 lane，自动连线
 const LANE_OF = {
   sumer: 1,
   egypt_predynastic: 2, egypt_old: 2, egypt_new: 2,
@@ -241,17 +265,17 @@ const LANE_OF = {
 };
 const MAX_LANES = 7;
 function laneX(lane){
-  const padL = 220, padR = 80;
-  const usable = RING_W - 160; // 椭圆内可用 (留点边距)
+  const padL = 220;
+  const usable = RING_W - 160;
   const startX = RING_X - usable/2 + 40;
-  return startX + (lane - 1) * (usable / (MAX_LANES));
+  return startX + (lane - 1) * (usable / MAX_LANES);
 }
 
 // ════════════════════════════════════════════════
 // 状态
 // ════════════════════════════════════════════════
-let revealedChapters = 1;     // 已展开几个 ring (1..5)
-const studied = new Set();    // civ id 集合
+let revealedChapters = 1;
+const studied = new Set();
 
 function getCivInfo(id){
   if (typeof EARLY_CIV_EXPLORER!=='undefined') {
@@ -263,116 +287,219 @@ function getCivInfo(id){
 }
 
 // ════════════════════════════════════════════════
-// 渲染整张图
+// 一次性渲染整张图 (后续只改 class，不重新渲染)
 // ════════════════════════════════════════════════
-function render(){
-  let html = `<svg class="map-svg" viewBox="0 0 ${SVG_W} ${SVG_H}" preserveAspectRatio="xMidYMid meet">
-    <defs>
-      <radialGradient id="ringGlow"><stop offset="0%" stop-color="rgba(212,168,88,.15)"/><stop offset="100%" stop-color="transparent"/></radialGradient>
-    </defs>`;
+function buildSVG(){
+  // 收集所有 civ 颜色，生成 sphere 渐变 + 阴影滤镜
+  const civColors = new Set();
+  CHAPTERS.forEach(ch=>ch.active_civs.forEach(c=>{
+    const info = getCivInfo(c.id);
+    civColors.add(info.color);
+  }));
 
-  // 1. 先画跨 ring 的传承连线 (在节点之下)
+  let defs = `<defs>
+    <!-- 椭圆 ring 的渐变 + 光晕 -->
+    <radialGradient id="ringHalo" cx="50%" cy="50%">
+      <stop offset="60%" stop-color="rgba(212,168,88,0)"/>
+      <stop offset="100%" stop-color="rgba(212,168,88,.15)"/>
+    </radialGradient>
+    <linearGradient id="ringStroke" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255,212,160,.8)"/>
+      <stop offset="50%" stop-color="rgba(212,168,88,.5)"/>
+      <stop offset="100%" stop-color="rgba(120,90,40,.6)"/>
+    </linearGradient>
+    <!-- 3D 球体阴影滤镜 -->
+    <filter id="sphereDrop" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dx="0" dy="4"/>
+      <feComposite in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="shadow"/>
+      <feFlood flood-color="#000" flood-opacity=".55"/>
+      <feComposite in2="shadow" operator="in"/>
+      <feComposite in2="SourceGraphic" operator="over"/>
+    </filter>
+    <!-- 内发光 -->
+    <filter id="innerLight"><feGaussianBlur stdDeviation="2" result="b"/><feBlend in="SourceGraphic" in2="b"/></filter>`;
+
+  // 每个 civ 颜色一个 sphere 渐变 (3D 球感)
+  [...civColors].forEach(color=>{
+    const id = 'sphere_' + color.replace('#','');
+    defs += `<radialGradient id="${id}" cx="32%" cy="28%" r="80%">
+      <stop offset="0%" stop-color="rgba(255,255,255,.85)"/>
+      <stop offset="18%" stop-color="rgba(255,255,255,.4)"/>
+      <stop offset="55%" stop-color="${color}"/>
+      <stop offset="100%" stop-color="${darken(color, 0.4)}"/>
+    </radialGradient>`;
+  });
+
+  defs += `</defs>`;
+
+  let html = `<svg class="map-svg" viewBox="0 0 ${SVG_W} ${SVG_H}" preserveAspectRatio="xMidYMid meet">${defs}`;
+
+  // 1. 传承连线 (在所有节点之下)
   for (let i=0; i<4; i++){
-    if (i+1 >= revealedChapters) continue; // 还没展开下一个 ring
     const upper = CHAPTERS[i];
     const lower = CHAPTERS[i+1];
-    // 收集 upper 中每个 civ 的 lane
     const upperLanes = {};
     upper.active_civs.forEach(c=>{ upperLanes[LANE_OF[c.id]] = c; });
     lower.active_civs.forEach(lc=>{
       const lane = LANE_OF[lc.id];
       if (upperLanes[lane]) {
-        // 上下两个 ring 同一 lane 有 civ → 画传承线
-        const y1 = ringCenterY(i) + RING_H/2 - 30;     // 上 ring 底部
-        const y2 = ringCenterY(i+1) - RING_H/2 + 30;   // 下 ring 顶部
+        const y1 = ringCenterY(i) + RING_H/2 - 50;
+        const y2 = ringCenterY(i+1) - RING_H/2 + 50;
         const x  = laneX(lane);
-        const path = `M ${x} ${y1} C ${x} ${y1+40}, ${x} ${y2-40}, ${x} ${y2}`;
-        html += `<path class="carryover-line" d="${path}"/>`;
+        const path = `M ${x} ${y1} C ${x} ${y1+50}, ${x} ${y2-50}, ${x} ${y2}`;
+        html += `<path class="carryover-line" data-upper="${i}" data-lower="${i+1}" d="${path}"/>`;
       }
     });
   }
 
-  // 2. 画每个 ring
+  // 2. 每个 ring + 节点
   CHAPTERS.forEach((ch, idx)=>{
     const cy = ringCenterY(idx);
-    const lockedCls = (idx >= revealedChapters) ? 'locked' : '';
-    html += `<g class="ring-group ${lockedCls}" data-idx="${idx}">`;
-    // 椭圆背景
-    html += `<ellipse cx="${RING_X}" cy="${cy}" rx="${RING_W/2}" ry="${RING_H/2}" class="ring-fill"/>`;
-    html += `<ellipse cx="${RING_X}" cy="${cy}" rx="${RING_W/2}" ry="${RING_H/2}" class="ring-outline"/>`;
+    html += `<g class="ring-group ${idx>=revealedChapters?'locked':''}" data-idx="${idx}">`;
+    // 椭圆光晕 (在下面，外发光)
+    html += `<ellipse cx="${RING_X}" cy="${cy}" rx="${RING_W/2 + 40}" ry="${RING_H/2 + 30}" fill="url(#ringHalo)"/>`;
+    // 椭圆主体
+    html += `<ellipse cx="${RING_X}" cy="${cy}" rx="${RING_W/2}" ry="${RING_H/2}" fill="rgba(212,168,88,.04)" stroke="url(#ringStroke)" stroke-width="2.5"/>`;
+    // 顶部高光弧
+    html += `<path d="M ${RING_X-RING_W/2+50} ${cy-RING_H/2+5} Q ${RING_X} ${cy-RING_H/2-12} ${RING_X+RING_W/2-50} ${cy-RING_H/2+5}" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/>`;
 
-    // 左侧标签
+    // 左侧标签 (3D 浮雕)
     const labelX = 30, labelY = cy - 20;
-    html += `<rect x="${labelX}" y="${labelY-26}" width="170" height="64" rx="10" class="ring-label-bg"/>`;
-    html += `<text x="${labelX+14}" y="${labelY-6}" class="ring-label-range" font-size="10">CHAPTER ${ch.no}</text>`;
-    html += `<text x="${labelX+14}" y="${labelY+13}" class="ring-label-title" font-size="14">${ch.title}</text>`;
-    html += `<text x="${labelX+14}" y="${labelY+28}" class="ring-label-range" font-size="10">${ch.range}</text>`;
+    html += `<g filter="url(#sphereDrop)"><rect x="${labelX}" y="${labelY-26}" width="170" height="68" rx="12" fill="rgba(15,15,28,.92)" stroke="rgba(212,168,88,.45)" stroke-width="1.5"/></g>`;
+    html += `<text x="${labelX+14}" y="${labelY-6}" font-family="var(--mono)" font-size="10" fill="var(--ink2)" letter-spacing=".1em">CHAPTER ${ch.no}</text>`;
+    html += `<text x="${labelX+14}" y="${labelY+13}" font-family="var(--serif)" font-size="15" font-weight="900" fill="var(--gold)">${ch.title}</text>`;
+    html += `<text x="${labelX+14}" y="${labelY+30}" font-family="var(--mono)" font-size="10" fill="var(--ink2)" letter-spacing=".1em">${ch.range}</text>`;
 
-    // 在椭圆内画 civ 节点
+    // civ 节点
     ch.active_civs.forEach(cv=>{
       const lane = LANE_OF[cv.id] || 1;
       const x = laneX(lane);
       const y = cy;
       const info = getCivInfo(cv.id);
-      const civNodeId = `${idx}:${cv.id}`;
-      const isStudied = studied.has(civNodeId);
+      const sphereId = 'sphere_' + info.color.replace('#','');
       const stateCls = cv.state==='巅峰'?'peak': (cv.state==='崩溃'||cv.state==='集体崩溃'?'collapse': (cv.state==='衰落'?'fade':'rise'));
+      const stateColor = cv.state==='巅峰'?'#7ad896': (cv.state.includes('崩溃')?'#ff7878': (cv.state==='衰落'?'#a8b0c8':'#d4a858'));
 
-      html += `<g class="civ-dot ${isStudied?'studied':''}" data-ch="${idx}" data-id="${cv.id}" transform="translate(${x},${y})" style="color:${info.color}">
-        <circle r="44" fill="url(#ringGlow)"/>
-        <circle r="28" fill="${info.color}" class="civ-circle" stroke="rgba(255,255,255,.4)" stroke-width="1.5"/>
-        <text text-anchor="middle" dominant-baseline="central" font-size="22">${info.icon}</text>
-        <text class="civ-label" y="48" font-size="11.5">${info.name}</text>
-        <text class="civ-state ${stateCls}" y="62" font-size="9">${cv.state}</text>
-        ${isStudied ? `<g transform="translate(20,-22)"><circle r="8" class="studied-tick"/><text class="studied-tick-text">✓</text></g>` : ''}
+      html += `<g class="civ-dot" data-ch="${idx}" data-id="${cv.id}" transform="translate(${x},${y})" style="color:${info.color}">
+        <!-- 外光晕 -->
+        <circle r="46" fill="${info.color}" opacity=".10"/>
+        <circle r="36" fill="${info.color}" opacity=".18"/>
+        <!-- 3D 球体 -->
+        <g filter="url(#sphereDrop)">
+          <circle class="civ-circle" r="30" fill="url(#${sphereId})" stroke="rgba(255,255,255,.35)" stroke-width="1.5"/>
+        </g>
+        <!-- 顶部高光小椭圆 (玻璃质感) -->
+        <ellipse cx="-7" cy="-12" rx="11" ry="5" fill="rgba(255,255,255,.55)" transform="rotate(-25 -7 -12)"/>
+        <!-- 图标 -->
+        <text text-anchor="middle" dominant-baseline="central" font-size="24" style="pointer-events:none">${info.icon}</text>
+        <!-- 名字 -->
+        <text class="civ-label" y="52" font-size="12">${info.name}</text>
+        <text class="civ-state" y="68" font-size="9.5" fill="${stateColor}">${cv.state}</text>
+        <!-- 学过标记 (默认 opacity 0) -->
+        <g class="studied-mark" transform="translate(22,-22)">
+          <circle r="10" fill="#7ad896" stroke="white" stroke-width="2" filter="url(#sphereDrop)"/>
+          <text y="0" text-anchor="middle" dominant-baseline="central" font-family="var(--mono)" font-size="11" font-weight="700" fill="white">✓</text>
+        </g>
       </g>`;
     });
-
     html += `</g>`;
 
-    // 在 ring 下方插入 "下一段 500 年" 按钮 (除最后一个 ring)
+    // 下一段按钮
     if (idx < CHAPTERS.length-1) {
       const btnY = cy + RING_H/2 + RING_GAP/2;
-      const isNext = (idx + 1 === revealedChapters); // 当前可点开下一段
-      const hasUnlocked = (idx + 1 < revealedChapters); // 已经解锁过了
-      if (isNext) {
-        html += `<g class="reveal-btn-group" onclick="revealNext()" data-idx="${idx+1}" style="cursor:pointer">
-          <rect class="reveal-btn-bg" x="${RING_X-140}" y="${btnY-22}" width="280" height="44" rx="22"/>
-          <text class="reveal-btn-text" x="${RING_X}" y="${btnY}">⤓ 展开下一段 500 年 ↓</text>
-        </g>`;
-      } else if (hasUnlocked) {
-        // 已经展开，不显示按钮（连线说明继承）
-      }
+      const isActive = (idx + 1 === revealedChapters);
+      html += `<g class="reveal-btn-group ${isActive?'':'hidden'}" data-idx="${idx+1}" onclick="revealNext()">
+        <rect class="reveal-btn-bg" x="${RING_X-150}" y="${btnY-24}" width="300" height="48" rx="24" filter="url(#sphereDrop)"/>
+        <text class="reveal-btn-text" x="${RING_X}" y="${btnY}">⤓ 展开下一段 500 年 ↓</text>
+      </g>`;
     }
   });
 
   html += `</svg>`;
   document.getElementById('mapContainer').innerHTML = html;
 
-  // 绑定 civ 点击
+  // 一次性绑定
   document.querySelectorAll('.civ-dot').forEach(el=>{
     el.addEventListener('click', ()=>{
-      const chIdx = parseInt(el.dataset.ch);
-      const civId = el.dataset.id;
-      onCivClick(chIdx, civId);
+      onCivClick(parseInt(el.dataset.ch), el.dataset.id);
     });
   });
 
-  // 进度
-  document.getElementById('progress').textContent = `已学 ${studied.size} 个文明 · ${revealedChapters}/5 段已展开`;
-  document.getElementById('summaryBtn').disabled = (revealedChapters < 5);
+  updateCarryoverVisibility();
+  updateProgress();
 }
 
 // ════════════════════════════════════════════════
-// 点击文明 → 详情
+// 状态变更 (不重新渲染 SVG, 只改 class)
 // ════════════════════════════════════════════════
 function onCivClick(chIdx, civId){
   const nodeId = `${chIdx}:${civId}`;
   studied.add(nodeId);
-  render();
+  // 只更新一个节点
+  const el = document.querySelector(`.civ-dot[data-ch="${chIdx}"][data-id="${civId}"]`);
+  if (el) el.classList.add('studied');
+  updateProgress();
   showDetail(chIdx, civId);
 }
 
+function updateCarryoverVisibility(){
+  // 连线只在上下两个 ring 都展开时才显示
+  document.querySelectorAll('.carryover-line').forEach(l=>{
+    const lower = parseInt(l.dataset.lower);
+    if (lower < revealedChapters) l.classList.add('visible');
+    else l.classList.remove('visible');
+  });
+}
+
+function revealNext(){
+  if (revealedChapters >= 5) return;
+  // 取消旧按钮高亮
+  const oldBtn = document.querySelector(`.reveal-btn-group[data-idx="${revealedChapters}"]`);
+  if (oldBtn) oldBtn.classList.add('hidden');
+  // 解锁下一个 ring
+  revealedChapters++;
+  const ringEl = document.querySelector(`.ring-group[data-idx="${revealedChapters-1}"]`);
+  if (ringEl) ringEl.classList.remove('locked');
+  // 显示新按钮
+  if (revealedChapters < 5) {
+    const newBtn = document.querySelector(`.reveal-btn-group[data-idx="${revealedChapters}"]`);
+    if (newBtn) newBtn.classList.remove('hidden');
+  }
+  updateCarryoverVisibility();
+  updateProgress();
+  // 平滑滚动到新 ring
+  setTimeout(()=>{
+    ringEl?.scrollIntoView({behavior:'smooth', block:'center'});
+  }, 200);
+}
+
+function resetAll(){
+  revealedChapters = 1;
+  studied.clear();
+  closeDetail();
+  // 重置所有节点状态
+  document.querySelectorAll('.civ-dot.studied').forEach(el=>el.classList.remove('studied'));
+  document.querySelectorAll('.ring-group').forEach(el=>{
+    const idx = parseInt(el.dataset.idx);
+    el.classList.toggle('locked', idx >= 1);
+  });
+  document.querySelectorAll('.reveal-btn-group').forEach(el=>{
+    el.classList.toggle('hidden', parseInt(el.dataset.idx) !== 1);
+  });
+  updateCarryoverVisibility();
+  updateProgress();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function updateProgress(){
+  document.getElementById('progress').textContent = `已学 ${studied.size} 个 · ${revealedChapters}/5 段已展开`;
+  document.getElementById('summaryBtn').disabled = (revealedChapters < 5);
+}
+
+// ════════════════════════════════════════════════
+// 详情 · 文明
+// ════════════════════════════════════════════════
 function showDetail(chIdx, civId){
   const ch = CHAPTERS[chIdx];
   const cv = ch.active_civs.find(c=>c.id===civId);
@@ -385,9 +512,8 @@ function showDetail(chIdx, civId){
   document.getElementById('dKi').textContent = `第 ${ch.no} 章 · ${ch.range} BCE`;
   document.getElementById('dTitle').textContent = info.name;
 
-  // 找该文明的事件 + 人物的深度数据
-  const events = (cv.L3_events||[]).map(eid => ({id:eid, deep:(typeof EVENT_DEEP!=='undefined')?EVENT_DEEP[eid]:null}));
-  const people = (cv.L4_people||[]).map(pid => ({id:pid, deep:(typeof PERSON_DEEP!=='undefined')?PERSON_DEEP[pid]:null}));
+  const events = (cv.L3_events||[]).map(eid => ({id:eid, deep:EVENT_DEEP?.[eid]}));
+  const people = (cv.L4_people||[]).map(pid => ({id:pid, deep:PERSON_DEEP?.[pid]}));
 
   document.getElementById('dBody').innerHTML = `
     <div class="detail-meta">
@@ -401,12 +527,12 @@ function showDetail(chIdx, civId){
       <div class="b">${cv.L2||cv.in_period_summary||''}</div>
     </div>
     ${events.length?`<div class="detail-section">
-      <div class="h">📅 关键事件 · ${events.length} 个</div>
-      ${events.map(e=>e.deep?`<div class="evt-mini"><div class="t">${e.deep.full_title}</div>${e.deep.one_liner||''}</div>`:`<div class="evt-mini"><div class="t">${e.id}</div>深度叙事待补</div>`).join('')}
+      <div class="h">📅 关键事件 · ${events.length} 个 · 点击看详情</div>
+      ${events.map(e=>e.deep?`<div class="evt-mini" onclick="showEventDetail('${e.id}')"><div class="t">${e.deep.full_title}</div>${e.deep.one_liner||''}</div>`:`<div class="evt-mini" style="cursor:default;opacity:.6"><div class="t">${e.id}</div>深度叙事待补</div>`).join('')}
     </div>`:''}
     ${people.length?`<div class="detail-section">
-      <div class="h">👤 关键人物 · ${people.length} 个</div>
-      ${people.map(p=>p.deep?`<div class="person-mini"><div class="t">${p.deep.full_name}</div>${(p.deep.biography||'').slice(0,140).trim()}...</div>`:`<div class="person-mini"><div class="t">${p.id}</div>传记待补</div>`).join('')}
+      <div class="h">👤 关键人物 · ${people.length} 个 · 点击看朋友圈</div>
+      ${people.map(p=>p.deep?`<div class="person-mini" onclick="showPersonDetail('${p.id}')"><div class="t">${p.deep.full_name}</div>${(p.deep.biography||'').slice(0,120).trim()}...</div>`:`<div class="person-mini" style="cursor:default;opacity:.6"><div class="t">${p.id}</div>传记待补</div>`).join('')}
     </div>`:''}
     ${cv.L5_full && civId==='sumer' && CIV_DEEP?.sumer ? `<div class="detail-section">
       <div class="h">📜 完整文明叙事</div>
@@ -415,30 +541,152 @@ function showDetail(chIdx, civId){
   `;
 }
 
+// ════════════════════════════════════════════════
+// 详情 · 事件 + 事件链
+// ════════════════════════════════════════════════
+function showEventDetail(eid){
+  const e = EVENT_DEEP?.[eid];
+  if (!e) return;
+  document.getElementById('detail').classList.add('open');
+  document.getElementById('dIc').textContent = '📅';
+  document.getElementById('dIc').style.background = 'rgba(232,152,112,.25)';
+  document.getElementById('dKi').textContent = '历史事件';
+  document.getElementById('dTitle').textContent = e.full_title;
+
+  // 事件链：起因 → 此事件 → 后果
+  const causes = parseChainText(e.context_before);
+  const effects = parseChainText(e.leads_to);
+
+  document.getElementById('dBody').innerHTML = `
+    <div class="detail-q">💡 ${e.one_liner||''}</div>
+    <div class="detail-section">
+      <div class="h">🔗 事件链条</div>
+      <div class="chain">
+        ${causes.length?`<div class="chain-row"><span class="chain-label">起因</span><div class="chain-items">${causes.map(c=>`<div class="chain-item cause">${c}</div>`).join('')}</div></div>`:''}
+        <div class="chain-row"><span class="chain-label">此事件</span><div class="chain-items"><div class="chain-item center">${e.full_title}</div></div></div>
+        ${effects.length?`<div class="chain-row"><span class="chain-label">导致</span><div class="chain-items">${effects.map(c=>`<div class="chain-item effect">${c}</div>`).join('')}</div></div>`:''}
+      </div>
+    </div>
+    <div class="detail-section">
+      <div class="h">📖 事件叙事</div>
+      <div class="detail-narrative">${e.narrative.trim().split(/\n\s*\n/).map(p=>'<p>'+p.trim()+'</p>').join('')}</div>
+    </div>
+    ${e.what_happened?`<div class="detail-section">
+      <div class="h">📅 时间线</div>
+      ${e.what_happened.map(t=>`<div class="evt-mini" style="cursor:default">${t}</div>`).join('')}
+    </div>`:''}
+    ${e.significance?`<div class="detail-section">
+      <div class="h">🎯 历史意义</div>
+      <div class="b">${e.significance}</div>
+    </div>`:''}
+    ${e.evidence?`<div class="detail-section">
+      <div class="h">🏺 考古证据</div>
+      ${e.evidence.map(ev=>`<div class="evt-mini" style="cursor:default;border-color:rgba(212,168,88,.3);background:rgba(212,168,88,.06)"><div class="t" style="color:var(--gold)">${ev.artifact}</div>${ev.what}<div style="margin-top:4px;font-family:var(--mono);font-size:10px;color:var(--ink3)">📍 ${ev.held}</div></div>`).join('')}
+    </div>`:''}
+  `;
+}
+
+function parseChainText(text){
+  if (!text) return [];
+  // 把 "A → B → C" 或 "A; B; C" 或简单文字拆成短句
+  return text.split(/→|;|；/).map(s=>s.trim()).filter(s=>s.length>0 && s.length<60).slice(0,4);
+}
+
+// ════════════════════════════════════════════════
+// 详情 · 人物 + 朋友圈
+// ════════════════════════════════════════════════
+function showPersonDetail(pid){
+  const p = PERSON_DEEP?.[pid];
+  if (!p) return;
+  document.getElementById('detail').classList.add('open');
+  document.getElementById('dIc').textContent = '👤';
+  document.getElementById('dIc').style.background = 'rgba(122,220,240,.25)';
+  document.getElementById('dKi').textContent = '历史人物';
+  document.getElementById('dTitle').textContent = p.full_name;
+
+  // 渲染朋友圈 SVG
+  const friendCircleSVG = renderFriendCircle(pid, p);
+
+  document.getElementById('dBody').innerHTML = `
+    <div class="detail-meta">
+      ${p.pronunciation?`<span>🔉 ${p.pronunciation}</span>`:''}
+      ${p.lifespan_real?`<span>📅 ${p.lifespan_real}</span>`:''}
+    </div>
+    ${p.historical_or_mythic?`<div class="detail-q">${p.historical_or_mythic}</div>`:''}
+    ${friendCircleSVG?`<div class="detail-section">
+      <div class="h">🤝 朋友圈 / 关系网</div>
+      <div class="friend-circle">
+        ${friendCircleSVG}
+        <div class="legend">中心紫色 = 当前人物 · 蓝色 = 关系人 · 点击进入</div>
+      </div>
+    </div>`:''}
+    <div class="detail-section">
+      <div class="h">📖 完整传记</div>
+      <div class="detail-narrative">${p.biography.trim().split(/\n\s*\n/).map(p=>'<p>'+p.trim()+'</p>').join('')}</div>
+    </div>
+    ${p.achievements_detail?`<div class="detail-section">
+      <div class="h">🏆 详细成就</div>
+      ${p.achievements_detail.map(a=>`<div class="evt-mini" style="cursor:default"><div class="t">${a.name}</div>${a.detail}<div style="margin-top:4px;font-family:var(--mono);font-size:10px;color:var(--ink3)">📜 ${a.proof}</div></div>`).join('')}
+    </div>`:''}
+    ${p.legacy?`<div class="detail-section">
+      <div class="h">🌟 历史遗产</div>
+      <div class="b">${p.legacy.trim().split(/\n\s*\n/)[0]}</div>
+    </div>`:''}
+  `;
+}
+
+function renderFriendCircle(pid, p){
+  if (!p.related || p.related.length===0) return '';
+  // 同时也找出所有指向这个人的人
+  const incoming = [];
+  Object.entries(PERSON_DEEP||{}).forEach(([otherId, other])=>{
+    if (otherId === pid) return;
+    (other.related||[]).forEach(r=>{
+      if (r.id === pid && !p.related.find(x=>x.id===otherId)) {
+        incoming.push({id: otherId, relation: r.relation, note: r.note});
+      }
+    });
+  });
+  const allRelations = [...p.related, ...incoming];
+  if (allRelations.length === 0) return '';
+
+  const W = 360, H = 220;
+  const cx = W/2, cy = H/2;
+  const r = 70;
+  const n = allRelations.length;
+  let svg = `<svg class="friend-circle-svg" viewBox="0 0 ${W} ${H}">`;
+  // 关系连线先画
+  allRelations.forEach((rel, i)=>{
+    const angle = -Math.PI/2 + (i - (n-1)/2) * (Math.PI*1.2/Math.max(n,1));
+    const x = cx + Math.cos(angle)*r;
+    const y = cy + Math.sin(angle)*r;
+    const relCls = rel.relation==='家人'||rel.relation==='妻子'||rel.relation==='丈夫'||rel.relation==='母亲'?'family':
+                   rel.relation==='敌人'?'enemy':
+                   rel.relation==='师承'||rel.relation==='宰相'||rel.relation==='主君'?'mentor':'';
+    svg += `<line class="fc-link ${relCls}" x1="${cx}" y1="${cy}" x2="${x}" y2="${y}"/>`;
+    svg += `<text class="fc-rel-label" x="${(cx+x)/2}" y="${(cy+y)/2 - 4}">${rel.relation}</text>`;
+  });
+  // 中心人物
+  svg += `<g><circle class="fc-center" cx="${cx}" cy="${cy}" r="20"/><text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="central" font-size="14" fill="#1a1410" font-weight="900">👤</text></g>`;
+  svg += `<text x="${cx}" y="${cy+34}" text-anchor="middle" font-family="var(--serif)" font-size="11" font-weight="700" fill="var(--gold)">${(p.full_name||pid).split(' ')[0]}</text>`;
+  // 关系人节点
+  allRelations.forEach((rel, i)=>{
+    const angle = -Math.PI/2 + (i - (n-1)/2) * (Math.PI*1.2/Math.max(n,1));
+    const x = cx + Math.cos(angle)*r;
+    const y = cy + Math.sin(angle)*r;
+    const otherP = PERSON_DEEP?.[rel.id];
+    const otherName = (otherP?.full_name || rel.id).split(' ')[0];
+    svg += `<g class="fc-node" onclick="showPersonDetail('${rel.id}')">`;
+    svg += `<circle class="fc-node-bg" cx="${x}" cy="${y}" r="16"/>`;
+    svg += `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="12" style="pointer-events:none">👤</text>`;
+    svg += `<text class="fc-name" x="${x}" y="${y+28}">${otherName}</text>`;
+    svg += `</g>`;
+  });
+  svg += `</svg>`;
+  return svg;
+}
+
 function closeDetail(){ document.getElementById('detail').classList.remove('open'); }
-
-// ════════════════════════════════════════════════
-// 展开下一段 + 重置
-// ════════════════════════════════════════════════
-function revealNext(){
-  if (revealedChapters < 5) {
-    revealedChapters++;
-    render();
-    // 平滑滚动到新展开的 ring
-    setTimeout(()=>{
-      const newRing = document.querySelector(`.ring-group[data-idx="${revealedChapters-1}"]`);
-      if (newRing) newRing.scrollIntoView({behavior:'smooth', block:'center'});
-    }, 100);
-  }
-}
-
-function resetAll(){
-  revealedChapters = 1;
-  studied.clear();
-  closeDetail();
-  render();
-  window.scrollTo({top:0, behavior:'smooth'});
-}
 
 // ════════════════════════════════════════════════
 // 总汇
@@ -471,13 +719,24 @@ function openSummary(){
 }
 function closeSummary(){ document.getElementById('summary').classList.remove('open'); }
 
+// 工具：颜色变暗
+function darken(hex, amount){
+  const c = hex.replace('#','');
+  const r = Math.max(0, parseInt(c.slice(0,2),16) - Math.round(255*amount));
+  const g = Math.max(0, parseInt(c.slice(2,4),16) - Math.round(255*amount));
+  const b = Math.max(0, parseInt(c.slice(4,6),16) - Math.round(255*amount));
+  return '#' + [r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+
 // 初始化
-render();
+buildSVG();
 window.revealNext = revealNext;
 window.resetAll = resetAll;
 window.closeDetail = closeDetail;
 window.openSummary = openSummary;
 window.closeSummary = closeSummary;
+window.showEventDetail = showEventDetail;
+window.showPersonDetail = showPersonDetail;
 </script>
 </body>
 </html>
