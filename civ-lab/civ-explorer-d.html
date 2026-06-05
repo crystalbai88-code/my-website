@@ -179,10 +179,11 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 .tooltip .cta{font-family:var(--mono);font-size:9.5px;color:var(--vermilion);letter-spacing:.12em;font-weight:700}
 
 /* 总汇 */
-.summary-btn{position:fixed;bottom:18px;right:24px;z-index:25;background:linear-gradient(135deg,var(--gold),var(--vermilion));color:white;border:none;padding:13px 22px;border-radius:99px;cursor:pointer;font-family:var(--serif);font-size:14px;font-weight:700;letter-spacing:.04em;box-shadow:0 8px 24px rgba(212,168,88,.5);transition:transform .2s}
-.summary-btn:hover{transform:translateY(-3px)}
-.map-btn{position:fixed;bottom:18px;right:200px;z-index:25;background:linear-gradient(135deg,#3a8868,#2a6850);color:white;border:none;padding:13px 22px;border-radius:99px;cursor:pointer;font-family:var(--serif);font-size:14px;font-weight:700;letter-spacing:.04em;box-shadow:0 8px 24px rgba(58,136,104,.5);transition:transform .2s}
-.map-btn:hover{transform:translateY(-3px)}
+/* 右侧竖排圆形操作按钮 (总汇 / 地图 / AI 一列) */
+.summary-btn{position:fixed;right:22px;bottom:206px;z-index:25;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--vermilion));color:white;border:none;cursor:pointer;font-size:24px;box-shadow:0 8px 22px rgba(212,168,88,.45);transition:transform .2s;display:flex;align-items:center;justify-content:center}
+.summary-btn:hover{transform:scale(1.08)}
+.map-btn{position:fixed;right:22px;bottom:140px;z-index:25;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#3a8868,#2a6850);color:white;border:none;cursor:pointer;font-size:24px;box-shadow:0 8px 22px rgba(58,136,104,.45);transition:transform .2s;display:flex;align-items:center;justify-content:center}
+.map-btn:hover{transform:scale(1.08)}
 .map-legend-item{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#5c4530;font-family:'Noto Sans SC',sans-serif;cursor:pointer;padding:3px 8px;border-radius:99px;border:1px solid rgba(184,136,48,.25)}
 .map-legend-item:hover{background:rgba(184,136,48,.1)}
 .map-legend-item .dot{width:12px;height:12px;border-radius:50%;border:1.5px solid #fff;flex-shrink:0}
@@ -219,7 +220,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 @media (max-width:768px){.topbar h1{font-size:13px}.topbar .hint{display:none}.ai-panel{right:8px!important;left:8px!important;width:auto!important}}
 
 /* AI 浮动按钮 + 面板 */
-.ai-fab{position:fixed;right:24px;bottom:78px;z-index:45;width:58px;height:58px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,var(--gold),var(--vermilion));color:white;font-size:26px;box-shadow:0 8px 24px rgba(212,168,88,.5);transition:transform .2s}
+.ai-fab{position:fixed;right:22px;bottom:74px;z-index:45;width:56px;height:56px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,#5a7aa8,#2d4a7c);color:white;font-size:24px;box-shadow:0 8px 22px rgba(45,74,124,.45);transition:transform .2s;display:flex;align-items:center;justify-content:center}
 .ai-fab:hover{transform:scale(1.08)}
 .ai-panel{position:fixed;right:24px;bottom:148px;z-index:46;width:380px;max-width:calc(100vw - 48px);height:500px;max-height:calc(100vh - 200px);background:rgba(15,15,28,.97);backdrop-filter:blur(24px);border:1px solid rgba(212,168,88,.4);border-radius:16px;display:none;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.7)}
 .ai-panel.open{display:flex}
@@ -270,8 +271,8 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
   </div>
 </div>
 
-<button class="summary-btn" onclick="openSummary()">🏁 全景总汇表</button>
-<button class="map-btn" onclick="openWorldMap()">🗺 文明总地图</button>
+<button class="summary-btn" onclick="openSummary()" title="全景总汇表">🏁</button>
+<button class="map-btn" onclick="openWorldMap()" title="文明总地图">🗺</button>
 
 <div class="summary-modal" id="worldMapModal">
   <div class="summary-content" style="max-width:1200px;padding:24px">
