@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>历史宇宙 · 早期文明时间网络</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Cinzel:wght@500;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 :root{
   --bg:#02030a; --ink:#f0e8d5; --ink2:#a8b0c8; --ink3:#5a6080;
@@ -129,6 +131,17 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 /* 总汇 */
 .summary-btn{position:fixed;bottom:18px;right:24px;z-index:25;background:linear-gradient(135deg,var(--gold),var(--vermilion));color:white;border:none;padding:13px 22px;border-radius:99px;cursor:pointer;font-family:var(--serif);font-size:14px;font-weight:700;letter-spacing:.04em;box-shadow:0 8px 24px rgba(212,168,88,.5);transition:transform .2s}
 .summary-btn:hover{transform:translateY(-3px)}
+.map-btn{position:fixed;bottom:18px;right:200px;z-index:25;background:linear-gradient(135deg,#3a8868,#2a6850);color:white;border:none;padding:13px 22px;border-radius:99px;cursor:pointer;font-family:var(--serif);font-size:14px;font-weight:700;letter-spacing:.04em;box-shadow:0 8px 24px rgba(58,136,104,.5);transition:transform .2s}
+.map-btn:hover{transform:translateY(-3px)}
+.map-legend-item{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#5c4530;font-family:'Noto Sans SC',sans-serif;cursor:pointer;padding:3px 8px;border-radius:99px;border:1px solid rgba(184,136,48,.25)}
+.map-legend-item:hover{background:rgba(184,136,48,.1)}
+.map-legend-item .dot{width:12px;height:12px;border-radius:50%;border:1.5px solid #fff;flex-shrink:0}
+.world-tip{background:rgba(44,26,8,.88)!important;color:#fff!important;border:none!important;border-radius:4px!important;font-size:10px!important;padding:1px 6px!important;box-shadow:0 2px 5px rgba(0,0,0,.4)!important}
+.world-tip::before{display:none!important}
+.leaflet-popup-content{font-family:'Noto Sans SC',sans-serif;font-size:12.5px;line-height:1.6}
+.leaflet-popup-content b{color:#c84820}
+.leaflet-popup-content a{color:#2a6850;font-weight:700;text-decoration:none}
+@media(max-width:768px){.map-btn{right:auto;left:14px;bottom:70px}}
 .summary-modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.85);backdrop-filter:blur(10px);display:none;align-items:flex-start;justify-content:center;padding:24px;overflow-y:auto}
 .summary-modal.open{display:flex}
 .summary-content{background:#fdf8ed;color:#1a1410;border-radius:18px;max-width:1100px;width:100%;padding:32px;margin:auto;position:relative}
@@ -203,6 +216,16 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 </div>
 
 <button class="summary-btn" onclick="openSummary()">🏁 全景总汇表</button>
+<button class="map-btn" onclick="openWorldMap()">🗺 文明总地图</button>
+
+<div class="summary-modal" id="worldMapModal">
+  <div class="summary-content" style="max-width:1200px;padding:24px">
+    <button class="close-x" onclick="closeWorldMap()">✕</button>
+    <div class="sh"><h2>🗺 早期文明总地图</h2><div class="ss">前 3500 – 前 1000 BCE · 所有遗址</div></div>
+    <div id="worldMap" style="height:62vh;min-height:420px;border-radius:12px;overflow:hidden;border:1px solid rgba(184,136,48,.3);background:#dfe8ee"></div>
+    <div id="worldMapLegend" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:14px"></div>
+  </div>
+</div>
 
 <button class="ai-fab" id="aiFab" title="AI 助手" onclick="toggleAI()">🤖</button>
 <div class="ai-panel" id="aiPanel">
@@ -482,6 +505,51 @@ function openSummary(){
   document.getElementById('summary').classList.add('open');
 }
 function closeSummary(){ document.getElementById('summary').classList.remove('open'); }
+
+// ── 文明总地图 (Leaflet + OSM, 所有遗址) ──
+let _worldMap = null;
+function civNameOf(id){
+  const c = ALL_CIVS.find(x=>x.id===id);
+  if (c) return c.name;
+  const fb = {egypt_predynastic:'古埃及·前王朝', indus_early:'印度河·早期', collapse:'青铜崩溃'};
+  return fb[id] || id;
+}
+function openWorldMap(){
+  document.getElementById('worldMapModal').classList.add('open');
+  setTimeout(initWorldMap, 80);
+}
+function closeWorldMap(){ document.getElementById('worldMapModal').classList.remove('open'); if(_worldMap){_worldMap.remove();_worldMap=null;} }
+function initWorldMap(){
+  if (typeof L==='undefined' || typeof CIV_MAP==='undefined') return;
+  if (_worldMap){ _worldMap.remove(); _worldMap=null; }
+  const el = document.getElementById('worldMap');
+  _worldMap = L.map(el, { scrollWheelZoom:true, worldCopyJump:true });
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:13, minZoom:2, attribution:'© OpenStreetMap' }).addTo(_worldMap);
+  const allCoords = [];
+  const legend = [];
+  Object.keys(CIV_MAP).forEach(civId=>{
+    const color = getCivColor(civId);
+    const name = civNameOf(civId);
+    legend.push({civId, color, name});
+    CIV_MAP[civId].forEach(p=>{
+      allCoords.push(p.coords);
+      L.circleMarker(p.coords, { radius:7, color:'#2a1808', weight:1.5, fillColor:color, fillOpacity:.92 })
+        .addTo(_worldMap)
+        .bindPopup(`<b>${p.name}</b><br><span style="color:${color}">●</span> ${name}<br>${p.note||''}<br><a href="./civ-deep.html#/civ/${civId}">进入该文明 →</a>`)
+        .bindTooltip(p.name, { direction:'top', className:'world-tip' });
+    });
+  });
+  if (allCoords.length) _worldMap.fitBounds(allCoords, { padding:[30,30], maxZoom:5 });
+  else _worldMap.setView([30,40], 3);
+  setTimeout(()=>_worldMap && _worldMap.invalidateSize(), 120);
+  setTimeout(()=>{ if(_worldMap){ _worldMap.invalidateSize(); if(allCoords.length)_worldMap.fitBounds(allCoords,{padding:[30,30],maxZoom:5}); } }, 480);
+  // 图例
+  document.getElementById('worldMapLegend').innerHTML = legend.map(l=>
+    `<span class="map-legend-item" onclick="location.href='./civ-deep.html#/civ/${l.civId}'"><span class="dot" style="background:${l.color}"></span>${l.name}</span>`
+  ).join('');
+}
+window.openWorldMap = openWorldMap;
+window.closeWorldMap = closeWorldMap;
 
 render();
 // ── AI 问答 (千问 SSE) ──

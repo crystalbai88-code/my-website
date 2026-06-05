@@ -116,6 +116,12 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 .scroll-card .site-item{background:white;border:1px solid rgba(184,136,48,.2);border-left:4px solid #3a8868;border-radius:8px;padding:10px 14px;font-size:13px;line-height:1.65;color:var(--paper-ink)}
 .scroll-card .site-item b{color:#2a6850}
 .scroll-card .site-item .coord{font-family:var(--mono);font-size:10.5px;color:var(--paper-ink3);margin-left:6px}
+/* 常见误解卡 */
+.scroll-card .myth-card{background:white;border:1px solid rgba(192,80,74,.25);border-left:4px solid #c0504a;border-radius:10px;padding:14px 16px;margin-bottom:10px}
+.scroll-card .myth-q{font-family:'Noto Serif SC',serif;font-size:15px;font-weight:700;color:#c0504a;margin-bottom:8px;line-height:1.5}
+.scroll-card .myth-t{font-size:14px;line-height:1.75;color:var(--paper-ink);margin-bottom:8px}
+.scroll-card .myth-t::first-letter{font-weight:700}
+.scroll-card .myth-w{font-size:12px;line-height:1.6;color:var(--paper-ink3);background:rgba(184,136,48,.08);border-radius:6px;padding:8px 10px}
 .site-tip{background:rgba(44,26,8,.9)!important;color:#fff!important;border:none!important;border-radius:4px!important;font-size:11px!important;font-weight:600;padding:2px 7px!important;box-shadow:0 2px 6px rgba(0,0,0,.4)!important}
 .site-tip::before{display:none!important}
 .leaflet-popup-content{font-family:'Noto Sans SC',sans-serif;font-size:12.5px;line-height:1.6}
@@ -559,6 +565,7 @@ function renderCivCosmic(civId){
   if (deep?.nine_inventions) themes.push({icon:'💡',name:'关键发明',color:'#e8a020',action:{type:'showText',payload:{kind:'inventions',civId}}});
   themes.push({icon:'🌍',name:'文明关系',color:'#7a60b0',action:{type:'showText',payload:{kind:'relations',civId}}});
   if (typeof CIV_MAP!=='undefined' && CIV_MAP[civId]?.length) themes.push({icon:'🗺',name:'遗址地图',color:'#3a8868',action:{type:'showText',payload:{kind:'map',civId}}});
+  if (typeof CIV_MYTHS!=='undefined' && CIV_MYTHS[civId]?.length) themes.push({icon:'⚠️',name:'常见误解',color:'#c0504a',action:{type:'showText',payload:{kind:'myths',civId}}});
   if (deep?.collapse_chain) themes.push({icon:'⏳',name:'崩溃过程',color:'#b04848',action:{type:'showText',payload:{kind:'collapse',civId}}});
   if (FINAL_OVERVIEW.civs.find(c=>c.id===civId)?.legacy) themes.push({icon:'🎁',name:'今天遗产',color:'#3a8868',action:{type:'showText',payload:{kind:'legacy',civId}}});
 
@@ -862,6 +869,18 @@ function openTextPanel(payload){
       <div class="map-note">该文明的主要遗址 / 古迹真实地理位置（拖动缩放，点标点看说明）：</div>
       <div id="siteMap" class="site-map"></div>
       <div class="site-list">${pts.map(p=>`<div class="site-item"><b>${p.name}</b><span class="coord">${p.coords[0].toFixed(2)}°, ${p.coords[1].toFixed(2)}°</span><br>${p.note||''}</div>`).join('')}</div>`;
+  }
+  else if (payload.kind === 'myths') {
+    const info = getCivInfo(payload.civId);
+    const ms = (typeof CIV_MYTHS!=='undefined' ? CIV_MYTHS[payload.civId] : []) || [];
+    html += `<div class="type-tag civ">${info.icon} ${info.name}</div>
+      <h1>⚠️ 常见误解</h1>
+      <div class="map-note">这些"想当然"的说法其实是错的——破除迷思才能真正理解历史：</div>
+      ${ms.map(m=>`<div class="myth-card">
+        <div class="myth-q">❌ ${m.myth}</div>
+        <div class="myth-t">✓ ${m.truth}</div>
+        ${m.why?`<div class="myth-w">为什么会有这个误解：${m.why}</div>`:''}
+      </div>`).join('')}`;
   }
   else if (payload.kind === 'legacy') {
     const info = getCivInfo(payload.civId);
