@@ -470,7 +470,7 @@ const PERSON_ICON = {
   minos:'🐂', agamemnon:'🛡️', suppiluliuma:'👑', muwatalli:'🏹', hattusili:'🕊️',
 };
 function personIcon(id){ return PERSON_ICON[id] || '👤'; }
-// 事件专属图标 (避免 📅 在苹果系统渲染成"JUL 17"日历)
+// 事件专属图标 (按内容贴切, 不用日历 emoji 以免渲染成带日期的图标)
 const EVENT_ICON = {
   evt_eridu_first:'🏛️', evt_uruk_period:'🏙️', evt_cuneiform_invented:'✍️', evt_royal_tombs_ur:'⚱️',
   evt_lagash_umma_war:'⚔️', evt_urnammu_law:'⚖️', evt_sargon_conquest:'⚔️', evt_naramsin_empire:'⭐',
@@ -584,8 +584,7 @@ function renderCosmic(centerData, orbs){
         <ellipse cx="${-r*0.18}" cy="${-r*0.32}" rx="${r*0.4}" ry="${r*0.17}" fill="rgba(255,255,255,.5)" transform="rotate(-25)"/>
         <text text-anchor="middle" dominant-baseline="central" font-size="${r*0.9}" style="pointer-events:none">${orb.icon}</text>
       </g>
-      <text class="type-tag" y="${r+18}" font-size="9">${orb.typeLabel}</text>
-      <g transform="translate(0,${r+38})">
+      <g transform="translate(0,${r+22})">
         <rect class="label-bg" x="${-orb.name.length*7-8}" y="${-11}" width="${orb.name.length*14+16}" height="22" rx="11"/>
         <text class="name" y="3" font-size="12.5">${orb.name}</text>
       </g>

@@ -376,7 +376,14 @@ const RELATIONS = [
 ];
 
 function getCivColor(id){
-  const fb = {egypt_predynastic:'#d4b870', indus_early:'#a070d4'};
+  // 完整配色 (不依赖 explorer 数据, 避免 mycenaean/collapse 等回退成灰色)
+  const fb = {
+    sumer:'#c86820', akkad:'#b04830', babylon:'#8a4090',
+    egypt_predynastic:'#d4b870', egypt_old:'#e8a040', egypt_new:'#e0a850',
+    indus_early:'#a070d4', indus:'#a08850',
+    minoan:'#2080a0', mycenaean:'#1880b0',
+    hittite:'#506890', shang:'#a02030', collapse:'#7a4040'
+  };
   if (fb[id]) return fb[id];
   if (typeof EARLY_CIV_EXPLORER!=='undefined') {
     const f = EARLY_CIV_EXPLORER.civilizations.find(c=>c.id===id);
@@ -544,7 +551,6 @@ function showTooltip(e, id){
     <div class="yr">前 ${Math.abs(civ.start)} – 前 ${Math.abs(civ.end)} BCE · 巅峰 前${Math.abs(civ.peak)}</div>
     <div class="desc">${summary}</div>
     <div class="coexist">🌍 <b>同期共存</b>：${co.length?co.join('、'):'无'}</div>
-    <div class="cta">点击 → 进入它的小宇宙</div>
   `;
   tip.classList.add('show');
   moveTooltip(e);
