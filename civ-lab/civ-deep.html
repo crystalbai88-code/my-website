@@ -107,6 +107,14 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 .axis-end{font-family:var(--mono);fill:rgba(240,200,130,.55);font-size:12px}
 .axis-flow{font-family:var(--mono);font-size:14.5px;letter-spacing:.1em;font-weight:700}
 .float-orb .orb-year{font-family:var(--mono);fill:rgba(240,200,130,.82);pointer-events:none}
+/* 延伸阅读 · 百科链接 */
+.scroll-card .wiki-section{margin-top:24px;padding-top:18px;border-top:1.5px dashed rgba(184,136,48,.35)}
+.scroll-card .wiki-h{font-family:var(--mono);font-size:11px;color:var(--vermilion);letter-spacing:.1em;font-weight:700;margin-bottom:5px;text-transform:uppercase}
+.scroll-card .wiki-sub{font-size:11.5px;color:var(--paper-ink3);margin-bottom:12px}
+.scroll-card .wiki-chips{display:flex;flex-wrap:wrap;gap:8px}
+.scroll-card .wiki-chip{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;background:white;border:1px solid rgba(184,136,48,.4);border-radius:99px;font-size:13px;color:var(--gold-deep);text-decoration:none;transition:all .15s;font-family:var(--sans);font-weight:600}
+.scroll-card .wiki-chip:hover{background:var(--gold);color:white;border-color:var(--gold);transform:translateY(-1px)}
+.scroll-card .wiki-chip .src{font-family:var(--mono);font-size:9px;opacity:.65}
 
 /* tooltip */
 .tooltip{position:fixed;z-index:50;background:rgba(15,15,28,.95);backdrop-filter:blur(20px);border:1px solid rgba(212,168,88,.35);border-radius:12px;padding:14px 18px;max-width:340px;display:none;pointer-events:none;box-shadow:0 12px 36px rgba(0,0,0,.7)}
@@ -263,6 +271,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
   <a href="./civ-explorer-d.html">◀ 历史宇宙</a>
   <button class="nav-btn" id="navBack" onclick="navBack()" title="返回">‹ 返回</button>
   <button class="nav-btn" id="navFwd" onclick="navFwd()" title="前进">前进 ›</button>
+  <button class="nav-btn" id="wikiBtn" onclick="openWiki()" title="查百科">🔍 百科</button>
   <a href="./civ-explorer-compare.html">⌂ 首页</a>
   <div class="crumb-cosmos" id="crumb"></div>
 </div>
@@ -925,10 +934,83 @@ function openTextPanel(payload){
       <div class="narrative"><p>${e.significance}</p></div>`;
   }
 
+  html += renderWikiSection(payload);
   card.innerHTML = html;
+  card.scrollTop = 0;
   document.getElementById('textPanel').classList.add('open');
 }
 function closeTextPanel(){ document.getElementById('textPanel').classList.remove('open'); stopSpeak(); }
+
+// ════════════════════════════════════════
+// 百科链接 · 把每个知识点链到维基/百度百科
+// ════════════════════════════════════════
+function cleanTerm(s){
+  if(!s) return '';
+  s = String(s);
+  const paren = s.match(/[（(]([^）)]*)[）)]/);
+  const segs = s.replace(/[（(][^）)]*[）)]/g,'').split(/[·\s]+/).filter(Boolean);
+  let cand = segs.find(p=>/[一-鿿]/.test(p)) || '';
+  if (!cand && paren && /[一-鿿]/.test(paren[1])) {
+    cand = (paren[1].split(/[·\s]+/).find(p=>/[一-鿿]/.test(p)) || paren[1]);
+  }
+  if (!cand) cand = segs[0] || '';
+  cand = cand.replace(/[A-Za-z0-9]+/g,'').replace(/[，,。.、;；:：!！?？\-—]/g,'').trim();
+  return cand;
+}
+function collectTerms(payload){
+  const set = new Set();
+  if (payload.civId){
+    set.add(cleanTerm(getCivInfo(payload.civId).name));
+    const c = CIV_DEEP[payload.civId];
+    if (c){
+      (c.nine_inventions||[]).forEach(i=>set.add(cleanTerm(i.name)));
+      if (c.capital_at_peak) set.add(cleanTerm(c.capital_at_peak));
+    }
+    findEventsOfCiv(payload.civId).forEach(e=>{ if(e.deep) set.add(cleanTerm(e.deep.full_title)); });
+    findPeopleOfCiv(payload.civId).forEach(p=>{ if(p.deep) set.add(cleanTerm(p.deep.full_name)); });
+  }
+  if (payload.pid){
+    const p = PERSON_DEEP[payload.pid];
+    if (p){
+      set.add(cleanTerm(p.full_name));
+      (p.achievements_detail||[]).forEach(a=>set.add(cleanTerm(a.name)));
+      (p.related||[]).forEach(r=>{ const o=PERSON_DEEP[r.id]; if(o)set.add(cleanTerm(o.full_name)); });
+    }
+  }
+  if (payload.eid){
+    const e = EVENT_DEEP[payload.eid];
+    if (e){
+      set.add(cleanTerm(e.full_title));
+      (e.evidence||[]).forEach(ev=>set.add(cleanTerm(ev.artifact)));
+      (e.related_people||[]).forEach(pid=>{ const p=PERSON_DEEP[pid]; if(p)set.add(cleanTerm(p.full_name)); });
+    }
+  }
+  return [...set].filter(t=>t && t.length>=2).slice(0,24);
+}
+function wikiChip(term){
+  const q = encodeURIComponent(term);
+  // 百度百科 (国内可访问) 为主, 维基备选
+  return `<a class="wiki-chip" href="https://baike.baidu.com/item/${q}" target="_blank" rel="noopener" title="百度百科：${term}">🔍 ${term}</a>`;
+}
+function renderWikiSection(payload){
+  const terms = collectTerms(payload);
+  if (!terms.length) return '';
+  return `<div class="wiki-section">
+    <div class="wiki-h">🔗 延伸阅读 · 百科</div>
+    <div class="wiki-sub">想深入了解每一个知识点？点击词条跳转百度百科：</div>
+    <div class="wiki-chips">${terms.map(t=>wikiChip(t)).join('')}</div>
+  </div>`;
+}
+// 顶栏「🔍 百科」按钮 → 用当前实体主名搜索
+function openWiki(){
+  const {type, id} = parseHash();
+  let term = '';
+  if (type==='civ') term = cleanTerm(getCivInfo(id).name);
+  else if (type==='person') term = cleanTerm(PERSON_DEEP[id]?.full_name||'');
+  else if (type==='event') term = cleanTerm(EVENT_DEEP[id]?.full_title||'');
+  if (!term){ alert('未识别当前词条'); return; }
+  window.open('https://baike.baidu.com/item/'+encodeURIComponent(term), '_blank', 'noopener');
+}
 
 function renderChainHtml(e){
   const before = e.context_before ? e.context_before.split(/[。，]/)[0].slice(0,20) : null;
@@ -1185,6 +1267,7 @@ window.navFwd = navFwd;
 window.toggleSpeak = toggleSpeak;
 window.stopSpeak = stopSpeak;
 window.toggleAI = toggleAI;
+window.openWiki = openWiki;
 route();
 recordNav();
 </script>
