@@ -49,7 +49,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
     radial-gradient(1.5px 1.5px at 91% 85%,#fff,transparent);
 }
 /* 闪烁层用透明度动画，且 will-change 避免重排 */
-.stars-front{position:absolute;inset:0;opacity:.6;animation:twinkle 9s ease-in-out infinite;will-change:opacity;
+.stars-front{position:absolute;inset:0;opacity:.4;animation:twinkle 11s ease-in-out infinite;will-change:opacity;
   background-image:
     radial-gradient(2px 2px at 18% 18%,#fff,transparent 40%),
     radial-gradient(2.5px 2.5px at 42% 28%,#ffd47a,transparent 40%),
@@ -60,7 +60,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
     radial-gradient(2px 2px at 82% 78%,#fff,transparent 40%),
     radial-gradient(2.3px 2.3px at 15% 82%,#fff,transparent 40%);
 }
-@keyframes twinkle{0%,100%{opacity:.6}50%{opacity:.35}}
+@keyframes twinkle{0%,100%{opacity:.4}50%{opacity:.25}}
 
 /* 顶栏 */
 .topbar{position:fixed;top:0;left:0;right:0;z-index:30;padding:16px 26px;display:flex;align-items:center;gap:16px;pointer-events:none;flex-wrap:wrap}
@@ -86,10 +86,10 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 .canvas-svg{position:fixed;inset:0;width:100%;height:100%;z-index:10}
 
 /* 时间网格 */
-.grid-line{stroke:rgba(212,168,88,.12);stroke-width:1}
-.grid-label{font-family:var(--mono);fill:rgba(212,168,88,.5);font-size:12px;text-anchor:middle;letter-spacing:.08em;font-weight:600}
-.region-label{font-family:var(--mono);fill:rgba(212,168,88,.4);font-size:10.5px;text-anchor:start;letter-spacing:.12em;font-weight:700;text-transform:uppercase}
-.region-divider{stroke:rgba(212,168,88,.06);stroke-width:1}
+.grid-line{stroke:rgba(212,168,88,.1);stroke-width:1}
+.grid-label{font-family:var(--mono);fill:rgba(240,210,150,.85);font-size:16px;text-anchor:middle;letter-spacing:.08em;font-weight:700}
+.region-label{font-family:var(--mono);fill:rgba(240,200,130,.72);font-size:13.5px;text-anchor:start;letter-spacing:.1em;font-weight:700;text-transform:uppercase}
+.region-divider{stroke:rgba(212,168,88,.05);stroke-width:1}
 
 /* 文明行 (跨度条 + 球) */
 .civ-row{cursor:pointer}
@@ -99,9 +99,9 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 .orb-inner{transition:transform .3s cubic-bezier(.4,1,.6,1);transform-box:fill-box;transform-origin:center}
 .civ-row:hover .orb-inner{transform:scale(1.15)}
 .civ-orb-body{filter:drop-shadow(0 4px 14px rgba(0,0,0,.5))}
-.civ-name{font-family:var(--serif);font-weight:700;fill:#fff;text-shadow:0 2px 6px rgba(0,0,0,.9);dominant-baseline:central}
-.civ-state{font-family:var(--mono);fill:var(--ink2);letter-spacing:.04em;dominant-baseline:central}
-.civ-years{font-family:var(--mono);fill:rgba(212,168,88,.6);font-size:9.5px;dominant-baseline:central}
+.civ-name{font-family:var(--serif);font-weight:700;fill:#fff;text-shadow:0 2px 8px rgba(0,0,0,.95);dominant-baseline:central}
+.civ-state{font-family:var(--mono);fill:rgba(200,208,228,.9);letter-spacing:.04em;dominant-baseline:central}
+.civ-years{font-family:var(--mono);fill:rgba(240,200,130,.8);font-size:11.5px;dominant-baseline:central}
 
 /* 关系连线 */
 .relation-path{fill:none;stroke-width:1.5;opacity:.0;transition:opacity .3s ease;pointer-events:none}
@@ -114,7 +114,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 
 /* 崩溃竖线 */
 .collapse-line{stroke:#ff4040;stroke-width:2;stroke-dasharray:4 4;opacity:.5}
-.collapse-label{font-family:var(--mono);fill:#ff7878;font-size:10px;text-anchor:middle;letter-spacing:.06em;font-weight:700}
+.collapse-label{font-family:var(--mono);fill:#ff9090;font-size:13px;text-anchor:middle;letter-spacing:.06em;font-weight:700}
 
 /* tooltip */
 .tooltip{position:fixed;z-index:50;background:rgba(15,15,28,.96);backdrop-filter:blur(20px);border:1px solid rgba(212,168,88,.35);border-radius:12px;padding:13px 16px;max-width:320px;display:none;pointer-events:none;box-shadow:0 12px 36px rgba(0,0,0,.7)}
@@ -227,7 +227,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 <script src="./chapters_data.js"></script>
 <script>
 const W = 1600, H = 900;
-const PAD_L = 200, PAD_R = 90, PAD_TOP = 110, PAD_BOT = 70;
+const PAD_L = 220, PAD_R = 280, PAD_TOP = 120, PAD_BOT = 90;
 const Y0 = -3600, Y1 = -950; // 时间范围
 function yearToX(y){ return PAD_L + ((y - Y0)/(Y1 - Y0)) * (W - PAD_L - PAD_R); }
 
@@ -303,7 +303,7 @@ function darken(hex, amt){
 }
 
 // 计算每行 y
-const ROW_H = 50, REGION_GAP = 18;
+const ROW_H = 54, REGION_GAP = 16;
 const totalRows = ALL_CIVS.length;
 const totalRegionGaps = REGIONS.length - 1;
 const blockH = totalRows*ROW_H + totalRegionGaps*REGION_GAP;
@@ -373,25 +373,29 @@ function render(){
     const x1 = yearToX(c.start), x2 = yearToX(c.end), xp = yearToX(c.peak);
     const color = getCivColor(c.id);
     const icon = getCivIcon(c.id);
-    const r = 21;
+    const r = 25;
+    // 名字默认放球右侧；靠右的文明 (x 超过 65% 宽度) 放球左侧, 防止跑出画面
+    const rightSide = xp > W*0.62;
+    const nameX = rightSide ? xp - r - 12 : xp + r + 12;
+    const nameAnchor = rightSide ? 'end' : 'start';
     svg += `<g class="civ-row" data-id="${c.id}" data-region="${c.region}">
       <!-- 时间跨度光条 -->
-      <rect class="civ-span" x="${x1}" y="${y-7}" width="${x2-x1}" height="14" rx="7" fill="url(#span_${c.id})" stroke="${color}" stroke-opacity="0.3" stroke-width="1" style="color:${color}"/>
+      <rect class="civ-span" x="${x1}" y="${y-8}" width="${x2-x1}" height="16" rx="8" fill="url(#span_${c.id})" stroke="${color}" stroke-opacity="0.35" stroke-width="1" style="color:${color}"/>
       <!-- 起止年标 -->
-      <text class="civ-years" x="${x1-6}" y="${y}" text-anchor="end">前${Math.abs(c.start)}</text>
-      <text class="civ-years" x="${x2+6}" y="${y}" text-anchor="start">前${Math.abs(c.end)}</text>
+      <text class="civ-years" x="${x1-8}" y="${y}" text-anchor="end">前${Math.abs(c.start)}</text>
+      <text class="civ-years" x="${x2+8}" y="${y}" text-anchor="start">前${Math.abs(c.end)}</text>
       <!-- 巅峰球 (内层缩放修复浮动 bug：fill-box 绕自身中心) -->
       <g class="orb-inner">
         <g class="civ-orb-body">
-          <circle cx="${xp}" cy="${y}" r="${r*1.5}" fill="${color}" opacity="0.12"/>
-          <circle cx="${xp}" cy="${y}" r="${r}" fill="url(#orb_${c.id})" stroke="rgba(255,255,255,.3)" stroke-width="1.5" filter="url(#orbShadow)"/>
+          <circle cx="${xp}" cy="${y}" r="${r*1.5}" fill="${color}" opacity="0.14"/>
+          <circle cx="${xp}" cy="${y}" r="${r}" fill="url(#orb_${c.id})" stroke="rgba(255,255,255,.35)" stroke-width="1.5" filter="url(#orbShadow)"/>
           <ellipse cx="${xp-r*0.18}" cy="${y-r*0.32}" rx="${r*0.4}" ry="${r*0.17}" fill="rgba(255,255,255,.5)"/>
           <text x="${xp}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="${r*0.95}" style="pointer-events:none">${icon}</text>
         </g>
       </g>
-      <!-- 名字 (在球右侧或上方) -->
-      <text class="civ-name" x="${xp+r+8}" y="${y-5}" font-size="13.5">${c.name}</text>
-      <text class="civ-state" x="${xp+r+8}" y="${y+10}" font-size="9.5">${c.state}</text>
+      <!-- 名字 -->
+      <text class="civ-name" x="${nameX}" y="${y-7}" font-size="18" text-anchor="${nameAnchor}">${c.name}</text>
+      <text class="civ-state" x="${nameX}" y="${y+13}" font-size="12.5" text-anchor="${nameAnchor}">${c.state}</text>
     </g>`;
   });
 
