@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>历史宇宙 · 星空设计系统</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Cinzel:wght@500;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css"/>
+<style>
+  /* 仅本指南页用的版面 */
+  html,body{overflow:auto}
+  .wrap{position:relative;z-index:10;max-width:1080px;margin:0 auto;padding:96px 24px 80px}
+  .ds-section{margin:46px 0}
+  .ds-section>.ds-sec-title{margin-bottom:18px}
+  .grid{display:grid;gap:14px}
+  .swatches{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  .sw{border:1px solid var(--panel-line);border-radius:var(--r-md);overflow:hidden;background:var(--panel-bg)}
+  .sw .chip{height:54px}
+  .sw .lbl{padding:8px 10px;font-family:var(--mono);font-size:10.5px;color:var(--ink2)}
+  .sw .lbl b{display:block;color:var(--ink);font-size:11.5px;margin-bottom:2px}
+  .cards-3{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+  .row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .demo{background:var(--panel-bg);border:1px dashed var(--panel-line);border-radius:var(--r-md);padding:22px;position:relative}
+  pre{background:var(--paper);color:var(--paper-ink);border-radius:var(--r-sm);padding:14px 16px;overflow:auto;font-family:var(--mono);font-size:12px;line-height:1.6;margin-top:12px;border:1px solid var(--panel-line)}
+  .type-row{display:flex;align-items:baseline;gap:16px;padding:10px 0;border-bottom:1px solid var(--panel-line)}
+  .type-row .tag{font-family:var(--mono);font-size:10px;color:var(--ink3);width:130px;flex-shrink:0}
+  .lead{font-family:var(--sans);font-size:14px;line-height:1.8;color:var(--ink2);max-width:680px}
+  code{font-family:var(--mono);font-size:.9em;color:var(--gold)}
+  .fab-static{position:static}
+</style>
+</head>
+<body data-theme="textbook">
+
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+
+<div class="ds-topbar">
+  <span class="ds-pill">◈ 星空设计系统 v1.0</span>
+  <span class="ds-h2" style="margin-left:4px">历史宇宙 · Cosmos Design System</span>
+  <div class="ds-theme-switch" id="themeSwitch" style="margin-left:auto">
+    <button data-t="deepblue" title="静夜深蓝"></button>
+    <button data-t="museum" title="博物馆典藏"></button>
+    <button data-t="textbook" title="现代教科书"></button>
+    <button data-t="parchment" title="羊皮纸古卷"></button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <p class="lead">提炼自「<b style="color:var(--gold)">早期文明 · 时间长河</b>」探索页的设计系统。它把这套星空风格固化成 <b>设计令牌 + 组件</b>，新板块只要 <code>&lt;link&gt;</code> 进 <b>cosmos-design-system.css</b> 就能复用。右上角切换四套主题——所有颜色由 CSS 变量驱动，自动适配。<br><span class="ds-muted">（与项目里另一套「国风卷轴」design-system.html 并存，互不影响。）</span></p>
+
+  <!-- 主题 -->
+  <section class="ds-section">
+    <div class="ds-sec-title">① 四套主题</div>
+    <div class="grid cards-3">
+      <div class="ds-card"><div class="icon">🌌</div><div class="title">静夜深蓝</div><div class="ds-muted" style="font-size:12px;margin-top:6px">深色默认。星空+星云，金色点缀，博物馆夜场感。</div></div>
+      <div class="ds-card"><div class="icon">🏛</div><div class="title">博物馆典藏</div><div class="ds-muted" style="font-size:12px;margin-top:6px">米白底，赭石金。典雅，适合长文阅读。</div></div>
+      <div class="ds-card"><div class="icon">📘</div><div class="title">现代教科书</div><div class="ds-muted" style="font-size:12px;margin-top:6px">纯白底，学院蓝+朱红。清晰明快，课堂友好。</div></div>
+      <div class="ds-card"><div class="icon">📜</div><div class="title">羊皮纸古卷</div><div class="ds-muted" style="font-size:12px;margin-top:6px">米黄做旧底，砖红。怀旧手稿感。</div></div>
+    </div>
+  </section>
+
+  <!-- 色彩 -->
+  <section class="ds-section">
+    <div class="ds-sec-title">② 颜色令牌（随主题变化）</div>
+    <div class="grid swatches" id="swatches"></div>
+  </section>
+
+  <!-- 字体 -->
+  <section class="ds-section">
+    <div class="ds-sec-title">③ 字体与排版</div>
+    <div class="ds-panel">
+      <div class="type-row"><span class="tag">.ds-h1 / --serif</span><span class="ds-h1">华夏文明的黎明</span></div>
+      <div class="type-row"><span class="tag">.ds-h2 / --serif</span><span class="ds-h2">青铜与甲骨</span></div>
+      <div class="type-row"><span class="tag">.ds-body / --sans</span><span class="ds-body">正文示例：思源黑体承载主要阅读内容，行距宽松、易读。</span></div>
+      <div class="type-row"><span class="tag">.ds-kicker / --mono</span><span class="ds-kicker">BRONZE AGE · 前 1600</span></div>
+      <div class="type-row" style="border:none"><span class="tag">Cinzel / --latin</span><span style="font-family:var(--latin);font-size:20px;color:var(--gold)">CIVILIZATION</span></div>
+    </div>
+  </section>
+
+  <!-- 按钮 -->
+  <section class="ds-section">
+    <div class="ds-sec-title">④ 按钮</div>
+    <div class="demo">
+      <div class="row">
+        <button class="ds-btn">主按钮</button>
+        <button class="ds-btn ds-btn-ghost">幽灵按钮</button>
+        <button class="ds-btn" disabled>禁用</button>
+        <span class="ds-pill">◈ 胶囊链接</span>
+      </div>
+      <div class="row" style="margin-top:18px">
+        <button class="ds-fab fab-static">🏁</button>
+        <button class="ds-fab green fab-static">🗺</button>
+        <button class="ds-fab purple fab-static">⚖️</button>
+        <button class="ds-fab blue fab-static">🤖</button>
+        <span class="ds-muted" style="font-size:12px">圆形浮动按钮 FAB（金/绿/紫/蓝四种角色色）</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 卡片 / 面板 -->
+  <section class="ds-section">
+    <div class="ds-sec-title">⑤ 卡片与面板</div>
+    <div class="grid cards-3">
+      <div class="ds-card"><div class="icon">📖</div><div class="title">文明叙事</div><div class="ds-muted" style="font-size:12px;margin-top:6px">可点击卡片，悬浮上浮+金边。</div></div>
+      <div class="ds-card"><div class="icon">💡</div><div class="title">关键发明</div><div class="ds-muted" style="font-size:12px;margin-top:6px">用于功能入口、知识点格栅。</div></div>
+      <div class="ds-card"><div class="icon">🌍</div><div class="title">文明关系</div><div class="ds-muted" style="font-size:12px;margin-top:6px">图标+标题+说明的标准结构。</div></div>
+    </div>
+    <div class="ds-panel" style="margin-top:14px">
+      <span class="ds-kicker">PANEL · 磨砂面板</span>
+      <p class="ds-body" style="margin-top:8px">.ds-panel 是静态信息容器，磨砂玻璃质感，承载图例、说明、表单等。</p>
+    </div>
+  </section>
+
+  <!-- chip / tooltip / legend -->
+  <section class="ds-section">
+    <div class="ds-sec-title">⑥ 信息胶囊 / 悬浮卡 / 图例</div>
+    <div class="demo">
+      <div class="row">
+        <span class="ds-chip event">🌊 大禹治水 <span class="yr">前2070</span></span>
+        <span class="ds-chip person">👑 武丁 <span class="yr">前1250</span></span>
+        <span class="ds-chip">⚱️ 司母戊鼎</span>
+      </div>
+      <div class="row" style="margin-top:18px;align-items:flex-start">
+        <div class="ds-tooltip" style="position:static">
+          <div class="nm">🐉 夏朝</div>
+          <div class="meta">约前 2070 – 前 1600 BCE</div>
+          <div class="desc">华夏第一个世袭王朝。悬浮卡背景随主题自适应，任何主题下文字都清晰可读。</div>
+        </div>
+        <div class="ds-legend">
+          <span class="ds-kicker">图例</span>
+          <div class="items"><span>● 崛起</span><span>● 巅峰</span><span>● 衰落</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 球体 -->
+  <section class="ds-section">
+    <div class="ds-sec-title">⑦ 文明球体（orb）</div>
+    <div class="demo row" style="gap:22px">
+      <span class="ds-orb" style="--orb:#c86820">📜</span>
+      <span class="ds-orb" style="--orb:#a02030">🏺</span>
+      <span class="ds-orb" style="--orb:#6f8f5a">🐉</span>
+      <span class="ds-orb" style="--orb:#2080a0">🐂</span>
+      <span class="ds-orb" style="--orb:#506890">🛡️</span>
+      <span class="ds-muted" style="font-size:12px">用 <code>--orb:&lt;色值&gt;</code> 控制每颗球主色（HTML 版；SVG 版用 radialGradient）。</span>
+    </div>
+  </section>
+
+  <!-- 表格 -->
+  <section class="ds-section">
+    <div class="ds-sec-title">⑧ 数据 / 对比表</div>
+    <div class="ds-table-wrap">
+      <table class="ds-table">
+        <thead><tr><th class="row-h">维度</th><th>夏朝</th><th>商朝</th><th>苏美尔</th></tr></thead>
+        <tbody>
+          <tr><td class="row-h">文字</td><td>无公认文字</td><td>甲骨文</td><td>楔形文字</td></tr>
+          <tr><td class="row-h">政治</td><td>世袭王权</td><td>王+占卜祭司</td><td>城邦联盟</td></tr>
+          <tr><td class="row-h">遗产</td><td>家天下</td><td>汉字</td><td>60进制</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 弹窗 -->
+  <section class="ds-section">
+    <div class="ds-sec-title">⑨ 遮罩弹窗</div>
+    <div class="demo"><button class="ds-btn" onclick="document.getElementById('demoModal').classList.add('open')">打开示例弹窗</button></div>
+  </section>
+
+  <!-- 用法 -->
+  <section class="ds-section">
+    <div class="ds-sec-title">⑩ 如何在新板块里用</div>
+    <div class="ds-panel">
+      <p class="ds-body">① 引入字体与样式表；② 给 body 加主题；③ 铺背景；④ 直接用 <code>ds-</code> 组件类。</p>
+<pre>&lt;link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=JetBrains+Mono&amp;family=Cinzel&amp;display=swap" rel="stylesheet"&gt;
+&lt;link rel="stylesheet" href="./cosmos-design-system.css"&gt;
+
+&lt;body data-theme="textbook"&gt;
+  &lt;div class="ds-cosmos"&gt;&lt;div class="nebula"&gt;&lt;/div&gt;&lt;div class="stars"&gt;&lt;/div&gt;&lt;/div&gt;
+  &lt;h1 class="ds-h1"&gt;新板块标题&lt;/h1&gt;
+  &lt;div class="ds-card"&gt;…&lt;/div&gt;
+  &lt;button class="ds-fab purple"&gt;⚖️&lt;/button&gt;
+&lt;/body&gt;</pre>
+    </div>
+  </section>
+
+</div>
+
+<!-- 示例弹窗 -->
+<div class="ds-modal" id="demoModal">
+  <div class="ds-modal-content" style="max-width:680px">
+    <button class="ds-close" onclick="document.getElementById('demoModal').classList.remove('open')">✕</button>
+    <div class="head"><h2>🏁 示例弹窗</h2><div class="sub">Modal · 暖纸内容</div></div>
+    <p style="font-family:var(--sans);font-size:13.5px;line-height:1.8;color:var(--paper-ink2)">遮罩弹窗用 <b>--overlay</b> 做背景模糊，内容卡固定用暖纸色（<b>--paper</b>），在任何主题下都保持优雅一致——适合承载总汇表、地图、长说明等重内容。</p>
+  </div>
+</div>
+
+<script>
+// 主题切换 (与项目共用 localStorage 键，风格统一)
+function applyTheme(t){
+  if(t&&t!=='deepblue') document.body.setAttribute('data-theme',t); else document.body.removeAttribute('data-theme');
+  localStorage.setItem('civ_theme',t||'deepblue');
+  document.querySelectorAll('#themeSwitch button').forEach(b=>b.classList.toggle('active',b.dataset.t===(t||'deepblue')));
+  setTimeout(renderSwatches,40);
+}
+// 颜色令牌色卡 (动态读取当前主题计算值)
+const TOKENS=[['--bg','页面底色'],['--ink','主文字'],['--ink2','次文字'],['--ink3','弱文字'],['--gold','金/主强调'],['--warm','暖强调'],['--vermilion','朱红/危险'],['--panel-bg','面板底'],['--panel-line','描边'],['--paper','暖纸'],['--cyan','青(恒定)'],['--purple','紫(恒定)']];
+function renderSwatches(){
+  document.getElementById('swatches').innerHTML=TOKENS.map(([v,n])=>
+    `<div class="sw"><div class="chip" style="background:var(${v})"></div><div class="lbl"><b>${n}</b>${v}</div></div>`).join('');
+}
+document.getElementById('themeSwitch').addEventListener('click',e=>{const b=e.target.closest('button');if(b)applyTheme(b.dataset.t);});
+applyTheme(localStorage.getItem('civ_theme')||'textbook');
+renderSwatches();
+</script>
+</body>
+</html>
