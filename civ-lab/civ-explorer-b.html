@@ -3,1194 +3,250 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>方向 B · 赛博图谱 · 早期文明关系图谱</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Orbitron:wght@500;700&family=Noto+Sans+SC:wght@400;500&display=swap" rel="stylesheet"/>
+<title>形态 B · 时间列车 · 早期文明</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Cinzel:wght@500&display=swap" rel="stylesheet"/>
 <style>
 :root{
-  --bg:#000000; --bg2:#050505;
-  --paper:#0a0a0a; --paper2:#141416;
-  --ink:#e8fff8; --ink2:#80f8e0; --ink3:#40a890;
-  --warm:#00ffd0; --warm-deep:#00b890; --gold:#ff00aa; --glow:#00ffd0;
-  --serif:'JetBrains Mono',ui-monospace,monospace;
-  --sans:'JetBrains Mono','SF Mono',ui-monospace,monospace;
-  --mono:'JetBrains Mono',ui-monospace,monospace;
-  --latin:'Orbitron','JetBrains Mono',monospace;
+  --bg:#080810; --paper:#fdf8ed; --ink:#1a1410; --ink2:#5c4530; --ink3:#8a7050;
+  --gold:#d4a858; --vermilion:#c84820;
+  --serif:'Noto Serif SC',serif; --sans:'Noto Sans SC',sans-serif; --mono:'JetBrains Mono',monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--ink);overflow:hidden}
-.app{display:flex;flex-direction:column;height:100vh}
+html,body{height:100%;font-family:var(--sans);background:var(--bg);color:white;overflow:hidden}
 
-/* TOP */
-.top{
-  display:flex;align-items:center;gap:14px;padding:12px 22px;
-  background:rgba(15,15,22,.92);backdrop-filter:blur(20px);
-  border-bottom:1px solid rgba(232,152,112,.15);flex-shrink:0;z-index:10;
-}
-.top .back{font-family:var(--mono);font-size:11px;color:var(--warm);text-decoration:none;letter-spacing:.2em}
-.top h1{font-family:var(--serif);font-size:16px;font-weight:700}
-.top h1 em{font-style:italic;color:var(--warm);margin-right:8px;font-family:var(--latin);font-weight:500}
-.top .subtitle{font-size:10px;color:var(--ink3);font-family:var(--mono);letter-spacing:.12em}
+.topbar{position:fixed;top:0;left:0;right:0;height:54px;z-index:30;background:rgba(8,8,16,.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(212,168,88,.2);display:flex;align-items:center;gap:14px;padding:0 22px}
+.topbar .home{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.18em}
+.topbar h1{font-family:var(--serif);font-size:14px;color:#f5e8c8;font-weight:700}
+.topbar h1 em{color:var(--gold);font-style:normal;margin-left:8px;font-family:var(--mono);font-size:11px;letter-spacing:.2em}
 
-/* BREADCRUMB */
-.crumb{display:flex;gap:6px;margin-left:auto;align-items:center;font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.12em}
-.crumb .step{padding:4px 10px;background:rgba(255,255,255,.05);border:1px solid rgba(232,152,112,.15);border-radius:99px;color:var(--ink2);cursor:pointer;font-weight:500;transition:all .15s}
-.crumb .step:hover{background:rgba(232,152,112,.2);color:var(--warm);border-color:var(--warm)}
-.crumb .step.current{background:var(--warm);color:white;border-color:var(--warm)}
-.crumb .arrow{color:var(--ink3)}
-.crumb .home-btn{background:rgba(232,152,112,.1)}
+/* 列车轨道 (顶部进度) */
+.rail{position:fixed;top:54px;left:0;right:0;height:80px;z-index:20;background:linear-gradient(180deg,rgba(8,8,16,.95),rgba(8,8,16,.7));backdrop-filter:blur(12px);border-bottom:1px solid rgba(212,168,88,.15)}
+.rail-track{position:absolute;top:50%;left:5%;right:5%;height:2px;background:linear-gradient(90deg,rgba(212,168,88,.6),rgba(212,168,88,.2));transform:translateY(-50%)}
+.rail-cars{position:absolute;top:50%;left:5%;right:5%;height:60px;transform:translateY(-50%);display:flex;justify-content:space-between;align-items:center}
+.car-dot{
+  width:60px;height:60px;border-radius:14px;cursor:pointer;
+  background:rgba(212,168,88,.08);border:1.5px solid rgba(212,168,88,.3);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:10px;color:rgba(212,168,88,.6);
+  transition:all .25s;font-weight:700;letter-spacing:.06em;
+}
+.car-dot:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-3px)}
+.car-dot .ic{font-size:22px;margin-bottom:1px}
+.car-dot.done{background:rgba(212,168,88,.15);border-color:var(--gold);color:var(--gold)}
+.car-dot.current{background:var(--gold);border-color:var(--gold);color:#1a1410;transform:translateY(-5px) scale(1.08);box-shadow:0 8px 20px rgba(212,168,88,.5)}
+.car-dot.locked{opacity:.3;cursor:not-allowed}
 
-/* MAIN */
-.main{flex:1;display:flex;overflow:hidden;position:relative}
+/* 主车厢窗口 */
+.cabin{position:fixed;top:134px;left:0;right:0;bottom:0;overflow:hidden}
+.car-page{position:absolute;inset:0;display:flex;flex-direction:column;transition:transform .5s cubic-bezier(.4,1,.6,1),opacity .4s}
+.car-page.exiting{transform:translateX(-100%);opacity:0}
+.car-page.entering{transform:translateX(100%);opacity:0}
 
-/* TIME AXIS (always on top) */
-.time-axis{
-  position:absolute;top:0;left:0;right:0;height:46px;
-  background:linear-gradient(180deg,rgba(15,15,22,.92),rgba(15,15,22,.4) 70%,transparent);
-  backdrop-filter:blur(10px);
-  z-index:5;border-bottom:1px solid rgba(232,152,112,.15);
-}
-.time-axis .ticks{position:relative;height:100%;padding:0 80px}
-.time-axis .tick{position:absolute;top:6px;bottom:6px;border-left:1px dashed rgba(232,152,112,.15)}
-.time-axis .tick span{
-  position:absolute;top:6px;left:-40px;width:80px;text-align:center;
-  font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.08em;
-}
-.time-axis .era-band{
-  position:absolute;top:30px;height:10px;border-radius:5px;
-  font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.6);
-  display:flex;align-items:center;justify-content:center;
-}
+/* 窗外风景 (上半) */
+.window{height:38%;min-height:240px;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;padding:24px 40px;color:white}
+.window .scene{position:absolute;inset:0;z-index:0}
+.window .scene::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.6) 100%)}
+.window .clouds{position:absolute;inset:0;opacity:.3;background:radial-gradient(2px 1px at 10% 30%,#fff,transparent),radial-gradient(3px 1.5px at 60% 20%,#fff,transparent),radial-gradient(2px 1px at 85% 40%,#fff,transparent)}
+.window .icon{font-size:48px;filter:drop-shadow(0 4px 16px rgba(0,0,0,.4));position:relative;z-index:1;margin-bottom:8px}
+.window h2{font-family:var(--serif);font-size:44px;font-weight:900;position:relative;z-index:1;text-shadow:0 4px 24px rgba(0,0,0,.5)}
+.window .range{font-family:var(--mono);font-size:13px;letter-spacing:.2em;opacity:.85;margin-bottom:4px;position:relative;z-index:1}
+.window .question{font-family:var(--serif);font-size:15px;line-height:1.6;margin-top:14px;background:rgba(255,255,255,.12);backdrop-filter:blur(10px);border-left:3px solid var(--gold);padding:10px 14px;border-radius:0 10px 10px 0;max-width:620px;position:relative;z-index:1}
 
-/* GRAPH */
-.graph{
-  flex:1;position:relative;padding-top:46px;
-  background:
-    linear-gradient(rgba(0,255,208,.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,255,208,.04) 1px, transparent 1px),
-    radial-gradient(ellipse at 50% 50%, rgba(0,255,208,.05) 0%, transparent 60%),
-    #000000;
-  background-size:40px 40px,40px 40px,100% 100%,100% 100%;
-  cursor:default;overflow:hidden;
-}
-.graph svg{width:100%;height:100%;display:block}
+/* 车厢内部 (下半，米黄底) */
+.interior{flex:1;background:var(--paper);color:var(--ink);overflow-y:auto;padding:24px 40px 100px}
+.section-title{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--vermilion);margin:0 0 14px;padding-bottom:6px;border-bottom:2px solid rgba(200,72,32,.2);display:flex;align-items:center;gap:8px}
+.world-ctx{font-family:var(--serif);font-size:13.5px;line-height:1.7;color:var(--ink2);background:linear-gradient(135deg,rgba(212,168,88,.12),rgba(200,72,32,.06));border:1px solid rgba(212,168,88,.25);border-radius:12px;padding:12px 16px;margin-bottom:20px}
+.world-ctx::before{content:'🌐 ';color:var(--vermilion)}
 
-.stars{position:absolute;inset:0;pointer-events:none;opacity:.3}
-.stars::before{
-  content:'';position:absolute;inset:0;
-  background-image:
-    radial-gradient(1.5px 1.5px at 20% 30%, #fff, transparent 60%),
-    radial-gradient(1.2px 1.2px at 70% 18%, #f0c060, transparent 60%),
-    radial-gradient(.9px .9px at 40% 70%, #fff, transparent 60%),
-    radial-gradient(1.3px 1.3px at 85% 55%, #fff, transparent 60%),
-    radial-gradient(.8px .8px at 25% 85%, #fff, transparent 60%),
-    radial-gradient(1px 1px at 60% 90%, #f0c060, transparent 60%);
-}
+/* 文明卡 */
+.civ-card{background:white;border-radius:12px;margin-bottom:12px;border:1px solid rgba(160,100,30,.18);overflow:hidden;transition:all .25s}
+.civ-card.expanded{box-shadow:0 6px 20px rgba(160,100,30,.15);border-color:var(--gold)}
+.civ-head{padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;min-height:56px}
+.civ-head:hover{background:rgba(212,168,88,.05)}
+.dot-ic{width:44px;height:44px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:white;font-size:20px;box-shadow:0 3px 10px rgba(0,0,0,.15)}
+.civ-head .info{flex:1;min-width:0}
+.civ-head .name{font-family:var(--serif);font-size:16px;font-weight:700;color:var(--ink)}
+.civ-head .l1{font-size:12px;color:var(--ink2);margin-top:3px;line-height:1.5}
+.state-chip{font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:99px;letter-spacing:.08em;font-weight:700;flex-shrink:0;background:rgba(212,168,88,.15);color:#8a6028}
+.state-chip[data-state="巅峰"]{background:rgba(60,160,80,.15);color:#2a6038}
+.state-chip[data-state="崩溃"],.state-chip[data-state="集体崩溃"]{background:rgba(200,72,32,.15);color:var(--vermilion)}
+.expand-ic{width:30px;height:30px;border-radius:50%;background:rgba(212,168,88,.1);color:var(--vermilion);display:flex;align-items:center;justify-content:center;font-size:12px;transition:transform .25s;flex-shrink:0}
+.civ-card.expanded .expand-ic{transform:rotate(180deg)}
+.civ-body{display:none;padding:4px 18px 18px;border-top:1px dashed rgba(160,100,30,.2)}
+.civ-card.expanded .civ-body{display:block}
+.layer{margin-top:14px;animation:fadeIn .35s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.l-label{font-family:var(--mono);font-size:9px;color:var(--vermilion);letter-spacing:.18em;font-weight:700;margin-bottom:6px;text-transform:uppercase}
+.l-text{font-family:var(--serif);font-size:14px;line-height:1.8;color:var(--ink)}
+.narrative{background:linear-gradient(180deg,rgba(255,255,255,.7),rgba(245,232,200,.5));border-left:3px solid var(--gold);padding:12px 16px;border-radius:0 10px 10px 0;font-family:var(--serif);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.narrative p{margin-bottom:12px}.narrative p:last-child{margin-bottom:0}
+.evt-list,.person-list{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.evt-item,.person-item{background:rgba(245,232,200,.4);border:1px solid rgba(160,100,30,.15);border-radius:10px;padding:11px 14px}
+.evt-item .ti,.person-item .ti{font-weight:700;color:var(--ink);font-size:13px;font-family:var(--serif);margin-bottom:3px}
+.evt-item .meta,.person-item .meta{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.06em}
+.evt-item .body,.person-item .body{font-size:12px;color:var(--ink2);line-height:1.6;margin-top:5px}
+.reveal-btn{margin-top:12px;width:100%;padding:10px 14px;border-radius:10px;border:1.5px dashed rgba(200,72,32,.4);background:transparent;cursor:pointer;color:var(--vermilion);font-family:var(--serif);font-size:12.5px;font-weight:600}
+.reveal-btn:hover{background:rgba(200,72,32,.06);border-style:solid}
 
-/* SIDE — 知识卡片用米黄渐变 (亮卡 on 暗 bg, 对比鲜明) */
-.side{
-  width:480px;background:linear-gradient(135deg,#fdf5e0,#f5e8c8);
-  border-left:2px solid #c84820;overflow-y:auto;padding:0;
-  transform:translateX(100%);transition:transform .35s cubic-bezier(.4,1,.6,1);
-  position:absolute;top:0;right:0;bottom:0;z-index:8;
-  box-shadow:-12px 0 36px rgba(0,0,0,.4);
-}
-.side.open{transform:translateX(0)}
+/* 列车控制 (底部固定，像列车控制台) */
+.controls{position:fixed;bottom:0;left:0;right:0;height:80px;z-index:25;background:linear-gradient(180deg,rgba(8,8,16,.5),rgba(8,8,16,.95) 30%);backdrop-filter:blur(16px);border-top:1px solid rgba(212,168,88,.2);display:flex;align-items:center;justify-content:center;gap:20px;padding:0 24px}
+.controls button{min-height:44px;border-radius:12px;border:1px solid rgba(212,168,88,.3);background:rgba(212,168,88,.08);color:var(--gold);font-family:var(--serif);font-size:13px;font-weight:600;cursor:pointer;padding:0 18px;display:flex;align-items:center;gap:6px;transition:all .15s}
+.controls button:hover:not(:disabled){background:var(--gold);color:#1a1410;border-color:var(--gold)}
+.controls button:disabled{opacity:.35;cursor:not-allowed}
+.controls .primary{background:var(--gold);color:#1a1410;border-color:var(--gold);padding:0 24px;font-size:14px;letter-spacing:.04em}
+.controls .ctx{color:rgba(212,168,88,.7);font-family:var(--mono);font-size:11px;letter-spacing:.18em}
 
-/* 知识卡片头部 (sticky 顶, 含朗读 + 关闭) */
-.card-head{
-  position:sticky;top:0;background:linear-gradient(135deg,#fdf5e0,#f5e8c8);
-  padding:18px 22px 14px;border-bottom:1.5px solid rgba(200,72,32,.2);
-  z-index:5;display:flex;gap:8px;align-items:center;
-}
-.card-head .head-info{flex:1;min-width:0}
-.card-head .ps-label{font-family:var(--mono);font-size:10px;color:#c84820;letter-spacing:.22em;text-transform:uppercase;font-weight:600;margin-bottom:4px}
-.card-head h2{font-family:'STSong','Noto Serif SC',serif;font-size:22px;color:#2c1a08;font-weight:700;line-height:1.2}
-.card-head h2 .icon{margin-right:8px}
-.card-head .action-btn{
-  width:44px;height:44px;border-radius:50%;border:1.5px solid rgba(200,72,32,.4);
-  background:white;cursor:pointer;font-size:16px;color:#2c1a08;
-  display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;
-}
-.card-head .action-btn:hover{background:#c84820;color:white;border-color:#c84820}
-.card-head .action-btn.speaking{background:#2a8038;color:white;border-color:#2a8038;animation:speakingPulse 1.2s ease-in-out infinite}
-@keyframes speakingPulse{0%,100%{box-shadow:0 0 0 0 rgba(60,160,80,.5)}50%{box-shadow:0 0 0 6px rgba(60,160,80,0)}}
-.card-head .action-btn:focus-visible{outline:2px solid #d4a858;outline-offset:2px}
+/* 总汇车厢 */
+.terminal{background:#fdf8ed;color:var(--ink);height:100%;overflow-y:auto;padding:40px 48px 100px}
+.terminal .th{text-align:center;margin-bottom:30px}
+.terminal h2{font-family:var(--serif);font-size:34px;font-weight:900;color:var(--ink);margin-bottom:6px}
+.terminal .sub{font-family:'Cinzel',serif;letter-spacing:.3em;font-size:12px;color:var(--ink3);text-transform:uppercase}
+.gantt{display:grid;grid-template-columns:140px repeat(5,1fr) 1.8fr;background:white;border-radius:14px;overflow:hidden;border:1px solid rgba(160,100,30,.2);margin-bottom:30px}
+.gh{padding:10px;background:rgba(212,168,88,.15);font-family:var(--mono);font-size:10px;font-weight:700;color:var(--vermilion);letter-spacing:.08em;border-bottom:1px solid rgba(160,100,30,.2);text-align:center}
+.gh:first-child{text-align:left}.gh.legacy{background:rgba(200,72,32,.12)}
+.gc{padding:10px;border-bottom:1px solid rgba(160,100,30,.1);min-height:48px;display:flex;align-items:center}
+.gc.civ-name{font-family:var(--serif);font-weight:700;font-size:12.5px;background:rgba(245,232,200,.3)}
+.gc.block{position:relative;padding:0}
+.gc .bar{position:absolute;left:8%;right:8%;top:30%;bottom:30%;border-radius:4px}
+.gc .bar.peak{opacity:1}.gc .bar.rise,.gc .bar.fade{opacity:.5}
+.gc.legacy-cell{font-size:11px;color:var(--ink2);line-height:1.5;background:rgba(200,72,32,.04)}
+.legacy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.legacy-card{background:white;border:1px solid rgba(160,100,30,.18);border-radius:12px;padding:14px 16px}
+.legacy-card .what{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--vermilion);margin-bottom:3px}
+.legacy-card .from{font-family:var(--mono);font-size:10px;color:var(--gold);letter-spacing:.08em;margin-bottom:6px}
+.legacy-card .why{font-size:12.5px;line-height:1.6;color:var(--ink2)}
+.legacy-h{font-family:var(--serif);font-size:22px;font-weight:900;margin:24px 0 14px;text-align:center}
 
-/* 卡片正文 */
-.card-body{padding:18px 22px 80px}
-.card-body .meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
-.card-body .meta span{padding:4px 10px;background:white;border:1px solid rgba(160,100,30,.3);border-radius:99px;font-family:var(--mono);font-size:10px;color:#5c3a14;font-weight:500}
-.card-body .meta .civ-tag{color:white;border-color:transparent;font-weight:700}
-.card-body .core-q{
-  background:rgba(200,72,32,.08);border-left:4px solid #c84820;
-  padding:14px 16px;border-radius:0 8px 8px 0;margin-bottom:18px;
-  font-family:'STSong','Noto Serif SC',serif;font-size:15px;color:#2c1a08;line-height:1.7;font-weight:500;
-}
-.card-body p{font-size:14px;line-height:1.85;color:#2c1a08;margin-bottom:12px}
-.card-body h3{
-  font-family:'STSong','Noto Serif SC',serif;font-size:16px;color:#c84820;font-weight:700;
-  margin:24px 0 12px;padding-bottom:8px;border-bottom:1.5px solid rgba(200,72,32,.2);
-  display:flex;align-items:center;gap:8px;
-}
-.card-body .src-chip{font-family:var(--mono);font-size:9px;color:white;background:#c84820;padding:2px 7px;border-radius:99px;letter-spacing:.06em;font-weight:700;margin-right:6px}
-.card-body .src-chip.b{background:#2a8038} .card-body .src-chip.c{background:#8a4090}
-
-/* 事实条目 */
-.fact-item{
-  background:white;border:1px solid rgba(160,100,30,.2);border-radius:10px;
-  padding:14px 16px;margin-bottom:10px;line-height:1.75;font-size:13.5px;color:#2c1a08;
-}
-.fact-item .src{display:block;margin-top:8px;font-size:11px;color:#7a5530;font-style:italic;line-height:1.5}
-.fact-item.deep{background:linear-gradient(135deg,#fff,rgba(212,168,88,.08));border-color:rgba(200,72,32,.3)}
-
-/* 误解条目 */
-.misconception{
-  background:rgba(232,152,112,.08);border-left:3px solid #c84820;
-  padding:10px 14px;margin-bottom:8px;border-radius:0 8px 8px 0;font-size:13px;line-height:1.7;color:#2c1a08;
-}
-.misconception strong{color:#c84820}
-.misconception .right{color:#2a6038;display:block;margin-top:4px}
-
-/* 连接条目 (跳转到其他节点) */
-.conn{
-  background:white;border:1.5px solid rgba(160,100,30,.25);border-radius:10px;padding:10px 12px;cursor:pointer;
-  display:flex;align-items:center;gap:10px;margin-bottom:8px;transition:all .15s;min-height:48px;
-}
-.conn:hover{border-color:#c84820;background:rgba(200,72,32,.06);transform:translateX(-2px)}
-.conn:focus-visible{outline:2px solid #d4a858;outline-offset:2px}
-.conn .ico{font-size:22px;flex-shrink:0}
-.conn .info{flex:1;min-width:0}
-.conn .name{font-size:13px;font-weight:700;color:#2c1a08;line-height:1.3}
-.conn .note{font-size:10.5px;color:#7a5530;margin-top:2px;font-family:var(--mono)}
-.conn .tag{font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:4px;color:white;letter-spacing:.1em;text-transform:uppercase;font-weight:700;flex-shrink:0}
-
-/* 上/下导航 — sticky 底部 */
-.card-nav{
-  position:sticky;bottom:0;background:linear-gradient(180deg,rgba(245,232,200,0),#f5e8c8 30%);
-  padding:12px 18px 14px;display:flex;gap:8px;border-top:1.5px solid rgba(200,72,32,.2);
-}
-.card-nav button{
-  flex:1;min-height:44px;border-radius:8px;border:1.5px solid #c84820;
-  background:white;color:#2c1a08;font-family:'STSong','Noto Serif SC',serif;font-size:13px;font-weight:600;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;
-}
-.card-nav button:hover:not(:disabled){background:#c84820;color:white}
-.card-nav button:disabled{opacity:.35;cursor:not-allowed}
-.card-nav button:focus-visible{outline:2px solid #d4a858;outline-offset:2px}
-.card-nav .close-btn{flex:0 0 44px;width:44px;background:transparent;border-color:rgba(160,100,30,.4);color:#7a5530;font-size:16px;font-family:var(--sans)}
-
-/* 浮动 AI 按钮 — 全站可问 */
-.ai-fab{
-  position:fixed;right:22px;bottom:22px;z-index:50;
-  width:60px;height:60px;border-radius:50%;border:none;cursor:pointer;
-  background:linear-gradient(135deg,#e89870,#c84820);color:white;font-size:26px;
-  box-shadow:0 8px 24px rgba(200,72,32,.5),0 0 0 4px rgba(255,255,255,.06);
-  transition:transform .2s;
-}
-.ai-fab:hover{transform:scale(1.08)}
-.ai-fab:focus-visible{outline:3px solid #d4a858;outline-offset:3px}
-.ai-panel{
-  position:fixed;right:22px;bottom:96px;z-index:51;width:380px;max-width:calc(100vw - 44px);
-  height:520px;max-height:calc(100vh - 130px);
-  background:linear-gradient(135deg,#fdf5e0,#f5e8c8);border:2px solid #c84820;border-radius:16px;
-  display:none;flex-direction:column;box-shadow:0 16px 48px rgba(0,0,0,.6);
-}
-.ai-panel.open{display:flex}
-.ai-panel .pnl-head{padding:14px 16px;border-bottom:1.5px solid rgba(200,72,32,.25);display:flex;align-items:center;gap:8px}
-.ai-panel .pnl-head h4{font-family:'STSong','Noto Serif SC',serif;font-size:16px;color:#c84820;flex:1}
-.ai-panel .pnl-head button{width:32px;height:32px;border-radius:6px;border:1px solid rgba(160,100,30,.3);background:white;cursor:pointer;color:#2c1a08}
-.ai-msgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
-.ai-msg{padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.7;max-width:88%}
-.ai-msg.user{align-self:flex-end;background:#c84820;color:white;border-bottom-right-radius:4px}
-.ai-msg.bot{align-self:flex-start;background:white;color:#2c1a08;border:1px solid rgba(160,100,30,.2);border-bottom-left-radius:4px}
-.ai-msg.bot .cursor{display:inline-block;width:6px;height:14px;background:#c84820;margin-left:2px;animation:blink 1s steps(2) infinite;vertical-align:middle}
-@keyframes blink{50%{opacity:0}}
-.ai-form{padding:10px 14px;border-top:1.5px solid rgba(200,72,32,.25);display:flex;gap:8px}
-.ai-form input{flex:1;min-height:44px;padding:0 12px;border-radius:8px;border:1.5px solid rgba(160,100,30,.3);font-family:inherit;font-size:13px;color:#2c1a08;background:white}
-.ai-form input:focus-visible{outline:2px solid #d4a858;outline-offset:1px;border-color:#c84820}
-.ai-form button{min-width:60px;height:44px;border-radius:8px;border:none;background:#c84820;color:white;font-weight:600;cursor:pointer}
-.ai-form button:disabled{opacity:.5;cursor:wait}
-
-/* 演示模式：隐藏所有 .admin-only */
-body:not(.admin) .admin-only{display:none !important}
-
-/* 移动端 */
 @media (max-width:768px){
-  .side{width:100% !important}
-  .ai-panel{right:10px;bottom:84px;width:calc(100vw - 20px);height:70vh}
-  .ai-fab{right:14px;bottom:14px;width:54px;height:54px;font-size:22px}
-}
-.tag-friend{background:#00ffd0;color:#000 !important} .tag-family{background:#ff00aa} .tag-enemy{background:#ff3388}
-.tag-mentor{background:#00ccff} .tag-cause{background:#ffaa00} .tag-effect{background:#00ffd0;color:#000 !important}
-.tag-member{background:#ff00aa}
-
-/* ──── Variant B · Cyber Atlas 专属 ──── */
-.side, .card-head, .card-nav, .ai-panel{background:linear-gradient(135deg,#0a0a0a,#0a1414) !important;border-color:#00ffd0 !important}
-.card-head{border-bottom:1px solid rgba(0,255,208,.3) !important}
-.card-head .ps-label{color:#00ffd0 !important}
-.card-head h2{color:#e8fff8 !important;font-family:'Orbitron','JetBrains Mono',monospace !important;font-size:18px !important;letter-spacing:.04em}
-.card-head .action-btn{background:#000 !important;color:#00ffd0 !important;border-color:#00ffd0 !important;border-radius:4px !important}
-.card-head .action-btn:hover{background:#00ffd0 !important;color:#000 !important}
-.card-body{color:#e8fff8}
-.card-body p, .card-body .core-q{color:#e8fff8 !important;font-family:'JetBrains Mono',monospace !important}
-.card-body .core-q{background:rgba(0,255,208,.06) !important;border-left-color:#00ffd0 !important;border-radius:0 !important}
-.card-body h3{color:#ff00aa !important;font-family:'Orbitron','JetBrains Mono',monospace !important;border-bottom-color:rgba(255,0,170,.3) !important;text-transform:uppercase;font-size:13px;letter-spacing:.1em}
-.card-body .meta span{background:#000 !important;color:#00ffd0 !important;border-color:#00ffd0 !important;border-radius:2px !important;font-weight:700;letter-spacing:.08em}
-.fact-item, .fact-item.deep{background:rgba(0,255,208,.04) !important;border:1px solid rgba(0,255,208,.2) !important;border-radius:2px !important;color:#e8fff8 !important;font-family:'JetBrains Mono',monospace !important}
-.fact-item .src{color:#80f8e0 !important}
-.misconception{background:rgba(255,0,170,.08) !important;border-left-color:#ff00aa !important;color:#e8fff8 !important;border-radius:0 !important}
-.misconception strong, .misconception .right{color:#ff00aa !important}
-.misconception .right{color:#00ffd0 !important}
-.conn{background:rgba(0,255,208,.04) !important;border:1px solid rgba(0,255,208,.25) !important;border-radius:2px !important;color:#e8fff8}
-.conn:hover{border-color:#00ffd0 !important;background:rgba(0,255,208,.1) !important;box-shadow:0 0 12px rgba(0,255,208,.4)}
-.conn .name{color:#e8fff8 !important}
-.conn .note{color:#80f8e0 !important}
-.card-nav{background:linear-gradient(180deg,transparent,#0a0a0a 30%) !important;border-top:1px solid rgba(0,255,208,.3) !important}
-.card-nav button{background:#000 !important;color:#00ffd0 !important;border:1px solid #00ffd0 !important;border-radius:2px !important;font-family:'Orbitron','JetBrains Mono',monospace !important;letter-spacing:.06em}
-.card-nav button:hover:not(:disabled){background:#00ffd0 !important;color:#000 !important;box-shadow:0 0 20px rgba(0,255,208,.6)}
-.ai-fab{background:linear-gradient(135deg,#00ffd0,#ff00aa) !important;color:#000 !important;border-radius:4px !important;box-shadow:0 0 24px rgba(0,255,208,.6) !important}
-.ai-panel{border-color:#00ffd0 !important;border-radius:2px !important}
-.ai-panel .pnl-head h4{color:#00ffd0 !important;font-family:'Orbitron',monospace !important;text-transform:uppercase}
-.ai-msg.user{background:#00ffd0 !important;color:#000 !important;border-radius:2px !important}
-.ai-msg.bot{background:rgba(0,255,208,.06) !important;color:#e8fff8 !important;border:1px solid rgba(0,255,208,.2) !important;border-radius:2px !important}
-.ai-form input{background:#000 !important;color:#00ffd0 !important;border-color:#00ffd0 !important;border-radius:2px !important;font-family:'JetBrains Mono',monospace !important}
-.ai-form button{background:#00ffd0 !important;color:#000 !important;border-radius:2px !important}
-.node-civ circle.bg{stroke:#00ffd0 !important;stroke-width:1.5 !important;filter:drop-shadow(0 0 10px rgba(0,255,208,.7))}
-.node-event circle.bg{stroke:#ff00aa !important;filter:drop-shadow(0 0 8px rgba(255,0,170,.6))}
-.node-person circle.bg{stroke:#ffaa00 !important;filter:drop-shadow(0 0 8px rgba(255,170,0,.5))}
-.top h1{font-family:'Orbitron',monospace !important;letter-spacing:.06em;text-transform:uppercase;font-size:14px}
-
-/* NODES — same as before but cleaner */
-.node{cursor:pointer;transition:opacity .3s,transform .3s}
-.node circle.bg{transition:r .3s,filter .3s}
-.node:hover circle.bg{filter:brightness(1.15)}
-
-.node-civ circle.bg{stroke:var(--glow);stroke-width:2.5}
-.node-civ .label{font-family:var(--serif);font-weight:700;font-size:14px;fill:var(--ink);text-anchor:middle}
-.node-civ .year-tag{font-family:var(--mono);font-size:9px;fill:var(--ink3);letter-spacing:.06em;text-anchor:middle}
-.node-civ .label-bg{fill:rgba(15,15,22,.85);stroke:rgba(232,152,112,.4)}
-
-.node-event circle.bg{stroke:var(--warm);stroke-width:2}
-.node-event .label{font-family:var(--sans);font-weight:500;font-size:10px;fill:var(--ink2);text-anchor:middle}
-
-.node-person circle.bg{stroke:var(--glow);stroke-width:2}
-.node-person .label{font-family:var(--serif);font-weight:600;font-size:11px;fill:var(--ink);text-anchor:middle}
-.node-person .label-bg{fill:rgba(15,15,22,.85);stroke:rgba(232,152,112,.3)}
-
-.edge{stroke-opacity:.55;transition:all .2s;pointer-events:none;fill:none}
-.edge.relate{stroke:#c898e0;stroke-width:1.5}
-.edge.cause{stroke:var(--warm);stroke-width:1.5}
-.edge.member{stroke:rgba(240,192,96,.4);stroke-width:1}
-.edge.contemporary{stroke:rgba(120,200,180,.3);stroke-width:.8;stroke-dasharray:1,4}
-
-.edge-label{font-family:var(--sans);font-size:10px;fill:var(--ink2);font-weight:500;text-anchor:middle;pointer-events:none;letter-spacing:.02em}
-.edge-label-bg{fill:rgba(15,15,22,.92);stroke:rgba(232,152,112,.2);stroke-width:.5}
-
-/* TOOLTIP */
-.tip{
-  position:absolute;background:rgba(20,15,10,.95);color:var(--ink);
-  padding:8px 12px;border-radius:8px;font-size:11px;pointer-events:none;
-  opacity:0;transition:opacity .15s;z-index:20;border:1px solid rgba(232,152,112,.3);
-  max-width:220px;line-height:1.5;backdrop-filter:blur(10px);
-}
-.tip.show{opacity:1}
-
-/* CONTROLS */
-.controls{position:absolute;top:60px;right:18px;display:flex;flex-direction:column;gap:6px;z-index:4}
-.ctrl{
-  width:36px;height:36px;background:rgba(15,15,22,.85);backdrop-filter:blur(10px);
-  border:1px solid rgba(232,152,112,.25);border-radius:50%;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;font-size:14px;
-  color:var(--ink);transition:all .15s;
-}
-.ctrl:hover{background:var(--warm);color:#0a0a0e;border-color:var(--warm)}
-
-.helpbar{
-  position:absolute;top:60px;left:18px;max-width:340px;
-  background:rgba(15,15,22,.88);backdrop-filter:blur(10px);
-  border:1px solid rgba(232,152,112,.25);border-radius:12px;padding:12px 16px;
-  font-size:12px;color:var(--ink2);line-height:1.6;z-index:4;
-}
-.helpbar strong{color:var(--warm);font-family:var(--serif)}
-.helpbar .close-help{float:right;cursor:pointer;color:var(--ink3);font-size:16px;background:none;border:none;margin-left:8px}
-
-@media(max-width:900px){
-  .side{width:100%}
-  .crumb{margin-left:0;flex-wrap:wrap}
+  .window{padding:20px}.window h2{font-size:30px}
+  .interior{padding:18px}
+  .gantt{grid-template-columns:80px repeat(5,1fr) 1.4fr;font-size:10px}
+  .gh,.gc{padding:5px}
 }
 </style>
 </head>
 <body>
-<div class="app">
 
-  <header class="top">
-    <a href="./" class="back">← 主站</a>
-    <h1><em>STAGE 1</em>早期文明关系图谱</h1>
-    <span class="subtitle">前 3500 — 前 1000 BCE</span>
-    <div class="crumb" id="crumb"></div>
-  </header>
-
-  <div class="main">
-    <div class="graph" id="graph">
-      <div class="stars"></div>
-
-      <!-- 时间轴 -->
-      <div class="time-axis">
-        <div class="ticks" id="ticks"></div>
-      </div>
-
-      <svg id="svg"></svg>
-
-      <div class="helpbar" id="helpbar">
-        <button class="close-help" onclick="document.getElementById('helpbar').style.display='none'">✕</button>
-        <strong>🌐 怎么用</strong><br/>
-        <span style="color:var(--ink3);font-size:11px">
-        当前是 <strong>总览</strong>：10 个文明按时间排列在屏幕上。<br/>
-        · 单击任意文明 → 展开它的人物 + 事件<br/>
-        · 单击人物 → 看他的朋友圈<br/>
-        · 单击事件 → 看前因后果<br/>
-        · 顶部 ← 面包屑回退<br/>
-        所有节点 <strong>x 位置 = 时间</strong> (左=早 / 右=晚)
-        </span>
-      </div>
-
-      <div class="controls">
-        <button class="ctrl" onclick="goHome()" title="回到总览">⌂</button>
-      </div>
-
-      <div class="tip" id="tip"></div>
-    </div>
-
-    <aside class="side" id="side" role="dialog" aria-label="知识卡片">
-      <div id="sideHead" class="card-head"></div>
-      <div id="sideContent" class="card-body"></div>
-      <div id="sideNav" class="card-nav"></div>
-    </aside>
-  </div>
+<div class="topbar">
+  <a href="./civ-explorer-compare.html" class="home">← 对比页</a>
+  <h1>早期文明 · 时间列车 <em>FORM B</em></h1>
 </div>
 
-<script src="./early_civ_kb.js"></script>
+<div class="rail">
+  <div class="rail-track"></div>
+  <div class="rail-cars" id="rail"></div>
+</div>
+
+<div class="cabin" id="cabin"></div>
+
+<div class="controls">
+  <button id="prev" onclick="prev()">◀ 上一节</button>
+  <div class="ctx" id="ctx">CAR 1 / 5</div>
+  <button id="next" class="primary" onclick="next()">下一节 ▶</button>
+</div>
+
+<script src="./early_civ_deep.js"></script>
 <script src="./early_civ_explorer_data.js"></script>
+<script src="./chapters_data.js"></script>
 <script>
-const D = EARLY_CIV_EXPLORER;
-const REL_LABEL = {friend:'朋友',family:'家人',enemy:'敌人',mentor:'师承',contemporary:'同代',successor:'继承'};
+let cur = 0; const done = new Set([0]);
 
-const YEAR_MIN = -3600, YEAR_MAX = -950;
-const TOP_PAD = 90;  // 留给时间轴
-
-const svg = document.getElementById('svg');
-const graph = document.getElementById('graph');
-const tip = document.getElementById('tip');
-let W = graph.clientWidth, H = graph.clientHeight;
-
-// 时间 ↔ x 坐标
-function yearToX(y){
-  const padL = 80, padR = 80;
-  return padL + ((y - YEAR_MIN) / (YEAR_MAX - YEAR_MIN)) * (W - padL - padR);
+function renderRail(){
+  const r = document.getElementById('rail');
+  r.innerHTML = CHAPTERS.map((c,i)=>{
+    let cls = '';
+    if (i===cur) cls='current';
+    else if (done.has(i)) cls='done';
+    return `<button class="car-dot ${cls}" onclick="goTo(${i})" title="${c.title}"><span class="ic">${c.icon}</span><span>CAR ${c.no}</span></button>`;
+  }).join('') + `<button class="car-dot ${cur===5?'current':(done.size>=5?'done':'locked')}" onclick="if(done.size>=5)goTo(5)" title="终点站"><span class="ic">🏁</span><span>END</span></button>`;
+  document.getElementById('prev').disabled = cur===0;
+  const n = document.getElementById('next');
+  if (cur===5) { n.textContent='已到终点'; n.disabled=true; }
+  else if (cur===4) { n.textContent='🏁 到终点站 ▶'; n.disabled=false; }
+  else { n.textContent='下一节 ▶'; n.disabled=false; }
+  document.getElementById('ctx').textContent = cur===5 ? '🏁 终点站 · 全景' : `CAR ${cur+1} / 5`;
 }
 
-// 地理 lane → y 坐标
-const LANES = {
-  '美索不达米亚': 1,
-  '尼罗河':       2,
-  '印度河':       3,
-  '黄河':         4,
-  '爱琴海':       5,
-  '安纳托利亚':   6,
-};
-function laneToY(laneName){
-  const idx = LANES[laneName] || 1;
-  const top = TOP_PAD + 50;
-  const bottom = H - 120;
-  const step = (bottom - top) / 6;
-  return top + (idx - 0.5) * step;
-}
-
-// 渲染时间轴
-function renderTimeAxis(){
-  const ticks = document.getElementById('ticks');
-  let html = '';
-  for (let y=-3500; y<=-1000; y+=500) {
-    const left = yearToX(y);
-    html += `<div class="tick" style="left:${left}px"><span>前 ${Math.abs(y)}</span></div>`;
+function getCivInfo(id){
+  if (typeof EARLY_CIV_EXPLORER!=='undefined') {
+    const f = EARLY_CIV_EXPLORER.civilizations.find(c=>c.id===id);
+    if (f) return f;
   }
-  ticks.innerHTML = html;
+  const fb = {egypt_predynastic:{name:'古埃及·前王朝',icon:'🌅',color:'#d4b870'},indus_early:{name:'印度河早期',icon:'🏘',color:'#a070d4'}};
+  return fb[id] || {name:id,icon:'🏛',color:'#888'};
 }
 
-// ════════════════════════════════════════════════════════════════
-// 状态：当前聚焦
-// ════════════════════════════════════════════════════════════════
-let view = {type:'home', focusId:null};
-// view.type: 'home' | 'civ' | 'event' | 'person'
-// view.focusId: 当聚焦节点 id
-
-const navStack = [];
-
-function go(type, id, label){
-  navStack.push(view);
-  view = {type, focusId: id, label};
-  render();
-}
-function goBack(){
-  if (!navStack.length) return;
-  view = navStack.pop();
-  render();
-}
-function goHome(){
-  navStack.length = 0;
-  view = {type:'home', focusId:null};
-  render();
-}
-function jumpTo(idx){
-  view = navStack[idx];
-  navStack.length = idx;
-  render();
-}
-
-// ════════════════════════════════════════════════════════════════
-// 面包屑
-// ════════════════════════════════════════════════════════════════
-function renderCrumb(){
-  const el = document.getElementById('crumb');
-  let html = `<span class="step home-btn ${view.type==='home'?'current':''}" onclick="goHome()">⌂ 总览</span>`;
-  navStack.slice(1).forEach((s, i) => {
-    html += `<span class="arrow">›</span><span class="step" onclick="jumpTo(${i+1})">${labelOf(s)}</span>`;
-  });
-  if (view.type !== 'home') {
-    html += `<span class="arrow">›</span><span class="step current">${labelOf(view)}</span>`;
-  }
-  el.innerHTML = html;
-}
-function labelOf(v){
-  if (v.type === 'home') return '⌂ 总览';
-  if (v.type === 'civ') {
-    const c = D.civilizations.find(x => x.id === v.focusId);
-    return `${c?.icon||''} ${c?.name||''}`;
-  }
-  if (v.type === 'event') {
-    const e = D.events.find(x => x.id === v.focusId);
-    return `📅 ${e?.title||''}`;
-  }
-  if (v.type === 'person') {
-    const p = D.people.find(x => x.id === v.focusId);
-    return `${p?.portrait||''} ${(p?.name||'').split(' ')[0]}`;
-  }
+function renderCar(ch){
+  return `<div class="car-page">
+    <div class="window">
+      <div class="scene" style="background:${ch.mood_grad}"></div>
+      <div class="clouds"></div>
+      <div class="icon">${ch.icon}</div>
+      <div class="range">CAR ${ch.no} · ${ch.range} BCE</div>
+      <h2>${ch.title}</h2>
+      <div class="question">💭 ${ch.hero_question}</div>
+    </div>
+    <div class="interior">
+      <div class="world-ctx">${ch.world_context}</div>
+      <h3 class="section-title">🏛 本节车厢的文明 · ${ch.active_civs.length} 个</h3>
+      ${ch.active_civs.map((cv,idx)=>{
+        const info = getCivInfo(cv.id);
+        return `<div class="civ-card" id="c-${idx}">
+          <div class="civ-head" onclick="toggle(${idx})">
+            <div class="dot-ic" style="background:${info.color}">${info.icon}</div>
+            <div class="info"><div class="name">${info.name}</div><div class="l1">${cv.L1||''}</div></div>
+            <span class="state-chip" data-state="${cv.state}">${cv.state}</span>
+            <div class="expand-ic">▼</div>
+          </div>
+          <div class="civ-body">
+            <div class="layer"><div class="l-label">L2 · 此期状态</div><div class="l-text">${cv.L2||cv.in_period_summary||''}</div></div>
+            ${cv.L3_events?.length ? `<button class="reveal-btn" onclick="reveal(${idx},3)" id="r3-${idx}">▼ 继续 · ${cv.L3_events.length} 个关键事件 (L3)</button><div id="l3-${idx}" style="display:none" class="layer"><div class="l-label">L3 · 关键事件</div><div class="evt-list">${cv.L3_events.map(eid=>{const e=(typeof EVENT_DEEP!=='undefined')?EVENT_DEEP[eid]:null;if(!e)return `<div class="evt-item"><div class="ti">📅 ${eid}</div><div class="meta">深度待补</div></div>`;return `<div class="evt-item"><div class="ti">📅 ${e.full_title}</div><div class="meta">${e.one_liner||''}</div><div class="body">${(e.narrative||'').slice(0,200).trim()}...</div></div>`;}).join('')}</div></div>` : ''}
+            ${cv.L4_people?.length ? `<button class="reveal-btn" onclick="reveal(${idx},4)" id="r4-${idx}">▼ 继续 · ${cv.L4_people.length} 个关键人物 (L4)</button><div id="l4-${idx}" style="display:none" class="layer"><div class="l-label">L4 · 关键人物</div><div class="person-list">${cv.L4_people.map(pid=>{const p=(typeof PERSON_DEEP!=='undefined')?PERSON_DEEP[pid]:null;if(!p)return `<div class="person-item"><div class="ti">${pid}</div><div class="meta">深度待补</div></div>`;return `<div class="person-item"><div class="ti">${p.full_name}</div><div class="meta">${p.lifespan_real||p.lifespan_mythic||''}</div><div class="body">${(p.biography||'').slice(0,220).trim()}...</div></div>`;}).join('')}</div></div>` : ''}
+            ${cv.L5_full ? `<button class="reveal-btn" onclick="reveal(${idx},5)" id="r5-${idx}">▼ 继续 · 完整文明叙事 (L5)</button><div id="l5-${idx}" style="display:none" class="layer"><div class="l-label">L5 · 完整叙事</div><div class="narrative">${((typeof CIV_DEEP!=='undefined'&&CIV_DEEP.sumer)?CIV_DEEP.sumer.opening_narrative:'').trim().split(/\n\s*\n/).map(p=>'<p>'+p.trim()+'</p>').join('')}</div></div>` : ''}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
 }
 
-// ════════════════════════════════════════════════════════════════
-// 渲染
-// ════════════════════════════════════════════════════════════════
+function renderTerminal(){
+  return `<div class="terminal">
+    <div class="th"><h2>🏁 终点站 · 2500 年世界全景</h2><div class="sub">FROM 3500 BCE TO 1000 BCE</div></div>
+    <div class="gantt">
+      <div class="gh">文明</div>
+      <div class="gh">CAR1<br>3500-3000</div><div class="gh">CAR2<br>3000-2500</div><div class="gh">CAR3<br>2500-2000</div><div class="gh">CAR4<br>2000-1500</div><div class="gh">CAR5<br>1500-1000</div>
+      <div class="gh legacy">今天保留</div>
+      ${FINAL_OVERVIEW.civs.map(cv=>{
+        let row = `<div class="gc civ-name">${cv.name}</div>`;
+        for (let ch=1; ch<=5; ch++){
+          const s = cv.spans.find(x=>x[0]===ch);
+          if (s) row += `<div class="gc block"><div class="bar ${s[1].split('_')[0]}" style="background:${cv.color}"></div></div>`;
+          else row += `<div class="gc block"></div>`;
+        }
+        row += `<div class="gc legacy-cell">${cv.legacy}</div>`;
+        return row;
+      }).join('')}
+    </div>
+    <h3 class="legacy-h">🎁 今天我们保留了什么</h3>
+    <div class="legacy-grid">
+      ${FINAL_OVERVIEW.today_legacy.map(l=>`<div class="legacy-card"><div class="what">${l.what}</div><div class="from">来自 · ${l.from}</div><div class="why">${l.why}</div></div>`).join('')}
+    </div>
+  </div>`;
+}
+
 function render(){
-  renderCrumb();
-  if (view.type === 'home') return renderHome();
-  if (view.type === 'civ') return renderCivView(view.focusId);
-  if (view.type === 'event') return renderEventView(view.focusId);
-  if (view.type === 'person') return renderPersonView(view.focusId);
+  document.getElementById('cabin').innerHTML = cur===5 ? renderTerminal() : renderCar(CHAPTERS[cur]);
+  renderRail();
 }
+function toggle(i){ document.getElementById('c-'+i).classList.toggle('expanded'); }
+function reveal(i,n){ document.getElementById(`l${n}-${i}`).style.display='block'; document.getElementById(`r${n}-${i}`).style.display='none'; }
+function next(){ done.add(cur); if (cur<5) cur++; render(); }
+function prev(){ if (cur>0) cur--; render(); }
+function goTo(i){ if (i===5 && done.size<5) return; cur=i; render(); }
 
-// ── HOME · 只显示 10 个文明 ──
-function renderHome(){
-  const items = D.civilizations.filter(c => !c.isEvent).map(c => {
-    const midYear = (c.start + c.end) / 2;
-    return {
-      ...c,
-      x: yearToX(midYear),
-      y: laneToY(c.region.split('(')[0].trim()) || H/2,
-      startX: yearToX(c.start),
-      endX: yearToX(c.end),
-    };
-  });
-
-  let svgHtml = `<defs>
-    <radialGradient id="civGlow"><stop offset="0%" stop-color="rgba(232,152,112,.5)"/><stop offset="100%" stop-color="transparent"/></radialGradient>
-  </defs>`;
-
-  // 文明的时间带 (轻浮于背景)
-  items.forEach(c => {
-    svgHtml += `<rect x="${c.startX}" y="${c.y-3}" width="${c.endX-c.startX}" height="6" fill="${c.color}" opacity=".25" rx="3"/>`;
-  });
-
-  // 地区标签 (左侧)
-  Object.entries(LANES).forEach(([name, idx]) => {
-    const y = laneToY(name);
-    svgHtml += `<text x="14" y="${y+4}" font-family="var(--mono)" font-size="10" fill="${'rgba(232,152,112,.6)'}">${name}</text>`;
-  });
-
-  // 文明节点
-  items.forEach(c => {
-    svgHtml += `<g class="node node-civ" data-id="${c.id}" transform="translate(${c.x},${c.y})">
-      <circle class="halo" r="42" fill="url(#civGlow)"/>
-      <circle class="bg" r="32" fill="${c.color}"/>
-      <text y="8" font-size="26" text-anchor="middle">${c.icon}</text>
-      <rect class="label-bg" x="${-c.name.length*7-6}" y="40" width="${c.name.length*14+12}" height="22" rx="11"/>
-      <text class="label" y="55">${c.name}</text>
-      <text class="year-tag" y="76">前 ${Math.abs(c.start)} - 前 ${Math.abs(c.end)}</text>
-    </g>`;
-  });
-
-  svg.innerHTML = svgHtml;
-  bindNodes();
-  document.getElementById('helpbar').innerHTML = `<button class="close-help" onclick="document.getElementById('helpbar').style.display='none'">✕</button>
-    <strong>🌐 L0 · 时间轴总览</strong><br/>
-    <span style="color:var(--ink3);font-size:11px">
-    10 个文明按 <strong>地理</strong>(纵) × <strong>时间</strong>(横) 排列。<br/>
-    分层阅读：L0 时间轴 → L1 事件 → L2 人物 → L3 关系。<br/>
-    单击任一文明 → 进入 L1。
-    </span>`;
-  document.getElementById('helpbar').style.display = 'block';
-}
-
-// ── CIV VIEW · L1 · 只看历史事件 (不显示人物) ──
-function renderCivView(civId){
-  const c = D.civilizations.find(x => x.id === civId);
-  if (!c) return;
-
-  const events = D.events.filter(e => e.civ === c.id);
-  const people = []; // L1 不显示人物 - 严格分层
-
-  // 文明节点在屏幕中上方，时间轴对应位置
-  const cx = yearToX((c.start + c.end) / 2);
-  const cy = TOP_PAD + 80;
-
-  let svgHtml = `<defs>
-    <radialGradient id="civGlow"><stop offset="0%" stop-color="rgba(232,152,112,.5)"/><stop offset="100%" stop-color="transparent"/></radialGradient>
-    <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="${c.color}"/></marker>
-  </defs>`;
-
-  // 文明时间带
-  svgHtml += `<rect x="${yearToX(c.start)}" y="${cy-1}" width="${yearToX(c.end)-yearToX(c.start)}" height="2" fill="${c.color}" opacity=".5" rx="1"/>`;
-
-  // 事件位置 — 居中
-  const evtY = H/2 + 30;
-  events.forEach(e => {
-    e._x = yearToX(e.year);
-    e._y = evtY;
-  });
-
-  const personY = 0; // 不使用
-
-  // 处理重叠 (同年附近的人物错开 y)
-  function spread(items, baseY, step){
-    items.sort((a,b) => a._x - b._x);
-    for (let i=1; i<items.length; i++) {
-      if (items[i]._x - items[i-1]._x < 70) {
-        items[i]._y = items[i-1]._y === baseY ? baseY + step : baseY;
-      }
-    }
-  }
-  spread(events, evtY, 50);
-  spread(people, personY, 65);
-
-  // 边 (civ → event, civ → person, event 因果链)
-  // 1. civ → events (member)
-  events.forEach(e => {
-    svgHtml += curvePath(cx, cy, e._x, e._y, 'member', '');
-  });
-  // 2. civ → people (member)
-  people.forEach(p => {
-    svgHtml += curvePath(cx, cy, p._x, p._y, 'member', '');
-  });
-  // 3. 事件因果 (此文明内部)
-  events.forEach(e => {
-    (e.leads_to || []).forEach(toId => {
-      const to = events.find(ev => ev.id === toId);
-      if (!to) return;
-      svgHtml += curvePath(e._x, e._y, to._x, to._y, 'cause', '导致', {arrow:true});
-    });
-  });
-  // 4. 人物关系 (内部)
-  people.forEach(p => {
-    (p.relationships || []).forEach(r => {
-      const o = people.find(x => x.id === r.to);
-      if (!o) return;
-      svgHtml += curvePath(p._x, p._y, o._x, o._y, 'relate', REL_LABEL[r.type]||r.type);
-    });
-  });
-
-  // 文明节点 (中心)
-  svgHtml += `<g class="node node-civ" data-id="${c.id}" transform="translate(${cx},${cy})">
-    <circle class="halo" r="56" fill="url(#civGlow)"/>
-    <circle class="bg" r="40" fill="${c.color}"/>
-    <text y="10" font-size="32" text-anchor="middle">${c.icon}</text>
-    <rect class="label-bg" x="${-c.name.length*8-8}" y="50" width="${c.name.length*16+16}" height="24" rx="12"/>
-    <text class="label" y="66" font-size="16">${c.name}</text>
-  </g>`;
-
-  // 事件节点
-  events.forEach(e => {
-    svgHtml += `<g class="node node-event" data-id="e_${e.id}" transform="translate(${e._x},${e._y})">
-      <circle class="bg" r="13" fill="rgba(232,152,112,.18)"/>
-      <text y="5" font-size="14" text-anchor="middle">📅</text>
-      <rect class="label-bg" x="${-e.title.length*5-5}" y="18" width="${e.title.length*10+10}" height="18" rx="9" fill="rgba(15,15,22,.9)" stroke="rgba(232,152,112,.3)"/>
-      <text class="label" y="30" font-size="10">${e.title}</text>
-      <text class="year-tag" y="44" font-family="var(--mono)" font-size="9" fill="${c.color}" text-anchor="middle">前 ${Math.abs(e.year)}</text>
-    </g>`;
-  });
-
-  // 人物节点
-  people.forEach(p => {
-    svgHtml += `<g class="node node-person" data-id="p_${p.id}" transform="translate(${p._x},${p._y})">
-      <circle class="halo" r="28" fill="url(#civGlow)" opacity=".7"/>
-      <circle class="bg" r="22" fill="rgba(240,192,96,.15)"/>
-      <text y="8" font-size="22" text-anchor="middle">${p.portrait}</text>
-      <rect class="label-bg" x="${-p.name.split(' ')[0].length*6-5}" y="28" width="${p.name.split(' ')[0].length*12+10}" height="18" rx="9"/>
-      <text class="label" y="40">${p.name.split(' ')[0]}</text>
-      <text class="year-tag" y="55" font-family="var(--mono)" font-size="9" fill="${c.color}" text-anchor="middle">前 ${Math.abs(p.born)}-${Math.abs(p.died)}</text>
-    </g>`;
-  });
-
-  // 层级标签
-  svgHtml += `<text x="14" y="${evtY+5}" font-family="var(--mono)" font-size="10" fill="rgba(232,152,112,.5)">📅 事件</text>`;
-
-  svg.innerHTML = svgHtml;
-  bindNodes();
-
-  // helpbar
-  document.getElementById('helpbar').innerHTML = `<button class="close-help" onclick="document.getElementById('helpbar').style.display='none'">✕</button>
-    <strong>📜 L1 · ${c.name}</strong> · 前 ${Math.abs(c.start)}-${Math.abs(c.end)} BCE<br/>
-    <span style="color:var(--ink3);font-size:11px">
-    ${events.length} 个关键历史事件，按时间排列。<br/>
-    单击 📅 任一事件 → 看该事件中的人物。
-    </span>`;
-  document.getElementById('helpbar').style.display = 'block';
-
-  showSideForCiv(c);
-}
-
-// ── EVENT VIEW · L2 · 此事件中的相关人物 ──
-function renderEventView(eventId){
-  const e = D.events.find(x => x.id === eventId);
-  if (!e) return;
-
-  const civ = e.civ ? D.civilizations.find(c => c.id === e.civ) : null;
-  const color = civ ? civ.color : '#7a2818';
-
-  // 找出与此事件相关的人物：同文明 + 生卒年覆盖事件年份 ± 80 年
-  const relatedPeople = D.people.filter(p => {
-    if (p.civ !== e.civ) return false;
-    return p.born <= e.year + 80 && p.died >= e.year - 80;
-  });
-
-  const cx = yearToX(e.year), cy = TOP_PAD + 100;
-
-  let svgHtml = `<defs>
-    <radialGradient id="civGlow"><stop offset="0%" stop-color="rgba(232,152,112,.5)"/><stop offset="100%" stop-color="transparent"/></radialGradient>
-    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="${color}"/></marker>
-  </defs>`;
-
-  // 中心事件 (顶部，时间轴对应位置)
-  svgHtml += `<g class="node node-event" data-id="e_${e.id}" transform="translate(${cx},${cy})">
-    <circle class="halo" r="50" fill="url(#civGlow)"/>
-    <circle class="bg" r="32" fill="${color}" opacity=".5"/>
-    <text y="10" font-size="30" text-anchor="middle">📅</text>
-    <rect class="label-bg" x="${-e.title.length*7-7}" y="42" width="${e.title.length*14+14}" height="22" rx="11" fill="rgba(15,15,22,.95)" stroke="${color}" stroke-width="1.5"/>
-    <text class="label" y="57" font-size="13">${e.title}</text>
-    <text class="year-tag" y="76" font-family="var(--mono)" font-size="11" fill="${color}" text-anchor="middle">前 ${Math.abs(e.year)} · ${e.type}</text>
-  </g>`;
-
-  // 人物排成一行，按出生年排序
-  const peopleY = H/2 + 60;
-  relatedPeople.sort((a,b) => a.born - b.born);
-  relatedPeople.forEach((p, i) => {
-    p._x = yearToX((p.born + p.died) / 2);
-    p._y = peopleY + (i % 2 === 0 ? 0 : 70);
-  });
-
-  // 事件 → 人物连线
-  relatedPeople.forEach(p => {
-    svgHtml += curvePath(cx, cy, p._x, p._y, 'member', '');
-  });
-
-  // 人物节点 (大)
-  relatedPeople.forEach(p => {
-    svgHtml += `<g class="node node-person" data-id="p_${p.id}" transform="translate(${p._x},${p._y})">
-      <circle class="halo" r="36" fill="url(#civGlow)" opacity=".7"/>
-      <circle class="bg" r="28" fill="rgba(240,192,96,.2)" stroke="${color}" stroke-width="2"/>
-      <text y="10" font-size="28" text-anchor="middle">${p.portrait}</text>
-      <rect class="label-bg" x="${-p.name.split(' ')[0].length*7-6}" y="36" width="${p.name.split(' ')[0].length*14+12}" height="20" rx="10"/>
-      <text class="label" y="50" font-size="12">${p.name.split(' ')[0]}</text>
-      <text class="year-tag" y="65" font-family="var(--mono)" font-size="9" fill="${color}" text-anchor="middle">前 ${Math.abs(p.born)}-${Math.abs(p.died)}</text>
-    </g>`;
-  });
-
-  // 层级标签
-  svgHtml += `<text x="14" y="${peopleY+5}" font-family="var(--mono)" font-size="10" fill="rgba(232,152,112,.5)">👤 此事件中的关键人物</text>`;
-
-  if (relatedPeople.length === 0) {
-    svgHtml += `<text x="${W/2}" y="${peopleY+40}" text-anchor="middle" font-size="13" fill="rgba(232,152,112,.6)">该事件未关联具名人物。可在右侧卡片继续阅读。</text>`;
-  }
-
-  svg.innerHTML = svgHtml;
-  bindNodes();
-
-  document.getElementById('helpbar').innerHTML = `<button class="close-help" onclick="document.getElementById('helpbar').style.display='none'">✕</button>
-    <strong>📅 L2 · ${e.title}</strong> · 前 ${Math.abs(e.year)} BCE<br/>
-    <span style="color:var(--ink3);font-size:11px">
-    此时活跃于 ${civ?.name||'该地'} 的 ${relatedPeople.length} 位关键人物。<br/>
-    单击 👤 任一人物 → 看 ta 的关系网。
-    </span>`;
-  document.getElementById('helpbar').style.display = 'block';
-
-  showSideForEvent(e);
-}
-
-// ── PERSON VIEW · 朋友圈放射 ──
-function renderPersonView(personId){
-  const p = D.people.find(x => x.id === personId);
-  if (!p) return;
-  const civ = D.civilizations.find(c => c.id === p.civ) || {color:'#888',name:p.civ,icon:'❓'};
-
-  const friends = (p.relationships || []).map(r => {
-    const o = D.people.find(x => x.id === r.to);
-    return o ? {person:o, type:r.type, note:r.note} : null;
-  }).filter(Boolean);
-
-  const cx = W/2, cy = H/2;
-
-  let svgHtml = `<defs>
-    <radialGradient id="civGlow"><stop offset="0%" stop-color="rgba(232,152,112,.5)"/><stop offset="100%" stop-color="transparent"/></radialGradient>
-  </defs>`;
-
-  // 朋友按时间轴+角度排列
-  const friendCount = friends.length;
-  const ringR = 220;
-  friends.forEach((f, i) => {
-    const angle = -Math.PI/2 + (i - (friendCount-1)/2) * (Math.PI * 1.4 / Math.max(friendCount,1));
-    f._x = cx + Math.cos(angle) * ringR;
-    f._y = cy + Math.sin(angle) * ringR;
-    // 优先按时间排序水平方向
-  });
-  // 按时间重排 x 位置
-  friends.sort((a,b) => (a.person.born) - (b.person.born));
-  friends.forEach((f, i) => {
-    f._x = yearToX((f.person.born + f.person.died) / 2);
-    // y 上下交替
-    f._y = cy + (i % 2 === 0 ? -160 : 160) + (Math.floor(i/2) % 3 - 1) * 50;
-  });
-
-  // 连接线
-  friends.forEach(f => {
-    svgHtml += curvePath(cx, cy, f._x, f._y, 'relate', REL_LABEL[f.type]||f.type);
-  });
-
-  // 朋友节点
-  friends.forEach(f => {
-    const ocv = D.civilizations.find(c => c.id === f.person.civ) || {color:'#888'};
-    svgHtml += `<g class="node node-person" data-id="p_${f.person.id}" transform="translate(${f._x},${f._y})">
-      <circle class="halo" r="32" fill="url(#civGlow)" opacity=".6"/>
-      <circle class="bg" r="24" fill="rgba(240,192,96,.15)" stroke="${ocv.color}"/>
-      <text y="9" font-size="24" text-anchor="middle">${f.person.portrait}</text>
-      <rect class="label-bg" x="${-f.person.name.split(' ')[0].length*6-5}" y="30" width="${f.person.name.split(' ')[0].length*12+10}" height="18" rx="9"/>
-      <text class="label" y="42">${f.person.name.split(' ')[0]}</text>
-      <text class="year-tag" y="58" font-family="var(--mono)" font-size="9" fill="var(--ink3)" text-anchor="middle">前 ${Math.abs(f.person.born)}-${Math.abs(f.person.died)}</text>
-    </g>`;
-  });
-
-  // 中心人物 (大)
-  svgHtml += `<g class="node node-person focused" data-id="p_${p.id}" transform="translate(${cx},${cy})">
-    <circle class="halo" r="60" fill="url(#civGlow)"/>
-    <circle class="bg" r="44" fill="rgba(240,192,96,.2)" stroke="${civ.color}" stroke-width="3"/>
-    <text y="15" font-size="42" text-anchor="middle">${p.portrait}</text>
-    <rect class="label-bg" x="${-p.name.length*7-7}" y="52" width="${p.name.length*14+14}" height="22" rx="11" fill="rgba(15,15,22,.95)" stroke="${civ.color}" stroke-width="1.5"/>
-    <text class="label" y="67" font-size="13">${p.name}</text>
-    <text class="year-tag" y="88" font-family="var(--mono)" font-size="11" fill="${civ.color}" text-anchor="middle">前 ${Math.abs(p.born)} - 前 ${Math.abs(p.died)}</text>
-  </g>`;
-
-  svg.innerHTML = svgHtml;
-  bindNodes();
-
-  document.getElementById('helpbar').innerHTML = `<button class="close-help" onclick="document.getElementById('helpbar').style.display='none'">✕</button>
-    <strong>${p.portrait} L3 · ${p.name}</strong> · ${civ.name}<br/>
-    <span style="color:var(--ink3);font-size:11px">
-    周围是他 <strong>直接关系</strong> 的 ${friends.length} 个人 (人与人之间的关系)。<br/>
-    每个朋友按 <strong>出生年</strong> 在时间轴上的位置。<br/>
-    点任意朋友继续看他的朋友圈。
-    </span>`;
-  document.getElementById('helpbar').style.display = 'block';
-
-  showSideForPerson(p);
-}
-
-// ════════════════════════════════════════════════════════════════
-// 工具：曲线路径 + 标签
-// ════════════════════════════════════════════════════════════════
-function curvePath(x1, y1, x2, y2, type, label, opts={}){
-  const dx = x2 - x1, dy = y2 - y1;
-  const dist = Math.sqrt(dx*dx+dy*dy) + 1;
-  const mx = (x1+x2)/2, my = (y1+y2)/2;
-  const nx = -dy/dist, ny = dx/dist;
-  const curve = Math.min(dist * 0.18, 50);
-  const cx = mx + nx*curve, cy = my + ny*curve;
-  let out = `<path class="edge ${type}" d="M ${x1},${y1} Q ${cx},${cy} ${x2},${y2}"${opts.arrow?' marker-end="url(#arrowhead)"':''}/>`;
-  if (label) {
-    const lblW = label.length * 11 + 12;
-    out += `<rect class="edge-label-bg" x="${cx - lblW/2}" y="${cy - 8}" width="${lblW}" height="16" rx="8"/>
-            <text class="edge-label" x="${cx}" y="${cy + 4}">${label}</text>`;
-  }
-  return out;
-}
-
-// ════════════════════════════════════════════════════════════════
-// 节点绑定
-// ════════════════════════════════════════════════════════════════
-function bindNodes(){
-  svg.querySelectorAll('.node').forEach(el => {
-    const id = el.getAttribute('data-id');
-    el.addEventListener('mouseenter', e => showTip(e, id));
-    el.addEventListener('mouseleave', () => hideTip());
-    el.addEventListener('click', e => {
-      e.stopPropagation();
-      onNodeClick(id);
-    });
-  });
-}
-
-function onNodeClick(id){
-  // id 格式: c_xxx / e_xxx / p_xxx 或 civ id (不带前缀)
-  if (id.startsWith('c_')) {
-    const civId = id.slice(2);
-    go('civ', civId);
-  } else if (id.startsWith('e_')) {
-    go('event', id.slice(2));
-  } else if (id.startsWith('p_')) {
-    go('person', id.slice(2));
-  } else {
-    // home 模式下 civ 节点 data-id 是裸 id
-    go('civ', id);
-  }
-}
-
-// ════════════════════════════════════════════════════════════════
-// Tooltip
-// ════════════════════════════════════════════════════════════════
-function showTip(e, id){
-  const realId = id.startsWith('c_') || id.startsWith('e_') || id.startsWith('p_') ? id.slice(2) : id;
-  let t = '';
-  if (id.startsWith('c_') || (!id.includes('_') && D.civilizations.find(c=>c.id===id))) {
-    const c = D.civilizations.find(x => x.id === realId);
-    if (c) t = `<strong>${c.icon} ${c.name}</strong><br><span style="color:var(--ink3)">${c.region}</span><br>前 ${Math.abs(c.start)} - 前 ${Math.abs(c.end)}`;
-  } else if (id.startsWith('e_')) {
-    const ev = D.events.find(x => x.id === realId);
-    if (ev) t = `<strong>📅 ${ev.title}</strong><br><span style="color:var(--ink3)">前 ${Math.abs(ev.year)} BCE · ${ev.type}</span>`;
-  } else if (id.startsWith('p_')) {
-    const p = D.people.find(x => x.id === realId);
-    if (p) t = `<strong>${p.portrait} ${p.name}</strong><br><span style="color:var(--ink3)">${p.role}</span><br>前 ${Math.abs(p.born)} - 前 ${Math.abs(p.died)}`;
-  }
-  if (!t) return;
-  tip.innerHTML = t;
-  tip.classList.add('show');
-  const r = graph.getBoundingClientRect();
-  tip.style.left = (e.clientX - r.left + 14) + 'px';
-  tip.style.top = (e.clientY - r.top + 14) + 'px';
-}
-function hideTip(){ tip.classList.remove('show'); }
-
-// ════════════════════════════════════════════════════════════════
-// 侧栏渲染
-// ════════════════════════════════════════════════════════════════
-// ── EARLY_CIV_KB 映射 (civId → 深度 11 字段节点) ──
-const CIV_TO_KB = {
-  sumer:'E01_sumer_first_civilization', egypt_old:'E02_egypt_old_kingdom',
-  indus:'E03_indus_valley', akkad:'E04_akkad_first_empire',
-  babylon:'E05_babylon_old_kingdom', egypt_new:'E06_egypt_new_kingdom',
-  shang:'E07_shang_dynasty', minoan:'E08_aegean_minoan_mycenaean',
-  mycenaean:'E08_aegean_minoan_mycenaean', hittite:'E09_hittite_empire',
-  bronze_collapse:'E10_bronze_age_collapse',
-};
-function getKB(civId){
-  const nodeId = CIV_TO_KB[civId]; if (!nodeId) return null;
-  return (typeof EARLY_CIV_KB!=='undefined') ? EARLY_CIV_KB.find(n=>n.node_id===nodeId) : null;
-}
-
-// ── 朗读 (Web Speech API, 中文) ──
-let speakingBtn = null;
-function stripHTML(s){ const d=document.createElement('div'); d.innerHTML=s; return d.textContent||d.innerText||''; }
-function speak(text, btn){
-  if (!('speechSynthesis' in window)) { alert('您的浏览器不支持语音朗读'); return; }
-  if (speakingBtn === btn) { speechSynthesis.cancel(); speakingBtn.classList.remove('speaking'); speakingBtn=null; return; }
-  if (speakingBtn) { speechSynthesis.cancel(); speakingBtn.classList.remove('speaking'); }
-  const u = new SpeechSynthesisUtterance(stripHTML(text));
-  u.lang = 'zh-CN'; u.rate = 1.0; u.pitch = 1.0;
-  u.onend = ()=>{ btn.classList.remove('speaking'); if(speakingBtn===btn) speakingBtn=null; };
-  u.onerror = u.onend;
-  speechSynthesis.speak(u);
-  btn.classList.add('speaking'); speakingBtn = btn;
-}
-window.speakCard = function(){
-  const btn = document.getElementById('speakBtn');
-  const text = document.getElementById('sideContent').innerText;
-  speak(text, btn);
-};
-
-// ── 上/下导航 ──
-let currentNode = null; // {type, id}
-function navList(){
-  if (!currentNode) return [];
-  if (currentNode.type==='civ') return D.civilizations.map(c=>({type:'civ',id:c.id}));
-  if (currentNode.type==='event'){
-    const civ = D.events.find(e=>e.id===currentNode.id)?.civ;
-    return D.events.filter(e=>e.civ===civ).sort((a,b)=>a.year-b.year).map(e=>({type:'event',id:e.id}));
-  }
-  if (currentNode.type==='person'){
-    const civ = D.people.find(p=>p.id===currentNode.id)?.civ;
-    return D.people.filter(p=>p.civ===civ).sort((a,b)=>a.born-b.born).map(p=>({type:'person',id:p.id}));
-  }
-  return [];
-}
-window.navPrev = ()=>{ const list=navList(); const i=list.findIndex(x=>x.id===currentNode.id); if(i>0) go(list[i-1].type, list[i-1].id); };
-window.navNext = ()=>{ const list=navList(); const i=list.findIndex(x=>x.id===currentNode.id); if(i>=0&&i<list.length-1) go(list[i+1].type, list[i+1].id); };
-
-function renderNav(){
-  const list = navList(); const i = list.findIndex(x=>x.id===currentNode?.id);
-  document.getElementById('sideNav').innerHTML = `
-    <button onclick="navPrev()" ${i<=0?'disabled':''} aria-label="上一个">⬅ 上一个</button>
-    <button class="close-btn" onclick="closeSide()" aria-label="关闭">✕</button>
-    <button onclick="navNext()" ${i<0||i>=list.length-1?'disabled':''} aria-label="下一个">下一个 ➡</button>
-  `;
-}
-
-function buildHead(label, iconHtml, title, color){
-  return `
-    <div class="head-info">
-      <div class="ps-label">${label}</div>
-      <h2><span class="icon" style="color:${color||'#c84820'}">${iconHtml}</span>${title}</h2>
-    </div>
-    <button id="speakBtn" class="action-btn" onclick="speakCard()" aria-label="朗读卡片" title="朗读">🔊</button>
-  `;
-}
-
-function showSideForCiv(c){
-  const side=document.getElementById('side'); side.classList.add('open');
-  currentNode = {type:'civ', id:c.id};
-  const ev = D.events.filter(e=>e.civ===c.id).sort((a,b)=>a.year-b.year);
-  const pp = D.people.filter(p=>p.civ===c.id).sort((a,b)=>a.born-b.born);
-  const kb = getKB(c.id);
-
-  document.getElementById('sideHead').innerHTML = buildHead('CIVILIZATION · L1 · 文明', c.icon, c.name, c.color);
-
-  let factsHTML = '', missHTML = '', childHTML = '', srcHTML = '';
-  if (kb) {
-    if (kb.core_question) {}
-    if (kb.fact_base?.length) {
-      factsHTML = `<h3>📚 事实底板 <span class="src-chip">A 级</span></h3>` +
-        kb.fact_base.slice(0,8).map(f=>`<div class="fact-item deep">${f.fact||f.text||f}${f.source?`<span class="src">来源 · ${f.source}</span>`:''}</div>`).join('');
-    }
-    if (kb.child_explanation?.length) {
-      childHTML = `<h3>🧒 儿童化解释 <span class="src-chip b">B 级</span></h3>` +
-        kb.child_explanation.slice(0,4).map(c=>`<div class="fact-item">${c.text||c.explanation||c}</div>`).join('');
-    }
-    if (kb.common_misconceptions?.length) {
-      missHTML = `<h3>⚠️ 常见误解</h3>` +
-        kb.common_misconceptions.slice(0,4).map(m=>`<div class="misconception"><strong>误解：</strong>${m.misconception||m.wrong||m}${m.correction||m.right?`<span class="right">✓ 真相：${m.correction||m.right}</span>`:''}</div>`).join('');
-    }
-    if (kb.sources?.length) {
-      srcHTML = `<h3>🔗 来源</h3>` +
-        kb.sources.slice(0,6).map(s=>`<div class="fact-item" style="font-size:11.5px"><span class="src-chip ${(s.tier||'A').toLowerCase()}">${s.tier||'A'}</span>${s.name||s.title||s}${s.url?` · <a href="${s.url}" target="_blank" style="color:#c84820">链接</a>`:''}</div>`).join('');
-    }
-  }
-
-  document.getElementById('sideContent').innerHTML = `
-    <div class="meta">
-      <span class="civ-tag" style="background:${c.color}">${c.region}</span>
-      <span>前 ${Math.abs(c.start)} – 前 ${Math.abs(c.end)} BCE</span>
-      ${kb?`<span>${kb.time_range||''}</span>`:''}
-    </div>
-    ${kb?.core_question?`<div class="core-q">💭 核心问题：${kb.core_question}</div>`:''}
-    ${factsHTML}
-    ${childHTML}
-    ${missHTML}
-    <h3>📅 关键历史事件 (${ev.length}) · 点击进入 L2</h3>
-    ${ev.map(e=>`<div class="conn" tabindex="0" onclick="onNodeClick('e_${e.id}')" onkeydown="if(event.key==='Enter')onNodeClick('e_${e.id}')"><span class="ico">📅</span><div class="info"><div class="name">${e.title}</div><div class="note">前 ${Math.abs(e.year)} · ${e.type}</div></div></div>`).join('')||'<p>暂无事件数据</p>'}
-    ${srcHTML}
-  `;
-  renderNav();
-}
-
-function showSideForEvent(e){
-  const side=document.getElementById('side'); side.classList.add('open');
-  currentNode = {type:'event', id:e.id};
-  const civ = e.civ ? D.civilizations.find(c=>c.id===e.civ) : null;
-  const relatedPeople = D.people.filter(p => p.civ===e.civ && p.born<=e.year+80 && p.died>=e.year-80)
-    .sort((a,b)=>a.born-b.born);
-  const causes = (e.caused_by||[]).map(id=>D.events.find(x=>x.id===id)).filter(Boolean);
-  const leads = (e.leads_to||[]).map(id=>D.events.find(x=>x.id===id)).filter(Boolean);
-
-  document.getElementById('sideHead').innerHTML = buildHead('EVENT · L2 · 事件', '📅', e.title, civ?.color);
-  document.getElementById('sideContent').innerHTML = `
-    <div class="meta">
-      <span>前 ${Math.abs(e.year)} BCE</span>
-      <span>${e.type}</span>
-      ${civ?`<span class="civ-tag" style="background:${civ.color}">${civ.icon} ${civ.name}</span>`:''}
-    </div>
-    ${e.desc?`<div class="core-q">${e.desc}</div>`:''}
-    <h3>👤 此事件中的人物 (${relatedPeople.length}) · 点击进入 L3</h3>
-    ${relatedPeople.map(p=>`<div class="conn" tabindex="0" onclick="onNodeClick('p_${p.id}')" onkeydown="if(event.key==='Enter')onNodeClick('p_${p.id}')"><span class="ico">${p.portrait}</span><div class="info"><div class="name">${p.name}</div><div class="note">${p.role} · 前 ${Math.abs(p.born)}-${Math.abs(p.died)}</div></div></div>`).join('')||'<p style="color:#7a5530;font-size:12.5px">该事件未关联具名人物。</p>'}
-    ${causes.length?`<h3>⬅ 此事件的起因 (${causes.length})</h3>${causes.map(c=>`<div class="conn" tabindex="0" onclick="onNodeClick('e_${c.id}')"><span class="ico">📅</span><div class="info"><div class="name">${c.title}</div><div class="note">前 ${Math.abs(c.year)} · ${c.type}</div></div><span class="tag" style="background:#c84820">起因</span></div>`).join('')}`:''}
-    ${leads.length?`<h3>➡ 此事件的后果 (${leads.length})</h3>${leads.map(c=>`<div class="conn" tabindex="0" onclick="onNodeClick('e_${c.id}')"><span class="ico">📅</span><div class="info"><div class="name">${c.title}</div><div class="note">前 ${Math.abs(c.year)} · ${c.type}</div></div><span class="tag" style="background:#2a8038">后果</span></div>`).join('')}`:''}
-    ${civ?`<h3>🏛 返回所属文明</h3><div class="conn" tabindex="0" onclick="onNodeClick('c_${civ.id}')"><span class="ico">${civ.icon}</span><div class="info"><div class="name">${civ.name}</div><div class="note">回到 L1</div></div><span class="tag" style="background:${civ.color}">L1</span></div>`:''}
-  `;
-  renderNav();
-}
-
-function showSideForPerson(p){
-  const side=document.getElementById('side'); side.classList.add('open');
-  currentNode = {type:'person', id:p.id};
-  const civ = D.civilizations.find(c=>c.id===p.civ) || {color:'#888',name:p.civ,icon:'❓'};
-
-  document.getElementById('sideHead').innerHTML = buildHead('PERSON · L3 · 人物关系', p.portrait, p.name, civ.color);
-  document.getElementById('sideContent').innerHTML = `
-    <div class="meta">
-      <span class="civ-tag" style="background:${civ.color}">${civ.icon} ${civ.name}</span>
-      <span>${p.role}</span>
-      <span>前 ${Math.abs(p.born)} – 前 ${Math.abs(p.died)} BCE</span>
-    </div>
-    ${p.desc?`<div class="core-q">${p.desc}</div>`:''}
-    ${p.inventions?.length?`<h3>🏆 主要贡献</h3>${p.inventions.map(i=>`<div class="fact-item">• ${i}</div>`).join('')}`:''}
-    <h3>🏛 所属文明</h3>
-    <div class="conn" tabindex="0" onclick="onNodeClick('c_${p.civ}')"><span class="ico">${civ.icon}</span><div class="info"><div class="name">${civ.name}</div><div class="note">${civ.region}</div></div><span class="tag" style="background:${civ.color}">归属</span></div>
-    ${p.relationships?.length?`<h3>🤝 朋友圈 (${p.relationships.length})</h3>${p.relationships.map(r=>{const o=D.people.find(x=>x.id===r.to);if(!o)return'';return`<div class="conn" tabindex="0" onclick="onNodeClick('p_${o.id}')"><span class="ico">${o.portrait}</span><div class="info"><div class="name">${o.name}</div><div class="note">${r.note||o.role}</div></div><span class="tag" style="background:${r.type==='enemy'?'#c84820':r.type==='family'?'#8a4090':'#2a8038'}">${REL_LABEL[r.type]||r.type}</span></div>`;}).join('')}`:''}
-  `;
-  renderNav();
-}
-
-function closeSide(){
-  document.getElementById('side').classList.remove('open');
-  if (speakingBtn) { speechSynthesis.cancel(); speakingBtn.classList.remove('speaking'); speakingBtn=null; }
-}
-
-// ════════════════════════════════════════════════════════════════
-// 浮动 AI · 全站可问 · 流式输出
-// ════════════════════════════════════════════════════════════════
-const AI_KEY_STORAGE = 'civ_qwen_key';
-function getAIKey(){ return localStorage.getItem(AI_KEY_STORAGE) || ''; }
-function setAIKey(k){ localStorage.setItem(AI_KEY_STORAGE, k); }
-
-function injectFloatingAI(){
-  const fab = document.createElement('button');
-  fab.className='ai-fab'; fab.id='aiFab'; fab.innerHTML='🤖';
-  fab.setAttribute('aria-label','打开 AI 助手'); fab.title='AI 助手';
-  fab.onclick = ()=>document.getElementById('aiPanel').classList.toggle('open');
-  document.body.appendChild(fab);
-
-  const pnl = document.createElement('div');
-  pnl.className='ai-panel'; pnl.id='aiPanel';
-  pnl.innerHTML = `
-    <div class="pnl-head">
-      <h4>🤖 文明实验室 AI</h4>
-      <button onclick="document.getElementById('aiPanel').classList.remove('open')" aria-label="关闭">✕</button>
-    </div>
-    <div class="ai-msgs" id="aiMsgs">
-      <div class="ai-msg bot">你好！我是基于 A 级博物馆 / Nature 来源的文明助手。问我任何关于早期文明的问题，例如「楔形文字怎么发明的？」</div>
-    </div>
-    <form class="ai-form" id="aiForm">
-      <input type="text" id="aiInput" placeholder="问我任何问题..." aria-label="输入问题" autocomplete="off"/>
-      <button type="submit" id="aiSend">发送</button>
-    </form>
-  `;
-  document.body.appendChild(pnl);
-  document.getElementById('aiForm').onsubmit = e=>{ e.preventDefault(); sendAIMsg(); };
-}
-
-function appendMsg(role, html, withCursor){
-  const box = document.getElementById('aiMsgs');
-  const div = document.createElement('div');
-  div.className = 'ai-msg ' + role;
-  div.innerHTML = html + (withCursor?'<span class="cursor"></span>':'');
-  box.appendChild(div); box.scrollTop = box.scrollHeight;
-  return div;
-}
-
-function buildAIContext(){
-  // 把当前节点 + KB 摘要塞进 system prompt
-  let ctx = '你是 AI 世界文明实验室助手，面向 10-15 岁中学生，用 DK / National Geographic Kids 的儿童语言。只用 A 级（博物馆 / Nature / Britannica）事实，不能编造细节。不知道就说不知道。\n\n';
-  if (currentNode) {
-    if (currentNode.type==='civ') {
-      const c = D.civilizations.find(x=>x.id===currentNode.id);
-      const kb = getKB(currentNode.id);
-      ctx += `用户正在看：${c?.name} (前${Math.abs(c?.start)}-前${Math.abs(c?.end)} BCE, ${c?.region})\n`;
-      if (kb?.fact_base) ctx += '已知事实:\n' + kb.fact_base.slice(0,5).map(f=>'- '+(f.fact||f.text||f)).join('\n') + '\n';
-    } else if (currentNode.type==='event') {
-      const e = D.events.find(x=>x.id===currentNode.id);
-      ctx += `用户正在看事件：${e?.title} (前${Math.abs(e?.year)} BCE)\n${e?.desc||''}\n`;
-    } else if (currentNode.type==='person') {
-      const p = D.people.find(x=>x.id===currentNode.id);
-      ctx += `用户正在看人物：${p?.name} · ${p?.role} (前${Math.abs(p?.born)}-前${Math.abs(p?.died)})\n${p?.desc||''}\n`;
-    }
-  }
-  return ctx;
-}
-
-async function sendAIMsg(){
-  const input = document.getElementById('aiInput');
-  const q = input.value.trim(); if (!q) return;
-  const sendBtn = document.getElementById('aiSend');
-  input.value=''; sendBtn.disabled=true;
-  appendMsg('user', q.replace(/</g,'&lt;'));
-
-  let key = getAIKey();
-  if (!key) {
-    key = prompt('请输入千问 API Key (一次性, 存本地):\n获取地址 https://dashscope.console.aliyun.com/');
-    if (!key) { sendBtn.disabled=false; return; }
-    setAIKey(key);
-  }
-
-  const botDiv = appendMsg('bot', '', true);
-  let acc = '';
-  try {
-    const resp = await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-      body: JSON.stringify({
-        model:'qwen-turbo',
-        messages:[{role:'system',content:buildAIContext()},{role:'user',content:q}],
-        stream:true, max_tokens:600,
-      }),
-    });
-    if (!resp.ok) throw new Error('HTTP '+resp.status);
-    const reader = resp.body.getReader(); const dec = new TextDecoder();
-    let buf = '';
-    while(true){
-      const {done,value} = await reader.read(); if (done) break;
-      buf += dec.decode(value, {stream:true});
-      const lines = buf.split('\n'); buf = lines.pop();
-      for (const line of lines) {
-        if (!line.startsWith('data: ')) continue;
-        const data = line.slice(6).trim(); if (data==='[DONE]') continue;
-        try {
-          const json = JSON.parse(data);
-          const chunk = json.choices?.[0]?.delta?.content || '';
-          if (chunk) { acc += chunk; botDiv.innerHTML = acc.replace(/\n/g,'<br>') + '<span class="cursor"></span>'; document.getElementById('aiMsgs').scrollTop=99999; }
-        } catch(_){}
-      }
-    }
-    botDiv.innerHTML = acc.replace(/\n/g,'<br>');
-  } catch(err) {
-    botDiv.innerHTML = '⚠️ 出错：' + err.message + '<br><small>(可能是 Key 错误，可手动 localStorage.removeItem("civ_qwen_key") 重置)</small>';
-  } finally {
-    sendBtn.disabled=false; input.focus();
-  }
-}
-
-// 演示模式检测
-if (new URLSearchParams(location.search).get('admin')==='1') document.body.classList.add('admin');
-injectFloatingAI();
-
-window.addEventListener('resize', () => {
-  W = graph.clientWidth; H = graph.clientHeight;
-  renderTimeAxis();
-  render();
-});
-
-renderTimeAxis();
 render();
-
-window.goHome = goHome;
-window.goBack = goBack;
-window.jumpTo = jumpTo;
-window.onNodeClick = onNodeClick;
-window.closeSide = closeSide;
+window.toggle=toggle; window.reveal=reveal; window.next=next; window.prev=prev; window.goTo=goTo;
 </script>
-
 </body>
 </html>
