@@ -9,29 +9,59 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 :root{
-  --bg:#02030a; --bg2:#080a20; --paper:#fbf6e9;
-  --ink:#f0e8d5; --ink2:#a8b0c8; --ink3:#5a6080;
-  --paper-ink:#2c1a08; --paper-ink2:#5c4530; --paper-ink3:#8a7050;
-  --gold:#d4a858; --warm:#e89870; --vermilion:#c84820;
-  --cyan:#7adcf0; --purple:#a070ff;
   --serif:'Noto Serif SC',serif; --sans:'Noto Sans SC',sans-serif;
   --mono:'JetBrains Mono',monospace; --latin:'Cinzel',serif;
+  --cyan:#7adcf0; --purple:#a070ff;
+  /* 阅读卡片 = 暖纸 (各主题保持优雅一致) */
+  --paper:#fbf6e9; --paper-ink:#2c1a08; --paper-ink2:#5c4530; --paper-ink3:#8a7050; --gold-deep:#8a6028;
+  /* 默认：静夜深蓝 */
+  --bg:#131a2a; --bg-grad:linear-gradient(180deg,#131a2a 0%,#0e1422 55%,#131a2a 100%);
+  --neb1:rgba(120,140,200,.10); --neb2:rgba(200,160,90,.08); --star:.22; --twinkle:.14;
+  --ink:#e8e4d8; --ink2:#a6aec4; --ink3:#6b7088;
+  --gold:#d4a858; --warm:#e0b070; --vermilion:#c87850;
+  --label-ink:#fff; --label-shadow:0 2px 8px rgba(0,0,0,.95);
+  --panel-bg:rgba(16,22,38,.82); --panel-line:rgba(212,168,88,.22); --topbar-bg:rgba(14,18,30,.6);
+  --overlay:rgba(8,10,18,.78);
+}
+body[data-theme="museum"]{
+  --bg:#f7f3ea; --bg-grad:radial-gradient(ellipse at 50% 30%,#fdfbf5,#f2ece0);
+  --neb1:transparent; --neb2:transparent; --star:0; --twinkle:0;
+  --ink:#2a2622; --ink2:#6a6258; --ink3:#9a9286;
+  --gold:#9c5b34; --warm:#b07a4a; --vermilion:#9c5b34;
+  --label-ink:#2a2622; --label-shadow:none;
+  --panel-bg:rgba(255,253,247,.92); --panel-line:rgba(156,91,52,.25); --topbar-bg:rgba(247,243,234,.85);
+  --overlay:rgba(120,108,90,.45);
+}
+body[data-theme="textbook"]{
+  --bg:#ffffff; --bg-grad:linear-gradient(180deg,#ffffff,#f4f7fb);
+  --neb1:transparent; --neb2:transparent; --star:0; --twinkle:0;
+  --ink:#1a2a3a; --ink2:#5a6678; --ink3:#9aa4b2;
+  --gold:#2d4a7c; --warm:#3a6ea5; --vermilion:#c0392b;
+  --label-ink:#1a2a3a; --label-shadow:none;
+  --panel-bg:rgba(255,255,255,.96); --panel-line:rgba(45,74,124,.18); --topbar-bg:rgba(255,255,255,.9);
+  --overlay:rgba(40,55,80,.4);
+}
+body[data-theme="parchment"]{
+  --bg:#efe3c8; --bg-grad:radial-gradient(ellipse at 50% 25%,#f5ead2,#e8dabb);
+  --neb1:rgba(180,130,70,.08); --neb2:rgba(150,110,60,.06); --star:0; --twinkle:0;
+  --ink:#3a2a18; --ink2:#6e5536; --ink3:#9a8460;
+  --gold:#b5642a; --warm:#c47a3a; --vermilion:#a8451e;
+  --label-ink:#3a2a18; --label-shadow:none;
+  --panel-bg:rgba(250,242,224,.94); --panel-line:rgba(181,100,42,.3); --topbar-bg:rgba(239,227,200,.85);
+  --overlay:rgba(120,95,55,.45);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--ink);overflow:hidden}
+html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--ink);overflow:hidden;transition:background .4s ease}
 
 /* 宇宙背景 (与首页一致) */
 .cosmos{position:fixed;inset:0;z-index:0;pointer-events:none}
-.nebula{position:absolute;inset:0;
+.nebula{position:absolute;inset:0;transition:background .4s ease;
   background:
-    radial-gradient(ellipse 40% 50% at 15% 20%, rgba(120,90,200,.28) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 40% at 85% 80%, rgba(200,120,60,.22) 0%, transparent 60%),
-    radial-gradient(ellipse 30% 30% at 70% 30%, rgba(80,140,200,.15) 0%, transparent 50%),
-    radial-gradient(ellipse 30% 30% at 30% 70%, rgba(60,180,140,.12) 0%, transparent 50%),
-    radial-gradient(ellipse 80% 80% at 50% 50%, transparent 0%, rgba(0,0,0,.4) 100%),
-    linear-gradient(180deg, #02030a 0%, #050818 50%, #02030a 100%);
+    radial-gradient(ellipse 45% 55% at 15% 20%, var(--neb1) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 45% at 85% 80%, var(--neb2) 0%, transparent 60%),
+    var(--bg-grad);
 }
-.stars-back{position:absolute;inset:0;opacity:.4;
+.stars-back{position:absolute;inset:0;opacity:var(--star);
   background-image:
     radial-gradient(1px 1px at 5% 12%,#fff,transparent),
     radial-gradient(1.2px 1.2px at 15% 25%,#fff,transparent),
@@ -55,7 +85,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
     radial-gradient(.9px .9px at 78% 92%,#fff,transparent),
     radial-gradient(1.5px 1.5px at 91% 85%,#fff,transparent);
 }
-.stars-front{position:absolute;inset:0;opacity:.7;animation:twinkle 8s ease-in-out infinite;
+.stars-front{position:absolute;inset:0;opacity:var(--twinkle);animation:twinkle 9s ease-in-out infinite;
   background-image:
     radial-gradient(2px 2px at 18% 18%,#fff,transparent 40%),
     radial-gradient(2.5px 2.5px at 42% 28%,#ffd47a,transparent 40%),
@@ -67,14 +97,23 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
     radial-gradient(2.3px 2.3px at 15% 82%,#fff,transparent 40%),
     radial-gradient(2.1px 2.1px at 65% 92%,#c8d4ff,transparent 40%);
 }
-@keyframes twinkle{0%,100%{opacity:.7}50%{opacity:.4}}
+@keyframes twinkle{0%,100%{opacity:var(--twinkle)}50%{opacity:calc(var(--twinkle) * .55)}}
 
 /* 顶部覆盖层 */
 .topbar-cosmos{position:fixed;top:0;left:0;right:0;z-index:30;padding:14px 24px;display:flex;align-items:center;gap:14px;pointer-events:none;flex-wrap:wrap}
 .topbar-cosmos > *{pointer-events:auto}
-.topbar-cosmos a, .topbar-cosmos button{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.16em;background:rgba(0,0,0,.55);backdrop-filter:blur(10px);padding:8px 14px;border-radius:99px;border:1px solid rgba(212,168,88,.3);transition:all .2s;cursor:pointer}
-.topbar-cosmos a:hover, .topbar-cosmos button:hover{background:var(--gold);color:#02030a;border-color:var(--gold)}
-.crumb-cosmos{display:flex;align-items:center;gap:6px;color:var(--ink2);font-family:var(--mono);font-size:11px;letter-spacing:.08em;flex-wrap:wrap;background:rgba(0,0,0,.5);backdrop-filter:blur(10px);padding:7px 14px;border-radius:99px;border:1px solid rgba(212,168,88,.2)}
+.topbar-cosmos a, .topbar-cosmos button{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.16em;background:var(--topbar-bg);backdrop-filter:blur(10px);padding:8px 14px;border-radius:99px;border:1px solid var(--panel-line);transition:all .2s;cursor:pointer}
+.topbar-cosmos a:hover, .topbar-cosmos button:hover{background:var(--gold);color:var(--bg);border-color:var(--gold)}
+/* 主题切换器 */
+.theme-switch{margin-left:auto;display:flex!important;gap:6px!important;background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:99px;padding:5px!important;backdrop-filter:blur(10px)}
+.theme-switch button{width:24px!important;height:24px!important;border-radius:50%!important;border:1.5px solid transparent!important;cursor:pointer;padding:0!important;transition:transform .15s}
+.theme-switch button:hover{transform:scale(1.12);background:initial}
+.theme-switch button.active{border-color:var(--gold)!important}
+.theme-switch button[data-t="deepblue"]{background:#131a2a!important}
+.theme-switch button[data-t="museum"]{background:#f2ece0!important}
+.theme-switch button[data-t="textbook"]{background:#2d4a7c!important}
+.theme-switch button[data-t="parchment"]{background:#e8dabb!important}
+.crumb-cosmos{display:flex;align-items:center;gap:6px;color:var(--ink2);font-family:var(--mono);font-size:11px;letter-spacing:.08em;flex-wrap:wrap;background:var(--topbar-bg);backdrop-filter:blur(10px);padding:7px 14px;border-radius:99px;border:1px solid var(--panel-line)}
 .crumb-cosmos a{background:none;border:none;padding:0;color:var(--ink2)}
 .crumb-cosmos a:hover{color:var(--gold);background:none}
 .crumb-cosmos .cur{color:var(--gold);font-weight:700}
@@ -90,19 +129,19 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 .center-orb .ring2{fill:none;stroke:rgba(212,168,88,.18);stroke-width:1}
 @keyframes orbitRing{from{stroke-dashoffset:0}to{stroke-dashoffset:600}}
 .center-orb .body{filter:drop-shadow(0 8px 30px rgba(212,168,88,.5))}
-.center-orb .label{font-family:var(--serif);font-weight:900;fill:#fff;text-anchor:middle;pointer-events:none;text-shadow:0 4px 12px rgba(0,0,0,.8)}
-.center-orb .meta{font-family:var(--mono);fill:rgba(255,255,255,.7);text-anchor:middle;pointer-events:none;letter-spacing:.1em}
+.center-orb .label{font-family:var(--serif);font-weight:900;fill:var(--label-ink);text-anchor:middle;pointer-events:none;text-shadow:var(--label-shadow)}
+.center-orb .meta{font-family:var(--mono);fill:var(--ink2);text-anchor:middle;pointer-events:none;letter-spacing:.1em}
 
 .float-orb{cursor:pointer}
 /* 修复浮动 bug：缩放放在内层 .body (绕中心)，不覆盖外层 translate */
 .float-orb .body{filter:drop-shadow(0 4px 16px rgba(0,0,0,.4));transition:transform .3s cubic-bezier(.4,1,.6,1);transform-box:fill-box;transform-origin:center}
 .float-orb:hover .body{transform:scale(1.14)}
-.float-orb .name{font-family:var(--serif);font-weight:700;fill:#fff;text-anchor:middle;pointer-events:none;text-shadow:0 2px 6px rgba(0,0,0,.8)}
-.float-orb .type-tag{font-family:var(--mono);fill:rgba(255,255,255,.65);text-anchor:middle;pointer-events:none;letter-spacing:.06em}
-.float-orb .label-bg{fill:rgba(0,0,0,.7);stroke:currentColor;stroke-width:1;stroke-opacity:.35}
+.float-orb .name{font-family:var(--serif);font-weight:700;fill:var(--label-ink);text-anchor:middle;pointer-events:none;text-shadow:var(--label-shadow)}
+.float-orb .type-tag{font-family:var(--mono);fill:var(--ink3);text-anchor:middle;pointer-events:none;letter-spacing:.06em}
+.float-orb .label-bg{fill:var(--panel-bg);stroke:currentColor;stroke-width:1;stroke-opacity:.35}
 
 /* 连线 (center → orbs) */
-.spoke{stroke:rgba(212,168,88,.18);stroke-width:1;stroke-dasharray:3 5;fill:none}
+.spoke{stroke:var(--panel-line);stroke-width:1;stroke-dasharray:3 5;fill:none}
 /* 时间轴标签 */
 .region-axis-label{font-family:var(--mono);fill:rgba(240,200,130,.78);font-size:14px;letter-spacing:.1em;font-weight:700;text-transform:uppercase}
 .axis-tick{font-family:var(--mono);fill:rgba(240,200,130,.7);font-size:13px;text-anchor:middle;letter-spacing:.04em}
@@ -150,7 +189,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 /* 文字内容面板 (slides in from bottom) */
 .text-panel{
   position:fixed;inset:0;z-index:40;display:none;
-  background:rgba(2,3,10,.85);backdrop-filter:blur(12px);
+  background:var(--overlay);backdrop-filter:blur(12px);
   align-items:flex-start;justify-content:center;
   padding:80px 24px 24px;
   overflow-y:auto;
@@ -297,6 +336,12 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
   <button class="nav-btn" id="wikiBtn" onclick="openWiki()" title="查维基百科">🔍 维基</button>
   <a href="./civ-explorer-compare.html">⌂ 首页</a>
   <div class="crumb-cosmos" id="crumb"></div>
+  <div class="theme-switch" id="themeSwitch">
+    <button data-t="deepblue" title="静夜深蓝"></button>
+    <button data-t="museum" title="博物馆典藏"></button>
+    <button data-t="textbook" title="现代教科书"></button>
+    <button data-t="parchment" title="羊皮纸古卷"></button>
+  </div>
 </div>
 
 <button class="ai-fab" id="aiFab" title="AI 助手" onclick="toggleAI()">🤖</button>
@@ -866,7 +911,7 @@ function openTextPanel(payload){
     const pts = (typeof CIV_MAP!=='undefined' ? CIV_MAP[payload.civId] : []) || [];
     html += `<div class="type-tag civ">${info.icon} ${info.name}</div>
       <h1>🗺 遗址地图</h1>
-      <div class="map-note">该文明的主要遗址 / 古迹真实地理位置（拖动缩放，点标点看说明）：</div>
+      <div class="map-note">主要遗址与古迹的地理位置</div>
       <div id="siteMap" class="site-map"></div>
       <div class="site-list">${pts.map(p=>`<div class="site-item"><b>${p.name}</b><span class="coord">${p.coords[0].toFixed(2)}°, ${p.coords[1].toFixed(2)}°</span><br>${p.note||''}</div>`).join('')}</div>`;
   }
@@ -1140,8 +1185,7 @@ function renderWikiSection(htmlStr){
   const terms = scanKnowledge(text);
   if (!terms.length) return '';   // 没有可解释的历史知识点 → 不挂维基
   return `<div class="wiki-section">
-    <div class="wiki-h">🔗 这段提到的历史知识点 · 维基百科 (双语)</div>
-    <div class="wiki-sub">点击查中文 / 英文维基，对照了解：</div>
+    <div class="wiki-h">延伸阅读 · 维基百科</div>
     <div class="wiki-chips">${terms.map(t=>wikiChip(t)).join('')}</div>
   </div>`;
 }
@@ -1211,22 +1255,18 @@ function showTooltip(e, action){
       const p = PERSON_DEEP[id];
       html = `<div class="nm">👤 ${p?.full_name||id}</div>
         <div class="meta">${p?.lifespan_real||p?.lifespan_mythic||''}</div>
-        <div class="desc">${(p?.biography||'').slice(0,100).trim()}...</div>
-        <div class="cta">点击 → 进入小宇宙</div>`;
+        <div class="desc">${(p?.biography||'').slice(0,90).trim()}…</div>`;
     } else if (t === 'event') {
       const ev = EVENT_DEEP[id];
       html = `<div class="nm">📅 ${ev?.full_title||id}</div>
         <div class="meta">${(ev?.what_happened?.[0]||'').split('·')[0].trim()}</div>
-        <div class="desc">${ev?.one_liner||''}</div>
-        <div class="cta">点击 → 进入小宇宙</div>`;
+        <div class="desc">${ev?.one_liner||''}</div>`;
     } else if (t === 'civ') {
       const info = getCivInfo(id);
-      html = `<div class="nm">${info.icon} ${info.name}</div>
-        <div class="cta">点击 → 进入小宇宙</div>`;
+      html = `<div class="nm">${info.icon} ${info.name}</div>`;
     }
   } else if (action.type === 'showText') {
-    html = `<div class="nm">${SECTION_HINTS[action.payload.kind]||'阅读'}</div>
-      <div class="cta">点击 → 展开文字内容</div>`;
+    html = `<div class="nm">${SECTION_HINTS[action.payload.kind]||''}</div>`;
   }
   tip.innerHTML = html;
   tip.classList.add('show');
@@ -1414,6 +1454,19 @@ window.toggleSpeak = toggleSpeak;
 window.stopSpeak = stopSpeak;
 window.toggleAI = toggleAI;
 window.openWiki = openWiki;
+
+// ── 主题切换 (与首页共享 localStorage) ──
+function applyTheme(t){
+  if (t && t!=='deepblue') document.body.setAttribute('data-theme', t);
+  else document.body.removeAttribute('data-theme');
+  localStorage.setItem('civ_theme', t||'deepblue');
+  document.querySelectorAll('#themeSwitch button').forEach(b=>b.classList.toggle('active', b.dataset.t===(t||'deepblue')));
+}
+document.getElementById('themeSwitch').addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(b) applyTheme(b.dataset.t);
+});
+applyTheme(localStorage.getItem('civ_theme') || 'deepblue');
+
 route();
 recordNav();
 </script>
