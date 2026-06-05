@@ -2502,4 +2502,27 @@ const CIV_MYTHS = {
   ],
 };
 
-if (typeof module !== 'undefined') module.exports = { CIV_DEEP, EVENT_DEEP, PERSON_DEEP, CIV_MAP, CIV_MYTHS };
+// ════════════════════════════════════════════════════════════════
+// 遗址的"今天在哪里" — 按遗址名映射现代国家/地区
+// ════════════════════════════════════════════════════════════════
+const SITE_MODERN = {
+  '乌鲁克 Uruk':'今伊拉克·穆萨纳省', '埃利都 Eridu':'今伊拉克·济加尔省',
+  '乌尔 Ur':'今伊拉克·济加尔省 (纳西里耶附近)', '尼普尔 Nippur':'今伊拉克·卡迪西亚省',
+  '拉格什 Lagash':'今伊拉克·济加尔省', '基什 Kish':'今伊拉克·巴比伦省',
+  '阿卡德 Akkad':'今伊拉克中部 (巴格达附近, 确切位置未知)', '苏萨 Susa':'今伊朗·胡齐斯坦省',
+  '巴比伦 Babylon':'今伊拉克·希拉市 (巴格达以南约 85km)', '马里 Mari':'今叙利亚·代尔祖尔省',
+  '希拉孔波利斯 Hierakonpolis':'今埃及·卢克索以南', '阿拜多斯 Abydos':'今埃及·索哈格省', '纳卡达 Naqada':'今埃及·基纳省',
+  '孟菲斯 Memphis':'今埃及·开罗以南', '吉萨 Giza':'今埃及·吉萨市 (大开罗)', '萨卡拉 Saqqara':'今埃及·吉萨省',
+  '底比斯/卢克索 Thebes':'今埃及·卢克索', '帝王谷 Valley of the Kings':'今埃及·卢克索西岸',
+  '阿马尔纳 Amarna':'今埃及·明亚省', '阿布辛贝 Abu Simbel':'今埃及·阿斯旺省', '卡迭石 Kadesh':'今叙利亚·霍姆斯省',
+  '梅赫尔格尔 Mehrgarh':'今巴基斯坦·俾路支省', '哈拉帕 Harappa(早期)':'今巴基斯坦·旁遮普省', '哈拉帕 Harappa':'今巴基斯坦·旁遮普省',
+  '摩亨佐-达罗 Mohenjo-daro':'今巴基斯坦·信德省', '多拉维拉 Dholavira':'今印度·古吉拉特邦', '洛塔尔 Lothal':'今印度·古吉拉特邦',
+  '克诺索斯 Knossos':'今希腊·克里特岛', '费斯托斯 Phaistos':'今希腊·克里特岛', '阿克罗蒂里 Akrotiri':'今希腊·圣托里尼岛',
+  '迈锡尼 Mycenae':'今希腊·伯罗奔尼撒', '皮洛斯 Pylos':'今希腊·墨西尼亚', '梯林斯 Tiryns':'今希腊·阿尔戈利斯', '特洛伊 Troy':'今土耳其·恰纳卡莱省',
+  '哈图沙 Hattusa':'今土耳其·乔鲁姆省', '卡尔凯美什 Carchemish':'今土耳其/叙利亚边境',
+  '殷墟 Yinxu(安阳)':'今河南·安阳', '郑州商城 Zhengzhou':'今河南·郑州', '二里头 Erlitou':'今河南·洛阳偃师', '偃师商城 Yanshi':'今河南·洛阳偃师',
+  '乌加里特 Ugarit':'今叙利亚·拉塔基亚省', '麦地那哈布 Medinet Habu':'今埃及·卢克索西岸',
+};
+function siteModern(name){ return SITE_MODERN[name] || ''; }
+
+if (typeof module !== 'undefined') module.exports = { CIV_DEEP, EVENT_DEEP, PERSON_DEEP, CIV_MAP, CIV_MYTHS, SITE_MODERN };

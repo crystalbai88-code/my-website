@@ -189,6 +189,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 .scroll-card .site-list{display:flex;flex-direction:column;gap:8px}
 .scroll-card .site-item{background:white;border:1px solid rgba(184,136,48,.2);border-left:4px solid #3a8868;border-radius:8px;padding:10px 14px;font-size:13px;line-height:1.65;color:var(--paper-ink)}
 .scroll-card .site-item b{color:#2a6850}
+.scroll-card .site-item .modern{display:inline-block;font-size:11px;color:#fff;background:#3a8868;padding:1px 8px;border-radius:99px;margin-left:8px;font-weight:600}
 .scroll-card .site-item .coord{font-family:var(--mono);font-size:10.5px;color:var(--paper-ink3);margin-left:6px}
 /* 常见误解卡 */
 .scroll-card .myth-card{background:white;border:1px solid rgba(192,80,74,.25);border-left:4px solid #c0504a;border-radius:10px;padding:14px 16px;margin-bottom:10px}
@@ -948,7 +949,7 @@ function openTextPanel(payload){
       <h1>🗺 遗址地图</h1>
       <div class="map-note">主要遗址与古迹的地理位置</div>
       <div id="siteMap" class="site-map"></div>
-      <div class="site-list">${pts.map(p=>`<div class="site-item"><b>${p.name}</b><span class="coord">${p.coords[0].toFixed(2)}°, ${p.coords[1].toFixed(2)}°</span><br>${p.note||''}</div>`).join('')}</div>`;
+      <div class="site-list">${pts.map(p=>{const mod=(typeof siteModern!=='undefined')?siteModern(p.name):'';return `<div class="site-item"><b>${p.name}</b>${mod?`<span class="modern">📍 ${mod}</span>`:''}<span class="coord">${p.coords[0].toFixed(2)}°, ${p.coords[1].toFixed(2)}°</span><br>${p.note||''}</div>`;}).join('')}</div>`;
   }
   else if (payload.kind === 'myths') {
     const info = getCivInfo(payload.civId);
@@ -1081,7 +1082,7 @@ function initSiteMap(civId){
   pts.forEach(p=>{
     L.circleMarker(p.coords, { radius:8, color:'#c84820', weight:2.5, fillColor:'#d4a858', fillOpacity:.95 })
       .addTo(_siteMap)
-      .bindPopup('<b>'+p.name+'</b><br>'+(p.note||''))
+      .bindPopup('<b>'+p.name+'</b>'+((typeof siteModern!=='undefined'&&siteModern(p.name))?'<br>📍 '+siteModern(p.name):'')+'<br>'+(p.note||''))
       .bindTooltip(p.name, { permanent:true, direction:'right', offset:[8,0], className:'site-tip' });
   });
   if (pts.length===1) _siteMap.setView(pts[0].coords, 8);

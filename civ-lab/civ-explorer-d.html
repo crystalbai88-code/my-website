@@ -620,7 +620,7 @@ function initWorldMap(){
       allCoords.push(p.coords);
       L.circleMarker(p.coords, { radius:7, color:'#2a1808', weight:1.5, fillColor:color, fillOpacity:.92 })
         .addTo(_worldMap)
-        .bindPopup(`<b>${p.name}</b><br><span style="color:${color}">●</span> ${name}<br>${p.note||''}<br><a href="./civ-deep.html#/civ/${civId}">进入该文明 →</a>`)
+        .bindPopup(`<b>${p.name}</b>${(typeof siteModern!=='undefined'&&siteModern(p.name))?`<br>📍 ${siteModern(p.name)}`:''}<br><span style="color:${color}">●</span> ${name}<br>${p.note||''}<br><a href="./civ-deep.html#/civ/${civId}">进入该文明 →</a>`)
         .bindTooltip(p.name, { direction:'top', className:'world-tip' });
     });
   });
