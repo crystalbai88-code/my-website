@@ -369,9 +369,10 @@ function renderStageCards() {
           nodes.some(n => n.linked_lesson === c)).length;
         const isComing = stage.status === 'coming_soon';
         return `
-          <button class="stage-card ${isComing ? 'coming-soon' : ''}"
+          <button class="stage-card ${isComing ? 'coming-soon' : ''} ${stage.featured ? 'featured' : ''}"
                   style="--stage-color:${stage.color}"
                   data-stage="${stage.id}">
+            ${stage.featured ? '<div class="stage-card-feature">✨ 完整版</div>' : ''}
             <div class="stage-card-num">阶段 ${i}</div>
             <div class="stage-card-icon">${stage.icon}</div>
             <h3 class="stage-card-title">${stage.title}</h3>
@@ -379,10 +380,10 @@ function renderStageCards() {
             <p class="stage-card-question">「${stage.core_question}」</p>
             <div class="stage-card-stats">
               <span class="stage-card-count">📚 ${total} 个知识点</span>
-              ${linkedCount > 0 ? `<span class="stage-card-ready">${linkedCount} 已开放${completed > 0 ? ` · ${completed} 已学` : ''}</span>` : ''}
+              ${stage.featured ? '<span class="stage-card-ready">12 文明 · 27 事件 · 34 人物</span>' : (linkedCount > 0 ? `<span class="stage-card-ready">${linkedCount} 已开放${completed > 0 ? ` · ${completed} 已学` : ''}</span>` : '')}
               ${isComing ? '<span class="stage-card-badge">⏳ 即将上线</span>' : ''}
             </div>
-            <div class="stage-card-cta">${isComing ? '敬请期待' : '进入探索 →'}</div>
+            <div class="stage-card-cta">${isComing ? '敬请期待' : (stage.featured ? '进入历史宇宙 →' : '进入探索 →')}</div>
           </button>`;
       }).join('')}
     </div>
@@ -402,6 +403,11 @@ function renderStageCards() {
 function enterStage(stageId) {
   const stage = MAIN_NETWORK.stages.find(s => s.id === stageId);
   if (!stage) return;
+  // 「早期文明」正式版 → 进入历史宇宙深度探索应用
+  if (stageId === 'STAGE_01') {
+    window.location.href = './civ-explorer-d.html';
+    return;
+  }
   homeViewState = { mode: 'stage', stageId };
   renderStageDetail(stageId);
   document.getElementById('s-home').scrollTo({ top: 0, behavior: 'smooth' });

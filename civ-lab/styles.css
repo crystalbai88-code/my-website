@@ -3264,7 +3264,11 @@ html, body {
   padding: 0 20px;
 }
 
+.stage-card.featured{ border-color: var(--stage-color); box-shadow: 0 6px 24px rgba(200,104,32,.22); }
+.stage-card.featured::after{ content:''; position:absolute; inset:0; border-radius:inherit; border:2px solid var(--stage-color); opacity:.55; pointer-events:none; }
+.stage-card-feature{ position:absolute; top:12px; right:12px; background:var(--stage-color); color:#fff; font-size:11px; font-weight:700; letter-spacing:.04em; padding:4px 10px; border-radius:99px; box-shadow:0 3px 10px rgba(0,0,0,.18); z-index:2; }
 .stage-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   text-align: left;
