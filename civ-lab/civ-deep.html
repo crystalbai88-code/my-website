@@ -1,0 +1,832 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>文明深度页 · 早期文明实验室</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Cinzel:wght@500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --paper:#fbf6e9; --paper2:#f5e8c8;
+  --ink:#2c1a08; --ink2:#5c4530; --ink3:#8a7050;
+  --gold:#b88830; --gold-deep:#8a6028; --vermilion:#c84820;
+  --line:#c8b08a;
+  --serif:'Noto Serif SC',serif; --sans:'Noto Sans SC',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%;font-family:var(--sans);background:var(--paper);color:var(--ink);scroll-behavior:smooth}
+
+/* 顶栏：返回 + 面包屑 */
+.topbar{position:sticky;top:0;height:60px;z-index:30;background:rgba(251,246,233,.96);backdrop-filter:blur(20px);border-bottom:1px solid rgba(184,136,48,.22);display:flex;align-items:center;gap:14px;padding:0 22px}
+.topbar .back-btn{display:flex;align-items:center;gap:6px;background:white;border:1.5px solid var(--gold);color:var(--gold-deep);padding:8px 16px;border-radius:99px;cursor:pointer;font-family:var(--serif);font-size:13.5px;font-weight:700;text-decoration:none;transition:all .15s}
+.topbar .back-btn:hover{background:var(--gold);color:white}
+.topbar .home-link{font-family:var(--mono);font-size:11px;color:var(--ink3);text-decoration:none;letter-spacing:.16em}
+.topbar .home-link:hover{color:var(--vermilion)}
+.crumb{display:flex;align-items:center;gap:6px;color:var(--ink3);font-family:var(--mono);font-size:11px;letter-spacing:.08em}
+.crumb a{color:var(--ink2);text-decoration:none;padding:3px 8px;border-radius:6px;transition:all .15s}
+.crumb a:hover{background:rgba(184,136,48,.12);color:var(--vermilion)}
+.crumb .cur{color:var(--gold-deep);font-weight:700;background:rgba(184,136,48,.12);padding:3px 10px;border-radius:99px}
+.crumb .sep{color:var(--ink3)}
+
+/* 主体宽度限制 */
+.page{max-width:1080px;margin:0 auto;padding:0 24px 80px}
+
+/* HERO 区 */
+.hero{padding:40px 0 32px;border-bottom:2px solid rgba(184,136,48,.18);margin-bottom:32px;position:relative}
+.hero .type-tag{display:inline-block;font-family:var(--mono);font-size:11px;color:white;background:var(--gold);padding:4px 12px;border-radius:99px;letter-spacing:.18em;font-weight:700;margin-bottom:12px;text-transform:uppercase}
+.hero .type-tag.civ{background:var(--vermilion)}
+.hero .type-tag.event{background:#c8732a}
+.hero .type-tag.person{background:#6080b0}
+.hero h1{font-family:var(--serif);font-size:42px;font-weight:900;color:var(--ink);line-height:1.1;margin-bottom:6px}
+.hero h1 .icon{margin-right:12px;vertical-align:middle}
+.hero .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.hero .meta span{font-family:var(--mono);font-size:11.5px;color:var(--gold-deep);background:rgba(184,136,48,.12);padding:5px 12px;border-radius:99px;letter-spacing:.06em;font-weight:600}
+.hero .one-liner{font-family:var(--serif);font-size:18px;line-height:1.65;color:var(--ink2);margin-top:18px;padding:14px 18px;background:rgba(184,136,48,.08);border-left:4px solid var(--gold);border-radius:0 10px 10px 0;font-style:italic}
+
+/* 章节 */
+.section{margin-bottom:36px}
+.section h2{font-family:var(--serif);font-size:22px;font-weight:900;color:var(--ink);margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid rgba(200,72,32,.25);display:flex;align-items:center;gap:8px}
+.section h2 .num{font-family:var(--mono);font-size:11px;color:var(--gold);background:rgba(184,136,48,.12);padding:3px 8px;border-radius:6px;letter-spacing:.1em;font-weight:700;margin-right:6px}
+.section h2 .count{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:.06em;font-weight:500}
+
+/* 叙事段 */
+.narrative{background:white;border:1px solid rgba(184,136,48,.18);border-radius:14px;padding:20px 24px;font-family:var(--serif);font-size:15px;line-height:1.95;color:var(--ink)}
+.narrative p{margin-bottom:14px}
+.narrative p:last-child{margin-bottom:0}
+.narrative strong{color:var(--vermilion);font-weight:700}
+
+/* 一句话/核心信息卡 */
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.info-card{background:white;border:1px solid rgba(184,136,48,.18);border-radius:10px;padding:12px 14px}
+.info-card .lbl{font-family:var(--mono);font-size:9.5px;color:var(--gold);letter-spacing:.14em;font-weight:700;text-transform:uppercase;margin-bottom:5px}
+.info-card .val{font-family:var(--serif);font-size:14px;color:var(--ink);line-height:1.55}
+
+/* 演化阶段 / 时间线 */
+.timeline{display:flex;flex-direction:column;gap:10px}
+.tl-item{display:flex;gap:14px;background:white;border:1px solid rgba(184,136,48,.18);border-radius:12px;padding:14px 18px;cursor:pointer;transition:all .2s}
+.tl-item:hover{border-color:var(--vermilion);background:rgba(251,246,233,.8);transform:translateX(-3px)}
+.tl-item .yr{font-family:var(--mono);font-size:11.5px;color:var(--gold-deep);font-weight:700;letter-spacing:.04em;flex-shrink:0;width:120px}
+.tl-item .info{flex:1;min-width:0}
+.tl-item .ti{font-family:var(--serif);font-size:14.5px;font-weight:700;color:var(--ink);margin-bottom:3px}
+.tl-item .ds{font-size:12.5px;line-height:1.6;color:var(--ink2)}
+
+/* 卡片网格（事件/人物） */
+.entity-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.entity-card{background:white;border:1.5px solid rgba(184,136,48,.22);border-radius:14px;padding:16px 18px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:8px}
+.entity-card:hover{border-color:var(--vermilion);transform:translateY(-3px);box-shadow:0 8px 20px rgba(184,136,48,.15)}
+.entity-card .top{display:flex;align-items:center;gap:10px}
+.entity-card .ic{width:42px;height:42px;border-radius:50%;background:rgba(184,136,48,.15);color:var(--gold-deep);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.entity-card.person .ic{background:rgba(96,128,176,.18);color:#3a5078}
+.entity-card.event .ic{background:rgba(200,115,42,.18);color:#a05818}
+.entity-card .nm{flex:1;font-family:var(--serif);font-size:15.5px;font-weight:700;color:var(--ink);line-height:1.2}
+.entity-card .yr{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.06em}
+.entity-card .desc{font-size:12.5px;line-height:1.65;color:var(--ink2)}
+.entity-card .more{margin-top:auto;font-family:var(--mono);font-size:10.5px;color:var(--vermilion);letter-spacing:.08em;font-weight:700}
+.entity-card .more::after{content:' →';opacity:.7}
+
+/* 朋友圈（小型 SVG 关系图） */
+.friend-circle{background:white;border:1px solid rgba(184,136,48,.2);border-radius:14px;padding:18px;text-align:center}
+.fc-svg{display:block;margin:0 auto;max-width:100%}
+.fc-link{stroke:rgba(184,136,48,.55);stroke-width:1.5;fill:none}
+.fc-link.family{stroke:#a070ff}
+.fc-link.enemy{stroke:#ff7878;stroke-dasharray:5 3}
+.fc-link.mentor{stroke:var(--gold)}
+.fc-center{fill:var(--gold);filter:drop-shadow(0 4px 10px rgba(184,136,48,.4))}
+.fc-node{cursor:pointer;transition:transform .2s}
+.fc-node:hover{transform:scale(1.1)}
+.fc-node-bg{fill:#6080b0;filter:drop-shadow(0 3px 8px rgba(96,128,176,.4))}
+.fc-name{font-family:var(--serif);font-size:11px;fill:var(--ink);text-anchor:middle;pointer-events:none;font-weight:700}
+.fc-center-name{font-family:var(--serif);font-size:13px;fill:white;text-anchor:middle;dominant-baseline:central;pointer-events:none;font-weight:700}
+.fc-rel-label{font-family:var(--mono);font-size:9.5px;fill:var(--gold-deep);text-anchor:middle;pointer-events:none;letter-spacing:.04em;font-weight:700}
+.fc-rel-bg{fill:var(--paper);stroke:rgba(184,136,48,.3);stroke-width:1}
+.fc-legend{font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.06em;margin-top:10px;display:flex;justify-content:center;gap:18px;flex-wrap:wrap}
+.fc-legend span{display:inline-flex;align-items:center;gap:6px}
+.fc-legend span::before{content:'';width:18px;height:2px;background:rgba(184,136,48,.55)}
+.fc-legend .family::before{background:#a070ff}
+.fc-legend .enemy::before{background:#ff7878}
+.fc-legend .mentor::before{background:var(--gold)}
+
+/* 事件因果链 */
+.chain-box{background:white;border:1px solid rgba(184,136,48,.2);border-radius:14px;padding:18px}
+.chain-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.chain-pill{padding:8px 16px;background:var(--paper);border:1.5px solid rgba(184,136,48,.35);border-radius:99px;font-family:var(--serif);font-size:13px;color:var(--ink);cursor:pointer;transition:all .15s}
+.chain-pill:hover{background:rgba(184,136,48,.15);border-color:var(--vermilion)}
+.chain-pill.center{background:var(--gold);color:white;border-color:var(--gold-deep);font-weight:700;cursor:default}
+.chain-arrow{color:var(--gold);font-size:16px;font-weight:700}
+
+/* 之前/当时/之后 3 栏 */
+.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+.three-col-card{background:white;border:1px solid rgba(184,136,48,.2);border-radius:12px;padding:16px}
+.three-col-card .lbl{font-family:var(--serif);font-size:16px;font-weight:900;color:var(--vermilion);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(200,72,32,.2)}
+.three-col-card .txt{font-size:13px;line-height:1.7;color:var(--ink2)}
+
+/* 证据卡 */
+.evidence-card{background:white;border:1px solid rgba(184,136,48,.2);border-left:4px solid var(--gold);border-radius:10px;padding:12px 16px;margin-bottom:8px}
+.evidence-card .nm{font-family:var(--serif);font-size:14px;font-weight:700;color:var(--gold-deep);margin-bottom:4px}
+.evidence-card .ds{font-size:13px;line-height:1.65;color:var(--ink2);margin-bottom:4px}
+.evidence-card .ho{font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.04em}
+
+/* 国与国关系 */
+.relations-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.rel-card{background:white;border:1px solid rgba(184,136,48,.2);border-radius:12px;padding:14px 16px}
+.rel-card .pair{font-family:var(--serif);font-size:14px;font-weight:700;color:var(--ink);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.rel-card .pair .arrow{color:var(--vermilion)}
+.rel-card .typ{display:inline-block;font-family:var(--mono);font-size:9.5px;color:white;background:var(--gold);padding:2px 8px;border-radius:99px;letter-spacing:.08em;margin-bottom:6px;font-weight:700}
+.rel-card .typ.war{background:#cc4040}.rel-card .typ.trade{background:#3a8868}.rel-card .typ.influence{background:#7a60b0}
+.rel-card .desc{font-size:12.5px;line-height:1.65;color:var(--ink2)}
+
+/* 遗产网格 */
+.legacy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.legacy-card{background:rgba(184,136,48,.06);border:1px solid rgba(184,136,48,.2);border-radius:10px;padding:14px 16px}
+.legacy-card .what{font-family:var(--serif);font-size:15px;font-weight:700;color:var(--vermilion);margin-bottom:3px}
+.legacy-card .why{font-size:12px;line-height:1.6;color:var(--ink2)}
+
+/* 同时代速览 */
+.contemp-strip{background:linear-gradient(135deg,rgba(184,136,48,.1),rgba(200,72,32,.08));border:1px solid rgba(184,136,48,.25);border-radius:14px;padding:18px}
+.contemp-strip h3{font-family:var(--serif);font-size:16px;font-weight:700;color:var(--vermilion);margin-bottom:8px}
+.contemp-strip p{font-size:13px;color:var(--ink2);line-height:1.7;margin-bottom:10px}
+.contemp-items{display:flex;flex-wrap:wrap;gap:8px}
+.contemp-chip{padding:6px 14px;background:white;border:1px solid rgba(184,136,48,.3);border-radius:99px;font-family:var(--serif);font-size:13px;color:var(--ink);cursor:pointer;transition:all .15s}
+.contemp-chip:hover{border-color:var(--vermilion);color:var(--vermilion)}
+
+/* 待补提示 */
+.todo-note{background:rgba(200,72,32,.06);border:1px dashed rgba(200,72,32,.35);border-radius:10px;padding:12px 16px;font-size:12.5px;color:var(--ink2);line-height:1.65;margin-top:12px}
+.todo-note::before{content:'📝 ';color:var(--vermilion);font-weight:700}
+
+/* 错误页 */
+.error-page{text-align:center;padding:80px 20px}
+.error-page h1{font-family:var(--serif);font-size:32px;color:var(--ink2);margin-bottom:12px}
+.error-page p{color:var(--ink3);margin-bottom:24px;font-size:14px}
+
+@media (max-width:768px){
+  .hero h1{font-size:30px}
+  .three-col{grid-template-columns:1fr}
+  .topbar{flex-wrap:wrap;height:auto;padding:10px 14px;gap:8px}
+  .crumb{font-size:10px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="./civ-explorer-d.html" class="back-btn">◀ 返回时间入口</a>
+  <a href="./civ-explorer-compare.html" class="home-link">⌂ 首页</a>
+  <div class="crumb" id="crumb"></div>
+</div>
+
+<main class="page" id="page"></main>
+
+<script src="./early_civ_deep.js"></script>
+<script src="./early_civ_explorer_data.js"></script>
+<script src="./chapters_data.js"></script>
+<script>
+// ════════════════════════════════════════════════
+// 路由：解析 hash #/civ/sumer 等
+// ════════════════════════════════════════════════
+function parseHash(){
+  const h = location.hash.replace(/^#\/?/, '');
+  const parts = h.split('/');
+  return {type: parts[0]||'', id: parts[1]||''};
+}
+
+function navigate(type, id){
+  location.hash = `#/${type}/${id}`;
+}
+
+function goBack(){
+  if (history.length > 1) history.back();
+  else location.href = './civ-explorer-d.html';
+}
+
+// ════════════════════════════════════════════════
+// 工具
+// ════════════════════════════════════════════════
+function getCivInfo(id){
+  if (typeof EARLY_CIV_EXPLORER!=='undefined') {
+    const f = EARLY_CIV_EXPLORER.civilizations.find(c=>c.id===id);
+    if (f) return f;
+  }
+  const fb = {egypt_predynastic:{name:'古埃及·前王朝',icon:'🌅',color:'#d4b870',region:'尼罗河'},indus_early:{name:'印度河早期',icon:'🏘',color:'#a070d4',region:'印度河'}};
+  return fb[id] || {name:id,icon:'🏛',color:'#888',region:''};
+}
+
+function findCivChapters(civId){
+  return CHAPTERS.filter(ch => ch.active_civs.some(cv=>cv.id===civId));
+}
+
+function findEventsOfCiv(civId){
+  const evs = [];
+  CHAPTERS.forEach(ch => {
+    const cv = ch.active_civs.find(x=>x.id===civId);
+    if (!cv) return;
+    (cv.L3_events||[]).forEach(eid => {
+      if (!evs.find(x=>x.id===eid)) evs.push({id:eid, deep:EVENT_DEEP[eid], ch});
+    });
+  });
+  return evs;
+}
+
+function findPeopleOfCiv(civId){
+  const ps = [];
+  CHAPTERS.forEach(ch => {
+    const cv = ch.active_civs.find(x=>x.id===civId);
+    if (!cv) return;
+    (cv.L4_people||[]).forEach(pid => {
+      if (!ps.find(x=>x.id===pid)) ps.push({id:pid, deep:PERSON_DEEP[pid], ch});
+    });
+  });
+  return ps;
+}
+
+function findEventCiv(eid){
+  for (const ch of CHAPTERS){
+    for (const cv of ch.active_civs){
+      if (cv.L3_events?.includes(eid)) return {civId:cv.id, chId:ch.id};
+    }
+  }
+  return null;
+}
+function findPersonCiv(pid){
+  for (const ch of CHAPTERS){
+    for (const cv of ch.active_civs){
+      if (cv.L4_people?.includes(pid)) return {civId:cv.id, chId:ch.id};
+    }
+  }
+  return null;
+}
+
+// ════════════════════════════════════════════════
+// 渲染面包屑
+// ════════════════════════════════════════════════
+function renderCrumb(type, id, name){
+  const c = document.getElementById('crumb');
+  let html = `<a href="./civ-explorer-d.html">⌂ 时间入口</a><span class="sep">›</span>`;
+  if (type === 'civ') {
+    html += `<span class="cur">${name}</span>`;
+  } else if (type === 'event' || type === 'person') {
+    const ctx = type==='event' ? findEventCiv(id) : findPersonCiv(id);
+    if (ctx) {
+      const civ = getCivInfo(ctx.civId);
+      html += `<a href="#/civ/${ctx.civId}" onclick="navigate('civ','${ctx.civId}');return false;">${civ.icon} ${civ.name}</a><span class="sep">›</span>`;
+    }
+    html += `<span class="cur">${name}</span>`;
+  }
+  c.innerHTML = html;
+}
+
+// ════════════════════════════════════════════════
+// 渲染：文明完整页
+// ════════════════════════════════════════════════
+function renderCivPage(civId){
+  const info = getCivInfo(civId);
+  const deep = CIV_DEEP[civId];
+  const chs = findCivChapters(civId);
+  const events = findEventsOfCiv(civId);
+  const people = findPeopleOfCiv(civId);
+
+  if (chs.length === 0 && !deep) return renderError(`未找到文明：${civId}`);
+
+  renderCrumb('civ', civId, info.name);
+
+  const firstCh = chs[0];
+  const oneLiner = firstCh?.active_civs.find(cv=>cv.id===civId)?.L1 || deep?.opening_narrative?.split(/\n\s*\n/)[0].trim().slice(0,120)+'...' || '';
+
+  let html = `
+    <div class="hero">
+      <div class="type-tag civ">CIVILIZATION · 文明</div>
+      <h1><span class="icon">${info.icon}</span>${info.name}</h1>
+      <div class="meta">
+        ${info.region?`<span>📍 ${info.region}</span>`:''}
+        ${deep?.time_range?`<span>📅 ${deep.time_range}</span>`:(chs.length?`<span>📅 ${chs[0].range} – ${chs[chs.length-1].range.split('–')[1]} BCE</span>`:'')}
+        ${deep?.capital_at_peak?`<span>🏛 ${deep.capital_at_peak}</span>`:''}
+        ${deep?.population_peak?`<span>👥 ${deep.population_peak.split('(')[0].trim()}</span>`:''}
+      </div>
+      <div class="one-liner">${oneLiner}</div>
+    </div>
+  `;
+
+  // 完整叙事
+  if (deep?.opening_narrative) {
+    html += `<section class="section">
+      <h2><span class="num">01</span>📖 完整文明叙事</h2>
+      <div class="narrative">${deep.opening_narrative.trim().split(/\n\s*\n/).map(p=>'<p>'+p.trim()+'</p>').join('')}</div>
+    </section>`;
+  }
+
+  // 基础事实
+  if (deep) {
+    const basics = [];
+    if (deep.capital_at_peak) basics.push(['首都', deep.capital_at_peak]);
+    if (deep.territory_max) basics.push(['领土', deep.territory_max]);
+    if (deep.population_peak) basics.push(['人口', deep.population_peak]);
+    if (deep.language) basics.push(['语言', deep.language]);
+    if (deep.writing) basics.push(['文字', deep.writing]);
+    if (deep.religion) basics.push(['宗教', deep.religion]);
+    if (deep.economy) basics.push(['经济', deep.economy]);
+    if (basics.length) {
+      html += `<section class="section">
+        <h2><span class="num">02</span>🏛 基础事实</h2>
+        <div class="info-grid">
+          ${basics.map(([k,v])=>`<div class="info-card"><div class="lbl">${k}</div><div class="val">${v}</div></div>`).join('')}
+        </div>
+      </section>`;
+    }
+  }
+
+  // 演化阶段 (从 chapters_data)
+  if (chs.length) {
+    html += `<section class="section">
+      <h2><span class="num">03</span>📅 演化阶段 <span class="count">${chs.length} 个阶段</span></h2>
+      <div class="timeline">
+        ${chs.map(ch=>{
+          const cv = ch.active_civs.find(x=>x.id===civId);
+          return `<div class="tl-item" onclick="(function(){window.scrollTo({top:0});})()">
+            <div class="yr">${ch.range} BCE</div>
+            <div class="info">
+              <div class="ti">${ch.title} · <span style="color:var(--gold-deep)">${cv.state}</span></div>
+              <div class="ds">${cv.in_period_summary||cv.L2||''}</div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </section>`;
+  }
+
+  // 历史事件
+  if (events.length) {
+    html += `<section class="section">
+      <h2><span class="num">04</span>📅 历史事件 <span class="count">${events.length} 个</span></h2>
+      <div class="entity-grid">
+        ${events.map(e=>{
+          const ev = e.deep;
+          const title = ev?.full_title || e.id;
+          const oneLine = ev?.one_liner || '';
+          const yr = ev?.what_happened?.[0]?.split('·')[0]?.trim() || e.ch.range;
+          return `<div class="entity-card event" onclick="navigate('event','${e.id}')">
+            <div class="top"><div class="ic">📅</div><div class="nm">${title}</div></div>
+            <div class="yr">${yr}</div>
+            <div class="desc">${oneLine}</div>
+            <div class="more">读完整事件</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </section>`;
+  }
+
+  // 关键人物
+  if (people.length) {
+    html += `<section class="section">
+      <h2><span class="num">05</span>👤 关键人物 <span class="count">${people.length} 个</span></h2>
+      <div class="entity-grid">
+        ${people.map(p=>{
+          const pe = p.deep;
+          const name = pe?.full_name || p.id;
+          const desc = pe?.biography?.slice(0,100).trim()+'...' || '深度待补';
+          const ls = pe?.lifespan_real || pe?.lifespan_mythic || '';
+          return `<div class="entity-card person" onclick="navigate('person','${p.id}')">
+            <div class="top"><div class="ic">👤</div><div class="nm">${name}</div></div>
+            <div class="yr">${ls}</div>
+            <div class="desc">${desc}</div>
+            <div class="more">读完整传记</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </section>`;
+  }
+
+  // 关键发明
+  if (deep?.nine_inventions) {
+    html += `<section class="section">
+      <h2><span class="num">06</span>💡 关键发明 <span class="count">${deep.nine_inventions.length} 项</span></h2>
+      <div class="entity-grid">
+        ${deep.nine_inventions.map(inv=>`<div class="entity-card" style="cursor:default">
+          <div class="top"><div class="ic" style="background:rgba(184,136,48,.2);color:var(--vermilion)">💡</div><div class="nm">${inv.name}</div></div>
+          <div class="yr">${inv.year||''}</div>
+          <div class="desc">${inv.body}</div>
+        </div>`).join('')}
+      </div>
+    </section>`;
+  }
+
+  // 与其它文明关系
+  const relations = findCivRelations(civId);
+  if (relations.length) {
+    html += `<section class="section">
+      <h2><span class="num">07</span>🌍 与其他文明的关系 <span class="count">${relations.length} 条</span></h2>
+      <div class="relations-grid">
+        ${relations.map(r=>`<div class="rel-card">
+          <div class="typ ${r.type}">${r.typeLabel||r.type}</div>
+          <div class="pair">${r.from}<span class="arrow">${r.symbol||'→'}</span>${r.to}</div>
+          <div class="desc">${r.desc}</div>
+        </div>`).join('')}
+      </div>
+    </section>`;
+  }
+
+  // 崩溃链
+  if (deep?.collapse_chain) {
+    html += `<section class="section">
+      <h2><span class="num">08</span>⏳ 崩溃链 · 怎么消失的</h2>
+      <div class="timeline">
+        ${deep.collapse_chain.map(t=>{
+          const [yr,...rest] = t.split('·');
+          return `<div class="tl-item" style="cursor:default"><div class="yr">${yr.trim()}</div><div class="info"><div class="ds">${rest.join('·').trim()}</div></div></div>`;
+        }).join('')}
+      </div>
+    </section>`;
+  }
+
+  // 同时代世界
+  html += renderContemporaryStrip(civId, 'civ');
+
+  // 文化遗产
+  const legacy = FINAL_OVERVIEW.civs.find(c=>c.id===civId)?.legacy;
+  if (legacy) {
+    const items = legacy.split(/\s*[·•|]\s*/).filter(x=>x.trim());
+    html += `<section class="section">
+      <h2><span class="num">09</span>🎁 今天我们保留了什么</h2>
+      <div class="legacy-grid">
+        ${items.map(it=>`<div class="legacy-card"><div class="what">${it}</div></div>`).join('')}
+      </div>
+    </section>`;
+  }
+
+  if (!deep) {
+    html += `<div class="todo-note">该文明（${info.name}）的完整深度叙事正在按《世界上下五千年》框架补写中。当前展示了：演化阶段 + 关联事件/人物（上方可点击进入）+ 与其它文明关系。已完成深度版的文明：<strong>苏美尔</strong>。</div>`;
+  }
+
+  document.getElementById('page').innerHTML = html;
+  window.scrollTo({top:0});
+  document.title = info.name + ' · 早期文明实验室';
+}
+
+// ════════════════════════════════════════════════
+// 渲染：人物完整页
+// ════════════════════════════════════════════════
+function renderPersonPage(pid){
+  const p = PERSON_DEEP[pid];
+  if (!p) return renderError(`未找到人物：${pid}`);
+  const name = p.full_name || pid;
+  renderCrumb('person', pid, name.split(' ')[0]);
+
+  let html = `
+    <div class="hero">
+      <div class="type-tag person">PERSON · 历史人物</div>
+      <h1><span class="icon">👤</span>${name}</h1>
+      <div class="meta">
+        ${p.pronunciation?`<span>🔉 ${p.pronunciation}</span>`:''}
+        ${p.lifespan_real?`<span>📅 ${p.lifespan_real}</span>`:''}
+        ${p.lifespan_mythic?`<span>📜 ${p.lifespan_mythic}</span>`:''}
+      </div>
+      <div class="one-liner">${p.historical_or_mythic||''}</div>
+    </div>
+
+    <section class="section">
+      <h2><span class="num">01</span>📖 完整传记</h2>
+      <div class="narrative">${(p.biography||'').trim().split(/\n\s*\n/).map(par=>'<p>'+par.trim()+'</p>').join('')}</div>
+    </section>
+
+    ${p.childhood?`<section class="section">
+      <h2><span class="num">02</span>👶 童年 · 出身</h2>
+      <div class="narrative">${p.childhood}</div>
+    </section>`:''}
+
+    ${p.achievements_detail?`<section class="section">
+      <h2><span class="num">03</span>🏆 主要成就 <span class="count">${p.achievements_detail.length} 项</span></h2>
+      ${p.achievements_detail.map(a=>`<div class="evidence-card">
+        <div class="nm">${a.name}</div>
+        <div class="ds">${a.detail}</div>
+        ${a.proof?`<div class="ho">📜 证据 · ${a.proof}</div>`:''}
+      </div>`).join('')}
+    </section>`:''}
+
+    <section class="section">
+      <h2><span class="num">04</span>🤝 朋友圈 · 关系网</h2>
+      ${renderFriendCircle(pid, p)}
+    </section>
+  `;
+
+  // 参与的事件
+  const involved = Object.entries(EVENT_DEEP).filter(([eid, e]) =>
+    e.related_people?.includes(pid) || (PERSON_DEEP[pid]?.achievements_detail||[]).some(a=>e.full_title?.includes(a.name))
+  );
+  if (involved.length) {
+    html += `<section class="section">
+      <h2><span class="num">05</span>📅 参与的历史事件 <span class="count">${involved.length} 个</span></h2>
+      <div class="entity-grid">
+        ${involved.map(([eid, e])=>`<div class="entity-card event" onclick="navigate('event','${eid}')">
+          <div class="top"><div class="ic">📅</div><div class="nm">${e.full_title}</div></div>
+          <div class="desc">${e.one_liner||''}</div>
+          <div class="more">读事件</div>
+        </div>`).join('')}
+      </div>
+    </section>`;
+  }
+
+  if (p.death) {
+    html += `<section class="section">
+      <h2><span class="num">06</span>⚰️ 死亡 · 晚年</h2>
+      <div class="narrative">${p.death}</div>
+    </section>`;
+  }
+
+  if (p.legacy) {
+    html += `<section class="section">
+      <h2><span class="num">07</span>🌟 历史遗产</h2>
+      <div class="narrative">${p.legacy.trim().split(/\n\s*\n/).map(par=>'<p>'+par.trim()+'</p>').join('')}</div>
+    </section>`;
+  }
+
+  // 同时代
+  html += renderContemporaryStrip(pid, 'person');
+
+  document.getElementById('page').innerHTML = html;
+  window.scrollTo({top:0});
+  document.title = name + ' · 早期文明实验室';
+}
+
+function renderFriendCircle(pid, p){
+  const direct = p.related || [];
+  // 反向：找出指向 p 的其他人
+  const incoming = [];
+  Object.entries(PERSON_DEEP).forEach(([oid, o])=>{
+    if (oid === pid) return;
+    (o.related||[]).forEach(r=>{
+      if (r.id === pid && !direct.find(x=>x.id===oid)) {
+        incoming.push({id:oid, relation:r.relation, note:r.note});
+      }
+    });
+  });
+  const all = [...direct, ...incoming];
+  if (all.length === 0) {
+    return `<div class="friend-circle"><p style="color:var(--ink2);font-size:13px">该人物的关系网正在补充中。</p></div>`;
+  }
+
+  const W = 700, H = 380;
+  const cx = W/2, cy = H/2;
+  const r = 130;
+  const n = all.length;
+
+  let svg = `<svg class="fc-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">`;
+
+  // 连线
+  all.forEach((rel, i)=>{
+    const angle = -Math.PI/2 + (i - (n-1)/2) * (Math.PI*1.4/Math.max(n,1));
+    const x = cx + Math.cos(angle)*r;
+    const y = cy + Math.sin(angle)*r;
+    const relCls = (rel.relation==='家人'||rel.relation==='妻子'||rel.relation==='丈夫'||rel.relation==='母亲'||rel.relation==='儿子')?'family':
+                   rel.relation==='敌人'?'enemy':
+                   (rel.relation==='师承'||rel.relation==='宰相'||rel.relation==='主君')?'mentor':'';
+    svg += `<line class="fc-link ${relCls}" x1="${cx}" y1="${cy}" x2="${x}" y2="${y}"/>`;
+    // 关系标签
+    const mx = (cx+x)/2, my = (cy+y)/2;
+    const labelW = rel.relation.length*12+12;
+    svg += `<rect class="fc-rel-bg" x="${mx-labelW/2}" y="${my-9}" width="${labelW}" height="18" rx="9"/>`;
+    svg += `<text class="fc-rel-label" x="${mx}" y="${my+3}">${rel.relation}</text>`;
+  });
+
+  // 中心
+  svg += `<circle class="fc-center" cx="${cx}" cy="${cy}" r="40"/>`;
+  svg += `<text class="fc-center-name" x="${cx}" y="${cy}">${(p.full_name||pid).split(' ')[0]}</text>`;
+
+  // 关系人节点
+  all.forEach((rel, i)=>{
+    const angle = -Math.PI/2 + (i - (n-1)/2) * (Math.PI*1.4/Math.max(n,1));
+    const x = cx + Math.cos(angle)*r;
+    const y = cy + Math.sin(angle)*r;
+    const other = PERSON_DEEP[rel.id];
+    const otherName = (other?.full_name || rel.id).split(' ')[0];
+    svg += `<g class="fc-node" onclick="navigate('person','${rel.id}')">`;
+    svg += `<circle class="fc-node-bg" cx="${x}" cy="${y}" r="28"/>`;
+    svg += `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="16" style="pointer-events:none" fill="white">👤</text>`;
+    svg += `<text class="fc-name" x="${x}" y="${y+44}">${otherName}</text>`;
+    svg += `</g>`;
+  });
+
+  svg += `</svg>`;
+
+  return `<div class="friend-circle">
+    ${svg}
+    <div class="fc-legend">
+      <span>归属/同事</span><span class="family">家人</span><span class="mentor">师承/上司</span><span class="enemy">敌对</span>
+    </div>
+  </div>`;
+}
+
+// ════════════════════════════════════════════════
+// 渲染：事件完整页
+// ════════════════════════════════════════════════
+function renderEventPage(eid){
+  const e = EVENT_DEEP[eid];
+  if (!e) return renderError(`未找到事件：${eid}`);
+  renderCrumb('event', eid, e.full_title);
+
+  const civCtx = findEventCiv(eid);
+  const civInfo = civCtx ? getCivInfo(civCtx.civId) : null;
+  const ch = civCtx ? CHAPTERS.find(c=>c.id===civCtx.chId) : null;
+
+  let html = `
+    <div class="hero">
+      <div class="type-tag event">EVENT · 历史事件</div>
+      <h1><span class="icon">📅</span>${e.full_title}</h1>
+      <div class="meta">
+        ${e.what_happened?.[0]?`<span>📅 ${e.what_happened[0].split('·')[0].trim()}</span>`:''}
+        ${civInfo?`<span>🏛 ${civInfo.icon} ${civInfo.name}</span>`:''}
+      </div>
+      <div class="one-liner">💡 ${e.one_liner||''}</div>
+    </div>
+
+    <section class="section">
+      <h2><span class="num">01</span>🔗 事件因果链</h2>
+      <div class="chain-box">${renderChainPills(e)}</div>
+    </section>
+
+    <section class="section">
+      <h2><span class="num">02</span>📜 之前 · 当时 · 之后</h2>
+      <div class="three-col">
+        <div class="three-col-card"><div class="lbl">之前</div><div class="txt">${e.context_before||'-'}</div></div>
+        <div class="three-col-card"><div class="lbl">当时</div><div class="txt">${e.significance||e.one_liner||'-'}</div></div>
+        <div class="three-col-card"><div class="lbl">之后</div><div class="txt">${e.leads_to||'-'}</div></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2><span class="num">03</span>📖 完整叙事</h2>
+      <div class="narrative">${(e.narrative||'').trim().split(/\n\s*\n/).map(p=>'<p>'+p.trim()+'</p>').join('')}</div>
+    </section>
+  `;
+
+  if (e.what_happened) {
+    html += `<section class="section">
+      <h2><span class="num">04</span>📅 事件时间线 <span class="count">${e.what_happened.length} 个节点</span></h2>
+      <div class="timeline">
+        ${e.what_happened.map(t=>{
+          const [yr,...rest] = t.split('·');
+          return `<div class="tl-item" style="cursor:default"><div class="yr">${yr.trim()}</div><div class="info"><div class="ds">${rest.join('·').trim()}</div></div></div>`;
+        }).join('')}
+      </div>
+    </section>`;
+  }
+
+  // 相关人物
+  const peopleInvolved = (e.related_people||[]).map(pid=>({id:pid, deep:PERSON_DEEP[pid]})).filter(x=>x.deep);
+  if (peopleInvolved.length) {
+    html += `<section class="section">
+      <h2><span class="num">05</span>👤 关键人物 <span class="count">${peopleInvolved.length} 个</span></h2>
+      <div class="entity-grid">
+        ${peopleInvolved.map(p=>`<div class="entity-card person" onclick="navigate('person','${p.id}')">
+          <div class="top"><div class="ic">👤</div><div class="nm">${p.deep.full_name}</div></div>
+          <div class="yr">${p.deep.lifespan_real||''}</div>
+          <div class="desc">${(p.deep.biography||'').slice(0,100).trim()}...</div>
+          <div class="more">读完整传记</div>
+        </div>`).join('')}
+      </div>
+    </section>`;
+  }
+
+  if (e.evidence) {
+    html += `<section class="section">
+      <h2><span class="num">06</span>🏺 考古证据 <span class="count">${e.evidence.length} 件</span></h2>
+      ${e.evidence.map(ev=>`<div class="evidence-card">
+        <div class="nm">${ev.artifact}</div>
+        <div class="ds">${ev.what}</div>
+        <div class="ho">📍 ${ev.held}</div>
+      </div>`).join('')}
+    </section>`;
+  }
+
+  if (e.significance) {
+    html += `<section class="section">
+      <h2><span class="num">07</span>🎯 历史意义</h2>
+      <div class="narrative">${e.significance}</div>
+    </section>`;
+  }
+
+  if (e.misconception) {
+    html += `<section class="section">
+      <h2><span class="num">08</span>⚠️ 常见误解</h2>
+      <div class="narrative" style="border-color:rgba(200,72,32,.3);background:rgba(200,72,32,.04)">${e.misconception}</div>
+    </section>`;
+  }
+
+  // 同时代
+  html += renderContemporaryStrip(eid, 'event');
+
+  document.getElementById('page').innerHTML = html;
+  window.scrollTo({top:0});
+  document.title = e.full_title + ' · 早期文明实验室';
+}
+
+function renderChainPills(e){
+  const before = e.context_before ? e.context_before.split(/[。，]/)[0].slice(0,20) : null;
+  const after = e.leads_to ? e.leads_to.split(/[→;；]/).map(s=>s.trim().slice(0,18)).filter(s=>s.length>0).slice(0,3) : [];
+  const center = e.full_title;
+  let html = '<div class="chain-row">';
+  if (before) html += `<span class="chain-pill">${before}</span><span class="chain-arrow">→</span>`;
+  html += `<span class="chain-pill center">${center}</span>`;
+  after.forEach((a,i)=>{
+    html += `<span class="chain-arrow">→</span><span class="chain-pill">${a}</span>`;
+  });
+  html += '</div>';
+  return html;
+}
+
+// ════════════════════════════════════════════════
+// 同时代速览（在每个页面底部）
+// ════════════════════════════════════════════════
+function renderContemporaryStrip(id, type){
+  // 找出 id 所在章节
+  let chFound = null;
+  if (type==='civ') {
+    chFound = CHAPTERS.find(ch=>ch.active_civs.some(cv=>cv.id===id)); // 第一个出现的章节
+  } else if (type==='event') {
+    const ctx = findEventCiv(id);
+    if (ctx) chFound = CHAPTERS.find(ch=>ch.id===ctx.chId);
+  } else if (type==='person') {
+    const ctx = findPersonCiv(id);
+    if (ctx) chFound = CHAPTERS.find(ch=>ch.id===ctx.chId);
+  }
+  if (!chFound) return '';
+
+  // 同期文明
+  const otherCivs = chFound.active_civs.filter(cv=>cv.id!==id);
+  if (otherCivs.length === 0) return '';
+
+  return `<section class="section">
+    <h2><span class="num">${type==='civ'?'10':type==='event'?'09':'08'}</span>🌍 同时代世界（${chFound.range} BCE）</h2>
+    <div class="contemp-strip">
+      <h3>当时世界正在发生</h3>
+      <p>${chFound.world_context||''}</p>
+      <div class="contemp-items">
+        ${otherCivs.map(cv=>{
+          const info = getCivInfo(cv.id);
+          return `<span class="contemp-chip" onclick="navigate('civ','${cv.id}')">${info.icon} ${info.name} · ${cv.state}</span>`;
+        }).join('')}
+      </div>
+    </div>
+  </section>`;
+}
+
+// ════════════════════════════════════════════════
+// 文明之间的关系（数据驱动）
+// ════════════════════════════════════════════════
+const CIV_RELATIONS = [
+  {from:'akkad', to:'sumer', type:'war', typeLabel:'征服', symbol:'⚔', desc:'Sargon 大帝约前 2350 年征服苏美尔，建立人类第一个多民族帝国，但保留了苏美尔语言+文化。'},
+  {from:'babylon', to:'sumer', type:'influence', typeLabel:'继承', symbol:'⇒', desc:'巴比伦全套继承了苏美尔的法律、文学、宗教、占星术；汉谟拉比法典直接基于 Ur-Nammu 法典。'},
+  {from:'sumer', to:'indus', type:'trade', typeLabel:'贸易', symbol:'⇄', desc:'苏美尔商人通过波斯湾与印度河文明远程贸易，进口红玉髓、象牙、孔雀；考古发现印度河印章出现在 Ur 王陵。'},
+  {from:'sumer', to:'egypt_old', type:'influence', typeLabel:'间接影响', symbol:'⇢', desc:'苏美尔的城市化模型 + 文字概念可能通过黎凡特间接影响埃及前王朝；但埃及发展出完全独立的象形文字。'},
+  {from:'hittite', to:'egypt_new', type:'war', typeLabel:'战争+和约', symbol:'⚔', desc:'前 1274 年卡迭石战役（古代最大战车战，5000-6000 战车）；前 1259 年签订人类已知最早的国际和约。'},
+  {from:'mycenaean', to:'minoan', type:'war', typeLabel:'取代', symbol:'⇒', desc:'约前 1450 年迈锡尼人征服米诺斯文明，继承爱琴海贸易主导权。'},
+  {from:'mycenaean', to:'hittite', type:'trade', typeLabel:'贸易+冲突', symbol:'⇄', desc:'两国通过爱琴海贸易（特别是青铜原料），赫梯文献记载"阿希亚瓦"（可能就是迈锡尼）多次干涉小亚细亚事务。'},
+  {from:'shang', to:'sumer', type:'influence', typeLabel:'平行发展', symbol:'∥', desc:'商朝与苏美尔完全独立发展，无直接联系；但都独立发明了：青铜冶炼、城市、占卜、王权宗教融合。'},
+  {from:'collapse', to:'hittite', type:'war', typeLabel:'毁灭', symbol:'✕', desc:'约前 1180 年 Sea Peoples 加干旱链使赫梯首都 Hattusa 被烧毁，赫梯帝国瓦解。'},
+  {from:'collapse', to:'mycenaean', type:'war', typeLabel:'毁灭', symbol:'✕', desc:'前 1180 年迈锡尼宫殿全部被烧毁，希腊进入 400 年"黑暗时代"。'},
+  {from:'collapse', to:'egypt_new', type:'war', typeLabel:'削弱', symbol:'⚠', desc:'埃及虽击退 Sea Peoples (Ramesses III, 前 1177)，但元气大伤，新王国从此衰落。'},
+];
+
+function findCivRelations(civId){
+  return CIV_RELATIONS.filter(r=>{
+    if (r.from === civId) {
+      const toInfo = getCivInfo(r.to);
+      return {...r, from: getCivInfo(civId).name, to: toInfo.name};
+    }
+    if (r.to === civId) {
+      const fromInfo = getCivInfo(r.from);
+      return {...r, from: fromInfo.name, to: getCivInfo(civId).name};
+    }
+    return false;
+  }).map(r=>{
+    if (r.from === civId) return {...r, from: getCivInfo(civId).icon+' '+getCivInfo(civId).name, to: getCivInfo(r.to).icon+' '+getCivInfo(r.to).name};
+    return {...r, from: getCivInfo(r.from).icon+' '+getCivInfo(r.from).name, to: getCivInfo(civId).icon+' '+getCivInfo(civId).name};
+  });
+}
+
+// ════════════════════════════════════════════════
+// 错误页 + 路由
+// ════════════════════════════════════════════════
+function renderError(msg){
+  document.getElementById('page').innerHTML = `<div class="error-page">
+    <h1>🚧 ${msg}</h1>
+    <p>这个实体的深度内容还没补到。返回时间入口选择已有的文明。</p>
+    <a href="./civ-explorer-d.html" class="back-btn" style="display:inline-flex">◀ 返回时间入口</a>
+  </div>`;
+}
+
+function route(){
+  const {type, id} = parseHash();
+  if (!type || !id) {
+    return renderError('请通过时间入口选择实体');
+  }
+  if (type==='civ') return renderCivPage(id);
+  if (type==='person') return renderPersonPage(id);
+  if (type==='event') return renderEventPage(id);
+  renderError(`未知类型：${type}`);
+}
+
+window.addEventListener('hashchange', route);
+window.navigate = navigate;
+window.goBack = goBack;
+route();
+</script>
+</body>
+</html>

@@ -259,9 +259,9 @@ function resetAll(){
   window.scrollTo({top:0, behavior:'smooth'});
 }
 
-// 进入 E (实体宇宙) - 把当前 civ 作为入口
+// 进入文明完整深度页
 function enterDeep(civId){
-  location.href = `./civ-explorer-e.html?entry=${civId}&type=civ`;
+  location.href = `./civ-deep.html#/civ/${civId}`;
 }
 
 function openSummary(){
