@@ -6,7 +6,16 @@
 <title>古典思想与帝国 · 时间长河</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Cinzel:wght@500;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="./cosmos-design-system.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="./classical_people.js?v=2"></script>
+<script src="./classical_deep.js?v=2"></script>
 <style>
+.world-tip{background:rgba(20,16,30,.9)!important;color:#fff!important;border:none!important;border-radius:4px!important;font-size:10px!important;padding:1px 6px!important}
+.world-tip::before{display:none!important}
+.leaflet-popup-content{font-family:'Noto Sans SC',sans-serif;font-size:12.5px;line-height:1.6}
+.leaflet-popup-content b{color:#c84820}
+.leaflet-popup-content a{color:#2a6850;font-weight:700;text-decoration:none}
 html,body{height:100%;overflow:hidden}
 /* 顶栏标题 */
 .topbar h1{font-family:var(--serif);font-size:18px;font-weight:900;color:var(--ink);text-shadow:var(--label-shadow)}
@@ -99,7 +108,15 @@ html,body{height:100%;overflow:hidden}
   <a class="ds-fab green" href="./classical-network.html" title="人物关系网" style="text-decoration:none">👥</a>
   <button class="ds-fab" onclick="openEmpire()" title="三大帝国对比">⚖️</button>
   <button class="ds-fab purple" onclick="openAxial()" title="轴心时代思想对比">🧠</button>
+  <button class="ds-fab" style="background:linear-gradient(135deg,#2a8a90,#185c64)" onclick="openWorldMap()" title="全局遗址地图">🗺</button>
 </div>
+
+<div class="ds-modal" id="worldMapModal"><div class="ds-modal-content" style="max-width:1120px;padding:24px">
+  <button class="ds-close" onclick="closeModal('worldMapModal')">✕</button>
+  <div class="head"><h2>🗺 古典世界 · 遗址地图</h2><div class="sub">前 600 – 公元 400 · 各文明主要遗址</div></div>
+  <div id="worldMap" style="height:62vh;min-height:420px;border-radius:12px;overflow:hidden;border:1px solid rgba(160,120,40,.3);background:#dfe8ee"></div>
+  <p class="cmp-note">📌 点击地图标记查看遗址说明，可点"进入该文明 →"跳转深度档案。</p>
+</div></div>
 
 <div class="ds-tooltip" id="tooltip" style="display:none"></div>
 
@@ -232,15 +249,8 @@ function showTip(e,id){const c=BYID[id];const co=coexist(c);const t=document.get
 function moveTip(e){const t=document.getElementById('tooltip');t.style.left=Math.min(e.clientX+16,innerWidth-330)+'px';t.style.top=Math.min(e.clientY+16,innerHeight-200)+'px';}
 function hideTip(){document.getElementById('tooltip').style.display='none';}
 
-function openCiv(id){const c=BYID[id],d=INFO[id];if(!d)return;
-  const ppl=d.ppl.map(n=>`<a class="ppl-chip" href="./classical-network.html" title="在人物关系网中查看">${n}</a>`).join('');
-  document.getElementById('civModalContent').innerHTML=`<button class="ds-close" onclick="closeModal('civModal')">✕</button>
-    <div class="head"><h2>${c.icon} ${c.name}</h2><div class="sub">${d.region} · ${d.years}</div></div>
-    <p class="ov-narr">${d.narr}</p>
-    <div class="ov-h">⭐ 关键成就与事件</div><ul class="ov-list">${d.hi.map(x=>`<li>${x}</li>`).join('')}</ul>
-    <div class="ov-h">👥 代表人物 <span style="font-size:11px;color:var(--paper-ink3);font-weight:400">· 点击进入人物关系网</span></div><div class="ppl-row">${ppl}</div>`;
-  document.getElementById('civModal').classList.add('open');
-}
+// 点击文明 → 进入深度档案页 (与早期文明一致)
+function openCiv(id){ location.href='./classical-deep.html#/civ/'+id; }
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 
 // 对比表
@@ -249,6 +259,27 @@ const EMPIRE=[['维度','波斯帝国','汉朝','罗马帝国'],['面积峰值',
 function fillTable(elId,data){const t=document.getElementById(elId);t.innerHTML='<thead><tr>'+data[0].map((h,i)=>`<th${i===0?' style="text-align:left"':''}>${h}</th>`).join('')+'</tr></thead><tbody>'+data.slice(1).map(row=>'<tr>'+row.map((cell,i)=>i===0?`<td class="row-h">${cell}</td>`:`<td>${cell}</td>`).join('')+'</tr>').join('')+'</tbody>';}
 function openAxial(){fillTable('axialTable',AXIAL);document.getElementById('axialModal').classList.add('open');}
 function openEmpire(){fillTable('empireTable',EMPIRE);document.getElementById('empireModal').classList.add('open');}
+
+// 全局遗址地图 (Leaflet + CIV_MAP)
+let _wm=null;
+function openWorldMap(){document.getElementById('worldMapModal').classList.add('open');setTimeout(initWM,80);}
+function initWM(){
+  if(typeof L==='undefined'||typeof CIV_MAP==='undefined')return;
+  if(_wm){_wm.remove();_wm=null;}
+  _wm=L.map(document.getElementById('worldMap'),{scrollWheelZoom:true,worldCopyJump:true});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:13,minZoom:2,attribution:'© OpenStreetMap'}).addTo(_wm);
+  const meta={};(EARLY_CIV_EXPLORER.civilizations||[]).forEach(c=>meta[c.id]=c);
+  const all=[];
+  Object.keys(CIV_MAP).forEach(cid=>{const m=meta[cid]||{color:'#888',name:cid,icon:''};
+    CIV_MAP[cid].forEach(p=>{all.push(p.coords);
+      L.circleMarker(p.coords,{radius:7,color:'#2a1808',weight:1.5,fillColor:m.color,fillOpacity:.92}).addTo(_wm)
+        .bindPopup(`<b>${p.name}</b><br><span style="color:${m.color}">●</span> ${m.icon} ${m.name}<br>${p.note||''}<br><a href="./classical-deep.html#/civ/${cid}">进入该文明 →</a>`)
+        .bindTooltip(p.name,{direction:'top',className:'world-tip'});});});
+  if(all.length)_wm.fitBounds(all,{padding:[30,30],maxZoom:5});else _wm.setView([35,60],3);
+  setTimeout(()=>_wm&&_wm.invalidateSize(),120);
+  setTimeout(()=>{if(_wm){_wm.invalidateSize();if(all.length)_wm.fitBounds(all,{padding:[30,30],maxZoom:5});}},480);
+}
+window.openWorldMap=openWorldMap;
 
 // 主题
 function applyTheme(t){if(t&&t!=='deepblue')document.body.setAttribute('data-theme',t);else document.body.removeAttribute('data-theme');localStorage.setItem('civ_theme',t||'deepblue');document.querySelectorAll('#themeSwitch button').forEach(b=>b.classList.toggle('active',b.dataset.t===(t||'deepblue')));}
