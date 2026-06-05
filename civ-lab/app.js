@@ -2,7 +2,11 @@
 
 // 🔒 样板演示模式 — 只解锁这些课程，其余显示锁
 // 等准备好内容后，把更多 lesson id 加进数组即可
-const DEMO_UNLOCKED_LESSONS = ['PH01', 'PH02'];
+const DEMO_UNLOCKED_LESSONS = [
+  'PH01', 'PH02',
+  // 早期文明 Stage 1 全部解锁（待主图素材就位后用户可继续完善）
+  'E01', 'E02', 'E03', 'E04', 'E05', 'E06', 'E07', 'E08', 'E09', 'E10'
+];
 
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => [...document.querySelectorAll(sel)];
@@ -256,7 +260,7 @@ async function sendFloatingAIMsg() {
   addFloatingAIMsg('user', text);
 
   // 根据当前页面推断上下文 period
-  let p = PREHISTORIC.periods.find(x => x.id === activePreEraId)
+  let p = findAnyPeriod(activePreEraId)
        || PREHISTORIC.periods[0]; // 默认 PH01
 
   addFloatingAIMsg('ai', '<em>⏳ 思考中…</em>');
@@ -653,6 +657,11 @@ function positionFigure() {
 function enterLesson(id) {
   // 🆕 PH## ID 直接进入对应史前知识网络（跳过冗余的总览层）
   if (/^PH\d+$/.test(id)) {
+    enterPreEra(id);
+    return;
+  }
+  // 🏛 E## ID 进入早期文明节点 (Stage 1)
+  if (/^E\d+$/.test(id)) {
     enterPreEra(id);
     return;
   }
@@ -1714,9 +1723,18 @@ function renderPreEraGrid() {
 }
 
 // ── Screen 5: 史前时代 9层 ────────────────────────
+// 🔍 在 PREHISTORIC 和 EARLY_CIVILIZATIONS 中查找 period (统一入口)
+function findAnyPeriod(id) {
+  let p = PREHISTORIC.periods.find(x => x.id === id);
+  if (!p && typeof EARLY_CIVILIZATIONS !== 'undefined') {
+    p = EARLY_CIVILIZATIONS.periods.find(x => x.id === id);
+  }
+  return p;
+}
+
 function enterPreEra(id) {
   activePreEraId = id;
-  const period = PREHISTORIC.periods.find(p => p.id === id);
+  const period = findAnyPeriod(id);
   if (!period) return;
   showScreen('s-pre-era');
   renderPreEra(period);
@@ -2007,7 +2025,7 @@ function escCloseDetail(e) {
 
 // 显示某个热点的详情卡
 function showImageOverlayDetail(nodeId) {
-  const p = PREHISTORIC.periods.find(x => x.id === activePreEraId);
+  const p = findAnyPeriod(activePreEraId);
   if (!p) return;
   const kn = p.knowledge_network;
 
@@ -2377,7 +2395,7 @@ function showFullscreenContent({ icon, title, subtitle, html, sidebarHtml, stepK
 // 🎯 自动推进 / 闯关进度
 // ════════════════════════════════════════════════════════════════
 function markStepCompleted(step) {
-  const p = PREHISTORIC.periods.find(x => x.id === activePreEraId);
+  const p = findAnyPeriod(activePreEraId);
   if (!p) return;
   const key = 'civ_steps_' + p.id;
   let steps = {};
@@ -2391,7 +2409,7 @@ function markStepCompleted(step) {
 function refreshAutoAdvanceCard() {
   const card = document.getElementById('autoAdvanceCard');
   if (!card) return;
-  const p = PREHISTORIC.periods.find(x => x.id === activePreEraId);
+  const p = findAnyPeriod(activePreEraId);
   if (!p) return;
   let steps = {};
   try { steps = JSON.parse(localStorage.getItem('civ_steps_' + p.id) || '{}'); } catch {}
@@ -2467,30 +2485,41 @@ function closeFullscreenAndMaybeAdvance(stepKey) {
   if ('speechSynthesis' in window) window.speechSynthesis.cancel();
 }
 
+// 统一周期序列（史前 PH01-PH08 + 早期文明 E01-E10）
+function getAllPeriods() {
+  const all = [...PREHISTORIC.periods];
+  if (typeof EARLY_CIVILIZATIONS !== 'undefined' && EARLY_CIVILIZATIONS.periods) {
+    all.push(...EARLY_CIVILIZATIONS.periods);
+  }
+  return all;
+}
+
 function goToNextLesson() {
-  // 关闭所有 modal
   document.getElementById('fullscreenContentModal')?.classList.add('hidden');
   document.getElementById('fullscreenMapModal')?.classList.add('hidden');
-  const periods = PREHISTORIC.periods;
+  const periods = getAllPeriods();
   const idx = periods.findIndex(x => x.id === activePreEraId);
   if (idx < 0) return;
-  // 找下一个解锁的课
   for (let i = idx + 1; i < periods.length; i++) {
     if (DEMO_UNLOCKED_LESSONS.includes(periods[i].id)) {
       enterPreEra(periods[i].id);
       return;
     }
   }
-  // 没有更多解锁课程
   alert('🎉 这是当前样板版本最后一课！\n更多内容正在准备中，敬请期待。');
 }
 
 function goToPrevLesson() {
   document.getElementById('fullscreenContentModal')?.classList.add('hidden');
   document.getElementById('fullscreenMapModal')?.classList.add('hidden');
-  const periods = PREHISTORIC.periods;
+  const periods = getAllPeriods();
   const idx = periods.findIndex(x => x.id === activePreEraId);
-  if (idx > 0) enterPreEra(periods[idx - 1].id);
+  for (let i = idx - 1; i >= 0; i--) {
+    if (DEMO_UNLOCKED_LESSONS.includes(periods[i].id)) {
+      enterPreEra(periods[i].id);
+      return;
+    }
+  }
 }
 
 function closeMapAndAdvance(justClose) {
@@ -2558,7 +2587,7 @@ function renderFossilDetail(fossilId) {
 
 // 🗺 全屏迁徙地图（点击工具栏 🗺 地图 触发）
 function showFullscreenMap() {
-  const p = PREHISTORIC.periods.find(x => x.id === activePreEraId);
+  const p = findAnyPeriod(activePreEraId);
   if (!p || !p.map || !p.map.evolution_path) return;
   const evo = p.map.evolution_path;
 
@@ -2745,7 +2774,7 @@ function openFossilPanel(fossilId) {
   if (!panel || !body) return;
 
   // 计算上一个/下一个化石点
-  const p = PREHISTORIC.periods.find(x => x.id === activePreEraId);
+  const p = findAnyPeriod(activePreEraId);
   const evo = p?.map?.evolution_path || [];
   const idx = evo.findIndex(e => e.id === fossilId);
   const prev = (idx > 0) ? evo[idx - 1] : null;
@@ -2769,7 +2798,7 @@ function openFossilPanel(fossilId) {
 
 // 显示富内容（总览/时光机/故事/AI）— 全部使用全屏 modal
 function showImageOverlayPlay(special) {
-  const p = PREHISTORIC.periods.find(x => x.id === activePreEraId);
+  const p = findAnyPeriod(activePreEraId);
   if (!p) return;
   const kn = p.knowledge_network;
 
@@ -4222,7 +4251,7 @@ async function saveAIKeyInline(provider) {
     result.innerHTML = `<span class="ai-key-ok">✓ 连接成功！${provider === 'qwen' ? '千问' : 'Claude'} 回复：${reply.slice(0, 50)}</span>
       <p style="margin-top:8px">关闭此窗口后即可开始真正的 AI 对话。</p>`;
     setTimeout(() => {
-      const p = PREHISTORIC.periods.find(x => x.id === activePreEraId);
+      const p = findAnyPeriod(activePreEraId);
       const modal = document.getElementById('fullscreenContentModal');
       if (p && modal && !modal.classList.contains('hidden')) {
         document.getElementById('aiKeySetupOverlay')?.remove();

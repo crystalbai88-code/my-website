@@ -1696,15 +1696,17 @@ const MAIN_NETWORK = {
     { id:'PH07_node', stage:'STAGE_00', label:'分工·贸易·信仰',      time:'约7000年前',  emoji:'💎', linked_lesson:'PH07' },
     { id:'PH08_node', stage:'STAGE_00', label:'走向城市',            time:'约5000年前',  emoji:'🏛', linked_lesson:'PH08' },
 
-    // ═══════ STAGE_01 早期文明 8 个（间距 167）═══════
-    { id:'K3000_mesopotamia', stage:'STAGE_01', x:447,  label:'两河流域',     time:'前3000', emoji:'📜', linked_lesson:'L01' },
-    { id:'K3000_uruk',        stage:'STAGE_01', x:614,  label:'乌鲁克',       time:'前3000', emoji:'🏛' },
-    { id:'K3000_cuneiform',   stage:'STAGE_01', x:781,  label:'楔形文字',     time:'前3300', emoji:'✍️' },
-    { id:'K3000_egypt',       stage:'STAGE_01', x:948,  label:'古埃及',       time:'前3000', emoji:'🌅' },
-    { id:'K2500_pyramids',    stage:'STAGE_01', x:1115, label:'金字塔',       time:'前2500', emoji:'🔺', linked_lesson:'L02' },
-    { id:'K2600_indus',       stage:'STAGE_01', x:1282, label:'印度河文明',   time:'前2600', emoji:'🧱' },
-    { id:'K1600_shang',       stage:'STAGE_01', x:1449, label:'商朝青铜',     time:'前1600', emoji:'⚱️', linked_lesson:'L03' },
-    { id:'K1200_collapse',    stage:'STAGE_01', x:1616, label:'青铜崩溃',     time:'前1200', emoji:'💫', linked_lesson:'L04' },
+    // ═══════ STAGE_01 早期文明 10 个 E01-E10 ═══════
+    { id:'E01_node', stage:'STAGE_01', x:330,  label:'苏美尔',          time:'前3500', emoji:'📜', linked_lesson:'E01' },
+    { id:'E02_node', stage:'STAGE_01', x:460,  label:'古埃及·古王国',   time:'前3100', emoji:'🔺', linked_lesson:'E02' },
+    { id:'E03_node', stage:'STAGE_01', x:590,  label:'印度河文明',      time:'前2600', emoji:'🧱', linked_lesson:'E03' },
+    { id:'E04_node', stage:'STAGE_01', x:720,  label:'阿卡德帝国',      time:'前2334', emoji:'👑', linked_lesson:'E04' },
+    { id:'E05_node', stage:'STAGE_01', x:850,  label:'古巴比伦·汉谟拉比', time:'前1894', emoji:'⚖', linked_lesson:'E05' },
+    { id:'E06_node', stage:'STAGE_01', x:980,  label:'古埃及·新王国',   time:'前1550', emoji:'👁', linked_lesson:'E06' },
+    { id:'E07_node', stage:'STAGE_01', x:1110, label:'商朝青铜',        time:'前1600', emoji:'⚱️', linked_lesson:'E07' },
+    { id:'E08_node', stage:'STAGE_01', x:1240, label:'米诺斯+迈锡尼',   time:'前2000', emoji:'🐂', linked_lesson:'E08' },
+    { id:'E09_node', stage:'STAGE_01', x:1370, label:'赫梯帝国',        time:'前1600', emoji:'🛡', linked_lesson:'E09' },
+    { id:'E10_node', stage:'STAGE_01', x:1500, label:'青铜崩溃',        time:'前1200', emoji:'💥', linked_lesson:'E10' },
 
     // ═══════ STAGE_02 古典思想与帝国 10 个（间距 136）═══════
     { id:'AXIAL_age',         stage:'STAGE_02', x:416,  label:'轴心时代',     time:'前600',  emoji:'💡', linked_lesson:'L05' },
