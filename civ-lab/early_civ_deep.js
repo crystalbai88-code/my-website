@@ -2426,10 +2426,14 @@ const CIV_MAP = {
     { name:'卡迭石 Kadesh', coords:[34.571, 36.523], note:'与埃及决战 + 签订最早国际和约之地。' },
     { name:'卡尔凯美什 Carchemish', coords:[36.829, 38.015], note:'赫梯控制的幼发拉底河战略要地。' },
   ],
+  xia: [
+    { name:'二里头 Erlitou', coords:[34.690, 112.689], note:'夏朝晚期都邑(传为斟鄩)，中国最早宫城 + 青铜礼器作坊。' },
+    { name:'王城岗 Wangchenggang(登封)', coords:[34.460, 113.077], note:'龙山-夏初城址，一说为"禹都阳城"。' },
+    { name:'新砦 Xinzhai(新密)', coords:[34.398, 113.624], note:'夏朝早期大型城址，介于龙山文化与二里头之间。' },
+  ],
   shang: [
     { name:'殷墟 Yinxu(安阳)', coords:[36.127, 114.314], note:'商朝晚期都城，甲骨文 + 妇好墓 + 司母戊鼎所在。' },
     { name:'郑州商城 Zhengzhou', coords:[34.757, 113.665], note:'商朝早期都城候选(亳或嚣)，7000 米城墙。' },
-    { name:'二里头 Erlitou', coords:[34.690, 112.689], note:'夏末商初都邑(夏朝?)，中国最早宫殿基址。' },
     { name:'偃师商城 Yanshi', coords:[34.730, 112.789], note:'商朝早期都城候选，与郑州商城同期。' },
   ],
   collapse: [

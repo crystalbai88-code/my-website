@@ -241,6 +241,7 @@ const FINAL_OVERVIEW = {
     { id: 'akkad',         name: '阿卡德',           color: '#c84820', spans: [[3,'peak_collapse']], legacy: '"帝国"概念 · 多民族统一治理' },
     { id: 'babylon',       name: '古巴比伦',         color: '#7060a0', spans: [[4,'peak']], legacy: '汉谟拉比法典 · "以眼还眼" · 数学 (二次方程)' },
     { id: 'egypt_new',     name: '古埃及·新王国',     color: '#f0c068', spans: [[5,'peak']], legacy: '一神教萌芽 · 国际外交 · 大型神庙' },
+    { id: 'xia',           name: '夏朝',             color: '#8a9a6a', spans: [[3,'rise'],[4,'peak']], legacy: '华夏第一个世袭王朝 · 二里头青铜礼器 · 夏历雏形' },
     { id: 'shang',         name: '商朝',             color: '#a0b890', spans: [[4,'rise'],[5,'peak']], legacy: '汉字 · 甲骨占卜 · 青铜礼器' },
     { id: 'minoan',        name: '米诺斯',           color: '#5aa0c0', spans: [[4,'peak']], legacy: '欧洲文明源头 · 海洋贸易模型' },
     { id: 'mycenaean',     name: '迈锡尼',           color: '#7080b0', spans: [[5,'peak_collapse']], legacy: '希腊语起源 · 荷马史诗背景' },

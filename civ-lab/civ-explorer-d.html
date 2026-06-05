@@ -355,6 +355,7 @@ const REGIONS = [
     {id:'hittite', name:'赫梯帝国', start:-1650, peak:-1274, end:-1180, state:'铁器+战车'},
   ]},
   {key:'china', name:'YEL 黄河·中国', civs:[
+    {id:'xia',   name:'夏朝', start:-2070, peak:-1750, end:-1600, state:'华夏第一王朝'},
     {id:'shang', name:'商朝', start:-1600, peak:-1250, end:-1046, state:'甲骨文+青铜'},
   ]},
 ];
@@ -373,6 +374,7 @@ const RELATIONS = [
   {from:'hittite', to:'egypt_new', type:'war'},
   {from:'mycenaean', to:'minoan', type:'war'},
   {from:'mycenaean', to:'hittite', type:'trade'},
+  {from:'shang', to:'xia', type:'continuation'},
 ];
 
 function getCivColor(id){
@@ -382,7 +384,7 @@ function getCivColor(id){
     egypt_predynastic:'#d4b870', egypt_old:'#e8a040', egypt_new:'#e0a850',
     indus_early:'#a070d4', indus:'#a08850',
     minoan:'#2080a0', mycenaean:'#1880b0',
-    hittite:'#506890', shang:'#a02030', collapse:'#7a4040'
+    hittite:'#506890', xia:'#6f8f5a', shang:'#a02030', collapse:'#7a4040'
   };
   if (fb[id]) return fb[id];
   if (typeof EARLY_CIV_EXPLORER!=='undefined') {
@@ -396,7 +398,7 @@ const CIV_ICON = {
   egypt_predynastic:'🌅', egypt_old:'🔺', egypt_new:'🏛️',
   indus_early:'🏘️', indus:'🧱',
   minoan:'🐂', mycenaean:'🦁',
-  hittite:'🛡️', shang:'🏺', collapse:'💥',
+  hittite:'🛡️', xia:'🐉', shang:'🏺', collapse:'💥',
 };
 function getCivIcon(id){
   if (CIV_ICON[id]) return CIV_ICON[id];
@@ -664,7 +666,7 @@ async function sendAI(){
   let key=localStorage.getItem(AI_KEY);
   if(!key){ key=prompt('输入千问 API Key (一次性, 存本地)： https://dashscope.console.aliyun.com/'); if(!key){btn.disabled=false;return;} localStorage.setItem(AI_KEY,key); }
   const bot=aiAppend('bot','',true); let acc='';
-  const sys='你是 AI 世界文明实验室助手，面向 10-15 岁中学生，用生动语言。覆盖前 3500–1000 年早期文明（苏美尔/埃及/印度河/阿卡德/巴比伦/米诺斯/迈锡尼/赫梯/商朝/青铜崩溃）。只用学界共识事实，不编造，不知道就说不知道，200 字内。';
+  const sys='你是 AI 世界文明实验室助手，面向 10-15 岁中学生，用生动语言。覆盖前 3500–1000 年早期文明（苏美尔/埃及/印度河/阿卡德/巴比伦/米诺斯/迈锡尼/赫梯/夏朝/商朝/青铜崩溃）。只用学界共识事实，不编造，不知道就说不知道，200 字内。';
   try{
     const resp=await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',{
       method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
