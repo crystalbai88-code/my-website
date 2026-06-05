@@ -96,17 +96,34 @@ h1{font-family:'Noto Serif SC',serif;font-size:34px;font-weight:900;margin-botto
   </div>
 
   <div class="card d" onclick="location='./civ-explorer-d.html'">
+    <div class="preview"><span class="big">🌌</span></div>
+    <div class="body">
+      <div class="tag">FORM D · CONTINUOUS MAP</div>
+      <h2>一张全图（按时间）</h2>
+      <p>5 个椭圆（每个 = 500 年）从上到下，按时间排列。导航逻辑：<strong>时间→文明→事件/人物</strong>。适合宏观鸟瞰 2500 年。</p>
+      <div class="feat"><span class="f">TIME-BASED</span><span class="f">3D NODES</span><span class="f">EVENT CHAIN</span></div>
+      <a class="go" href="./civ-explorer-d.html">打开 D →</a>
+    </div>
+  </div>
+
+  <div class="card e" onclick="location='./civ-explorer-e.html'">
     <div class="preview"><span class="big">🧠</span></div>
     <div class="body">
-      <div class="tag">FORM D · DYNAMIC MIND MAP</div>
-      <h2>一张全图 ✨ NEW</h2>
-      <p>一张连续长图，5 个椭圆（每个 = 500 年）从上到下排列。点"展开下一段"按钮 → 下一个椭圆滑出 + 自动用<strong>金色线</strong>连接跨越两段的文明。最后看到完整 2500 年地图。无快闪动画。</p>
-      <div class="feat"><span class="f">CONTINUOUS MAP</span><span class="f">CARRY-OVER LINES</span><span class="f">PROGRESSIVE</span><span class="f">RECOMMENDED</span></div>
-      <a class="go" href="./civ-explorer-d.html">打开 D （推荐） →</a>
+      <div class="tag">FORM E · ENTITY UNIVERSE ✨ NEW</div>
+      <h2>实体宇宙（按人/事钻深）</h2>
+      <p>选一个<strong>人/事件/文明</strong>作为入口 → 周围辐射出 5-7 个关联 → 点任一关联，<strong>它成为新中心</strong> → 可一直钻 5-6 层。带同时代视图 + 对比表（在最后）。<strong>层层深入，无限钻取。</strong></p>
+      <div class="feat"><span class="f">ENTITY-CENTRIC</span><span class="f">DEEP DRILL</span><span class="f">CONTEMPORARY</span><span class="f">RECOMMENDED</span></div>
+      <a class="go" href="./civ-explorer-e.html">打开 E （推荐） →</a>
     </div>
   </div>
 
 </div>
+
+<style>
+.e .preview{background:linear-gradient(135deg,#fbf6e9 0%,#f5e8c8 100%)}
+.e .preview .big{color:#b88830;text-shadow:0 4px 16px rgba(184,136,48,.3)}
+.e h2{color:#b88830}.e .tag{color:#c84820}
+</style>
 
 <style>
 .d .preview{background:radial-gradient(ellipse at 30% 30%,rgba(120,90,200,.4),transparent 50%),radial-gradient(ellipse at 70% 70%,rgba(212,168,88,.3),transparent 50%),#04050c}
@@ -115,7 +132,12 @@ h1{font-family:'Noto Serif SC',serif;font-size:34px;font-weight:900;margin-botto
 </style>
 
 <div style="max-width:1200px;margin:40px auto 0;padding:22px 26px;background:#15151c;border-radius:14px;border:1px solid #2a2a36">
-  <h3 style="font-family:'Noto Serif SC',serif;color:#d4a858;margin-bottom:10px;font-size:18px">🎯 我推荐 → D 动态思维导图（最符合"层层探索"）</h3>
+  <h3 style="font-family:'Noto Serif SC',serif;color:#d4a858;margin-bottom:10px;font-size:18px">🎯 推荐 D + E 互补使用</h3>
+  <p style="color:#c8bca0;font-size:13px;line-height:1.7;margin-bottom:10px">
+  <strong style="color:#7aa8ff">D（按时间）</strong>：宏观鸟瞰 2500 年，看哪些文明同时存在 / 谁继承谁。<br>
+  <strong style="color:#b88830">E（按实体）</strong>：从一个人或事件开始，层层钻 5-6 层，看到庞大的关联网络。<br>
+  老师讲课 / 学生预习 → 用 D；学生深入研究某个人或事件 → 用 E。
+  </p>
   <ul style="color:#c8bca0;font-size:13.5px;line-height:1.85;padding-left:20px">
     <li>"点点点累进式"最自然（每段折叠 → 点击展开 L1 → L2 → L3 → L4 → L5）</li>
     <li>不强迫翻页，但"段落感"清晰（每段卷轴有自己的 hero）</li>
