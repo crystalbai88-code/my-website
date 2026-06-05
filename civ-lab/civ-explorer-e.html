@@ -413,25 +413,34 @@ function getRelatedNodes(id, type){
     });
   } else if (type === 'civ') {
     const c = CIV_DEEP[id];
-    if (!c) return [];
-    // 该文明的事件
-    Object.entries(EVENT_DEEP).forEach(([eid, e])=>{
-      const ch = CHAPTERS.find(ch => ch.active_civs.some(cv => cv.id===id && cv.L3_events?.includes(eid)));
-      if (ch) nodes.push({id:eid, type:'event', label:e.full_title, relation:'本文明事件', category:'事件'});
+    // 该文明跨所有章节出现，收集事件 + 人物
+    CHAPTERS.forEach(ch => {
+      const cv = ch.active_civs.find(x => x.id === id);
+      if (!cv) return;
+      (cv.L3_events||[]).forEach(eid=>{
+        if (nodes.find(n=>n.id===eid)) return;
+        const e = EVENT_DEEP[eid];
+        nodes.push({id:eid, type:'event', label:e?.full_title||eid, relation:ch.no+'章事件', category:'事件'});
+      });
+      (cv.L4_people||[]).forEach(pid=>{
+        if (nodes.find(n=>n.id===pid)) return;
+        const p = PERSON_DEEP[pid];
+        nodes.push({id:pid, type:'person', label:p?.full_name?.split(' ')[0]||pid, relation:ch.no+'章人物', category:'人物'});
+      });
     });
-    // 该文明的人物
-    Object.entries(PERSON_DEEP).forEach(([pid, p])=>{
-      const ch = CHAPTERS.find(ch => ch.active_civs.some(cv => cv.id===id && cv.L4_people?.includes(pid)));
-      if (ch) nodes.push({id:pid, type:'person', label:p.full_name?.split(' ')[0]||pid, relation:'本文明人物', category:'人物'});
-    });
-    // 核心概念
-    if (c.nine_inventions) {
+    // 核心概念 (如果有 CIV_DEEP)
+    if (c?.nine_inventions) {
       c.nine_inventions.slice(0,2).forEach(inv=>{
         nodes.push({id:'inv_'+id+'_'+inv.name, type:'concept', label:inv.name, relation:'发明', category:'概念', data:inv, parentCiv:id});
       });
     }
+    // 如果该文明跨多个章节，加一个"完整时间线"概念节点
+    const chsForCiv = CHAPTERS.filter(ch=>ch.active_civs.some(cv=>cv.id===id));
+    if (chsForCiv.length > 1) {
+      nodes.push({id:'timeline_'+id, type:'concept', label:'完整时间线', relation:'演化', category:'概念', data:{name:'时间线', detail:chsForCiv.map(ch=>`${ch.range} BCE · ${ch.title}：${ch.active_civs.find(cv=>cv.id===id)?.in_period_summary||''}`).join('\n\n')}, parentCiv:id});
+    }
   }
-  return nodes.slice(0, 7); // 限制最多 7 个 spoke
+  return nodes.slice(0, 8); // 限制最多 8 个 spoke
 }
 
 // ════════════════════════════════════════════════
@@ -522,7 +531,13 @@ function getEntityInfo(id, type){
   }
   if (type === 'civ') {
     const c = CIV_DEEP[id];
-    return {label: getCivName(id), meta: c?.time_range || ''};
+    // 找 chapters_data 里该文明的时间范围 (取最早出现的 chapter)
+    let timeRange = c?.time_range;
+    if (!timeRange) {
+      const firstCh = CHAPTERS.find(ch=>ch.active_civs.some(cv=>cv.id===id));
+      if (firstCh) timeRange = firstCh.range + ' BCE';
+    }
+    return {label: getCivName(id), meta: timeRange || ''};
   }
   if (type === 'concept' || type === 'place') {
     return {label: id, meta: ''};
@@ -639,23 +654,36 @@ function showDetail(id, type){
     `;
   } else if (type === 'civ') {
     const c = CIV_DEEP[id];
-    if (!c) return;
     document.getElementById('dIc').textContent = getCivInfo(id).icon || '🏛';
     document.getElementById('dKi').textContent = '文明 · CIVILIZATION';
     document.getElementById('dTitle').textContent = getCivName(id);
+    // 用 chapters_data 拼出该文明在各章节的状态
+    const chsForCiv = CHAPTERS.filter(ch=>ch.active_civs.some(cv=>cv.id===id));
+    const phasesHTML = chsForCiv.length ? `<div class="detail-section">
+      <div class="h">📅 演化阶段</div>
+      ${chsForCiv.map(ch=>{
+        const cv = ch.active_civs.find(x=>x.id===id);
+        return `<div style="background:white;border:1px solid rgba(184,136,48,.2);border-radius:8px;padding:10px 12px;margin-bottom:6px;font-size:12.5px;line-height:1.6">
+          <div style="font-weight:700;color:var(--gold-deep);font-family:var(--serif);font-size:13px;margin-bottom:3px">${ch.range} BCE · ${cv.state}</div>
+          ${cv.in_period_summary||''}
+        </div>`;
+      }).join('')}
+    </div>` : '';
     document.getElementById('dBody').innerHTML = `
       <div class="detail-meta">
-        ${c.time_range?`<span>📅 ${c.time_range}</span>`:''}
-        ${c.capital_at_peak?`<span>📍 ${c.capital_at_peak}</span>`:''}
+        ${c?.time_range?`<span>📅 ${c.time_range}</span>`:(chsForCiv[0]?`<span>📅 ${chsForCiv[0].range} BCE 起</span>`:'')}
+        ${c?.capital_at_peak?`<span>📍 ${c.capital_at_peak}</span>`:''}
       </div>
-      <div class="detail-section">
+      ${c?.opening_narrative?`<div class="detail-section">
         <div class="h">📖 文明叙事</div>
-        <div class="detail-narrative">${(c.opening_narrative||'').trim().split(/\n\s*\n/).slice(0,3).map(p=>'<p>'+p.trim()+'</p>').join('')}</div>
-      </div>
-      ${c.nine_inventions?`<div class="detail-section">
+        <div class="detail-narrative">${c.opening_narrative.trim().split(/\n\s*\n/).slice(0,3).map(p=>'<p>'+p.trim()+'</p>').join('')}</div>
+      </div>`:''}
+      ${phasesHTML}
+      ${c?.nine_inventions?`<div class="detail-section">
         <div class="h">💡 关键发明</div>
         ${c.nine_inventions.slice(0,5).map(inv=>`<div style="background:white;border:1px solid rgba(184,136,48,.2);border-radius:8px;padding:10px 12px;margin-bottom:6px;font-size:12.5px;line-height:1.6"><div style="font-weight:700;color:var(--gold-deep);font-family:var(--serif);font-size:13px">${inv.name} <span style="font-family:var(--mono);font-size:10px;color:var(--ink3);font-weight:400">· ${inv.year}</span></div>${inv.body}</div>`).join('')}
       </div>`:''}
+      ${!c?`<div style="background:rgba(200,72,32,.06);border:1px dashed rgba(200,72,32,.3);border-radius:8px;padding:12px;font-size:12px;color:var(--ink2);line-height:1.65;margin-top:8px">📝 该文明深度叙事正在按《世界上下五千年》框架补写中。已有：演化阶段 + 关联事件/人物（上方画布可点击）。</div>`:''}
     `;
   }
 }
@@ -801,8 +829,15 @@ function renderCompTable(){
   `;
 }
 
-// 初始化
-buildEntryScreen();
+// 初始化 - 支持 URL 参数 ?entry=xxx&type=xxx 直接进入
+const urlParams = new URLSearchParams(location.search);
+const entryId = urlParams.get('entry');
+const entryType = urlParams.get('type');
+if (entryId && entryType) {
+  enterUniverse(entryId, entryType);
+} else {
+  buildEntryScreen();
+}
 window.enterUniverse = enterUniverse;
 window.goBack = goBack;
 window.goEntry = goEntry;
