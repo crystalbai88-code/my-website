@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>古典思想与帝国 · 人物关系网</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Cinzel:wght@500;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css"/>
+<style>
+  html,body{height:100%;overflow:hidden}
+  #app{position:relative;z-index:10;display:flex;flex-direction:column;height:100vh}
+  .nav{display:flex;align-items:center;gap:10px;padding:12px 18px 4px;flex-wrap:wrap}
+  .nav .title{font-family:var(--serif);font-weight:900;font-size:16px;color:var(--ink);text-shadow:var(--label-shadow)}
+  .nav .sub{font-family:var(--mono);font-size:10px;color:var(--ink2);letter-spacing:.1em}
+  .civ-row{display:flex;gap:8px;padding:8px 18px 10px;flex-wrap:wrap;align-items:center}
+  .civ-pill{font-family:var(--sans);font-size:12.5px;font-weight:700;color:var(--ink2);background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:var(--r-pill);padding:6px 15px;cursor:pointer;transition:all .15s;backdrop-filter:blur(10px)}
+  .civ-pill:hover{color:var(--gold);border-color:var(--gold)}
+  .civ-pill.on{color:#fff;background:var(--gold);border-color:var(--gold)}
+  #canvas-wrap{flex:1;position:relative;overflow:hidden}
+  canvas{position:absolute;inset:0;cursor:grab}
+  canvas.dragging{cursor:grabbing}
+  #panel{position:absolute;right:14px;top:14px;width:250px;max-height:calc(100vh - 130px);overflow-y:auto;display:none;padding:0}
+  #panel.show{display:block}
+  #panel .p-pad{padding:15px 17px}
+  .p-civ{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+  .p-name{font-family:var(--serif);font-size:20px;font-weight:900;color:var(--ink);line-height:1.2;margin-top:3px}
+  .p-eng{font-family:var(--mono);font-size:11px;color:var(--ink3);margin-top:2px}
+  .p-dates{font-family:var(--mono);font-size:11px;color:var(--ink2);margin:5px 0 8px}
+  .p-role{display:inline-block;padding:2px 11px;border-radius:var(--r-pill);font-size:10px;font-weight:700;margin-bottom:6px}
+  .p-bio{font-size:12.5px;color:var(--ink);line-height:1.72;padding-top:9px;border-top:1px solid var(--panel-line)}
+  .p-rels{margin-top:11px;padding-top:9px;border-top:1px solid var(--panel-line)}
+  .p-rels h4{font-family:var(--mono);font-size:10px;color:var(--gold);letter-spacing:.1em;margin-bottom:7px;text-transform:uppercase}
+  .rel-item{font-size:12px;color:var(--ink);padding:4px 0;display:flex;gap:6px;cursor:pointer;align-items:flex-start;transition:color .12s}
+  .rel-item:hover{color:var(--gold)}
+  .rel-type{color:var(--ink2);font-size:10px;flex-shrink:0;margin-top:1px;background:rgba(128,128,128,.16);padding:1px 6px;border-radius:6px}
+  .legend{position:absolute;left:14px;bottom:14px;font-size:11px}
+  .leg-row{display:flex;align-items:center;gap:6px;margin-bottom:5px;color:var(--ink2)}
+  .leg-row:last-child{margin-bottom:0}
+  .leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;background:#888}
+  .stats{position:absolute;left:14px;top:14px;font-family:var(--mono);font-size:10px;color:var(--ink2)}
+  .hint{position:absolute;bottom:14px;right:14px;font-family:var(--mono);font-size:10px;color:var(--ink3);text-align:right;max-width:46%}
+  @media(max-width:768px){ #panel{width:calc(100vw - 28px)} .legend{display:none} }
+</style>
+</head>
+<body data-theme="textbook">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="nav">
+    <a href="./index.html" class="ds-pill">⌂ 返回</a>
+    <span class="title">古典思想与帝国 · 人物关系网</span>
+    <span class="sub">前 600 — 公元 400</span>
+    <div class="ds-theme-switch" id="themeSwitch" style="margin-left:auto">
+      <button data-t="deepblue" title="静夜深蓝"></button>
+      <button data-t="museum" title="博物馆典藏"></button>
+      <button data-t="textbook" title="现代教科书"></button>
+      <button data-t="parchment" title="羊皮纸古卷"></button>
+    </div>
+  </div>
+  <div class="civ-row">
+    <span class="ds-kicker" style="margin-right:2px">选择国度</span>
+    <button class="civ-pill on" data-civ="china">🐉 中国</button>
+    <button class="civ-pill" data-civ="greece">🏛 希腊</button>
+    <button class="civ-pill" data-civ="rome">🦅 罗马</button>
+    <button class="civ-pill" data-civ="persia">🔥 波斯</button>
+    <button class="civ-pill" data-civ="india">☸ 印度·佛教</button>
+  </div>
+  <div id="canvas-wrap">
+    <canvas id="c"></canvas>
+    <div id="panel" class="ds-panel"><div class="p-pad">
+      <div class="p-civ" id="p-civ"></div>
+      <div class="p-name" id="p-name"></div>
+      <div class="p-eng" id="p-eng"></div>
+      <div class="p-dates" id="p-dates"></div>
+      <span class="p-role" id="p-role"></span>
+      <div class="p-bio" id="p-bio"></div>
+      <div class="p-rels"><h4>本国关联人物</h4><div id="p-rels"></div></div>
+    </div></div>
+    <div class="legend ds-panel" style="padding:10px 13px">
+      <div class="leg-row"><div class="leg-dot" data-role="ruler"></div><span>统治者</span></div>
+      <div class="leg-row"><div class="leg-dot" data-role="general"></div><span>将领</span></div>
+      <div class="leg-row"><div class="leg-dot" data-role="thinker"></div><span>思想家</span></div>
+      <div class="leg-row"><div class="leg-dot" data-role="religious"></div><span>宗教人物</span></div>
+      <div class="leg-row"><div class="leg-dot" data-role="other"></div><span>其他</span></div>
+    </div>
+    <div class="stats ds-panel" id="stats" style="padding:7px 12px"></div>
+    <div class="hint">拖拽节点 · 滚轮缩放 · 点击查看详情</div>
+  </div>
+</div>
+<script>
+const CIV_NAMES={china:"中国",greece:"希腊",rome:"罗马",persia:"波斯",india:"印度/佛教",cross:"跨文明"};
+const ROLE_NAMES={ruler:"统治者",general:"将领",thinker:"思想家",religious:"宗教人物",other:"其他人物"};
+// 节点按角色着色，色值映射到设计系统变量，主题切换时刷新
+const ROLE_VAR={ruler:'--gold',general:'--vermilion',thinker:'--cyan',religious:'--purple',other:'--ink3'};
+let TH={role:{}};
+function refreshTheme(){
+  const cs=getComputedStyle(document.body);
+  TH.ink=cs.getPropertyValue('--ink').trim()||'#e8e4d8';
+  TH.edge=cs.getPropertyValue('--grid-ink').trim()||'rgba(200,200,200,.6)';
+  TH.role={}; for(const k in ROLE_VAR) TH.role[k]=cs.getPropertyValue(ROLE_VAR[k]).trim()||'#888';
+  // 同步图例圆点颜色
+  document.querySelectorAll('.leg-dot[data-role]').forEach(d=>d.style.background=TH.role[d.dataset.role]);
+}
+function roleColor(r){return (TH.role&&TH.role[r])||'#888';}
+
+const P=[
+// ═══ 中国 ═══
+{id:"guanzhong",n:"管仲",e:"Guan Zhong",c:"china",r:"other",d:"前723—前645",b:"齐桓公相国，法家先驱，盐铁国营开创者，九合诸侯，'仓廪实而知礼节'，与鲍叔牙友谊'管鲍之交'流传千古。",rel:[{i:"baoshuya",t:"挚友"},{i:"qihuan",t:"效力"}]},
+{id:"baoshuya",n:"鲍叔牙",e:"Bao Shuya",c:"china",r:"other",d:"约前710—前644",b:"管仲的挚友，多次让利举荐管仲，甘居其下，是古代最著名的友谊典范。",rel:[{i:"guanzhong",t:"挚友"},{i:"qihuan",t:"效力"}]},
+{id:"qihuan",n:"齐桓公",e:"Duke Huan of Qi",c:"china",r:"ruler",d:"前685—前643在位",b:"春秋第一霸，任用管仲，九合诸侯，尊王攘夷，晚年信奸臣，饿死宫中。",rel:[{i:"guanzhong",t:"重用"}]},
+{id:"jinhuan",n:"晋文公",e:"Duke Wen of Jin",c:"china",r:"ruler",d:"前636—前628在位",b:"流亡19年，62岁执政成春秋第二霸，城濮之战以退避三舍击败楚国。",rel:[{i:"qihuan",t:"同时代霸主"}]},
+{id:"zichan",n:"子产",e:"Zichan",c:"china",r:"thinker",d:"约前582—前522",b:"郑国执政，铸刑书于铜鼎——中国最早公布成文法律的政治家，孔子极其尊重他。",rel:[{i:"kongzi",t:"被孔子尊重"}]},
+{id:"yanzi",n:"晏婴（晏子）",e:"Yanying",c:"china",r:"other",d:"？—前500",b:"齐国大夫，机智外交家，身材矮小才智卓绝，'橘生淮南则为橘，生淮北则为枳'。",rel:[{i:"kongzi",t:"同时代"}]},
+{id:"kongzi",n:"孔子",e:"Confucius",c:"china",r:"thinker",d:"前551—前479",b:"儒家创始人，周游列国14年推行仁政，整理六经，仁礼君子思想影响东亚两千年。",rel:[{i:"yanhui",t:"最爱弟子"},{i:"zilu",t:"护卫弟子"},{i:"zigong",t:"富商弟子"},{i:"zengzi",t:"弟子"},{i:"laozi",t:"曾问礼"},{i:"mencius",t:"思想传承"}]},
+{id:"laozi",n:"老子",e:"Laozi",c:"china",r:"thinker",d:"约前571—前471",b:"道家创始人，《道德经》五千言，无为自然，孔子曾向其问礼，'如东方神龙'。",rel:[{i:"kongzi",t:"被问礼"},{i:"zhuangzi",t:"思想先驱"}]},
+{id:"yanhui",n:"颜回",e:"Yan Hui",c:"china",r:"thinker",d:"前521—前481",b:"孔子最钟爱弟子，贫穷而乐道，'一箪食一瓢饮'，孔子视其最接近仁，早逝令孔子恸哭。",rel:[{i:"kongzi",t:"师傅"}]},
+{id:"zilu",n:"子路",e:"Zilu",c:"china",r:"other",d:"前542—前480",b:"孔子忠实护卫，性情直爽武勇，在卫国内乱中战死，死前仍整好冠带从容就义。",rel:[{i:"kongzi",t:"师傅"}]},
+{id:"zigong",n:"子贡",e:"Zi Gong",c:"china",r:"other",d:"前520—前456",b:"儒门第一富商外交家，多次外交救鲁，孔子死后守墓六年，儒家传播的关键推手。",rel:[{i:"kongzi",t:"师傅"}]},
+{id:"zengzi",n:"曾参",e:"Zengzi",c:"china",r:"thinker",d:"前505—前435",b:"著《大学》《孝经》，以孝道著称，连接孔子与孟子的关键传承链。",rel:[{i:"kongzi",t:"师傅"},{i:"zisi",t:"授业"}]},
+{id:"zisi",n:"子思",e:"Zisi",c:"china",r:"thinker",d:"前483—前402",b:"孔子之孙，著《中庸》，连接孔子与孟子的重要桥梁，将儒家形而上学化。",rel:[{i:"kongzi",t:"祖父"},{i:"zengzi",t:"受业"},{i:"mencius",t:"授业"}]},
+{id:"mozi",n:"墨子",e:"Mozi",c:"china",r:"thinker",d:"约前480—前390",b:"墨家创始人，兼爱非攻，节用尚贤，亲自参与守城设计，小孔成像最早记录者，儒家最强竞争对手。",rel:[{i:"kongzi",t:"思想对立"}]},
+{id:"yangzhu",n:"杨朱",e:"Yang Zhu",c:"china",r:"thinker",d:"约前440—前360",b:"'拔一毛利天下而不为'，极端个人主义，孟子时代'天下言不归杨则归墨'，著作全失。",rel:[{i:"mozi",t:"思想对立"},{i:"mencius",t:"被批判"}]},
+{id:"sunzi",n:"孙武",e:"Sun Tzu",c:"china",r:"general",d:"约前544—前496",b:"兵圣，《孙子兵法》十三篇是世界最重要的军事著作，以宫女测试展示纪律。",rel:[{i:"helv",t:"效力"},{i:"wuzixu",t:"同僚"}]},
+{id:"helv",n:"吴王阖闾",e:"King Helü",c:"china",r:"ruler",d:"前514—前496在位",b:"吴国雄主，任用孙武和伍子胥，攻破楚都，春秋末年最强势力，被越国击败后伤重而死。",rel:[{i:"sunzi",t:"重用"},{i:"wuzixu",t:"重用"},{i:"goujian",t:"战场对手"}]},
+{id:"wuzixu",n:"伍子胥",e:"Wu Zixu",c:"china",r:"general",d:"前559—前484",b:"过昭关一夜白头，辅助阖闾攻破楚都，掘平王墓鞭尸复仇，反对夫差被赐剑，死前嘱托挂眼看越灭吴。",rel:[{i:"helv",t:"效力"},{i:"sunzi",t:"同僚"},{i:"goujian",t:"战场对手"}]},
+{id:"goujian",n:"越王勾践",e:"King Goujian",c:"china",r:"ruler",d:"前496—前465在位",b:"会稽之耻后卧薪尝胆20年，灭吴称霸，中国最著名的忍辱复仇典故。",rel:[{i:"fanli",t:"谋臣"},{i:"fucha",t:"最终灭之"}]},
+{id:"fucha",n:"吴王夫差",e:"King Fucha",c:"china",r:"ruler",d:"前495—前473在位",b:"不杀勾践，沉迷西施，最终被越国灭亡，用布遮脸自刎，'无颜见伍子胥于地下'。",rel:[{i:"goujian",t:"被灭"},{i:"xishi",t:"迷恋"}]},
+{id:"xishi",n:"西施",e:"Xi Shi",c:"china",r:"other",d:"约前506—？",b:"四大美人之首，越国美人被送给夫差，成功迷惑吴王，越国灭吴的关键棋子。",rel:[{i:"fucha",t:"迷惑"},{i:"fanli",t:"传说随其隐退"}]},
+{id:"fanli",n:"范蠡",e:"Fan Li",c:"china",r:"other",d:"约前536—前448",b:"越国谋臣，卧薪尝胆参谋者，功成隐退为陶朱公三次致富散尽，被后世商人尊为财神。",rel:[{i:"goujian",t:"辅佐"},{i:"xishi",t:"传说相恋"}]},
+{id:"mencius",n:"孟子",e:"Mencius",c:"china",r:"thinker",d:"前372—前289",b:"儒家亚圣，性善论，民本思想（民为贵君为轻），游历各国推行仁政，与梁惠王齐宣王辩论。",rel:[{i:"kongzi",t:"传承"},{i:"zisi",t:"受业"},{i:"xunzi",t:"对立"},{i:"yangzhu",t:"批判"}]},
+{id:"zhuangzi",n:"庄子",e:"Zhuangzi",c:"china",r:"thinker",d:"约前369—前286",b:"道家集大成，蝴蝶梦、庖丁解牛、濠梁之辩，反对礼教，追求精神绝对自由。",rel:[{i:"laozi",t:"思想传承"},{i:"huizi",t:"终身辩友"}]},
+{id:"huizi",n:"惠子",e:"Hui Shi",c:"china",r:"thinker",d:"约前370—前310",b:"名家代表，庄子终身辩友，惠子死后庄子悲叹'再无对手'，合同异哲学。",rel:[{i:"zhuangzi",t:"辩友"}]},
+{id:"gongsunlong",n:"公孙龙",e:"Gongsun Long",c:"china",r:"thinker",d:"约前320—前250",b:"名家代表，'白马非马'论——具体不等于抽象，中国古代最早的概念分析哲学。",rel:[{i:"huizi",t:"同派"}]},
+{id:"suqin",n:"苏秦",e:"Su Qin",c:"china",r:"other",d:"约前340—前284",b:"纵横家，身佩六国相印，头悬梁锥刺股，合纵抗秦的设计者，最终以间谍身份死于车裂。",rel:[{i:"zhangyi",t:"同门对立"},{i:"guiguzi",t:"传说受业"}]},
+{id:"zhangyi",n:"张仪",e:"Zhang Yi",c:"china",r:"other",d:"约前370—前310",b:"纵横家，秦国相国，连横破合纵，'张仪欺楚'是古代最著名外交欺诈，与苏秦分庭抗礼。",rel:[{i:"suqin",t:"对立"},{i:"guiguzi",t:"传说受业"}]},
+{id:"guiguzi",n:"鬼谷子",e:"Guiguzi",c:"china",r:"thinker",d:"战国时期",b:"纵横家鼻祖，传为苏秦张仪孙膑庞涓之师，《鬼谷子》是中国最早的谋略心理学著作。",rel:[{i:"suqin",t:"传说授业"},{i:"zhangyi",t:"传说授业"},{i:"sunbin",t:"传说授业"}]},
+{id:"sunbin",n:"孙膑",e:"Sun Bin",c:"china",r:"general",d:"约前382—前316",b:"《孙膑兵法》作者，被庞涓挖膝盖骨，后以围魏救赵、马陵之战报仇杀庞涓。",rel:[{i:"pangjuan",t:"宿仇"},{i:"guiguzi",t:"传说受业"}]},
+{id:"pangjuan",n:"庞涓",e:"Pang Juan",c:"china",r:"general",d:"？—前341",b:"魏国将领，嫉妒孙膑陷害致残，马陵之战中伏被乱箭射死，'遂成竖子之名'。",rel:[{i:"sunbin",t:"宿仇"}]},
+{id:"shangyang",n:"商鞅",e:"Shang Yang",c:"china",r:"thinker",d:"约前390—前338",b:"法家政治家，两次变法彻底重塑秦国：军功爵、郡县制、连坐法，变法成功后被车裂。",rel:[{i:"qin_xiaogong",t:"效力"},{i:"hanfeizi",t:"思想先驱"},{i:"shenbuhai",t:"同时代法家"}]},
+{id:"qin_xiaogong",n:"秦孝公",e:"Duke Xiao of Qin",c:"china",r:"ruler",d:"前361—前338在位",b:"颁布求贤令，全力支持商鞅变法，奠定秦国称霸基础。",rel:[{i:"shangyang",t:"重用"}]},
+{id:"shenbuhai",n:"申不害",e:"Shen Buhai",c:"china",r:"thinker",d:"约前385—前337",b:"韩国相国，法家'术'派，强调帝王驾驭臣下的权谋，与商鞅的'法'分庭抗礼。",rel:[{i:"shangyang",t:"同时代法家"},{i:"hanfeizi",t:"思想先驱"}]},
+{id:"xunzi",n:"荀子",e:"Xunzi",c:"china",r:"thinker",d:"约前313—前238",b:"儒家荀派，性恶论，礼治为本，制天命而用之，弟子韩非子和李斯发展为法家。",rel:[{i:"mencius",t:"对立"},{i:"hanfeizi",t:"授业"},{i:"lisi",t:"授业"}]},
+{id:"hanfeizi",n:"韩非子",e:"Han Fei",c:"china",r:"thinker",d:"约前280—前233",b:"法家集大成，《韩非子》法术势体系，口吃著述精辟，被同学李斯嫉妒害死狱中。",rel:[{i:"xunzi",t:"受业"},{i:"lisi",t:"同学宿仇"},{i:"qin_shihuang",t:"思想影响"}]},
+{id:"lisi",n:"李斯",e:"Li Si",c:"china",r:"other",d:"约前284—前208",b:"秦朝丞相，助秦始皇统一六国，主导书同文，焚书坑儒，赵高政变后被腰斩。",rel:[{i:"xunzi",t:"受业"},{i:"hanfeizi",t:"同学"},{i:"qin_shihuang",t:"辅佐"},{i:"zhaoago",t:"同谋变节"}]},
+{id:"qin_shihuang",n:"秦始皇",e:"Qin Shi Huang",c:"china",r:"ruler",d:"前259—前210",b:"中国第一个皇帝，灭六国统一天下，书同文车同轨，焚书坑儒，修长城，兵马俑，开创帝制。",rel:[{i:"lisi",t:"重用"},{i:"zhaoago",t:"被利用"},{i:"xiangyu",t:"推翻其制度"}]},
+{id:"zhaoago",n:"赵高",e:"Zhao Gao",c:"china",r:"other",d:"？—前207",b:"秦朝最大奸宦，'指鹿为马'测试忠诚，扶植秦二世，杀李斯，最终被子婴所杀。",rel:[{i:"lisi",t:"政治盟友后杀之"},{i:"qin_shihuang",t:"宦官"}]},
+{id:"xiangyu",n:"项羽",e:"Xiang Yu",c:"china",r:"general",d:"前232—前202",b:"贵族后裔，破釜沉舟，巨鹿大胜，推翻秦朝的最大军事力量，垓下四面楚歌，乌江自刎。",rel:[{i:"liubang",t:"宿敌"},{i:"fanzheng",t:"谋士"},{i:"qin_shihuang",t:"推翻"}]},
+{id:"fanzheng",n:"范增",e:"Fan Zeng",c:"china",r:"other",d:"前277—前204",b:"项羽'亚父'，鸿门宴力主杀刘邦，被离间计逼走，愤然离去背疽而死。",rel:[{i:"xiangyu",t:"辅佐"}]},
+{id:"liubang",n:"刘邦",e:"Liu Bang",c:"china",r:"ruler",d:"前247—前195",b:"汉朝开国皇帝，平民出身，善用人才，战胜项羽，休养生息黄老之术治国。",rel:[{i:"xiangyu",t:"宿敌"},{i:"hanxin",t:"重用"},{i:"xiao_he",t:"倚重"},{i:"zhanglianghan",t:"智囊"}]},
+{id:"xiao_he",n:"萧何",e:"Xiao He",c:"china",r:"other",d:"约前257—前193",b:"汉初三杰，进咸阳独取律令图书，制定汉朝法律制度，月下追韩信举荐刘邦。",rel:[{i:"liubang",t:"辅佐"},{i:"hanxin",t:"举荐"}]},
+{id:"hanxin",n:"韩信",e:"Han Xin",c:"china",r:"general",d:"约前231—前196",b:"汉初军事天才，胯下之辱后拜大将军，背水一战，十面埋伏，兵仙，被吕后杀害。",rel:[{i:"liubang",t:"效力"},{i:"xiao_he",t:"被举荐"},{i:"xiangyu",t:"对阵"}]},
+{id:"zhanglianghan",n:"张良",e:"Zhang Liang",c:"china",r:"other",d:"约前250—前186",b:"汉初三杰，运筹帷幄，鸿门宴化解危机，功成身退学道修仙。",rel:[{i:"liubang",t:"辅佐"}]},
+{id:"lvhou",n:"吕后",e:"Empress Lü",c:"china",r:"ruler",d:"前241—前180",b:"中国历史上第一位称制的女性，执政约15年，政治上维持汉初休养生息，将戚夫人制成人彘。",rel:[{i:"liubang",t:"皇后"},{i:"hanxin",t:"诛杀"}]},
+{id:"dongzhongshu",n:"董仲舒",e:"Dong Zhongshu",c:"china",r:"thinker",d:"前179—前104",b:"西汉大儒，提出'罢黜百家独尊儒术'，天人感应说，将儒家改造为国家意识形态。",rel:[{i:"wudi_han",t:"效力"},{i:"kongzi",t:"推崇"}]},
+{id:"wudi_han",n:"汉武帝",e:"Emperor Wu of Han",c:"china",r:"ruler",d:"前156—前87",b:"西汉最重要皇帝，独尊儒术，推恩令，盐铁专卖，遣卫青霍去病征匈奴，派张骞通西域。",rel:[{i:"dongzhongshu",t:"重用"},{i:"weiqing",t:"重用"},{i:"huoqubing",t:"重用"},{i:"zhangqian",t:"遣使"},{i:"simarqian",t:"宫刑后著史"}]},
+{id:"weiqing",n:"卫青",e:"Wei Qing",c:"china",r:"general",d:"约前140—前106",b:"七次出击匈奴，收复河套，大将军，封狼居胥的奠基者，汉武帝舅兄。",rel:[{i:"wudi_han",t:"效力"},{i:"huoqubing",t:"舅甥"}]},
+{id:"huoqubing",n:"霍去病",e:"Huo Qubing",c:"china",r:"general",d:"前140—前117",b:"军事天才，两次河西之战，扫荡漠北，17岁出征24岁去世，'匈奴不灭何以家为'。",rel:[{i:"wudi_han",t:"效力"},{i:"weiqing",t:"外甥"}]},
+{id:"zhangqian",n:"张骞",e:"Zhang Qian",c:"china",r:"other",d:"约前164—前114",b:"两次出使西域，被匈奴俘虏10年仍不辱使命，实际开通丝绸之路，获封博望侯。",rel:[{i:"wudi_han",t:"奉命"},{i:"silk",t:"开辟"}]},
+{id:"simarqian",n:"司马迁",e:"Sima Qian",c:"china",r:"other",d:"约前145—前86",b:"《史记》作者，因为李陵辩护遭宫刑，忍辱完成中国第一部纪传体通史，史家之绝唱。",rel:[{i:"wudi_han",t:"供职被宫刑"}]},
+{id:"liuche",n:"班超",e:"Ban Chao",c:"china",r:"general",d:"32—102",b:"以36人在西域纵横30年，恢复汉朝西域控制，派甘英出使大秦（罗马），投笔从戎典故。",rel:[{i:"silk",t:"维系丝路"}]},
+
+// ═══ 希腊 ═══
+{id:"thales",n:"泰利斯",e:"Thales",c:"greece",r:"thinker",d:"约前624—前546",b:"第一位哲学家，预测前585年日食，'万物本质是水'，从神话到理性解释的第一人。",rel:[{i:"anaximander",t:"学生"}]},
+{id:"anaximander",n:"阿纳克西曼德",e:"Anaximander",c:"greece",r:"thinker",d:"约前611—前546",b:"泰利斯学生，宇宙本质是无限者（Apeiron），绘制西方第一张世界地图，早期进化思想。",rel:[{i:"thales",t:"老师"}]},
+{id:"pythagoras",n:"毕达哥拉斯",e:"Pythagoras",c:"greece",r:"thinker",d:"约前570—前495",b:"毕达哥拉斯定理，发现音乐与数学的关系，建立神秘主义兄弟会，'万物皆数'。",rel:[{i:"thales",t:"受影响"}]},
+{id:"heraclitus",n:"赫拉克利特",e:"Heraclitus",c:"greece",r:"thinker",d:"约前535—前475",b:"'万物流动，无物常住'，'人不能两次踏进同一条河流'，晦涩著称，对立统一的先驱。",rel:[{i:"parmenides",t:"思想对立"}]},
+{id:"parmenides",n:"巴门尼德",e:"Parmenides",c:"greece",r:"thinker",d:"约前515—前450",b:"'存在存在，不存在不存在'——变化是幻觉，真实是不变的一，深刻影响柏拉图。",rel:[{i:"heraclitus",t:"思想对立"},{i:"plato",t:"影响"}]},
+{id:"democritus",n:"德谟克利特",e:"Democritus",c:"greece",r:"thinker",d:"约前460—前370",b:"原子论创始人，万物由不可分原子组成在空虚中运动——距现代物理学概念2400年。",rel:[{i:"epicurus",t:"思想影响"}]},
+{id:"protagoras",n:"普罗塔戈拉",e:"Protagoras",c:"greece",r:"thinker",d:"约前490—前420",b:"智者派领袖，'人是万物的尺度'，西方相对主义宣言，第一个公开收费教学的哲学家。",rel:[{i:"socrates",t:"思想对立"}]},
+{id:"solon",n:"梭伦",e:"Solon",c:"greece",r:"ruler",d:"约前638—前558",b:"雅典立法者，废除债务奴隶制，按财富分级公民，奠定民主基础，七贤之一。",rel:[{i:"peisistratos",t:"反对"},{i:"cleisthenes",t:"民主先驱"}]},
+{id:"peisistratos",n:"庇西特拉图",e:"Peisistratos",c:"greece",r:"ruler",d:"约前607—前527",b:"雅典僭主，三起三落，推动经济发展，资助戏剧，客观上削弱贵族为民主铺路。",rel:[{i:"solon",t:"后继"},{i:"cleisthenes",t:"对手"}]},
+{id:"cleisthenes",n:"克莱斯提尼",e:"Cleisthenes",c:"greece",r:"ruler",d:"约前570—前508",b:"雅典民主之父，废血缘部落，建500人议会，发明贝壳放逐制，真正民主制度建立者。",rel:[{i:"solon",t:"传承"},{i:"peisistratos",t:"对手"},{i:"pericles",t:"民主先驱"}]},
+{id:"miltiades",n:"米太亚德",e:"Miltiades",c:"greece",r:"general",d:"前550—前489",b:"马拉松战役（前490年）统帅，两翼包围战术击败波斯，希腊的救星，后遭政治迫害而死。",rel:[{i:"themistocles",t:"前辈"},{i:"darius1",t:"战场对手"}]},
+{id:"leonidas",n:"列奥尼达一世",e:"Leonidas I",c:"greece",r:"general",d:"约前540—前480",b:"斯巴达王，温泉关300壮士统帅，明知必死仍阻击波斯三天，西方英雄主义永恒象征。",rel:[{i:"xerxes",t:"战场对手"},{i:"themistocles",t:"盟友"}]},
+{id:"themistocles",n:"地米斯托克利",e:"Themistocles",c:"greece",r:"general",d:"约前524—前459",b:"萨拉米斯海战总策划者，以200艘战船以狭窄水道击败波斯巨舰，拯救希腊文明。",rel:[{i:"leonidas",t:"盟友"},{i:"xerxes",t:"战场对手"},{i:"pericles",t:"前辈"}]},
+{id:"pericles",n:"伯里克利",e:"Pericles",c:"greece",r:"ruler",d:"约前495—前429",b:"雅典黄金时代领导者，扩大民主，建帕特农神庙，死于雅典大瘟疫。",rel:[{i:"themistocles",t:"继承民主"},{i:"socrates",t:"同时代"},{i:"aspasia",t:"情人"}]},
+{id:"aspasia",n:"阿斯帕西娅",e:"Aspasia",c:"greece",r:"other",d:"约前470—前400",b:"伯里克利情人，来自米利都，博学智慧，苏格拉底也向她请教修辞，雅典最著名的女性知识分子。",rel:[{i:"pericles",t:"伴侣"},{i:"socrates",t:"交往"}]},
+{id:"aeschylus",n:"埃斯库罗斯",e:"Aeschylus",c:"greece",r:"other",d:"约前525—前456",b:"悲剧之父，《俄瑞斯忒亚》现存最早完整悲剧，参加马拉松战役，墓志铭只提战士身份。",rel:[{i:"sophocles",t:"后继"},{i:"miltiades",t:"同僚"}]},
+{id:"sophocles",n:"索福克勒斯",e:"Sophocles",c:"greece",r:"other",d:"约前496—前406",b:"《俄狄浦斯王》——亚里士多德誉为悲剧典范，《安提戈涅》探讨法律与道德，90岁仍创作。",rel:[{i:"aeschylus",t:"传承"},{i:"euripides",t:"同时代"}]},
+{id:"euripides",n:"欧里庇得斯",e:"Euripides",c:"greece",r:"other",d:"约前484—前406",b:"《美狄亚》《特洛伊妇女》，最具批判精神，质疑神话和战争，'舞台上的哲学家'。",rel:[{i:"sophocles",t:"同时代"},{i:"socrates",t:"相互欣赏"}]},
+{id:"aristophanes",n:"阿里斯托芬",e:"Aristophanes",c:"greece",r:"other",d:"约前446—前386",b:"喜剧之父，《云》讽刺苏格拉底，《利西斯特拉达》——女性以性罢工反战，史上最早反战喜剧。",rel:[{i:"socrates",t:"讽刺"}]},
+{id:"herodotus",n:"希罗多德",e:"Herodotus",c:"greece",r:"other",d:"约前484—前425",b:"历史之父，《历史》记录希波战争，游历埃及波斯，将神话与历史混合，奠定西方史学传统。",rel:[{i:"themistocles",t:"记录功绩"}]},
+{id:"thucydides",n:"修昔底德",e:"Thucydides",c:"greece",r:"other",d:"约前460—前400",b:"批判性历史之父，《伯罗奔尼撒战争史》，修昔底德陷阱概念来源，因失职被流放20年。",rel:[{i:"pericles",t:"记录演讲"}]},
+{id:"socrates",n:"苏格拉底",e:"Socrates",c:"greece",r:"thinker",d:"约前470—前399",b:"雅典哲学奠基人，苏格拉底方法，'我只知道我一无所知'，被判处死刑，从容饮毒芹就义。",rel:[{i:"plato",t:"授业"},{i:"xenophon",t:"弟子"},{i:"alcibiades",t:"崇拜者"},{i:"pericles",t:"同时代"}]},
+{id:"xenophon",n:"色诺芬",e:"Xenophon",c:"greece",r:"other",d:"约前430—前354",b:"苏格拉底弟子，历史学家军事家，《长征记》记录希腊雇佣军万里撤退，保存苏格拉底思想。",rel:[{i:"socrates",t:"受业"}]},
+{id:"alcibiades",n:"阿尔西比亚德斯",e:"Alcibiades",c:"greece",r:"general",d:"约前450—前404",b:"雅典最有才也最危险的政治家，美貌非凡，策动西西里远征惨败，先叛斯巴达再叛波斯。",rel:[{i:"socrates",t:"崇拜师傅"},{i:"pericles",t:"监护人"}]},
+{id:"plato",n:"柏拉图",e:"Plato",c:"greece",r:"thinker",d:"约前427—前347",b:"理念论，建立雅典学园，《理想国》提出哲人王统治，著作保存了苏格拉底思想。",rel:[{i:"socrates",t:"受业"},{i:"aristotle",t:"授业"},{i:"parmenides",t:"受影响"}]},
+{id:"aristotle",n:"亚里士多德",e:"Aristotle",c:"greece",r:"thinker",d:"前384—前322",b:"古代最博学者，建立吕克昂，奠定逻辑学、生物学、政治学、伦理学、诗学，亚历山大的老师。",rel:[{i:"plato",t:"受业"},{i:"alexander",t:"授业"},{i:"theophrastus",t:"授业"},{i:"democritus",t:"批判发展"}]},
+{id:"theophrastus",n:"西奥弗拉斯图斯",e:"Theophrastus",c:"greece",r:"thinker",d:"约前371—前287",b:"亚里士多德接班人，植物学奠基者，《论植物》，古代最重要的植物学家。",rel:[{i:"aristotle",t:"受业/继承学园"}]},
+{id:"demosthenes",n:"德谟斯提尼",e:"Demosthenes",c:"greece",r:"other",d:"前384—前322",b:"雅典最伟大演说家，用小石子练口吃，《腓力斯反驳》系列反对马其顿，被追杀，以毒药自尽。",rel:[{i:"philip2",t:"激烈反对"},{i:"alexander",t:"政治对手"}]},
+{id:"epaminondas",n:"伊帕明农达",e:"Epaminondas",c:"greece",r:"general",d:"前418—前362",b:"底比斯将领，发明斜线阵，留克特拉战役打破斯巴达不败神话，阵亡后底比斯霸权终结。",rel:[{i:"philip2",t:"影响马其顿军事改革"}]},
+{id:"philip2",n:"腓力二世",e:"Philip II",c:"greece",r:"ruler",d:"前382—前336",b:"马其顿国王，发明马其顿方阵，喀罗尼亚战役征服全希腊，在女儿婚礼上被刺杀。",rel:[{i:"alexander",t:"父亲"},{i:"demosthenes",t:"政治对手"},{i:"epaminondas",t:"学习斜线阵"}]},
+{id:"alexander",n:"亚历山大大帝",e:"Alexander the Great",c:"greece",r:"ruler",d:"前356—前323",b:"13年征服波斯、埃及到印度河，建立古代最大帝国，传播希腊化文化，32岁在巴比伦去世。",rel:[{i:"aristotle",t:"受业"},{i:"philip2",t:"继承"},{i:"darius3",t:"战场对手"},{i:"ptolemy",t:"将领后继承"},{i:"seleucus",t:"将领后继承"},{i:"diogenes",t:"传说交集"}]},
+{id:"diogenes",n:"第欧根尼",e:"Diogenes",c:"greece",r:"thinker",d:"约前412—前323",b:"犬儒派，住木桶，白天持灯找'诚实的人'，对亚历山大说'请不要挡住我的阳光'。",rel:[{i:"alexander",t:"传说交集"},{i:"plato",t:"批评"}]},
+{id:"epicurus",n:"伊壁鸠鲁",e:"Epicurus",c:"greece",r:"thinker",d:"前341—前270",b:"伊壁鸠鲁派，快乐是最高善但精神快乐胜于肉体，友谊是幸福核心，花园学派接纳女性和奴隶。",rel:[{i:"democritus",t:"思想传承"},{i:"zeno_stoic",t:"同时代对立学派"}]},
+{id:"zeno_stoic",n:"斯多葛芝诺",e:"Zeno of Citium",c:"greece",r:"thinker",d:"约前334—前262",b:"斯多葛派创始人，在雅典门廊讲学，理性顺从自然，影响了马可·奥勒留和整个罗马哲学。",rel:[{i:"epicurus",t:"对立学派"},{i:"seneca",t:"思想传承"}]},
+{id:"archimedes",n:"阿基米德",e:"Archimedes",c:"greece",r:"thinker",d:"约前287—前212",b:"古代最伟大数学物理学家，浮力原理、杠杆原理，计算π近似值，被罗马兵杀死时仍在做数学。",rel:[{i:"ptolemy",t:"托勒密王朝时期"}]},
+{id:"ptolemy",n:"托勒密一世",e:"Ptolemy I",c:"greece",r:"ruler",d:"前367—前283",b:"亚历山大童年伙伴和将领，建立埃及托勒密王朝，建亚历山大里亚图书馆。",rel:[{i:"alexander",t:"伙伴/将领"},{i:"seleucus",t:"竞争对手"}]},
+{id:"seleucus",n:"塞琉古一世",e:"Seleucus I",c:"greece",r:"ruler",d:"前358—前281",b:"亚历山大帝国分裂后建立塞琉古帝国，控制中东、波斯，与印度孔雀王朝有外交往来。",rel:[{i:"alexander",t:"将领"},{i:"ptolemy",t:"竞争对手"},{i:"chandragupta",t:"外交岳父"}]},
+
+// ═══ 罗马 ═══
+{id:"scipio",n:"西庇阿",e:"Scipio Africanus",c:"rome",r:"general",d:"前236—前183",b:"扎马战役击败汉尼拔，获封阿非利加努斯，罗马最重要将领之一，后被政敌打压郁郁而终。",rel:[{i:"hannibal",t:"战场宿敌"}]},
+{id:"hannibal",n:"汉尼拔",e:"Hannibal Barca",c:"rome",r:"general",d:"前247—前183",b:"翻越阿尔卑斯山，坎尼战役歼灭七万罗马军，古代最伟大军事天才之一，被罗马追逼自尽。",rel:[{i:"scipio",t:"宿敌"}]},
+{id:"gracchus_t",n:"提比略·格拉古",e:"Tiberius Gracchus",c:"rome",r:"ruler",d:"前163—前133",b:"试图重分公地给平民，被元老院保守派组织暴徒打死，共和国暴力政治的开始。",rel:[{i:"gracchus_g",t:"弟弟"}]},
+{id:"gracchus_g",n:"盖尤斯·格拉古",e:"Gaius Gracchus",c:"rome",r:"ruler",d:"前154—前121",b:"继续土地改革，被元老院镇压，命令奴隶杀死自己，共和国危机激化节点。",rel:[{i:"gracchus_t",t:"哥哥"},{i:"marius",t:"改革后继"}]},
+{id:"spartacus",n:"斯巴达克斯",e:"Spartacus",c:"rome",r:"general",d:"约前111—前71",b:"色雷斯角斗士，领导罗马最大规模奴隶起义，横扫意大利，6000起义者被钉死大道两旁。",rel:[{i:"crassus",t:"被镇压"}]},
+{id:"marius",n:"马略",e:"Gaius Marius",c:"rome",r:"general",d:"前157—前86",b:"七次执政官，军事改革创造职业军人制，使军队忠于将领而非国家，是内战根源。",rel:[{i:"sulla",t:"政敌内战"},{i:"caesar",t:"舅父"},{i:"gracchus_g",t:"后继"}]},
+{id:"sulla",n:"苏拉",e:"Sulla",c:"rome",r:"general",d:"前138—前78",b:"第一个率军进入罗马城的将领，建立独裁统治后主动辞职恢复共和，奠定恺撒效仿先例。",rel:[{i:"marius",t:"政敌"},{i:"caesar",t:"政治打压过"}]},
+{id:"crassus",n:"克拉苏",e:"Crassus",c:"rome",r:"ruler",d:"约前115—前53",b:"罗马最富的人，前三头之一，卡莱战役被帕提亚骑兵歼灭，熔金灌口，罗马东扩重大挫败。",rel:[{i:"caesar",t:"前三头"},{i:"pompey",t:"前三头"},{i:"spartacus",t:"镇压起义"}]},
+{id:"pompey",n:"庞培",e:"Pompey",c:"rome",r:"general",d:"前106—前48",b:"罗马最著名将领，清除地中海海盗，征服东方，前三头之一，法萨卢斯被击败后逃往埃及被刺。",rel:[{i:"caesar",t:"内战对手"},{i:"crassus",t:"前三头"},{i:"cicero",t:"政治盟友"}]},
+{id:"cicero",n:"西塞罗",e:"Cicero",c:"rome",r:"thinker",d:"前106—前43",b:"罗马最伟大演说家，揭发卡提林阴谋，《论共和国》，安东尼命令下被杀，手被钉于讲台。",rel:[{i:"pompey",t:"政治盟友"},{i:"caesar",t:"共存"},{i:"mark_antony",t:"被杀"}]},
+{id:"caesar",n:"尤利乌斯·恺撒",e:"Julius Caesar",c:"rome",r:"ruler",d:"前100—前44",b:"高卢战争，卢比孔河，《高卢战记》，改革历法，三月诺奈被布鲁图斯等23人刺杀。",rel:[{i:"pompey",t:"内战对手"},{i:"crassus",t:"前三头"},{i:"cleopatra",t:"政治情人"},{i:"brutus",t:"被刺"},{i:"octavian",t:"养子/继承人"},{i:"marius",t:"舅父"}]},
+{id:"cleopatra",n:"克利奥帕特拉七世",e:"Cleopatra VII",c:"rome",r:"ruler",d:"前69—前30",b:"埃及最后一位法老，与恺撒和安东尼分别联盟，古代最著名政治女性，以毒蛇自杀。",rel:[{i:"caesar",t:"政治情人"},{i:"mark_antony",t:"爱侣联盟"},{i:"octavian",t:"失败于"}]},
+{id:"brutus",n:"布鲁图斯",e:"Brutus",c:"rome",r:"other",d:"前85—前42",b:"刺杀恺撒主谋之一，'你也有份，布鲁图？'，腓力战役被屋大维击败后自杀。",rel:[{i:"caesar",t:"刺杀"},{i:"octavian",t:"被击败"}]},
+{id:"mark_antony",n:"马克·安东尼",e:"Mark Antony",c:"rome",r:"general",d:"前83—前30",b:"恺撒最重要将领，葬礼演说激起民愤，与克利奥帕特拉爱情是古代最著名故事，亚克兴战败自杀。",rel:[{i:"caesar",t:"副将"},{i:"cleopatra",t:"爱侣"},{i:"octavian",t:"最终对手"},{i:"cicero",t:"下令杀"}]},
+{id:"octavian",n:"奥古斯都",e:"Augustus",c:"rome",r:"ruler",d:"前63—公元14",b:"罗马帝国第一位皇帝，设计元首制维持200年罗马和平，自称第一公民。",rel:[{i:"caesar",t:"养子/继承人"},{i:"mark_antony",t:"击败"},{i:"tiberius",t:"继承人"},{i:"agrippa",t:"最重要将领"}]},
+{id:"agrippa",n:"阿格里帕",e:"Marcus Agrippa",c:"rome",r:"general",d:"前64—前12",b:"奥古斯都最重要将领，亚克兴海战真正指挥者，修建万神殿，是帝国建设核心执行者。",rel:[{i:"octavian",t:"最重要战友"}]},
+{id:"tiberius",n:"提比略",e:"Tiberius",c:"rome",r:"ruler",d:"前42—公元37",b:"奥古斯都继子，能干多疑，晚年退居卡普里岛。耶稣在其统治期间被钉十字架。",rel:[{i:"octavian",t:"继承"},{i:"jesus",t:"在位期间钉十字架"}]},
+{id:"nero",n:"尼禄",e:"Nero",c:"rome",r:"ruler",d:"公元37—68",b:"暴君，64年罗马大火嫁祸基督徒，开创系统迫害，最终被宣布为公敌，自杀前喊'我死一个多大的艺术家！'",rel:[{i:"tiberius",t:"最终继承"},{i:"seneca",t:"老师被赐死"},{i:"peter_apos",t:"在位时殉道"},{i:"paul_apos",t:"在位时殉道"}]},
+{id:"seneca",n:"塞内卡",e:"Seneca",c:"rome",r:"thinker",d:"约前4—公元65",b:"斯多葛派哲学家，尼禄导师，《书信集》是晚期罗马文学巅峰，最终被尼禄赐死，从容切断动脉。",rel:[{i:"nero",t:"辅政被赐死"},{i:"marcus_aurelius",t:"思想传承"},{i:"zeno_stoic",t:"传承斯多葛"}]},
+{id:"trajan",n:"图拉真",e:"Trajan",c:"rome",r:"ruler",d:"公元53—117",b:"五贤帝，征服达契亚，帝国最大疆域缔造者，图拉真柱记录战争，被称最好的皇帝。",rel:[{i:"hadrian",t:"继承人"}]},
+{id:"hadrian",n:"哈德良",e:"Hadrian",c:"rome",r:"ruler",d:"公元76—138",b:"旅行家皇帝，建哈德良长城，热爱希腊文化，爱人安提诺乌斯溺死后将其神格化。",rel:[{i:"trajan",t:"继承"},{i:"antoninus",t:"继承人"},{i:"antinous",t:"爱人"}]},
+{id:"antinous",n:"安提诺乌斯",e:"Antinous",c:"rome",r:"other",d:"约111—130",b:"哈德良的爱人，比提尼亚少年，130年神秘溺死于尼罗河，哈德良在帝国各地建立其雕像神庙。",rel:[{i:"hadrian",t:"被哈德良挚爱"}]},
+{id:"antoninus",n:"安东尼·庇护",e:"Antoninus Pius",c:"rome",r:"ruler",d:"公元86—161",b:"五贤帝，在位23年无战争，政务宽和，罗马和平最平静的顶峰，被视为理想统治者典范。",rel:[{i:"hadrian",t:"继承"},{i:"marcus_aurelius",t:"养父"}]},
+{id:"marcus_aurelius",n:"马可·奥勒留",e:"Marcus Aurelius",c:"rome",r:"ruler",d:"公元121—180",b:"哲学家皇帝，斯多葛派，《沉思录》是西方最重要的心灵修炼著作，应对北方战争和安东尼瘟疫。",rel:[{i:"antoninus",t:"继承"},{i:"seneca",t:"思想传承"},{i:"commodus",t:"儿子"}]},
+{id:"commodus",n:"康茂德",e:"Commodus",c:"rome",r:"ruler",d:"公元161—192",b:"以角斗士自居（宣称自己是赫拉克勒斯），把罗马改名为科莫德斯城，被情人和大臣合谋杀死。",rel:[{i:"marcus_aurelius",t:"儿子/衰落标志"}]},
+{id:"diocletian",n:"戴克里先",e:"Diocletian",c:"rome",r:"ruler",d:"公元245—311",b:"结束三世纪危机，四帝共治，301年最高价格敕令，303年大迫害基督徒，主动退位种卷心菜。",rel:[{i:"constantine",t:"政治先驱"}]},
+{id:"constantine",n:"君士坦丁一世",e:"Constantine I",c:"rome",r:"ruler",d:"公元272—337",b:"313年米兰敕令宗教自由，325年尼西亚大公会议三位一体，330年迁都君士坦丁堡，第一位基督教皇帝。",rel:[{i:"diocletian",t:"继承体制"},{i:"jesus",t:"推广其宗教"},{i:"augustine",t:"奠定基础"}]},
+{id:"augustine",n:"奥古斯丁",e:"Augustine of Hippo",c:"rome",r:"thinker",d:"公元354—430",b:"西方基督教神学最重要思想家，《忏悔录》《上帝之城》，系统化原罪论，奠定中世纪神学。",rel:[{i:"constantine",t:"继承时代"},{i:"jesus",t:"神学阐释"}]},
+
+// ═══ 波斯 ═══
+{id:"cyrus",n:"居鲁士大帝",e:"Cyrus the Great",c:"persia",r:"ruler",d:"约前600—前530",b:"波斯帝国缔造者，征服米底吕底亚巴比伦，居鲁士圆柱释放被囚民族，犹太人称其为弥赛亚。",rel:[{i:"cambyses",t:"儿子"},{i:"darius1",t:"后继"},{i:"croesus",t:"征服"},{i:"zoroaster",t:"信仰"}]},
+{id:"croesus",n:"克罗伊苏斯",e:"Croesus",c:"persia",r:"ruler",d:"约前595—前547",b:"吕底亚末代王，极度富有，向德尔菲神谕问吉凶后被居鲁士征服，神谕的双关语讽刺典故。",rel:[{i:"cyrus",t:"被征服"}]},
+{id:"cambyses",n:"冈比西斯二世",e:"Cambyses II",c:"persia",r:"ruler",d:"前530—前522在位",b:"居鲁士之子，征服埃及，据报杀死阿庇斯神牛亵渎宗教，神秘死亡，或自杀或被刺。",rel:[{i:"cyrus",t:"继承"},{i:"darius1",t:"被继承"}]},
+{id:"darius1",n:"大流士一世",e:"Darius I",c:"persia",r:"ruler",d:"前522—前486在位",b:"波斯帝国真正组织者，行省制、王道、波斯波利斯，马拉松战役败于希腊，历史上最伟大行政者之一。",rel:[{i:"cambyses",t:"继承"},{i:"xerxes",t:"传位"},{i:"miltiades",t:"战场对手"}]},
+{id:"xerxes",n:"薛西斯一世",e:"Xerxes I",c:"persia",r:"ruler",d:"前486—前465在位",b:"建两条海峡浮桥，率史上最大古代军队侵希腊，萨拉米斯惨败，晚年在宫廷阴谋中被杀。",rel:[{i:"darius1",t:"继承"},{i:"leonidas",t:"战场对手"},{i:"themistocles",t:"被智谋击败"}]},
+{id:"artaxerxes",n:"阿塔薛西斯一世",e:"Artaxerxes I",c:"persia",r:"ruler",d:"前465—前424在位",b:"薛西斯之子，与希腊签订卡利亚斯和约结束希波战争，统治期间犹太人重建耶路撒冷城墙。",rel:[{i:"xerxes",t:"继承"}]},
+{id:"darius3",n:"大流士三世",e:"Darius III",c:"persia",r:"ruler",d:"前380—前330",b:"波斯帝国末代皇帝，三次面对亚历山大均落败，最终被自己的总督贝苏斯刺杀。",rel:[{i:"alexander",t:"战场对手被击败"}]},
+{id:"zoroaster",n:"琐罗亚斯德",e:"Zoroaster",c:"persia",r:"religious",d:"约前1500—前1000（有争议）",b:"拜火教创始人，阿胡拉·马兹达，善恶二元论，末世审判天堂地狱，深刻影响犹太教和基督教。",rel:[{i:"cyrus",t:"信仰影响"},{i:"jesus",t:"间接神学影响"}]},
+
+// ═══ 印度/佛教 ═══
+{id:"buddha",n:"悉达多（佛陀）",e:"Siddhartha Gautama",c:"india",r:"religious",d:"约前563—前483",b:"佛教创始人，四门出游，菩提树下开悟，四圣谛八正道，弘法45年，涅槃于拘尸那揭罗。",rel:[{i:"ananda",t:"侍者弟子"},{i:"mahakassapa",t:"首席弟子"},{i:"bimbisara",t:"护法国王"},{i:"ajatasattu",t:"后皈依"},{i:"ashoka",t:"信仰传播"}]},
+{id:"mahavira",n:"大雄（筏驮摩那）",e:"Mahavira",c:"india",r:"religious",d:"约前599—前527",b:"耆那教集大成者，与佛陀同时代，极端不杀生主义，裸体苦行，42岁开悟，印度最古老活宗教。",rel:[{i:"buddha",t:"同时代"}]},
+{id:"ananda",n:"阿难",e:"Ananda",c:"india",r:"religious",d:"约前500年代",b:"佛陀最亲近侍者25年，记忆力超群，第一次结集背诵大量经文，为女性出家权向佛请求。",rel:[{i:"buddha",t:"侍者"},{i:"mahakassapa",t:"同门结集"}]},
+{id:"mahakassapa",n:"摩诃迦叶",e:"Mahakassapa",c:"india",r:"religious",d:"约前500年代",b:"佛陀首席弟子，主持第一次结集500阿罗汉，禅宗视其为禅的第一传人（拈花微笑）。",rel:[{i:"buddha",t:"首席弟子"},{i:"ananda",t:"同门"}]},
+{id:"bimbisara",n:"频婆娑罗王",e:"Bimbisara",c:"india",r:"ruler",d:"约前544—前492",b:"摩揭陀国王，最重要佛教护法者，捐献竹林精舍，后被儿子阿阇世王幽禁而死。",rel:[{i:"buddha",t:"护法皈依"},{i:"ajatasattu",t:"被儿子弑杀"}]},
+{id:"ajatasattu",n:"阿阇世王",e:"Ajatasattu",c:"india",r:"ruler",d:"约前492—前460在位",b:"弑父夺位，后悔皈依佛教，主持佛教第一次结集，早期佛教政治史的关键人物。",rel:[{i:"bimbisara",t:"弑父"},{i:"buddha",t:"皈依"},{i:"mahakassapa",t:"支持结集"}]},
+{id:"chanakya",n:"考底利耶",e:"Chanakya/Kautilya",c:"india",r:"thinker",d:"约前350—前275",b:"古印度最重要政治思想家，《政事论》是印度版《君主论》，辅佐旃陀罗笈多建立孔雀帝国。",rel:[{i:"chandragupta",t:"辅佐"}]},
+{id:"chandragupta",n:"旃陀罗笈多",e:"Chandragupta Maurya",c:"india",r:"ruler",d:"约前340—前298",b:"孔雀帝国创始人，统一印度次大陆大部，与塞琉古有外交往来，晚年出家成耆那教苦行者。",rel:[{i:"chanakya",t:"被辅佐"},{i:"ashoka",t:"祖父"},{i:"seleucus",t:"外交/岳父"}]},
+{id:"ashoka",n:"阿育王",e:"Ashoka",c:"india",r:"ruler",d:"约前304—前232",b:"孔雀帝国最伟大皇帝，羯陵伽战争后皈依佛教，颁布石柱法敕，派传教团使佛教成世界性宗教。",rel:[{i:"buddha",t:"信仰传播"},{i:"chandragupta",t:"孙子"},{i:"silk",t:"佛教传播节点"}]},
+{id:"nagarjuna",n:"龙树",e:"Nagarjuna",c:"india",r:"religious",d:"约公元150—250",b:"大乘佛教最重要哲学家，中观哲学，'诸法皆空'，《中论》奠定大乘佛教理论基础，第二佛陀。",rel:[{i:"buddha",t:"思想传承"}]},
+
+// ═══ 基督教 · 兴于罗马帝国 (并入罗马) ═══
+{id:"jesus",n:"耶稣基督",e:"Jesus Christ",c:"rome",r:"religious",d:"约前4—公元30",b:"基督教创始人，登山宝训，被钉十字架，三日复活，影响西方文明两千年。",rel:[{i:"paul_apos",t:"思想传播"},{i:"peter_apos",t:"首席门徒"},{i:"tiberius",t:"在位期间殉道"},{i:"constantine",t:"信仰国教化"}]},
+{id:"peter_apos",n:"彼得",e:"Peter",c:"rome",r:"religious",d:"约前1—公元68",b:"十二门徒之首，早期教会领袖，据传在罗马被倒钉十字架殉道，梵蒂冈圣彼得大教堂建于其墓上。",rel:[{i:"jesus",t:"首席门徒"},{i:"paul_apos",t:"同僚"},{i:"nero",t:"在位时殉道"}]},
+{id:"paul_apos",n:"保罗",e:"Paul of Tarsus",c:"rome",r:"religious",d:"约公元5—67",b:"基督教向世界传播的最重要人物，大马士革顿悟皈依，三次传教旅程，因信称义神学。",rel:[{i:"jesus",t:"使徒/传道"},{i:"peter_apos",t:"同僚"},{i:"nero",t:"在位时殉道"}]},
+];
+
+// Build lookup
+const BY_ID={};
+P.forEach(p=>{BY_ID[p.id]=p});
+
+const canvas=document.getElementById('c');
+const ctx=canvas.getContext('2d');
+let W=0,H=0;
+let nodes=[],edges=[];
+let selId=null,hovId=null;
+let curCiv='china',curRole='all';
+let drag=null,dragOffset={x:0,y:0};
+let panX=0,panY=0,scale=1;
+let lastPan={x:0,y:0},panStart=null;
+let animFrame=0;
+
+function resize(){
+  const wrap=document.getElementById('canvas-wrap');
+  W=wrap.clientWidth;H=wrap.clientHeight;
+  canvas.width=W*devicePixelRatio;
+  canvas.height=H*devicePixelRatio;
+  canvas.style.width=W+'px';canvas.style.height=H+'px';
+  ctx.scale(devicePixelRatio,devicePixelRatio);
+}
+
+function getVisible(){
+  return P.filter(p=>{
+    if(curCiv!=='all'&&p.c!==curCiv)return false;
+    if(curRole!=='all'&&p.r!==curRole)return false;
+    return true;
+  });
+}
+
+function buildGraph(){
+  const vis=getVisible();
+  const visIds=new Set(vis.map(p=>p.id));
+  // Reuse existing positions or init new
+  const oldMap={};
+  nodes.forEach(n=>oldMap[n.id]=n);
+  nodes=vis.map(p=>{
+    if(oldMap[p.id])return oldMap[p.id];
+    const cx=W/2+(Math.random()-.5)*300;
+    const cy=H/2+(Math.random()-.5)*250;
+    return{id:p.id,x:cx,y:cy,vx:(Math.random()-.5)*2,vy:(Math.random()-.5)*2,data:p,pinned:false};
+  });
+  edges=[];
+  const added=new Set();
+  vis.forEach(p=>{
+    p.rel.forEach(r=>{
+      if(!visIds.has(r.i))return;
+      const key=[p.id,r.i].sort().join('~');
+      if(!added.has(key)){added.add(key);edges.push({a:p.id,b:r.i,t:r.t})}
+    });
+  });
+  document.getElementById('stats').textContent=nodes.length+'位人物  '+edges.length+'条关系';
+}
+
+function tick(){
+  const rep=4000,k=90;
+  const damp=0.82;
+  nodes.forEach(n=>{if(!n.pinned){n.vx*=damp;n.vy*=damp;}});
+  // Repulsion
+  for(let i=0;i<nodes.length;i++){
+    for(let j=i+1;j<nodes.length;j++){
+      const a=nodes[i],b=nodes[j];
+      const dx=b.x-a.x,dy=b.y-a.y;
+      const d=Math.sqrt(dx*dx+dy*dy)||1;
+      const f=rep/(d*d);
+      if(!a.pinned){a.vx-=dx/d*f;a.vy-=dy/d*f;}
+      if(!b.pinned){b.vx+=dx/d*f;b.vy+=dy/d*f;}
+    }
+  }
+  // Edges
+  edges.forEach(e=>{
+    const a=nodes.find(n=>n.id===e.a),b=nodes.find(n=>n.id===e.b);
+    if(!a||!b)return;
+    const dx=b.x-a.x,dy=b.y-a.y;
+    const d=Math.sqrt(dx*dx+dy*dy)||1;
+    const f=(d-k)*0.03;
+    if(!a.pinned){a.vx+=dx/d*f;a.vy+=dy/d*f;}
+    if(!b.pinned){b.vx-=dx/d*f;b.vy-=dy/d*f;}
+  });
+  // Center pull
+  nodes.forEach(n=>{
+    if(!n.pinned){
+      n.vx+=(W/2-n.x)*0.005;
+      n.vy+=(H/2-n.y)*0.005;
+      n.x+=n.vx;n.y+=n.vy;
+      n.x=Math.max(30,Math.min(W-30,n.x));
+      n.y=Math.max(30,Math.min(H-30,n.y));
+    }
+  });
+}
+
+function draw(){
+  ctx.save();
+  ctx.clearRect(0,0,W,H);
+  ctx.translate(panX,panY);
+  ctx.scale(scale,scale);
+  // Edges
+  edges.forEach(e=>{
+    const a=nodes.find(n=>n.id===e.a),b=nodes.find(n=>n.id===e.b);
+    if(!a||!b)return;
+    const isHighlighted=selId&&(a.id===selId||b.id===selId);
+    ctx.save();
+    ctx.globalAlpha=isHighlighted?0.9:0.32;
+    ctx.strokeStyle=isHighlighted?roleColor(a.data.r):TH.edge;
+    ctx.lineWidth=isHighlighted?1.6:0.7;
+    if(!isHighlighted)ctx.setLineDash([3,4]);
+    ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+    ctx.restore();
+  });
+  // Nodes
+  nodes.forEach(n=>{
+    const p=n.data;
+    const col=roleColor(p.r);
+    const isSel=n.id===selId,isHov=n.id===hovId;
+    const r=isSel?11:isHov?9:7;
+    ctx.save();
+    // Ring for selected
+    if(isSel){
+      ctx.beginPath();ctx.arc(n.x,n.y,r+5,0,Math.PI*2);
+      ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.globalAlpha=0.4;
+      ctx.stroke();
+    }
+    ctx.beginPath();ctx.arc(n.x,n.y,r,0,Math.PI*2);
+    ctx.fillStyle=col;ctx.globalAlpha=isSel||isHov?1:0.7;
+    ctx.fill();
+    if(isHov||isSel){
+      ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.globalAlpha=1;ctx.stroke();
+    }
+    ctx.restore();
+    // Label
+    const showLabel=isSel||isHov||scale>1.4||nodes.length<30;
+    if(showLabel){
+      ctx.save();
+      ctx.font=(isSel?'700 12px':'500 11px')+' "Noto Sans SC",system-ui,sans-serif';
+      ctx.fillStyle=TH.ink;
+      ctx.textAlign='center';
+      ctx.textBaseline='bottom';
+      ctx.fillText(p.n,n.x,n.y-r-3);
+      ctx.restore();
+    }
+  });
+  ctx.restore();
+  tick();
+  requestAnimationFrame(draw);
+}
+
+function screenToWorld(sx,sy){
+  return{x:(sx-panX)/scale,y:(sy-panY)/scale};
+}
+
+function nodeAt(sx,sy){
+  const w=screenToWorld(sx,sy);
+  return nodes.find(n=>{
+    const dx=n.x-w.x,dy=n.y-w.y;
+    return Math.sqrt(dx*dx+dy*dy)<14/scale;
+  });
+}
+
+function showDetail(id){
+  selId=id;
+  const p=BY_ID[id];if(!p)return;
+  const col=roleColor(p.r);
+  document.getElementById('p-civ').textContent=CIV_NAMES[p.c]||p.c;
+  document.getElementById('p-name').textContent=p.n;
+  document.getElementById('p-eng').textContent=p.e;
+  document.getElementById('p-dates').textContent=p.d;
+  const roleEl=document.getElementById('p-role');
+  roleEl.textContent=ROLE_NAMES[p.r]||p.r;
+  roleEl.style.background=col+'26';
+  roleEl.style.color=col;
+  document.getElementById('p-bio').textContent=p.b;
+  // 只列「本国」关联人物（同一国度），跨文明关系不显示
+  const rels=p.rel.map(r=>{
+    const rp=BY_ID[r.i];
+    if(!rp||rp.c!==p.c)return'';
+    return`<div class="rel-item" onclick="showDetail('${r.i}')"><span class="rel-type">${r.t}</span><span>${rp.n}</span></div>`;
+  }).filter(Boolean);
+  const rh=document.querySelector('.p-rels h4');
+  document.getElementById('p-rels').innerHTML=rels.length?rels.join(''):'<div style="font-size:11.5px;color:var(--ink3)">（本国内无直接关联人物）</div>';
+  document.getElementById('panel').classList.add('show');
+}
+
+// Mouse/touch events
+let isDown=false,downPos={x:0,y:0},downTime=0;
+
+canvas.addEventListener('mousedown',e=>{
+  isDown=true;downPos={x:e.clientX,y:e.clientY};downTime=Date.now();
+  const n=nodeAt(e.clientX,e.clientY);
+  if(n){drag=n;drag._startX=n.x;drag._startY=n.y;}
+  else{panStart={x:e.clientX-panX,y:e.clientY-panY};}
+  canvas.classList.add('dragging');
+});
+
+canvas.addEventListener('mousemove',e=>{
+  const n=nodeAt(e.clientX,e.clientY);
+  hovId=n?n.id:null;
+  canvas.style.cursor=n?'pointer':isDown&&!drag?'grabbing':'grab';
+  if(!isDown)return;
+  if(drag){
+    const w=screenToWorld(e.clientX,e.clientY);
+    drag.x=w.x;drag.y=w.y;drag.vx=0;drag.vy=0;drag.pinned=true;
+  }else if(panStart){
+    panX=e.clientX-panStart.x;
+    panY=e.clientY-panStart.y;
+  }
+});
+
+canvas.addEventListener('mouseup',e=>{
+  canvas.classList.remove('dragging');
+  if(drag){
+    const moved=Math.abs(drag.x-drag._startX)+Math.abs(drag.y-drag._startY);
+    if(moved<5){showDetail(drag.id);}
+    else{drag.pinned=false;}
+    drag=null;
+  } else if(panStart){
+    const movedPx=Math.abs(e.clientX-downPos.x)+Math.abs(e.clientY-downPos.y);
+    if(movedPx<5&&Date.now()-downTime<300){
+      // Click on background
+      selId=null;
+      document.getElementById('panel').classList.remove('show');
+    }
+    panStart=null;
+  }
+  isDown=false;
+});
+
+canvas.addEventListener('wheel',e=>{
+  e.preventDefault();
+  const factor=e.deltaY<0?1.1:0.9;
+  const wx=e.clientX,wy=e.clientY;
+  panX=wx-(wx-panX)*factor;
+  panY=wy-(wy-panY)*factor;
+  scale*=factor;
+  scale=Math.max(0.3,Math.min(4,scale));
+},{passive:false});
+
+canvas.addEventListener('touchstart',e=>{
+  e.preventDefault();
+  if(e.touches.length===1){
+    const t=e.touches[0];
+    const n=nodeAt(t.clientX,t.clientY);
+    if(n){drag=n;drag._startX=n.x;drag._startY=n.y;drag._tapTime=Date.now();}
+    else panStart={x:t.clientX-panX,y:t.clientY-panY};
+  }
+},{passive:false});
+
+canvas.addEventListener('touchmove',e=>{
+  e.preventDefault();
+  if(e.touches.length===1){
+    const t=e.touches[0];
+    if(drag){const w=screenToWorld(t.clientX,t.clientY);drag.x=w.x;drag.y=w.y;drag.vx=0;drag.vy=0;drag.pinned=true;}
+    else if(panStart){panX=t.clientX-panStart.x;panY=t.clientY-panStart.y;}
+  }
+},{passive:false});
+
+canvas.addEventListener('touchend',e=>{
+  e.preventDefault();
+  if(drag){
+    const moved=Math.abs(drag.x-(drag._startX||0))+Math.abs(drag.y-(drag._startY||0));
+    if(moved<8&&Date.now()-(drag._tapTime||0)<400){showDetail(drag.id);}
+    else{drag.pinned=false;}
+    drag=null;
+  }
+  panStart=null;
+},{passive:false});
+
+// 国度切换：每个国度只显示自己内部的人物关系网
+document.querySelectorAll('.civ-pill').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.civ-pill').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');curCiv=b.dataset.civ;
+    selId=null;document.getElementById('panel').classList.remove('show');
+    nodes=[];panX=0;panY=0;scale=1; // 换国重置布局
+    buildGraph();
+  });
+});
+
+// 主题切换 (4 套, 与项目共用 localStorage)
+function applyTheme(t){
+  if(t&&t!=='deepblue') document.body.setAttribute('data-theme',t);
+  else document.body.removeAttribute('data-theme');
+  localStorage.setItem('civ_theme',t||'deepblue');
+  document.querySelectorAll('#themeSwitch button').forEach(x=>x.classList.toggle('active',x.dataset.t===(t||'deepblue')));
+  refreshTheme();
+}
+document.getElementById('themeSwitch').addEventListener('click',e=>{const b=e.target.closest('button');if(b)applyTheme(b.dataset.t);});
+
+window.addEventListener('resize',()=>{resize();});
+
+resize();
+applyTheme(localStorage.getItem('civ_theme')||'textbook');
+buildGraph();
+draw();
+</script>
+</body>
+</html>
