@@ -471,9 +471,8 @@ function render(){
           <text x="${xp}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="${r*0.95}" style="pointer-events:none">${icon}</text>
         </g>
       </g>
-      <!-- 名字 -->
-      <text class="civ-name" x="${nameX}" y="${y-7}" font-size="18" text-anchor="${nameAnchor}">${c.name}</text>
-      <text class="civ-state" x="${nameX}" y="${y+13}" font-size="12.5" text-anchor="${nameAnchor}">${c.state}</text>
+      <!-- 名字 (只留名字, 不加状态小字) -->
+      <text class="civ-name" x="${nameX}" y="${y+1}" font-size="18" text-anchor="${nameAnchor}">${c.name}</text>
     </g>`;
   });
 
@@ -616,7 +615,7 @@ function applyTheme(t){
 document.getElementById('themeSwitch').addEventListener('click', e=>{
   const b = e.target.closest('button'); if(b) applyTheme(b.dataset.t);
 });
-applyTheme(localStorage.getItem('civ_theme') || 'deepblue');
+applyTheme(localStorage.getItem('civ_theme') || 'textbook');
 
 render();
 // ── AI 问答 (千问 SSE) ──
