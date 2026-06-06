@@ -90,7 +90,7 @@ const CHAPTERS = [
         in_period_summary: '印度河流域开始出现规划过的早期城镇（Harappa 早期层位）。还没到巅峰。',
         L1: '印度河早期 Harappan 文化出现。',
         L2: '在今巴基斯坦旁遮普地区，开始出现有街道规划、排水系统的早期定居点。但成熟期要等到下一章。',
-        L3_events: [],
+        L3_events: ['evt_harappa_early','evt_indus_seals_early'],
         L4_people: [],
         L5_full: null,
       },
