@@ -97,6 +97,8 @@ function refreshTheme(){
   const cs=getComputedStyle(document.body);
   TH.ink=cs.getPropertyValue('--ink').trim()||'#e8e4d8';
   TH.edge=cs.getPropertyValue('--grid-ink').trim()||'rgba(200,200,200,.6)';
+  TH.chip=cs.getPropertyValue('--panel-bg').trim()||'rgba(0,0,0,.6)';
+  TH.chipInk=cs.getPropertyValue('--ink').trim()||'#fff';
   TH.role={}; for(const k in ROLE_VAR) TH.role[k]=cs.getPropertyValue(ROLE_VAR[k]).trim()||'#888';
   // 同步图例圆点颜色
   document.querySelectorAll('.leg-dot[data-role]').forEach(d=>d.style.background=TH.role[d.dataset.role]);
@@ -215,6 +217,19 @@ function draw(){
     if(!isHighlighted)ctx.setLineDash([3,4]);
     ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
     ctx.restore();
+    // 选中节点时，在连线中点标出"两人之间是什么关系"
+    if(isHighlighted && e.t){
+      const mx=(a.x+b.x)/2, my=(a.y+b.y)/2;
+      ctx.save();
+      ctx.font='600 10px "Noto Sans SC",system-ui,sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      const w=ctx.measureText(e.t).width+10;
+      ctx.globalAlpha=0.95; ctx.fillStyle=TH.chip||'rgba(0,0,0,.55)';
+      const rr=7; const x=mx-w/2,y=my-9,h=18;
+      ctx.beginPath();ctx.moveTo(x+rr,y);ctx.arcTo(x+w,y,x+w,y+h,rr);ctx.arcTo(x+w,y+h,x,y+h,rr);ctx.arcTo(x,y+h,x,y,rr);ctx.arcTo(x,y,x+w,y,rr);ctx.closePath();ctx.fill();
+      ctx.fillStyle=TH.chipInk||'#fff'; ctx.fillText(e.t,mx,my);
+      ctx.restore();
+    }
   });
   // Nodes
   nodes.forEach(n=>{
