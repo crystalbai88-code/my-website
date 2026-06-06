@@ -422,9 +422,9 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
   <div class="scroll-card" id="scrollCard"></div>
 </div>
 
-<script src="./classical_people.js?v=7"></script>
-<script src="./classical_deep.js?v=7"></script>
-<script src="./classical_people_deep.js?v=1"></script>
+<script src="./classical_people.js?v=8"></script>
+<script src="./classical_deep.js?v=8"></script>
+<script src="./classical_people_deep.js?v=8"></script>
 <script>
 const W = 1600, H = 900;
 const CX = W/2, CY = H/2 - 30;
@@ -649,10 +649,14 @@ const CIV_SPAN = {
 };
 function parseYear(str){
   if (!str) return null;
-  let m = str.match(/前\s*(\d+)/);          // 中文 "前 3200"
+  let m = str.match(/前\s*(\d+)/);          // 公元前 "前 3200"
   if (m) return -parseInt(m[1]);
   m = str.match(/~?\s*(\d+)\s*BCE/i);        // 英文 "~5400 BCE"
   if (m) return -parseInt(m[1]);
+  m = str.match(/公元\s*(\d+)/);             // "公元 220"
+  if (m) return parseInt(m[1]);
+  m = str.match(/(\d{3,4})/);                // 默认按公元正数(跨到公元的古典文明)
+  if (m) return parseInt(m[1]);
   return null;
 }
 function eventYear(e){
@@ -702,25 +706,26 @@ function renderCivCosmic(civId){
   // 事件 + 人物 按 500 年分期
   const evItems = events.map(e=>({type:'event', id:e.id, year:eventYear(e), name:(e.deep?.full_title||e.id)})).filter(x=>x.name);
   const ppItems = people.map(p=>({type:'person', id:p.id, year:personYear(p), name:(p.deep?.full_name||p.id).split(' ')[0]})).filter(x=>x.name);
-  // 分桶 (前3500起, 每500年)
-  function bucketKey(y){ if(y==null) return null; return Math.floor((-y)/500)*500; } // e.g. -2700 -> 2500 (代表 2500-3000)
+  // 分桶 (每世纪; 兼容公元前/公元)
+  function bucketKey(y){ if(y==null) return null; return Math.floor(y/100)*100; }
   const buckets = {};
   [...evItems, ...ppItems].forEach(it=>{
     const k = bucketKey(it.year); if(k==null) return;
     (buckets[k] = buckets[k] || {ev:[], pe:[]})[it.type==='event'?'ev':'pe'].push(it);
   });
-  const bucketKeys = Object.keys(buckets).map(Number).sort((a,b)=>b-a); // 大->小 = 早->晚 (因为是"前X")
+  const bucketKeys = Object.keys(buckets).map(Number).sort((a,b)=>a-b); // 小->大 = 早->晚
   bucketKeys.forEach(k=>{ buckets[k].ev.sort((a,b)=>(a.year||0)-(b.year||0)); buckets[k].pe.sort((a,b)=>(a.year||0)-(b.year||0)); });
+  const yrLabel = y => y==null?'':(y<0?('前'+(-y)):(y+''));
+  const eraLabel = k => k<0?(`前 ${-k} – 前 ${Math.max(-k-99,1)}`):(`公元 ${k||1} – ${k+99} 年`);
 
-  const chip = it => `<div class="tl-chip ${it.type==='event'?'ev':'pe'}" onclick="navigate('${it.type}','${it.id}')"><span class="nm">${(it.type==='event'?eventIcon(it.id):personIcon(it.id))+' '}${it.name}</span>${it.year!=null?`<span class="yr">前${Math.abs(it.year)}</span>`:''}</div>`;
+  const chip = it => `<div class="tl-chip ${it.type==='event'?'ev':'pe'}" onclick="navigate('${it.type}','${it.id}')"><span class="nm">${(it.type==='event'?eventIcon(it.id):personIcon(it.id))+' '}${it.name}</span>${it.year!=null?`<span class="yr">${yrLabel(it.year)}</span>`:''}</div>`;
 
   let timelineHtml = '';
   if (bucketKeys.length){
     timelineHtml = bucketKeys.map(k=>{
       const b = buckets[k];
-      const hi = k, lo = k-500; // 前 hi – 前 lo
       return `<div class="era-block">
-        <div class="era-head">前 ${hi} – 前 ${lo} BCE<span class="era-line"></span></div>
+        <div class="era-head">${eraLabel(k)}<span class="era-line"></span></div>
         ${b.ev.length?`<div class="era-row"><div class="rl">历史事件</div><div class="era-items">${b.ev.map(chip).join('')}</div></div>`:''}
         ${b.pe.length?`<div class="era-row"><div class="rl">关键人物</div><div class="era-items">${b.pe.map(chip).join('')}</div></div>`:''}
       </div>`;
