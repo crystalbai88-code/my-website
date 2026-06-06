@@ -66,6 +66,58 @@ const CLASSICAL_PEOPLE=[
 {id:"pachacuti",n:"帕查库特克",e:"Pachacuti",c:"americas",r:"ruler",d:"约1418—1472",b:"印加帝国奠基者，把库斯科小国扩张为安第斯大帝国，重建库斯科、兴建马丘比丘，创立印加的行政与道路体系。",rel:[{i:"montezuma2",t:"同期美洲帝国"}]},
 // ═══ 跨文明 ═══
 {id:"marco_polo",n:"马可·波罗",e:"Marco Polo",c:"europe",r:"other",d:"1254—1324",b:"威尼斯商人，17年游历元朝中国，《马可·波罗游记》向欧洲展现东方的繁华，激发了后世的大航海与探索热情。",rel:[{i:"kublai",t:"觐见忽必烈"},{i:"ibn_battuta",t:"东西方旅行家"}]},
+// ═══ 补充 · 唐(500-1000) ═══
+{id:"weizheng",n:"魏征",e:"Wei Zheng",c:"china",r:"other",d:"580—643",b:"太宗最著名的谏臣，直言进谏约200余事。太宗叹'以人为镜可以明得失，魏征没，朕失一镜矣'。",rel:[{i:"taizong",t:"君臣·谏诤"}]},
+{id:"lijing",n:"李靖",e:"Li Jing",c:"china",r:"general",d:"571—649",b:"唐初第一名将，630年灭东突厥活捉颉利可汗，635年远征吐谷浑，后世尊为'军神'。",rel:[{i:"taizong",t:"效力"}]},
+{id:"direnjie",n:"狄仁杰",e:"Di Renjie",c:"china",r:"other",d:"630—700",b:"武则天时代最受信任的宰相，断案如神('东方福尔摩斯'原型),力劝武则天还政李唐。",rel:[{i:"wuzetian",t:"君臣·信任"}]},
+{id:"yangguifei",n:"杨贵妃",e:"Yang Guifei",c:"china",r:"other",d:"719—756",b:"玄宗宠妃，'回眸一笑百媚生'。安史之乱中马嵬驿兵变被赐死，白居易《长恨歌》咏其事。",rel:[{i:"xuanzong",t:"宠妃"},{i:"anlushan",t:"乱世悲剧"}]},
+{id:"guoziyi",n:"郭子仪",e:"Guo Ziyi",c:"china",r:"general",d:"697—781",b:"平定安史之乱的第一功臣，'再造唐室'。功高震主却从不自傲、得以善终，中国史上最成功的将领之一。",rel:[{i:"anlushan",t:"讨平叛乱"},{i:"xuanzong",t:"勤王"},{i:"shisiming",t:"对阵叛军"}]},
+{id:"shisiming",n:"史思明",e:"Shi Siming",c:"china",r:"general",d:"约703—761",b:"安禄山部将，叛军后期领袖，'安史之乱'之'史'。",rel:[{i:"anlushan",t:"同盟·继任"},{i:"guoziyi",t:"被其讨"}]},
+{id:"baijuyi",n:"白居易",e:"Bai Juyi",c:"china",r:"thinker",d:"772—846",b:"通俗诗人，《长恨歌》(咏杨贵妃)《琵琶行》传诵千年，诗风平易、对日本文学影响极深。",rel:[{i:"yangguifei",t:"咏其事"}]},
+{id:"wangwei",n:"王维",e:"Wang Wei",c:"china",r:"thinker",d:"约701—761",b:"'诗佛'，诗画双绝——苏轼评'诗中有画，画中有诗'。",rel:[{i:"libai",t:"同时代诗人"}]},
+{id:"hanyu",n:"韩愈",e:"Han Yu",c:"china",r:"thinker",d:"768—824",b:"'文起八代之衰'，唐宋古文运动领袖，力排佛老、倡儒学复兴。",rel:[{i:"liuzongyuan",t:"挚友·古文运动"}]},
+{id:"liuzongyuan",n:"柳宗元",e:"Liu Zongyuan",c:"china",r:"thinker",d:"773—819",b:"韩愈挚友，古文运动共同领袖，《永州八记》开创中国山水散文。",rel:[{i:"hanyu",t:"挚友·古文运动"}]},
+{id:"jianzhen",n:"鉴真",e:"Jianzhen",c:"china",r:"religious",d:"688—763",b:"六次东渡日本(五次失败、双目失明),754年抵日传戒律、建唐招提寺，中日交流的象征。",rel:[{i:"xuanzang",t:"同代高僧"}]},
+{id:"huangchao",n:"黄巢",e:"Huang Chao",c:"china",r:"general",d:"835—884",b:"盐商出身，875年起义，880年攻入长安称帝，虽被镇压，唐朝从此名存实亡。",rel:[{i:"zhuwen",t:"降将后自立"}]},
+{id:"zhuwen",n:"朱温(朱全忠)",e:"Zhu Wen",c:"china",r:"ruler",d:"852—912",b:"黄巢降将，后控制朝政、907年废唐建后梁，唐朝的终结者、五代之始。",rel:[{i:"huangchao",t:"旧主"}]},
+// ═══ 补充 · 伊斯兰(500-1000) ═══
+{id:"khadijah",n:"赫蒂彻",e:"Khadijah",c:"islam",r:"other",d:"约555—619",b:"穆罕默德第一任妻子、富商寡妇，历史上第一位皈依伊斯兰的人。",rel:[{i:"muhammad",t:"妻·首位穆斯林"}]},
+{id:"uthman",n:"乌斯曼",e:"Uthman",c:"islam",r:"ruler",d:"约576—656",b:"第三任正统哈里发，最大贡献是标准化《古兰经》文本；任用亲族引发不满，656年被叛军杀害，触发第一次内战。",rel:[{i:"muhammad",t:"女婿"},{i:"ali",t:"继任者"}]},
+{id:"fatima",n:"法蒂玛",e:"Fatima",c:"islam",r:"other",d:"约605—632",b:"穆罕默德之女、阿里之妻，什叶派最尊崇的女性，法蒂玛王朝以其命名。",rel:[{i:"muhammad",t:"父亲"},{i:"ali",t:"丈夫"},{i:"husayn",t:"儿子"}]},
+{id:"khalid",n:"哈立德·伊本·瓦利德",e:"Khalid ibn al-Walid",c:"islam",r:"general",d:"约585—642",b:"'真主之剑'——伊斯兰史上最伟大的军事天才，叛教战争与叙利亚伊拉克征服中从未败绩，636年雅穆克破拜占庭。",rel:[{i:"abu_bakr",t:"效力"},{i:"umar",t:"统帅"}]},
+{id:"husayn",n:"侯赛因",e:"Husayn ibn Ali",c:"islam",r:"religious",d:"约626—680",b:"阿里次子、穆罕默德外孙。680年卡尔巴拉惨案中被倭马亚军杀害——什叶派最核心的殉道事件(阿舒拉节)。",rel:[{i:"ali",t:"父亲"},{i:"fatima",t:"母亲"},{i:"muawiya",t:"对立"}]},
+{id:"muawiya",n:"穆阿维叶一世",e:"Muawiya I",c:"islam",r:"ruler",d:"602—680",b:"倭马亚王朝创建者，迁都大马士革，建立世袭哈里发制——伊斯兰从'公议'走向王朝。",rel:[{i:"ali",t:"政敌·内战"},{i:"husayn",t:"其子杀侯赛因"}]},
+{id:"abdmalik",n:"阿卜杜勒·马利克",e:"Abd al-Malik",c:"islam",r:"ruler",d:"685—705",b:"倭马亚中兴之主，定阿拉伯语为官方语言、改革货币，691年建耶路撒冷圆顶清真寺。",rel:[{i:"tariq",t:"开疆同朝"}]},
+{id:"tariq",n:"塔利格·伊本·齐亚德",e:"Tariq ibn Ziyad",c:"islam",r:"general",d:"约670—720",b:"711年率军渡过直布罗陀海峡(Jabal Tariq=塔利格之山)征服西班牙西哥特王国。",rel:[{i:"abdmalik",t:"倭马亚开疆"}]},
+{id:"abumuslim",n:"阿布·穆斯林",e:"Abu Muslim",c:"islam",r:"general",d:"约718—755",b:"阿拔斯革命的实际军事领袖，举黑旗推翻倭马亚——功成后被哈里发曼苏尔以'功高盖主'处死。",rel:[{i:"mansur",t:"被其处死"}]},
+{id:"mansur",n:"曼苏尔",e:"al-Mansur",c:"islam",r:"ruler",d:"754—775在位",b:"阿拔斯王朝奠基者，762年建巴格达'和平之城',奠定五百年帝都；处死功臣阿布·穆斯林。",rel:[{i:"abumuslim",t:"处死功臣"},{i:"harun",t:"曾孙"}]},
+{id:"mamun",n:"马蒙",e:"al-Ma'mun",c:"islam",r:"ruler",d:"813—833在位",b:"哈伦之子，巴格达'智慧宫'的创建者，大规模翻译希腊典籍、资助科学，把伊斯兰科学推向巅峰。",rel:[{i:"harun",t:"父子"},{i:"al_khwarizmi",t:"资助"}]},
+{id:"abdrahman1",n:"阿卜杜拉赫曼一世",e:"Abd al-Rahman I",c:"islam",r:"ruler",d:"731—788",b:"'入安达卢斯者'——唯一逃脱阿拔斯屠杀的倭马亚王子，756年在科尔多瓦建立后倭马亚，开启西班牙伊斯兰文明。",rel:[{i:"mansur",t:"宿敌(逃其追杀)"}]},
+{id:"razi",n:"拉齐(拉泽斯)",e:"al-Razi",c:"islam",r:"thinker",d:"约854—925",b:"波斯医学家，首次区分天花与麻疹，《医学集成》是中世纪最全面的医学百科。",rel:[{i:"avicenna",t:"医学先驱"}]},
+// ═══ 补充 · 拜占庭(500-1000) ═══
+{id:"belisarius",n:"贝利萨留",e:"Belisarius",c:"byzantine",r:"general",d:"约500—565",b:"查士丁尼首席名将，533年灭汪达尔、535—554征服意大利，常以寡胜众，晚年遭皇帝猜忌。",rel:[{i:"justinian",t:"效力"},{i:"narses",t:"同僚"}]},
+{id:"narses",n:"纳尔西斯",e:"Narses",c:"byzantine",r:"general",d:"约478—573",b:"宦官将领，在意大利完成贝利萨留未竟之功，552年塔吉纳战役击灭东哥特人。",rel:[{i:"justinian",t:"效力"},{i:"belisarius",t:"同僚"}]},
+{id:"heraclius",n:"赫拉克利乌斯",e:"Heraclius",c:"byzantine",r:"ruler",d:"610—641在位",b:"627年尼尼微之战大破萨珊波斯、收复真十字架；却眼睁睁看阿拉伯人夺走叙利亚与埃及。把官方语言改为希腊语。",rel:[{i:"justinian",t:"后继帝业"}]},
+{id:"leo3",n:"利奥三世",e:"Leo III",c:"byzantine",r:"ruler",d:"717—741在位",b:"717—718年以希腊火击退阿拉伯人对君士坦丁堡的第二次大围攻；726年发起'圣像破坏运动'。",rel:[{i:"johndamascus",t:"神学对手"}]},
+{id:"johndamascus",n:"大马士革的约翰",e:"John of Damascus",c:"byzantine",r:"religious",d:"约675—749",b:"最后一位东方教父，反对圣像破坏运动的理论奠基人。",rel:[{i:"leo3",t:"神学对手"}]},
+{id:"nikephoros2",n:"尼基弗鲁斯·福卡斯",e:"Nikephoros II",c:"byzantine",r:"ruler",d:"912—969",b:"军人皇帝，961年收复克里特、969年收复安条克，拜占庭军事复兴的核心，后被政变刺杀。",rel:[{i:"basil2",t:"军事复兴前驱"}]},
+{id:"cyrilmeth",n:"西里尔与美多迪乌斯",e:"Cyril & Methodius",c:"byzantine",r:"religious",d:"约827—885",b:"兄弟传教士，创造格拉哥里字母(斯拉夫文字前身),把基督教与文字带给斯拉夫人——'斯拉夫人的使徒'。",rel:[{i:"photios",t:"受牧首派遣"},{i:"vladimir",t:"斯拉夫基督教化"}]},
+{id:"photios",n:"弗提乌斯",e:"Photios I",c:"byzantine",r:"religious",d:"约810—893",b:"拜占庭最博学的牧首，'弗提乌斯分裂'加深东西教会裂痕，推动斯拉夫传教。",rel:[{i:"cyrilmeth",t:"派遣传教"}]},
+// ═══ 补充 · 罗斯/维京(东欧, 归 byzantine 组) ═══
+{id:"oleg",n:"先知奥列格",e:"Oleg of Novgorod",c:"byzantine",r:"ruler",d:"约845—912",b:"瓦良格首领，882年迁都基辅、统一诺夫哥罗德与基辅，奠定基辅罗斯；曾远征君士坦丁堡。",rel:[{i:"rurik",t:"继承"},{i:"igor",t:"摄政辅佐"}]},
+{id:"igor",n:"伊戈尔",e:"Igor of Kiev",c:"byzantine",r:"ruler",d:"约878—945",b:"基辅大公、留里克之子；945年因重复征贡被德列夫利安人杀害。",rel:[{i:"oleg",t:"受其辅佐"},{i:"olga",t:"妻子"}]},
+{id:"olga",n:"圣奥尔加",e:"Olga of Kiev",c:"byzantine",r:"ruler",d:"约890—969",b:"基辅女摄政，为夫'四次复仇'德列夫利安人(残酷智计);约957年皈依基督教，是罗斯王室首位基督徒。",rel:[{i:"igor",t:"丈夫"},{i:"sviatoslav",t:"儿子"}]},
+{id:"sviatoslav",n:"斯维亚托斯拉夫",e:"Sviatoslav I",c:"byzantine",r:"general",d:"约943—972",b:"最后的异教大公、纯粹武人，灭可萨汗国、征保加利亚，名言'我来找你了',战死途中。",rel:[{i:"olga",t:"母亲"},{i:"vladimir",t:"儿子"}]},
+{id:"yaroslav",n:"智者雅罗斯拉夫",e:"Yaroslav the Wise",c:"byzantine",r:"ruler",d:"978—1054",b:"基辅罗斯文化巅峰，编《罗斯法典》、建索菲亚大教堂，把女儿嫁给法/挪/匈国王，被称'欧洲的岳父'。",rel:[{i:"vladimir",t:"父亲"}]},
+// ═══ 补充 · 法兰克/加洛林(西欧) ═══
+{id:"clovis",n:"克洛维一世",e:"Clovis I",c:"europe",r:"ruler",d:"约466—511",b:"墨洛温王朝奠基者，统一高卢法兰克人；约496年皈依天主教(而非阿里乌派),为法兰克与罗马教会同盟埋下种子。",rel:[{i:"charlesmartel",t:"后世法兰克"}]},
+{id:"charlesmartel",n:"查理·马特",e:"Charles Martel",c:"europe",r:"general",d:"约688—741",b:"'铁锤查理',法兰克宫相。732年普瓦捷/图尔之战击退伊斯兰军队北进，被誉为'拯救基督教欧洲'。",rel:[{i:"pepinshort",t:"父子"},{i:"charlemagne",t:"祖孙"}]},
+{id:"pepinshort",n:"矮子丕平",e:"Pepin the Short",c:"europe",r:"ruler",d:"约714—768",b:"751年废墨洛温末王、建立加洛林王朝；754年与教皇结盟、'丕平献土'——教皇国的起源。",rel:[{i:"charlesmartel",t:"父子"},{i:"charlemagne",t:"父子"}]},
+{id:"alcuin",n:"阿尔昆",e:"Alcuin of York",c:"europe",r:"thinker",d:"约735—804",b:"英格兰学者，受查理曼之邀主持宫廷学校，发展加洛林小写体(现代小写字母之源),加洛林文艺复兴的灵魂。",rel:[{i:"charlemagne",t:"宫廷导师"}]},
+{id:"einhard",n:"艾因哈德",e:"Einhard",c:"europe",r:"thinker",d:"约775—840",b:"查理曼的传记作者，《查理大帝传》是中世纪最重要的传记之一。",rel:[{i:"charlemagne",t:"为其立传"}]},
+{id:"louispious",n:"虔诚者路易",e:"Louis the Pious",c:"europe",r:"ruler",d:"778—840",b:"查理曼之子，继承帝国但诸子争位，843年凡尔登条约后帝国三分(法/德/中间王国雏形)。",rel:[{i:"charlemagne",t:"父子"}]},
+{id:"alfred",n:"阿尔弗雷德大帝",e:"Alfred the Great",c:"europe",r:"ruler",d:"849—899",b:"威塞克斯国王，878年埃丁顿之战击败维京'大异教徒军队',保住英格兰、推动文教，唯一被称'大帝'的英王。",rel:[]},
+{id:"cnut",n:"克努特大帝",e:"Cnut the Great",c:"europe",r:"ruler",d:"约994—1035",b:"'北海帝国'之主，同时统治英格兰、丹麦与挪威；'命令潮水后退'传说讽喻王权的有限。",rel:[{i:"alfred",t:"后世英格兰王"}]},
 ];
 if(typeof window!=='undefined')window.CLASSICAL_PEOPLE=CLASSICAL_PEOPLE;
 
@@ -83,6 +135,12 @@ const CLASSICAL_ICON = {
   sundiata:'🦁',mansa_musa:'💰',
   pakal:'🗿',montezuma2:'🦅',pachacuti:'🏔️',
   marco_polo:'🧭',
+  // 补充 500-1000
+  weizheng:'📜',lijing:'⚔️',direnjie:'⚖️',yangguifei:'👤',guoziyi:'⚔️',shisiming:'⚔️',baijuyi:'📜',wangwei:'🖼️',hanyu:'📜',liuzongyuan:'📜',jianzhen:'☸️',huangchao:'⚔️',zhuwen:'👑',
+  khadijah:'👤',uthman:'📖',fatima:'👤',khalid:'🗡️',husayn:'🕌',muawiya:'👑',abdmalik:'🕌',tariq:'⚔️',abumuslim:'⚔️',mansur:'🏛️',mamun:'📚',abdrahman1:'👑',razi:'⚕️',
+  belisarius:'⚔️',narses:'⚔️',heraclius:'👑',leo3:'🛡️',johndamascus:'📜',nikephoros2:'⚔️',cyrilmeth:'🔤',photios:'📜',
+  oleg:'🛡️',igor:'👑',olga:'✝️',sviatoslav:'⚔️',yaroslav:'📜',
+  clovis:'👑',charlesmartel:'🔨',pepinshort:'👑',alcuin:'📚',einhard:'📜',louispious:'👑',alfred:'👑',cnut:'👑',
 };
 const ROLE_ICON_FALLBACK = {ruler:'👑',general:'⚔️',thinker:'📜',religious:'🕊️',other:'🔹'};
 function personIconOf(p){ if(!p) return '👤'; const id=typeof p==='string'?p:p.id; if(CLASSICAL_ICON[id])return CLASSICAL_ICON[id]; const role=typeof p==='object'?p.r:null; return ROLE_ICON_FALLBACK[role]||'👤'; }
