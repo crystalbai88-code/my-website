@@ -150,11 +150,30 @@ const CLASSICAL_PEOPLE=[
 {id:"jesus",n:"耶稣基督",e:"Jesus Christ",c:"rome",r:"religious",d:"约前4—公元30",b:"基督教创始人，登山宝训，被钉十字架，三日复活，影响西方文明两千年。",rel:[{i:"paul_apos",t:"思想传播"},{i:"peter_apos",t:"首席门徒"},{i:"tiberius",t:"在位期间殉道"},{i:"constantine",t:"信仰国教化"}]},
 {id:"peter_apos",n:"彼得",e:"Peter",c:"rome",r:"religious",d:"约前1—公元68",b:"十二门徒之首，早期教会领袖，据传在罗马被倒钉十字架殉道，梵蒂冈圣彼得大教堂建于其墓上。",rel:[{i:"jesus",t:"首席门徒"},{i:"paul_apos",t:"同僚"},{i:"nero",t:"在位时殉道"}]},
 {id:"paul_apos",n:"保罗",e:"Paul of Tarsus",c:"rome",r:"religious",d:"约公元5—67",b:"基督教向世界传播的最重要人物，大马士革顿悟皈依，三次传教旅程，因信称义神学。",rel:[{i:"jesus",t:"使徒/传道"},{i:"peter_apos",t:"同僚"},{i:"nero",t:"在位时殉道"}]},
+// ═══ 补全章节：铁器·字母·先知 (前1000–前600) ═══
+// 中国·西周
+{id:"zhouwu",n:"周武王",e:"King Wu of Zhou",c:"china",r:"ruler",d:"约前1046在位",b:"周朝开国君主。前1046年牧野之战灭商纣，建立周朝、定都镐京、大封诸侯，结束商朝六百年统治。",rel:[{i:"zhougong",t:"弟"},{i:"jiangziya",t:"重用军师"}]},
+{id:"zhougong",n:"周公",e:"Duke of Zhou",c:"china",r:"thinker",d:"约前11世纪",b:"武王之弟姬旦。武王死后辅佐成王，东征平定三监之乱，制礼作乐、推行分封宗法、营建洛邑，奠定中华礼乐文明，功成还政。孔子终身景仰的圣人。",rel:[{i:"zhouwu",t:"兄"},{i:"kongzi",t:"被其景仰"}]},
+{id:"jiangziya",n:"姜子牙",e:"Jiang Ziya",c:"china",r:"general",d:"约前11世纪",b:"吕尚，周文王武王的军师，助周灭商首功之臣。传说垂钓渭水待明主'愿者上钩'，后世尊为兵家与谋略之祖。",rel:[{i:"zhouwu",t:"辅佐"}]},
+// 西亚·两河
+{id:"ashurbanipal",n:"亚述巴尼拔",e:"Ashurbanipal",c:"near_east",r:"ruler",d:"前668—前627在位",b:"新亚述末代雄主，军事强盛，更以在尼尼微建立古代最大图书馆著称，系统收藏楔形文字泥板，为后世保存《吉尔伽美什史诗》等两河无价文献。",rel:[]},
+{id:"nebuchadnezzar2",n:"尼布甲尼撒二世",e:"Nebuchadnezzar II",c:"near_east",r:"ruler",d:"前605—前562在位",b:"新巴比伦最伟大君主，重建巴比伦城与伊什塔尔门，传说建空中花园。前586年灭犹大、毁第一圣殿，掳走犹太人，制造'巴比伦之囚'。",rel:[{i:"david",t:"灭其后裔之国"}]},
+// 黎凡特·以色列
+{id:"david",n:"大卫王",e:"King David",c:"levant",r:"ruler",d:"约前1010—前970在位",b:"以色列联合王国第二位君主。少年以投石击杀巨人歌利亚，统一十二支派、定都耶路撒冷，传为《诗篇》多篇作者，犹太/基督/伊斯兰三教共尊的伟大君王。",rel:[{i:"solomon",t:"子"}]},
+{id:"solomon",n:"所罗门王",e:"King Solomon",c:"levant",r:"ruler",d:"约前970—前931在位",b:"大卫之子，以智慧著称('所罗门的审判')。在位时国力鼎盛，建造耶路撒冷第一圣殿。死后王国分裂为北国以色列与南国犹大。",rel:[{i:"david",t:"父"}]},
+{id:"isaiah",n:"以赛亚",e:"Isaiah",c:"levant",r:"religious",d:"约前8世纪",b:"以色列最重要的先知之一，宣讲唯一神的公义与对弥赛亚(救世主)的盼望，《以赛亚书》深刻影响犹太教与基督教。",rel:[]},
+// 希腊·古风
+{id:"homer",n:"荷马",e:"Homer",c:"greece",r:"thinker",d:"约前8世纪",b:"古希腊盲诗人，相传作《伊利亚特》《奥德赛》两大史诗，奠定希腊神话、荣誉观与文学传统，西方文学的源头。",rel:[]},
+// 罗马·王政
+{id:"romulus",n:"罗慕路斯",e:"Romulus",c:"rome",r:"ruler",d:"传说前753",b:"罗马建城传说中的创建者与首位国王。与孪生弟雷穆斯被母狼哺育，前753年建罗马城，后世尊为国父。",rel:[]},
 ];
 if(typeof window!=='undefined')window.CLASSICAL_PEOPLE=CLASSICAL_PEOPLE;
 
 // ── 人物代表图标 (相当于头像，反映其身份/文明/文化) ──
 const CLASSICAL_ICON = {
+  // 补全章节 · 铁器字母先知
+  zhouwu:'👑',zhougong:'📜',jiangziya:'🎣',ashurbanipal:'📚',nebuchadnezzar2:'👑',
+  david:'🎵',solomon:'⚖️',isaiah:'🕊️',homer:'🎭',romulus:'🐺',
   // 中国 · 春秋战国
   kongzi:'📜',laozi:'☯️',guanzhong:'⚖️',baoshuya:'🤝',qihuan:'👑',jinhuan:'👑',zichan:'⚖️',yanzi:'🗣️',
   mencius:'📜',zhuangzi:'📜',mozi:'🛡️',yangzhu:'📜',huizi:'💬',gongsunlong:'📜',sunzi:'⚔️',helv:'👑',

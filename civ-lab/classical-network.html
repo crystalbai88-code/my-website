@@ -48,7 +48,7 @@
   <div class="nav">
     <a href="./index.html" class="ds-pill">⌂ 返回</a>
     <span class="title">古典思想与帝国 · 人物关系网</span>
-    <span class="sub">前 600 — 公元 400</span>
+    <span class="sub">前 1000 — 公元 400</span>
     <div class="ds-theme-switch" id="themeSwitch" style="margin-left:auto">
       <button data-t="deepblue" title="静夜深蓝"></button>
       <button data-t="museum" title="博物馆典藏"></button>
@@ -63,6 +63,8 @@
     <button class="civ-pill" data-civ="rome">🦅 罗马</button>
     <button class="civ-pill" data-civ="persia">🔥 波斯</button>
     <button class="civ-pill" data-civ="india">☸ 印度·佛教</button>
+    <button class="civ-pill" data-civ="near_east">🦁 西亚</button>
+    <button class="civ-pill" data-civ="levant">✡️ 黎凡特</button>
   </div>
   <div id="canvas-wrap">
     <canvas id="c"></canvas>
@@ -86,9 +88,9 @@
     <div class="hint">拖拽节点 · 滚轮缩放 · 点击查看详情</div>
   </div>
 </div>
-<script src="./classical_people.js?v=5"></script>
+<script src="./classical_people.js?v=6"></script>
 <script>
-const CIV_NAMES={china:"中国",greece:"希腊",rome:"罗马",persia:"波斯",india:"印度/佛教",cross:"跨文明"};
+const CIV_NAMES={china:"中国",greece:"希腊",rome:"罗马",persia:"波斯",india:"印度/佛教",near_east:"西亚",levant:"黎凡特",cross:"跨文明"};
 const ROLE_NAMES={ruler:"统治者",general:"将领",thinker:"思想家",religious:"宗教人物",other:"其他人物"};
 // 节点按角色着色，色值映射到设计系统变量，主题切换时刷新
 const ROLE_VAR={ruler:'--gold',general:'--vermilion',thinker:'--cyan',religious:'--purple',other:'--ink3'};
@@ -115,6 +117,9 @@ P.forEach(p=>{BY_ID[p.id]=p});
 const PORTRAIT={}; // id -> Image(已加载) | false(无) | null(加载中)
 // 部分人物维基条目标题与中文名不同，做映射以提高命中率
 const WIKI_TITLE={
+  zhouwu:'周武王', zhougong:'周公旦', jiangziya:'姜子牙', ashurbanipal:'亞述巴尼拔',
+  nebuchadnezzar2:'尼布甲尼撒二世', david:'大卫', solomon:'所罗门', isaiah:'以赛亚',
+  homer:'荷马', romulus:'罗慕路斯',
   buddha:'释迦牟尼', mahavira:'笩駄摩那', goujian:'勾践', liuche:'班超', lvhou:'吕雉',
   qin_shihuang:'秦始皇', wudi_han:'汉武帝', simarqian:'司马迁', helv:'阖闾', fucha:'夫差',
   cyrus:'居鲁士二世', darius1:'大流士一世', darius3:'大流士三世', xerxes:'薛西斯一世',
