@@ -146,21 +146,34 @@ const CIV_PEOPLE_NAMES = {
   roman_empire:['奥古斯都','图拉真','哈德良','马可·奥勒留','塞内卡','尼禄'],
   christianity:['耶稣基督','保罗','彼得','君士坦丁一世','奥古斯丁'],
 };
+// 补充事件 (使每个文明都有充实的历史事件)
+Object.assign(EVENT_DEEP, {
+  evt_cyrus_found:{full_title:'居鲁士缔造波斯帝国',one_liner:'约前550–539年，居鲁士接连征服米底、吕底亚、巴比伦，建立人类第一个世界帝国。',narrative:'波斯人原是米底帝国治下的附庸。约前550年，居鲁士起兵推翻外祖父统治的米底，随后挥师西进，击败富甲天下的吕底亚王克罗伊苏斯；前539年又兵不血刃拿下巴比伦，释放被囚的犹太人。短短二十年，他缔造了一个横跨亚非、统治数十个民族的庞大帝国——并以前所未有的宽容治理它。',context_before:'近东诸国(米底、吕底亚、巴比伦、埃及)并立，波斯是米底的附庸。',what_happened:['约前550 · 推翻米底','约前547 · 灭吕底亚，俘克罗伊苏斯','前539 · 占巴比伦，释放犹太人','建立行省雏形，宽容统治百族'],significance:'人类第一个跨洲世界帝国诞生，确立了"宽容多元"的帝国治理范式。',evidence:[{artifact:'居鲁士圆柱',what:'记录其释放被囚民族的政策，被誉为最早人权宣言之一。',held:'大英博物馆'}],leads_to:'大流士行省制 → 希波战争 → 前330被亚历山大所灭',source:'希罗多德《历史》；《圣经·以斯拉记》',related_people:['cyrus','croesus']},
+  evt_han_xiongnu:{full_title:'汉匈战争 · 卫青霍去病反击匈奴',one_liner:'前129–119年，汉武帝派卫青、霍去病三击匈奴，解除北方百年威胁。',narrative:'自汉初"白登之围"以来，汉朝对匈奴长期屈辱和亲。汉武帝积累国力后转守为攻：卫青七出塞收复河套、奇袭龙城；少年战神霍去病两次河西之战打通河西走廊，又封狼居胥、扫荡漠北。匈奴元气大伤、远遁，"漠南无王庭"。代价是汉朝也几乎掏空了文景以来的积蓄。',context_before:'汉初对匈奴和亲屈辱，武帝时国力强盛转向进攻。',what_happened:['前129 · 卫青奇袭龙城','前121 · 霍去病河西之战，设河西四郡','前119 · 漠北决战，卫霍合击，封狼居胥','匈奴远遁，"漠南无王庭"'],significance:'解除匈奴对中原的百年威胁，打通河西走廊、保障丝绸之路，奠定汉疆。',evidence:[{artifact:'河西四郡(武威/张掖/酒泉/敦煌)',what:'汉控制河西的行政建置，丝路要冲。',held:'甘肃河西走廊'}],leads_to:'河西畅通 → 丝绸之路繁荣 → 汉威远播西域',source:'《史记·匈奴列传》《卫将军骠骑列传》',related_people:['weiqing','huoqubing','wudi_han']},
+  evt_shangyang:{full_title:'商鞅变法',one_liner:'约前356–350年，商鞅在秦两次变法，把秦改造成战国最强的战争机器。',narrative:'秦孝公颁布求贤令，卫国人商鞅入秦。为取信于民，他"徙木立信"——立木于市、谁搬走就赏金，以示令出必行。随后两次变法：奖励军功(按斩首授爵)、废井田开阡陌、推行郡县、编户连坐、统一度量衡、重农抑商。秦国由弱变强、为日后统一奠基；但严刑峻法树敌无数，孝公一死，商鞅即被车裂。',context_before:'战国变法图强成风，秦偏处西陲、相对落后。',what_happened:['徙木立信，树立法律权威','奖励军功，废世卿世禄','废井田、推郡县、编户连坐','统一度量衡，重农抑商','孝公死后商鞅被车裂'],significance:'奠定秦国富强与统一的制度基础，是法家治国最彻底的实践。',evidence:[{artifact:'商鞅方升',what:'统一度量衡的标准器，变法实物见证。',held:'上海博物馆'}],leads_to:'秦富强 → 灭六国 → 秦制延续两千年',source:'《史记·商君列传》',related_people:['shangyang','qin_xiaogong']},
+  evt_socrates_death:{full_title:'苏格拉底之死',one_liner:'前399年，雅典以"亵渎神明、败坏青年"判处苏格拉底死刑，他从容饮鸩。',narrative:'伯罗奔尼撒战争战败后的雅典动荡不安。前399年，苏格拉底被控"不敬城邦诸神、引入新神、败坏青年"，受陪审团审判。他在《申辩》中拒绝认罪、坚持哲学使命，被判死刑。朋友安排他越狱，他却拒绝——认为公民应服从城邦法律，否则正义无存。最终他平静地饮下毒堇汁，与弟子谈论灵魂不朽直至气绝。',context_before:'雅典战败、民主受挫，迁怒于"异见者"苏格拉底。',what_happened:['前399 · 被控不敬神、败坏青年','《申辩》中拒绝认罪','被判死刑，拒绝越狱','从容饮鸩，谈灵魂不朽而死'],significance:'西方"为思想/真理殉道"的原型；引发对民主、法律与良知关系的永恒追问。',evidence:[{artifact:'柏拉图《申辩篇》《克力同》《斐多篇》',what:'记录苏格拉底受审、拒逃与临终，西方哲学经典。',held:'传世文献'}],leads_to:'柏拉图对雅典民主幻灭 → 著《理想国》→ 西方哲学传统',source:'柏拉图对话录；色诺芬',related_people:['socrates','plato']},
+  evt_alexandria:{full_title:'亚历山大里亚 · 希腊化科学巅峰',one_liner:'前3世纪，托勒密在亚历山大里亚建图书馆与博学园，古代科学达到顶峰。',narrative:'托勒密一世父子在埃及的亚历山大里亚兴建了古代世界最大的图书馆(藏书数十万卷)与"博学园(Mouseion)"，重金招揽地中海最聪明的头脑。在这里，欧几里得写下《几何原本》，阿基米德钻研力学，埃拉托色尼仅凭影子算出地球周长，希罗菲卢斯开创解剖学。这是工业革命前人类科学的一座高峰。',context_before:'亚历山大死后，托勒密据有埃及、定都亚历山大里亚。',what_happened:['建亚历山大里亚图书馆与博学园','欧几里得《几何原本》成书','阿基米德力学、埃拉托色尼测地球','希腊化科学繁荣数百年'],significance:'希腊化科学的中心，保存与发展了古典知识，影响后世(包括伊斯兰与文艺复兴科学)。',evidence:[{artifact:'《几何原本》',what:'欧几里得在此完成，统治数学教育两千年。',held:'传世文献'}],leads_to:'科学经罗马、阿拉伯传承 → 近代科学复兴',source:'古典史料；科学史研究',related_people:['ptolemy','archimedes','epicurus']},
+  evt_cailun:{full_title:'蔡伦改进造纸术',one_liner:'约公元105年，蔡伦用树皮麻布造出廉价纸张，改变了人类信息传播。',narrative:'此前书写靠笨重的简牍或昂贵的丝帛。东汉宦官蔡伦总结改进民间技艺，用树皮、麻头、破布、旧渔网为原料造出质优价廉的"蔡侯纸"。廉价书写材料让知识得以大规模复制与传播，是人类信息史上最重要的发明之一，后经丝路与阿拉伯人西传，深刻改变了世界文明的进程。',context_before:'书写依赖简牍(笨重)与缣帛(昂贵)，知识传播受限。',what_happened:['约105 · 蔡伦献"蔡侯纸"于汉和帝','以树皮麻布等廉价原料造纸','纸张逐渐取代简帛','经丝路西传至阿拉伯、欧洲'],significance:'廉价书写材料普及，是知识传播与文明发展的里程碑，"四大发明"之一。',evidence:[{artifact:'居延/敦煌出土早期麻纸',what:'印证汉代造纸技术的实物。',held:'甘肃等地'}],leads_to:'纸张西传 → 印刷术 → 知识大众化',source:'《后汉书·蔡伦传》',related_people:['liuche']},
+  evt_ganying:{full_title:'甘英探大秦 · 汉与罗马的遥望',one_liner:'公元97年班超派甘英出使罗马(大秦)，抵波斯湾而返——两大帝国最近的一次接触。',narrative:'东汉经营西域时，班超派部下甘英出使传说中的"大秦"(罗马帝国)。甘英一路西行直抵波斯湾(条支),却被安息(帕提亚)船人渲染海路凶险而劝退，最终未能渡海到达罗马。166年，又有自称"大秦王安敦"(可能是罗马皇帝)的使者经海路抵达洛阳。汉与罗马——欧亚大陆两端的两大帝国，靠丝路遥相呼应，却始终未能直接相遇。',context_before:'班超经营西域、丝路畅通，汉欲联络遥远的大秦。',what_happened:['97 · 班超派甘英西使大秦','甘英抵波斯湾(条支)，被劝阻未渡海','166 · "大秦王安敦"使者至洛阳(《后汉书》)','汉罗马间接接触，未直接相遇'],significance:'记录了古代东西方两大帝国相互"遥望"的珍贵一刻，丝绸之路连接欧亚的象征。',evidence:[{artifact:'《后汉书·西域传》',what:'记甘英出使与大秦使者来洛阳。',held:'传世文献'}],leads_to:'丝路贸易延续 → 罗马对"赛里斯(丝国)"的想象',source:'《后汉书·西域传》',related_people:['liuche']},
+  evt_crisis3:{full_title:'三世纪危机',one_liner:'235–284年，罗马五十年间约换五十帝，蛮族入侵、瘟疫与通胀几乎让帝国解体。',narrative:'马可·奥勒留之后，罗马陷入半个世纪的大动荡："三世纪危机"。军队随意拥立和杀害皇帝，五十年间走马灯般换了约五十位皇帝；日耳曼人与波斯萨珊王朝两线入侵，瘟疫横行，货币贬值、贸易萎缩，帝国一度分裂为三。直到戴克里先(284年)以"四帝共治"和铁腕改革才勉强稳住——但帝国已元气大伤、走向东西分裂的不归路。',context_before:'五贤帝盛世结束，军人干政、外患频仍。',what_happened:['235起 · 军队频繁废立皇帝','日耳曼人、萨珊波斯两线入侵','瘟疫与恶性通货膨胀','帝国一度三分','284 · 戴克里先四帝共治稳局'],significance:'罗马由盛转衰的转折，催生了戴克里先—君士坦丁的专制改革与帝国东西分裂。',evidence:[{artifact:'三世纪货币',what:'银币含银量骤降，见证恶性通胀。',held:'各国钱币馆藏'}],leads_to:'戴克里先改革 → 君士坦丁迁都 → 395帝国分裂',source:'古典史料；钱币学',related_people:['marcus_aurelius','diocletian','constantine']},
+  evt_jesus:{full_title:'耶稣传道与受难',one_liner:'约公元30年，耶稣在犹太行省传道、被钉十字架，门徒信其复活，基督教由此发端。',narrative:'约公元28年，耶稣在加利利与犹太开始公开传道，用"登山宝训"和比喻宣讲悔改、爱与"天国临近"，并行医治病的神迹，吸引大批追随者。他洁净圣殿、抨击伪善，触怒了犹太祭司集团与罗马当局。约公元30年逾越节，他被门徒犹大出卖、受审，由罗马总督彼拉多判处钉十字架。门徒坚信他第三日复活、向他们显现——这一信念，成为基督教的起点。',context_before:'罗马治下的犹太充满弥赛亚期待与宗教张力。',what_happened:['约28 · 耶稣开始传道，行神迹','登山宝训：爱仇敌、八福、金律','洁净圣殿，触怒当局','约30 · 受难，被钉十字架','门徒宣告复活与显现'],significance:'基督教的起源事件，深刻改变了西方乃至世界的宗教、伦理与历史进程(公元纪年即以此为界)。',evidence:[{artifact:'四福音书',what:'记载耶稣生平、教导、受难与复活。',held:'《新约》'},{artifact:'塔西佗《编年史》',what:'罗马史家提及"基督被彼拉多处死"，旁证其历史性。',held:'传世文献'}],leads_to:'保罗外邦传教 → 罗马迫害 → 313米兰敕令 → 380国教',source:'《新约》四福音；塔西佗',related_people:['jesus','paul_apos','peter_apos']},
+});
+
 const CIV_EVENTS = {
   chunqiu:['evt_confucius'],
-  zhanguo:['evt_hundred_schools'],
+  zhanguo:['evt_hundred_schools','evt_shangyang'],
   qin:['evt_qin_unify'],
-  xihan:['evt_duzun_ruxue','evt_zhangqian'],
-  donghan:[],
-  achaemenid:['evt_marathon'],
+  xihan:['evt_duzun_ruxue','evt_zhangqian','evt_han_xiongnu'],
+  donghan:['evt_cailun','evt_ganying'],
+  achaemenid:['evt_cyrus_found','evt_marathon'],
   magadha:['evt_buddha'],
   maurya:['evt_ashoka'],
-  greece_classical:['evt_marathon'],
+  greece_classical:['evt_marathon','evt_socrates_death'],
   macedon:['evt_alexander'],
-  hellenistic:[],
+  hellenistic:['evt_alexandria'],
   roman_republic:['evt_punic','evt_caesar'],
-  roman_empire:['evt_pax_romana'],
-  christianity:['evt_milan'],
+  roman_empire:['evt_pax_romana','evt_crisis3'],
+  christianity:['evt_jesus','evt_milan'],
 };
 
 // 名字→id 映射

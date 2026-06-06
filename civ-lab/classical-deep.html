@@ -423,7 +423,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 </div>
 
 <script src="./classical_people.js?v=3"></script>
-<script src="./classical_deep.js?v=3"></script>
+<script src="./classical_deep.js?v=4"></script>
 <script src="./classical_people_deep.js?v=1"></script>
 <script>
 const W = 1600, H = 900;
@@ -1263,17 +1263,29 @@ function renderChainHtml(e){
 // 跨文明关系
 // ════════════════════════════════════════
 const CIV_RELATIONS = [
-  {from:'akkad', to:'sumer', type:'war', typeLabel:'征服', symbol:'⚔', desc:'Sargon 大帝约前 2350 年征服苏美尔，建立人类第一个多民族帝国。'},
-  {from:'babylon', to:'sumer', type:'influence', typeLabel:'继承', symbol:'⇒', desc:'巴比伦全套继承了苏美尔的法律、文学、宗教、占星术。'},
-  {from:'sumer', to:'indus', type:'trade', typeLabel:'贸易', symbol:'⇄', desc:'苏美尔商人通过波斯湾与印度河文明远程贸易青金石+红玉髓。'},
-  {from:'sumer', to:'egypt_old', type:'influence', typeLabel:'间接影响', symbol:'⇢', desc:'苏美尔的城市化模型 + 文字概念可能通过黎凡特间接影响埃及。'},
-  {from:'hittite', to:'egypt_new', type:'war', typeLabel:'战争+和约', symbol:'⚔', desc:'卡迭石战役 (前 1274) + 人类已知最早国际和约 (前 1259)。'},
-  {from:'mycenaean', to:'minoan', type:'war', typeLabel:'取代', symbol:'⇒', desc:'约前 1450 年迈锡尼人征服米诺斯文明，继承爱琴海贸易主导权。'},
-  {from:'mycenaean', to:'hittite', type:'trade', typeLabel:'贸易', symbol:'⇄', desc:'两国通过爱琴海贸易青铜原料。'},
-  {from:'shang', to:'sumer', type:'influence', typeLabel:'平行发展', symbol:'∥', desc:'商朝与苏美尔完全独立发展，无直接联系。'},
-  {from:'collapse', to:'hittite', type:'war', typeLabel:'毁灭', symbol:'✕', desc:'约前 1180 年 Sea Peoples 加干旱链使赫梯首都被烧毁。'},
-  {from:'collapse', to:'mycenaean', type:'war', typeLabel:'毁灭', symbol:'✕', desc:'前 1180 年迈锡尼宫殿被烧，希腊进入 400 年黑暗时代。'},
-  {from:'collapse', to:'egypt_new', type:'war', typeLabel:'削弱', symbol:'⚠', desc:'埃及虽击退 Sea Peoples，但元气大伤。'},
+  // 中国 · 朝代承继
+  {from:'zhanguo', to:'chunqiu', type:'continuation', typeLabel:'承继', symbol:'⇒', desc:'战国由春秋的兼并演化而来，思想上承接孔子老子开启的诸子之学。'},
+  {from:'qin', to:'zhanguo', type:'continuation', typeLabel:'承继', symbol:'⇒', desc:'秦凭商鞅变法在战国胜出，吸收法家思想完成统一。'},
+  {from:'xihan', to:'qin', type:'continuation', typeLabel:'汉承秦制', symbol:'⇒', desc:'汉朝几乎全盘继承秦的郡县、律令、官僚制度，"汉承秦制"。'},
+  {from:'donghan', to:'xihan', type:'continuation', typeLabel:'中兴延续', symbol:'⇒', desc:'王莽篡汉后，刘秀光武中兴，重建汉室、定都洛阳。'},
+  // 波斯 — 希腊 — 马其顿 — 希腊化 — 罗马 链条
+  {from:'achaemenid', to:'greece_classical', type:'war', typeLabel:'希波战争', symbol:'⚔', desc:'前490–479年波斯两次入侵希腊，马拉松/温泉关/萨拉米斯，希腊以弱胜强，保住文明火种。'},
+  {from:'macedon', to:'achaemenid', type:'war', typeLabel:'灭亡', symbol:'⚔', desc:'前334–330亚历山大三战灭亡二百年的波斯帝国。'},
+  {from:'macedon', to:'greece_classical', type:'continuation', typeLabel:'统一·继承', symbol:'⇒', desc:'腓力二世征服希腊城邦，马其顿继承并把希腊文明传向东方。'},
+  {from:'hellenistic', to:'macedon', type:'continuation', typeLabel:'分裂继承', symbol:'⇒', desc:'亚历山大死后帝国三分，托勒密/塞琉古等希腊化王国继承其遗产。'},
+  // 东西交流 · 希腊化与印度
+  {from:'macedon', to:'magadha', type:'influence', typeLabel:'东征接触', symbol:'⇢', desc:'亚历山大东征抵印度河，希腊与印度首次直接接触，后催生犍陀罗佛教艺术。'},
+  {from:'hellenistic', to:'maurya', type:'trade', typeLabel:'联姻通好', symbol:'⇄', desc:'塞琉古与旃陀罗笈多议和联姻，孔雀王朝换得战象、互派使节。'},
+  {from:'maurya', to:'hellenistic', type:'influence', typeLabel:'佛法西传', symbol:'⇢', desc:'阿育王派传教团至希腊化诸国传播佛教。'},
+  // 罗马的征服与继承
+  {from:'roman_republic', to:'hellenistic', type:'war', typeLabel:'吞并', symbol:'⚔', desc:'罗马于前2–1世纪逐一吞并希腊化王国，前30年克利奥帕特拉的埃及陷落。'},
+  {from:'roman_empire', to:'greece_classical', type:'influence', typeLabel:'文化继承', symbol:'⇒', desc:'"被征服的希腊俘虏了野蛮的征服者"——罗马在文学、哲学、艺术上全面吸收希腊。'},
+  // 汉 ⇄ 罗马 · 丝绸之路
+  {from:'xihan', to:'roman_empire', type:'trade', typeLabel:'丝路间接贸易', symbol:'⇄', desc:'经丝绸之路，汉朝丝绸辗转运抵罗马(罗马称中国为"赛里斯/丝国")，两大帝国遥相呼应却未直接相遇。'},
+  {from:'donghan', to:'roman_empire', type:'trade', typeLabel:'遣使遥望', symbol:'⇢', desc:'97年班超派甘英出使大秦抵波斯湾而返；166年"大秦王安敦"使者到访洛阳。'},
+  // 宗教思想链
+  {from:'roman_empire', to:'christianity', type:'continuation', typeLabel:'孕育→国教', symbol:'⇒', desc:'基督教在罗马治下兴起，历三百年迫害后于4世纪成为罗马国教。'},
+  {from:'achaemenid', to:'christianity', type:'influence', typeLabel:'思想影响', symbol:'⇢', desc:'琐罗亚斯德教的善恶二元、末日审判与救世主观念，影响了犹太教与基督教。'},
 ];
 function findCivRelations(civId){
   const result = [];
