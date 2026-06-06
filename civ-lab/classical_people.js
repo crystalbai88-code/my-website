@@ -166,6 +166,17 @@ const CLASSICAL_PEOPLE=[
 {id:"homer",n:"荷马",e:"Homer",c:"greece",r:"thinker",d:"约前8世纪",b:"古希腊盲诗人，相传作《伊利亚特》《奥德赛》两大史诗，奠定希腊神话、荣誉观与文学传统，西方文学的源头。",rel:[]},
 // 罗马·王政
 {id:"romulus",n:"罗慕路斯",e:"Romulus",c:"rome",r:"ruler",d:"传说前753",b:"罗马建城传说中的创建者与首位国王。与孪生弟雷穆斯被母狼哺育，前753年建罗马城，后世尊为国父。",rel:[]},
+// ═══ 补全批次02：笈多 · 道教 · 犹太战争 ═══
+// 印度·笈多
+{id:"samudragupta",n:"沙摩陀罗·笈多",e:"Samudragupta",c:"india",r:"ruler",d:"约335—375在位",b:"笈多王朝第三位君主，军事天才，南征北战几乎统一北印度，被誉为'印度的拿破仑'。其功业刻于阿拉哈巴德石柱(借用阿育王旧柱)。",rel:[{i:"chandragupta2",t:"父子"}]},
+{id:"chandragupta2",n:"超日王",e:"Chandragupta II",c:"india",r:"ruler",d:"约380—415在位",b:"旃陀罗·笈多二世，称'超日王'(Vikramaditya)。笈多黄金时代的顶峰君主，国力鼎盛、文化繁荣，中国高僧法显此时游历印度并盛赞其太平。",rel:[{i:"samudragupta",t:"父子"},{i:"kalidasa",t:"宫廷诗人"}]},
+{id:"aryabhata",n:"阿耶波多",e:"Aryabhata",c:"india",r:"thinker",d:"476—550",b:"笈多时代伟大数学家与天文学家。《阿耶波多历书》(499)提出地球绕轴自转、计算圆周率至四位小数、科学解释日月食，运用十进制与'零'，领先世界千年。",rel:[]},
+{id:"kalidasa",n:"迦梨陀娑",e:"Kalidasa",c:"india",r:"thinker",d:"约4—5世纪",b:"古典梵语最伟大的诗人与剧作家，代表作《沙恭达罗》《云使》，被誉为'印度的莎士比亚'，笈多文学黄金时代的象征。",rel:[{i:"chandragupta2",t:"侍奉"}]},
+// 中国·道教
+{id:"zhang_daoling",n:"张道陵",e:"Zhang Daoling",c:"china",r:"religious",d:"34—156",b:"道教创始人之一。142年在四川创'五斗米道'(天师道)，尊老子为太上老君、奉《道德经》为经典，以符水治病、建立教团组织，使先秦道家哲学演变为有组织的宗教。",rel:[{i:"laozi",t:"尊奉为教主"}]},
+// 罗马/犹太·犹太战争
+{id:"titus",n:"提图斯",e:"Titus",c:"rome",r:"ruler",d:"39—81",b:"罗马弗拉维王朝皇帝。公元70年率军攻陷耶路撒冷、焚毁第二圣殿，罗马提图斯凯旋门浮雕刻有从圣殿掠走的七枝金灯台。后继父位为帝，在位时维苏威火山爆发(庞贝)。",rel:[{i:"josephus",t:"随军史家"}]},
+{id:"josephus",n:"约瑟夫斯",e:"Flavius Josephus",c:"levant",r:"thinker",d:"约37—100",b:"犹太祭司与历史学家。犹太战争中先抗罗马后投降，成为提图斯的随军记录者，著《犹太战争史》《犹太古史》，是研究第二圣殿时代与早期基督教背景的关键史料。",rel:[{i:"titus",t:"随其记录战争"}]},
 ];
 if(typeof window!=='undefined')window.CLASSICAL_PEOPLE=CLASSICAL_PEOPLE;
 
@@ -174,6 +185,9 @@ const CLASSICAL_ICON = {
   // 补全章节 · 铁器字母先知
   zhouwu:'👑',zhougong:'📜',jiangziya:'🎣',ashurbanipal:'📚',nebuchadnezzar2:'👑',
   david:'🎵',solomon:'⚖️',isaiah:'🕊️',homer:'🎭',romulus:'🐺',
+  // 补全批次02 · 笈多/道教/犹太战争
+  samudragupta:'⚔️',chandragupta2:'👑',aryabhata:'🔢',kalidasa:'📜',
+  zhang_daoling:'☯️',titus:'⚔️',josephus:'📖',
   // 中国 · 春秋战国
   kongzi:'📜',laozi:'☯️',guanzhong:'⚖️',baoshuya:'🤝',qihuan:'👑',jinhuan:'👑',zichan:'⚖️',yanzi:'🗣️',
   mencius:'📜',zhuangzi:'📜',mozi:'🛡️',yangzhu:'📜',huizi:'💬',gongsunlong:'📜',sunzi:'⚔️',helv:'👑',

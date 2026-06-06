@@ -8,8 +8,8 @@
 <link rel="stylesheet" href="./cosmos-design-system.css"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="./classical_people.js?v=6"></script>
-<script src="./classical_deep.js?v=6"></script>
+<script src="./classical_people.js?v=7"></script>
+<script src="./classical_deep.js?v=7"></script>
 <style>
 .world-tip{background:rgba(20,16,30,.9)!important;color:#fff!important;border:none!important;border-radius:4px!important;font-size:10px!important;padding:1px 6px!important}
 .world-tip::before{display:none!important}
@@ -100,7 +100,7 @@ html,body{height:100%;overflow:hidden}
 
 <div class="ds-legend" style="position:fixed;bottom:18px;left:24px;z-index:25">
   <span class="ds-kicker">轴心时代 → 帝国时代</span>
-  <div class="items" style="margin-top:6px">前 1000 — 公元 400 · 铁器字母 · 思想突破 · 帝国兴衰</div>
+  <div class="items" style="margin-top:6px">前 1000 — 公元 550 · 铁器字母 · 思想突破 · 帝国兴衰</div>
 </div>
 
 <div class="fab-rail">
@@ -113,7 +113,7 @@ html,body{height:100%;overflow:hidden}
 
 <div class="ds-modal" id="worldMapModal"><div class="ds-modal-content" style="max-width:1120px;padding:24px">
   <button class="ds-close" onclick="closeModal('worldMapModal')">✕</button>
-  <div class="head"><h2>🗺 古典世界 · 遗址地图</h2><div class="sub">前 1000 – 公元 400 · 各文明主要遗址</div></div>
+  <div class="head"><h2>🗺 古典世界 · 遗址地图</h2><div class="sub">前 1000 – 公元 550 · 各文明主要遗址</div></div>
   <div id="worldMap" style="height:62vh;min-height:420px;border-radius:12px;overflow:hidden;border:1px solid rgba(160,120,40,.3);background:#dfe8ee"></div>
   <p class="cmp-note">📌 点击地图标记查看遗址说明，可点"进入该文明 →"跳转深度档案。</p>
 </div></div>
@@ -140,14 +140,14 @@ html,body{height:100%;overflow:hidden}
 <!-- AI -->
 <div class="ai-panel" id="aiPanel">
   <div class="pnl-head"><h4>🤖 古典文明 AI</h4><button onclick="toggleAI()">✕</button></div>
-  <div class="ai-msgs" id="aiMsgs"><div class="ai-msg bot">你好！问我任何关于前 1000–公元 400 古典文明的问题，比如「为什么轴心时代会同时出现这么多思想家？」或「腓尼基字母是怎么变成今天英文字母的？」</div></div>
+  <div class="ai-msgs" id="aiMsgs"><div class="ai-msg bot">你好！问我任何关于前 1000–公元 550 古典文明的问题，比如「为什么轴心时代会同时出现这么多思想家？」或「腓尼基字母是怎么变成今天英文字母的？」</div></div>
   <form class="ai-form" id="aiForm"><input type="text" id="aiInput" placeholder="问我任何问题..." autocomplete="off"/><button type="submit" id="aiSend">发送</button></form>
 </div>
 
 <script>
 const W=1600,H=900;
 const PAD_L=210,PAD_R=250,PAD_TOP=110,PAD_BOT=80;
-const Y0=-1050,Y1=400;
+const Y0=-1050,Y1=570;
 function yearToX(y){return PAD_L+((y-Y0)/(Y1-Y0))*(W-PAD_L-PAD_R);}
 function yrTxt(y){return y<0?'前 '+Math.abs(y):(y===0?'公元元年':'公元 '+y);}
 
@@ -168,6 +168,7 @@ const REGIONS=[
   {key:'india',name:'印度 INDIA',civs:[
     {id:'magadha',name:'摩揭陀·佛陀',start:-600,peak:-500,end:-321,state:'佛陀与十六国',color:'#8957e5',icon:'☸'},
     {id:'maurya',name:'孔雀王朝',start:-321,peak:-260,end:-185,state:'阿育王弘法',color:'#a878e0',icon:'🦁'},
+    {id:'gupta',name:'笈多王朝',start:320,peak:415,end:550,state:'黄金时代·零与十进制',color:'#e0a040',icon:'🔢'},
   ]},
   {key:'greece',name:'希腊 GREECE',civs:[
     {id:'greece_archaic',name:'古风希腊',start:-800,peak:-600,end:-508,state:'字母·荷马·奥运·城邦',color:'#1f6fa8',icon:'🏺'},
@@ -213,7 +214,7 @@ const RELATIONS=[
 ];
 
 // 事件竖线
-const EVENTS=[{y:-1046,t:'前1046 武王伐纣'},{y:-586,t:'前586 巴比伦之囚'},{y:-221,t:'前221 秦统一'},{y:-130,t:'前130 丝路'},{y:313,t:'313 米兰敕令'}];
+const EVENTS=[{y:-1046,t:'前1046 武王伐纣'},{y:-586,t:'前586 巴比伦之囚'},{y:-221,t:'前221 秦统一'},{y:-130,t:'前130 丝路'},{y:70,t:'70 圣殿被毁'},{y:313,t:'313 米兰敕令'}];
 
 // ── 文明深度内容 ──
 const INFO={
@@ -231,6 +232,7 @@ const INFO={
   donghan:{years:'公元 25 – 220',narr:'光武帝刘秀中兴汉室。班超经营西域、丝路繁盛，蔡伦改进造纸术。后期外戚宦官交替专权、黄巾起义，走向三国。',hi:['光武中兴，定都洛阳','班超以36人纵横西域30年，派甘英出使大秦(罗马)','蔡伦改进造纸术——影响世界文明','佛教经丝路传入中国','外戚宦官之争 + 黄巾起义 → 三国'],ppl:['班超'],region:'中国'},
   achaemenid:{years:'前 550 – 前 330',narr:'居鲁士大帝缔造人类第一个跨洲"世界帝国"。以宽容著称——居鲁士圆柱释放被囚民族，被犹太人称为弥赛亚。大流士一世建行省制、王道驿道、波斯波利斯。信奉琐罗亚斯德教(善恶二元)。',hi:['居鲁士大帝征服米底、吕底亚、巴比伦，宽容治国','大流士一世：行省(萨特拉普)制 + 2700公里王道','希波战争：马拉松(前490)、温泉关、萨拉米斯','琐罗亚斯德教：善恶二元、末日审判——影响犹太教/基督教','前330 被亚历山大灭亡'],ppl:['居鲁士大帝','大流士一世','薛西斯一世','琐罗亚斯德'],region:'波斯'},
   magadha:{years:'前 600 – 前 321',narr:'恒河流域"十六国"争雄，摩揭陀崛起。这里诞生了佛陀(悉达多)与耆那教大雄——印度的轴心时代。佛陀菩提树下开悟，四圣谛八正道，弘法45年。',hi:['悉达多·乔达摩(佛陀)：四门出游、菩提开悟、四圣谛八正道','大雄(筏驮摩那)：耆那教，极端不杀生','频婆娑罗王、阿阇世王：佛教护法','第一次结集：阿难、摩诃迦叶整理经典'],ppl:['悉达多（佛陀）','大雄（筏驮摩那）','阿难','摩诃迦叶','频婆娑罗王','阿阇世王'],region:'印度/佛教'},
+  gupta:{years:'公元 320 – 公元 550',narr:'孔雀王朝后印度分裂数百年，笈多王朝重新统一北印度，迎来印度的黄金时代。数学家发明"零"与十进制位值制(后经阿拉伯传遍世界，被误称"阿拉伯数字"),阿耶波多提出地球自转。印度教复兴成为主流、种姓制度固化，佛教在本土渐衰。',hi:['沙摩陀罗笈多统一北印度("印度拿破仑")','超日王鼎盛，法显来访','发明"零"与十进制——现代数学基石','阿耶波多：地球自转、圆周率、日月食','迦梨陀娑梵语文学；印度教复兴+种姓固化'],ppl:['沙摩陀罗·笈多','超日王','阿耶波多','迦梨陀娑'],region:'印度'},
   maurya:{years:'前 321 – 前 185',narr:'旃陀罗笈多在考底利耶(《政事论》)辅佐下统一印度大部，建孔雀帝国。其孙阿育王在羯陵伽血战后皈依佛教，立石柱法敕、派传教团，使佛教从地方信仰变为世界性宗教。',hi:['旃陀罗笈多统一印度次大陆，与塞琉古联姻','考底利耶《政事论》——印度版《君主论》','阿育王羯陵伽之战后皈依佛教，"放下屠刀"','石柱法敕 + 派传教团 → 佛教世界化','龙树(后世)：大乘中观哲学，"诸法皆空"'],ppl:['旃陀罗笈多','考底利耶','阿育王','龙树'],region:'印度/佛教'},
   greece_classical:{years:'前 508 – 前 338',narr:'雅典克莱斯提尼建立民主制(前508)，伯里克利时代达到黄金顶峰：帕特农神庙、悲剧、哲学。苏格拉底-柏拉图-亚里士多德三代师承奠定西方哲学。斯巴达与雅典的伯罗奔尼撒战争两败俱伤。',hi:['雅典民主：克莱斯提尼→伯里克利，公民直接参政','哲学三代：苏格拉底→柏拉图(理想国)→亚里士多德(逻辑学)','希波战争胜利：马拉松、萨拉米斯','悲剧三大家：埃斯库罗斯、索福克勒斯、欧里庇得斯','伯罗奔尼撒战争(前431–404)：雅典vs斯巴达'],ppl:['苏格拉底','柏拉图','亚里士多德','伯里克利','列奥尼达一世','希罗多德'],region:'希腊'},
   macedon:{years:'前 359 – 前 323',narr:'腓力二世以马其顿方阵征服全希腊。其子亚历山大大帝(亚里士多德的学生)13年间征服波斯、埃及到印度河，建立古代最大帝国，32岁病逝于巴比伦——开启"希腊化"时代。',hi:['腓力二世发明马其顿方阵，统一希腊','亚历山大灭波斯(高加米拉)、入埃及、抵印度河','建立数十座"亚历山大里亚"城，传播希腊文化','英年早逝(32岁)，帝国被部将瓜分'],ppl:['亚历山大大帝','腓力二世','亚里士多德','大流士三世','第欧根尼'],region:'希腊'},
@@ -241,7 +243,7 @@ const INFO={
 };
 
 // 行布局
-const ROW_H=30,REGION_GAP=12;
+const ROW_H=30,REGION_GAP=8;
 const totalRows=ALL.length, gaps=REGIONS.length-1;
 const blockH=totalRows*ROW_H+gaps*REGION_GAP;
 let yC=PAD_TOP+(H-PAD_TOP-PAD_BOT-blockH)/2+ROW_H/2;
@@ -254,7 +256,7 @@ function spanPct(c,w){const t=c.end-c.start;return t===0?50:Math.round(((c[w]-c.
 function render(){
   let svg=`<defs>${ALL.map(c=>`<radialGradient id="orb_${c.id}" cx="35%" cy="30%"><stop offset="0%" stop-color="rgba(255,255,255,.92)"/><stop offset="30%" stop-color="${c.color}"/><stop offset="100%" stop-color="${darken(c.color,.5)}"/></radialGradient><linearGradient id="span_${c.id}" x1="0%" x2="100%"><stop offset="0%" stop-color="${c.color}" stop-opacity="0.15"/><stop offset="${spanPct(c,'peak')}%" stop-color="${c.color}" stop-opacity="0.85"/><stop offset="100%" stop-color="${c.color}" stop-opacity="0.1"/></linearGradient>`).join('')}<filter id="oS" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000" flood-opacity="0.5"/></filter></defs>`;
   // 网格
-  for(let y=-1000;y<=400;y+=100){const x=yearToX(y);svg+=`<line class="grid-line" x1="${x}" y1="${PAD_TOP-10}" x2="${x}" y2="${H-PAD_BOT+10}"/><text class="grid-label" x="${x}" y="${PAD_TOP-22}">${yrTxt(y)}</text>`;}
+  for(let y=-1000;y<=500;y+=100){const x=yearToX(y);svg+=`<line class="grid-line" x1="${x}" y1="${PAD_TOP-10}" x2="${x}" y2="${H-PAD_BOT+10}"/><text class="grid-label" x="${x}" y="${PAD_TOP-22}">${yrTxt(y)}</text>`;}
   // 区域标签+分隔
   REGIONS.forEach((reg,ri)=>{svg+=`<text class="region-label" x="24" y="${reg._labelY}">${reg.name}</text>`;if(ri>0){const dy=ROW_Y[reg.civs[0].id]-ROW_H/2-REGION_GAP/2;svg+=`<line class="region-divider" x1="190" y1="${dy}" x2="${W-40}" y2="${dy}"/>`;}});
   // 关系线
