@@ -1221,7 +1221,7 @@ function scanKnowledge(text){
 }
 function wikiChip(t){
   const label = t.zh || t.en;
-  const zhUrl = t.zh ? `https://zh.wikipedia.org/wiki/${encodeURIComponent(t.zh)}` : '';
+  const zhUrl = t.zh ? `https://zh.wikipedia.org/wiki/Special:搜索/${encodeURIComponent(t.zh)}` : '';
   const enUrl = t.en ? `https://en.wikipedia.org/wiki/${encodeURIComponent(t.en.replace(/ /g,'_'))}` : '';
   return `<span class="wiki-term">
     <span class="label">${label}</span>
@@ -1229,26 +1229,38 @@ function wikiChip(t){
     ${t.en?`<a class="en" href="${enUrl}" target="_blank" rel="noopener" title="English Wikipedia: ${t.en}">EN</a>`:''}
   </span>`;
 }
-// 基于"这块内容的实际文字"扫描知识点 → 有才挂, 没有不挂
+// 当前实体(文明/人物/事件)的主词条 —— 保证每页都有维基链接
+function primaryWikiTerm(){
+  const {type,id}=parseHash();
+  if(!type||!id) return null;
+  if(type==='civ'){ const w=CIV_WIKI[id]; const nm=getCivInfo(id).name; return {zh:(w&&w.zh)||cleanTerm(nm), en:(w&&w.en)||''}; }
+  if(type==='person'){ const p=PERSON_DEEP[id]; if(!p)return null; const t=parseTerm(p.full_name); return t||{zh:(p.full_name||'').replace(/[·\s].*$/,''),en:''}; }
+  if(type==='event'){ const e=EVENT_DEEP[id]; if(!e)return null; const zh=(e.full_title||'').split(/[·]/)[0].split('与')[0].trim(); return zh?{zh,en:''}:null; }
+  return null;
+}
+// 主词条 + 内容里扫描到的知识点, 一并挂维基; 保证每页都有"延伸阅读"
 function renderWikiSection(htmlStr){
   const text = String(htmlStr).replace(/<[^>]+>/g,' ');
-  const terms = scanKnowledge(text);
-  if (!terms.length) return '';   // 没有可解释的历史知识点 → 不挂维基
+  const scanned = scanKnowledge(text);
+  const list = []; const seen = new Set();
+  const primary = primaryWikiTerm();
+  if (primary && primary.zh){ list.push(primary); seen.add(primary.zh); }
+  scanned.forEach(t=>{ if(t.zh && !seen.has(t.zh)){ seen.add(t.zh); list.push(t); } });
+  if (!list.length) return '';
   return `<div class="wiki-section">
     <div class="wiki-h">延伸阅读 · 维基百科</div>
-    <div class="wiki-chips">${terms.map(t=>wikiChip(t)).join('')}</div>
+    <div class="wiki-sub">点开下面的词条,在维基百科了解更多 ↓</div>
+    <div class="wiki-chips">${list.map(t=>wikiChip(t)).join('')}</div>
   </div>`;
 }
 // 顶栏「🔍 维基」按钮 → 当前实体, 中文维基
 function openWiki(){
-  const {type, id} = parseHash();
-  let t = null;
-  if (type==='civ') t = CIV_WIKI[id] || parseTerm(getCivInfo(id).name);
-  else if (type==='person') t = parseTerm(PERSON_DEEP[id]?.full_name||'');
-  else if (type==='event') t = parseTerm(EVENT_DEEP[id]?.full_title||'');
-  if (!t){ alert('未识别当前词条'); return; }
-  const url = t.zh ? `https://zh.wikipedia.org/wiki/${encodeURIComponent(t.zh)}`
-                   : `https://en.wikipedia.org/wiki/${encodeURIComponent((t.en||'').replace(/ /g,'_'))}`;
+  const t = primaryWikiTerm();
+  const q = (t && t.zh) || '';
+  // 用"搜索即跳转": 有同名条目直达, 否则显示搜索结果 —— 永不 404
+  const url = q ? `https://zh.wikipedia.org/wiki/Special:搜索/${encodeURIComponent(q)}`
+                : (t && t.en) ? `https://en.wikipedia.org/wiki/${encodeURIComponent(t.en.replace(/ /g,'_'))}`
+                : 'https://zh.wikipedia.org/';
   window.open(url, '_blank', 'noopener');
 }
 
