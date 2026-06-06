@@ -156,6 +156,7 @@ function loadPortrait(p){ loadPortraitsBatch([p]); }
 const canvas=document.getElementById('c');
 const ctx=canvas.getContext('2d');
 let W=0,H=0;
+let cvOff={x:0,y:0}; // 画布相对视口的偏移(顶栏在上方，必须扣除否则点击命中错位)
 let nodes=[],edges=[];
 let selId=null,hovId=null;
 let curCiv='china',curRole='all';
@@ -171,6 +172,7 @@ function resize(){
   canvas.height=H*devicePixelRatio;
   canvas.style.width=W+'px';canvas.style.height=H+'px';
   ctx.scale(devicePixelRatio,devicePixelRatio);
+  const _r=canvas.getBoundingClientRect(); cvOff={x:_r.left,y:_r.top};
 }
 
 function getVisible(){
@@ -332,7 +334,7 @@ function draw(){
 }
 
 function screenToWorld(sx,sy){
-  return{x:(sx-panX)/scale,y:(sy-panY)/scale};
+  return{x:(sx-cvOff.x-panX)/scale,y:(sy-cvOff.y-panY)/scale};
 }
 
 function nodeAt(sx,sy){
@@ -373,7 +375,7 @@ let isDown=false,downPos={x:0,y:0},downTime=0;
 canvas.addEventListener('mousedown',e=>{
   isDown=true;downPos={x:e.clientX,y:e.clientY};downTime=Date.now();
   const n=nodeAt(e.clientX,e.clientY);
-  if(n){drag=n;drag._startX=n.x;drag._startY=n.y;}
+  if(n){drag=n;drag._startX=n.x;drag._startY=n.y;drag._wasPinned=n.pinned;n.pinned=true;n.vx=0;n.vy=0;} // 按下即定住，避免点击期间漂移
   else{panStart={x:e.clientX-panX,y:e.clientY-panY};}
   canvas.classList.add('dragging');
 });
@@ -396,17 +398,14 @@ canvas.addEventListener('mousemove',e=>{
 canvas.addEventListener('mouseup',e=>{
   canvas.classList.remove('dragging');
   if(drag){
-    const moved=Math.abs(drag.x-drag._startX)+Math.abs(drag.y-drag._startY);
-    if(moved<5){showDetail(drag.id);}
-    else{drag.pinned=false;}
+    // 用鼠标屏幕移动量判断点击/拖拽（不受力导向漂移影响）
+    const movedPx=Math.abs(e.clientX-downPos.x)+Math.abs(e.clientY-downPos.y);
+    if(movedPx<6){ showDetail(drag.id); drag.pinned=drag._wasPinned; } // 点击：弹详情并恢复原状态
+    // 否则视为拖拽：保持 pinned（用户摆放的位置）
     drag=null;
   } else if(panStart){
     const movedPx=Math.abs(e.clientX-downPos.x)+Math.abs(e.clientY-downPos.y);
-    if(movedPx<5&&Date.now()-downTime<300){
-      // Click on background
-      selId=null;
-      document.getElementById('panel').classList.remove('show');
-    }
+    if(movedPx<6&&Date.now()-downTime<400){ selId=null; document.getElementById('panel').classList.remove('show'); }
     panStart=null;
   }
   isDown=false;
@@ -415,7 +414,7 @@ canvas.addEventListener('mouseup',e=>{
 canvas.addEventListener('wheel',e=>{
   e.preventDefault();
   const factor=e.deltaY<0?1.1:0.9;
-  const wx=e.clientX,wy=e.clientY;
+  const wx=e.clientX-cvOff.x,wy=e.clientY-cvOff.y;
   panX=wx-(wx-panX)*factor;
   panY=wy-(wy-panY)*factor;
   scale*=factor;
@@ -427,7 +426,7 @@ canvas.addEventListener('touchstart',e=>{
   if(e.touches.length===1){
     const t=e.touches[0];
     const n=nodeAt(t.clientX,t.clientY);
-    if(n){drag=n;drag._startX=n.x;drag._startY=n.y;drag._tapTime=Date.now();}
+    if(n){drag=n;drag._tapX=t.clientX;drag._tapY=t.clientY;drag._tapTime=Date.now();drag._wasPinned=n.pinned;n.pinned=true;n.vx=0;n.vy=0;}
     else panStart={x:t.clientX-panX,y:t.clientY-panY};
   }
 },{passive:false});
@@ -444,9 +443,9 @@ canvas.addEventListener('touchmove',e=>{
 canvas.addEventListener('touchend',e=>{
   e.preventDefault();
   if(drag){
-    const moved=Math.abs(drag.x-(drag._startX||0))+Math.abs(drag.y-(drag._startY||0));
-    if(moved<8&&Date.now()-(drag._tapTime||0)<400){showDetail(drag.id);}
-    else{drag.pinned=false;}
+    const t=(e.changedTouches&&e.changedTouches[0])||{clientX:drag._tapX,clientY:drag._tapY};
+    const movedPx=Math.abs(t.clientX-(drag._tapX||0))+Math.abs(t.clientY-(drag._tapY||0));
+    if(movedPx<10&&Date.now()-(drag._tapTime||0)<500){ showDetail(drag.id); drag.pinned=drag._wasPinned; }
     drag=null;
   }
   panStart=null;
