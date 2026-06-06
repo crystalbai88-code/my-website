@@ -413,6 +413,11 @@ function enterStage(stageId) {
     window.location.href = './classical-explorer.html';
     return;
   }
+  // 「中世纪多中心」正式版 → 进入时间长河探索页
+  if (stageId === 'STAGE_03') {
+    window.location.href = './medieval-explorer.html';
+    return;
+  }
   homeViewState = { mode: 'stage', stageId };
   renderStageDetail(stageId);
   document.getElementById('s-home').scrollTo({ top: 0, behavior: 'smooth' });

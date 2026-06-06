@@ -1,0 +1,1542 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>中世纪多中心 · 深度档案</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Cinzel:wght@500;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{
+  --serif:'Noto Serif SC',serif; --sans:'Noto Sans SC',sans-serif;
+  --mono:'JetBrains Mono',monospace; --latin:'Cinzel',serif;
+  --cyan:#7adcf0; --purple:#a070ff;
+  /* 阅读卡片 = 暖纸 (各主题保持优雅一致) */
+  --paper:#fbf6e9; --paper-ink:#2c1a08; --paper-ink2:#5c4530; --paper-ink3:#8a7050; --gold-deep:#8a6028;
+  /* 默认：静夜深蓝 */
+  --bg:#131a2a; --bg-grad:linear-gradient(180deg,#131a2a 0%,#0e1422 55%,#131a2a 100%);
+  --neb1:rgba(120,140,200,.10); --neb2:rgba(200,160,90,.08); --star:.22; --twinkle:.14;
+  --ink:#e8e4d8; --ink2:#a6aec4; --ink3:#6b7088;
+  --gold:#d4a858; --warm:#e0b070; --vermilion:#c87850;
+  --label-ink:#fff; --label-shadow:0 2px 8px rgba(0,0,0,.95);
+  --panel-bg:rgba(16,22,38,.82); --panel-line:rgba(212,168,88,.22); --topbar-bg:rgba(14,18,30,.6);
+  --overlay:rgba(8,10,18,.78);
+}
+body[data-theme="museum"]{
+  --bg:#f7f3ea; --bg-grad:radial-gradient(ellipse at 50% 30%,#fdfbf5,#f2ece0);
+  --neb1:transparent; --neb2:transparent; --star:0; --twinkle:0;
+  --ink:#2a2622; --ink2:#6a6258; --ink3:#9a9286;
+  --gold:#9c5b34; --warm:#b07a4a; --vermilion:#9c5b34;
+  --label-ink:#2a2622; --label-shadow:none;
+  --panel-bg:rgba(255,253,247,.92); --panel-line:rgba(156,91,52,.25); --topbar-bg:rgba(247,243,234,.85);
+  --overlay:rgba(120,108,90,.45);
+}
+body[data-theme="textbook"]{
+  --bg:#ffffff; --bg-grad:linear-gradient(180deg,#ffffff,#f4f7fb);
+  --neb1:transparent; --neb2:transparent; --star:0; --twinkle:0;
+  --ink:#1a2a3a; --ink2:#5a6678; --ink3:#9aa4b2;
+  --gold:#2d4a7c; --warm:#3a6ea5; --vermilion:#c0392b;
+  --label-ink:#1a2a3a; --label-shadow:none;
+  --panel-bg:rgba(255,255,255,.96); --panel-line:rgba(45,74,124,.18); --topbar-bg:rgba(255,255,255,.9);
+  --overlay:rgba(40,55,80,.4);
+}
+body[data-theme="parchment"]{
+  --bg:#efe3c8; --bg-grad:radial-gradient(ellipse at 50% 25%,#f5ead2,#e8dabb);
+  --neb1:rgba(180,130,70,.08); --neb2:rgba(150,110,60,.06); --star:0; --twinkle:0;
+  --ink:#3a2a18; --ink2:#6e5536; --ink3:#9a8460;
+  --gold:#b5642a; --warm:#c47a3a; --vermilion:#a8451e;
+  --label-ink:#3a2a18; --label-shadow:none;
+  --panel-bg:rgba(250,242,224,.94); --panel-line:rgba(181,100,42,.3); --topbar-bg:rgba(239,227,200,.85);
+  --overlay:rgba(120,95,55,.45);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--ink);overflow:hidden;transition:background .4s ease}
+
+/* 宇宙背景 (与首页一致) */
+.cosmos{position:fixed;inset:0;z-index:0;pointer-events:none}
+.nebula{position:absolute;inset:0;transition:background .4s ease;
+  background:
+    radial-gradient(ellipse 45% 55% at 15% 20%, var(--neb1) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 45% at 85% 80%, var(--neb2) 0%, transparent 60%),
+    var(--bg-grad);
+}
+.stars-back{position:absolute;inset:0;opacity:var(--star);
+  background-image:
+    radial-gradient(1px 1px at 5% 12%,#fff,transparent),
+    radial-gradient(1.2px 1.2px at 15% 25%,#fff,transparent),
+    radial-gradient(.8px .8px at 28% 8%,#ffd47a,transparent),
+    radial-gradient(1px 1px at 42% 18%,#fff,transparent),
+    radial-gradient(1.5px 1.5px at 55% 32%,#fff,transparent),
+    radial-gradient(1px 1px at 68% 11%,#c8d4ff,transparent),
+    radial-gradient(1.2px 1.2px at 82% 24%,#fff,transparent),
+    radial-gradient(.9px .9px at 95% 16%,#ffd47a,transparent),
+    radial-gradient(1px 1px at 8% 45%,#fff,transparent),
+    radial-gradient(1.3px 1.3px at 22% 58%,#fff,transparent),
+    radial-gradient(1px 1px at 38% 65%,#c8d4ff,transparent),
+    radial-gradient(1.5px 1.5px at 52% 72%,#fff,transparent),
+    radial-gradient(1px 1px at 65% 48%,#ffd47a,transparent),
+    radial-gradient(1.2px 1.2px at 78% 64%,#fff,transparent),
+    radial-gradient(.8px .8px at 92% 52%,#fff,transparent),
+    radial-gradient(1px 1px at 12% 88%,#fff,transparent),
+    radial-gradient(1.4px 1.4px at 28% 82%,#c8d4ff,transparent),
+    radial-gradient(1px 1px at 45% 95%,#fff,transparent),
+    radial-gradient(1.2px 1.2px at 62% 88%,#ffd47a,transparent),
+    radial-gradient(.9px .9px at 78% 92%,#fff,transparent),
+    radial-gradient(1.5px 1.5px at 91% 85%,#fff,transparent);
+}
+.stars-front{position:absolute;inset:0;opacity:var(--twinkle);animation:twinkle 9s ease-in-out infinite;
+  background-image:
+    radial-gradient(2px 2px at 18% 18%,#fff,transparent 40%),
+    radial-gradient(2.5px 2.5px at 42% 28%,#ffd47a,transparent 40%),
+    radial-gradient(2px 2px at 72% 38%,#fff,transparent 40%),
+    radial-gradient(2.2px 2.2px at 92% 12%,#c8d4ff,transparent 40%),
+    radial-gradient(2px 2px at 22% 55%,#fff,transparent 40%),
+    radial-gradient(2.4px 2.4px at 58% 68%,#ffd47a,transparent 40%),
+    radial-gradient(2px 2px at 82% 78%,#fff,transparent 40%),
+    radial-gradient(2.3px 2.3px at 15% 82%,#fff,transparent 40%),
+    radial-gradient(2.1px 2.1px at 65% 92%,#c8d4ff,transparent 40%);
+}
+@keyframes twinkle{0%,100%{opacity:var(--twinkle)}50%{opacity:calc(var(--twinkle) * .55)}}
+
+/* 顶部覆盖层 */
+.topbar-cosmos{position:fixed;top:0;left:0;right:0;z-index:30;padding:14px 24px;display:flex;align-items:center;gap:14px;pointer-events:none;flex-wrap:wrap}
+.topbar-cosmos > *{pointer-events:auto}
+.topbar-cosmos a, .topbar-cosmos button{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.16em;background:var(--topbar-bg);backdrop-filter:blur(10px);padding:8px 14px;border-radius:99px;border:1px solid var(--panel-line);transition:all .2s;cursor:pointer}
+.topbar-cosmos a:hover, .topbar-cosmos button:hover{background:var(--gold);color:var(--bg);border-color:var(--gold)}
+/* 主题切换器 */
+.theme-switch{margin-left:auto;display:flex!important;gap:6px!important;background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:99px;padding:5px!important;backdrop-filter:blur(10px)}
+.theme-switch button{width:24px!important;height:24px!important;border-radius:50%!important;border:1.5px solid transparent!important;cursor:pointer;padding:0!important;transition:transform .15s}
+.theme-switch button:hover{transform:scale(1.12);background:initial}
+.theme-switch button.active{border-color:var(--gold)!important}
+.theme-switch button[data-t="deepblue"]{background:#131a2a!important}
+.theme-switch button[data-t="museum"]{background:#f2ece0!important}
+.theme-switch button[data-t="textbook"]{background:#2d4a7c!important}
+.theme-switch button[data-t="parchment"]{background:#e8dabb!important}
+.crumb-cosmos{display:flex;align-items:center;gap:6px;color:var(--ink2);font-family:var(--mono);font-size:11px;letter-spacing:.08em;flex-wrap:wrap;background:var(--topbar-bg);backdrop-filter:blur(10px);padding:7px 14px;border-radius:99px;border:1px solid var(--panel-line)}
+.crumb-cosmos a{background:none;border:none;padding:0;color:var(--ink2)}
+.crumb-cosmos a:hover{color:var(--gold);background:none}
+.crumb-cosmos .cur{color:var(--gold);font-weight:700}
+.crumb-cosmos .sep{color:var(--ink3)}
+
+/* 主画布 (cosmic hub) */
+.universe-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:10}
+.universe-canvas.hidden{display:none}
+
+/* ── 文明页 · 教科书式三段布局 ── */
+.civ-page{position:fixed;top:64px;left:0;right:0;bottom:0;z-index:11;overflow-y:auto;display:none;padding:6px 22px 70px}
+.civ-page.active{display:block}
+.civ-wrap{max-width:1060px;margin:0 auto}
+.civ-hero{text-align:center;padding:30px 0 26px}
+.civ-hero .ic{width:88px;height:88px;border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:44px;box-shadow:0 8px 28px rgba(0,0,0,.18);border:2px solid rgba(255,255,255,.35)}
+.civ-hero h1{font-family:var(--serif);font-size:40px;font-weight:900;color:var(--ink);line-height:1.1}
+.civ-hero .range{font-family:var(--mono);font-size:13px;letter-spacing:.14em;color:var(--gold);margin-top:8px;font-weight:600}
+.civ-hero .tag{font-family:var(--serif);font-size:16.5px;line-height:1.7;color:var(--ink2);margin:14px auto 0;max-width:640px}
+.sec-title{font-family:var(--serif);font-size:15px;font-weight:700;color:var(--gold);letter-spacing:.06em;margin:34px 0 16px;display:flex;align-items:center;gap:10px}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--panel-line)}
+/* 通识方面卡片网格 */
+.aspects{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.aspect{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:14px;padding:18px 14px;cursor:pointer;text-align:center;transition:transform .18s,border-color .18s,box-shadow .18s;backdrop-filter:blur(6px)}
+.aspect:hover{border-color:var(--gold);transform:translateY(-3px);box-shadow:0 8px 22px rgba(0,0,0,.12)}
+.aspect .ai{font-size:27px;margin-bottom:8px;line-height:1}
+.aspect .al{font-family:var(--serif);font-size:14px;font-weight:700;color:var(--ink)}
+/* 分期时间线 */
+.era-block{margin-bottom:16px;background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:14px;padding:16px 20px;backdrop-filter:blur(6px)}
+.era-head{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--gold);letter-spacing:.08em;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.era-head .era-line{flex:1;height:2px;background:linear-gradient(90deg,var(--gold),transparent);opacity:.4}
+.era-row{display:flex;gap:12px;margin-bottom:10px;align-items:flex-start}
+.era-row:last-child{margin-bottom:0}
+.era-row .rl{font-family:var(--sans);font-size:12px;color:var(--ink3);width:60px;flex-shrink:0;padding-top:9px;font-weight:600}
+.era-items{flex:1;display:flex;gap:8px;flex-wrap:wrap}
+.tl-chip{display:flex;flex-direction:column;gap:2px;border-radius:10px;padding:8px 13px;cursor:pointer;transition:all .15s;border:1px solid;min-width:0}
+.tl-chip:hover{transform:translateY(-2px)}
+.tl-chip.ev{background:rgba(200,115,42,.10);border-color:rgba(200,115,42,.35)}
+.tl-chip.ev:hover{background:rgba(200,115,42,.2);border-color:#c8732a}
+.tl-chip.pe{background:rgba(96,128,176,.12);border-color:rgba(96,128,176,.4)}
+.tl-chip.pe:hover{background:rgba(96,128,176,.24);border-color:#5a7aa8}
+.tl-chip .nm{font-family:var(--serif);font-size:13.5px;font-weight:700;color:var(--ink);line-height:1.25}
+.tl-chip .yr{font-family:var(--mono);font-size:10px;color:var(--ink3)}
+.era-empty{font-size:12px;color:var(--ink3);font-style:italic}
+
+/* 中心+悬浮节点 */
+.center-orb{cursor:default}
+.center-orb .ring1{fill:none;stroke:rgba(212,168,88,.3);stroke-width:1.5;animation:orbitRing 30s linear infinite}
+.center-orb .ring2{fill:none;stroke:rgba(212,168,88,.18);stroke-width:1}
+@keyframes orbitRing{from{stroke-dashoffset:0}to{stroke-dashoffset:600}}
+.center-orb .body{filter:drop-shadow(0 8px 30px rgba(212,168,88,.5))}
+.center-orb .label{font-family:var(--serif);font-weight:900;fill:var(--label-ink);text-anchor:middle;pointer-events:none;text-shadow:var(--label-shadow)}
+.center-orb .meta{font-family:var(--mono);fill:var(--ink2);text-anchor:middle;pointer-events:none;letter-spacing:.1em}
+
+.float-orb{cursor:pointer}
+/* 修复浮动 bug：缩放放在内层 .body (绕中心)，不覆盖外层 translate */
+.float-orb .body{filter:drop-shadow(0 4px 16px rgba(0,0,0,.4));transition:transform .3s cubic-bezier(.4,1,.6,1);transform-box:fill-box;transform-origin:center}
+.float-orb:hover .body{transform:scale(1.14)}
+.float-orb .name{font-family:var(--serif);font-weight:700;fill:var(--label-ink);text-anchor:middle;pointer-events:none;text-shadow:var(--label-shadow)}
+.float-orb .type-tag{font-family:var(--mono);fill:var(--ink3);text-anchor:middle;pointer-events:none;letter-spacing:.06em}
+.float-orb .label-bg{fill:var(--panel-bg);stroke:currentColor;stroke-width:1;stroke-opacity:.35}
+
+/* 连线 (center → orbs) */
+.spoke{stroke:var(--panel-line);stroke-width:1;stroke-dasharray:3 5;fill:none}
+/* 时间轴标签 */
+.region-axis-label{font-family:var(--mono);fill:rgba(240,200,130,.78);font-size:14px;letter-spacing:.1em;font-weight:700;text-transform:uppercase}
+.axis-tick{font-family:var(--mono);fill:rgba(240,200,130,.7);font-size:13px;text-anchor:middle;letter-spacing:.04em}
+.axis-end{font-family:var(--mono);fill:rgba(240,200,130,.55);font-size:12px}
+.axis-flow{font-family:var(--mono);font-size:14.5px;letter-spacing:.1em;font-weight:700}
+.float-orb .orb-year{font-family:var(--mono);fill:rgba(240,200,130,.82);pointer-events:none}
+/* 遗址地图 */
+.scroll-card .map-note{font-size:13px;color:var(--paper-ink2);margin-bottom:8px;line-height:1.6}
+.scroll-card .site-map{height:480px;border-radius:12px;overflow:hidden;border:1px solid rgba(184,136,48,.35);margin:6px 0 18px;background:#dfe8ee}
+.scroll-card .site-list{display:flex;flex-direction:column;gap:8px}
+.scroll-card .site-item{background:white;border:1px solid rgba(184,136,48,.2);border-left:4px solid #3a8868;border-radius:8px;padding:10px 14px;font-size:13px;line-height:1.65;color:var(--paper-ink)}
+.scroll-card .site-item b{color:#2a6850}
+.scroll-card .site-item .modern{display:inline-block;font-size:11px;color:#fff;background:#3a8868;padding:1px 8px;border-radius:99px;margin-left:8px;font-weight:600}
+.scroll-card .site-item .coord{font-family:var(--mono);font-size:10.5px;color:var(--paper-ink3);margin-left:6px}
+/* 常见误解卡 */
+.scroll-card .myth-card{background:white;border:1px solid rgba(192,80,74,.25);border-left:4px solid #c0504a;border-radius:10px;padding:14px 16px;margin-bottom:10px}
+.scroll-card .myth-q{font-family:'Noto Serif SC',serif;font-size:15px;font-weight:700;color:#c0504a;margin-bottom:8px;line-height:1.5}
+.scroll-card .myth-t{font-size:14px;line-height:1.75;color:var(--paper-ink);margin-bottom:8px}
+.scroll-card .myth-t::first-letter{font-weight:700}
+.scroll-card .myth-w{font-size:12px;line-height:1.6;color:var(--paper-ink3);background:rgba(184,136,48,.08);border-radius:6px;padding:8px 10px}
+.site-tip{background:rgba(44,26,8,.9)!important;color:#fff!important;border:none!important;border-radius:4px!important;font-size:11px!important;font-weight:600;padding:2px 7px!important;box-shadow:0 2px 6px rgba(0,0,0,.4)!important}
+.site-tip::before{display:none!important}
+.leaflet-popup-content{font-family:'Noto Sans SC',sans-serif;font-size:12.5px;line-height:1.6}
+.leaflet-popup-content b{color:#c84820}
+/* 延伸阅读 · 百科链接 */
+.scroll-card .wiki-section{margin-top:24px;padding-top:18px;border-top:1.5px dashed rgba(184,136,48,.35)}
+.scroll-card .wiki-h{font-family:var(--mono);font-size:11px;color:var(--vermilion);letter-spacing:.1em;font-weight:700;margin-bottom:5px;text-transform:uppercase}
+.scroll-card .wiki-sub{font-size:11.5px;color:var(--paper-ink3);margin-bottom:12px}
+.scroll-card .wiki-chips{display:flex;flex-wrap:wrap;gap:8px}
+.scroll-card .wiki-term{display:inline-flex;align-items:stretch;border:1px solid rgba(184,136,48,.4);border-radius:99px;overflow:hidden;font-size:12.5px;font-family:var(--sans);font-weight:600}
+.scroll-card .wiki-term .label{display:inline-flex;align-items:center;padding:7px 8px 7px 13px;color:var(--paper-ink);background:white}
+.scroll-card .wiki-term a{display:inline-flex;align-items:center;padding:7px 10px;text-decoration:none;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.04em;transition:all .15s}
+.scroll-card .wiki-term a.zh{background:rgba(184,136,48,.12);color:var(--gold-deep);border-left:1px solid rgba(184,136,48,.3)}
+.scroll-card .wiki-term a.zh:hover{background:var(--gold);color:white}
+.scroll-card .wiki-term a.en{background:rgba(96,128,176,.14);color:#3a5078;border-left:1px solid rgba(96,128,176,.3)}
+.scroll-card .wiki-term a.en:hover{background:#5a7aa8;color:white}
+
+/* tooltip */
+.tooltip{position:fixed;z-index:50;background:var(--panel-bg);backdrop-filter:blur(20px);border:1px solid var(--panel-line);border-radius:12px;padding:14px 18px;max-width:340px;display:none;pointer-events:none;box-shadow:0 12px 36px rgba(0,0,0,.25)}
+.tooltip.show{display:block}
+.tooltip .nm{font-family:var(--serif);font-size:16px;font-weight:900;color:var(--gold);margin-bottom:4px}
+.tooltip .meta{font-family:var(--mono);font-size:10px;color:var(--ink2);letter-spacing:.06em;margin-bottom:8px;text-transform:uppercase}
+.tooltip .desc{font-size:12.5px;line-height:1.65;color:var(--ink);margin-bottom:8px}
+.tooltip .cta{font-family:var(--mono);font-size:10px;color:var(--vermilion);letter-spacing:.12em;font-weight:700}
+
+/* 文字内容面板 (slides in from bottom) */
+.text-panel{
+  position:fixed;inset:0;z-index:40;display:none;
+  background:var(--overlay);backdrop-filter:blur(12px);
+  align-items:flex-start;justify-content:center;
+  padding:80px 24px 24px;
+  overflow-y:auto;
+}
+.text-panel.open{display:flex;animation:fadeIn .4s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.scroll-card{
+  background:var(--paper);color:var(--paper-ink);
+  border-radius:18px;max-width:880px;width:100%;
+  padding:36px 44px;margin:auto;position:relative;
+  box-shadow:0 24px 60px rgba(0,0,0,.6);
+  border:2px solid rgba(212,168,88,.35);
+  animation:slideUp .4s cubic-bezier(.4,1,.6,1);
+}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.scroll-card .close-x{position:absolute;top:18px;right:18px;width:42px;height:42px;border-radius:50%;background:white;border:1.5px solid rgba(184,136,48,.3);cursor:pointer;font-size:18px;color:var(--paper-ink2);display:flex;align-items:center;justify-content:center;transition:all .15s}
+.scroll-card .close-x:hover{background:var(--vermilion);color:white;border-color:var(--vermilion)}
+
+.scroll-card .type-tag{display:inline-block;font-family:var(--mono);font-size:10px;color:white;background:var(--gold);padding:4px 12px;border-radius:99px;letter-spacing:.18em;font-weight:700;margin-bottom:10px;text-transform:uppercase}
+.scroll-card .type-tag.civ{background:var(--vermilion)}
+.scroll-card .type-tag.event{background:#c8732a}
+.scroll-card .type-tag.person{background:#6080b0}
+.scroll-card h1{font-family:var(--serif);font-size:32px;font-weight:900;color:var(--paper-ink);line-height:1.15;margin-bottom:8px}
+.scroll-card .one-liner{font-family:var(--serif);font-size:16.5px;line-height:1.75;color:var(--paper-ink2);margin:14px 0 20px;padding:14px 18px;background:rgba(184,136,48,.08);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;font-style:italic}
+
+.scroll-card .narrative{font-family:var(--serif);font-size:16.5px;line-height:2.0;color:var(--paper-ink)}
+.scroll-card .narrative p{margin-bottom:14px}
+.scroll-card .narrative p:last-child{margin-bottom:0}
+.scroll-card .narrative strong{color:var(--vermilion);font-weight:700}
+
+.scroll-card .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:10px}
+.scroll-card .info-card{background:white;border:1px solid rgba(184,136,48,.18);border-radius:10px;padding:12px 14px}
+.scroll-card .info-card .lbl{font-family:var(--mono);font-size:9.5px;color:var(--gold);letter-spacing:.14em;font-weight:700;text-transform:uppercase;margin-bottom:5px}
+.scroll-card .info-card .val{font-family:var(--serif);font-size:13.5px;color:var(--paper-ink);line-height:1.55}
+
+.scroll-card .tl-item{display:flex;gap:14px;background:white;border:1px solid rgba(184,136,48,.18);border-radius:10px;padding:12px 16px;margin-bottom:8px}
+.scroll-card .tl-item .yr{font-family:var(--mono);font-size:11px;color:var(--gold);font-weight:700;letter-spacing:.04em;flex-shrink:0;width:130px}
+.scroll-card .tl-item .ds{flex:1;font-size:13px;line-height:1.7;color:var(--paper-ink)}
+
+.scroll-card .chain-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:white;border:1px solid rgba(184,136,48,.2);border-radius:12px;padding:14px}
+.scroll-card .chain-pill{padding:7px 14px;background:var(--paper);border:1.5px solid rgba(184,136,48,.35);border-radius:99px;font-family:var(--serif);font-size:13px;color:var(--paper-ink)}
+.scroll-card .chain-pill.center{background:var(--gold);color:white;border-color:#8a6028;font-weight:700}
+.scroll-card .chain-arrow{color:var(--gold);font-size:14px;font-weight:700}
+
+.scroll-card .three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.scroll-card .three-col-card{background:white;border:1px solid rgba(184,136,48,.2);border-radius:10px;padding:14px}
+.scroll-card .three-col-card .lbl{font-family:var(--serif);font-size:15px;font-weight:900;color:var(--vermilion);margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid rgba(200,72,32,.2)}
+.scroll-card .three-col-card .txt{font-size:12.5px;line-height:1.7;color:var(--paper-ink2)}
+
+.scroll-card .ev-card{background:white;border:1px solid rgba(184,136,48,.2);border-left:4px solid var(--gold);border-radius:8px;padding:12px 14px;margin-bottom:8px}
+.scroll-card .ev-card .nm{font-family:var(--serif);font-size:13.5px;font-weight:700;color:#8a6028;margin-bottom:4px}
+.scroll-card .ev-card .ds{font-size:12.5px;line-height:1.6;color:var(--paper-ink)}
+.scroll-card .ev-card .ho{font-family:var(--mono);font-size:10px;color:var(--paper-ink3);letter-spacing:.04em;margin-top:4px}
+
+.scroll-card .rel-list{display:flex;flex-direction:column;gap:8px}
+.scroll-card .rel-card{background:white;border:1px solid rgba(184,136,48,.2);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .15s}
+.scroll-card .rel-card:hover{border-color:var(--vermilion);transform:translateX(-2px)}
+.scroll-card .rel-card .pair{font-family:var(--serif);font-size:13.5px;font-weight:700;color:var(--paper-ink);margin-bottom:4px}
+.scroll-card .rel-card .pair .arrow{color:var(--vermilion);margin:0 6px}
+.scroll-card .rel-card .typ{display:inline-block;font-family:var(--mono);font-size:9px;color:white;background:var(--gold);padding:2px 7px;border-radius:99px;letter-spacing:.08em;margin-bottom:5px;font-weight:700}
+.scroll-card .rel-card .typ.war{background:#cc4040}.scroll-card .rel-card .typ.trade{background:#3a8868}.scroll-card .rel-card .typ.influence{background:#7a60b0}
+.scroll-card .rel-card .desc{font-size:12px;line-height:1.6;color:var(--paper-ink2)}
+
+.scroll-card .legacy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.scroll-card .legacy-card{background:rgba(184,136,48,.06);border:1px solid rgba(184,136,48,.2);border-radius:10px;padding:12px 14px}
+.scroll-card .legacy-card .what{font-family:var(--serif);font-size:14.5px;font-weight:700;color:var(--vermilion);margin-bottom:3px}
+
+.scroll-card .friend-circle{background:white;border:1px solid rgba(184,136,48,.2);border-radius:14px;padding:16px;text-align:center}
+.scroll-card .fc-svg{display:block;margin:0 auto;max-width:100%}
+.fc-link{stroke:rgba(184,136,48,.55);stroke-width:1.5;fill:none}
+.fc-link.family{stroke:#a070ff}
+.fc-link.enemy{stroke:#ff7878;stroke-dasharray:5 3}
+.fc-link.mentor{stroke:var(--gold)}
+.fc-center-svg{fill:var(--gold);filter:drop-shadow(0 4px 10px rgba(184,136,48,.4))}
+.fc-node-svg{cursor:pointer;transition:transform .2s}
+.fc-node-svg:hover{transform:scale(1.1)}
+.fc-node-bg{fill:#6080b0;filter:drop-shadow(0 3px 8px rgba(96,128,176,.4))}
+.fc-name{font-family:var(--serif);font-size:11px;fill:var(--paper-ink);text-anchor:middle;pointer-events:none;font-weight:700}
+.fc-center-name{font-family:var(--serif);font-size:13px;fill:white;text-anchor:middle;dominant-baseline:central;pointer-events:none;font-weight:700}
+.fc-rel-label{font-family:var(--mono);font-size:9.5px;fill:#8a6028;text-anchor:middle;pointer-events:none;letter-spacing:.04em;font-weight:700}
+.fc-rel-bg{fill:var(--paper);stroke:rgba(184,136,48,.3);stroke-width:1}
+
+.todo-note{background:rgba(200,72,32,.06);border:1px dashed rgba(200,72,32,.35);border-radius:10px;padding:14px 18px;font-size:13px;color:var(--paper-ink2);line-height:1.7;margin-top:14px}
+.todo-note::before{content:'📝 ';color:var(--vermilion);font-weight:700}
+
+.error-page{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:20}
+.error-page h1{font-family:var(--serif);font-size:32px;color:var(--ink);margin-bottom:14px}
+
+@media (max-width:768px){
+  .topbar-cosmos{flex-wrap:wrap;gap:6px;padding:9px 10px}
+  .topbar-cosmos a,.topbar-cosmos button{font-size:10px;padding:6px 10px}
+  .theme-switch{margin-left:0;order:5}
+  .theme-switch button{width:20px!important;height:20px!important}
+  .ai-panel{right:8px!important;left:8px!important;width:auto!important;bottom:130px!important}
+  /* 人物/事件宇宙图字号由 JS 按屏幕计算 (renderCosmic), 此处不覆盖 */
+  /* 文明页: 卡片两列, hero 缩小 */
+  .civ-page{top:96px;padding:6px 14px 60px}
+  .civ-hero{padding:18px 0 16px}
+  .civ-hero h1{font-size:30px}
+  .civ-hero .ic{width:68px;height:68px;font-size:34px}
+  .aspects{grid-template-columns:repeat(2,1fr);gap:9px}
+  .era-block{padding:13px 14px}
+  .era-row{flex-direction:column;gap:6px}
+  .era-row .rl{width:auto;padding-top:0}
+  .scroll-card{padding:22px 16px!important}
+  .scroll-card h1{font-size:24px}
+  .site-map{height:340px!important}
+}
+
+/* 前进/返回按钮 */
+.topbar-cosmos button.nav-btn:disabled{opacity:.3;cursor:not-allowed}
+.topbar-cosmos button.nav-btn:disabled:hover{background:rgba(0,0,0,.55);color:var(--gold)}
+
+/* 朗读按钮 (文字面板内) */
+.scroll-card .speak-btn{position:absolute;top:18px;right:70px;width:42px;height:42px;border-radius:50%;background:white;border:1.5px solid rgba(184,136,48,.4);cursor:pointer;font-size:16px;color:var(--gold-deep);display:flex;align-items:center;justify-content:center;transition:all .15s}
+.scroll-card .speak-btn:hover{background:var(--gold);color:white;border-color:var(--gold)}
+.scroll-card .speak-btn.speaking{background:#2a8038;color:white;border-color:#2a8038;animation:speakPulse 1.2s ease-in-out infinite}
+@keyframes speakPulse{0%,100%{box-shadow:0 0 0 0 rgba(60,160,80,.5)}50%{box-shadow:0 0 0 7px rgba(60,160,80,0)}}
+
+/* AI 浮动按钮 + 面板 */
+.ai-fab{position:fixed;right:24px;bottom:78px;z-index:45;width:58px;height:58px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,var(--gold),var(--vermilion));color:white;font-size:26px;box-shadow:0 8px 24px rgba(212,168,88,.5);transition:transform .2s}
+.ai-fab:hover{transform:scale(1.08)}
+.ai-panel{position:fixed;right:24px;bottom:148px;z-index:46;width:380px;max-width:calc(100vw - 48px);height:520px;max-height:calc(100vh - 200px);background:var(--bg);backdrop-filter:blur(24px);border:1.5px solid var(--panel-line);border-radius:16px;display:none;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.ai-panel.open{display:flex}
+.ai-panel .pnl-head{padding:14px 16px;border-bottom:1px solid var(--panel-line);display:flex;align-items:center;gap:8px}
+.ai-panel .pnl-head h4{font-family:var(--serif);font-size:15px;color:var(--gold);flex:1;font-weight:700}
+.ai-panel .pnl-head .ctx-chip{font-family:var(--mono);font-size:9px;color:var(--ink2);background:rgba(128,128,128,.14);padding:3px 8px;border-radius:99px;letter-spacing:.04em}
+.ai-panel .pnl-head button{width:30px;height:30px;border-radius:7px;border:1px solid var(--panel-line);background:transparent;cursor:pointer;color:var(--ink2);font-size:13px}
+.ai-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.ai-msg{padding:10px 13px;border-radius:12px;font-size:13px;line-height:1.7;max-width:90%}
+.ai-msg.user{align-self:flex-end;background:var(--gold);color:#fff;border-bottom-right-radius:4px}
+.ai-msg.bot{align-self:flex-start;background:var(--panel-bg);color:var(--ink);border:1px solid var(--panel-line);border-bottom-left-radius:4px}
+.ai-msg.bot .cursor{display:inline-block;width:6px;height:14px;background:var(--gold);margin-left:2px;animation:blink 1s steps(2) infinite;vertical-align:middle}
+@keyframes blink{50%{opacity:0}}
+.ai-form{padding:10px 12px;border-top:1px solid var(--panel-line);display:flex;gap:8px}
+.ai-form input{flex:1;min-height:42px;padding:0 12px;border-radius:8px;border:1px solid var(--panel-line);background:rgba(128,128,128,.12);color:var(--ink);font-family:inherit;font-size:13px}
+.ai-form input::placeholder{color:var(--ink3)}
+.ai-form input:focus{outline:none;border-color:var(--gold)}
+.ai-form button{min-width:56px;border-radius:8px;border:none;background:var(--gold);color:#fff;font-weight:700;cursor:pointer}
+.ai-form button:disabled{opacity:.5}
+@media(max-width:768px){
+  .scroll-card .speak-btn{right:64px}
+  .scroll-card{padding:24px 20px}
+  .scroll-card h1{font-size:24px}
+  .scroll-card .three-col{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="cosmos">
+  <div class="nebula"></div>
+  <div class="stars-back"></div>
+  <div class="stars-front"></div>
+</div>
+
+<div class="topbar-cosmos">
+  <a href="./medieval-explorer.html">◀ 历史宇宙</a>
+  <button class="nav-btn" id="navBack" onclick="navBack()" title="返回">‹ 返回</button>
+  <button class="nav-btn" id="navFwd" onclick="navFwd()" title="前进">前进 ›</button>
+  <button class="nav-btn" id="wikiBtn" onclick="openWiki()" title="查维基百科">🔍 维基</button>
+  <a href="./index.html">⌂ 主站</a>
+  <div class="crumb-cosmos" id="crumb"></div>
+  <div class="theme-switch" id="themeSwitch">
+    <button data-t="deepblue" title="静夜深蓝"></button>
+    <button data-t="museum" title="博物馆典藏"></button>
+    <button data-t="textbook" title="现代教科书"></button>
+    <button data-t="parchment" title="羊皮纸古卷"></button>
+  </div>
+</div>
+
+<button class="ai-fab" id="aiFab" title="AI 助手" onclick="toggleAI()">🤖</button>
+<div class="ai-panel" id="aiPanel">
+  <div class="pnl-head">
+    <h4>🤖 文明实验室 AI</h4>
+    <span class="ctx-chip" id="aiCtx">通用</span>
+    <button onclick="toggleAI()">✕</button>
+  </div>
+  <div class="ai-msgs" id="aiMsgs">
+    <div class="ai-msg bot">你好！我是基于 A 级博物馆 / Nature 来源的文明助手。你正在看的内容我都知道，随便问我，比如「楔形文字怎么发明的？」</div>
+  </div>
+  <form class="ai-form" id="aiForm">
+    <input type="text" id="aiInput" placeholder="问我任何问题..." autocomplete="off"/>
+    <button type="submit" id="aiSend">发送</button>
+  </form>
+</div>
+
+<svg class="universe-canvas" id="canvas" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet"></svg>
+<div class="civ-page" id="civPage"></div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<div class="text-panel" id="textPanel">
+  <div class="scroll-card" id="scrollCard"></div>
+</div>
+
+<script src="./medieval_people.js?v=1"></script>
+<script src="./medieval_deep.js?v=1"></script>
+<script src="./"></script>
+<script>
+const W = 1600, H = 900;
+const CX = W/2, CY = H/2 - 30;
+
+function parseHash(){
+  const h = location.hash.replace(/^#\/?/, '');
+  const parts = h.split('/').filter(x=>x);
+  return {type: parts[0]||'', id: parts[1]||'', section: parts[2]||''};
+}
+function navigate(type, id, section){
+  location.hash = section ? `#/${type}/${id}/${section}` : `#/${type}/${id}`;
+}
+
+// ════════════════════════════════════════
+// 工具
+// ════════════════════════════════════════
+// 文明专属图标 (统一、贴切、避免出戏)
+const CIV_ICON = {
+  sumer:'📜', akkad:'👑', babylon:'⚖️',
+  egypt_predynastic:'🌅', egypt_old:'🔺', egypt_new:'🏛️',
+  indus_early:'🏘️', indus:'🧱',
+  minoan:'🐂', mycenaean:'🦁',
+  hittite:'🛡️', xia:'🐉', shang:'🏺', collapse:'💥',
+};
+function getCivInfo(id){
+  let base = null;
+  if (typeof EARLY_CIV_EXPLORER!=='undefined') base = EARLY_CIV_EXPLORER.civilizations.find(c=>c.id===id);
+  const fb = {egypt_predynastic:{name:'古埃及·前王朝',color:'#d4b870'},egypt_new:{name:'古埃及·新王国',color:'#e0a850'},indus_early:{name:'印度河早期',color:'#a070d4'},mycenaean:{name:'迈锡尼',color:'#1880b0'},xia:{name:'夏朝',color:'#6f8f5a'},collapse:{name:'青铜时代崩溃',color:'#888'}};
+  base = base || fb[id] || {name:id,color:'#888'};
+  return {...base, icon: CIV_ICON[id] || base.icon || '🏛'};
+}
+// 人物专属图标 (按身份, 比全用 👤 更贴切)
+const PERSON_ICON = {
+  gilgamesh:'👑', enkidu:'🐂', enheduanna:'🌙', sargon:'👑', naramsin:'⭐', urnammu:'⚖️',
+  puabi:'💎', eannatum:'🦅', gudea:'🗿', hammurabi:'⚖️',
+  narmer:'👑', imhotep:'📐', djoser:'🔺', khufu:'🔺', khafre:'🦁',
+  hatshepsut:'👑', thutmose3:'⚔️', akhenaten:'☀️', nefertiti:'💎', tutankhamun:'🪙', ramesses2:'🏛️',
+  shangtang:'👑', yiyin:'📜', wuding:'👑', fuhao:'⚔️', fushuo:'📜', dixin:'🔥', zhou_wu:'⚔️',
+  yu_the_great:'🌊', qi_xia:'👑', jie_xia:'🔥',
+  minos:'🐂', agamemnon:'🛡️', suppiluliuma:'👑', muwatalli:'🏹', hattusili:'🕊️',
+};
+function personIcon(id){ return (typeof CLASSICAL_ICON!=='undefined' && CLASSICAL_ICON[id]) || PERSON_ICON[id] || '👤'; }
+// 事件专属图标 (按内容贴切, 不用日历 emoji 以免渲染成带日期的图标)
+const EVENT_ICON = {
+  evt_eridu_first:'🏛️', evt_uruk_period:'🏙️', evt_cuneiform_invented:'✍️', evt_royal_tombs_ur:'⚱️',
+  evt_lagash_umma_war:'⚔️', evt_urnammu_law:'⚖️', evt_sargon_conquest:'⚔️', evt_naramsin_empire:'⭐',
+  evt_great_pyramid:'🔺', evt_giza_complex:'🦁', evt_egypt_unification:'👑', evt_hyksos_expulsion:'🏹',
+  evt_akhenaten_reform:'☀️', evt_kadesh:'⚔️', evt_indus_peak:'🏙️', evt_indus_decline:'🌊',
+  evt_knossos_palace:'🏛️', evt_thera_eruption:'🌋', evt_trojan_war:'🐴', evt_hittite_sack_babylon:'🔥',
+  evt_sea_peoples:'⛵', evt_bronze_collapse:'💥', evt_shang_founding:'👑', evt_pangeng_relocate:'🏙️',
+  evt_wuding_peak:'👑', evt_battle_muye:'⚔️',
+  evt_yu_flood:'🌊', evt_qi_hereditary:'👑', evt_shaokang:'🗡️',
+  evt_minoan_fall:'⚔️', evt_mycenae_goldmask:'🎭', evt_telepinu:'📜', evt_enuma_elish:'📖', evt_indus_trade:'⚓',
+};
+const CLASSICAL_EVENT_ICON={evt_confucius:'📜',evt_hundred_schools:'💭',evt_shangyang:'⚖️',evt_qin_unify:'👑',evt_duzun_ruxue:'📜',evt_zhangqian:'🐫',evt_han_xiongnu:'🐎',evt_cailun:'📃',evt_ganying:'🐫',evt_cyrus_found:'👑',evt_marathon:'⚔️',evt_buddha:'☸️',evt_ashoka:'🦁',evt_alexander:'🌍',evt_alexandria:'📚',evt_socrates_death:'☠️',evt_punic:'🐘',evt_caesar:'🗡️',evt_pax_romana:'🏛️',evt_crisis3:'⚔️',evt_jesus:'✝️',evt_milan:'✝️'};
+function eventIcon(id){ return CLASSICAL_EVENT_ICON[id] || EVENT_ICON[id] || '⭐'; }
+function findCivChapters(civId){return CHAPTERS.filter(ch=>ch.active_civs.some(cv=>cv.id===civId))}
+function findEventsOfCiv(civId){
+  const evs = [];
+  CHAPTERS.forEach(ch=>{const cv=ch.active_civs.find(x=>x.id===civId);if(!cv)return;(cv.L3_events||[]).forEach(eid=>{if(!evs.find(x=>x.id===eid))evs.push({id:eid,deep:EVENT_DEEP[eid]})})});
+  return evs;
+}
+function findPeopleOfCiv(civId){
+  const ps = [];
+  CHAPTERS.forEach(ch=>{const cv=ch.active_civs.find(x=>x.id===civId);if(!cv)return;(cv.L4_people||[]).forEach(pid=>{if(!ps.find(x=>x.id===pid))ps.push({id:pid,deep:PERSON_DEEP[pid]})})});
+  return ps;
+}
+function findEventCiv(eid){for(const ch of CHAPTERS)for(const cv of ch.active_civs)if(cv.L3_events?.includes(eid))return{civId:cv.id,chId:ch.id};return null}
+function findPersonCiv(pid){for(const ch of CHAPTERS)for(const cv of ch.active_civs)if(cv.L4_people?.includes(pid))return{civId:cv.id,chId:ch.id};return null}
+
+function darken(hex, amount){
+  if (!hex || !hex.startsWith('#')) return '#444';
+  const c = hex.replace('#','');
+  const r = Math.max(0, parseInt(c.slice(0,2),16) - Math.round(255*amount));
+  const g = Math.max(0, parseInt(c.slice(2,4),16) - Math.round(255*amount));
+  const b = Math.max(0, parseInt(c.slice(4,6),16) - Math.round(255*amount));
+  return '#' + [r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+
+// ════════════════════════════════════════
+// 面包屑
+// ════════════════════════════════════════
+function renderCrumb(type, id, name){
+  const c = document.getElementById('crumb');
+  let html = `<a onclick="location.href='./medieval-explorer.html'">⌂ 历史宇宙</a><span class="sep">›</span>`;
+  if (type === 'civ') {
+    html += `<span class="cur">${name}</span>`;
+  } else if (type === 'event' || type === 'person') {
+    const ctx = type==='event' ? findEventCiv(id) : findPersonCiv(id);
+    if (ctx) {
+      const civ = getCivInfo(ctx.civId);
+      html += `<a onclick="navigate('civ','${ctx.civId}')">${civ.icon} ${civ.name}</a><span class="sep">›</span>`;
+    }
+    html += `<span class="cur">${name}</span>`;
+  }
+  c.innerHTML = html;
+}
+
+// ════════════════════════════════════════
+// 通用 cosmic 渲染：center + 周围 orbs
+// ════════════════════════════════════════
+function renderCosmic(centerData, orbs){
+  // 人物/事件页用 SVG 宇宙图：显示 canvas, 隐藏文明页
+  document.getElementById('canvas').classList.remove('hidden');
+  document.getElementById('civPage').classList.remove('active');
+  // 给 orb 计算位置 (更大半径 + 每环更少, 避免标签互相遮挡)
+  const N = orbs.length;
+  const ringSize = N <= 7 ? N : Math.ceil(N/2);
+  const rings = Math.ceil(N / ringSize);
+
+  // 半径放大, 让节点铺满画面不显空
+  orbs.forEach((orb, i)=>{
+    const ring = Math.floor(i / ringSize);
+    const idx = i % ringSize;
+    const items = (ring === rings - 1) ? (N - ring * ringSize) : ringSize;
+    const angleOffset = ring * 0.4;  // 内外环错开角度, 防止径向标签叠在一起
+    const angle = -Math.PI/2 + angleOffset + idx * (Math.PI * 2 / items);
+    const r = 300 + ring * 215;
+    orb.x = CX + Math.cos(angle) * r;
+    orb.y = CY + Math.sin(angle) * r * 0.8;
+  });
+
+  let svg = `<defs>
+    <radialGradient id="centerGrad" cx="35%" cy="30%">
+      <stop offset="0%" stop-color="rgba(255,255,255,.95)"/>
+      <stop offset="30%" stop-color="${centerData.color}" stop-opacity=".95"/>
+      <stop offset="100%" stop-color="${darken(centerData.color,0.5)}"/>
+    </radialGradient>
+    <radialGradient id="centerHalo">
+      <stop offset="0%" stop-color="${centerData.color}" stop-opacity=".5"/>
+      <stop offset="100%" stop-color="${centerData.color}" stop-opacity="0"/>
+    </radialGradient>
+    ${orbs.map((o,i)=>`<radialGradient id="orbGrad${i}" cx="35%" cy="30%">
+      <stop offset="0%" stop-color="rgba(255,255,255,.85)"/>
+      <stop offset="30%" stop-color="${o.color}" stop-opacity=".9"/>
+      <stop offset="100%" stop-color="${darken(o.color,0.5)}"/>
+    </radialGradient>`).join('')}
+  </defs>`;
+
+  // 轨道虚线圈
+  for (let r=1; r<=rings; r++){
+    const radius = 300 + (r-1) * 215;
+    svg += `<ellipse cx="${CX}" cy="${CY}" rx="${radius}" ry="${radius*0.8}" fill="none" stroke="var(--panel-line)" stroke-width="1" stroke-dasharray="3 6" opacity=".5"/>`;
+  }
+
+  // spokes (从中心到每个 orb)
+  orbs.forEach(orb=>{
+    svg += `<line class="spoke" x1="${CX}" y1="${CY}" x2="${orb.x}" y2="${orb.y}"/>`;
+  });
+
+  // 尺寸随屏幕: 手机上 SVG 被压缩, 需更大字号+球
+  const mobile = window.matchMedia('(max-width:768px)').matches;
+  const nameFs = mobile ? 26 : 18;
+  const orbScale = mobile ? 1.7 : 1.45;
+  const cScale = mobile ? 1.6 : 1.38;
+  const cLabelFs = mobile ? 40 : 28;
+  const cMetaFs = mobile ? 23 : 15;
+
+  // orbs
+  orbs.forEach((orb,i)=>{
+    const r = (orb.size || 36) * orbScale;
+    const h = nameFs + 14, w = orb.name.length*nameFs + nameFs + 14;
+    svg += `<g class="float-orb" data-action='${JSON.stringify(orb.action)}' transform="translate(${orb.x},${orb.y})" style="color:${orb.color}">
+      <circle cx="0" cy="0" r="${r*1.55}" fill="${orb.color}" opacity="0.12"/>
+      <g class="body">
+        <circle cx="0" cy="0" r="${r}" fill="url(#orbGrad${i})" stroke="rgba(255,255,255,.3)" stroke-width="2"/>
+        <ellipse cx="${-r*0.18}" cy="${-r*0.32}" rx="${r*0.4}" ry="${r*0.17}" fill="rgba(255,255,255,.5)" transform="rotate(-25)"/>
+        <text text-anchor="middle" dominant-baseline="central" font-size="${r*0.9}" style="pointer-events:none">${orb.icon}</text>
+      </g>
+      <g transform="translate(0,${r+h/2+8})">
+        <rect class="label-bg" x="${-w/2}" y="${-h/2}" width="${w}" height="${h}" rx="${h/2}"/>
+        <text class="name" y="0" dominant-baseline="central" font-size="${nameFs}">${orb.name}</text>
+      </g>
+    </g>`;
+  });
+
+  // center orb
+  const cr = (centerData.size || 70) * cScale;
+  svg += `<g class="center-orb" transform="translate(${CX},${CY})">
+    <circle cx="0" cy="0" r="${cr*2}" fill="url(#centerHalo)"/>
+    <circle class="ring1" cx="0" cy="0" r="${cr+28}" stroke-dasharray="6 10"/>
+    <circle class="ring2" cx="0" cy="0" r="${cr+52}" stroke-dasharray="2 16"/>
+    <g class="body">
+      <circle cx="0" cy="0" r="${cr}" fill="url(#centerGrad)" stroke="rgba(255,255,255,.4)" stroke-width="2.5"/>
+      <ellipse cx="${-cr*0.18}" cy="${-cr*0.32}" rx="${cr*0.4}" ry="${cr*0.17}" fill="rgba(255,255,255,.5)" transform="rotate(-25)"/>
+      <text text-anchor="middle" dominant-baseline="central" font-size="${cr*0.66}" style="pointer-events:none">${centerData.icon}</text>
+    </g>
+    <text class="label" y="${cr+cLabelFs}" font-size="${cLabelFs}">${centerData.name}</text>
+    ${centerData.meta?`<text class="meta" y="${cr+cLabelFs+cMetaFs+6}" font-size="${cMetaFs}">${centerData.meta}</text>`:''}
+  </g>`;
+
+  document.getElementById('canvas').innerHTML = svg;
+
+  // 绑定
+  document.querySelectorAll('.float-orb').forEach(el=>{
+    const action = JSON.parse(el.dataset.action);
+    el.addEventListener('click', ()=>handleOrbClick(action));
+    el.addEventListener('mouseenter', e=>showTooltip(e, action));
+    el.addEventListener('mousemove', moveTooltip);
+    el.addEventListener('mouseleave', hideTooltip);
+  });
+}
+
+function handleOrbClick(action){
+  hideTooltip();
+  if (action.type === 'navigate') {
+    navigate(action.to.type, action.to.id);
+  } else if (action.type === 'showText') {
+    openTextPanel(action.payload);
+  }
+}
+
+// ════════════════════════════════════════
+// 年份解析 + 文明时间跨度
+// ════════════════════════════════════════
+const CIV_SPAN = {
+  sumer:[-3500,-2004], akkad:[-2334,-2154], babylon:[-1894,-1595],
+  egypt_predynastic:[-3500,-3100], egypt_old:[-2686,-2181], egypt_new:[-1550,-1077],
+  indus_early:[-3300,-2600], indus:[-2600,-1900],
+  minoan:[-2700,-1450], mycenaean:[-1750,-1050],
+  hittite:[-1650,-1180], shang:[-1600,-1046],
+};
+function parseYear(str){
+  if (!str) return null;
+  let m = str.match(/前\s*(\d+)/);          // 中文 "前 3200"
+  if (m) return -parseInt(m[1]);
+  m = str.match(/~?\s*(\d+)\s*BCE/i);        // 英文 "~5400 BCE"
+  if (m) return -parseInt(m[1]);
+  return null;
+}
+function eventYear(e){
+  const d = e.deep;
+  if (d?.what_happened?.length){ const y=parseYear(d.what_happened[0]); if(y)return y; }
+  if (d?.one_liner){ const y=parseYear(d.one_liner); if(y)return y; }
+  return null;
+}
+function personYear(p){
+  const d = p.deep;
+  return parseYear(d?.lifespan_real) || parseYear(d?.lifespan_mythic) || null;
+}
+
+// ════════════════════════════════════════
+// 文明小宇宙 · 时间轴布局
+//   顶部：文明中心球 + 一排主题章节球
+//   下部：横向时间轴 → 事件(上) + 人物(下) 按年份排列
+// ════════════════════════════════════════
+function renderCivCosmic(civId){
+  const info = getCivInfo(civId);
+  const deep = CIV_DEEP[civId];
+  const chs = findCivChapters(civId);
+  const events = findEventsOfCiv(civId);
+  const people = findPeopleOfCiv(civId);
+  if (chs.length === 0 && !deep) return renderError(`未找到文明：${civId}`);
+  renderCrumb('civ', civId, info.name);
+
+  // 切换到文明页布局 (隐藏宇宙 canvas)
+  document.getElementById('canvas').classList.add('hidden');
+  document.getElementById('civPage').classList.add('active');
+
+  const timeRange = deep?.time_range || (chs.length?`${chs[0].range} – ${chs[chs.length-1].range.split('–')[1]} BCE`:'');
+  const color = info.color;
+  const tagline = chs[0]?.active_civs.find(cv=>cv.id===civId)?.L1 || '';
+
+  // 通识方面 (有内容才显示)
+  const aspects = [];
+  if (deep?.opening_narrative) aspects.push({icon:'📖',name:'文明叙事',kind:'narrative'});
+  if (deep) aspects.push({icon:'🏛',name:'基础事实',kind:'basics'});
+  if (deep?.nine_inventions) aspects.push({icon:'💡',name:'关键发明',kind:'inventions'});
+  aspects.push({icon:'🌍',name:'文明关系',kind:'relations'});
+  if (typeof CIV_MAP!=='undefined' && CIV_MAP[civId]?.length) aspects.push({icon:'🗺',name:'遗址地图',kind:'map'});
+  if (typeof CIV_MYTHS!=='undefined' && CIV_MYTHS[civId]?.length) aspects.push({icon:'⚠️',name:'常见误解',kind:'myths'});
+  if (deep?.collapse_chain) aspects.push({icon:'⏳',name:'崩溃过程',kind:'collapse'});
+  if (FINAL_OVERVIEW.civs.find(c=>c.id===civId)?.legacy) aspects.push({icon:'🎁',name:'今天遗产',kind:'legacy'});
+
+  // 事件 + 人物 按 500 年分期
+  const evItems = events.map(e=>({type:'event', id:e.id, year:eventYear(e), name:(e.deep?.full_title||e.id)})).filter(x=>x.name);
+  const ppItems = people.map(p=>({type:'person', id:p.id, year:personYear(p), name:(p.deep?.full_name||p.id).split(' ')[0]})).filter(x=>x.name);
+  // 分桶 (前3500起, 每500年)
+  function bucketKey(y){ if(y==null) return null; return Math.floor((-y)/500)*500; } // e.g. -2700 -> 2500 (代表 2500-3000)
+  const buckets = {};
+  [...evItems, ...ppItems].forEach(it=>{
+    const k = bucketKey(it.year); if(k==null) return;
+    (buckets[k] = buckets[k] || {ev:[], pe:[]})[it.type==='event'?'ev':'pe'].push(it);
+  });
+  const bucketKeys = Object.keys(buckets).map(Number).sort((a,b)=>b-a); // 大->小 = 早->晚 (因为是"前X")
+  bucketKeys.forEach(k=>{ buckets[k].ev.sort((a,b)=>(a.year||0)-(b.year||0)); buckets[k].pe.sort((a,b)=>(a.year||0)-(b.year||0)); });
+
+  const chip = it => `<div class="tl-chip ${it.type==='event'?'ev':'pe'}" onclick="navigate('${it.type}','${it.id}')"><span class="nm">${(it.type==='event'?eventIcon(it.id):personIcon(it.id))+' '}${it.name}</span>${it.year!=null?`<span class="yr">前${Math.abs(it.year)}</span>`:''}</div>`;
+
+  let timelineHtml = '';
+  if (bucketKeys.length){
+    timelineHtml = bucketKeys.map(k=>{
+      const b = buckets[k];
+      const hi = k, lo = k-500; // 前 hi – 前 lo
+      return `<div class="era-block">
+        <div class="era-head">前 ${hi} – 前 ${lo} BCE<span class="era-line"></span></div>
+        ${b.ev.length?`<div class="era-row"><div class="rl">历史事件</div><div class="era-items">${b.ev.map(chip).join('')}</div></div>`:''}
+        ${b.pe.length?`<div class="era-row"><div class="rl">关键人物</div><div class="era-items">${b.pe.map(chip).join('')}</div></div>`:''}
+      </div>`;
+    }).join('');
+  } else {
+    timelineHtml = `<div class="era-block"><div class="era-empty">该文明的事件 / 人物深度内容正在补充中。</div></div>`;
+  }
+
+  const sphere = `radial-gradient(circle at 34% 30%, rgba(255,255,255,.92), ${color} 55%, ${darken(color,0.45)})`;
+
+  document.getElementById('civPage').innerHTML = `<div class="civ-wrap">
+    <div class="civ-hero">
+      <div class="ic" style="background:${sphere}">${info.icon}</div>
+      <h1>${info.name}</h1>
+      <div class="range">${timeRange}</div>
+      ${tagline?`<div class="tag">${tagline}</div>`:''}
+    </div>
+
+    <div class="sec-title">了解这个文明</div>
+    <div class="aspects">
+      ${aspects.map(a=>`<div class="aspect" onclick="openTextPanel({kind:'${a.kind}',civId:'${civId}'})"><div class="ai">${a.icon}</div><div class="al">${a.name}</div></div>`).join('')}
+    </div>
+
+    <div class="sec-title">时间线 · 事件与人物</div>
+    ${timelineHtml}
+  </div>`;
+
+  document.getElementById('civPage').scrollTop = 0;
+  document.title = info.name + ' · 中世纪多中心';
+}
+
+// 单个浮动球 SVG (timeline 版用)
+function floatOrb(orb, gradIdx, r, isTheme){
+  return `<g class="float-orb" data-action='${JSON.stringify(orb.action)}' transform="translate(${orb.x},${orb.y})" style="color:${orb.color}">
+    <circle cx="0" cy="0" r="${r*1.5}" fill="${orb.color}" opacity="0.12"/>
+    <g class="body">
+      <circle cx="0" cy="0" r="${r}" fill="url(#og${gradIdx})" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
+      <ellipse cx="${-r*0.18}" cy="${-r*0.32}" rx="${r*0.4}" ry="${r*0.17}" fill="rgba(255,255,255,.5)" transform="rotate(-25)"/>
+      <text text-anchor="middle" dominant-baseline="central" font-size="${r*0.9}" style="pointer-events:none">${orb.icon}</text>
+    </g>
+    <g transform="translate(0,${r+16})">
+      <rect class="label-bg" x="${-orb.name.length*7-7}" y="${-11}" width="${orb.name.length*14+14}" height="21" rx="10"/>
+      <text class="name" y="3" font-size="14">${orb.name}</text>
+    </g>
+    ${orb.year!=null?`<text class="orb-year" y="${r+36}" text-anchor="middle" font-size="11.5">前${Math.abs(orb.year)}</text>`:''}
+  </g>`;
+}
+
+function bindFloatOrbs(){
+  document.querySelectorAll('.float-orb').forEach(el=>{
+    const action = JSON.parse(el.dataset.action);
+    el.addEventListener('click', ()=>handleOrbClick(action));
+    el.addEventListener('mouseenter', e=>showTooltip(e, action));
+    el.addEventListener('mousemove', moveTooltip);
+    el.addEventListener('mouseleave', hideTooltip);
+  });
+}
+
+// ════════════════════════════════════════
+// 人物 cosmic hub
+// ════════════════════════════════════════
+function renderPersonCosmic(pid){
+  const p = PERSON_DEEP[pid];
+  if (!p) return renderError(`未找到人物：${pid}`);
+  const name = p.full_name || pid;
+  renderCrumb('person', pid, name.split(' ')[0]);
+
+  const center = {
+    icon: personIcon(pid), name: name.split(' ')[0], color: '#6080b0',
+    meta: p.lifespan_real || p.lifespan_mythic || '',
+    size: 70,
+  };
+
+  const orbs = [];
+  if (p.biography) orbs.push({icon:'📖',name:'完整传记',color:'#d4a858',typeLabel:'BIOGRAPHY',size:42,
+    action:{type:'showText',payload:{kind:'biography',pid}}});
+  if (p.childhood) orbs.push({icon:'👶',name:'童年出身',color:'#c8a080',typeLabel:'CHILDHOOD',size:34,
+    action:{type:'showText',payload:{kind:'childhood',pid}}});
+  if (p.achievements_detail?.length) orbs.push({icon:'🏆',name:`成就 ×${p.achievements_detail.length}`,color:'#e8a020',typeLabel:'ACHIEVEMENTS',size:38,
+    action:{type:'showText',payload:{kind:'achievements',pid}}});
+
+  // 朋友圈：每个朋友单独一个 orb (可跳转)
+  const direct = p.related || [];
+  const incoming = [];
+  Object.entries(PERSON_DEEP).forEach(([oid, o])=>{
+    if (oid===pid) return;
+    (o.related||[]).forEach(r=>{
+      if (r.id===pid && !direct.find(x=>x.id===oid)) incoming.push({id:oid, relation:r.relation});
+    });
+  });
+  const allFriends = [...direct, ...incoming];
+  allFriends.forEach(f=>{
+    const other = PERSON_DEEP[f.id];
+    const fname = (other?.full_name || f.id).split(' ')[0];
+    orbs.push({icon:personIcon(f.id),name:fname,color:'#7080b0',typeLabel:f.relation||'关系',size:34,
+      action:{type:'navigate',to:{type:'person',id:f.id}}});
+  });
+
+  // 参与事件
+  const involved = Object.entries(EVENT_DEEP).filter(([eid, e]) => e.related_people?.includes(pid));
+  involved.forEach(([eid, e])=>{
+    const title = e.full_title;
+    orbs.push({icon:eventIcon(eid),name:title.length>10?title.slice(0,10)+'...':title,color:'#c8732a',typeLabel:'参与事件',size:34,
+      action:{type:'navigate',to:{type:'event',id:eid}}});
+  });
+
+  if (p.death) orbs.push({icon:'⚰️',name:'死亡晚年',color:'#7a5050',typeLabel:'DEATH',size:32,
+    action:{type:'showText',payload:{kind:'death',pid}}});
+  if (p.legacy) orbs.push({icon:'🌟',name:'历史遗产',color:'#e8c860',typeLabel:'LEGACY',size:36,
+    action:{type:'showText',payload:{kind:'plegacy',pid}}});
+
+  renderCosmic(center, orbs);
+  document.title = name + ' · 人物小宇宙';
+}
+
+// ════════════════════════════════════════
+// 事件 cosmic hub
+// ════════════════════════════════════════
+function renderEventCosmic(eid){
+  const e = EVENT_DEEP[eid];
+  if (!e) return renderError(`未找到事件：${eid}`);
+  renderCrumb('event', eid, e.full_title);
+
+  const center = {
+    icon: eventIcon(eid), name: e.full_title, color: '#c8732a',
+    meta: e.what_happened?.[0]?.split('·')[0]?.trim() || '',
+    size: 75,
+  };
+
+  const orbs = [];
+  if (e.one_liner) orbs.push({icon:'💡',name:'一句话',color:'#e8b820',typeLabel:'ONE-LINER',size:34,
+    action:{type:'showText',payload:{kind:'oneliner',eid}}});
+  if (e.context_before || e.leads_to) orbs.push({icon:'🔗',name:'因果链',color:'#d4a858',typeLabel:'CHAIN',size:36,
+    action:{type:'showText',payload:{kind:'chain',eid}}});
+  orbs.push({icon:'📜',name:'之前·当时·之后',color:'#b88830',typeLabel:'BEFORE-NOW-AFTER',size:36,
+    action:{type:'showText',payload:{kind:'three',eid}}});
+  if (e.narrative) orbs.push({icon:'📖',name:'完整叙事',color:'#d4a858',typeLabel:'NARRATIVE',size:42,
+    action:{type:'showText',payload:{kind:'enarrative',eid}}});
+  if (e.what_happened?.length) orbs.push({icon:'🕰️',name:'时间线',color:'#c8a070',typeLabel:'TIMELINE',size:36,
+    action:{type:'showText',payload:{kind:'ewhat',eid}}});
+
+  // 关键人物
+  (e.related_people||[]).forEach(pid=>{
+    const p = PERSON_DEEP[pid];
+    if (!p) return;
+    const fname = (p.full_name||pid).split(' ')[0];
+    orbs.push({icon:personIcon(pid),name:fname,color:'#6080b0',typeLabel:'关键人物',size:36,
+      action:{type:'navigate',to:{type:'person',id:pid}}});
+  });
+
+  if (e.evidence?.length) orbs.push({icon:'🏺',name:`证据 ×${e.evidence.length}`,color:'#a07840',typeLabel:'EVIDENCE',size:34,
+    action:{type:'showText',payload:{kind:'evidence',eid}}});
+  if (e.significance) orbs.push({icon:'🎯',name:'历史意义',color:'#c84820',typeLabel:'SIGNIFICANCE',size:36,
+    action:{type:'showText',payload:{kind:'significance',eid}}});
+
+  renderCosmic(center, orbs);
+  document.title = e.full_title + ' · 事件小宇宙';
+}
+
+// ════════════════════════════════════════
+// 文字面板 (slides up from bottom)
+// ════════════════════════════════════════
+function openTextPanel(payload){
+  const card = document.getElementById('scrollCard');
+  let html = `<button class="close-x" onclick="closeTextPanel()">✕</button>
+    <button class="speak-btn" id="speakBtn" onclick="toggleSpeak()" title="朗读">🔊</button>`;
+
+  if (payload.kind === 'narrative') {
+    const c = CIV_DEEP[payload.civId];
+    const info = getCivInfo(payload.civId);
+    html += `<div class="type-tag civ">${info.icon} ${info.name} · 完整叙事</div>
+      <h1>📖 文明叙事</h1>
+      <div class="narrative">${c.opening_narrative.trim().split(/\n\s*\n/).map(p=>'<p>'+p.trim()+'</p>').join('')}</div>`;
+  }
+  else if (payload.kind === 'basics') {
+    const c = CIV_DEEP[payload.civId];
+    const info = getCivInfo(payload.civId);
+    const basics = [];
+    if (c.capital_at_peak) basics.push(['首都', c.capital_at_peak]);
+    if (c.territory_max) basics.push(['领土', c.territory_max]);
+    if (c.population_peak) basics.push(['人口', c.population_peak]);
+    if (c.language) basics.push(['语言', c.language]);
+    if (c.writing) basics.push(['文字', c.writing]);
+    if (c.religion) basics.push(['宗教', c.religion]);
+    if (c.economy) basics.push(['经济', c.economy]);
+    html += `<div class="type-tag civ">${info.icon} ${info.name}</div>
+      <h1>🏛 基础事实</h1>
+      <div class="info-grid">${basics.map(([k,v])=>`<div class="info-card"><div class="lbl">${k}</div><div class="val">${v}</div></div>`).join('')}</div>`;
+  }
+  else if (payload.kind === 'timeline') {
+    const chs = findCivChapters(payload.civId);
+    const info = getCivInfo(payload.civId);
+    html += `<div class="type-tag civ">${info.icon} ${info.name}</div>
+      <h1>🕰️ 演化阶段</h1>
+      ${chs.map(ch=>{
+        const cv = ch.active_civs.find(x=>x.id===payload.civId);
+        return `<div class="tl-item"><div class="yr">${ch.range} BCE</div><div class="ds"><strong>${ch.title} · ${cv.state}</strong><br/>${cv.in_period_summary||cv.L2||''}</div></div>`;
+      }).join('')}`;
+  }
+  else if (payload.kind === 'inventions') {
+    const c = CIV_DEEP[payload.civId];
+    const info = getCivInfo(payload.civId);
+    html += `<div class="type-tag civ">${info.icon} ${info.name}</div>
+      <h1>💡 关键发明</h1>
+      ${c.nine_inventions.map(inv=>`<div class="ev-card">
+        <div class="nm">${inv.name} <span style="font-family:var(--mono);font-size:10px;color:var(--paper-ink3);font-weight:400">· ${inv.year||''}</span></div>
+        <div class="ds">${inv.body}</div>
+      </div>`).join('')}`;
+  }
+  else if (payload.kind === 'relations') {
+    const info = getCivInfo(payload.civId);
+    const rels = findCivRelations(payload.civId);
+    html += `<div class="type-tag civ">${info.icon} ${info.name}</div>
+      <h1>🌍 与其他文明的关系</h1>
+      ${rels.length?`<div class="rel-list">${rels.map(r=>`<div class="rel-card" onclick="closeTextPanel();navigate('civ','${r.targetId}')">
+        <span class="typ ${r.type}">${r.typeLabel||r.type}</span>
+        <div class="pair">${r.from}<span class="arrow">${r.symbol||'→'}</span>${r.to}</div>
+        <div class="desc">${r.desc}</div>
+      </div>`).join('')}</div>`:`<div class="todo-note">跨文明关系待补</div>`}`;
+  }
+  else if (payload.kind === 'collapse') {
+    const c = CIV_DEEP[payload.civId];
+    const info = getCivInfo(payload.civId);
+    html += `<div class="type-tag civ">${info.icon} ${info.name}</div>
+      <h1>⏳ 崩溃过程</h1>
+      ${c.collapse_chain.map(t=>{
+        const [yr,...rest] = t.split('·');
+        return `<div class="tl-item"><div class="yr">${yr.trim()}</div><div class="ds">${rest.join('·').trim()}</div></div>`;
+      }).join('')}`;
+  }
+  else if (payload.kind === 'map') {
+    const info = getCivInfo(payload.civId);
+    const pts = (typeof CIV_MAP!=='undefined' ? CIV_MAP[payload.civId] : []) || [];
+    html += `<div class="type-tag civ">${info.icon} ${info.name}</div>
+      <h1>🗺 遗址地图</h1>
+      <div class="map-note">主要遗址与古迹的地理位置</div>
+      <div id="siteMap" class="site-map"></div>
+      <div class="site-list">${pts.map(p=>{const mod=(typeof siteModern!=='undefined')?siteModern(p.name):'';return `<div class="site-item"><b>${p.name}</b>${mod?`<span class="modern">📍 ${mod}</span>`:''}<span class="coord">${p.coords[0].toFixed(2)}°, ${p.coords[1].toFixed(2)}°</span><br>${p.note||''}</div>`;}).join('')}</div>`;
+  }
+  else if (payload.kind === 'myths') {
+    const info = getCivInfo(payload.civId);
+    const ms = (typeof CIV_MYTHS!=='undefined' ? CIV_MYTHS[payload.civId] : []) || [];
+    html += `<div class="type-tag civ">${info.icon} ${info.name}</div>
+      <h1>⚠️ 常见误解</h1>
+      <div class="map-note">这些"想当然"的说法其实是错的——破除迷思才能真正理解历史：</div>
+      ${ms.map(m=>`<div class="myth-card">
+        <div class="myth-q">❌ ${m.myth}</div>
+        <div class="myth-t">✓ ${m.truth}</div>
+        ${m.why?`<div class="myth-w">为什么会有这个误解：${m.why}</div>`:''}
+      </div>`).join('')}`;
+  }
+  else if (payload.kind === 'legacy') {
+    const info = getCivInfo(payload.civId);
+    const legacyStr = FINAL_OVERVIEW.civs.find(c=>c.id===payload.civId)?.legacy || '';
+    const items = legacyStr.split(/\s*[·•|]\s*/).filter(x=>x.trim());
+    html += `<div class="type-tag civ">${info.icon} ${info.name}</div>
+      <h1>🎁 今天我们保留了什么</h1>
+      <div class="legacy-grid">${items.map(it=>`<div class="legacy-card"><div class="what">${it}</div></div>`).join('')}</div>`;
+  }
+  else if (payload.kind === 'biography') {
+    const p = PERSON_DEEP[payload.pid];
+    html += `<div class="type-tag person">👤 ${p.full_name}</div>
+      <h1>📖 完整传记</h1>
+      ${p.historical_or_mythic?`<div class="one-liner">${p.historical_or_mythic}</div>`:''}
+      <div class="narrative">${p.biography.trim().split(/\n\s*\n/).map(par=>'<p>'+par.trim()+'</p>').join('')}</div>`;
+  }
+  else if (payload.kind === 'childhood') {
+    const p = PERSON_DEEP[payload.pid];
+    html += `<div class="type-tag person">👤 ${p.full_name}</div>
+      <h1>👶 童年 · 出身</h1>
+      <div class="narrative"><p>${p.childhood}</p></div>`;
+  }
+  else if (payload.kind === 'achievements') {
+    const p = PERSON_DEEP[payload.pid];
+    html += `<div class="type-tag person">👤 ${p.full_name}</div>
+      <h1>🏆 主要成就</h1>
+      ${p.achievements_detail.map(a=>`<div class="ev-card">
+        <div class="nm">${a.name}</div>
+        <div class="ds">${a.detail}</div>
+        ${a.proof?`<div class="ho">📜 ${a.proof}</div>`:''}
+      </div>`).join('')}`;
+  }
+  else if (payload.kind === 'death') {
+    const p = PERSON_DEEP[payload.pid];
+    html += `<div class="type-tag person">👤 ${p.full_name}</div>
+      <h1>⚰️ 死亡 · 晚年</h1>
+      <div class="narrative"><p>${p.death}</p></div>`;
+  }
+  else if (payload.kind === 'plegacy') {
+    const p = PERSON_DEEP[payload.pid];
+    html += `<div class="type-tag person">👤 ${p.full_name}</div>
+      <h1>🌟 历史遗产</h1>
+      <div class="narrative">${p.legacy.trim().split(/\n\s*\n/).map(par=>'<p>'+par.trim()+'</p>').join('')}</div>`;
+  }
+  else if (payload.kind === 'oneliner') {
+    const e = EVENT_DEEP[payload.eid];
+    html += `<div class="type-tag event">${eventIcon(payload.eid)} ${e.full_title}</div>
+      <h1>💡 一句话总结</h1>
+      <div class="narrative" style="font-size:20px;line-height:1.7;text-align:center;padding:24px 0"><p>${e.one_liner}</p></div>`;
+  }
+  else if (payload.kind === 'chain') {
+    const e = EVENT_DEEP[payload.eid];
+    html += `<div class="type-tag event">${eventIcon(payload.eid)} ${e.full_title}</div>
+      <h1>🔗 因果链</h1>
+      ${renderChainHtml(e)}`;
+  }
+  else if (payload.kind === 'three') {
+    const e = EVENT_DEEP[payload.eid];
+    html += `<div class="type-tag event">${eventIcon(payload.eid)} ${e.full_title}</div>
+      <h1>📜 之前 · 当时 · 之后</h1>
+      <div class="three-col">
+        <div class="three-col-card"><div class="lbl">之前</div><div class="txt">${e.context_before||'-'}</div></div>
+        <div class="three-col-card"><div class="lbl">当时</div><div class="txt">${e.significance||e.one_liner||'-'}</div></div>
+        <div class="three-col-card"><div class="lbl">之后</div><div class="txt">${e.leads_to||'-'}</div></div>
+      </div>`;
+  }
+  else if (payload.kind === 'enarrative') {
+    const e = EVENT_DEEP[payload.eid];
+    html += `<div class="type-tag event">${eventIcon(payload.eid)} ${e.full_title}</div>
+      <h1>📖 事件完整叙事</h1>
+      <div class="one-liner">💡 ${e.one_liner||''}</div>
+      <div class="narrative">${e.narrative.trim().split(/\n\s*\n/).map(p=>'<p>'+p.trim()+'</p>').join('')}</div>`;
+  }
+  else if (payload.kind === 'ewhat') {
+    const e = EVENT_DEEP[payload.eid];
+    html += `<div class="type-tag event">${eventIcon(payload.eid)} ${e.full_title}</div>
+      <h1>🕰️ 事件时间线</h1>
+      ${e.what_happened.map(t=>{
+        const [yr,...rest] = t.split('·');
+        return `<div class="tl-item"><div class="yr">${yr.trim()}</div><div class="ds">${rest.join('·').trim()}</div></div>`;
+      }).join('')}`;
+  }
+  else if (payload.kind === 'evidence') {
+    const e = EVENT_DEEP[payload.eid];
+    html += `<div class="type-tag event">${eventIcon(payload.eid)} ${e.full_title}</div>
+      <h1>🏺 考古证据</h1>
+      ${e.evidence.map(ev=>`<div class="ev-card">
+        <div class="nm">${ev.artifact}</div>
+        <div class="ds">${ev.what}</div>
+        <div class="ho">📍 ${ev.held}</div>
+      </div>`).join('')}`;
+  }
+  else if (payload.kind === 'significance') {
+    const e = EVENT_DEEP[payload.eid];
+    html += `<div class="type-tag event">${eventIcon(payload.eid)} ${e.full_title}</div>
+      <h1>🎯 历史意义</h1>
+      <div class="narrative"><p>${e.significance}</p></div>`;
+  }
+
+  html += renderWikiSection(html);
+  card.innerHTML = html;
+  card.scrollTop = 0;
+  document.getElementById('textPanel').classList.add('open');
+  if (payload.kind === 'map') setTimeout(()=>initSiteMap(payload.civId), 80);
+}
+function closeTextPanel(){ document.getElementById('textPanel').classList.remove('open'); stopSpeak(); if(_siteMap){ _siteMap.remove(); _siteMap=null; } }
+
+// 遗址地图 (Leaflet + OpenStreetMap)
+let _siteMap = null;
+function initSiteMap(civId){
+  const pts = (typeof CIV_MAP!=='undefined' ? CIV_MAP[civId] : null) || [];
+  if (!pts.length || typeof L==='undefined') return;
+  if (_siteMap){ _siteMap.remove(); _siteMap=null; }
+  const el = document.getElementById('siteMap');
+  if (!el) return;
+  _siteMap = L.map(el, { scrollWheelZoom:true, attributionControl:true });
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:13, minZoom:2, attribution:'© OpenStreetMap' }).addTo(_siteMap);
+  pts.forEach(p=>{
+    L.circleMarker(p.coords, { radius:8, color:'#c84820', weight:2.5, fillColor:'#d4a858', fillOpacity:.95 })
+      .addTo(_siteMap)
+      .bindPopup('<b>'+p.name+'</b>'+((typeof siteModern!=='undefined'&&siteModern(p.name))?'<br>📍 '+siteModern(p.name):'')+'<br>'+(p.note||''))
+      .bindTooltip(p.name, { permanent:true, direction:'right', offset:[8,0], className:'site-tip' });
+  });
+  if (pts.length===1) _siteMap.setView(pts[0].coords, 8);
+  else _siteMap.fitBounds(pts.map(p=>p.coords), { padding:[45,45], maxZoom:9 });
+  setTimeout(()=>_siteMap && _siteMap.invalidateSize(), 120);
+  setTimeout(()=>{ if(_siteMap){ _siteMap.invalidateSize(); if(pts.length>1) _siteMap.fitBounds(pts.map(p=>p.coords),{padding:[45,45],maxZoom:9}); } }, 480);
+}
+
+// ════════════════════════════════════════
+// 维基百科链接 (中文 + 英文双语)
+// ════════════════════════════════════════
+// 中文术语 → 英文维基条目名 (用于无英文名的概念/文明)
+const EN_MAP = {
+  '苏美尔':'Sumer','古巴比伦':'Babylonia','巴比伦':'Babylon','阿卡德帝国':'Akkadian Empire','阿卡德':'Akkadian Empire',
+  '印度河文明':'Indus Valley Civilisation','印度河':'Indus Valley Civilisation','米诺斯':'Minoan civilization','迈锡尼':'Mycenaean Greece',
+  '赫梯帝国':'Hittites','赫梯':'Hittites','商朝':'Shang dynasty','古埃及':'Ancient Egypt','埃及':'Ancient Egypt',
+  '青铜时代崩溃':'Late Bronze Age collapse','青铜时代大崩溃':'Late Bronze Age collapse',
+  '楔形文字':'Cuneiform','楔形文字诞生':'Cuneiform','车轮':'Wheel','灌溉系统':'Irrigation','帆船':'Sailing ship',
+  '青铜冶炼':'Bronze','象形文字':'Egyptian hieroglyphs','金字塔':'Egyptian pyramids','莎草纸':'Papyrus',
+  '历法':'Egyptian calendar','木乃伊':'Mummy','医学':'Ancient Egyptian medicine','汉谟拉比法典':'Code of Hammurabi',
+  '城市规划':'Urban planning','甲骨文':'Oracle bone script','青铜礼器':'Chinese ritual bronzes','一神教':'Monotheism',
+  '六十进制':'Sexagesimal','60进制':'Sexagesimal','法律':'Code of Ur-Nammu','学校':'Edubba','石质建筑技术':'Ancient Egyptian architecture',
+  '十二进制时间':'Hour','帝国':'Empire','神王制':'Divine king','代数学':'Babylonian mathematics','天文学':'Babylonian astronomy',
+  '水利工程':'Sanitation of the Indus Valley Civilisation','度量衡':'Ancient Mesopotamian units of measurement',
+  '乌鲁克':'Uruk','乌尔':'Ur','埃利都':'Eridu','尼普尔':'Nippur','拉格什':'Lagash','基什':'Kish (Sumer)',
+  '孟菲斯':'Memphis, Egypt','底比斯':'Thebes, Egypt','安阳':'Yinxu','殷墟':'Yinxu',
+  '上下埃及统一':'Narmer','武丁中兴':'Wu Ding','盘庚迁殷':'Pan Geng','牧野之战':'Battle of Muye','商汤灭夏':'Tang of Shang',
+  '卡迭石战役':'Battle of Kadesh',
+};
+function cleanTerm(s){
+  if(!s) return '';
+  s = String(s);
+  const paren = s.match(/[（(]([^）)]*)[）)]/);
+  const segs = s.replace(/[（(][^）)]*[）)]/g,'').split(/[·\s]+/).filter(Boolean);
+  let cand = segs.find(p=>/[一-鿿]/.test(p)) || '';
+  if (!cand && paren && /[一-鿿]/.test(paren[1])) cand = (paren[1].split(/[·\s]+/).find(p=>/[一-鿿]/.test(p)) || paren[1]);
+  if (!cand) cand = segs[0] || '';
+  return cand.replace(/[A-Za-z0-9]+/g,'').replace(/[，,。.、;；:：!！?？\-—]/g,'').trim();
+}
+// 从名字中提取 {zh, en}
+function parseTerm(name){
+  if(!name) return null;
+  const s = String(name);
+  const zh = cleanTerm(s);
+  // 抽取拉丁词 (可含空格的多词, 如 Warka Vase)
+  let en = '';
+  const m = s.match(/[A-Za-z][A-Za-z'’.\-]*(?:\s+[A-Za-z][A-Za-z'’.\-]*)*/);
+  if (m) en = m[0].trim().replace(/\.+$/,'');
+  if (!en && zh && EN_MAP[zh]) en = EN_MAP[zh];
+  if (!zh && !en) return null;
+  return {zh, en};
+}
+// 文明 → 精确维基条目 (中/英)
+const CIV_WIKI = {
+  sumer:{zh:'苏美尔',en:'Sumer'}, akkad:{zh:'阿卡德帝国',en:'Akkadian Empire'}, babylon:{zh:'巴比伦',en:'Babylon'},
+  egypt_predynastic:{zh:'前王朝时期 (埃及)',en:'Prehistoric Egypt'}, egypt_old:{zh:'古王国时期',en:'Old Kingdom of Egypt'}, egypt_new:{zh:'新王国时期',en:'New Kingdom of Egypt'},
+  indus_early:{zh:'印度河流域文明',en:'Indus Valley Civilisation'}, indus:{zh:'印度河流域文明',en:'Indus Valley Civilisation'},
+  minoan:{zh:'米诺斯文明',en:'Minoan civilization'}, mycenaean:{zh:'迈锡尼文明',en:'Mycenaean Greece'},
+  hittite:{zh:'赫梯',en:'Hittites'}, shang:{zh:'商朝',en:'Shang dynasty'}, collapse:{zh:'青铜时代晚期崩溃',en:'Late Bronze Age collapse'},
+};
+// 抽象/普通名词 → 不链接 (维基查不到具体词条 或 非专名知识点)
+const SKIP = new Set(['学校','法律','医学','贸易','城市规划','灌溉系统','帝国','神王制','度量衡','水利工程','十二进制时间','代数学','天文学','石质建筑技术','历法','一神教','六十进制','60进制','区域交流','南亚交通','帝国道路网络','帝国秩序','宗教思考','哲学','公民政治']);
+
+// ── 历史知识点词典 (维基真能查到的专名 + 重要历史概念/文物) ──
+// match: 在正文里匹配的词 (可多个别名); zh/en: 维基条目名
+const KB_DICT = (function(){
+  const list = [];
+  const seen = new Set();
+  const add = (zh, en, match) => {
+    const key = zh || en; if (!key || seen.has(key)) return; seen.add(key);
+    list.push({zh, en, match: match || [zh].filter(Boolean)});
+  };
+  // 文明
+  add('苏美尔','Sumer'); add('阿卡德帝国','Akkadian Empire',['阿卡德']); add('巴比伦','Babylon',['巴比伦','古巴比伦']);
+  add('古王国时期','Old Kingdom of Egypt',['古王国','古王國']); add('新王国时期','New Kingdom of Egypt',['新王国','新王國']);
+  add('古埃及','Ancient Egypt'); add('印度河流域文明','Indus Valley Civilisation',['印度河']);
+  add('米诺斯文明','Minoan civilization',['米诺斯']); add('迈锡尼文明','Mycenaean Greece',['迈锡尼']);
+  add('赫梯','Hittites',['赫梯']); add('商朝','Shang dynasty',['商朝','商王']); add('夏朝','Xia dynasty'); add('周朝','Zhou dynasty',['周朝','西周','周武王','周']);
+  add('青铜时代晚期崩溃','Late Bronze Age collapse',['青铜时代大崩溃','青铜时代崩溃','青铜崩溃']);
+  // 重要历史概念 / 文物类型 (需要解释的知识点)
+  add('楔形文字','Cuneiform'); add('象形文字','Egyptian hieroglyphs',['象形文字']); add('甲骨文','Oracle bone script',['甲骨文','甲骨']);
+  add('金字塔','Egyptian pyramids',['金字塔']); add('金字形神塔','Ziggurat',['金字形神塔','塔庙','ziggurat']);
+  add('莎草纸','Papyrus'); add('木乃伊','Mummy'); add('青金石','Lapis lazuli'); add('红玉髓','Carnelian');
+  add('青铜','Bronze',['青铜']); add('战车','Chariot',['战车']); add('铁器','Iron metallurgy',['铁器','铁']);
+  add('占卜','Divination',['占卜','卜辞']); add('青铜礼器','Chinese ritual bronzes',['青铜礼器','礼器','司母戊鼎','妇好墓']);
+  add('汉谟拉比法典','Code of Hammurabi',['汉谟拉比法典','以眼还眼']); add('乌尔纳姆法典','Code of Ur-Nammu',['乌尔纳姆法典','Ur-Nammu 法典','Ur-Nammu法典']);
+  add('吉尔伽美什史诗','Epic of Gilgamesh',['吉尔伽美什史诗','《吉尔伽美什》','吉尔伽美什史诗']);
+  add('大洪水','Flood myth',['大洪水','洪水']); add('海上民族','Sea Peoples',['海上民族','Sea Peoples']);
+  add('线性文字B','Linear B',['线性文字B','线性文字 B']);
+  // 遗址 / 城市 / 古迹
+  add('乌鲁克','Uruk'); add('乌尔','Ur',['乌尔']); add('埃利都','Eridu',['埃利都','埃里都','Eridu']);
+  add('尼普尔','Nippur'); add('拉格什','Lagash'); add('基什','Kish (Sumer)',['基什']);
+  add('孟菲斯','Memphis, Egypt',['孟菲斯','Memphis']); add('底比斯','Thebes, Egypt',['底比斯']);
+  add('吉萨','Giza',['吉萨']); add('卡纳克神庙','Karnak',['卡纳克']); add('阿布辛贝','Abu Simbel',['阿布辛贝']);
+  add('帝王谷','Valley of the Kings',['帝王谷']); add('阿马尔纳','Amarna',['阿马尔纳','Amarna']);
+  add('殷墟','Yinxu',['殷墟','殷','安阳']); add('二里头','Erlitou',['二里头']); add('郑州商城','Zhengzhou Shang City',['郑州商城']);
+  add('克诺索斯','Knossos',['克诺索斯','Knossos']); add('哈拉帕','Harappa',['哈拉帕','Harappa']);
+  add('摩亨佐-达罗','Mohenjo-daro',['摩亨佐-达罗','摩亨佐达罗','Mohenjo-Daro','Mohenjo-daro']);
+  add('哈图沙','Hattusa',['哈图沙','Hattusa']); add('卡迭石','Kadesh',['卡迭石']);
+  // 人物 (从 PERSON_DEEP 自动补)
+  if (typeof PERSON_DEEP!=='undefined') Object.values(PERSON_DEEP).forEach(p=>{
+    const t = parseTerm(p.full_name); if(t) add(t.zh, t.en, [t.zh, t.en].filter(Boolean));
+  });
+  // 重要事件 (从 EVENT_DEEP 自动补, 用核心标题)
+  if (typeof EVENT_DEEP!=='undefined') Object.values(EVENT_DEEP).forEach(e=>{
+    const zh = cleanTerm(e.full_title); if(zh) add(zh, null, [zh]);
+  });
+  return list;
+})();
+
+// 扫描一段正文文本, 只返回文本里真出现的知识点 (按出现顺序, 去重)
+function scanKnowledge(text){
+  const found = [];
+  KB_DICT.forEach(t=>{
+    let pos = -1;
+    for (const m of t.match){ if(m){ const i = text.indexOf(m); if(i>=0 && (pos<0||i<pos)) pos=i; } }
+    if (pos<0 && t.en){ const i=text.indexOf(t.en); if(i>=0) pos=i; }
+    if (pos>=0) found.push({zh:t.zh, en:t.en, _pos:pos});
+  });
+  found.sort((a,b)=>a._pos-b._pos);
+  return found;
+}
+function wikiChip(t){
+  const label = t.zh || t.en;
+  const zhUrl = t.zh ? `https://zh.wikipedia.org/wiki/${encodeURIComponent(t.zh)}` : '';
+  const enUrl = t.en ? `https://en.wikipedia.org/wiki/${encodeURIComponent(t.en.replace(/ /g,'_'))}` : '';
+  return `<span class="wiki-term">
+    <span class="label">${label}</span>
+    ${t.zh?`<a class="zh" href="${zhUrl}" target="_blank" rel="noopener" title="中文维基：${t.zh}">中文</a>`:''}
+    ${t.en?`<a class="en" href="${enUrl}" target="_blank" rel="noopener" title="English Wikipedia: ${t.en}">EN</a>`:''}
+  </span>`;
+}
+// 基于"这块内容的实际文字"扫描知识点 → 有才挂, 没有不挂
+function renderWikiSection(htmlStr){
+  const text = String(htmlStr).replace(/<[^>]+>/g,' ');
+  const terms = scanKnowledge(text);
+  if (!terms.length) return '';   // 没有可解释的历史知识点 → 不挂维基
+  return `<div class="wiki-section">
+    <div class="wiki-h">延伸阅读 · 维基百科</div>
+    <div class="wiki-chips">${terms.map(t=>wikiChip(t)).join('')}</div>
+  </div>`;
+}
+// 顶栏「🔍 维基」按钮 → 当前实体, 中文维基
+function openWiki(){
+  const {type, id} = parseHash();
+  let t = null;
+  if (type==='civ') t = CIV_WIKI[id] || parseTerm(getCivInfo(id).name);
+  else if (type==='person') t = parseTerm(PERSON_DEEP[id]?.full_name||'');
+  else if (type==='event') t = parseTerm(EVENT_DEEP[id]?.full_title||'');
+  if (!t){ alert('未识别当前词条'); return; }
+  const url = t.zh ? `https://zh.wikipedia.org/wiki/${encodeURIComponent(t.zh)}`
+                   : `https://en.wikipedia.org/wiki/${encodeURIComponent((t.en||'').replace(/ /g,'_'))}`;
+  window.open(url, '_blank', 'noopener');
+}
+
+function renderChainHtml(e){
+  const before = e.context_before ? e.context_before.split(/[。，]/)[0].slice(0,20) : null;
+  const after = e.leads_to ? e.leads_to.split(/[→;；]/).map(s=>s.trim().slice(0,18)).filter(s=>s.length>0).slice(0,3) : [];
+  let html = '<div class="chain-row">';
+  if (before) html += `<span class="chain-pill">${before}</span><span class="chain-arrow">→</span>`;
+  html += `<span class="chain-pill center">${e.full_title}</span>`;
+  after.forEach(a=>{
+    html += `<span class="chain-arrow">→</span><span class="chain-pill">${a}</span>`;
+  });
+  html += '</div>';
+  return html;
+}
+
+// ════════════════════════════════════════
+// 跨文明关系
+// ════════════════════════════════════════
+const CIV_RELATIONS = [
+  // 东亚 · 承继与冲击
+  {from:'song', to:'tang', type:'continuation', typeLabel:'承继', symbol:'⇒', desc:'经五代十国后，宋承唐制并把商业、科技、文官政治推向新高，但军事上不及唐之开阔。'},
+  {from:'mongol', to:'song', type:'war', typeLabel:'灭亡', symbol:'⚔', desc:'1279年崖山海战，蒙古(元)灭南宋，首次由草原民族统一全中国。'},
+  {from:'tang', to:'heian', type:'influence', typeLabel:'遣唐使', symbol:'⇢', desc:'日本派遣唐使全面学习唐朝的制度、佛教、文字与城市规划，平安京仿长安而建。'},
+  {from:'mongol', to:'shogunate', type:'war', typeLabel:'两征日本', symbol:'⚔', desc:'忽必烈1274/1281两征日本，皆遇台风("神风")而败，镰仓幕府得保。'},
+  // 伊斯兰世界
+  {from:'abbasid', to:'islam_rise', type:'continuation', typeLabel:'承继', symbol:'⇒', desc:'阿拔斯推翻倭马亚、定都巴格达，把伊斯兰文明带入黄金时代。'},
+  {from:'mongol', to:'abbasid', type:'war', typeLabel:'灭亡', symbol:'⚔', desc:'1258年旭烈兀攻陷巴格达、终结阿拔斯哈里发，智慧宫典籍被毁。'},
+  {from:'crusades', to:'abbasid', type:'war', typeLabel:'东征', symbol:'⚔', desc:'十字军与伊斯兰世界(塞尔柱、阿尤布的萨拉丁)在黎凡特反复争夺圣地。'},
+  // 知识传播链
+  {from:'abbasid', to:'medieval_europe', type:'influence', typeLabel:'知识西传', symbol:'⇢', desc:'希腊典籍经阿拉伯翻译保存，连同代数、阿拉伯数字、医学，经西班牙与十字军传回欧洲，催生经院哲学与文艺复兴。'},
+  {from:'song', to:'mongol', type:'influence', typeLabel:'技术外传', symbol:'⇢', desc:'火药、印刷、指南针经蒙古和平打通的欧亚通道西传，深刻改变世界。'},
+  // 拜占庭 · 东欧
+  {from:'kievan_rus', to:'byzantine', type:'influence', typeLabel:'罗斯受洗', symbol:'⇢', desc:'988年弗拉基米尔皈依东正教，罗斯纳入拜占庭文明圈(东正教/西里尔字母)。'},
+  {from:'crusades', to:'byzantine', type:'war', typeLabel:'洗劫君堡', symbol:'⚔', desc:'1204年第四次十字军竟洗劫了同为基督教的拜占庭首都，使其元气大伤。'},
+  {from:'vikings', to:'kievan_rus', type:'continuation', typeLabel:'建国', symbol:'⇒', desc:'瓦良格(东方维京)首领留里克及其后裔建立基辅罗斯。'},
+  // 西欧
+  {from:'medieval_europe', to:'franks', type:'continuation', typeLabel:'承继', symbol:'⇒', desc:'查理曼帝国三分后，封建的中世纪西欧在其废墟与基督教传统上成形。'},
+  {from:'crusades', to:'medieval_europe', type:'continuation', typeLabel:'东征发起', symbol:'⇒', desc:'中世纪欧洲(教皇号召)发起十字军，打开东方视野、刺激商业与文艺复兴。'},
+  // 蒙古和平 · 东西交流
+  {from:'mongol', to:'medieval_europe', type:'trade', typeLabel:'东西交流', symbol:'⇄', desc:'"蒙古和平"下马可·波罗东游、技术与商品东西流通，也把黑死病带向欧洲。'},
+  // 印度洋与东南亚
+  {from:'chola', to:'srivijaya', type:'war', typeLabel:'海上远征', symbol:'⚔', desc:'11世纪朱罗海军远征室利佛逝，争夺马六甲海峡的贸易控制权。'},
+  {from:'delhi_sultanate', to:'mongol', type:'war', typeLabel:'抵御', symbol:'⚔', desc:'德里苏丹国数次挡住蒙古对印度的入侵，使印度免遭浩劫。'},
+  // 非洲贸易
+  {from:'mali', to:'abbasid', type:'influence', typeLabel:'伊斯兰学术', symbol:'⇢', desc:'马里皈依伊斯兰、曼萨·穆萨朝觐麦加，廷巴克图成为伊斯兰学术名城。'},
+  {from:'great_zimbabwe', to:'song', type:'trade', typeLabel:'印度洋贸易', symbol:'⇄', desc:'大津巴布韦的黄金经斯瓦希里港口卖到印度洋世界，出土了来自中国的宋元瓷器。'},
+];
+function findCivRelations(civId){
+  const result = [];
+  CIV_RELATIONS.forEach(r=>{
+    if (r.from === civId) {
+      result.push({...r, from: getCivInfo(civId).icon+' '+getCivInfo(civId).name, to: getCivInfo(r.to).icon+' '+getCivInfo(r.to).name, targetId: r.to});
+    } else if (r.to === civId) {
+      result.push({...r, from: getCivInfo(r.from).icon+' '+getCivInfo(r.from).name, to: getCivInfo(civId).icon+' '+getCivInfo(civId).name, targetId: r.from});
+    }
+  });
+  return result;
+}
+
+// ════════════════════════════════════════
+// Tooltip
+// ════════════════════════════════════════
+function showTooltip(e, action){
+  const tip = document.getElementById('tooltip');
+  let html = '';
+  if (action.type === 'navigate') {
+    const t = action.to.type, id = action.to.id;
+    if (t === 'person') {
+      const p = PERSON_DEEP[id];
+      html = `<div class="nm">👤 ${p?.full_name||id}</div>
+        <div class="meta">${p?.lifespan_real||p?.lifespan_mythic||''}</div>
+        <div class="desc">${(p?.biography||'').slice(0,90).trim()}…</div>`;
+    } else if (t === 'event') {
+      const ev = EVENT_DEEP[id];
+      html = `<div class="nm">${eventIcon(id)} ${ev?.full_title||id}</div>
+        <div class="meta">${(ev?.what_happened?.[0]||'').split('·')[0].trim()}</div>
+        <div class="desc">${ev?.one_liner||''}</div>`;
+    } else if (t === 'civ') {
+      const info = getCivInfo(id);
+      html = `<div class="nm">${info.icon} ${info.name}</div>`;
+    }
+  } else if (action.type === 'showText') {
+    html = `<div class="nm">${SECTION_HINTS[action.payload.kind]||''}</div>`;
+  }
+  tip.innerHTML = html;
+  tip.classList.add('show');
+  moveTooltip(e);
+}
+const SECTION_HINTS = {
+  narrative:'📖 完整文明叙事', basics:'🏛 基础事实', timeline:'🕰️ 演化阶段',
+  inventions:'💡 关键发明', relations:'🌍 与其他文明的关系', collapse:'⏳ 崩溃过程',
+  legacy:'🎁 今天的遗产',
+  biography:'📖 完整传记', childhood:'👶 童年出身', achievements:'🏆 主要成就',
+  death:'⚰️ 死亡晚年', plegacy:'🌟 历史遗产',
+  oneliner:'💡 一句话总结', chain:'🔗 事件因果链', three:'📜 之前·当时·之后',
+  enarrative:'📖 事件完整叙事', ewhat:'🕰️ 事件时间线',
+  evidence:'🏺 考古证据', significance:'🎯 历史意义',
+};
+function moveTooltip(e){
+  const tip = document.getElementById('tooltip');
+  const x = Math.min(e.clientX + 16, window.innerWidth - 360);
+  const y = Math.min(e.clientY + 16, window.innerHeight - 200);
+  tip.style.left = x+'px';
+  tip.style.top = y+'px';
+}
+function hideTooltip(){ document.getElementById('tooltip').classList.remove('show'); }
+
+// ════════════════════════════════════════
+// 路由 + 错误
+// ════════════════════════════════════════
+function renderError(msg){
+  document.getElementById('canvas').innerHTML = '';
+  document.body.insertAdjacentHTML('beforeend', `<div class="error-page" id="errorPage">
+    <h1>🚧 ${msg}</h1>
+    <a href="./medieval-explorer.html" style="color:var(--gold);text-decoration:none;background:rgba(212,168,88,.15);padding:10px 20px;border-radius:99px;border:1px solid var(--gold);margin-top:14px">◀ 返回历史宇宙</a>
+  </div>`);
+}
+
+function route(){
+  document.getElementById('errorPage')?.remove();
+  closeTextPanel();
+  const {type, id} = parseHash();
+  if (!type || !id) return renderError('请通过历史宇宙选择实体');
+  if (type==='civ') return renderCivCosmic(id);
+  if (type==='person') return renderPersonCosmic(id);
+  if (type==='event') return renderEventCosmic(id);
+  renderError(`未知类型：${type}`);
+}
+
+// ════════════════════════════════════════
+// 前进 / 返回 (基于自维护历史栈)
+// ════════════════════════════════════════
+let navHist = [];     // 访问过的 hash
+let navPos = -1;       // 当前位置
+let navInternal = false;
+function recordNav(){
+  const h = location.hash;
+  if (navInternal){ navInternal = false; updateNavButtons(); return; }
+  // 截断前进分支
+  navHist = navHist.slice(0, navPos+1);
+  if (navHist[navPos] !== h){ navHist.push(h); navPos = navHist.length-1; }
+  updateNavButtons();
+}
+function navBack(){
+  if (navPos > 0){ navPos--; navInternal=true; location.hash = navHist[navPos]; }
+  else { location.href = './medieval-explorer.html'; } // 退到首页
+}
+function navFwd(){
+  if (navPos < navHist.length-1){ navPos++; navInternal=true; location.hash = navHist[navPos]; }
+}
+function updateNavButtons(){
+  const b = document.getElementById('navBack'), f = document.getElementById('navFwd');
+  if (b) b.disabled = false; // 返回始终可用 (至少回首页)
+  if (f) f.disabled = navPos >= navHist.length-1;
+}
+
+// ════════════════════════════════════════
+// 朗读 (Web Speech API zh-CN)
+// ════════════════════════════════════════
+let speaking = false;
+function stripText(){
+  const card = document.getElementById('scrollCard');
+  if (!card) return '';
+  const clone = card.cloneNode(true);
+  clone.querySelectorAll('button').forEach(b=>b.remove());
+  return (clone.innerText||clone.textContent||'').replace(/\s+/g,' ').trim();
+}
+function toggleSpeak(){
+  if (!('speechSynthesis' in window)){ alert('浏览器不支持朗读'); return; }
+  if (speaking){ stopSpeak(); return; }
+  const text = stripText();
+  if (!text) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang='zh-CN'; u.rate=1.0; u.pitch=1.0;
+  u.onend = ()=>{ speaking=false; const b=document.getElementById('speakBtn'); if(b)b.classList.remove('speaking'); };
+  u.onerror = u.onend;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+  speaking=true;
+  const b=document.getElementById('speakBtn'); if(b)b.classList.add('speaking');
+}
+function stopSpeak(){
+  if ('speechSynthesis' in window) speechSynthesis.cancel();
+  speaking=false;
+  const b=document.getElementById('speakBtn'); if(b)b.classList.remove('speaking');
+}
+
+// ════════════════════════════════════════
+// AI 问答 (千问 SSE 流式 + 当前实体上下文)
+// ════════════════════════════════════════
+const AI_KEY = 'civ_qwen_key';
+function toggleAI(){ document.getElementById('aiPanel').classList.toggle('open'); document.getElementById('aiInput')?.focus(); }
+function buildAIContext(){
+  const {type, id} = parseHash();
+  let ctx = '你是 AI 世界文明实验室助手，面向 10-15 岁中学生，用 DK / National Geographic Kids 的生动语言。只用学界共识 (博物馆/Nature/Britannica) 事实，不能编造细节，不知道就说不知道。回答简洁，200 字内。\n\n';
+  document.getElementById('aiCtx').textContent = '通用';
+  try {
+    if (type==='civ'){
+      const c = CIV_DEEP[id]; const info = getCivInfo(id);
+      ctx += `用户正在看文明：${info.name}。`;
+      if (c?.opening_narrative) ctx += '背景：'+c.opening_narrative.slice(0,400);
+      document.getElementById('aiCtx').textContent = info.name;
+    } else if (type==='event'){
+      const e = EVENT_DEEP[id];
+      ctx += `用户正在看历史事件：${e?.full_title}。${e?.one_liner||''} ${(e?.narrative||'').slice(0,400)}`;
+      document.getElementById('aiCtx').textContent = e?.full_title?.slice(0,12)||'事件';
+    } else if (type==='person'){
+      const p = PERSON_DEEP[id];
+      ctx += `用户正在看人物：${p?.full_name}。${(p?.biography||'').slice(0,400)}`;
+      document.getElementById('aiCtx').textContent = (p?.full_name||'人物').split(' ')[0];
+    }
+  } catch(_){}
+  return ctx;
+}
+function aiAppend(role, html, cursor){
+  const box = document.getElementById('aiMsgs');
+  const d = document.createElement('div');
+  d.className = 'ai-msg '+role;
+  d.innerHTML = html + (cursor?'<span class="cursor"></span>':'');
+  box.appendChild(d); box.scrollTop = box.scrollHeight;
+  return d;
+}
+async function sendAI(){
+  const input = document.getElementById('aiInput');
+  const q = input.value.trim(); if(!q) return;
+  const btn = document.getElementById('aiSend');
+  input.value=''; btn.disabled=true;
+  aiAppend('user', q.replace(/</g,'&lt;'));
+  let key = localStorage.getItem(AI_KEY);
+  if (!key){
+    key = prompt('输入千问 API Key (一次性, 存本地)：\nhttps://dashscope.console.aliyun.com/');
+    if (!key){ btn.disabled=false; return; }
+    localStorage.setItem(AI_KEY, key);
+  }
+  const bot = aiAppend('bot','',true);
+  let acc='';
+  try{
+    const resp = await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',{
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body: JSON.stringify({model:'qwen-turbo',messages:[{role:'system',content:buildAIContext()},{role:'user',content:q}],stream:true,max_tokens:500})
+    });
+    if(!resp.ok) throw new Error('HTTP '+resp.status);
+    const reader = resp.body.getReader(); const dec=new TextDecoder(); let buf='';
+    while(true){
+      const {done,value}=await reader.read(); if(done) break;
+      buf += dec.decode(value,{stream:true});
+      const lines = buf.split('\n'); buf=lines.pop();
+      for (const line of lines){
+        if(!line.startsWith('data: ')) continue;
+        const data=line.slice(6).trim(); if(data==='[DONE]') continue;
+        try{ const j=JSON.parse(data); const ch=j.choices?.[0]?.delta?.content||''; if(ch){acc+=ch; bot.innerHTML=acc.replace(/\n/g,'<br>')+'<span class="cursor"></span>'; document.getElementById('aiMsgs').scrollTop=99999;} }catch(_){}
+      }
+    }
+    bot.innerHTML = acc.replace(/\n/g,'<br>');
+  }catch(err){
+    bot.innerHTML = '⚠️ 出错：'+err.message+'<br><small>Key 错误可在控制台 localStorage.removeItem("civ_qwen_key") 重置</small>';
+  }finally{ btn.disabled=false; input.focus(); }
+}
+
+window.addEventListener('hashchange', ()=>{ route(); recordNav(); });
+// 跨越手机/桌面断点时重新渲染 (字号随屏幕变), 避免地址栏伸缩频繁重绘
+let _lastMobile = window.matchMedia('(max-width:768px)').matches;
+window.addEventListener('resize', ()=>{
+  const m = window.matchMedia('(max-width:768px)').matches;
+  if (m !== _lastMobile){ _lastMobile = m; const {type}=parseHash(); if(type) route(); }
+});
+document.getElementById('aiForm').addEventListener('submit', e=>{ e.preventDefault(); sendAI(); });
+
+window.navigate = navigate;
+window.openTextPanel = openTextPanel;
+window.closeTextPanel = closeTextPanel;
+window.navBack = navBack;
+window.navFwd = navFwd;
+window.toggleSpeak = toggleSpeak;
+window.stopSpeak = stopSpeak;
+window.toggleAI = toggleAI;
+window.openWiki = openWiki;
+
+// ── 主题切换 (与首页共享 localStorage) ──
+function applyTheme(t){
+  if (t && t!=='deepblue') document.body.setAttribute('data-theme', t);
+  else document.body.removeAttribute('data-theme');
+  localStorage.setItem('civ_theme', t||'deepblue');
+  document.querySelectorAll('#themeSwitch button').forEach(b=>b.classList.toggle('active', b.dataset.t===(t||'deepblue')));
+}
+document.getElementById('themeSwitch').addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(b) applyTheme(b.dataset.t);
+});
+applyTheme(localStorage.getItem('civ_theme') || 'textbook');
+
+route();
+recordNav();
+</script>
+</body>
+</html>
