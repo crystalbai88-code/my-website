@@ -1654,7 +1654,7 @@ const MAIN_NETWORK = {
       status:'active', featured:true, featured_stat:'22 文明 · 49 事件 · 156 人物' },
     { id:'STAGE_03', title:'中世纪多中心',  icon:'🌍', y:700, color:'#8a5a90',
       time_range:'公元500-1500',    core_question:'世界如何通过宗教、贸易、城市连接？',
-      status:'active', featured:true, featured_stat:'22 文明 · 25 事件 · 51 人物' },
+      status:'active', featured:true, featured_stat:'22 文明 · 34 事件 · 98 人物' },
     { id:'STAGE_04', title:'全球连接时代',  icon:'⛵', y:880, color:'#3a7868',
       time_range:'1500-1800',       core_question:'航海、殖民、贸易如何重组世界？',
       status:'coming_soon' },
