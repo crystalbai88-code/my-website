@@ -86,7 +86,7 @@
     <div class="hint">拖拽节点 · 滚轮缩放 · 点击查看详情</div>
   </div>
 </div>
-<script src="./classical_people.js?v=4"></script>
+<script src="./classical_people.js?v=5"></script>
 <script>
 const CIV_NAMES={china:"中国",greece:"希腊",rome:"罗马",persia:"波斯",india:"印度/佛教",cross:"跨文明"};
 const ROLE_NAMES={ruler:"统治者",general:"将领",thinker:"思想家",religious:"宗教人物",other:"其他人物"};
@@ -110,6 +110,48 @@ const P=CLASSICAL_PEOPLE;
 // Build lookup
 const BY_ID={};
 P.forEach(p=>{BY_ID[p.id]=p});
+
+// ── 真实画像 (维基百科 pageimages；多为公有领域：半身像/古画/钱币像) ──
+const PORTRAIT={}; // id -> Image(已加载) | false(无) | null(加载中)
+// 部分人物维基条目标题与中文名不同，做映射以提高命中率
+const WIKI_TITLE={
+  buddha:'释迦牟尼', mahavira:'笩駄摩那', goujian:'勾践', liuche:'班超', lvhou:'吕雉',
+  qin_shihuang:'秦始皇', wudi_han:'汉武帝', simarqian:'司马迁', helv:'阖闾', fucha:'夫差',
+  cyrus:'居鲁士二世', darius1:'大流士一世', darius3:'大流士三世', xerxes:'薛西斯一世',
+  zoroaster:'琐罗亚斯德', cambyses:'冈比西斯二世', artaxerxes:'阿尔塔薛西斯一世',
+  alexander:'亚历山大大帝', philip2:'腓力二世 (马其顿)', leonidas:'列奥尼达一世', darius3:'大流士三世',
+  octavian:'奥古斯都', caesar:'尤利乌斯·恺撒', marcus_aurelius:'马尔库斯·奥列里乌斯',
+  zeno_stoic:'季蒂昂的芝诺', jesus:'耶稣', peter_apos:'圣伯多禄', paul_apos:'大数的扫罗',
+  ashoka:'阿育王', chandragupta:'旃陀罗笈多·孔雀', nagarjuna:'龙树', mahakassapa:'摩诃迦叶',
+  ajatasattu:'阿阇世王', bimbisara:'频婆娑罗', constantine:'君士坦丁大帝', cleopatra:'克利奥帕特拉七世',
+};
+function wikiTitle(p){ return WIKI_TITLE[p.id] || (p.n||'').replace(/[（(].*?[)）]/g,'').trim(); }
+// 批量取画像：一次请求最多 ~45 个标题，避免并发限流
+function loadPortraitsBatch(people){
+  const todo=people.filter(p=>PORTRAIT[p.id]===undefined);
+  if(!todo.length) return;
+  todo.forEach(p=>PORTRAIT[p.id]=null);
+  for(let i=0;i<todo.length;i+=45){
+    const chunk=todo.slice(i,i+45);
+    const origMap={}; chunk.forEach(p=>{origMap[wikiTitle(p)]=p;});
+    const titles=chunk.map(wikiTitle).join('|');
+    const url='https://zh.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=200&titles='+encodeURIComponent(titles);
+    fetch(url).then(r=>r.json()).then(j=>{
+      const q=j.query||{}; const back={};
+      (q.normalized||[]).forEach(n=>back[n.to]=n.from);
+      (q.redirects||[]).forEach(rr=>{back[rr.to]=back[rr.from]||rr.from;});
+      const resolve=t=>{let cur=t,g=0;while(g++<4){if(origMap[cur])return origMap[cur];if(back[cur]){cur=back[cur];continue;}break;}return origMap[cur]||null;};
+      const got=new Set();
+      Object.values(q.pages||{}).forEach(pg=>{
+        const person=resolve(pg.title); if(!person)return; got.add(person.id);
+        if(pg.thumbnail&&pg.thumbnail.source){const img=new Image();img.referrerPolicy='no-referrer';img.onload=()=>PORTRAIT[person.id]=img;img.onerror=()=>PORTRAIT[person.id]=false;img.src=pg.thumbnail.source;}
+        else PORTRAIT[person.id]=false;
+      });
+      chunk.forEach(p=>{ if(!got.has(p.id)&&PORTRAIT[p.id]===null) PORTRAIT[p.id]=false; });
+    }).catch(()=>{ chunk.forEach(p=>{ if(PORTRAIT[p.id]===null) PORTRAIT[p.id]=undefined; }); });
+  }
+}
+function loadPortrait(p){ loadPortraitsBatch([p]); }
 
 const canvas=document.getElementById('c');
 const ctx=canvas.getContext('2d');
@@ -161,6 +203,7 @@ function buildGraph(){
     });
   });
   document.getElementById('stats').textContent=nodes.length+'位人物  '+edges.length+'条关系';
+  loadPortraitsBatch(vis); // 批量拉取真实画像(1-2个请求)
   alpha=1; // 重新布局时重新加热
 }
 
@@ -248,15 +291,29 @@ function draw(){
       ctx.beginPath();ctx.arc(n.x,n.y,r+4,0,Math.PI*2);
       ctx.strokeStyle=col;ctx.lineWidth=2.5;ctx.globalAlpha=isSel?0.95:0.5;ctx.stroke();
     }
-    // 角色色圆底 + 白描边(头像底座)
+    // 角色色圆底(头像底座)
     ctx.beginPath();ctx.arc(n.x,n.y,r,0,Math.PI*2);
-    ctx.fillStyle=col;ctx.globalAlpha=isSel||isHov?1:0.9;ctx.fill();
-    ctx.globalAlpha=1;ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=1.5;ctx.stroke();
-    // 头像图标
-    ctx.globalAlpha=isSel||isHov?1:0.95;
-    ctx.font=Math.round(r*1.35)+'px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",system-ui';
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(icon,n.x,n.y+1);
+    ctx.fillStyle=col;ctx.globalAlpha=isSel||isHov?1:0.9;ctx.fill();ctx.globalAlpha=1;
+    const portrait=PORTRAIT[n.id];
+    if(portrait && portrait.naturalWidth){
+      // 真实画像(圆形裁剪, cover 填充)
+      ctx.save();
+      ctx.beginPath();ctx.arc(n.x,n.y,r-1,0,Math.PI*2);ctx.clip();
+      const iw=portrait.naturalWidth,ih=portrait.naturalHeight,side=Math.min(iw,ih);
+      ctx.globalAlpha=isSel||isHov?1:0.96;
+      ctx.drawImage(portrait,(iw-side)/2,(ih-side)*0.32,side,side,n.x-r,n.y-r,2*r,2*r);
+      ctx.restore();
+    } else {
+      // 严肃图标占位
+      ctx.globalAlpha=isSel||isHov?1:0.95;
+      ctx.font=Math.round(r*1.3)+'px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",system-ui';
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(icon,n.x,n.y+1);
+    }
+    // 描边(角色色环)
+    ctx.globalAlpha=1;ctx.beginPath();ctx.arc(n.x,n.y,r,0,Math.PI*2);
+    ctx.strokeStyle=portrait&&portrait.naturalWidth?col:'rgba(255,255,255,.85)';
+    ctx.lineWidth=portrait&&portrait.naturalWidth?2.5:1.5;ctx.stroke();
     ctx.restore();
     // 名字(节点下方)
     const showLabel=isSel||isHov||scale>1.05||nodes.length<28;

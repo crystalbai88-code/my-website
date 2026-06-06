@@ -157,11 +157,11 @@ if(typeof window!=='undefined')window.CLASSICAL_PEOPLE=CLASSICAL_PEOPLE;
 const CLASSICAL_ICON = {
   // 中国 · 春秋战国
   kongzi:'📜',laozi:'☯️',guanzhong:'⚖️',baoshuya:'🤝',qihuan:'👑',jinhuan:'👑',zichan:'⚖️',yanzi:'🗣️',
-  mencius:'📜',zhuangzi:'🦋',mozi:'🛡️',yangzhu:'🚶',huizi:'💬',gongsunlong:'🐴',sunzi:'⚔️',helv:'👑',
-  wuzixu:'🗡️',goujian:'🗡️',fucha:'👑',xishi:'🌸',fanli:'💰',xunzi:'📜',hanfeizi:'⚖️',shangyang:'⚖️',
-  qin_xiaogong:'👑',shenbuhai:'⚖️',suqin:'🗣️',zhangyi:'🗣️',guiguzi:'🧙',sunbin:'♟️',pangjuan:'⚔️',
+  mencius:'📜',zhuangzi:'📜',mozi:'🛡️',yangzhu:'📜',huizi:'💬',gongsunlong:'📜',sunzi:'⚔️',helv:'👑',
+  wuzixu:'🗡️',goujian:'🗡️',fucha:'👑',xishi:'👤',fanli:'💰',xunzi:'📜',hanfeizi:'⚖️',shangyang:'⚖️',
+  qin_xiaogong:'👑',shenbuhai:'⚖️',suqin:'🗣️',zhangyi:'🗣️',guiguzi:'🧙',sunbin:'⚔️',pangjuan:'⚔️',
   // 中国 · 秦汉
-  qin_shihuang:'👑',lisi:'📜',zhaoago:'🦌',xiangyu:'⚔️',fanzheng:'🧓',liubang:'👑',xiao_he:'📊',
+  qin_shihuang:'👑',lisi:'📜',zhaoago:'📜',xiangyu:'⚔️',fanzheng:'📜',liubang:'👑',xiao_he:'📊',
   hanxin:'⚔️',zhanglianghan:'🧠',lvhou:'👸',dongzhongshu:'📜',wudi_han:'👑',weiqing:'⚔️',huoqubing:'🐎',
   zhangqian:'🐫',simarqian:'📖',liuche:'🖌️',
   // 波斯
@@ -172,14 +172,14 @@ const CLASSICAL_ICON = {
   // 希腊
   thales:'💧',anaximander:'🗺️',pythagoras:'📐',heraclitus:'🔥',parmenides:'🌀',democritus:'⚛️',protagoras:'🗣️',
   solon:'⚖️',peisistratos:'👑',cleisthenes:'🗳️',miltiades:'⚔️',leonidas:'🛡️',themistocles:'⛵',pericles:'🏛️',
-  aspasia:'🌸',aeschylus:'🎭',sophocles:'🎭',euripides:'🎭',aristophanes:'😂',herodotus:'📜',thucydides:'📜',
+  aspasia:'👤',aeschylus:'🎭',sophocles:'🎭',euripides:'🎭',aristophanes:'🎭',herodotus:'📜',thucydides:'📜',
   socrates:'🏛️',xenophon:'📜',alcibiades:'⚔️',plato:'💡',aristotle:'📚',theophrastus:'🌿',demosthenes:'🗣️',
-  epaminondas:'⚔️',philip2:'🛡️',alexander:'🌍',diogenes:'🛢️',epicurus:'🍇',zeno_stoic:'🏛️',archimedes:'📐',
+  epaminondas:'⚔️',philip2:'🛡️',alexander:'🌍',diogenes:'🏛️',epicurus:'🏛️',zeno_stoic:'🏛️',archimedes:'📐',
   ptolemy:'📚',seleucus:'🐘',
   // 罗马
   scipio:'⚔️',hannibal:'🐘',gracchus_t:'✊',gracchus_g:'✊',spartacus:'⛓️',marius:'🛡️',sulla:'⚔️',crassus:'💰',
   pompey:'⚔️',cicero:'🗣️',caesar:'👑',cleopatra:'🐍',brutus:'🗡️',mark_antony:'⚔️',octavian:'👑',agrippa:'⚓',
-  tiberius:'👑',nero:'🔥',seneca:'📜',trajan:'🏛️',hadrian:'🧱',antinous:'🌹',antoninus:'👑',marcus_aurelius:'📖',
+  tiberius:'👑',nero:'🔥',seneca:'📜',trajan:'🏛️',hadrian:'🧱',antinous:'👤',antoninus:'👑',marcus_aurelius:'📖',
   commodus:'🗡️',diocletian:'👑',constantine:'✝️',augustine:'📖',
   // 跨文明/基督教
   jesus:'✝️',peter_apos:'🔑',paul_apos:'📜',silk:'🐫',
