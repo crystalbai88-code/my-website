@@ -289,6 +289,15 @@ Object.assign(EVENT_DEEP, {
   evt_huangchao:{full_title:'黄巢起义 · 唐朝灭亡',one_liner:'875–907年,黄巢起义重创唐朝,朱温篡唐,中国进入五代十国。',narrative:'唐朝后期藩镇割据、宦官专权、土地兼并严重。875年盐商黄巢领导大起义,转战大半个中国,880年攻入长安称帝,沉重打击了门阀士族。起义虽于884年被镇压,但唐朝已名存实亡,各地藩镇拥兵自重。黄巢降将朱温(朱全忠)逐渐控制朝政,907年废唐哀帝、自立为帝建后梁——立国近三百年的唐朝灭亡,中国进入分裂的"五代十国"乱世,直到960年宋朝再度统一。',context_before:'唐末藩镇、宦官、党争、灾荒交织,民不聊生。',what_happened:['875 黄巢起义,转战全国','880 攻入长安称帝','884 起义被镇压,唐名存实亡','907 朱温篡唐建后梁,唐亡'],significance:'唐朝终结、门阀士族瓦解;中国进入五代十国分裂。',evidence:[{artifact:'《旧唐书》末帝纪',what:'记唐亡始末。',held:'传世文献'}],leads_to:'五代十国→960宋朝统一',source:'《旧唐书》《资治通鉴》',related_people:['huangchao','zhuwen']},
 });
 
+// ── 补充:此前无事件的国家(朱罗/德里/室利佛逝/大津巴布韦/玛雅) ──
+Object.assign(EVENT_DEEP, {
+  evt_chola:{full_title:'朱罗帝国的海上霸权',one_liner:'11世纪朱罗帝国建宏伟神庙、派海军远征东南亚,称霸孟加拉湾。',narrative:'南印度泰米尔地区的朱罗帝国(Chola)在9世纪复兴,到罗茶罗乍一世与其子拉真陀罗时达到鼎盛。他们修建了宏伟的坦贾武尔大庙(布里诃丁湿婆神庙),是南印度建筑的杰作。朱罗拥有当时印度罕见的强大海军——1025年拉真陀罗跨海远征苏门答腊的室利佛逝(三佛齐),控制了孟加拉湾与东南亚的海上贸易,把印度教与泰米尔文化远播海外。这是印度历史上少有的海权扩张。',context_before:'南印度泰米尔地区,朱罗自9世纪复兴。',what_happened:['约850 朱罗复兴','1010 建坦贾武尔大庙','1025 拉真陀罗远征室利佛逝','称霸孟加拉湾海上贸易'],significance:'印度罕见的海权帝国;泰米尔文化、印度教与建筑远播东南亚。',evidence:[{artifact:'坦贾武尔大庙',what:'罗茶罗乍一世所建,南印度建筑杰作,世界遗产。',held:'印度泰米尔纳德邦'}],leads_to:'朱罗文化影响东南亚;13世纪后衰落',source:'朱罗碑铭;南印度史',related_people:['rajaraja']},
+  evt_delhi:{full_title:'德里苏丹国的建立',one_liner:'1206年突厥将领在北印度建立德里苏丹国,伊斯兰统治印度之始,并挡住蒙古。',narrative:'12世纪末,来自中亚的突厥-阿富汗穆斯林征服了北印度。1206年,奴隶出身的将领库特布丁·艾巴克在德里自立为苏丹,开创"德里苏丹国"——伊斯兰政权在印度的第一个大帝国。它历经奴隶、卡尔吉、图格鲁克等五个王朝,并多次击退凶猛的蒙古入侵,守住了印度次大陆。标志性建筑库特布塔(Qutb Minar)是世界最高的砖砌宣礼塔。伊斯兰与印度文化在此深度交融,为后来的莫卧儿帝国铺路。',context_before:'北印度列国分立,中亚突厥穆斯林南下。',what_happened:['1192 突厥征服北印度','1206 库特布丁建德里苏丹国','建库特布塔','多次击退蒙古入侵'],significance:'伊斯兰在印度统治的开端;印度-伊斯兰文化交融;为莫卧儿帝国铺路。',evidence:[{artifact:'库特布塔(Qutb Minar)',what:'世界最高砖砌宣礼塔,德里苏丹国象征,世界遗产。',held:'印度德里'}],leads_to:'五朝更替→16世纪莫卧儿帝国',source:'印度中世纪史',related_people:[]},
+  evt_srivijaya:{full_title:'室利佛逝海上帝国',one_liner:'7–13世纪,室利佛逝(三佛齐)控制马六甲海峡,称霸东南亚海上佛教贸易。',narrative:'室利佛逝(Srivijaya,中国史称三佛齐)是以苏门答腊巨港为中心的海上强国。从7世纪起,它控制了马六甲与巽他海峡——连接中国与印度的海上咽喉,垄断香料与黄金的转口贸易而富庶。它也是东南亚大乘佛教的中心:唐代高僧义净西行求法时曾在此停留译经,称当地僧侣逾千、佛法兴盛。它与南印度朱罗帝国争夺海权,1025年遭朱罗远征重创,13世纪后逐渐衰落。',context_before:'东南亚海上商路兴起,巨港据海峡之利。',what_happened:['7世纪 以巨港为中心崛起','控制马六甲海峡','义净停留译经','1025 遭朱罗远征','13世纪衰落'],significance:'东南亚第一个海上贸易帝国与佛教中心;海上丝路的关键枢纽。',evidence:[{artifact:'婆罗浮屠(同期爪哇)',what:'同期东南亚大乘佛教建筑巅峰,世界最大佛塔之一。',held:'印尼爪哇'}],leads_to:'让位于满者伯夷等;伊斯兰东传',source:'义净《大唐西域求法高僧传》;东南亚史',related_people:[]},
+  evt_great_zimbabwe:{full_title:'大津巴布韦石城',one_liner:'约11–15世纪,绍纳人建起撒哈拉以南最宏伟的石城,黄金贸易的中心。',narrative:'在今津巴布韦的高原上,绍纳人(Shona)于约11世纪起建造了"大津巴布韦"——撒哈拉以南非洲最宏伟的石构建筑群。它不用任何灰浆,而以精工干砌的花岗岩石墙著称(大围墙高达11米、周长约250米)。这里是一个强大王国的都城,鼎盛时或有上万居民,通过印度洋海岸(基尔瓦等斯瓦希里港口)出口黄金与象牙,换回中国瓷器与波斯玻璃。约15世纪因资源枯竭等原因被弃。"津巴布韦"(意为"石头房子")成为今日的国名。',context_before:'东南非高原,绍纳人以黄金贸易致富。',what_happened:['约1100 绍纳人始建石城','干砌花岗岩大围墙','黄金象牙换中国瓷器','约1450 被弃'],significance:'撒哈拉以南非洲本土文明的高度证明,打破"非洲无历史"的偏见。',evidence:[{artifact:'大津巴布韦遗址',what:'撒哈拉以南最大石构建筑,世界遗产,出土中国瓷器。',held:'津巴布韦'}],leads_to:'王权南移(莫诺莫塔帕);今为国名',source:'考古;斯瓦希里贸易史',related_people:[]},
+  evt_maya_classic:{full_title:'玛雅古典文明',one_liner:'约250–900年,玛雅城邦在中美洲创造文字、历法与金字塔,后神秘崩溃。',narrative:'在中美洲的丛林中,玛雅人建立了众多繁荣的城邦(蒂卡尔、帕伦克、卡拉克穆尔等),进入"古典期"(约250–900)。他们发展出美洲唯一完整的文字系统、精密的天文历法(著名的"长纪历"与对金星的观测),独立发明了"零"的概念,并建造高耸的阶梯金字塔。帕伦克国王帕卡尔大帝留下了著名的石棺浮雕。但约9世纪,南部低地的众多玛雅城市在数十年间相继被遗弃——干旱、战争、生态崩溃等可能原因,至今争论不休。',context_before:'中美洲丛林,玛雅城邦林立。',what_happened:['约250 进入古典期','发展玛雅文字与长纪历','建蒂卡尔/帕伦克金字塔','约800–900 南部城市神秘崩溃'],significance:'美洲最先进的本土文明之一;独立发明文字与"零";其崩溃是著名历史谜团。',evidence:[{artifact:'蒂卡尔金字塔',what:'玛雅古典期城邦,丛林中的高大神庙金字塔,世界遗产。',held:'危地马拉'},{artifact:'帕卡尔石棺盖',what:'帕伦克国王陵浮雕,玛雅艺术杰作。',held:'墨西哥帕伦克'}],leads_to:'后古典期(奇琴伊察)→西班牙征服',source:'玛雅碑铭;中美洲考古',related_people:['pakal']},
+});
+
 const CIV_EVENTS = {
   byzantine:['evt_justinian_law','evt_greekfire','evt_1453'],
   islam_rise:['evt_hijra','evt_arab_conquest','evt_karbala'],
@@ -298,18 +307,18 @@ const CIV_EVENTS = {
   heian:['evt_genji'],
   shogunate:['evt_kamikaze'],
   mongol:['evt_genghis_unify','evt_mongol_conquest','evt_yuan_kublai'],
-  chola:[],
-  delhi_sultanate:[],
+  chola:['evt_chola'],
+  delhi_sultanate:['evt_delhi'],
   khmer:['evt_angkor_wat'],
-  srivijaya:[],
+  srivijaya:['evt_srivijaya'],
   kievan_rus:['evt_kievan_founded','evt_rus_baptism'],
   vikings:['evt_viking_age','evt_vinland'],
   franks:['evt_tours','evt_charlemagne','evt_charlemagne_crown','evt_verdun'],
   medieval_europe:['evt_black_death'],
   crusades:['evt_crusades'],
   mali:['evt_mansa_musa'],
-  great_zimbabwe:[],
-  maya:[],
+  great_zimbabwe:['evt_great_zimbabwe'],
+  maya:['evt_maya_classic'],
   aztec:['evt_aztec'],
   inca:['evt_inca_road'],
 };
