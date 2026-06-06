@@ -86,7 +86,7 @@
     <div class="hint">拖拽节点 · 滚轮缩放 · 点击查看详情</div>
   </div>
 </div>
-<script src="./classical_people.js"></script>
+<script src="./classical_people.js?v=4"></script>
 <script>
 const CIV_NAMES={china:"中国",greece:"希腊",rome:"罗马",persia:"波斯",india:"印度/佛教",cross:"跨文明"};
 const ROLE_NAMES={ruler:"统治者",general:"将领",thinker:"思想家",religious:"宗教人物",other:"其他人物"};
@@ -161,10 +161,14 @@ function buildGraph(){
     });
   });
   document.getElementById('stats').textContent=nodes.length+'位人物  '+edges.length+'条关系';
+  alpha=1; // 重新布局时重新加热
 }
 
+let alpha=1; // 模拟"能量"，随时间冷却；稳定后定格，点击更顺滑
 function tick(){
-  const rep=4000,k=90;
+  if(alpha<0.008) return;      // 已稳定 → 节点停止漂移，便于点击
+  alpha*=0.992;
+  const rep=5600,k=124;        // 头像更大，间距相应加大
   const damp=0.82;
   nodes.forEach(n=>{if(!n.pinned){n.vx*=damp;n.vy*=damp;}});
   // Repulsion
@@ -231,35 +235,37 @@ function draw(){
       ctx.restore();
     }
   });
-  // Nodes
+  // Nodes (头像图标节点)
   nodes.forEach(n=>{
     const p=n.data;
     const col=roleColor(p.r);
     const isSel=n.id===selId,isHov=n.id===hovId;
-    const r=isSel?11:isHov?9:7;
+    const r=isSel?21:isHov?18:15;
+    const icon=(typeof personIconOf==='function')?personIconOf(p):'👤';
     ctx.save();
-    // Ring for selected
-    if(isSel){
-      ctx.beginPath();ctx.arc(n.x,n.y,r+5,0,Math.PI*2);
-      ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.globalAlpha=0.4;
-      ctx.stroke();
+    // 强调外环(选中/悬浮)
+    if(isSel||isHov){
+      ctx.beginPath();ctx.arc(n.x,n.y,r+4,0,Math.PI*2);
+      ctx.strokeStyle=col;ctx.lineWidth=2.5;ctx.globalAlpha=isSel?0.95:0.5;ctx.stroke();
     }
+    // 角色色圆底 + 白描边(头像底座)
     ctx.beginPath();ctx.arc(n.x,n.y,r,0,Math.PI*2);
-    ctx.fillStyle=col;ctx.globalAlpha=isSel||isHov?1:0.7;
-    ctx.fill();
-    if(isHov||isSel){
-      ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.globalAlpha=1;ctx.stroke();
-    }
+    ctx.fillStyle=col;ctx.globalAlpha=isSel||isHov?1:0.9;ctx.fill();
+    ctx.globalAlpha=1;ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=1.5;ctx.stroke();
+    // 头像图标
+    ctx.globalAlpha=isSel||isHov?1:0.95;
+    ctx.font=Math.round(r*1.35)+'px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",system-ui';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(icon,n.x,n.y+1);
     ctx.restore();
-    // Label
-    const showLabel=isSel||isHov||scale>1.4||nodes.length<30;
+    // 名字(节点下方)
+    const showLabel=isSel||isHov||scale>1.05||nodes.length<28;
     if(showLabel){
       ctx.save();
       ctx.font=(isSel?'700 12px':'500 11px')+' "Noto Sans SC",system-ui,sans-serif';
-      ctx.fillStyle=TH.ink;
-      ctx.textAlign='center';
-      ctx.textBaseline='bottom';
-      ctx.fillText(p.n,n.x,n.y-r-3);
+      ctx.fillStyle=TH.ink;ctx.textAlign='center';ctx.textBaseline='top';
+      ctx.shadowColor=TH.chip||'rgba(0,0,0,.5)';ctx.shadowBlur=3;
+      ctx.fillText(p.n,n.x,n.y+r+4);
       ctx.restore();
     }
   });
@@ -276,7 +282,7 @@ function nodeAt(sx,sy){
   const w=screenToWorld(sx,sy);
   return nodes.find(n=>{
     const dx=n.x-w.x,dy=n.y-w.y;
-    return Math.sqrt(dx*dx+dy*dy)<14/scale;
+    return Math.sqrt(dx*dx+dy*dy)<20/scale;
   });
 }
 
@@ -323,6 +329,7 @@ canvas.addEventListener('mousemove',e=>{
   if(drag){
     const w=screenToWorld(e.clientX,e.clientY);
     drag.x=w.x;drag.y=w.y;drag.vx=0;drag.vy=0;drag.pinned=true;
+    alpha=Math.max(alpha,0.5); // 拖动时让邻居重新调整
   }else if(panStart){
     panX=e.clientX-panStart.x;
     panY=e.clientY-panStart.y;
@@ -372,7 +379,7 @@ canvas.addEventListener('touchmove',e=>{
   e.preventDefault();
   if(e.touches.length===1){
     const t=e.touches[0];
-    if(drag){const w=screenToWorld(t.clientX,t.clientY);drag.x=w.x;drag.y=w.y;drag.vx=0;drag.vy=0;drag.pinned=true;}
+    if(drag){const w=screenToWorld(t.clientX,t.clientY);drag.x=w.x;drag.y=w.y;drag.vx=0;drag.vy=0;drag.pinned=true;alpha=Math.max(alpha,0.5);}
     else if(panStart){panX=t.clientX-panStart.x;panY=t.clientY-panStart.y;}
   }
 },{passive:false});

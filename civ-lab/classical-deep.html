@@ -422,7 +422,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
   <div class="scroll-card" id="scrollCard"></div>
 </div>
 
-<script src="./classical_people.js?v=3"></script>
+<script src="./classical_people.js?v=4"></script>
 <script src="./classical_deep.js?v=5"></script>
 <script src="./classical_people_deep.js?v=1"></script>
 <script>
@@ -466,7 +466,7 @@ const PERSON_ICON = {
   yu_the_great:'🌊', qi_xia:'👑', jie_xia:'🔥',
   minos:'🐂', agamemnon:'🛡️', suppiluliuma:'👑', muwatalli:'🏹', hattusili:'🕊️',
 };
-function personIcon(id){ return PERSON_ICON[id] || '👤'; }
+function personIcon(id){ return (typeof CLASSICAL_ICON!=='undefined' && CLASSICAL_ICON[id]) || PERSON_ICON[id] || '👤'; }
 // 事件专属图标 (按内容贴切, 不用日历 emoji 以免渲染成带日期的图标)
 const EVENT_ICON = {
   evt_eridu_first:'🏛️', evt_uruk_period:'🏙️', evt_cuneiform_invented:'✍️', evt_royal_tombs_ur:'⚱️',
@@ -479,7 +479,8 @@ const EVENT_ICON = {
   evt_yu_flood:'🌊', evt_qi_hereditary:'👑', evt_shaokang:'🗡️',
   evt_minoan_fall:'⚔️', evt_mycenae_goldmask:'🎭', evt_telepinu:'📜', evt_enuma_elish:'📖', evt_indus_trade:'⚓',
 };
-function eventIcon(id){ return EVENT_ICON[id] || '⭐'; }
+const CLASSICAL_EVENT_ICON={evt_confucius:'📜',evt_hundred_schools:'💭',evt_shangyang:'⚖️',evt_qin_unify:'👑',evt_duzun_ruxue:'📜',evt_zhangqian:'🐫',evt_han_xiongnu:'🐎',evt_cailun:'📃',evt_ganying:'🐫',evt_cyrus_found:'👑',evt_marathon:'⚔️',evt_buddha:'☸️',evt_ashoka:'🦁',evt_alexander:'🌍',evt_alexandria:'📚',evt_socrates_death:'☠️',evt_punic:'🐘',evt_caesar:'🗡️',evt_pax_romana:'🏛️',evt_crisis3:'⚔️',evt_jesus:'✝️',evt_milan:'✝️'};
+function eventIcon(id){ return CLASSICAL_EVENT_ICON[id] || EVENT_ICON[id] || '⭐'; }
 function findCivChapters(civId){return CHAPTERS.filter(ch=>ch.active_civs.some(cv=>cv.id===civId))}
 function findEventsOfCiv(civId){
   const evs = [];
