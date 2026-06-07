@@ -1645,7 +1645,7 @@ const MAIN_NETWORK = {
   stages: [
     { id:'STAGE_00', title:'史前文明准备', icon:'🦴', y:160, color:'#7a5530',
       time_range:'30万年前-前3000', core_question:'人类如何走向文明？',
-      status:'active' },
+      status:'locked', hidden:true },
     { id:'STAGE_01', title:'早期文明',     icon:'🏛', y:340, color:'#c86820',
       time_range:'前3500-前1000',  core_question:'城市、文字、王权如何出现？',
       status:'active', featured:true, featured_stat:'12 文明 · 27 事件 · 34 人物' },

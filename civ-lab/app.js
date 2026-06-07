@@ -357,11 +357,11 @@ function renderStageCards() {
 
   container.innerHTML = `
     <div class="stage-cards-intro">
-      <p>🌍 七个文明阶段 · 从 30 万年前到 AI 时代</p>
+      <p>🌍 六大文明阶段 · 从早期文明到 AI 时代</p>
       <p class="intro-sub">点击任意阶段卡片，深入了解这个时期的关键课程</p>
     </div>
     <div class="stage-cards-grid">
-      ${N.stages.map((stage, i) => {
+      ${N.stages.filter(s => !s.hidden).map((stage, i) => {
         const nodes = N.nodes.filter(n => n.stage === stage.id);
         const linkedCount = nodes.filter(n => n.linked_lesson).length;
         const total = nodes.length;
@@ -403,6 +403,7 @@ function renderStageCards() {
 function enterStage(stageId) {
   const stage = MAIN_NETWORK.stages.find(s => s.id === stageId);
   if (!stage) return;
+  if (stage.hidden || stage.status === 'locked') { return; }  // 史前文明已锁定隐藏
   // 「早期文明」正式版 → 进入历史宇宙深度探索应用
   if (stageId === 'STAGE_01') {
     window.location.href = './civ-explorer-d.html';
@@ -497,7 +498,7 @@ function renderMainKnowledgeNetwork() {
   const W = 1820, H = 1380;
 
   // ── 7 个 STAGE 横向带（每行 180px 高，背景 + 简洁标签）──
-  const stageBands = N.stages.map(s => `
+  const stageBands = N.stages.filter(s => !s.hidden).map(s => `
     <rect x="40" y="${s.y - 85}" width="${W - 80}" height="170"
           fill="${s.color}" fill-opacity="${s.status === 'coming_soon' ? 0.025 : 0.05}"/>
     <text x="60" y="${s.y - 50}" font-size="16" font-weight="700"
@@ -522,7 +523,7 @@ function renderMainKnowledgeNetwork() {
   const byId = {};
   N.nodes.forEach(n => {
     const stage = N.stages.find(s => s.id === n.stage);
-    if (!stage) return;
+    if (!stage || stage.hidden) return;
     byId[n.id] = { ...n, y: stage.y, stageColor: stage.color, stageStatus: stage.status };
   });
 
@@ -671,9 +672,8 @@ function positionFigure() {
 // ENTER LESSON
 // ════════════════════════════════════════════════
 function enterLesson(id) {
-  // 🆕 PH## ID 直接进入对应史前知识网络（跳过冗余的总览层）
-  if (/^PH\d+$/.test(id)) {
-    enterPreEra(id);
+  // 史前文明单元已锁定隐藏（PH## 与 P01 入口暂不开放）
+  if (/^PH\d+$/.test(id) || id === 'P01') {
     return;
   }
   // 🏛 E## ID 进入早期文明节点 (Stage 1)
