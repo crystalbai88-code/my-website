@@ -1660,7 +1660,7 @@ const MAIN_NETWORK = {
       status:'active', featured:true, featured_stat:'10 主题 · 33 事件 · 63 人物' },
     { id:'STAGE_05', title:'工业与现代世界', title_en:'Industry & the Modern World', icon:'⚙️', y:1060, color:'#506890',
       time_range:'1750-1945',       core_question:'工业、民族国家、战争如何创造现代世界？', core_question_en:'How did industry, nations & war create the modern world?',
-      status:'coming_soon' },
+      status:'active', featured:true, featured_stat:'7 主题 · 29 事件 · 73 人物' },
     { id:'STAGE_06', title:'当代与未来文明', title_en:'Contemporary & Future Civilization', icon:'🤖', y:1240, color:'#6a4a90',
       time_range:'1945-至今',       core_question:'科技、全球化、AI 如何改变文明？', core_question_en:'How are tech, globalization & AI changing civilization?',
       status:'coming_soon' },

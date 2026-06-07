@@ -443,6 +443,10 @@ function enterStage(stageId) {
     window.location.href = './global-explorer.html';
     return;
   }
+  if (stageId === 'STAGE_05') {
+    window.location.href = './modern-explorer.html';
+    return;
+  }
   homeViewState = { mode: 'stage', stageId };
   renderStageDetail(stageId);
   document.getElementById('s-home').scrollTo({ top: 0, behavior: 'smooth' });
