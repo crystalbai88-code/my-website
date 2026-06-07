@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>此时世界 · 全球同一时刻</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css"/>
+<style>
+  html,body{height:100%;margin:0}
+  body{overflow-x:hidden}
+  #app{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column}
+  .nav{display:flex;align-items:center;gap:10px;padding:12px 18px 4px;flex-wrap:wrap}
+  .nav .title{font-family:var(--serif);font-weight:900;font-size:17px;color:var(--ink);text-shadow:var(--label-shadow)}
+  .nav .sub{font-family:var(--mono);font-size:10px;color:var(--ink2);letter-spacing:.1em}
+
+  /* 时间滑块区 */
+  .timebar{padding:8px 22px 14px;position:sticky;top:0;z-index:30;backdrop-filter:blur(12px);background:linear-gradient(var(--page-bg-fade,rgba(10,12,28,.72)),transparent)}
+  .yearbig{font-family:var(--serif);font-weight:900;font-size:34px;color:var(--gold);text-align:center;line-height:1;letter-spacing:1px;text-shadow:var(--label-shadow)}
+  .yearbig .era{font-size:15px;color:var(--ink2);margin-left:8px;font-weight:700}
+  .slider-row{display:flex;align-items:center;gap:12px;margin-top:8px;max-width:920px;margin-left:auto;margin-right:auto}
+  .slider-row input[type=range]{flex:1;height:6px;-webkit-appearance:none;appearance:none;border-radius:6px;
+    background:linear-gradient(90deg,#2a4a8a,#7a5a30 45%,#c84830 70%,#8a5a90);outline:none;cursor:pointer}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--gold);border:3px solid #fff3;box-shadow:0 0 12px var(--gold);cursor:grab}
+  input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--gold);border:3px solid #fff3;cursor:grab}
+  .stepbtn{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--ink);background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:50%;width:30px;height:30px;cursor:pointer;flex-shrink:0}
+  .stepbtn:hover{color:var(--gold);border-color:var(--gold)}
+  .jumps{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:9px}
+  .jump{font-family:var(--sans);font-size:11px;font-weight:600;color:var(--ink2);background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:var(--r-pill);padding:4px 11px;cursor:pointer;transition:all .15s}
+  .jump:hover{color:var(--gold);border-color:var(--gold)}
+  .playbtn{font-family:var(--sans);font-size:11px;font-weight:700;color:#fff;background:var(--gold);border:none;border-radius:var(--r-pill);padding:5px 14px;cursor:pointer}
+
+  /* 区域网格 */
+  .regions{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;padding:6px 22px 40px;max-width:1500px;margin:0 auto;width:100%;box-sizing:border-box}
+  .region{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:16px;padding:14px 15px;backdrop-filter:blur(10px);transition:opacity .25s}
+  .region.empty{opacity:.4}
+  .region h3{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink);margin:0 0 3px;display:flex;align-items:center;gap:7px}
+  .region .rcount{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-bottom:9px}
+  .civs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px}
+  .civchip{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:12.5px;font-weight:700;color:#fff;padding:4px 11px;border-radius:var(--r-pill);cursor:pointer;transition:transform .12s,box-shadow .12s;border:1px solid #fff2}
+  .civchip:hover{transform:translateY(-1px);box-shadow:0 3px 12px #0005}
+  .sect{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;margin:8px 0 4px;font-weight:700}
+  .ev,.pe{font-size:12px;color:var(--ink);line-height:1.5;padding:3px 0;cursor:pointer;border-bottom:1px dashed var(--panel-line)}
+  .ev:hover,.pe:hover{color:var(--gold)}
+  .ev .yr,.pe .yr{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-right:6px}
+  .ev .tag{font-family:var(--mono);font-size:9px;color:var(--ink3)}
+  .none{font-size:11.5px;color:var(--ink3);font-style:italic;padding:2px 0}
+  .pe-row{display:flex;flex-wrap:wrap;gap:5px}
+  .pe{border:none;background:rgba(128,128,176,.14);border-radius:8px;padding:3px 9px}
+  .legend-note{text-align:center;font-family:var(--mono);font-size:10px;color:var(--ink3);padding:0 22px 18px}
+  @media(max-width:600px){ .regions{grid-template-columns:1fr;padding:6px 12px 40px} .yearbig{font-size:27px} }
+</style>
+</head>
+<body data-theme="deepblue">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="nav">
+    <a href="./index.html" class="ds-pill">⌂ 返回</a>
+    <span class="title">🌍 此时世界</span>
+    <span class="sub">拖动年份，看世界各地同一时刻在发生什么</span>
+    <div class="ds-theme-switch" id="themeSwitch" style="margin-left:auto">
+      <button data-t="deepblue" title="静夜深蓝"></button>
+      <button data-t="museum" title="博物馆典藏"></button>
+      <button data-t="textbook" title="现代教科书"></button>
+      <button data-t="parchment" title="羊皮纸古卷"></button>
+    </div>
+  </div>
+
+  <div class="timebar">
+    <div class="yearbig" id="yearbig"></div>
+    <div class="slider-row">
+      <button class="stepbtn" id="minus">−</button>
+      <input type="range" id="slider" min="-3500" max="1550" value="-500" step="10">
+      <button class="stepbtn" id="plus">+</button>
+      <button class="playbtn" id="play">▶ 播放</button>
+    </div>
+    <div class="jumps" id="jumps"></div>
+  </div>
+
+  <div class="regions" id="regions"></div>
+  <div class="legend-note">点文明卡进入深度页 · 事件显示前后约 60 年内 · 同一时刻不同文明，正是"全球史观"</div>
+</div>
+
+<script src="./meanwhile_data.js?v=1"></script>
+<script>
+const REGION_ICON={'东亚':'🏯','南亚':'🕉️','西亚·中东':'☪️','欧洲':'🏛️','非洲':'🔺','美洲':'🗿','东南亚':'⛵'};
+const CIV_COLOR={early:'#c86820',classical:'#b83018',medieval:'#8a5a90'};
+const CIV_BY_ID={}; WORLD_CIVS.forEach(c=>CIV_BY_ID[c.id]=c);
+const DEEP_PAGE={early:'civ-deep.html',classical:'classical-deep.html',medieval:'medieval-deep.html'};
+const WINDOW=60; // 事件/人物前后年限
+
+function fmtYear(y){ return y<0?('公元前 '+(-y)):('公元 '+y); }
+function eraLabel(y){
+  if(y<-3000)return'文明黎明';if(y<-1000)return'青铜时代';if(y<-200)return'轴心时代';
+  if(y<500)return'古典帝国';if(y<1000)return'中世纪前期';return'中世纪后期';
+}
+function go(page,hash){ window.location.href='./'+page+'#'+hash; }
+
+function render(year){
+  document.getElementById('yearbig').innerHTML=fmtYear(year)+' <span class="era">'+eraLabel(year)+'</span>';
+  const box=document.getElementById('regions');
+  let html='';
+  REGIONS.forEach(rg=>{
+    const civs=WORLD_CIVS.filter(c=>c.region===rg && c.s<=year && c.e>=year);
+    const evs=WORLD_EVENTS.filter(e=>e.region===rg && Math.abs(e.year-year)<=WINDOW).sort((a,b)=>Math.abs(a.year-year)-Math.abs(b.year-year)).slice(0,5);
+    const pes=WORLD_PEOPLE.filter(p=>p.region===rg && Math.abs(p.year-year)<=WINDOW).sort((a,b)=>Math.abs(a.year-year)-Math.abs(b.year-year)).slice(0,8);
+    const empty=!civs.length&&!evs.length&&!pes.length;
+    html+='<div class="region'+(empty?' empty':'')+'">';
+    html+='<h3>'+(REGION_ICON[rg]||'•')+' '+rg+'</h3>';
+    html+='<div class="rcount">'+(civs.length?civs.length+' 个文明在世':'尚无已收录文明')+'</div>';
+    if(civs.length){
+      html+='<div class="civs">';
+      civs.forEach(c=>{ html+='<span class="civchip" style="background:'+(CIV_COLOR[c.chapter]||'#666')+'" onclick="go(\''+DEEP_PAGE[c.chapter]+'\',\'/civ/'+c.id+'\')">'+c.icon+' '+c.name+'</span>'; });
+      html+='</div>';
+    }
+    if(evs.length){
+      html+='<div class="sect">正在发生</div>';
+      evs.forEach(e=>{ const pg=DEEP_PAGE[(CIV_BY_ID[e.civ]||{}).chapter]||'classical-deep.html';
+        html+='<div class="ev" onclick="go(\''+pg+'\',\'/event/'+e.id+'\')"><span class="yr">'+fmtYear(e.year)+'</span>'+e.title+'</div>'; });
+    }
+    if(pes.length){
+      html+='<div class="sect">在世人物</div><div class="pe-row">';
+      pes.forEach(p=>{ html+='<span class="pe" title="'+fmtYear(p.year)+'">'+p.name+'</span>'; });
+      html+='</div>';
+    }
+    if(empty) html+='<div class="none">这一时刻这里还没有收录的内容</div>';
+    html+='</div>';
+  });
+  box.innerHTML=html;
+}
+
+// 快速跳转
+const JUMPS=[['前3000·苏美尔',-3000],['前2500·金字塔',-2500],['前1300·商朝',-1300],['前500·孔子与佛陀',-500],['前221·秦统一',-221],['公元1·罗马',1],['700·唐朝',700],['1000·宋与拜占庭',1000],['1250·蒙古',1250]];
+document.getElementById('jumps').innerHTML=JUMPS.map(j=>'<span class="jump" data-y="'+j[1]+'">'+j[0]+'</span>').join('');
+document.querySelectorAll('.jump').forEach(b=>b.onclick=()=>{ setYear(+b.dataset.y); });
+
+const slider=document.getElementById('slider');
+function setYear(y){ y=Math.max(-3500,Math.min(1550,y)); slider.value=y; render(y); }
+slider.oninput=()=>render(+slider.value);
+document.getElementById('minus').onclick=()=>setYear(+slider.value-50);
+document.getElementById('plus').onclick=()=>setYear(+slider.value+50);
+
+// 播放:沿时间轴自动前进
+let playing=null;
+document.getElementById('play').onclick=function(){
+  if(playing){ clearInterval(playing); playing=null; this.textContent='▶ 播放'; return; }
+  this.textContent='⏸ 暂停';
+  playing=setInterval(()=>{ let y=+slider.value+20; if(y>1550){y=-3500;} setYear(y); },420);
+};
+
+// 主题切换
+document.querySelectorAll('#themeSwitch button').forEach(b=>b.onclick=()=>{document.body.dataset.theme=b.dataset.t;});
+
+setYear(-500);
+</script>
+</body>
+</html>

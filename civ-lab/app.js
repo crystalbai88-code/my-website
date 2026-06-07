@@ -359,6 +359,7 @@ function renderStageCards() {
     <div class="stage-cards-intro">
       <p>🌍 六大文明阶段 · 从早期文明到 AI 时代</p>
       <p class="intro-sub">点击任意阶段卡片，深入了解这个时期的关键课程</p>
+      <a href="./meanwhile.html" style="display:inline-block;margin-top:12px;padding:11px 22px;border-radius:999px;font-weight:700;font-size:14px;text-decoration:none;color:#fff;background:linear-gradient(90deg,#c86820,#b83018 55%,#8a5a90);box-shadow:0 4px 18px rgba(200,104,32,.4);transition:transform .15s,box-shadow .15s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 7px 24px rgba(200,104,32,.55)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 18px rgba(200,104,32,.4)'">🌍 此时世界 · 拖动年份，看全球同一时刻在发生什么 →</a>
     </div>
     <div class="stage-cards-grid">
       ${N.stages.filter(s => !s.hidden).map((stage, i) => {
