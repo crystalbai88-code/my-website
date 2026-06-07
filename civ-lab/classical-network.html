@@ -16,6 +16,9 @@
   .civ-pill{font-family:var(--sans);font-size:12.5px;font-weight:700;color:var(--ink2);background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:var(--r-pill);padding:6px 15px;cursor:pointer;transition:all .15s;backdrop-filter:blur(10px)}
   .civ-pill:hover{color:var(--gold);border-color:var(--gold)}
   .civ-pill.on{color:#fff;background:var(--gold);border-color:var(--gold)}
+  .rel-pill{font-family:var(--sans);font-size:11.5px;font-weight:700;color:var(--ink2);background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:var(--r-pill);padding:4px 12px;cursor:pointer;transition:all .15s}
+  .rel-pill:hover{color:var(--ink)}
+  .rel-pill.on{color:#fff;border-color:transparent}
   #canvas-wrap{flex:1;position:relative;overflow:hidden}
   canvas{position:absolute;inset:0;cursor:grab}
   canvas.dragging{cursor:grabbing}
@@ -66,6 +69,9 @@
     <button class="civ-pill" data-civ="near_east">🦁 西亚</button>
     <button class="civ-pill" data-civ="levant">✡️ 黎凡特</button>
   </div>
+  <div class="civ-row" id="relFilterRow" style="padding-top:0">
+    <span class="ds-kicker" style="margin-right:2px">关系类型</span>
+  </div>
   <div id="canvas-wrap">
     <canvas id="c"></canvas>
     <div id="panel" class="ds-panel"><div class="p-pad">
@@ -108,6 +114,20 @@ function refreshTheme(){
 function roleColor(r){return (TH.role&&TH.role[r])||'#888';}
 
 const P=CLASSICAL_PEOPLE;
+
+// ── 关系分层:从关系文字自动归类 ──
+let relFilter='all';
+const REL_CATS=[['all','全部'],['family','家族'],['thought','师承·思想'],['power','君臣·权力'],['ally','盟友'],['war','敌对·战争']];
+const REL_CAT_COLOR={family:'#d4708a',thought:'#5aa0c8',power:'#d4a858',ally:'#5ab87a',war:'#c84830',other:'#888'};
+function catOf(t){
+  t=t||'';
+  if(/父|子|母|女|妻|夫|兄|弟|祖|孙|家族|联姻|外孙|岳|嫁|后裔|世袭|血脉/.test(t))return'family';
+  if(/师|徒|弟子|学生|门生|思想|译|启发|衣钵|理学|传法|授业/.test(t)||/继承.*(学|思想|衣钵)/.test(t))return'thought';
+  if(/敌|战|征|攻|杀|刺|灭|对抗|宿敌|叛|起义|入侵|镇压|歼/.test(t))return'war';
+  if(/臣|效力|奉命|重用|辅|继位|册封|提拔|放逐|篡|拥立|摄政|侍奉|归顺|进谏|部下|麾下|赐死|宫刑/.test(t))return'power';
+  if(/盟|友|挚友|结盟|支持|同盟|共事|同朝|同时代|同乡|同属|论敌/.test(t))return'ally';
+  return'other';
+}
 
 // Build lookup
 const BY_ID={};
@@ -208,7 +228,7 @@ function buildGraph(){
     p.rel.forEach(r=>{
       if(!visIds.has(r.i))return;
       const key=[p.id,r.i].sort().join('~');
-      if(!added.has(key)){added.add(key);edges.push({a:p.id,b:r.i,t:r.t})}
+      if(!added.has(key)){added.add(key);edges.push({a:p.id,b:r.i,t:r.t,cat:catOf(r.t)})}
     });
   });
   document.getElementById('stats').textContent=nodes.length+'位人物  '+edges.length+'条关系';
@@ -265,16 +285,17 @@ function draw(){
   edges.forEach(e=>{
     const a=nodes.find(n=>n.id===e.a),b=nodes.find(n=>n.id===e.b);
     if(!a||!b)return;
-    const isHighlighted=selId&&(a.id===selId||b.id===selId);
+    const inFilter = relFilter==='all' || e.cat===relFilter;
+    const isHighlighted=(selId&&(a.id===selId||b.id===selId)) || (relFilter!=='all'&&inFilter);
     ctx.save();
-    ctx.globalAlpha=isHighlighted?0.9:0.32;
-    ctx.strokeStyle=isHighlighted?roleColor(a.data.r):TH.edge;
-    ctx.lineWidth=isHighlighted?1.6:0.7;
+    if(relFilter!=='all' && !inFilter){ ctx.globalAlpha=0.05; ctx.strokeStyle=TH.edge; ctx.lineWidth=0.5; }
+    else { ctx.globalAlpha=isHighlighted?0.9:0.32; ctx.strokeStyle=isHighlighted?(REL_CAT_COLOR[e.cat]||roleColor(a.data.r)):TH.edge; ctx.lineWidth=isHighlighted?1.8:0.7; }
     if(!isHighlighted)ctx.setLineDash([3,4]);
     ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
     ctx.restore();
     // 选中节点时，在连线中点标出"两人之间是什么关系"
-    if(isHighlighted && e.t){
+    const showLabel = e.t && selId && (a.id===selId||b.id===selId);
+    if(showLabel){
       const mx=(a.x+b.x)/2, my=(a.y+b.y)/2;
       ctx.save();
       ctx.font='600 10px "Noto Sans SC",system-ui,sans-serif';
@@ -468,6 +489,22 @@ document.querySelectorAll('.civ-pill').forEach(b=>{
     buildGraph();
   });
 });
+
+// 关系类型筛选按钮
+(function(){
+  const row=document.getElementById('relFilterRow');
+  REL_CATS.forEach(([k,label])=>{
+    const b=document.createElement('button');
+    b.className='rel-pill'+(k==='all'?' on':''); b.textContent=label; b.dataset.cat=k;
+    b.onclick=()=>{
+      relFilter=k;
+      row.querySelectorAll('.rel-pill').forEach(x=>{x.classList.remove('on');x.style.background='';});
+      b.classList.add('on');
+      if(k!=='all') b.style.background=REL_CAT_COLOR[k]||'#888';
+    };
+    row.appendChild(b);
+  });
+})();
 
 // 主题切换 (4 套, 与项目共用 localStorage)
 function applyTheme(t){
