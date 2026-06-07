@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>我的历史思维画像</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css"/>
+<style>
+  html,body{margin:0;min-height:100%}
+  #app{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+  .nav{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:12px 18px 4px;flex-wrap:wrap}
+  .nav .title{font-family:var(--serif);font-weight:900;font-size:17px;color:var(--ink);text-shadow:var(--label-shadow)}
+  .wrap{width:min(680px,94%);margin:14px auto 50px}
+  .hero{text-align:center;background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:18px;padding:24px;backdrop-filter:blur(12px)}
+  .hero .ic{font-size:52px}
+  .hero .type{font-family:var(--serif);font-weight:900;font-size:26px;color:var(--gold);margin:8px 0 6px}
+  .hero .desc{font-size:14px;color:var(--ink2);line-height:1.8}
+  .sec{margin-top:18px;background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:16px;padding:16px 18px;backdrop-filter:blur(10px)}
+  .sec h3{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink);margin:0 0 12px}
+  .bar{margin:7px 0}
+  .bar .lb{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink);margin-bottom:3px}
+  .bar .track{height:9px;background:rgba(255,255,255,.07);border-radius:6px;overflow:hidden}
+  .bar .fill{height:100%;border-radius:6px;background:linear-gradient(90deg,#5aa0c8,#8a7ad0)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{font-family:var(--sans);font-size:13px;font-weight:700;color:#fff;border-radius:var(--r-pill);padding:6px 14px}
+  .muted{color:var(--ink3);font-size:13px;line-height:1.7}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:18px}
+  .actbtn{font-family:var(--sans);font-weight:700;font-size:13px;color:#fff;background:linear-gradient(90deg,#c86820,#b83018);border:none;border-radius:var(--r-pill);padding:9px 18px;cursor:pointer;text-decoration:none;display:inline-block}
+  .actbtn.ghost{background:var(--panel-bg);color:var(--ink2);border:1px solid var(--panel-line)}
+  .empty{text-align:center;padding:40px 20px}
+  .empty .ic{font-size:48px}
+  .empty p{color:var(--ink2);font-size:14px;line-height:1.8}
+</style>
+</head>
+<body data-theme="deepblue">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="nav">
+    <a href="./index.html" class="ds-pill">⌂ 返回</a>
+    <span class="title">🧭 我的历史思维画像</span>
+  </div>
+  <div class="wrap" id="wrap"></div>
+</div>
+<script src="./track.js?v=1"></script>
+<script>
+const d=Track.all();
+const visits=d.visits||{}, features=d.features||{}, tags=d.tags||{}, regions=d.regions||{};
+// 思维维度打分
+const MODES=[
+  {key:'时间·空间观',color:'#c86820',score:(features['此时世界']||0)+(features['路线旅行']||0)+(visits['meanwhile']||0)+(visits['route']||0),
+   tip:'你喜欢在地图与时间轴上看世界如何同时变化。'},
+  {key:'因果观',color:'#b83018',score:(features['因果链']||0)*2+(visits['causality']||0),
+   tip:'你善于追问"为什么发生、造成了什么"。'},
+  {key:'比较思维',color:'#5aa0c8',score:(features['文明对比']||0)*2+(visits['compare']||0),
+   tip:'你喜欢把不同文明放在一起,发现异同。'},
+  {key:'证据思维',color:'#5ab87a',score:(features['证据侦探']||0)+(visits['evidence']||0),
+   tip:'你在意"我们凭什么知道这段历史"。'},
+  {key:'关系观',color:'#d4708a',score:(visits['classical-network']||0)+(visits['medieval-network']||0),
+   tip:'你关注人物之间如何互相影响。'},
+  {key:'换位·自我观',color:'#8a7ad0',score:(features['角色体验']||0)+(visits['roleplay']||0),
+   tip:'你愿意走进古人的处境,思考自己会怎么选。'},
+];
+const totalAct=Object.values(features).reduce((a,b)=>a+b,0)+Object.values(visits).reduce((a,b)=>a+b,0);
+const wrap=document.getElementById('wrap');
+
+if(totalAct<2){
+  wrap.innerHTML=`<div class="sec empty"><div class="ic">🌱</div><p>你的历史思维画像还在生长中。<br>去探索几个互动,再回来看看你是什么样的"历史思考者"吧！</p>
+    <div class="actions">
+      <a class="actbtn" href="./meanwhile.html">🌍 此时世界</a>
+      <a class="actbtn" href="./causality.html">🔗 因果链</a>
+      <a class="actbtn" href="./compare.html">⚖️ 文明对比</a>
+      <a class="actbtn" href="./evidence.html">🔍 证据侦探</a>
+    </div></div>`;
+}else{
+  const sorted=MODES.slice().sort((a,b)=>b.score-a.score);
+  const top=sorted[0];
+  const TYPE={'时间·空间观':['🌍','文明连接者','你像一位站在高处的观察者,擅长看见世界各地如何同时呼吸、彼此相连。'],
+    '因果观':['🔗','因果探究者','你像一位历史侦探,总想顺着"因为→所以"把事情的来龙去脉理清楚。'],
+    '比较思维':['⚖️','文明比较者','你善于把不同文明并排观察,在异同中看见更大的图景。'],
+    '证据思维':['🔍','证据侦探','你不轻信结论,在意每段历史"凭什么被知道"——这是真正的史学精神。'],
+    '关系观':['🕸️','关系编织者','你着迷于人与人之间的牵连,看历史像看一张巨大的关系网。'],
+    '换位·自我观':['🎭','换位思考者','你愿意走进古人的处境,在他们的两难里照见自己的价值。']};
+  const t=TYPE[top.key]||['🧭','历史探索者','你正在用自己的方式认识世界历史。'];
+  const max=Math.max(1,...MODES.map(m=>m.score));
+  // 兴趣区域
+  const regSorted=Object.entries(regions).sort((a,b)=>b[1]-a[1]);
+  const tagSorted=Object.entries(tags).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const TAGCOLOR=['#5aa0c8','#8a7ad0','#c86820','#5ab87a','#d4708a','#b83018'];
+
+  let nextTip=sorted[sorted.length-1];
+  let h=`<div class="hero"><div class="ic">${t[0]}</div><div class="type">你是一名"${t[1]}"</div>
+    <div class="desc">${t[2]}<br>下一步,可以多试试 <b style="color:var(--ink)">${nextTip.key}</b> 相关的探索,让你的历史眼光更全面。</div></div>`;
+
+  h+=`<div class="sec"><h3>🧠 你的历史思维倾向</h3>`;
+  MODES.forEach(m=>{ const pct=Math.round(m.score/max*100);
+    h+=`<div class="bar"><div class="lb"><span>${m.key}</span><span style="color:var(--ink3)">${m.score}</span></div><div class="track"><div class="fill" style="width:${pct}%;background:linear-gradient(90deg,${m.color},${m.color}aa)"></div></div></div>`;
+  });
+  h+=`<div class="muted" style="margin-top:8px">${top.tip}</div></div>`;
+
+  if(regSorted.length){
+    h+=`<div class="sec"><h3>🗺️ 你最关注的区域</h3><div class="chips">`;
+    regSorted.slice(0,5).forEach(([r,n],i)=>h+=`<span class="chip" style="background:${TAGCOLOR[i%6]}">${r} ·${n}</span>`);
+    h+=`</div></div>`;
+  }
+  if(tagSorted.length){
+    h+=`<div class="sec"><h3>⚖️ 你在角色抉择中的价值倾向</h3><div class="chips">`;
+    tagSorted.forEach(([t,n],i)=>h+=`<span class="chip" style="background:${TAGCOLOR[i%6]}">${t} ·${n}</span>`);
+    h+=`</div><div class="muted" style="margin-top:8px">这些不是给你贴标签,而是帮你看见:面对历史的两难,你更看重什么。</div></div>`;
+  }
+  // 足迹
+  const featList=Object.entries(features).sort((a,b)=>b[1]-a[1]);
+  if(featList.length){
+    h+=`<div class="sec"><h3>👣 探索足迹</h3><div class="chips">`;
+    featList.forEach(([f,n],i)=>h+=`<span class="chip" style="background:#3a4a6a">${f} ×${n}</span>`);
+    h+=`</div></div>`;
+  }
+  h+=`<div class="actions">
+    <a class="actbtn" href="./${({'时间·空间观':'meanwhile','因果观':'causality','比较思维':'compare','证据思维':'evidence','关系观':'medieval-network','换位·自我观':'roleplay'})[nextTip.key]||'meanwhile'}.html">去练练「${nextTip.key}」 →</a>
+    <button class="actbtn ghost" id="reset">清空我的画像</button></div>`;
+  wrap.innerHTML=h;
+  const rb=document.getElementById('reset'); if(rb) rb.onclick=()=>{ if(confirm('确定清空本地的历史思维画像数据吗?')){Track.reset();location.reload();} };
+}
+</script>
+</body>
+</html>

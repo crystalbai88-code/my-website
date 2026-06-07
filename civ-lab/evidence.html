@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>历史证据侦探 · 历史知识从哪里来</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css"/>
+<style>
+  html,body{margin:0;min-height:100%}
+  #app{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+  .nav{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:12px 18px 4px;flex-wrap:wrap}
+  .nav .title{font-family:var(--serif);font-weight:900;font-size:17px;color:var(--ink);text-shadow:var(--label-shadow)}
+  .nav .sub{font-family:var(--mono);font-size:10px;color:var(--ink2);letter-spacing:.08em}
+  .score{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--gold);font-weight:700}
+  .card{width:min(560px,92%);margin:18px auto 0;background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:18px;padding:22px 24px;backdrop-filter:blur(12px);text-align:center}
+  .relic-ic{font-size:54px;line-height:1}
+  .relic-name{font-family:var(--serif);font-weight:900;font-size:21px;color:var(--ink);margin:10px 0 4px}
+  .relic-held{font-family:var(--mono);font-size:11.5px;color:var(--ink3)}
+  .q{font-family:var(--sans);font-size:14.5px;font-weight:700;color:var(--ink);margin:18px 0 12px}
+  .opts{display:flex;flex-direction:column;gap:9px}
+  .opt{font-family:var(--sans);font-size:14px;font-weight:600;color:var(--ink);background:rgba(255,255,255,.04);border:1.5px solid var(--panel-line);border-radius:12px;padding:11px 16px;cursor:pointer;transition:all .15s;text-align:left}
+  .opt:hover{border-color:var(--gold);color:var(--gold)}
+  .opt.correct{border-color:#4caf72;background:rgba(76,175,114,.14);color:var(--ink)}
+  .opt.wrong{border-color:#d65a4a;background:rgba(214,90,74,.14)}
+  .opt.dim{opacity:.5}
+  .reveal{margin-top:16px;text-align:left;display:none}
+  .reveal.show{display:block}
+  .reveal .proves{font-size:14px;color:var(--ink);line-height:1.7;background:rgba(90,160,200,.1);border-left:4px solid var(--cyan,#5aa0c8);border-radius:8px;padding:11px 14px}
+  .reveal .proves b{color:var(--cyan,#5aa0c8)}
+  .reveal .think{font-size:12.5px;color:var(--ink2);line-height:1.7;margin-top:10px}
+  .reveal .think b{color:var(--gold)}
+  .reveal a.dlink{display:inline-block;margin-top:10px;font-family:var(--sans);font-weight:700;font-size:13px;color:var(--gold);text-decoration:none}
+  .nextbtn{margin-top:16px;font-family:var(--sans);font-weight:700;font-size:14px;color:#fff;background:linear-gradient(90deg,#c86820,#b83018);border:none;border-radius:var(--r-pill);padding:10px 26px;cursor:pointer}
+  .intro{max-width:560px;text-align:center;color:var(--ink2);font-size:13px;margin:8px auto 0;font-family:var(--sans);line-height:1.6}
+</style>
+</head>
+<body data-theme="deepblue">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="nav">
+    <a href="./index.html" class="ds-pill">⌂ 返回</a>
+    <span class="title">🔍 历史证据侦探</span>
+    <span class="sub">历史不是背出来的，是从证据里推出来的</span>
+    <span class="score" id="score">0 / 0</span>
+  </div>
+  <div class="intro">每件文物都是一条线索。先判断它来自哪个文明，再看看它<b>能证明什么</b>——这就是历史学家的工作。</div>
+  <div class="card" id="card"></div>
+</div>
+
+<script src="./track.js?v=1"></script>
+<script src="./evidence_data.js?v=1"></script>
+<script>
+const REGION_IC={'东亚':'🏯','南亚':'🕉️','西亚·中东':'☪️','欧洲':'🏛️','非洲':'🔺','美洲':'🗿','东南亚':'⛵'};
+const DEEP={early:'civ-deep.html',classical:'classical-deep.html',medieval:'medieval-deep.html'};
+const CIV_NAMES=[...new Set(EVIDENCE.map(e=>e.civName))];
+let score=0, total=0, cur=null;
+function pick(arr,n,exclude){const p=arr.filter(x=>x!==exclude);const out=[];while(out.length<n&&p.length){out.push(p.splice(Math.floor(Math.random()*p.length),1)[0]);}return out;}
+function relicIcon(a){a=a||'';if(/碑|铭|文|书|典|纸|卷|档案/.test(a))return'📜';if(/鼎|青铜|器|爵/.test(a))return'⚱️';if(/金字塔|塔|庙|寺|宫|城|建筑|墙/.test(a))return'🏛️';if(/币|钱/.test(a))return'🪙';if(/像|雕|面具|俑/.test(a))return'🗿';if(/墓|陵|葬/.test(a))return'⚰️';if(/印章|印/.test(a))return'🔖';return'🏺';}
+
+function next(){
+  cur=EVIDENCE[Math.floor(Math.random()*EVIDENCE.length)];
+  const distract=pick(CIV_NAMES,3,cur.civName);
+  const opts=[cur.civName,...distract].sort(()=>Math.random()-.5);
+  let h=`<div class="relic-ic">${relicIcon(cur.artifact)}</div>
+    <div class="relic-name">${cur.artifact}</div>
+    <div class="relic-held">📍 现藏 / 发现于：${cur.held||'—'}</div>
+    <div class="q">这件文物最可能来自哪个文明？</div>
+    <div class="opts" id="opts">`;
+  opts.forEach(o=>h+=`<div class="opt" data-civ="${o}">${o}</div>`);
+  h+=`</div><div class="reveal" id="reveal"></div>`;
+  document.getElementById('card').innerHTML=h;
+  document.querySelectorAll('.opt').forEach(o=>o.onclick=()=>answer(o));
+}
+function answer(el){
+  total++;
+  const correct=el.dataset.civ===cur.civName;
+  if(correct)score++; if(window.Track){Track.log("证据侦探");Track.region(cur.region);}
+  document.querySelectorAll('.opt').forEach(o=>{
+    o.onclick=null;
+    if(o.dataset.civ===cur.civName)o.classList.add('correct');
+    else if(o===el)o.classList.add('wrong');
+    else o.classList.add('dim');
+  });
+  document.getElementById('score').textContent=score+' / '+total;
+  const rv=document.getElementById('reveal');
+  rv.innerHTML=`<div class="proves"><b>它能证明什么：</b>${cur.what}</div>
+    <div class="think"><b>侦探笔记：</b>这是来自<b>${REGION_IC[cur.region]||''}${cur.civName}</b>的实物（一手证据），与「${cur.eventTitle}」有关。实物证据比后世的传说更可靠——但它也只能证明"曾经存在过什么"，不能直接告诉我们当时人怎么想。</div>
+    <a class="dlink" href="./${DEEP[cur.chapter]}#/event/${cur.eventId}">查看相关事件 →</a>
+    <button class="nextbtn" id="nextbtn">下一个线索 →</button>`;
+  rv.classList.add('show');
+  document.getElementById('nextbtn').onclick=next;
+}
+next();
+</script>
+</body>
+</html>

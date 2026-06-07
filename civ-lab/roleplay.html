@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>历史角色体验 · 如果我活在那个时代</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css"/>
+<style>
+  html,body{margin:0;min-height:100%}
+  #app{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+  .nav{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:12px 18px 4px;flex-wrap:wrap}
+  .nav .title{font-family:var(--serif);font-weight:900;font-size:17px;color:var(--ink);text-shadow:var(--label-shadow)}
+  .nav .sub{font-family:var(--mono);font-size:10px;color:var(--ink2);letter-spacing:.08em}
+  .roles{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;padding:10px 18px}
+  .rpill{font-family:var(--sans);font-size:13px;font-weight:700;color:var(--ink2);background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:var(--r-pill);padding:7px 15px;cursor:pointer}
+  .rpill.on{color:#fff;background:var(--gold);border-color:var(--gold)}
+  .stage{width:min(600px,94%);margin:8px auto 50px}
+  .fact{font-size:12.5px;color:var(--ink2);background:rgba(90,160,200,.1);border-left:4px solid var(--cyan,#5aa0c8);border-radius:8px;padding:10px 13px;line-height:1.65;margin-bottom:6px}
+  .sim-badge{display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:700;color:#fff;background:#8a7ad0;border-radius:6px;padding:1px 8px;margin:10px 0 4px}
+  .role-line{font-family:var(--serif);font-weight:900;font-size:18px;color:var(--ink);margin-bottom:14px}
+  .situation{font-family:var(--serif);font-size:17px;color:var(--ink);line-height:1.6;background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:14px;padding:16px 18px;backdrop-filter:blur(10px)}
+  .step-no{font-family:var(--mono);font-size:11px;color:var(--gold);margin-bottom:6px}
+  .choices{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+  .choice{font-family:var(--sans);font-size:14.5px;font-weight:600;color:var(--ink);background:rgba(255,255,255,.04);border:1.5px solid var(--panel-line);border-radius:12px;padding:13px 16px;cursor:pointer;transition:all .15s;text-align:left}
+  .choice:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-1px)}
+  .outcome{margin-top:14px;font-size:14px;color:var(--ink);line-height:1.7;background:rgba(200,160,60,.1);border-left:4px solid var(--gold);border-radius:8px;padding:12px 15px;display:none}
+  .outcome.show{display:block}
+  .nextbtn{margin-top:14px;font-family:var(--sans);font-weight:700;font-size:14px;color:#fff;background:linear-gradient(90deg,#c86820,#b83018);border:none;border-radius:var(--r-pill);padding:10px 24px;cursor:pointer}
+  .reflect{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:16px;padding:20px;backdrop-filter:blur(10px);text-align:center}
+  .reflect h2{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);margin:0 0 12px}
+  .reflect .tags{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:12px 0}
+  .reflect .tg{font-family:var(--sans);font-size:13px;font-weight:700;color:#fff;background:linear-gradient(90deg,#5aa0c8,#8a7ad0);border-radius:var(--r-pill);padding:6px 14px}
+  .reflect .rtext{font-size:14px;color:var(--ink2);line-height:1.8;margin-top:8px}
+  .reflect .again{margin-top:16px;font-family:var(--sans);font-weight:700;color:var(--ink2);background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:var(--r-pill);padding:9px 20px;cursor:pointer}
+</style>
+</head>
+<body data-theme="deepblue">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="nav">
+    <a href="./index.html" class="ds-pill">⌂ 返回</a>
+    <span class="title">🎭 历史角色体验</span>
+    <span class="sub">走进那个时代，你会怎么选？</span>
+    <div class="ds-theme-switch" style="margin-left:auto" id="themeSwitch">
+      <button data-t="deepblue"></button><button data-t="museum"></button><button data-t="textbook"></button><button data-t="parchment"></button>
+    </div>
+  </div>
+  <div class="roles" id="roles"></div>
+  <div class="stage" id="stage"></div>
+</div>
+<script src="./track.js?v=1"></script>
+<script src="./roleplay_data.js?v=1"></script>
+<script>
+let cur=ROLES[0], step=0, tags=[];
+document.getElementById('roles').innerHTML=ROLES.map((r,i)=>`<span class="rpill${i===0?' on':''}" data-i="${i}">${r.emoji} ${r.title}</span>`).join('');
+document.querySelectorAll('.rpill').forEach(p=>p.onclick=()=>{document.querySelectorAll('.rpill').forEach(x=>x.classList.remove('on'));p.classList.add('on');cur=ROLES[+p.dataset.i];start();});
+function start(){ step=0; tags=[]; render(); }
+function render(){
+  if(step>=cur.steps.length) return reflect();
+  const s=cur.steps[step];
+  let h='';
+  if(step===0) h+=`<div class="fact">${cur.fact}</div><div class="sim-badge">情境模拟</div><div class="role-line">${cur.emoji} ${cur.role}</div>`;
+  h+=`<div class="step-no">抉择 ${step+1} / ${cur.steps.length}</div><div class="situation"><div class="step-q">${s.situation}</div><div class="choices" id="choices">`;
+  s.choices.forEach((c,i)=>h+=`<div class="choice" data-i="${i}">${c.text}</div>`);
+  h+=`</div><div class="outcome" id="outcome"></div></div>`;
+  document.getElementById('stage').innerHTML=h;
+  document.querySelectorAll('.choice').forEach(el=>el.onclick=()=>choose(+el.dataset.i,el));
+}
+function choose(i,el){
+  const c=cur.steps[step].choices[i];
+  tags.push(c.tag); if(window.Track){Track.tag(c.tag);Track.log("角色体验");}
+  document.querySelectorAll('.choice').forEach(x=>{x.onclick=null;x.style.opacity=x===el?'1':'.45';if(x===el)x.style.borderColor='var(--gold)';});
+  const o=document.getElementById('outcome');
+  o.innerHTML=`<b>${c.tag}</b> · ${c.outcome}<br><button class="nextbtn" id="nx">${step<cur.steps.length-1?'继续 →':'看看我的选择 →'}</button>`;
+  o.classList.add('show');
+  document.getElementById('nx').onclick=()=>{step++;render();};
+}
+function reflect(){
+  const uniq=[...new Set(tags)];
+  let h=`<div class="reflect"><h2>${cur.emoji} 你的选择</h2><div class="tags">`;
+  uniq.forEach(t=>h+=`<span class="tg">${t}</span>`);
+  h+=`</div><div class="rtext">${cur.reflection}</div><button class="again" id="again">↺ 重新选择</button></div>`;
+  document.getElementById('stage').innerHTML=h;
+  document.getElementById('again').onclick=start;
+}
+document.querySelectorAll('#themeSwitch button').forEach(b=>b.onclick=()=>document.body.dataset.theme=b.dataset.t);
+start();
+</script>
+</body>
+</html>

@@ -90,6 +90,7 @@
 
 <div id="detail" class="ds-panel"><div class="dpad" id="dpad"></div></div>
 
+<script src="./track.js?v=1"></script>
 <script src="./causality_data.js?v=1"></script>
 <script>
 const KIND_COLOR={环境:'#5ab87a',制度:'#5aa0c8',技术:'#d4a858',人物:'#d4708a',事件:'#c84830',影响:'#8a7ad0'};
@@ -214,7 +215,7 @@ function check(){
     if(placed[s]===s){sl.classList.add('correct');ok++;} else sl.classList.add('wrong');
   });
   const r=document.getElementById('result');
-  if(ok===n){ r.textContent='🎉 全对！你重建了完整的因果链'; r.style.color='#4caf72'; }
+  if(ok===n){ if(window.Track)Track.log("因果链");r.textContent='🎉 全对！你重建了完整的因果链'; r.style.color='#4caf72'; }
   else { r.textContent=`对了 ${ok}/${n} 个 · 绿色正确、红色需调整，再试试`; r.style.color='var(--gold)'; }
 }
 function showAnswer(){

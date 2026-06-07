@@ -81,6 +81,7 @@
   <div class="legend-note">点文明卡进入深度页 · 事件显示前后约 60 年内 · 同一时刻不同文明，正是"全球史观"</div>
 </div>
 
+<script src="./track.js?v=1"></script>
 <script src="./meanwhile_data.js?v=1"></script>
 <script>
 const REGION_ICON={'东亚':'🏯','南亚':'🕉️','西亚·中东':'☪️','欧洲':'🏛️','非洲':'🔺','美洲':'🗿','东南亚':'⛵'};
@@ -94,7 +95,7 @@ function eraLabel(y){
   if(y<-3000)return'文明黎明';if(y<-1000)return'青铜时代';if(y<-200)return'轴心时代';
   if(y<500)return'古典帝国';if(y<1000)return'中世纪前期';return'中世纪后期';
 }
-function go(page,hash){ window.location.href='./'+page+'#'+hash; }
+function go(page,hash){ if(window.Track)Track.log('此时世界'); window.location.href='./'+page+'#'+hash; }
 
 function render(year){
   document.getElementById('yearbig').innerHTML=fmtYear(year)+' <span class="era">'+eraLabel(year)+'</span>';

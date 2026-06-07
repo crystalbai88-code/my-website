@@ -359,8 +359,18 @@ function renderStageCards() {
     <div class="stage-cards-intro">
       <p>🌍 六大文明阶段 · 从早期文明到 AI 时代</p>
       <p class="intro-sub">点击任意阶段卡片，深入了解这个时期的关键课程</p>
-      <a href="./meanwhile.html" style="display:inline-block;margin-top:12px;padding:11px 22px;border-radius:999px;font-weight:700;font-size:14px;text-decoration:none;color:#fff;background:linear-gradient(90deg,#c86820,#b83018 55%,#8a5a90);box-shadow:0 4px 18px rgba(200,104,32,.4);transition:transform .15s,box-shadow .15s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 7px 24px rgba(200,104,32,.55)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 18px rgba(200,104,32,.4)'">🌍 此时世界 · 拖动年份，看全球同一时刻在发生什么 →</a>
-      <a href="./causality.html" style="display:inline-block;margin-top:10px;margin-left:8px;padding:11px 22px;border-radius:999px;font-weight:700;font-size:14px;text-decoration:none;color:#fff;background:linear-gradient(90deg,#5aa0c8,#8a7ad0 60%,#c84830);box-shadow:0 4px 18px rgba(90,160,200,.4);transition:transform .15s,box-shadow .15s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">🔗 历史因果链 · 看世界为什么变成今天这样，并亲手重建 →</a>
+      <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:9px;justify-content:center;max-width:760px;margin-left:auto;margin-right:auto">
+        ${[
+          ['./meanwhile.html','🌍 此时世界','#c86820'],
+          ['./causality.html','🔗 历史因果链','#b83018'],
+          ['./compare.html','⚖️ 文明对比','#5aa0c8'],
+          ['./evidence.html','🔍 证据侦探','#5ab87a'],
+          ['./roleplay.html','🎭 角色体验','#8a7ad0'],
+          ['./route.html','🗺️ 路线旅行','#d4708a'],
+          ['./profile.html','🧭 我的思维画像','#3a7868'],
+        ].map(([href,label,c])=>`<a href="${href}" style="display:inline-block;padding:9px 17px;border-radius:999px;font-weight:700;font-size:13.5px;text-decoration:none;color:#fff;background:${c};box-shadow:0 3px 12px ${c}66;transition:transform .15s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">${label}</a>`).join('')}
+      </div>
+      <p class="intro-sub" style="margin-top:8px;opacity:.75">🧩 7 个互动探索 · 训练时间观 · 空间观 · 因果观 · 比较与证据思维</p>
     </div>
     <div class="stage-cards-grid">
       ${N.stages.filter(s => !s.hidden).map((stage, i) => {

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>历史路线旅行 · 跟着旅行者看世界</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="./cosmos-design-system.css"/>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden}
+  #app{position:relative;z-index:10;display:flex;flex-direction:column;height:100vh}
+  .nav{display:flex;align-items:center;gap:10px;padding:10px 16px 4px;flex-wrap:wrap}
+  .nav .title{font-family:var(--serif);font-weight:900;font-size:16px;color:var(--ink);text-shadow:var(--label-shadow)}
+  .routes{display:flex;gap:6px;padding:6px 16px 8px;flex-wrap:wrap}
+  .rpill{font-family:var(--sans);font-size:12.5px;font-weight:700;color:var(--ink2);background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:var(--r-pill);padding:6px 13px;cursor:pointer;transition:all .15s}
+  .rpill:hover{color:var(--gold);border-color:var(--gold)}
+  .rpill.on{color:#fff;background:var(--gold);border-color:var(--gold)}
+  .main{flex:1;position:relative}
+  #map{position:absolute;inset:0;background:#0a0e1c}
+  .leaflet-container{background:#0a0e1c}
+  .panel{position:absolute;left:14px;top:14px;width:270px;max-height:calc(100vh - 170px);overflow-y:auto;z-index:500;padding:0}
+  .panel .pad{padding:14px 16px}
+  .panel h2{font-family:var(--serif);font-weight:900;font-size:18px;color:var(--ink);margin:0}
+  .panel .era{font-family:var(--mono);font-size:10px;color:var(--gold);letter-spacing:.08em;margin:2px 0 6px}
+  .panel .desc{font-size:12.5px;color:var(--ink2);line-height:1.65}
+  .panel .ctrl{display:flex;gap:7px;margin:11px 0 6px}
+  .panel .gobtn{font-family:var(--sans);font-weight:700;font-size:13px;color:#fff;background:linear-gradient(90deg,#c86820,#b83018);border:none;border-radius:var(--r-pill);padding:8px 16px;cursor:pointer}
+  .panel .gobtn.ghost{background:var(--panel-bg);color:var(--ink2);border:1px solid var(--panel-line)}
+  .journal{margin-top:8px;border-top:1px dashed var(--panel-line);padding-top:8px}
+  .journal h4{font-family:var(--mono);font-size:10px;color:var(--gold);letter-spacing:.1em;margin:0 0 6px;text-transform:uppercase}
+  .jstop{font-size:12.5px;color:var(--ink);padding:5px 0;border-bottom:1px dashed var(--panel-line);opacity:.35;transition:opacity .3s}
+  .jstop.visited{opacity:1}
+  .jstop .nm{font-weight:700}
+  .jstop .nt{font-size:11.5px;color:var(--ink2);line-height:1.5}
+  .hint{position:absolute;right:14px;bottom:14px;z-index:500;font-family:var(--mono);font-size:10px;color:var(--ink3)}
+  .traveler-ic{font-size:26px;filter:drop-shadow(0 0 6px #000)}
+  .city-lbl{font-family:var(--sans);font-size:11px;font-weight:700;color:#fff;text-shadow:0 1px 4px #000,0 0 6px #000;white-space:nowrap}
+</style>
+</head>
+<body data-theme="deepblue">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div></div>
+<div id="app">
+  <div class="nav">
+    <a href="./index.html" class="ds-pill">⌂ 返回</a>
+    <span class="title">🗺️ 历史路线旅行</span>
+    <div class="ds-theme-switch" style="margin-left:auto" id="themeSwitch">
+      <button data-t="deepblue"></button><button data-t="museum"></button><button data-t="textbook"></button><button data-t="parchment"></button>
+    </div>
+  </div>
+  <div class="routes" id="routes"></div>
+  <div class="main">
+    <div id="map"></div>
+    <div class="panel ds-panel"><div class="pad" id="panel"></div></div>
+    <div class="hint">▶ 出发 跟着旅行者走过每座城 · 生成你的旅行册</div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="./track.js?v=1"></script>
+<script src="./routes_data.js?v=1"></script>
+<script>
+let map, cur=ROUTES[0], layer, traveler, anim=null;
+map=L.map('map',{zoomControl:true,attributionControl:false,worldCopyJump:true}).setView([35,70],3);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:10,subdomains:'abcd'}).addTo(map);
+
+document.getElementById('routes').innerHTML=ROUTES.map((r,i)=>`<span class="rpill${i===0?' on':''}" data-i="${i}">${r.emoji} ${r.title}</span>`).join('');
+document.querySelectorAll('.rpill').forEach(p=>p.onclick=()=>{document.querySelectorAll('.rpill').forEach(x=>x.classList.remove('on'));p.classList.add('on');cur=ROUTES[+p.dataset.i];loadRoute();});
+
+function clearLayer(){ if(anim){clearInterval(anim);anim=null;} if(layer){map.removeLayer(layer);} if(traveler){map.removeLayer(traveler);traveler=null;} }
+function loadRoute(){
+  clearLayer();
+  layer=L.layerGroup().addTo(map);
+  const pts=cur.stops.map(s=>s.coords);
+  L.polyline(pts,{color:'#c86820',weight:2.5,opacity:.55,dashArray:'6,8'}).addTo(layer);
+  cur.stops.forEach((s,i)=>{
+    L.circleMarker(s.coords,{radius:6,color:'#fff',weight:1.5,fillColor:'#c86820',fillOpacity:.9}).addTo(layer)
+      .bindTooltip(s.name,{permanent:true,direction:'top',className:'city-lbl',offset:[0,-6]});
+  });
+  map.fitBounds(L.latLngBounds(pts).pad(0.25));
+  // panel
+  let h=`<h2>${cur.emoji} ${cur.title}</h2><div class="era">${cur.era} · ${cur.traveler}</div><div class="desc">${cur.desc}</div>
+    <div class="ctrl"><button class="gobtn" id="go">▶ 出发</button><button class="gobtn ghost" id="reset">↺ 重来</button></div>
+    <div class="journal"><h4>我的旅行册</h4><div id="journal">`;
+  cur.stops.forEach((s,i)=>h+=`<div class="jstop" data-i="${i}"><span class="nm">${i+1}. ${s.name}</span><div class="nt">${s.note}</div></div>`);
+  h+='</div></div>';
+  document.getElementById('panel').innerHTML=h;
+  document.getElementById('go').onclick=play;
+  document.getElementById('reset').onclick=loadRoute;
+}
+function travIcon(){return L.divIcon({className:'',html:`<div class="traveler-ic">${cur.emoji}</div>`,iconSize:[30,30],iconAnchor:[15,15]});}
+function play(){
+  if(anim)return;
+  if(window.Track)Track.log('路线旅行');
+  let i=0;
+  if(traveler)map.removeLayer(traveler);
+  traveler=L.marker(cur.stops[0].coords,{icon:travIcon()}).addTo(map);
+  document.querySelectorAll('.jstop').forEach(j=>j.classList.remove('visited'));
+  function step(){
+    const j=document.querySelector('.jstop[data-i="'+i+'"]'); if(j)j.classList.add('visited');
+    traveler.setLatLng(cur.stops[i].coords);
+    map.panTo(cur.stops[i].coords,{animate:true});
+    L.popup({closeButton:false,className:'city-pop'}).setLatLng(cur.stops[i].coords).setContent('<b>'+cur.stops[i].name+'</b>').openOn(map);
+    i++;
+    if(i>=cur.stops.length){ clearInterval(anim); anim=null; }
+  }
+  step(); anim=setInterval(step,1500);
+}
+document.querySelectorAll('#themeSwitch button').forEach(b=>b.onclick=()=>document.body.dataset.theme=b.dataset.t);
+loadRoute();
+</script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>文明对比工作台 · 自己发现异同</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css"/>
+<style>
+  html,body{margin:0;min-height:100%}
+  #app{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column}
+  .nav{display:flex;align-items:center;gap:10px;padding:12px 18px 4px;flex-wrap:wrap}
+  .nav .title{font-family:var(--serif);font-weight:900;font-size:17px;color:var(--ink);text-shadow:var(--label-shadow)}
+  .nav .sub{font-family:var(--mono);font-size:10px;color:var(--ink2);letter-spacing:.08em}
+  .pick{padding:8px 18px}
+  .pick .hint{font-family:var(--sans);font-size:12.5px;color:var(--ink2);margin-bottom:7px}
+  .regbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+  .regbtn{font-family:var(--sans);font-size:11.5px;font-weight:700;color:var(--ink2);background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:var(--r-pill);padding:4px 11px;cursor:pointer}
+  .regbtn.on{color:#fff;background:var(--gold);border-color:var(--gold)}
+  .civlist{display:flex;gap:6px;flex-wrap:wrap;max-height:120px;overflow-y:auto;padding:4px 0}
+  .cpill{font-family:var(--sans);font-size:12px;font-weight:600;color:var(--ink2);background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:var(--r-pill);padding:4px 11px;cursor:pointer;transition:all .12s}
+  .cpill:hover{color:var(--gold);border-color:var(--gold)}
+  .cpill.sel{color:#fff;background:linear-gradient(90deg,#c86820,#b83018);border-color:transparent}
+  .cpill.dis{opacity:.4;cursor:not-allowed}
+
+  .tablewrap{flex:1;padding:6px 18px 40px;overflow-x:auto}
+  table.cmp{border-collapse:collapse;width:100%;min-width:520px;max-width:1100px;margin:0 auto}
+  table.cmp th,table.cmp td{border:1px solid var(--panel-line);padding:10px 13px;text-align:left;vertical-align:top;font-size:13px;line-height:1.6;color:var(--ink)}
+  table.cmp thead th{background:var(--panel-bg);font-family:var(--serif);font-weight:900;font-size:15px;backdrop-filter:blur(8px);position:sticky;top:0}
+  table.cmp thead th .reg{font-family:var(--mono);font-size:10px;color:var(--ink3);font-weight:400;display:block;margin-top:2px}
+  table.cmp tbody th{background:var(--panel-bg);font-family:var(--sans);font-weight:700;font-size:12.5px;color:var(--gold);white-space:nowrap;width:96px}
+  table.cmp .inv{margin:2px 0;padding-left:14px;position:relative}
+  table.cmp .inv:before{content:'•';position:absolute;left:2px;color:var(--gold)}
+  .empty-hint{text-align:center;color:var(--ink3);font-size:14px;padding:50px 20px;font-family:var(--serif)}
+  .civhead{cursor:pointer}
+  .civhead .x{font-size:11px;color:var(--ink3);margin-left:6px}
+
+  /* 观察区 */
+  .observe{max-width:1100px;margin:8px auto 0;padding:14px 18px;background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:14px;backdrop-filter:blur(10px)}
+  .observe h3{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink);margin:0 0 8px}
+  .observe textarea{width:100%;box-sizing:border-box;min-height:70px;background:rgba(255,255,255,.04);border:1px solid var(--panel-line);border-radius:10px;color:var(--ink);font-family:var(--sans);font-size:13.5px;padding:10px;resize:vertical}
+  .observe .ob-btn{margin-top:9px;font-family:var(--sans);font-weight:700;font-size:13px;color:#fff;background:linear-gradient(90deg,#5aa0c8,#8a7ad0);border:none;border-radius:var(--r-pill);padding:8px 18px;cursor:pointer}
+  .observe .prompts{margin-top:12px;display:none}
+  .observe .prompts.show{display:block}
+  .observe .prompts .q{font-size:13px;color:var(--ink);line-height:1.8;padding-left:18px;position:relative}
+  .observe .prompts .q:before{content:'?';position:absolute;left:0;color:var(--cyan,#5aa0c8);font-weight:700}
+  .observe .auto{margin-top:10px;font-size:13px;color:var(--ink2);line-height:1.7;border-top:1px dashed var(--panel-line);padding-top:9px}
+</style>
+</head>
+<body data-theme="deepblue">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="nav">
+    <a href="./index.html" class="ds-pill">⌂ 返回</a>
+    <span class="title">⚖️ 文明对比工作台</span>
+    <span class="sub">选 2-3 个文明，自己发现它们的异同</span>
+    <div class="ds-theme-switch" style="margin-left:auto" id="themeSwitch">
+      <button data-t="deepblue"></button><button data-t="museum"></button><button data-t="textbook"></button><button data-t="parchment"></button>
+    </div>
+  </div>
+  <div class="pick">
+    <div class="hint">先选区域，再点文明加入对比（最多 3 个）。试试同一时代的不同文明，或同一地方的不同朝代。</div>
+    <div class="regbar" id="regbar"></div>
+    <div class="civlist" id="civlist"></div>
+  </div>
+  <div class="tablewrap"><div id="table"></div></div>
+  <div class="observe" id="observe" style="display:none">
+    <h3>✍️ 先写下你自己的观察</h3>
+    <textarea id="obtext" placeholder="例如：唐朝和阿拔斯都很重视学问和贸易，但唐朝是皇帝集权，阿拔斯由哈里发统治……"></textarea>
+    <button class="ob-btn" id="obBtn">完成观察 · 看看可以从哪些角度想</button>
+    <div class="prompts" id="prompts"></div>
+  </div>
+</div>
+
+<script src="./track.js?v=1"></script>
+<script src="./compare_data.js?v=1"></script>
+<script>
+const BYID={}; COMPARE_CIVS.forEach(c=>BYID[c.id]=c);
+const REGIONS=['全部','东亚','南亚','西亚·中东','欧洲','非洲','美洲','东南亚'];
+let curReg='全部', selected=[];
+const DEEP={early:'civ-deep.html',classical:'classical-deep.html',medieval:'medieval-deep.html'};
+
+document.getElementById('regbar').innerHTML=REGIONS.map((r,i)=>`<span class="regbtn${i===0?' on':''}" data-r="${r}">${r}</span>`).join('');
+document.querySelectorAll('.regbtn').forEach(b=>b.onclick=()=>{curReg=b.dataset.r;document.querySelectorAll('.regbtn').forEach(x=>x.classList.remove('on'));b.classList.add('on');drawList();});
+
+function fmtY(y){return y<0?('前'+(-y)):(''+y);}
+function drawList(){
+  const list=COMPARE_CIVS.filter(c=>curReg==='全部'||c.region===curReg);
+  document.getElementById('civlist').innerHTML=list.map(c=>{
+    const sel=selected.includes(c.id); const dis=!sel&&selected.length>=3;
+    return `<span class="cpill ${sel?'sel':''} ${dis?'dis':''}" data-id="${c.id}">${c.icon} ${c.name}</span>`;
+  }).join('');
+  document.querySelectorAll('.cpill').forEach(p=>p.onclick=()=>{
+    const id=p.dataset.id;
+    if(selected.includes(id)) selected=selected.filter(x=>x!==id);
+    else if(selected.length<3) selected.push(id);
+    drawList(); drawTable();
+  });
+}
+
+const ROWS=[
+  ['🏛️ 政治中心','capital'],['🗺️ 疆域','territory'],['👥 人口','population'],
+  ['✍️ 语言','language'],['📜 文字','writing'],['⛩️ 宗教','religion'],
+  ['💰 经济·贸易','economy'],['💡 关键贡献','inventions'],['📉 如何衰亡','collapse']
+];
+function drawTable(){
+  const obs=document.getElementById('observe');
+  if(!selected.length){ document.getElementById('table').innerHTML='<div class="empty-hint">👆 选择 2-3 个文明开始对比</div>'; obs.style.display='none'; return; }
+  const civs=selected.map(id=>BYID[id]);
+  let h='<table class="cmp"><thead><tr><th></th>';
+  civs.forEach(c=>h+=`<th class="civhead" onclick="location.href='./${DEEP[c.chapter]}#/civ/${c.id}'">${c.icon} ${c.name}<span class="reg">${c.region} · ${fmtY(c.s)}–${fmtY(c.e)}</span><span class="x">详情→</span></th>`);
+  h+='</tr></thead><tbody>';
+  ROWS.forEach(([label,key])=>{
+    h+=`<tr><th>${label}</th>`;
+    civs.forEach(c=>{
+      if(key==='inventions') h+='<td>'+(c.inventions.length?c.inventions.map(x=>`<div class="inv">${x}</div>`).join(''):'—')+'</td>';
+      else h+=`<td>${c[key]||'—'}</td>`;
+    });
+    h+='</tr>';
+  });
+  h+='</tbody></table>';
+  document.getElementById('table').innerHTML=h;
+  obs.style.display = selected.length>=2 ? 'block':'none';
+}
+
+// 观察 → 提示
+document.getElementById('obBtn').onclick=()=>{
+  const civs=selected.map(id=>BYID[id]);
+  if(window.Track){Track.log('文明对比');civs.forEach(c=>Track.region(c.region));}
+  const p=document.getElementById('prompts');
+  let h='<div class="q">它们的<b>权力</b>是集中在一个君主，还是分散在城邦/贵族/宗教领袖？</div>'+
+    '<div class="q">它们靠什么<b>养活</b>自己——农业、贸易，还是征服？</div>'+
+    '<div class="q">它们的<b>信仰</b>相同吗？宗教在国家里扮演什么角色？</div>'+
+    '<div class="q">它们留给今天世界<b>最重要的东西</b>分别是什么？</div>'+
+    '<div class="q">它们为什么会<b>衰亡</b>？有没有共同的原因（如气候、入侵、内乱）？</div>';
+  // 自动小结(基于数据,非AI):找几个客观差异点
+  const auto=[];
+  const terr=civs.map(c=>c.territory).join(' / ');
+  auto.push('疆域对比：'+civs.map(c=>c.name+'（'+c.territory+'）').join('；'));
+  const rels=[...new Set(civs.map(c=>c.religion.split(/[，,;；]/)[0].slice(0,12)))];
+  auto.push('信仰：'+(rels.length>1?'各不相同 → '+civs.map(c=>c.name+'='+c.religion.split(/[，,;；]/)[0].slice(0,14)).join('；'):'有相似之处'));
+  const cols=civs.map(c=>c.name+'：'+c.collapse.replace(/^~?-?\d+\s*(BCE|年)?\s*·?\s*/,'').slice(0,22));
+  auto.push('衰亡：'+cols.join('；'));
+  h+='<div class="auto"><b>📊 数据帮你看到的差异</b><br>'+auto.join('<br>')+'</div>';
+  p.innerHTML=h; p.classList.add('show');
+};
+
+document.querySelectorAll('#themeSwitch button').forEach(b=>b.onclick=()=>document.body.dataset.theme=b.dataset.t);
+drawList(); drawTable();
+</script>
+</body>
+</html>
