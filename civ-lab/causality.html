@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>历史因果链 · 为什么世界变成今天这样</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css"/>
+<style>
+  html,body{margin:0;min-height:100%}
+  #app{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column}
+  .nav{display:flex;align-items:center;gap:10px;padding:12px 18px 4px;flex-wrap:wrap}
+  .nav .title{font-family:var(--serif);font-weight:900;font-size:17px;color:var(--ink);text-shadow:var(--label-shadow)}
+  .nav .sub{font-family:var(--mono);font-size:10px;color:var(--ink2);letter-spacing:.08em}
+  .chains{display:flex;gap:7px;padding:10px 18px;flex-wrap:wrap;align-items:center}
+  .chain-pill{font-family:var(--sans);font-size:12.5px;font-weight:700;color:var(--ink2);background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:var(--r-pill);padding:6px 13px;cursor:pointer;transition:all .15s;backdrop-filter:blur(10px)}
+  .chain-pill:hover{color:var(--gold);border-color:var(--gold)}
+  .chain-pill.on{color:#fff;background:var(--gold);border-color:var(--gold)}
+  .topbar{display:flex;gap:10px;align-items:center;padding:4px 20px 8px;flex-wrap:wrap}
+  .chain-title{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink)}
+  .chain-theme{font-family:var(--mono);font-size:11px;color:var(--gold);letter-spacing:.1em}
+  .modes{margin-left:auto;display:flex;gap:6px}
+  .mode-btn,.act-btn{font-family:var(--sans);font-size:12.5px;font-weight:700;border-radius:var(--r-pill);padding:6px 15px;cursor:pointer;border:1px solid var(--panel-line);background:var(--panel-bg);color:var(--ink2);transition:all .15s}
+  .mode-btn.on{background:var(--gold);color:#fff;border-color:var(--gold)}
+  .act-btn{color:#fff;background:linear-gradient(90deg,#c86820,#b83018);border:none}
+  .act-btn.ghost{background:var(--panel-bg);color:var(--ink2)}
+  .stage{flex:1;padding:6px 20px 50px;max-width:1100px;margin:0 auto;width:100%;box-sizing:border-box}
+
+  /* 学习模式 — 因果流 */
+  .flow{display:flex;flex-direction:column;align-items:center;gap:0}
+  .node{width:min(560px,92%);background:var(--panel-bg);border:1px solid var(--panel-line);border-left:5px solid var(--kc,#888);border-radius:13px;padding:12px 16px;backdrop-filter:blur(10px);cursor:pointer;transition:transform .12s,box-shadow .12s,opacity .3s}
+  .node:hover{transform:translateY(-2px);box-shadow:0 5px 18px #0004}
+  .node .kbadge{display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:700;color:#fff;background:var(--kc,#888);border-radius:6px;padding:1px 8px;letter-spacing:.05em}
+  .node .yr{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-left:7px}
+  .node .lab{font-family:var(--serif);font-size:16px;font-weight:700;color:var(--ink);margin-top:5px;line-height:1.35}
+  .node.hidden-step{opacity:0;pointer-events:none;height:0;padding:0;border:0;overflow:hidden}
+  .arrow{font-size:20px;color:var(--gold);margin:4px 0;line-height:1}
+  .arrow .because{font-family:var(--sans);font-size:10px;color:var(--ink3);display:block;text-align:center}
+
+  /* 重建模式 */
+  .rebuild-tip{font-family:var(--sans);font-size:13.5px;color:var(--ink);text-align:center;margin:6px 0 14px}
+  .slots{display:flex;flex-direction:column;gap:8px;align-items:center;margin-bottom:18px}
+  .slot{width:min(560px,92%);min-height:46px;border:2px dashed var(--panel-line);border-radius:12px;display:flex;align-items:center;gap:10px;padding:4px 12px;box-sizing:border-box;transition:border-color .15s,background .15s}
+  .slot.over{border-color:var(--gold);background:rgba(200,160,60,.08)}
+  .slot .num{font-family:var(--mono);font-weight:700;color:var(--ink3);flex-shrink:0;width:20px;text-align:center}
+  .slot.correct{border-style:solid;border-color:#4caf72;background:rgba(76,175,114,.1)}
+  .slot.wrong{border-style:solid;border-color:#d65a4a;background:rgba(214,90,74,.1)}
+  .tray{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;min-height:40px;padding:10px;border-top:1px dashed var(--panel-line)}
+  .card{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--ink);background:var(--panel-bg);border:1px solid var(--panel-line);border-left:5px solid var(--kc,#888);border-radius:11px;padding:8px 13px;cursor:grab;user-select:none;backdrop-filter:blur(8px);transition:transform .1s}
+  .card:active{cursor:grabbing}
+  .card.in-slot{flex:1;cursor:pointer}
+  .card .kbadge{font-family:var(--mono);font-size:9px;color:#fff;background:var(--kc,#888);border-radius:5px;padding:1px 6px;margin-right:6px}
+  .result{text-align:center;font-family:var(--serif);font-weight:900;font-size:18px;margin:8px 0;min-height:24px}
+
+  /* 详情面板 */
+  #detail{position:fixed;right:16px;top:80px;width:280px;max-height:calc(100vh-110px);overflow-y:auto;display:none;z-index:40}
+  #detail.show{display:block}
+  #detail .dpad{padding:16px 18px}
+  #detail .dk{font-family:var(--mono);font-size:9.5px;color:#fff;background:var(--kc,#888);border-radius:6px;padding:1px 9px;font-weight:700}
+  #detail .dl{font-family:var(--serif);font-size:18px;font-weight:900;color:var(--ink);margin:8px 0 3px;line-height:1.3}
+  #detail .dy{font-family:var(--mono);font-size:11px;color:var(--ink3)}
+  #detail .dd{font-size:13px;color:var(--ink);line-height:1.7;margin:10px 0;padding-top:9px;border-top:1px solid var(--panel-line)}
+  #detail .cause{font-size:12px;color:var(--ink2);margin:5px 0}
+  #detail .cause b{color:var(--gold)}
+  #detail a.dlink{display:inline-block;margin-top:8px;font-family:var(--sans);font-size:12px;font-weight:700;color:var(--gold);text-decoration:none}
+  @media(max-width:760px){ #detail{position:static;width:auto;margin:10px 20px} }
+</style>
+</head>
+<body data-theme="deepblue">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="nav">
+    <a href="./index.html" class="ds-pill">⌂ 返回</a>
+    <span class="title">🔗 历史因果链</span>
+    <span class="sub">向前看"为什么发生"，向后看"造成了什么"</span>
+    <div class="ds-theme-switch" style="margin-left:auto" id="themeSwitch">
+      <button data-t="deepblue"></button><button data-t="museum"></button><button data-t="textbook"></button><button data-t="parchment"></button>
+    </div>
+  </div>
+  <div class="chains" id="chains"></div>
+  <div class="topbar">
+    <div><div class="chain-title" id="ctitle"></div><div class="chain-theme" id="ctheme"></div></div>
+    <div class="modes">
+      <button class="mode-btn on" id="mLearn">📖 学习</button>
+      <button class="mode-btn" id="mBuild">🧩 重建</button>
+    </div>
+  </div>
+  <div class="stage" id="stage"></div>
+</div>
+
+<div id="detail" class="ds-panel"><div class="dpad" id="dpad"></div></div>
+
+<script src="./causality_data.js?v=1"></script>
+<script>
+const KIND_COLOR={环境:'#5ab87a',制度:'#5aa0c8',技术:'#d4a858',人物:'#d4708a',事件:'#c84830',影响:'#8a7ad0'};
+let curChain=CAUSAL_CHAINS[0], mode='learn', stepMode=false, stepN=0;
+
+// 链选择器
+document.getElementById('chains').innerHTML=CAUSAL_CHAINS.map((c,i)=>
+  `<span class="chain-pill${i===0?' on':''}" data-i="${i}">${c.emoji} ${c.title}</span>`).join('');
+document.querySelectorAll('.chain-pill').forEach(p=>p.onclick=()=>{
+  document.querySelectorAll('.chain-pill').forEach(x=>x.classList.remove('on'));
+  p.classList.add('on'); curChain=CAUSAL_CHAINS[+p.dataset.i]; stepMode=false; render();
+});
+document.getElementById('mLearn').onclick=()=>{mode='learn';setModeBtn();render();};
+document.getElementById('mBuild').onclick=()=>{mode='build';setModeBtn();render();};
+function setModeBtn(){ document.getElementById('mLearn').classList.toggle('on',mode==='learn'); document.getElementById('mBuild').classList.toggle('on',mode==='build'); }
+
+function render(){
+  document.getElementById('ctitle').textContent=curChain.emoji+' '+curChain.title;
+  document.getElementById('ctheme').textContent='主题 · '+curChain.theme;
+  document.getElementById('detail').classList.remove('show');
+  if(mode==='learn') renderLearn(); else renderBuild();
+}
+
+// ── 学习模式 ──
+function renderLearn(){
+  const ns=curChain.nodes;
+  let h='<div style="display:flex;gap:8px;justify-content:center;margin-bottom:14px">'+
+    `<button class="act-btn ghost" id="stepBtn">${stepMode?'显示全部':'▶ 逐步揭示'}</button>`+
+    (stepMode?`<button class="act-btn" id="nextBtn">下一步 (${Math.min(stepN+1,ns.length)}/${ns.length})</button>`:'')+
+    '</div><div class="flow">';
+  ns.forEach((n,i)=>{
+    const vis = !stepMode || i<=stepN;
+    const c=KIND_COLOR[n.kind]||'#888';
+    if(i>0) h+=`<div class="arrow ${vis?'':'hidden-step'}">↓<span class="because">所以</span></div>`;
+    h+=`<div class="node ${vis?'':'hidden-step'}" style="--kc:${c}" data-i="${i}">
+      <span class="kbadge">${n.kind}</span><span class="yr">${n.year||''}</span>
+      <div class="lab">${n.label}</div></div>`;
+  });
+  h+='</div>';
+  document.getElementById('stage').innerHTML=h;
+  document.querySelectorAll('.node').forEach(el=>el.onclick=()=>showDetail(+el.dataset.i));
+  const sb=document.getElementById('stepBtn'); if(sb) sb.onclick=()=>{stepMode=!stepMode;stepN=0;render();};
+  const nb=document.getElementById('nextBtn'); if(nb) nb.onclick=()=>{stepN=Math.min(stepN+1,ns.length-1);render();};
+}
+
+function showDetail(i){
+  const n=curChain.nodes[i], c=KIND_COLOR[n.kind]||'#888';
+  const prev=i>0?curChain.nodes[i-1].label:null, next=i<curChain.nodes.length-1?curChain.nodes[i+1].label:null;
+  let h=`<span class="dk" style="--kc:${c}">${n.kind}</span><div class="dl">${n.label}</div><div class="dy">${n.year||''}</div>`;
+  h+=`<div class="dd">${n.desc||''}</div>`;
+  if(prev) h+=`<div class="cause"><b>为什么发生?</b> 因为「${prev}」</div>`;
+  if(next) h+=`<div class="cause"><b>造成了什么?</b> 导致「${next}」</div>`;
+  if(n.link) h+=`<a class="dlink" href="./${n.link.page}#${n.link.hash}">查看深度页 →</a>`;
+  document.getElementById('dpad').innerHTML=h;
+  document.getElementById('detail').classList.add('show');
+}
+
+// ── 重建模式 ──
+let placed=[]; // slot index -> original node index (or null)
+let trayOrder=[];
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function renderBuild(){
+  const n=curChain.nodes.length;
+  placed=new Array(n).fill(null);
+  trayOrder=shuffle(curChain.nodes.map((_,i)=>i));
+  drawBuild('把下面打乱的环节，按"先因后果"的顺序拖到上方空格里 👇');
+}
+function drawBuild(tip){
+  const n=curChain.nodes.length;
+  let h=`<div class="rebuild-tip">${tip}</div><div class="result" id="result"></div>`;
+  h+='<div class="slots" id="slots">';
+  for(let s=0;s<n;s++){
+    const oi=placed[s];
+    h+=`<div class="slot" data-s="${s}"><span class="num">${s+1}</span>`+
+      (oi!=null?cardHtml(oi,true):'')+'</div>';
+  }
+  h+='</div>';
+  h+='<div style="display:flex;gap:8px;justify-content:center;margin:6px 0 12px">'+
+     '<button class="act-btn" id="checkBtn">✓ 检查</button>'+
+     '<button class="act-btn ghost" id="reshuffle">🔀 重新打乱</button>'+
+     '<button class="act-btn ghost" id="answer">💡 看答案</button></div>';
+  h+='<div class="tray" id="tray">';
+  trayOrder.forEach(oi=>{ if(!placed.includes(oi)) h+=cardHtml(oi,false); });
+  h+='</div>';
+  document.getElementById('stage').innerHTML=h;
+  wireBuild();
+}
+function cardHtml(oi,inSlot){
+  const nd=curChain.nodes[oi], c=KIND_COLOR[nd.kind]||'#888';
+  return `<div class="card${inSlot?' in-slot':''}" draggable="true" data-oi="${oi}" style="--kc:${c}"><span class="kbadge">${nd.kind}</span>${nd.label}</div>`;
+}
+let dragOi=null;
+function wireBuild(){
+  document.querySelectorAll('#tray .card').forEach(c=>{
+    c.ondragstart=e=>{dragOi=+c.dataset.oi;};
+    c.onclick=()=>{ const s=placed.indexOf(null); if(s>=0){placed[s]=+c.dataset.oi;drawBuild(currentTip());} };
+  });
+  document.querySelectorAll('#slots .card').forEach(c=>{
+    c.ondragstart=e=>{dragOi=+c.dataset.oi;};
+    c.onclick=()=>{ const s=placed.indexOf(+c.dataset.oi); if(s>=0){placed[s]=null;drawBuild(currentTip());} };
+  });
+  document.querySelectorAll('.slot').forEach(sl=>{
+    sl.ondragover=e=>{e.preventDefault();sl.classList.add('over');};
+    sl.ondragleave=()=>sl.classList.remove('over');
+    sl.ondrop=e=>{e.preventDefault();sl.classList.remove('over');
+      if(dragOi==null)return;
+      const s=+sl.dataset.s;
+      const old=placed.indexOf(dragOi); if(old>=0)placed[old]=null; // 从旧位置移走
+      placed[s]=dragOi; dragOi=null; drawBuild(currentTip());
+    };
+  });
+  document.getElementById('checkBtn').onclick=check;
+  document.getElementById('reshuffle').onclick=()=>renderBuild();
+  document.getElementById('answer').onclick=showAnswer;
+}
+function currentTip(){ const f=placed.filter(x=>x!=null).length; return `已放 ${f}/${curChain.nodes.length} 个 · 拖动或点击调整`; }
+function check(){
+  const n=curChain.nodes.length; let ok=0;
+  document.querySelectorAll('.slot').forEach((sl,s)=>{
+    sl.classList.remove('correct','wrong');
+    if(placed[s]==null) return;
+    if(placed[s]===s){sl.classList.add('correct');ok++;} else sl.classList.add('wrong');
+  });
+  const r=document.getElementById('result');
+  if(ok===n){ r.textContent='🎉 全对！你重建了完整的因果链'; r.style.color='#4caf72'; }
+  else { r.textContent=`对了 ${ok}/${n} 个 · 绿色正确、红色需调整，再试试`; r.style.color='var(--gold)'; }
+}
+function showAnswer(){
+  placed=curChain.nodes.map((_,i)=>i);
+  drawBuild('这是正确的因果顺序 ✓ 切到"学习"看每一步为什么');
+  document.querySelectorAll('.slot').forEach(sl=>sl.classList.add('correct'));
+  document.getElementById('result').textContent='💡 已显示正确答案';
+  document.getElementById('result').style.color='#4caf72';
+}
+
+document.querySelectorAll('#themeSwitch button').forEach(b=>b.onclick=()=>document.body.dataset.theme=b.dataset.t);
+render();
+</script>
+</body>
+</html>
