@@ -354,24 +354,29 @@ function renderStageCards() {
   const container = document.getElementById('mainNetworkContainer');
   if (!container) return;
   const N = MAIN_NETWORK;
+  const L = (window.I18N ? I18N.get() : 'zh');
+  const T = (k)=> window.I18N ? I18N.T(k) : k;
 
   container.innerHTML = `
     <div class="stage-cards-intro">
-      <p>🌍 六大文明阶段 · 从早期文明到 AI 时代</p>
-      <p class="intro-sub">点击任意阶段卡片，深入了解这个时期的关键课程</p>
+      <div style="display:flex;justify-content:center;margin-bottom:8px">
+        <button id="langToggle" style="font-family:var(--mono,monospace);font-size:12px;font-weight:700;color:#fff;background:rgba(120,90,40,.5);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:5px 14px;cursor:pointer">${L==='en'?'中文':'EN'}</button>
+      </div>
+      <p>${T('intro_stages')}</p>
+      <p class="intro-sub">${T('intro_sub')}</p>
       <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:9px;justify-content:center;max-width:760px;margin-left:auto;margin-right:auto">
         ${[
-          ['./meanwhile.html','🌍 此时世界','#c86820'],
-          ['./causality.html','🔗 历史因果链','#b83018'],
-          ['./compare.html','⚖️ 文明对比','#5aa0c8'],
-          ['./evidence.html','🔍 证据侦探','#5ab87a'],
-          ['./roleplay.html','🎭 角色体验','#8a7ad0'],
-          ['./route.html','🗺️ 路线旅行','#d4708a'],
-          ['./perspectives.html','🗣️ 多角度看历史','#b8862e'],
-          ['./profile.html','🧭 我的思维画像','#3a7868'],
-        ].map(([href,label,c])=>`<a href="${href}" style="display:inline-block;padding:9px 17px;border-radius:999px;font-weight:700;font-size:13.5px;text-decoration:none;color:#fff;background:${c};box-shadow:0 3px 12px ${c}66;transition:transform .15s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">${label}</a>`).join('')}
+          ['./meanwhile.html','f_meanwhile','#c86820'],
+          ['./causality.html','f_causality','#b83018'],
+          ['./compare.html','f_compare','#5aa0c8'],
+          ['./evidence.html','f_evidence','#5ab87a'],
+          ['./roleplay.html','f_roleplay','#8a7ad0'],
+          ['./route.html','f_route','#d4708a'],
+          ['./perspectives.html','f_perspectives','#b8862e'],
+          ['./profile.html','f_profile','#3a7868'],
+        ].map(([href,key,c])=>`<a href="${href}" style="display:inline-block;padding:9px 17px;border-radius:999px;font-weight:700;font-size:13.5px;text-decoration:none;color:#fff;background:${c};box-shadow:0 3px 12px ${c}66;transition:transform .15s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">${T(key)}</a>`).join('')}
       </div>
-      <p class="intro-sub" style="margin-top:8px;opacity:.75">🧩 8 个互动探索 · 训练时间观 · 空间观 · 因果观 · 比较 · 证据 · 多角度思维 · <a href="./family.html" style="color:var(--ink2,#9a8a70);text-decoration:underline">👨‍👩‍👧 家长 / 教师入口</a></p>
+      <p class="intro-sub" style="margin-top:8px;opacity:.75">${T('interactions')} · <a href="./family.html" style="color:var(--ink2,#9a8a70);text-decoration:underline">${T('family')}</a></p>
     </div>
     <div class="stage-cards-grid">
       ${N.stages.filter(s => !s.hidden).map((stage, i) => {
@@ -385,18 +390,18 @@ function renderStageCards() {
           <button class="stage-card ${isComing ? 'coming-soon' : ''} ${stage.featured ? 'featured' : ''}"
                   style="--stage-color:${stage.color}"
                   data-stage="${stage.id}">
-            ${stage.featured ? '<div class="stage-card-feature">✨ 完整版</div>' : ''}
-            <div class="stage-card-num">阶段 ${i}</div>
+            ${stage.featured ? `<div class="stage-card-feature">${L==='en'?'✨ Full':'✨ 完整版'}</div>` : ''}
+            <div class="stage-card-num">${L==='en'?'Stage':'阶段'} ${i}</div>
             <div class="stage-card-icon">${stage.icon}</div>
-            <h3 class="stage-card-title">${stage.title}</h3>
+            <h3 class="stage-card-title">${L==='en'&&stage.title_en?stage.title_en:stage.title}</h3>
             <p class="stage-card-time">${stage.time_range}</p>
-            <p class="stage-card-question">「${stage.core_question}」</p>
+            <p class="stage-card-question">「${L==='en'&&stage.core_question_en?stage.core_question_en:stage.core_question}」</p>
             <div class="stage-card-stats">
-              <span class="stage-card-count">📚 ${total} 个知识点</span>
+              <span class="stage-card-count">📚 ${total} ${L==='en'?'topics':'个知识点'}</span>
               ${stage.featured ? `<span class="stage-card-ready">${stage.featured_stat || ''}</span>` : (linkedCount > 0 ? `<span class="stage-card-ready">${linkedCount} 已开放${completed > 0 ? ` · ${completed} 已学` : ''}</span>` : '')}
-              ${isComing ? '<span class="stage-card-badge">⏳ 即将上线</span>' : ''}
+              ${isComing ? `<span class="stage-card-badge">⏳ ${T('coming')}</span>` : ''}
             </div>
-            <div class="stage-card-cta">${isComing ? '敬请期待' : (stage.featured ? '进入历史宇宙 →' : '进入探索 →')}</div>
+            <div class="stage-card-cta">${isComing ? (L==='en'?'Coming soon':'敬请期待') : (L==='en'?'Enter →':(stage.featured ? '进入历史宇宙 →' : '进入探索 →'))}</div>
           </button>`;
       }).join('')}
     </div>
@@ -408,6 +413,8 @@ function renderStageCards() {
       enterStage(sid);
     });
   });
+  const lt = document.getElementById('langToggle');
+  if (lt) lt.addEventListener('click', () => { if(window.I18N){ I18N.toggle(); renderHomeTimeline(); } });
 }
 
 // ════════════════════════════════════════════════════
