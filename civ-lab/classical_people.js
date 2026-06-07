@@ -51,9 +51,9 @@ const CLASSICAL_PEOPLE=[
 {id:"wudi_han",n:"汉武帝",e:"Emperor Wu of Han",c:"china",r:"ruler",d:"前156—前87",b:"西汉最重要皇帝，独尊儒术，推恩令，盐铁专卖，遣卫青霍去病征匈奴，派张骞通西域。",rel:[{i:"dongzhongshu",t:"重用"},{i:"weiqing",t:"重用"},{i:"huoqubing",t:"重用"},{i:"zhangqian",t:"遣使"},{i:"simarqian",t:"宫刑后著史"}]},
 {id:"weiqing",n:"卫青",e:"Wei Qing",c:"china",r:"general",d:"约前140—前106",b:"七次出击匈奴，收复河套，大将军，封狼居胥的奠基者，汉武帝舅兄。",rel:[{i:"wudi_han",t:"效力"},{i:"huoqubing",t:"舅甥"}]},
 {id:"huoqubing",n:"霍去病",e:"Huo Qubing",c:"china",r:"general",d:"前140—前117",b:"军事天才，两次河西之战，扫荡漠北，17岁出征24岁去世，'匈奴不灭何以家为'。",rel:[{i:"wudi_han",t:"效力"},{i:"weiqing",t:"外甥"}]},
-{id:"zhangqian",n:"张骞",e:"Zhang Qian",c:"china",r:"other",d:"约前164—前114",b:"两次出使西域，被匈奴俘虏10年仍不辱使命，实际开通丝绸之路，获封博望侯。",rel:[{i:"wudi_han",t:"奉命"},{i:"silk",t:"开辟"}]},
+{id:"zhangqian",n:"张骞",e:"Zhang Qian",c:"china",r:"other",d:"约前164—前114",b:"两次出使西域，被匈奴俘虏10年仍不辱使命，实际开通丝绸之路，获封博望侯。",rel:[{i:"wudi_han",t:"奉命"},{i:"liuche",t:"丝路后继者班超"}]},
 {id:"simarqian",n:"司马迁",e:"Sima Qian",c:"china",r:"other",d:"约前145—前86",b:"《史记》作者，因为李陵辩护遭宫刑，忍辱完成中国第一部纪传体通史，史家之绝唱。",rel:[{i:"wudi_han",t:"供职被宫刑"}]},
-{id:"liuche",n:"班超",e:"Ban Chao",c:"china",r:"general",d:"32—102",b:"以36人在西域纵横30年，恢复汉朝西域控制，派甘英出使大秦（罗马），投笔从戎典故。",rel:[{i:"silk",t:"维系丝路"}]},
+{id:"liuche",n:"班超",e:"Ban Chao",c:"china",r:"general",d:"32—102",b:"以36人在西域纵横30年，恢复汉朝西域控制，派甘英出使大秦（罗马），投笔从戎典故。",rel:[{i:"zhangqian",t:"承张骞所辟丝路"}]},
 
 // ═══ 希腊 ═══
 {id:"thales",n:"泰利斯",e:"Thales",c:"greece",r:"thinker",d:"约前624—前546",b:"第一位哲学家，预测前585年日食，'万物本质是水'，从神话到理性解释的第一人。",rel:[{i:"anaximander",t:"学生"}]},
@@ -143,7 +143,7 @@ const CLASSICAL_PEOPLE=[
 {id:"ajatasattu",n:"阿阇世王",e:"Ajatasattu",c:"india",r:"ruler",d:"约前492—前460在位",b:"弑父夺位，后悔皈依佛教，主持佛教第一次结集，早期佛教政治史的关键人物。",rel:[{i:"bimbisara",t:"弑父"},{i:"buddha",t:"皈依"},{i:"mahakassapa",t:"支持结集"}]},
 {id:"chanakya",n:"考底利耶",e:"Chanakya/Kautilya",c:"india",r:"thinker",d:"约前350—前275",b:"古印度最重要政治思想家，《政事论》是印度版《君主论》，辅佐旃陀罗笈多建立孔雀帝国。",rel:[{i:"chandragupta",t:"辅佐"}]},
 {id:"chandragupta",n:"旃陀罗笈多",e:"Chandragupta Maurya",c:"india",r:"ruler",d:"约前340—前298",b:"孔雀帝国创始人，统一印度次大陆大部，与塞琉古有外交往来，晚年出家成耆那教苦行者。",rel:[{i:"chanakya",t:"被辅佐"},{i:"ashoka",t:"祖父"},{i:"seleucus",t:"外交/岳父"}]},
-{id:"ashoka",n:"阿育王",e:"Ashoka",c:"india",r:"ruler",d:"约前304—前232",b:"孔雀帝国最伟大皇帝，羯陵伽战争后皈依佛教，颁布石柱法敕，派传教团使佛教成世界性宗教。",rel:[{i:"buddha",t:"信仰传播"},{i:"chandragupta",t:"孙子"},{i:"silk",t:"佛教传播节点"}]},
+{id:"ashoka",n:"阿育王",e:"Ashoka",c:"india",r:"ruler",d:"约前304—前232",b:"孔雀帝国最伟大皇帝，羯陵伽战争后皈依佛教，颁布石柱法敕，派传教团使佛教成世界性宗教。",rel:[{i:"buddha",t:"信仰传播"},{i:"chandragupta",t:"孙子"}]},
 {id:"nagarjuna",n:"龙树",e:"Nagarjuna",c:"india",r:"religious",d:"约公元150—250",b:"大乘佛教最重要哲学家，中观哲学，'诸法皆空'，《中论》奠定大乘佛教理论基础，第二佛陀。",rel:[{i:"buddha",t:"思想传承"}]},
 
 // ═══ 基督教 · 兴于罗马帝国 (并入罗马) ═══
@@ -156,21 +156,21 @@ const CLASSICAL_PEOPLE=[
 {id:"zhougong",n:"周公",e:"Duke of Zhou",c:"china",r:"thinker",d:"约前11世纪",b:"武王之弟姬旦。武王死后辅佐成王，东征平定三监之乱，制礼作乐、推行分封宗法、营建洛邑，奠定中华礼乐文明，功成还政。孔子终身景仰的圣人。",rel:[{i:"zhouwu",t:"兄"},{i:"kongzi",t:"被其景仰"}]},
 {id:"jiangziya",n:"姜子牙",e:"Jiang Ziya",c:"china",r:"general",d:"约前11世纪",b:"吕尚，周文王武王的军师，助周灭商首功之臣。传说垂钓渭水待明主'愿者上钩'，后世尊为兵家与谋略之祖。",rel:[{i:"zhouwu",t:"辅佐"}]},
 // 西亚·两河
-{id:"ashurbanipal",n:"亚述巴尼拔",e:"Ashurbanipal",c:"near_east",r:"ruler",d:"前668—前627在位",b:"新亚述末代雄主，军事强盛，更以在尼尼微建立古代最大图书馆著称，系统收藏楔形文字泥板，为后世保存《吉尔伽美什史诗》等两河无价文献。",rel:[]},
+{id:"ashurbanipal",n:"亚述巴尼拔",e:"Ashurbanipal",c:"near_east",r:"ruler",d:"前668—前627在位",b:"新亚述末代雄主，军事强盛，更以在尼尼微建立古代最大图书馆著称，系统收藏楔形文字泥板，为后世保存《吉尔伽美什史诗》等两河无价文献。",rel:[{i:"nebuchadnezzar2",t:"亚述衰亡后巴比伦继兴"}]},
 {id:"nebuchadnezzar2",n:"尼布甲尼撒二世",e:"Nebuchadnezzar II",c:"near_east",r:"ruler",d:"前605—前562在位",b:"新巴比伦最伟大君主，重建巴比伦城与伊什塔尔门，传说建空中花园。前586年灭犹大、毁第一圣殿，掳走犹太人，制造'巴比伦之囚'。",rel:[{i:"david",t:"灭其后裔之国"}]},
 // 黎凡特·以色列
 {id:"david",n:"大卫王",e:"King David",c:"levant",r:"ruler",d:"约前1010—前970在位",b:"以色列联合王国第二位君主。少年以投石击杀巨人歌利亚，统一十二支派、定都耶路撒冷，传为《诗篇》多篇作者，犹太/基督/伊斯兰三教共尊的伟大君王。",rel:[{i:"solomon",t:"子"}]},
 {id:"solomon",n:"所罗门王",e:"King Solomon",c:"levant",r:"ruler",d:"约前970—前931在位",b:"大卫之子，以智慧著称('所罗门的审判')。在位时国力鼎盛，建造耶路撒冷第一圣殿。死后王国分裂为北国以色列与南国犹大。",rel:[{i:"david",t:"父"}]},
-{id:"isaiah",n:"以赛亚",e:"Isaiah",c:"levant",r:"religious",d:"约前8世纪",b:"以色列最重要的先知之一，宣讲唯一神的公义与对弥赛亚(救世主)的盼望，《以赛亚书》深刻影响犹太教与基督教。",rel:[]},
+{id:"isaiah",n:"以赛亚",e:"Isaiah",c:"levant",r:"religious",d:"约前8世纪",b:"以色列最重要的先知之一，宣讲唯一神的公义与对弥赛亚(救世主)的盼望，《以赛亚书》深刻影响犹太教与基督教。",rel:[{i:"david",t:"预言大卫子孙弥赛亚"},{i:"solomon",t:"希伯来先知传统"}]},
 // 希腊·古风
-{id:"homer",n:"荷马",e:"Homer",c:"greece",r:"thinker",d:"约前8世纪",b:"古希腊盲诗人，相传作《伊利亚特》《奥德赛》两大史诗，奠定希腊神话、荣誉观与文学传统，西方文学的源头。",rel:[]},
+{id:"homer",n:"荷马",e:"Homer",c:"greece",r:"thinker",d:"约前8世纪",b:"古希腊盲诗人，相传作《伊利亚特》《奥德赛》两大史诗，奠定希腊神话、荣誉观与文学传统，西方文学的源头。",rel:[{i:"solon",t:"荷马史诗哺育的雅典"},{i:"pythagoras",t:"希腊文化共同源头"}]},
 // 罗马·王政
-{id:"romulus",n:"罗慕路斯",e:"Romulus",c:"rome",r:"ruler",d:"传说前753",b:"罗马建城传说中的创建者与首位国王。与孪生弟雷穆斯被母狼哺育，前753年建罗马城，后世尊为国父。",rel:[]},
+{id:"romulus",n:"罗慕路斯",e:"Romulus",c:"rome",r:"ruler",d:"传说前753",b:"罗马建城传说中的创建者与首位国王。与孪生弟雷穆斯被母狼哺育，前753年建罗马城，后世尊为国父。",rel:[{i:"scipio",t:"罗慕路斯之城的捍卫者"},{i:"cicero",t:"罗马传统的传承者"}]},
 // ═══ 补全批次02：笈多 · 道教 · 犹太战争 ═══
 // 印度·笈多
 {id:"samudragupta",n:"沙摩陀罗·笈多",e:"Samudragupta",c:"india",r:"ruler",d:"约335—375在位",b:"笈多王朝第三位君主，军事天才，南征北战几乎统一北印度，被誉为'印度的拿破仑'。其功业刻于阿拉哈巴德石柱(借用阿育王旧柱)。",rel:[{i:"chandragupta2",t:"父子"}]},
 {id:"chandragupta2",n:"超日王",e:"Chandragupta II",c:"india",r:"ruler",d:"约380—415在位",b:"旃陀罗·笈多二世，称'超日王'(Vikramaditya)。笈多黄金时代的顶峰君主，国力鼎盛、文化繁荣，中国高僧法显此时游历印度并盛赞其太平。",rel:[{i:"samudragupta",t:"父子"},{i:"kalidasa",t:"宫廷诗人"}]},
-{id:"aryabhata",n:"阿耶波多",e:"Aryabhata",c:"india",r:"thinker",d:"476—550",b:"笈多时代伟大数学家与天文学家。《阿耶波多历书》(499)提出地球绕轴自转、计算圆周率至四位小数、科学解释日月食，运用十进制与'零'，领先世界千年。",rel:[]},
+{id:"aryabhata",n:"阿耶波多",e:"Aryabhata",c:"india",r:"thinker",d:"476—550",b:"笈多时代伟大数学家与天文学家。《阿耶波多历书》(499)提出地球绕轴自转、计算圆周率至四位小数、科学解释日月食，运用十进制与'零'，领先世界千年。",rel:[{i:"chanakya",t:"印度学术传统"},{i:"nagarjuna",t:"印度智识传统"}]},
 {id:"kalidasa",n:"迦梨陀娑",e:"Kalidasa",c:"india",r:"thinker",d:"约4—5世纪",b:"古典梵语最伟大的诗人与剧作家，代表作《沙恭达罗》《云使》，被誉为'印度的莎士比亚'，笈多文学黄金时代的象征。",rel:[{i:"chandragupta2",t:"侍奉"}]},
 // 中国·道教
 {id:"zhang_daoling",n:"张道陵",e:"Zhang Daoling",c:"china",r:"religious",d:"34—156",b:"道教创始人之一。142年在四川创'五斗米道'(天师道)，尊老子为太上老君、奉《道德经》为经典，以符水治病、建立教团组织，使先秦道家哲学演变为有组织的宗教。",rel:[{i:"laozi",t:"尊奉为教主"}]},

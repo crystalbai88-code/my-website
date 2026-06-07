@@ -422,7 +422,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
   <div class="scroll-card" id="scrollCard"></div>
 </div>
 
-<script src="./classical_people.js?v=8"></script>
+<script src="./classical_people.js?v=9"></script>
 <script src="./classical_deep.js?v=8"></script>
 <script src="./classical_people_deep.js?v=8"></script>
 <script>
@@ -1076,7 +1076,7 @@ function openTextPanel(payload){
   }
 
   html += renderWikiSection(html);
-  card.innerHTML = html;
+  card.innerHTML = html.replace(/\*\*([^*]+?)\*\*/g, "<strong>$1</strong>");
   card.scrollTop = 0;
   document.getElementById('textPanel').classList.add('open');
   if (payload.kind === 'map') setTimeout(()=>initSiteMap(payload.civId), 80);

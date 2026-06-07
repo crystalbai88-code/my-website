@@ -18,9 +18,9 @@ const CLASSICAL_PEOPLE=[
 {id:"sushi",n:"苏轼",e:"Su Shi",c:"china",r:"thinker",d:"1037—1101",b:"苏东坡，宋代文坛全才——诗词文书画俱绝。'大江东去''但愿人长久'，旷达豁然，屡遭贬谪仍乐观，'东坡肉'亦传为美谈。",rel:[{i:"wang_anshi",t:"政见不合"}]},
 {id:"yuefei",n:"岳飞",e:"Yue Fei",c:"china",r:"general",d:"1103—1142",b:"南宋抗金名将，'精忠报国'，大破金军，却被秦桧以'莫须有'罪名害死于风波亭，成为中华忠义的象征。",rel:[{i:"zhao_kuangyin",t:"宋室"}]},
 {id:"zhuxi",n:"朱熹",e:"Zhu Xi",c:"china",r:"thinker",d:"1130—1200",b:"南宋理学集大成者，融合儒释道建立'程朱理学'(存天理灭人欲),注《四书》成为此后科举标准，影响东亚思想七百年。",rel:[{i:"sima_guang",t:"承儒统"}]},
-{id:"shen_kuo",n:"沈括",e:"Shen Kuo",c:"china",r:"thinker",d:"1031—1095",b:"北宋科学家，著《梦溪笔谈》,记录活字印刷、指南针、石油等，是中国古代科技的百科全书式人物。",rel:[]},
+{id:"shen_kuo",n:"沈括",e:"Shen Kuo",c:"china",r:"thinker",d:"1031—1095",b:"北宋科学家，著《梦溪笔谈》,记录活字印刷、指南针、石油等，是中国古代科技的百科全书式人物。",rel:[{i:"wang_anshi",t:"同朝推行新法"},{i:"sushi",t:"同时代士大夫"}]},
 // ═══ 日本 ═══
-{id:"murasaki",n:"紫式部",e:"Murasaki Shikibu",c:"japan",r:"thinker",d:"约973—1014",b:"平安时代宫廷女官，著《源氏物语》——世界最早的长篇小说之一，日本古典文学的巅峰，展现平安贵族的'物哀'美学。",rel:[]},
+{id:"murasaki",n:"紫式部",e:"Murasaki Shikibu",c:"japan",r:"thinker",d:"约973—1014",b:"平安时代宫廷女官，著《源氏物语》——世界最早的长篇小说之一，日本古典文学的巅峰，展现平安贵族的'物哀'美学。",rel:[{i:"yoritomo",t:"其笔下贵族世界的终结者"}]},
 {id:"yoritomo",n:"源赖朝",e:"Minamoto no Yoritomo",c:"japan",r:"ruler",d:"1147—1199",b:"源平合战胜利者，1185年建立镰仓幕府、自任征夷大将军，开启日本近七百年的武士(幕府)统治时代。",rel:[{i:"hojo",t:"外戚继承"}]},
 {id:"hojo",n:"北条时宗",e:"Hojo Tokimune",c:"japan",r:"ruler",d:"1251—1284",b:"镰仓幕府执权，两次(1274/1281)抵御忽必烈的蒙古大军入侵，台风('神风')助日本击退元军，'神风'传说由此而来。",rel:[{i:"yoritomo",t:"承幕府"},{i:"kublai",t:"抵御其入侵"}]},
 {id:"ashikaga",n:"足利义满",e:"Ashikaga Yoshimitsu",c:"japan",r:"ruler",d:"1358—1408",b:"室町幕府第三代将军，统一南北朝、建金阁寺、与明朝勘合贸易，室町文化的鼎盛期。",rel:[{i:"yoritomo",t:"幕府传统"}]},
@@ -40,8 +40,8 @@ const CLASSICAL_PEOPLE=[
 {id:"ibn_battuta",n:"伊本·白图泰",e:"Ibn Battuta",c:"islam",r:"other",d:"1304—1369",b:"摩洛哥大旅行家，30年游历从西非到中国约12万公里，《游记》是中世纪伊斯兰世界最详尽的见闻录，堪比马可·波罗。",rel:[{i:"mansa_musa",t:"记录其帝国"},{i:"marco_polo",t:"东西方旅行家"}]},
 // ═══ 印度 ═══
 {id:"harsha",n:"戒日王",e:"Harsha",c:"india",r:"ruler",d:"约590—647",b:"后笈多时代统一北印度的君主，崇佛护文、广行布施，玄奘曾访其朝廷并参加曲女城辩经大会。其死后北印度再度分裂。",rel:[{i:"xuanzang",t:"接待玄奘"}]},
-{id:"rajaraja",n:"罗茶罗乍一世",e:"Rajaraja Chola I",c:"india",r:"ruler",d:"约947—1014",b:"朱罗帝国最伟大君主，建强大海军征服斯里兰卡与马尔代夫、远征东南亚，兴建坦贾武尔大神庙(世界遗产),南印度的黄金时代。",rel:[]},
-{id:"ramanuja",n:"罗摩奴阇",e:"Ramanuja",c:"india",r:"religious",d:"约1017—1137",b:"印度教虔信(Bhakti)运动的核心哲学家，倡导对神(毗湿奴)的虔诚之爱可超越种姓，深刻影响印度宗教。",rel:[]},
+{id:"rajaraja",n:"罗茶罗乍一世",e:"Rajaraja Chola I",c:"india",r:"ruler",d:"约947—1014",b:"朱罗帝国最伟大君主，建强大海军征服斯里兰卡与马尔代夫、远征东南亚，兴建坦贾武尔大神庙(世界遗产),南印度的黄金时代。",rel:[{i:"ramanuja",t:"同属南印度泰米尔"},{i:"harsha",t:"印度王权"}]},
+{id:"ramanuja",n:"罗摩奴阇",e:"Ramanuja",c:"india",r:"religious",d:"约1017—1137",b:"印度教虔信(Bhakti)运动的核心哲学家，倡导对神(毗湿奴)的虔诚之爱可超越种姓，深刻影响印度宗教。",rel:[{i:"rajaraja",t:"南印度同乡君主"}]},
 // ═══ 东南亚 ═══
 {id:"suryavarman2",n:"苏耶跋摩二世",e:"Suryavarman II",c:"sea",r:"ruler",d:"约1113—1150在位",b:"高棉帝国君主，兴建吴哥窟(Angkor Wat)——世界最大的宗教建筑，供奉毗湿奴，高棉文明的巅峰象征。",rel:[{i:"jayavarman7",t:"后继名王"}]},
 {id:"jayavarman7",n:"阇耶跋摩七世",e:"Jayavarman VII",c:"sea",r:"ruler",d:"约1122—1218",b:"高棉最伟大的国王，击退占婆、建吴哥城(Angkor Thom)与巴戎寺(四面佛塔),广修医院驿道，笃信大乘佛教。",rel:[{i:"suryavarman2",t:"承高棉盛世"}]},
@@ -61,7 +61,7 @@ const CLASSICAL_PEOPLE=[
 {id:"sundiata",n:"松迪亚塔",e:"Sundiata Keita",c:"africa",r:"ruler",d:"约1217—1255",b:"马里帝国开国君主('狮子王'),击败索索王统一曼丁戈,颁《库鲁坎富加宪章》(早期人权宪章),史诗世代传唱。",rel:[{i:"mansa_musa",t:"后世名君"}]},
 {id:"mansa_musa",n:"曼萨·穆萨",e:"Mansa Musa",c:"africa",r:"ruler",d:"约1280—1337",b:"马里帝国君主，史上最富有的人之一。1324年携巨量黄金朝觐麦加，沿途撒金致埃及金价暴跌，使马里与廷巴克图闻名世界。",rel:[{i:"sundiata",t:"承马里"},{i:"ibn_battuta",t:"被其记录"}]},
 // ═══ 美洲 ═══
-{id:"pakal",n:"帕卡尔大帝",e:"K'inich Janaab' Pakal",c:"americas",r:"ruler",d:"603—683",b:"玛雅帕伦克城邦最伟大的国王，在位68年大兴土木，其铭文神庙与精雕石棺(著名的'宇航员'浮雕)是玛雅文明的瑰宝。",rel:[]},
+{id:"pakal",n:"帕卡尔大帝",e:"K'inich Janaab' Pakal",c:"americas",r:"ruler",d:"603—683",b:"玛雅帕伦克城邦最伟大的国王，在位68年大兴土木，其铭文神庙与精雕石棺(著名的'宇航员'浮雕)是玛雅文明的瑰宝。",rel:[{i:"montezuma2",t:"同属美洲古文明"},{i:"pachacuti",t:"美洲文明"}]},
 {id:"montezuma2",n:"蒙特祖马二世",e:"Moctezuma II",c:"americas",r:"ruler",d:"约1466—1520",b:"阿兹特克帝国末代雄主，帝国鼎盛却在1519年迎来西班牙人科尔特斯，被俘身死，阿兹特克随之灭亡。",rel:[{i:"pachacuti",t:"同期美洲帝国"}]},
 {id:"pachacuti",n:"帕查库特克",e:"Pachacuti",c:"americas",r:"ruler",d:"约1418—1472",b:"印加帝国奠基者，把库斯科小国扩张为安第斯大帝国，重建库斯科、兴建马丘比丘，创立印加的行政与道路体系。",rel:[{i:"montezuma2",t:"同期美洲帝国"}]},
 // ═══ 跨文明 ═══
@@ -116,7 +116,7 @@ const CLASSICAL_PEOPLE=[
 {id:"alcuin",n:"阿尔昆",e:"Alcuin of York",c:"europe",r:"thinker",d:"约735—804",b:"英格兰学者，受查理曼之邀主持宫廷学校，发展加洛林小写体(现代小写字母之源),加洛林文艺复兴的灵魂。",rel:[{i:"charlemagne",t:"宫廷导师"}]},
 {id:"einhard",n:"艾因哈德",e:"Einhard",c:"europe",r:"thinker",d:"约775—840",b:"查理曼的传记作者，《查理大帝传》是中世纪最重要的传记之一。",rel:[{i:"charlemagne",t:"为其立传"}]},
 {id:"louispious",n:"虔诚者路易",e:"Louis the Pious",c:"europe",r:"ruler",d:"778—840",b:"查理曼之子，继承帝国但诸子争位，843年凡尔登条约后帝国三分(法/德/中间王国雏形)。",rel:[{i:"charlemagne",t:"父子"}]},
-{id:"alfred",n:"阿尔弗雷德大帝",e:"Alfred the Great",c:"europe",r:"ruler",d:"849—899",b:"威塞克斯国王，878年埃丁顿之战击败维京'大异教徒军队',保住英格兰、推动文教，唯一被称'大帝'的英王。",rel:[]},
+{id:"alfred",n:"阿尔弗雷德大帝",e:"Alfred the Great",c:"europe",r:"ruler",d:"849—899",b:"威塞克斯国王，878年埃丁顿之战击败维京'大异教徒军队',保住英格兰、推动文教，唯一被称'大帝'的英王。",rel:[{i:"charlemagne",t:"同期西欧基督教君主"},{i:"cnut",t:"征服英格兰的丹麦王"}]},
 {id:"cnut",n:"克努特大帝",e:"Cnut the Great",c:"europe",r:"ruler",d:"约994—1035",b:"'北海帝国'之主，同时统治英格兰、丹麦与挪威；'命令潮水后退'传说讽喻王权的有限。",rel:[{i:"alfred",t:"后世英格兰王"}]},
 ];
 if(typeof window!=='undefined')window.CLASSICAL_PEOPLE=CLASSICAL_PEOPLE;

@@ -423,7 +423,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 </div>
 
 <script src="./early_civ_deep.js?v=4"></script>
-<script src="./early_civ_explorer_data.js?v=2"></script>
+<script src="./early_civ_explorer_data.js?v=3"></script>
 <script src="./chapters_data.js?v=4"></script>
 <script>
 const W = 1600, H = 900;
@@ -1070,7 +1070,7 @@ function openTextPanel(payload){
   }
 
   html += renderWikiSection(html);
-  card.innerHTML = html;
+  card.innerHTML = html.replace(/\*\*([^*]+?)\*\*/g, "<strong>$1</strong>");
   card.scrollTop = 0;
   document.getElementById('textPanel').classList.add('open');
   if (payload.kind === 'map') setTimeout(()=>initSiteMap(payload.civId), 80);
