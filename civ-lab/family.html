@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>家长 / 教师 · 看见孩子的历史成长</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css"/>
+<style>
+  html,body{margin:0;min-height:100%}
+  #app{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+  .nav{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:12px 18px 4px;flex-wrap:wrap}
+  .nav .title{font-family:var(--serif);font-weight:900;font-size:17px;color:var(--ink);text-shadow:var(--label-shadow)}
+  .tabs{display:flex;gap:8px;padding:10px 18px}
+  .tab{font-family:var(--sans);font-size:14px;font-weight:700;color:var(--ink2);background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:var(--r-pill);padding:8px 18px;cursor:pointer}
+  .tab.on{color:#fff;background:var(--gold);border-color:var(--gold)}
+  .wrap{width:min(720px,94%);margin:6px auto 50px}
+  .sec{margin-top:14px;background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:16px;padding:16px 18px;backdrop-filter:blur(10px)}
+  .sec h3{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink);margin:0 0 10px;display:flex;align-items:center;gap:7px}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{font-family:var(--sans);font-size:12.5px;font-weight:700;color:#fff;border-radius:var(--r-pill);padding:5px 13px}
+  .q{font-size:14px;color:var(--ink);line-height:1.7;padding:8px 0 8px 22px;position:relative;border-bottom:1px dashed var(--panel-line)}
+  .q:last-child{border-bottom:none}
+  .q:before{content:'💬';position:absolute;left:0;top:7px}
+  .q.act:before{content:'🎯'}
+  .q .tagref{font-family:var(--mono);font-size:10px;color:var(--gold);margin-left:6px}
+  .muted{color:var(--ink3);font-size:13px;line-height:1.7}
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+  .nodecard{background:rgba(255,255,255,.04);border:1px solid var(--panel-line);border-radius:12px;padding:12px 14px;text-decoration:none;display:block;transition:all .15s}
+  .nodecard:hover{border-color:var(--gold);transform:translateY(-2px)}
+  .nodecard .nt{font-family:var(--serif);font-weight:900;font-size:14px;color:var(--ink)}
+  .nodecard .nd{font-size:11.5px;color:var(--ink2);line-height:1.5;margin-top:3px}
+  .note{font-size:12px;color:var(--ink3);text-align:center;margin-top:14px;line-height:1.6}
+  .big{font-family:var(--serif);font-weight:900;font-size:18px;color:var(--gold)}
+</style>
+</head>
+<body data-theme="textbook">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div></div>
+<div id="app">
+  <div class="nav">
+    <a href="./index.html" class="ds-pill">⌂ 返回</a>
+    <span class="title">👨‍👩‍👧‍👦 家长 / 教师</span>
+    <div class="ds-theme-switch" style="margin-left:auto" id="themeSwitch">
+      <button data-t="deepblue"></button><button data-t="museum"></button><button data-t="textbook"></button><button data-t="parchment"></button>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab on" id="tParent">👨‍👩‍👧 家长视角</button>
+    <button class="tab" id="tTeacher">🍎 教师视角</button>
+  </div>
+  <div class="wrap" id="wrap"></div>
+</div>
+<script src="./track.js?v=1"></script>
+<script>
+const d=Track.all();
+const visits=d.visits||{}, features=d.features||{}, tags=d.tags||{}, regions=d.regions||{};
+const totalAct=Object.values(features).reduce((a,b)=>a+b,0)+Object.values(visits).reduce((a,b)=>a+b,0);
+const FEAT_NAME={此时世界:'此时世界',因果链:'因果链重建',文明对比:'文明对比',证据侦探:'证据侦探',角色体验:'角色体验',路线旅行:'路线旅行',多角度:'多角度看历史'};
+const COL=['#5aa0c8','#8a7ad0','#c86820','#5ab87a','#d4708a','#b83018','#3a7868'];
+
+// 亲子讨论题(通用,贴近探索)
+const TALK=[
+  ['如果能穿越到一个古代文明，你最想去哪个？为什么？',''],
+  ['你觉得一个文明"强大"，是看军队、财富，还是它留下的思想和发明？',''],
+  ['同一件历史大事，为什么不同的人说法会不一样？','多角度'],
+  ['"历史是胜利者书写的"是什么意思？你同意吗？','证据'],
+  ['我们今天的生活里，有哪些东西其实来自很久以前某个文明？',''],
+  ['一个强大的文明为什么会衰亡？不同文明有没有共同的原因？','因果'],
+  ['如果你是古代的国王、商人或学者，遇到难题你会怎么选？','角色'],
+  ['几千年前没有摄像机，我们到底怎么知道当时发生了什么？','证据'],
+];
+const ACT=[
+  ['"同一时刻的世界"','用「此时世界」拖到某一年，让学生说出各大洲分别在发生什么——建立全球同时性。','meanwhile.html'],
+  ['因果链重排','用「因果链」重建模式，分组把打乱的环节排成因果顺序，再讲解为什么。','causality.html'],
+  ['文明对比汇报','用「文明对比工作台」，每组选两个文明，从权力/宗教/贸易等维度对比并汇报。','compare.html'],
+  ['文物推理','用「证据侦探」，展示文物让学生推断来自何处、能证明什么，区分一手/二手证据。','evidence.html'],
+  ['角色扮演与价值讨论','用「角色体验」，学生扮演古代角色做抉择，再讨论"你为什么这样选"。','roleplay.html'],
+  ['多角度辩论','用「同一个事件不同的声音」，让学生分别代表不同立场，辩论同一事件。','perspectives.html'],
+  ['人物关系图讲解','用「关系网」按家族/师承/君臣等分层，讲人物如何互相影响。','medieval-network.html'],
+  ['跟着路线讲交流','用「路线旅行」，沿丝路/郑和等路线讲贸易与文明交流。','route.html'],
+];
+const COURSE=[
+  ['🏛 早期文明','城市·文字·王权的起源','civ-explorer-d.html'],
+  ['💡 古典思想与帝国','哲学·宗教·帝国如何塑造世界','classical-explorer.html'],
+  ['🌍 中世纪多中心','宗教·贸易·城市连接世界','medieval-explorer.html'],
+];
+
+const wrap=document.getElementById('wrap');
+function explored(){
+  const fs=Object.entries(features).filter(([k,v])=>v>0);
+  const topReg=Object.entries(regions).sort((a,b)=>b[1]-a[1]).slice(0,4);
+  return {fs,topReg};
+}
+function parentView(){
+  const {fs,topReg}=explored();
+  let h='';
+  if(totalAct<2){
+    h=`<div class="sec"><h3>🌱 还没有探索记录</h3><div class="muted">让孩子先在首页玩几个互动(此时世界、因果链、证据侦探…)，这里就会显示 ta 探索了什么、对什么感兴趣，并给你<b>亲子讨论题</b>。</div></div>`;
+  }else{
+    h+=`<div class="sec"><h3>👣 孩子最近在探索什么</h3>`;
+    if(fs.length){h+='<div class="chips">'+fs.map(([k,v],i)=>`<span class="chip" style="background:${COL[i%7]}">${FEAT_NAME[k]||k} ×${v}</span>`).join('')+'</div>';}
+    else h+='<div class="muted">主要在浏览各文明的内容。</div>';
+    if(topReg.length)h+='<div style="margin-top:10px"><span class="muted">最关注的区域：</span>'+topReg.map(([r,n])=>`<b>${r}</b>`).join('、')+'</div>';
+    h+=`<div style="margin-top:10px"><a href="./profile.html" class="big">→ 查看孩子的"历史思维画像"</a></div></div>`;
+  }
+  h+=`<div class="sec"><h3>💬 今晚可以和孩子聊聊</h3><div class="muted" style="margin-bottom:6px">不用考知识点，这些开放问题能引出思考与对话：</div>`;
+  TALK.forEach(([q,ref])=>h+=`<div class="q">${q}${ref?`<span class="tagref">关联：${ref}</span>`:''}</div>`);
+  h+=`</div>`;
+  h+=`<div class="note">所有数据只保存在<b>本机浏览器</b>，不会上传到任何服务器。换设备或清缓存会重置。</div>`;
+  wrap.innerHTML=h;
+}
+function teacherView(){
+  let h=`<div class="sec"><h3>📚 可直接用的课程节点</h3><div class="grid2">`;
+  COURSE.forEach(([t,desc,href])=>h+=`<a class="nodecard" href="./${href}"><div class="nt">${t}</div><div class="nd">${desc}</div></a>`);
+  h+=`</div></div>`;
+  h+=`<div class="sec"><h3>🎯 课堂活动建议</h3><div class="muted" style="margin-bottom:6px">每个互动都能直接变成一节课的活动：</div>`;
+  ACT.forEach(([t,desc,href])=>h+=`<div class="q act"><b>${t}</b> — ${desc} <a href="./${href}" style="color:var(--gold);text-decoration:none;font-weight:700">[打开]</a></div>`);
+  h+=`</div>`;
+  h+=`<div class="sec"><h3>📈 学习与思维评估</h3><div class="muted">「历史思维画像」从时间/空间/因果/比较/证据/关系/换位等维度，呈现学生的思考倾向，可作为过程性评价参考。</div><div style="margin-top:8px"><a href="./profile.html" class="big">→ 打开思维画像</a></div></div>`;
+  h+=`<div class="note">提示：可在大屏用「此时世界」「关系网」「路线旅行」做课堂演示。</div>`;
+  wrap.innerHTML=h;
+}
+document.getElementById('tParent').onclick=function(){this.classList.add('on');document.getElementById('tTeacher').classList.remove('on');parentView();};
+document.getElementById('tTeacher').onclick=function(){this.classList.add('on');document.getElementById('tParent').classList.remove('on');teacherView();};
+document.querySelectorAll('#themeSwitch button').forEach(b=>b.onclick=()=>document.body.dataset.theme=b.dataset.t);
+parentView();
+</script>
+</body>
+</html>

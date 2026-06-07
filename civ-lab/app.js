@@ -367,10 +367,11 @@ function renderStageCards() {
           ['./evidence.html','🔍 证据侦探','#5ab87a'],
           ['./roleplay.html','🎭 角色体验','#8a7ad0'],
           ['./route.html','🗺️ 路线旅行','#d4708a'],
+          ['./perspectives.html','🗣️ 多角度看历史','#b8862e'],
           ['./profile.html','🧭 我的思维画像','#3a7868'],
         ].map(([href,label,c])=>`<a href="${href}" style="display:inline-block;padding:9px 17px;border-radius:999px;font-weight:700;font-size:13.5px;text-decoration:none;color:#fff;background:${c};box-shadow:0 3px 12px ${c}66;transition:transform .15s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">${label}</a>`).join('')}
       </div>
-      <p class="intro-sub" style="margin-top:8px;opacity:.75">🧩 7 个互动探索 · 训练时间观 · 空间观 · 因果观 · 比较与证据思维</p>
+      <p class="intro-sub" style="margin-top:8px;opacity:.75">🧩 8 个互动探索 · 训练时间观 · 空间观 · 因果观 · 比较 · 证据 · 多角度思维 · <a href="./family.html" style="color:var(--ink2,#9a8a70);text-decoration:underline">👨‍👩‍👧 家长 / 教师入口</a></p>
     </div>
     <div class="stage-cards-grid">
       ${N.stages.filter(s => !s.hidden).map((stage, i) => {

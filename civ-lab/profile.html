@@ -60,6 +60,8 @@ const MODES=[
    tip:'你关注人物之间如何互相影响。'},
   {key:'换位·自我观',color:'#8a7ad0',score:(features['角色体验']||0)+(visits['roleplay']||0),
    tip:'你愿意走进古人的处境,思考自己会怎么选。'},
+  {key:'多元视角',color:'#b8862e',score:(features['多角度']||0)+(visits['perspectives']||0),
+   tip:'你愿意听见同一件事的不同声音,再做判断。'},
 ];
 const totalAct=Object.values(features).reduce((a,b)=>a+b,0)+Object.values(visits).reduce((a,b)=>a+b,0);
 const wrap=document.getElementById('wrap');
@@ -80,7 +82,8 @@ if(totalAct<2){
     '比较思维':['⚖️','文明比较者','你善于把不同文明并排观察,在异同中看见更大的图景。'],
     '证据思维':['🔍','证据侦探','你不轻信结论,在意每段历史"凭什么被知道"——这是真正的史学精神。'],
     '关系观':['🕸️','关系编织者','你着迷于人与人之间的牵连,看历史像看一张巨大的关系网。'],
-    '换位·自我观':['🎭','换位思考者','你愿意走进古人的处境,在他们的两难里照见自己的价值。']};
+    '换位·自我观':['🎭','换位思考者','你愿意走进古人的处境,在他们的两难里照见自己的价值。'],
+    '多元视角':['🗣️','多元倾听者','你明白同一件事会有不同的声音,愿意听见各方再做判断——这是难得的成熟。']};
   const t=TYPE[top.key]||['🧭','历史探索者','你正在用自己的方式认识世界历史。'];
   const max=Math.max(1,...MODES.map(m=>m.score));
   // 兴趣区域
@@ -116,7 +119,7 @@ if(totalAct<2){
     h+=`</div></div>`;
   }
   h+=`<div class="actions">
-    <a class="actbtn" href="./${({'时间·空间观':'meanwhile','因果观':'causality','比较思维':'compare','证据思维':'evidence','关系观':'medieval-network','换位·自我观':'roleplay'})[nextTip.key]||'meanwhile'}.html">去练练「${nextTip.key}」 →</a>
+    <a class="actbtn" href="./${({'时间·空间观':'meanwhile','因果观':'causality','比较思维':'compare','证据思维':'evidence','关系观':'medieval-network','换位·自我观':'roleplay','多元视角':'perspectives'})[nextTip.key]||'meanwhile'}.html">去练练「${nextTip.key}」 →</a>
     <button class="actbtn ghost" id="reset">清空我的画像</button></div>`;
   wrap.innerHTML=h;
   const rb=document.getElementById('reset'); if(rb) rb.onclick=()=>{ if(confirm('确定清空本地的历史思维画像数据吗?')){Track.reset();location.reload();} };
