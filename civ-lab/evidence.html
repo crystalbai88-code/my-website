@@ -49,10 +49,10 @@
 </div>
 
 <script src="./track.js?v=1"></script>
-<script src="./evidence_data.js?v=1"></script>
+<script src="./evidence_data.js?v=2"></script>
 <script>
 const REGION_IC={'东亚':'🏯','南亚':'🕉️','西亚·中东':'☪️','欧洲':'🏛️','非洲':'🔺','美洲':'🗿','东南亚':'⛵'};
-const DEEP={early:'civ-deep.html',classical:'classical-deep.html',medieval:'medieval-deep.html'};
+const DEEP={early:'civ-deep.html',classical:'classical-deep.html',medieval:'medieval-deep.html',global:'global-deep.html',modern:'modern-deep.html',contemporary:'contemporary-deep.html'};
 const CIV_NAMES=[...new Set(EVIDENCE.map(e=>e.civName))];
 let score=0, total=0, cur=null;
 function pick(arr,n,exclude){const p=arr.filter(x=>x!==exclude);const out=[];while(out.length<n&&p.length){out.push(p.splice(Math.floor(Math.random()*p.length),1)[0]);}return out;}

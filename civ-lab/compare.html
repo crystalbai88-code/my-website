@@ -73,12 +73,12 @@
 </div>
 
 <script src="./track.js?v=1"></script>
-<script src="./compare_data.js?v=1"></script>
+<script src="./compare_data.js?v=2"></script>
 <script>
 const BYID={}; COMPARE_CIVS.forEach(c=>BYID[c.id]=c);
-const REGIONS=['全部','东亚','南亚','西亚·中东','欧洲','非洲','美洲','东南亚'];
+const REGIONS=['全部','东亚','南亚','西亚·中东','欧洲','非洲','美洲','东南亚','近代·全球','工业·现代','当代'];
 let curReg='全部', selected=[];
-const DEEP={early:'civ-deep.html',classical:'classical-deep.html',medieval:'medieval-deep.html'};
+const DEEP={early:'civ-deep.html',classical:'classical-deep.html',medieval:'medieval-deep.html',global:'global-deep.html',modern:'modern-deep.html',contemporary:'contemporary-deep.html'};
 
 document.getElementById('regbar').innerHTML=REGIONS.map((r,i)=>`<span class="regbtn${i===0?' on':''}" data-r="${r}">${r}</span>`).join('');
 document.querySelectorAll('.regbtn').forEach(b=>b.onclick=()=>{curReg=b.dataset.r;document.querySelectorAll('.regbtn').forEach(x=>x.classList.remove('on'));b.classList.add('on');drawList();});

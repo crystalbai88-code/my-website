@@ -70,7 +70,7 @@
     <div class="yearbig" id="yearbig"></div>
     <div class="slider-row">
       <button class="stepbtn" id="minus">−</button>
-      <input type="range" id="slider" min="-3500" max="1550" value="-500" step="10">
+      <input type="range" id="slider" min="-3500" max="2025" value="-500" step="10">
       <button class="stepbtn" id="plus">+</button>
       <button class="playbtn" id="play">▶ 播放</button>
     </div>
@@ -82,18 +82,19 @@
 </div>
 
 <script src="./track.js?v=1"></script>
-<script src="./meanwhile_data.js?v=1"></script>
+<script src="./meanwhile_data.js?v=2"></script>
 <script>
-const REGION_ICON={'东亚':'🏯','南亚':'🕉️','西亚·中东':'☪️','欧洲':'🏛️','非洲':'🔺','美洲':'🗿','东南亚':'⛵'};
-const CIV_COLOR={early:'#c86820',classical:'#b83018',medieval:'#8a5a90'};
+const REGION_ICON={'东亚':'🏯','南亚':'🕉️','西亚·中东':'☪️','欧洲':'🏛️','非洲':'🔺','美洲':'🗿','东南亚':'⛵','全球':'🌐'};
+const CIV_COLOR={early:'#c86820',classical:'#b83018',medieval:'#8a5a90',global:'#3a7868',modern:'#506890',contemporary:'#6a4a90'};
 const CIV_BY_ID={}; WORLD_CIVS.forEach(c=>CIV_BY_ID[c.id]=c);
-const DEEP_PAGE={early:'civ-deep.html',classical:'classical-deep.html',medieval:'medieval-deep.html'};
+const DEEP_PAGE={early:'civ-deep.html',classical:'classical-deep.html',medieval:'medieval-deep.html',global:'global-deep.html',modern:'modern-deep.html',contemporary:'contemporary-deep.html'};
 const WINDOW=60; // 事件/人物前后年限
 
 function fmtYear(y){ return y<0?('公元前 '+(-y)):('公元 '+y); }
 function eraLabel(y){
   if(y<-3000)return'文明黎明';if(y<-1000)return'青铜时代';if(y<-200)return'轴心时代';
-  if(y<500)return'古典帝国';if(y<1000)return'中世纪前期';return'中世纪后期';
+  if(y<500)return'古典帝国';if(y<1000)return'中世纪前期';if(y<1500)return'中世纪后期';
+  if(y<1750)return'大航海·全球连接';if(y<1900)return'工业革命时代';if(y<1945)return'世界大战';return'当代世界';
 }
 function go(page,hash){ if(window.Track)Track.log('此时世界'); window.location.href='./'+page+'#'+hash; }
 
@@ -131,7 +132,7 @@ function render(year){
 }
 
 // 快速跳转
-const JUMPS=[['前3000·苏美尔',-3000],['前2500·金字塔',-2500],['前1300·商朝',-1300],['前500·孔子与佛陀',-500],['前221·秦统一',-221],['公元1·罗马',1],['700·唐朝',700],['1000·宋与拜占庭',1000],['1250·蒙古',1250]];
+const JUMPS=[['前3000·苏美尔',-3000],['前2500·金字塔',-2500],['前1300·商朝',-1300],['前500·孔子与佛陀',-500],['前221·秦统一',-221],['公元1·罗马',1],['700·唐朝',700],['1000·宋与拜占庭',1000],['1250·蒙古',1250],['1500·大航海',1500],['1789·法国大革命',1789],['1914·一战',1914],['1945·二战后',1945],['2000·全球化·AI',2000]];
 document.getElementById('jumps').innerHTML=JUMPS.map(j=>'<span class="jump" data-y="'+j[1]+'">'+j[0]+'</span>').join('');
 document.querySelectorAll('.jump').forEach(b=>b.onclick=()=>{ setYear(+b.dataset.y); });
 
