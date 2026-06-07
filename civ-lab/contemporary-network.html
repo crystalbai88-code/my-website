@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>当代与未来文明 · 人物关系网</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Cinzel:wght@500;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css"/>
+<style>
+  html,body{height:100%;overflow:hidden}
+  #app{position:relative;z-index:10;display:flex;flex-direction:column;height:100vh}
+  .nav{display:flex;align-items:center;gap:10px;padding:12px 18px 4px;flex-wrap:wrap}
+  .nav .title{font-family:var(--serif);font-weight:900;font-size:16px;color:var(--ink);text-shadow:var(--label-shadow)}
+  .nav .sub{font-family:var(--mono);font-size:10px;color:var(--ink2);letter-spacing:.1em}
+  .civ-row{display:flex;gap:8px;padding:8px 18px 10px;flex-wrap:wrap;align-items:center}
+  .civ-pill{font-family:var(--sans);font-size:12.5px;font-weight:700;color:var(--ink2);background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:var(--r-pill);padding:6px 15px;cursor:pointer;transition:all .15s;backdrop-filter:blur(10px)}
+  .civ-pill:hover{color:var(--gold);border-color:var(--gold)}
+  .civ-pill.on{color:#fff;background:var(--gold);border-color:var(--gold)}
+  .rel-pill{font-family:var(--sans);font-size:11.5px;font-weight:700;color:var(--ink2);background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:var(--r-pill);padding:4px 12px;cursor:pointer;transition:all .15s}
+  .rel-pill:hover{color:var(--ink)}
+  .rel-pill.on{color:#fff;border-color:transparent}
+  #canvas-wrap{flex:1;position:relative;overflow:hidden}
+  canvas{position:absolute;inset:0;cursor:grab}
+  canvas.dragging{cursor:grabbing}
+  #panel{position:absolute;right:14px;top:14px;width:250px;max-height:calc(100vh - 130px);overflow-y:auto;display:none;padding:0}
+  #panel.show{display:block}
+  #panel .p-pad{padding:15px 17px}
+  .p-civ{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+  .p-name{font-family:var(--serif);font-size:20px;font-weight:900;color:var(--ink);line-height:1.2;margin-top:3px}
+  .p-eng{font-family:var(--mono);font-size:11px;color:var(--ink3);margin-top:2px}
+  .p-dates{font-family:var(--mono);font-size:11px;color:var(--ink2);margin:5px 0 8px}
+  .p-role{display:inline-block;padding:2px 11px;border-radius:var(--r-pill);font-size:10px;font-weight:700;margin-bottom:6px}
+  .p-bio{font-size:12.5px;color:var(--ink);line-height:1.72;padding-top:9px;border-top:1px solid var(--panel-line)}
+  .p-rels{margin-top:11px;padding-top:9px;border-top:1px solid var(--panel-line)}
+  .p-rels h4{font-family:var(--mono);font-size:10px;color:var(--gold);letter-spacing:.1em;margin-bottom:7px;text-transform:uppercase}
+  .rel-item{font-size:12px;color:var(--ink);padding:4px 0;display:flex;gap:6px;cursor:pointer;align-items:flex-start;transition:color .12s}
+  .rel-item:hover{color:var(--gold)}
+  .rel-type{color:var(--ink2);font-size:10px;flex-shrink:0;margin-top:1px;background:rgba(128,128,128,.16);padding:1px 6px;border-radius:6px}
+  .legend{position:absolute;left:14px;bottom:14px;font-size:11px}
+  .leg-row{display:flex;align-items:center;gap:6px;margin-bottom:5px;color:var(--ink2)}
+  .leg-row:last-child{margin-bottom:0}
+  .leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;background:#888}
+  .stats{position:absolute;left:14px;top:14px;font-family:var(--mono);font-size:10px;color:var(--ink2)}
+  .hint{position:absolute;bottom:14px;right:14px;font-family:var(--mono);font-size:10px;color:var(--ink3);text-align:right;max-width:46%}
+  @media(max-width:768px){ #panel{width:calc(100vw - 28px)} .legend{display:none} }
+</style>
+</head>
+<body data-theme="textbook">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="nav">
+    <a href="./index.html" class="ds-pill">⌂ 返回</a>
+    <span class="title">当代与未来文明 · 人物关系网</span>
+    <span class="sub">公元 1945 — 至今</span>
+    <div class="ds-theme-switch" id="themeSwitch" style="margin-left:auto">
+      <button data-t="deepblue" title="静夜深蓝"></button>
+      <button data-t="museum" title="博物馆典藏"></button>
+      <button data-t="textbook" title="现代教科书"></button>
+      <button data-t="parchment" title="羊皮纸古卷"></button>
+    </div>
+  </div>
+  <div class="civ-row">
+    <span class="ds-kicker" style="margin-right:2px">选择国度</span>
+        <button class="civ-pill on" data-civ="un">🕊️ 联合国</button>
+    <button class="civ-pill" data-civ="coldwar">❄️ 冷战</button>
+    <button class="civ-pill" data-civ="globalization">🌐 全球化</button>
+    <button class="civ-pill" data-civ="internet">🕸️ 互联网</button>
+    <button class="civ-pill" data-civ="ai">🤖 AI时代</button>
+    <button class="civ-pill" data-civ="climate">🌡️ 气候变化</button>
+    <button class="civ-pill" data-civ="space">🚀 太空探索</button>
+  </div>
+  <div class="civ-row" id="relFilterRow" style="padding-top:0">
+    <span class="ds-kicker" style="margin-right:2px">关系类型</span>
+  </div>
+  <div id="canvas-wrap">
+    <canvas id="c"></canvas>
+    <div id="panel" class="ds-panel"><div class="p-pad">
+      <div class="p-civ" id="p-civ"></div>
+      <div class="p-name" id="p-name"></div>
+      <div class="p-eng" id="p-eng"></div>
+      <div class="p-dates" id="p-dates"></div>
+      <span class="p-role" id="p-role"></span>
+      <div class="p-bio" id="p-bio"></div>
+      <div class="p-rels"><h4>本国关联人物</h4><div id="p-rels"></div></div>
+    </div></div>
+    <div class="legend ds-panel" style="padding:10px 13px">
+      <div class="leg-row"><div class="leg-dot" data-role="ruler"></div><span>统治者</span></div>
+      <div class="leg-row"><div class="leg-dot" data-role="general"></div><span>将领</span></div>
+      <div class="leg-row"><div class="leg-dot" data-role="thinker"></div><span>思想家</span></div>
+      <div class="leg-row"><div class="leg-dot" data-role="religious"></div><span>宗教人物</span></div>
+      <div class="leg-row"><div class="leg-dot" data-role="other"></div><span>其他</span></div>
+    </div>
+    <div class="stats ds-panel" id="stats" style="padding:7px 12px"></div>
+    <div class="hint">拖拽节点 · 滚轮缩放 · 点击查看详情</div>
+  </div>
+</div>
+<script src="./contemporary_people.js?v=1"></script>
+<script>
+const CIV_NAMES={un:"联合国",coldwar:"冷战",globalization:"全球化",internet:"互联网",ai:"AI时代",climate:"气候变化",space:"太空探索",cross:"跨主题"};
+const ROLE_NAMES={ruler:"统治者",general:"将领",thinker:"思想家",religious:"宗教人物",other:"其他人物"};
+// 节点按角色着色，色值映射到设计系统变量，主题切换时刷新
+const ROLE_VAR={ruler:'--gold',general:'--vermilion',thinker:'--cyan',religious:'--purple',other:'--ink3'};
+let TH={role:{}};
+function refreshTheme(){
+  const cs=getComputedStyle(document.body);
+  TH.ink=cs.getPropertyValue('--ink').trim()||'#e8e4d8';
+  TH.edge=cs.getPropertyValue('--grid-ink').trim()||'rgba(200,200,200,.6)';
+  TH.chip=cs.getPropertyValue('--panel-bg').trim()||'rgba(0,0,0,.6)';
+  TH.chipInk=cs.getPropertyValue('--ink').trim()||'#fff';
+  TH.role={}; for(const k in ROLE_VAR) TH.role[k]=cs.getPropertyValue(ROLE_VAR[k]).trim()||'#888';
+  // 同步图例圆点颜色
+  document.querySelectorAll('.leg-dot[data-role]').forEach(d=>d.style.background=TH.role[d.dataset.role]);
+}
+function roleColor(r){return (TH.role&&TH.role[r])||'#888';}
+
+const P=CLASSICAL_PEOPLE;
+
+// ── 关系分层:从关系文字自动归类 ──
+let relFilter='all';
+const REL_CATS=[['all','全部'],['family','家族'],['thought','师承·思想'],['power','君臣·权力'],['ally','盟友'],['war','敌对·战争']];
+const REL_CAT_COLOR={family:'#d4708a',thought:'#5aa0c8',power:'#d4a858',ally:'#5ab87a',war:'#c84830',other:'#888'};
+function catOf(t){
+  t=t||'';
+  if(/父|子|母|女|妻|夫|兄|弟|祖|孙|家族|联姻|外孙|岳|嫁|后裔|世袭|血脉/.test(t))return'family';
+  if(/师|徒|弟子|学生|门生|思想|译|启发|衣钵|理学|传法/.test(t)||/继承.*(学|思想|衣钵)/.test(t))return'thought';
+  if(/敌|战|征|攻|杀|刺|灭|对抗|宿敌|叛|起义|入侵|镇压|歼/.test(t))return'war';
+  if(/臣|效力|奉命|重用|辅|继位|册封|提拔|放逐|篡|拥立|摄政|侍奉|归顺|进谏|部下|麾下|赐死/.test(t))return'power';
+  if(/盟|友|挚友|结盟|支持|同盟|共事|同朝|同时代|同乡|同属/.test(t))return'ally';
+  return'other';
+}
+
+// Build lookup
+const BY_ID={};
+P.forEach(p=>{BY_ID[p.id]=p});
+
+// ── 真实画像 (维基百科 pageimages；多为公有领域：半身像/古画/钱币像) ──
+const PORTRAIT={}; // id -> Image(已加载) | false(无) | null(加载中)
+// 部分人物维基条目标题与中文名不同，做映射以提高命中率
+const WIKI_TITLE={
+  taizong:'唐太宗', wuzetian:'武则天', xuanzong:'唐玄宗', libai:'李白', dufu:'杜甫', xuanzang:'玄奘', anlushan:'安禄山',
+  zhao_kuangyin:'宋太祖', wang_anshi:'王安石', sima_guang:'司马光', sushi:'苏轼', yuefei:'岳飞', zhuxi:'朱熹', shen_kuo:'沈括',
+  murasaki:'紫式部', yoritomo:'源頼朝', hojo:'北条時宗', ashikaga:'足利義満',
+  genghis:'成吉思汗', ogedei:'窝阔台', kublai:'忽必烈',
+  muhammad:'穆罕默德', abu_bakr:'阿布·伯克尔', umar:'欧麦尔', ali:'阿里·本·阿比·塔利卜',
+  harun:'哈伦·拉希德', al_khwarizmi:'花拉子米', avicenna:'伊本·西那', averroes:'伊本·路世德', ibn_battuta:'伊本·白图泰',
+  harsha:'戒日王', rajaraja:'罗茶罗乍一世', ramanuja:'罗摩奴阇',
+  suryavarman2:'苏耶跋摩二世', jayavarman7:'阇耶跋摩七世',
+  justinian:'查士丁尼一世', theodora:'狄奥多拉', basil2:'巴西尔二世', vladimir:'弗拉基米尔一世', rurik:'留里克', leif_erikson:'萊夫·埃里克松',
+  charlemagne:'查理曼', urban2:'乌尔班二世', aquinas:'托马斯·阿奎那', dante:'但丁',
+  sundiata:'松迪亚塔', mansa_musa:'曼萨·穆萨',
+  pakal:'巴加尔二世', montezuma2:'蒙特苏马二世', pachacuti:'帕查库特克',
+  marco_polo:'马可·波罗',
+  weizheng:'魏徵', lijing:'李靖 (唐朝)', direnjie:'狄仁杰', yangguifei:'杨贵妃', guoziyi:'郭子仪', shisiming:'史思明',
+  baijuyi:'白居易', wangwei:'王维', hanyu:'韩愈', liuzongyuan:'柳宗元', jianzhen:'鉴真', huangchao:'黄巢', zhuwen:'朱温',
+  khadijah:'赫蒂彻', uthman:'奥斯曼·伊本·阿凡', fatima:'法蒂玛', khalid:'哈立德·本·瓦利德', husayn:'侯赛因·本·阿里',
+  muawiya:'穆阿维叶一世', abdmalik:'阿卜杜勒·马利克', tariq:'塔里克·伊本·齐亚德', abumuslim:'阿布·穆斯林',
+  mansur:'曼苏尔 (阿拔斯)', mamun:'马蒙', abdrahman1:'阿卜杜拉赫曼一世', razi:'拉齐',
+  belisarius:'贝利撒留', narses:'纳尔西斯', heraclius:'希拉克略', leo3:'利奥三世 (拜占庭)', johndamascus:'大马士革的约翰',
+  nikephoros2:'尼基弗鲁斯二世', cyrilmeth:'西里尔和美多德', photios:'佛提乌一世',
+  oleg:'预言者奥列格', igor:'伊戈尔一世', olga:'奥丽加', sviatoslav:'斯维亚托斯拉夫一世', yaroslav:'雅罗斯拉夫一世',
+  clovis:'克洛维一世', charlesmartel:'查理·马特', pepinshort:'丕平三世', alcuin:'阿尔琴', einhard:'艾因哈德',
+  louispious:'虔诚者路易', alfred:'阿尔弗雷德大帝', cnut:'克努特大帝',
+};
+function wikiTitle(p){ return WIKI_TITLE[p.id] || (p.n||'').replace(/[（(].*?[)）]/g,'').trim(); }
+// 批量取画像：一次请求最多 ~45 个标题，避免并发限流
+function loadPortraitsBatch(people){
+  const todo=people.filter(p=>PORTRAIT[p.id]===undefined);
+  if(!todo.length) return;
+  todo.forEach(p=>PORTRAIT[p.id]=null);
+  for(let i=0;i<todo.length;i+=45){
+    const chunk=todo.slice(i,i+45);
+    const origMap={}; chunk.forEach(p=>{origMap[wikiTitle(p)]=p;});
+    const titles=chunk.map(wikiTitle).join('|');
+    const url='https://zh.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=200&titles='+encodeURIComponent(titles);
+    fetch(url).then(r=>r.json()).then(j=>{
+      const q=j.query||{}; const back={};
+      (q.normalized||[]).forEach(n=>back[n.to]=n.from);
+      (q.redirects||[]).forEach(rr=>{back[rr.to]=back[rr.from]||rr.from;});
+      const resolve=t=>{let cur=t,g=0;while(g++<4){if(origMap[cur])return origMap[cur];if(back[cur]){cur=back[cur];continue;}break;}return origMap[cur]||null;};
+      const got=new Set();
+      Object.values(q.pages||{}).forEach(pg=>{
+        const person=resolve(pg.title); if(!person)return; got.add(person.id);
+        if(pg.thumbnail&&pg.thumbnail.source){const img=new Image();img.referrerPolicy='no-referrer';img.onload=()=>PORTRAIT[person.id]=img;img.onerror=()=>PORTRAIT[person.id]=false;img.src=pg.thumbnail.source;}
+        else PORTRAIT[person.id]=false;
+      });
+      chunk.forEach(p=>{ if(!got.has(p.id)&&PORTRAIT[p.id]===null) PORTRAIT[p.id]=false; });
+    }).catch(()=>{ chunk.forEach(p=>{ if(PORTRAIT[p.id]===null) PORTRAIT[p.id]=undefined; }); });
+  }
+}
+function loadPortrait(p){ loadPortraitsBatch([p]); }
+
+const canvas=document.getElementById('c');
+const ctx=canvas.getContext('2d');
+let W=0,H=0;
+let cvOff={x:0,y:0}; // 画布相对视口的偏移(顶栏在上方，必须扣除否则点击命中错位)
+let nodes=[],edges=[];
+let selId=null,hovId=null;
+let curCiv='un',curRole='all';
+let drag=null,dragOffset={x:0,y:0};
+let panX=0,panY=0,scale=1;
+let lastPan={x:0,y:0},panStart=null;
+let animFrame=0;
+
+function resize(){
+  const wrap=document.getElementById('canvas-wrap');
+  W=wrap.clientWidth;H=wrap.clientHeight;
+  canvas.width=W*devicePixelRatio;
+  canvas.height=H*devicePixelRatio;
+  canvas.style.width=W+'px';canvas.style.height=H+'px';
+  ctx.scale(devicePixelRatio,devicePixelRatio);
+  const _r=canvas.getBoundingClientRect(); cvOff={x:_r.left,y:_r.top};
+}
+
+function getVisible(){
+  return P.filter(p=>{
+    if(curCiv!=='all'&&p.c!==curCiv)return false;
+    if(curRole!=='all'&&p.r!==curRole)return false;
+    return true;
+  });
+}
+
+function buildGraph(){
+  const vis=getVisible();
+  const visIds=new Set(vis.map(p=>p.id));
+  // Reuse existing positions or init new
+  const oldMap={};
+  nodes.forEach(n=>oldMap[n.id]=n);
+  nodes=vis.map(p=>{
+    if(oldMap[p.id])return oldMap[p.id];
+    const cx=W/2+(Math.random()-.5)*300;
+    const cy=H/2+(Math.random()-.5)*250;
+    return{id:p.id,x:cx,y:cy,vx:(Math.random()-.5)*2,vy:(Math.random()-.5)*2,data:p,pinned:false};
+  });
+  edges=[];
+  const added=new Set();
+  vis.forEach(p=>{
+    p.rel.forEach(r=>{
+      if(!visIds.has(r.i))return;
+      const key=[p.id,r.i].sort().join('~');
+      if(!added.has(key)){added.add(key);edges.push({a:p.id,b:r.i,t:r.t,cat:catOf(r.t)})}
+    });
+  });
+  document.getElementById('stats').textContent=nodes.length+'位人物  '+edges.length+'条关系';
+  loadPortraitsBatch(vis); // 批量拉取真实画像(1-2个请求)
+  alpha=1; // 重新布局时重新加热
+}
+
+let alpha=1; // 模拟"能量"，随时间冷却；稳定后定格，点击更顺滑
+function tick(){
+  if(alpha<0.008) return;      // 已稳定 → 节点停止漂移，便于点击
+  alpha*=0.992;
+  const rep=5600,k=124;        // 头像更大，间距相应加大
+  const damp=0.82;
+  nodes.forEach(n=>{if(!n.pinned){n.vx*=damp;n.vy*=damp;}});
+  // Repulsion
+  for(let i=0;i<nodes.length;i++){
+    for(let j=i+1;j<nodes.length;j++){
+      const a=nodes[i],b=nodes[j];
+      const dx=b.x-a.x,dy=b.y-a.y;
+      const d=Math.sqrt(dx*dx+dy*dy)||1;
+      const f=rep/(d*d);
+      if(!a.pinned){a.vx-=dx/d*f;a.vy-=dy/d*f;}
+      if(!b.pinned){b.vx+=dx/d*f;b.vy+=dy/d*f;}
+    }
+  }
+  // Edges
+  edges.forEach(e=>{
+    const a=nodes.find(n=>n.id===e.a),b=nodes.find(n=>n.id===e.b);
+    if(!a||!b)return;
+    const dx=b.x-a.x,dy=b.y-a.y;
+    const d=Math.sqrt(dx*dx+dy*dy)||1;
+    const f=(d-k)*0.03;
+    if(!a.pinned){a.vx+=dx/d*f;a.vy+=dy/d*f;}
+    if(!b.pinned){b.vx-=dx/d*f;b.vy-=dy/d*f;}
+  });
+  // Center pull
+  nodes.forEach(n=>{
+    if(!n.pinned){
+      n.vx+=(W/2-n.x)*0.005;
+      n.vy+=(H/2-n.y)*0.005;
+      n.x+=n.vx;n.y+=n.vy;
+      n.x=Math.max(30,Math.min(W-30,n.x));
+      n.y=Math.max(30,Math.min(H-30,n.y));
+    }
+  });
+}
+
+function draw(){
+  ctx.save();
+  ctx.clearRect(0,0,W,H);
+  ctx.translate(panX,panY);
+  ctx.scale(scale,scale);
+  // Edges
+  edges.forEach(e=>{
+    const a=nodes.find(n=>n.id===e.a),b=nodes.find(n=>n.id===e.b);
+    if(!a||!b)return;
+    const inFilter = relFilter==='all' || e.cat===relFilter;
+    const isHighlighted=(selId&&(a.id===selId||b.id===selId)) || (relFilter!=='all'&&inFilter);
+    ctx.save();
+    if(relFilter!=='all' && !inFilter){ ctx.globalAlpha=0.05; ctx.strokeStyle=TH.edge; ctx.lineWidth=0.5; }
+    else { ctx.globalAlpha=isHighlighted?0.9:0.32; ctx.strokeStyle=isHighlighted?(REL_CAT_COLOR[e.cat]||roleColor(a.data.r)):TH.edge; ctx.lineWidth=isHighlighted?1.8:0.7; }
+    if(!isHighlighted)ctx.setLineDash([3,4]);
+    ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+    ctx.restore();
+    // 选中节点时，在连线中点标出"两人之间是什么关系"
+    const showLabel = e.t && selId && (a.id===selId||b.id===selId);
+    if(showLabel){
+      const mx=(a.x+b.x)/2, my=(a.y+b.y)/2;
+      ctx.save();
+      ctx.font='600 10px "Noto Sans SC",system-ui,sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      const w=ctx.measureText(e.t).width+10;
+      ctx.globalAlpha=0.95; ctx.fillStyle=TH.chip||'rgba(0,0,0,.55)';
+      const rr=7; const x=mx-w/2,y=my-9,h=18;
+      ctx.beginPath();ctx.moveTo(x+rr,y);ctx.arcTo(x+w,y,x+w,y+h,rr);ctx.arcTo(x+w,y+h,x,y+h,rr);ctx.arcTo(x,y+h,x,y,rr);ctx.arcTo(x,y,x+w,y,rr);ctx.closePath();ctx.fill();
+      ctx.fillStyle=TH.chipInk||'#fff'; ctx.fillText(e.t,mx,my);
+      ctx.restore();
+    }
+  });
+  // Nodes (头像图标节点)
+  nodes.forEach(n=>{
+    const p=n.data;
+    const col=roleColor(p.r);
+    const isSel=n.id===selId,isHov=n.id===hovId;
+    const r=isSel?21:isHov?18:15;
+    const icon=(typeof personIconOf==='function')?personIconOf(p):'👤';
+    ctx.save();
+    // 强调外环(选中/悬浮)
+    if(isSel||isHov){
+      ctx.beginPath();ctx.arc(n.x,n.y,r+4,0,Math.PI*2);
+      ctx.strokeStyle=col;ctx.lineWidth=2.5;ctx.globalAlpha=isSel?0.95:0.5;ctx.stroke();
+    }
+    // 角色色圆底(头像底座)
+    ctx.beginPath();ctx.arc(n.x,n.y,r,0,Math.PI*2);
+    ctx.fillStyle=col;ctx.globalAlpha=isSel||isHov?1:0.9;ctx.fill();ctx.globalAlpha=1;
+    const portrait=PORTRAIT[n.id];
+    if(portrait && portrait.naturalWidth){
+      // 真实画像(圆形裁剪, cover 填充)
+      ctx.save();
+      ctx.beginPath();ctx.arc(n.x,n.y,r-1,0,Math.PI*2);ctx.clip();
+      const iw=portrait.naturalWidth,ih=portrait.naturalHeight,side=Math.min(iw,ih);
+      ctx.globalAlpha=isSel||isHov?1:0.96;
+      ctx.drawImage(portrait,(iw-side)/2,(ih-side)*0.32,side,side,n.x-r,n.y-r,2*r,2*r);
+      ctx.restore();
+    } else {
+      // 严肃图标占位
+      ctx.globalAlpha=isSel||isHov?1:0.95;
+      ctx.font=Math.round(r*1.3)+'px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",system-ui';
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(icon,n.x,n.y+1);
+    }
+    // 描边(角色色环)
+    ctx.globalAlpha=1;ctx.beginPath();ctx.arc(n.x,n.y,r,0,Math.PI*2);
+    ctx.strokeStyle=portrait&&portrait.naturalWidth?col:'rgba(255,255,255,.85)';
+    ctx.lineWidth=portrait&&portrait.naturalWidth?2.5:1.5;ctx.stroke();
+    ctx.restore();
+    // 名字(节点下方)
+    const showLabel=isSel||isHov||scale>1.05||nodes.length<28;
+    if(showLabel){
+      ctx.save();
+      ctx.font=(isSel?'700 12px':'500 11px')+' "Noto Sans SC",system-ui,sans-serif';
+      ctx.fillStyle=TH.ink;ctx.textAlign='center';ctx.textBaseline='top';
+      ctx.shadowColor=TH.chip||'rgba(0,0,0,.5)';ctx.shadowBlur=3;
+      ctx.fillText(p.n,n.x,n.y+r+4);
+      ctx.restore();
+    }
+  });
+  ctx.restore();
+  tick();
+  requestAnimationFrame(draw);
+}
+
+function screenToWorld(sx,sy){
+  return{x:(sx-cvOff.x-panX)/scale,y:(sy-cvOff.y-panY)/scale};
+}
+
+function nodeAt(sx,sy){
+  const w=screenToWorld(sx,sy);
+  return nodes.find(n=>{
+    const dx=n.x-w.x,dy=n.y-w.y;
+    return Math.sqrt(dx*dx+dy*dy)<20/scale;
+  });
+}
+
+function showDetail(id){
+  selId=id;
+  const p=BY_ID[id];if(!p)return;
+  const col=roleColor(p.r);
+  document.getElementById('p-civ').textContent=CIV_NAMES[p.c]||p.c;
+  document.getElementById('p-name').textContent=p.n;
+  document.getElementById('p-eng').textContent=p.e;
+  document.getElementById('p-dates').textContent=p.d;
+  const roleEl=document.getElementById('p-role');
+  roleEl.textContent=ROLE_NAMES[p.r]||p.r;
+  roleEl.style.background=col+'26';
+  roleEl.style.color=col;
+  document.getElementById('p-bio').textContent=p.b;
+  // 只列「本国」关联人物（同一国度），跨文明关系不显示
+  const rels=p.rel.map(r=>{
+    const rp=BY_ID[r.i];
+    if(!rp||rp.c!==p.c)return'';
+    return`<div class="rel-item" onclick="showDetail('${r.i}')"><span class="rel-type">${r.t}</span><span>${rp.n}</span></div>`;
+  }).filter(Boolean);
+  const rh=document.querySelector('.p-rels h4');
+  document.getElementById('p-rels').innerHTML=rels.length?rels.join(''):'<div style="font-size:11.5px;color:var(--ink3)">（本国内无直接关联人物）</div>';
+  document.getElementById('panel').classList.add('show');
+}
+
+// Mouse/touch events
+let isDown=false,downPos={x:0,y:0},downTime=0;
+
+canvas.addEventListener('mousedown',e=>{
+  isDown=true;downPos={x:e.clientX,y:e.clientY};downTime=Date.now();
+  const n=nodeAt(e.clientX,e.clientY);
+  if(n){drag=n;drag._startX=n.x;drag._startY=n.y;drag._wasPinned=n.pinned;n.pinned=true;n.vx=0;n.vy=0;} // 按下即定住，避免点击期间漂移
+  else{panStart={x:e.clientX-panX,y:e.clientY-panY};}
+  canvas.classList.add('dragging');
+});
+
+canvas.addEventListener('mousemove',e=>{
+  const n=nodeAt(e.clientX,e.clientY);
+  hovId=n?n.id:null;
+  canvas.style.cursor=n?'pointer':isDown&&!drag?'grabbing':'grab';
+  if(!isDown)return;
+  if(drag){
+    const w=screenToWorld(e.clientX,e.clientY);
+    drag.x=w.x;drag.y=w.y;drag.vx=0;drag.vy=0;drag.pinned=true;
+    alpha=Math.max(alpha,0.5); // 拖动时让邻居重新调整
+  }else if(panStart){
+    panX=e.clientX-panStart.x;
+    panY=e.clientY-panStart.y;
+  }
+});
+
+canvas.addEventListener('mouseup',e=>{
+  canvas.classList.remove('dragging');
+  if(drag){
+    // 用鼠标屏幕移动量判断点击/拖拽（不受力导向漂移影响）
+    const movedPx=Math.abs(e.clientX-downPos.x)+Math.abs(e.clientY-downPos.y);
+    if(movedPx<6){ showDetail(drag.id); drag.pinned=drag._wasPinned; } // 点击：弹详情并恢复原状态
+    // 否则视为拖拽：保持 pinned（用户摆放的位置）
+    drag=null;
+  } else if(panStart){
+    const movedPx=Math.abs(e.clientX-downPos.x)+Math.abs(e.clientY-downPos.y);
+    if(movedPx<6&&Date.now()-downTime<400){ selId=null; document.getElementById('panel').classList.remove('show'); }
+    panStart=null;
+  }
+  isDown=false;
+});
+
+canvas.addEventListener('wheel',e=>{
+  e.preventDefault();
+  const factor=e.deltaY<0?1.1:0.9;
+  const wx=e.clientX-cvOff.x,wy=e.clientY-cvOff.y;
+  panX=wx-(wx-panX)*factor;
+  panY=wy-(wy-panY)*factor;
+  scale*=factor;
+  scale=Math.max(0.3,Math.min(4,scale));
+},{passive:false});
+
+canvas.addEventListener('touchstart',e=>{
+  e.preventDefault();
+  if(e.touches.length===1){
+    const t=e.touches[0];
+    const n=nodeAt(t.clientX,t.clientY);
+    if(n){drag=n;drag._tapX=t.clientX;drag._tapY=t.clientY;drag._tapTime=Date.now();drag._wasPinned=n.pinned;n.pinned=true;n.vx=0;n.vy=0;}
+    else panStart={x:t.clientX-panX,y:t.clientY-panY};
+  }
+},{passive:false});
+
+canvas.addEventListener('touchmove',e=>{
+  e.preventDefault();
+  if(e.touches.length===1){
+    const t=e.touches[0];
+    if(drag){const w=screenToWorld(t.clientX,t.clientY);drag.x=w.x;drag.y=w.y;drag.vx=0;drag.vy=0;drag.pinned=true;alpha=Math.max(alpha,0.5);}
+    else if(panStart){panX=t.clientX-panStart.x;panY=t.clientY-panStart.y;}
+  }
+},{passive:false});
+
+canvas.addEventListener('touchend',e=>{
+  e.preventDefault();
+  if(drag){
+    const t=(e.changedTouches&&e.changedTouches[0])||{clientX:drag._tapX,clientY:drag._tapY};
+    const movedPx=Math.abs(t.clientX-(drag._tapX||0))+Math.abs(t.clientY-(drag._tapY||0));
+    if(movedPx<10&&Date.now()-(drag._tapTime||0)<500){ showDetail(drag.id); drag.pinned=drag._wasPinned; }
+    drag=null;
+  }
+  panStart=null;
+},{passive:false});
+
+// 国度切换：每个国度只显示自己内部的人物关系网
+document.querySelectorAll('.civ-pill').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.civ-pill').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');curCiv=b.dataset.civ;
+    selId=null;document.getElementById('panel').classList.remove('show');
+    nodes=[];panX=0;panY=0;scale=1; // 换国重置布局
+    buildGraph();
+  });
+});
+
+// 关系类型筛选按钮
+(function(){
+  const row=document.getElementById('relFilterRow');
+  REL_CATS.forEach(([k,label])=>{
+    const b=document.createElement('button');
+    b.className='rel-pill'+(k==='all'?' on':''); b.textContent=label; b.dataset.cat=k;
+    if(k!=='all') b.style.setProperty('--cc',REL_CAT_COLOR[k]||'#888');
+    b.onclick=()=>{
+      relFilter=k;
+      row.querySelectorAll('.rel-pill').forEach(x=>{x.classList.remove('on');x.style.background='';});
+      b.classList.add('on');
+      if(k!=='all') b.style.background=REL_CAT_COLOR[k]||'#888';
+    };
+    row.appendChild(b);
+  });
+})();
+
+// 主题切换 (4 套, 与项目共用 localStorage)
+function applyTheme(t){
+  if(t&&t!=='deepblue') document.body.setAttribute('data-theme',t);
+  else document.body.removeAttribute('data-theme');
+  localStorage.setItem('civ_theme',t||'deepblue');
+  document.querySelectorAll('#themeSwitch button').forEach(x=>x.classList.toggle('active',x.dataset.t===(t||'deepblue')));
+  refreshTheme();
+}
+document.getElementById('themeSwitch').addEventListener('click',e=>{const b=e.target.closest('button');if(b)applyTheme(b.dataset.t);});
+
+window.addEventListener('resize',()=>{resize();});
+
+resize();
+applyTheme(localStorage.getItem('civ_theme')||'textbook');
+buildGraph();
+draw();
+</script>
+</body>
+</html>

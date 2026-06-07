@@ -447,6 +447,10 @@ function enterStage(stageId) {
     window.location.href = './modern-explorer.html';
     return;
   }
+  if (stageId === 'STAGE_06') {
+    window.location.href = './contemporary-explorer.html';
+    return;
+  }
   homeViewState = { mode: 'stage', stageId };
   renderStageDetail(stageId);
   document.getElementById('s-home').scrollTo({ top: 0, behavior: 'smooth' });

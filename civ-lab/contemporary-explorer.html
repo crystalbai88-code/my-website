@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>当代与未来文明 · 时间长河</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Cinzel:wght@500;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="./contemporary_people.js?v=1"></script>
+<script src="./contemporary_deep.js?v=1"></script>
+<style>
+.world-tip{background:rgba(20,16,30,.9)!important;color:#fff!important;border:none!important;border-radius:4px!important;font-size:10px!important;padding:1px 6px!important}
+.world-tip::before{display:none!important}
+.leaflet-popup-content{font-family:'Noto Sans SC',sans-serif;font-size:12.5px;line-height:1.6}
+.leaflet-popup-content b{color:#c84820}
+.leaflet-popup-content a{color:#2a6850;font-weight:700;text-decoration:none}
+html,body{height:100%;overflow:hidden}
+/* 顶栏标题 */
+.topbar h1{font-family:var(--serif);font-size:18px;font-weight:900;color:var(--ink);text-shadow:var(--label-shadow)}
+/* 主画布 */
+.canvas-svg{position:fixed;inset:0;width:100%;height:100%;z-index:10}
+.grid-line{stroke:var(--line);stroke-width:1}
+.grid-label{font-family:var(--mono);fill:var(--grid-ink);font-size:15px;text-anchor:middle;letter-spacing:.06em;font-weight:700}
+.region-label{font-family:var(--sans);fill:var(--grid-ink);font-size:13px;text-anchor:start;letter-spacing:.05em;font-weight:700}
+.region-divider{stroke:var(--line);stroke-width:1;opacity:.5}
+.civ-row{cursor:pointer}
+.civ-span{transition:opacity .25s,filter .25s}
+.civ-row:hover .civ-span{filter:brightness(1.25) drop-shadow(0 0 12px currentColor)}
+.orb-inner{transition:transform .3s cubic-bezier(.4,1,.6,1);transform-box:fill-box;transform-origin:center}
+.civ-row:hover .orb-inner{transform:scale(1.15)}
+.civ-orb-body{filter:drop-shadow(0 4px 14px rgba(0,0,0,.5))}
+.civ-name{font-family:var(--serif);font-weight:700;fill:var(--label-ink);text-shadow:var(--label-shadow);dominant-baseline:central}
+.relation-path{fill:none;stroke-width:1.5;opacity:0;transition:opacity .3s;pointer-events:none}
+.relation-path.visible{opacity:.55}
+.relation-path.continuation{stroke:var(--gold)}
+.relation-path.war{stroke:#ff7878}
+.relation-path.influence{stroke:#a070ff;stroke-dasharray:7 3}
+.event-line{stroke:var(--vermilion);stroke-width:2;stroke-dasharray:4 4;opacity:.5}
+.event-label{font-family:var(--mono);fill:var(--vermilion);font-size:12px;text-anchor:middle;letter-spacing:.04em;font-weight:700}
+/* FAB rail */
+.fab-rail{position:fixed;right:22px;bottom:22px;z-index:25;display:flex;flex-direction:column-reverse;gap:10px}
+/* 弹窗内容 */
+.ov-narr{font-family:var(--sans);font-size:13.5px;line-height:1.8;color:var(--paper-ink2)}
+.ov-h{font-family:var(--serif);font-size:15px;font-weight:700;color:var(--vermilion);margin:18px 0 8px}
+.ov-list{list-style:none;display:flex;flex-direction:column;gap:7px}
+.ov-list li{font-size:13px;line-height:1.6;color:var(--paper-ink);padding-left:18px;position:relative}
+.ov-list li::before{content:'◆';position:absolute;left:0;color:var(--gold);font-size:9px;top:4px}
+.ppl-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.ppl-chip{font-size:12px;color:var(--paper-ink);background:rgba(160,120,40,.12);border:1px solid rgba(160,120,40,.3);border-radius:99px;padding:4px 12px;cursor:pointer;text-decoration:none;transition:all .15s}
+.ppl-chip:hover{background:var(--gold);color:#fff;border-color:var(--gold)}
+/* 对比表 */
+.cmp-table{border-collapse:separate;border-spacing:0;width:100%;font-size:12.5px}
+.cmp-table th,.cmp-table td{border-bottom:1px solid rgba(160,120,40,.18);border-right:1px solid rgba(160,120,40,.12);padding:9px 11px;text-align:left;vertical-align:top;color:var(--paper-ink)}
+.cmp-table thead th{background:rgba(160,120,40,.16);font-family:var(--serif);font-weight:700;color:var(--vermilion);text-align:center}
+.cmp-table td.row-h{font-family:var(--serif);font-weight:700;color:var(--vermilion);background:rgba(160,120,40,.06);white-space:nowrap}
+.cmp-note{font-family:var(--sans);font-size:11px;color:var(--paper-ink3);margin-top:12px;line-height:1.6}
+/* AI 面板 */
+.ai-panel{position:fixed;right:24px;bottom:150px;z-index:46;width:380px;max-width:calc(100vw - 48px);height:500px;max-height:calc(100vh - 200px);background:var(--bg);backdrop-filter:blur(24px);border:1.5px solid var(--panel-line);border-radius:16px;display:none;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.ai-panel.open{display:flex}
+.ai-panel .pnl-head{padding:14px 16px;border-bottom:1px solid var(--panel-line);display:flex;align-items:center;gap:8px}
+.ai-panel .pnl-head h4{font-family:var(--serif);font-size:15px;color:var(--gold);flex:1;font-weight:700}
+.ai-panel .pnl-head button{width:30px;height:30px;border-radius:7px;border:1px solid var(--panel-line);background:transparent;cursor:pointer;color:var(--ink2);font-size:13px}
+.ai-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.ai-msg{padding:10px 13px;border-radius:12px;font-size:13px;line-height:1.7;max-width:90%}
+.ai-msg.user{align-self:flex-end;background:var(--gold);color:#fff;border-bottom-right-radius:4px}
+.ai-msg.bot{align-self:flex-start;background:var(--panel-bg);color:var(--ink);border:1px solid var(--panel-line);border-bottom-left-radius:4px}
+.ai-msg.bot .cursor{display:inline-block;width:6px;height:14px;background:var(--gold);margin-left:2px;animation:blink 1s steps(2) infinite;vertical-align:middle}
+@keyframes blink{50%{opacity:0}}
+.ai-form{padding:10px 12px;border-top:1px solid var(--panel-line);display:flex;gap:8px}
+.ai-form input{flex:1;min-height:42px;padding:0 12px;border-radius:8px;border:1px solid var(--panel-line);background:rgba(128,128,128,.12);color:var(--ink);font-family:inherit;font-size:13px}
+.ai-form input:focus{outline:none;border-color:var(--gold)}
+.ai-form button{min-width:56px;border-radius:8px;border:none;background:var(--gold);color:#fff;font-weight:700;cursor:pointer}
+@media(max-width:768px){
+  .topbar h1{font-size:14px;flex:1 0 100%;order:-1}
+  .civ-name{font-size:26px}
+  .grid-label{font-size:22px}.region-label{font-size:19px}.event-label{font-size:18px}
+  .fab-rail{right:14px;bottom:14px}
+  .ai-panel{right:8px!important;left:8px!important;width:auto!important;bottom:130px!important}
+}
+</style>
+</head>
+<body data-theme="textbook">
+
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+
+<div class="topbar ds-topbar">
+  <a href="./index.html" class="ds-pill">⌂ 返回主站</a>
+  <h1>当代与未来文明 · 时间长河</h1>
+  <div class="ds-theme-switch" id="themeSwitch" style="margin-left:auto">
+    <button data-t="deepblue" title="静夜深蓝"></button>
+    <button data-t="museum" title="博物馆典藏"></button>
+    <button data-t="textbook" title="现代教科书"></button>
+    <button data-t="parchment" title="羊皮纸古卷"></button>
+  </div>
+</div>
+
+<svg class="canvas-svg" id="canvas" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet"></svg>
+
+<div class="ds-legend" style="position:fixed;bottom:18px;left:24px;z-index:25">
+  <span class="ds-kicker">多中心并立的世界</span>
+  <div class="items" style="margin-top:6px">1945 — 至今 · 大航海·殖民·科学革命·全球贸易</div>
+</div>
+
+<div class="fab-rail">
+  <button class="ds-fab blue" onclick="toggleAI()" title="AI 助手">🤖</button>
+  <a class="ds-fab green" href="./medieval-network.html" title="人物关系网" style="text-decoration:none">👥</a>
+  <button class="ds-fab" onclick="openEmpire()" title="全球时代对比">⚖️</button>
+  <button class="ds-fab purple" onclick="openAxial()" title="全球时代文明对比">🧠</button>
+  <button class="ds-fab" style="background:linear-gradient(135deg,#2a8a90,#185c64)" onclick="openWorldMap()" title="全局遗址地图">🗺</button>
+</div>
+
+<div class="ds-modal" id="worldMapModal"><div class="ds-modal-content" style="max-width:1120px;padding:24px">
+  <button class="ds-close" onclick="closeModal('worldMapModal')">✕</button>
+  <div class="head"><h2>🗺 全球连接世界 · 遗址地图</h2><div class="sub">1945 – 至今 · 各文明主要遗址</div></div>
+  <div id="worldMap" style="height:62vh;min-height:420px;border-radius:12px;overflow:hidden;border:1px solid rgba(160,120,40,.3);background:#dfe8ee"></div>
+  <p class="cmp-note">📌 点击地图标记查看遗址说明，可点"进入该文明 →"跳转深度档案。</p>
+</div></div>
+
+<div class="ds-tooltip" id="tooltip" style="display:none"></div>
+
+<!-- 文明深度弹窗 -->
+<div class="ds-modal" id="civModal"><div class="ds-modal-content" id="civModalContent" style="max-width:760px"></div></div>
+<!-- 全球时代文明对比 -->
+<div class="ds-modal" id="axialModal"><div class="ds-modal-content" style="max-width:960px">
+  <button class="ds-close" onclick="closeModal('axialModal')">✕</button>
+  <div class="head"><h2>🧠 全球连接 · 文明对比</h2><div class="sub">大航海·科学·帝国 · 1945 – 至今</div></div>
+  <p class="ov-narr" style="text-align:center;margin-bottom:18px">公元前一千年间，中国、印度、希腊、波斯几乎<b>同时</b>出现思想突破——人类第一次系统追问"如何生活、何为正义、苦难从何而来"。</p>
+  <div style="overflow-x:auto"><table class="cmp-table" id="axialTable"></table></div>
+</div></div>
+<!-- 全球时代对比 -->
+<div class="ds-modal" id="empireModal"><div class="ds-modal-content" style="max-width:900px">
+  <button class="ds-close" onclick="closeModal('empireModal')">✕</button>
+  <div class="head"><h2>⚖️ 三大帝国 · 横向对比</h2><div class="sub">波斯 · 汉 · 罗马</div></div>
+  <div style="overflow-x:auto"><table class="cmp-table" id="empireTable"></table></div>
+  <p class="cmp-note">📌 三大帝国几乎同时存在于欧亚大陆两端，靠丝绸之路间接相连。它们用不同方式回答了同一个问题：如何统治数千万人、上百个民族？</p>
+</div></div>
+
+<!-- AI -->
+<div class="ai-panel" id="aiPanel">
+  <div class="pnl-head"><h4>🤖 全球连接 AI</h4><button onclick="toggleAI()">✕</button></div>
+  <div class="ai-msgs" id="aiMsgs"><div class="ai-msg bot">你好！问我任何关于公元 500–1500 中世纪文明的问题，比如「为什么说中世纪不是黑暗时代？」或「蒙古帝国如何把欧亚连成一体？」</div></div>
+  <form class="ai-form" id="aiForm"><input type="text" id="aiInput" placeholder="问我任何问题..." autocomplete="off"/><button type="submit" id="aiSend">发送</button></form>
+</div>
+
+<script>
+const W=1600,H=900;
+const PAD_L=210,PAD_R=250,PAD_TOP=110,PAD_BOT=80;
+const Y0=240,Y1=1560;
+function yearToX(y){return PAD_L+((y-Y0)/(Y1-Y0))*(W-PAD_L-PAD_R);}
+function yrTxt(y){return y<0?'前 '+Math.abs(y):(y===0?'公元元年':'公元 '+y);}
+
+const REGIONS=[
+  {key:'order',name:'战后秩序 ORDER',civs:[
+    {id:'un',name:'联合国与战后秩序',start:1945,peak:1948,end:2025,state:'联合国·人权·去殖民',color:'#3a78b0',icon:'🕊️'},
+    {id:'coldwar',name:'冷战',start:1947,peak:1962,end:1991,state:'两极·核竞赛·柏林墙',color:'#7a3a3a',icon:'❄️'},
+  ]},
+  {key:'connected',name:'连接的世界 CONNECTED',civs:[
+    {id:'globalization',name:'全球化',start:1980,peak:2001,end:2025,state:'WTO·供应链·地球村',color:'#2a8a6a',icon:'🌐'},
+    {id:'internet',name:'互联网革命',start:1969,peak:2007,end:2025,state:'万维网·智能手机',color:'#3a5ac8',icon:'🕸️'},
+  ]},
+  {key:'frontier',name:'科技前沿 FRONTIER',civs:[
+    {id:'ai',name:'AI 时代',start:1956,peak:2022,end:2025,state:'深度学习·ChatGPT',color:'#8a4ac0',icon:'🤖'},
+    {id:'space',name:'太空探索',start:1957,peak:1969,end:2025,state:'登月·空间站·火星',color:'#1a2a6a',icon:'🚀'},
+  ]},
+  {key:'future',name:'共同未来 FUTURE',civs:[
+    {id:'climate',name:'气候变化',start:1958,peak:2015,end:2025,state:'巴黎协定·能源转型',color:'#2a9a4a',icon:'🌡️'},
+  ]},
+];
+const ALL=REGIONS.flatMap(r=>r.civs.map(c=>({...c,region:r.key})));
+const BYID={};ALL.forEach(c=>BYID[c.id]=c);
+
+const RELATIONS=[
+  {from:'song',to:'tang',type:'continuation'},
+  {from:'mongol',to:'song',type:'war'},
+  {from:'tang',to:'heian',type:'influence'},
+  {from:'mongol',to:'shogunate',type:'war'},
+  {from:'abbasid',to:'islam_rise',type:'continuation'},
+  {from:'mongol',to:'abbasid',type:'war'},
+  {from:'crusades',to:'abbasid',type:'war'},
+  {from:'kievan_rus',to:'byzantine',type:'influence'},
+  {from:'crusades',to:'byzantine',type:'war'},
+  {from:'vikings',to:'kievan_rus',type:'continuation'},
+  {from:'medieval_europe',to:'franks',type:'continuation'},
+  {from:'crusades',to:'medieval_europe',type:'continuation'},
+  {from:'chola',to:'srivijaya',type:'war'},
+  {from:'delhi_sultanate',to:'mongol',type:'war'},
+  {from:'mali',to:'abbasid',type:'influence'},
+  {from:'abbasid',to:'medieval_europe',type:'influence'},
+];
+
+// 事件竖线
+const EVENTS=[{y:622,t:'622 伊斯兰元年'},{y:800,t:'800 查理曼加冕'},{y:1206,t:'1206 成吉思汗'},{y:1347,t:'1347 黑死病'},{y:1453,t:'1453 君堡陷落'}];
+
+// ── 文明深度内容 ──
+const INFO={
+  tang:{years:'618 – 907',narr:'中国最辉煌开放的王朝，长安是当时世界最大的国际都市。贞观之治、武则天、开元盛世，唐诗与玄奘取经灿烂夺目；755年安史之乱由盛转衰。',hi:['贞观之治：太宗纳谏、科举、三省六部，"天可汗"','武则天——中国唯一女皇帝','开元盛世+李白杜甫；玄奘西行取经','755 安史之乱——由盛转衰的转折','深刻影响日本、朝鲜、越南'],ppl:['唐太宗','武则天','唐玄宗','李白','杜甫','玄奘'],region:'中国'},
+  song:{years:'960 – 1279',narr:'军事不强却经济科技文化空前繁荣——一场"商业革命"。城市、纸币、海贸兴盛，活字印刷/火药/指南针三大发明西传改变世界。1127靖康之变，1279亡于蒙古。',hi:['赵匡胤"杯酒释兵权"，重文抑武','商业革命：百万人口城市、纸币"交子"','三大发明：活字印刷、火药、指南针','王安石变法；1127靖康之变','岳飞抗金；1279崖山亡于蒙古'],ppl:['宋太祖','王安石','司马光','苏轼','岳飞','沈括'],region:'中国'},
+  islam_rise:{years:'610 – 661',narr:'穆罕默德传一神信仰、622希吉拉建伊斯兰纪元，统一阿拉伯。四大哈里发二十年间击败拜占庭与波斯，建横跨三洲的帝国，却也分裂为逊尼与什叶。',hi:['约610 穆罕默德得启示传教','622 希吉拉迁麦地那(伊斯兰元年)','《古兰经》与圣训','632起 阿拉伯大征服','逊尼/什叶分裂之始'],ppl:['穆罕默德','阿布·伯克尔','欧麦尔','阿里'],region:'伊斯兰'},
+  abbasid:{years:'750 – 1258',narr:'阿拔斯定都巴格达，迎来伊斯兰黄金时代。智慧宫翻译并发展希腊/印度知识——花拉子米创代数、传播阿拉伯数字，阿维森纳医学。1258亡于蒙古。',hi:['762 营建圆形新都巴格达','智慧宫翻译运动','花拉子米：代数、阿拉伯数字、算法','阿维森纳《医典》、阿威罗伊','1258 旭烈兀破巴格达·智慧宫被毁'],ppl:['哈伦·拉希德','花拉子米','阿维森纳(伊本·西拿)','阿威罗伊(伊本·路世德)','伊本·白图泰'],region:'伊斯兰'},
+  byzantine:{years:'330 – 1453',narr:'罗马帝国的东半部、延续千年。查士丁尼编《罗马法》、建圣索菲亚；以希腊火与外交续命，保存古典文献点燃文艺复兴。1453亡于奥斯曼巨炮。',hi:['查士丁尼法典——欧洲大陆法系源头','圣索菲亚大教堂','希腊火、精明外交续命千年','保存希腊典籍→文艺复兴','1453 君堡陷落，罗马终结'],ppl:['查士丁尼','狄奥多拉','巴西尔二世'],region:'拜占庭'},
+  kievan_rus:{years:'882 – 1240',narr:'斯拉夫人与瓦良格(维京)共建，俄/乌/白俄的源头。988年弗拉基米尔皈依东正教，纳入拜占庭文明圈。1240亡于蒙古(金帐汗国)。',hi:['留里克与瓦良格人建国','"从瓦良格到希腊之路"贸易','988 罗斯受洗(东正教)','西里尔字母、拜占庭艺术','1240 蒙古攻陷基辅'],ppl:['弗拉基米尔大公','留里克'],region:'拜占庭/东欧'},
+  vikings:{years:'793 – 1066',narr:'北欧海盗、商人与探险家。长船横扫四方：西达北美(早哥伦布五百年)、东建基辅罗斯、南建诺曼底并征服英格兰。无角盔是后世误传。',hi:['793 突袭林迪斯法恩，维京时代开端','长船航海术','约1000 莱夫抵北美"文兰"','建诺曼底、基辅罗斯','1066诺曼征服后渐止'],ppl:['莱夫·埃里克松'],region:'北欧'},
+  franks:{years:'481 – 887',narr:'西罗马灭亡后西欧的重建者。查理曼征服大半西欧，800年被加冕"罗马人的皇帝"，推动加洛林文艺复兴。843三分帝国，奠定法德意雏形。',hi:['查理曼征服西欧大部','800 教皇加冕"罗马人皇帝"','加洛林文艺复兴(兴学、抄典籍)','加洛林小写体(今小写字母祖先)','843 凡尔登条约三分帝国'],ppl:['查理曼'],region:'西欧'},
+  medieval_europe:{years:'约 500 – 1500',narr:'"黑暗时代"实为偏见。封建制度、天主教会主导，盛期诞生大学、哥特大教堂、经院哲学；1347黑死病夺走三分之一人口，松动封建、通向文艺复兴。',hi:['封建制度与庄园、农奴','天主教会主导精神与政治','11-12世纪大学诞生(博洛尼亚/巴黎)','哥特大教堂、阿奎那、但丁','1347 黑死病→封建解体'],ppl:['托马斯·阿奎那','但丁'],region:'西欧'},
+  crusades:{years:'1096 – 1291',narr:'教皇号召的夺圣地东征，近两百年。1099占耶路撒冷、1187萨拉丁收复、1204竟洗劫君堡。军事失败，却打开东方视野、催生商业城市与文艺复兴。',hi:['1095 乌尔班二世号召','1099 第一次十字军占耶路撒冷','1187 萨拉丁收复圣城','1204 四次十字军洗劫君堡','1291 阿卡陷落，东征失败'],ppl:['乌尔班二世'],region:'西欧'},
+  mongol:{years:'1206 – 1368',narr:'成吉思汗统一草原，建立人类史上最大连续陆地帝国。横扫欧亚、灭金/花剌子模/阿拔斯。忽必烈建元、接见马可·波罗。"蒙古和平"促东西大交流。',hi:['1206 成吉思汗统一蒙古','横扫欧亚，1258破巴格达','忽必烈建元、灭南宋','马可·波罗东游','蒙古和平→东西交流(也传黑死病)'],ppl:['成吉思汗','窝阔台','忽必烈','马可·波罗'],region:'草原'},
+  heian:{years:'794 – 1185',narr:'迁都平安京，优雅内向的国风时代。藤原氏摄政，贵族沉浸于"物哀"审美。紫式部《源氏物语》——世界最早长篇小说之一。末期武士崛起。',hi:['迁都平安京(京都)','废遣唐使，发展国风文化','假名文字、《源氏物语》','"物哀"美学','武士兴起→幕府'],ppl:['紫式部'],region:'日本'},
+  shogunate:{years:'1185 – 1573',narr:'源赖朝建镰仓幕府，武士统治近七百年。武士道与禅文化成型。1274/1281两次"神风"击退蒙古。室町后期应仁之乱引爆战国时代。',hi:['1185 源赖朝建镰仓幕府','武士道与禅(茶道/枯山水)','1274/1281 "神风"抗元','室町·足利义满·金阁寺','1467应仁之乱→战国'],ppl:['源赖朝','北条时宗','足利义满'],region:'日本'},
+  chola:{years:'约 850 – 1279',narr:'南印度泰米尔人的海洋帝国。罗茶罗乍建强大海军，征服斯里兰卡、远征东南亚。坦贾武尔大神庙与"舞王"青铜像是印度艺术瑰宝。',hi:['强大海军，征服斯里兰卡','远征室利佛逝，控印度洋航路','坦贾武尔大神庙(世界遗产)','"舞王"湿婆青铜像','传播印度教/泰米尔文化至东南亚'],ppl:['罗茶罗乍一世'],region:'印度'},
+  delhi_sultanate:{years:'1206 – 1526',narr:'印度第一个穆斯林政权，统治北印度三百年。带来波斯行政与印度-伊斯兰建筑(顾特卜塔)，并数次挡住蒙古入侵。1526亡于莫卧儿。',hi:['印度第一个穆斯林政权','印度-伊斯兰建筑(顾特卜塔)','数次抵御蒙古入侵','波斯文化传入印度','1526 亡于莫卧儿(巴布尔)'],ppl:['戒日王'],region:'印度'},
+  khmer:{years:'802 – 1431',narr:'东南亚最辉煌的"印度化"文明。靠庞大水利支撑百万人口都城。苏耶跋摩二世建吴哥窟(世界最大宗教建筑)，阇耶跋摩七世建"高棉的微笑"。15世纪湮没丛林。',hi:['大型水利(巴莱)支撑百万人口','吴哥窟——世界最大宗教建筑','巴戎寺"高棉的微笑"四面佛','印度教→大乘佛教','15世纪吴哥被弃·湮没丛林'],ppl:['苏耶跋摩二世','阇耶跋摩七世'],region:'东南亚'},
+  srivijaya:{years:'约 650 – 1377',narr:'称霸东南亚海域的海上贸易帝国，控制马六甲海峡咽喉。靠贸易立国，是大乘佛教国际中心，义净曾在此学法。',hi:['控制马六甲海峡贸易','靠通行税与贸易立国','大乘佛教国际中心(义净)','连接中国-印度-阿拉伯','遭朱罗远征后衰落'],ppl:[],region:'东南亚'},
+  mali:{years:'1235 – 约1600',narr:'西非黄金帝国，控制跨撒哈拉黄金-食盐贸易。曼萨·穆萨朝觐麦加沿途撒金震动世界，廷巴克图成伊斯兰学术名城。',hi:['松迪亚塔"狮子王"建国','控制跨撒哈拉黄金贸易','曼萨·穆萨1324朝觐撒金','廷巴克图学术中心','证明中世纪非洲文明的繁荣'],ppl:['松迪亚塔','曼萨·穆萨'],region:'非洲'},
+  great_zimbabwe:{years:'约 1100 – 1450',narr:'撒哈拉以南非洲最壮观的干砌巨石城("石头大屋")。靠黄金/象牙经斯瓦希里港口联入印度洋贸易。本地绍纳人所建(非外来,破除殖民偏见)。',hi:['无砂浆干砌巨石墙','椭圆大围场与圆锥塔','黄金象牙→印度洋贸易','出土中国/波斯瓷器','本地绍纳人所建'],ppl:[],region:'非洲'},
+  maya:{years:'约 250 – 900(古典期)',narr:'中美洲城邦文明。独立发明"零"、美洲唯一完整文字、精密历法与天文。阶梯金字塔神庙。约900南部低地神秘崩溃,但玛雅人从未消失。',hi:['玛雅文字(美洲唯一完整文字)','独立发明"零"与长纪历','精确天文(日月食/金星)','阶梯金字塔神庙','约900南部低地崩溃(干旱等)'],ppl:['帕卡尔大帝'],region:'美洲'},
+  aztec:{years:'1428 – 1521',narr:'墨西哥中部帝国。"鹰立仙人掌叼蛇"建特诺奇蒂特兰水城(人口或达20万)，奇南帕浮田。活人祭招致属部怨恨。1521亡于西班牙与天花。',hi:['1325 建特诺奇蒂特兰水城','奇南帕浮田养活20万人','太阳崇拜·活人祭·鲜花战争','1519 科尔特斯到来','1521 亡于西班牙+天花'],ppl:['蒙特祖马二世'],region:'美洲'},
+  inca:{years:'约 1438 – 1533',narr:'安第斯山脉的美洲最大帝国"四方之地"。无文字(结绳奇普)、无铁器轮子货币,却高度组织:四万公里大道、巨石建筑、梯田。1533亡于西班牙与内乱天花。',hi:['帕查库特克扩张为大帝国','四万公里印加大道+吊桥','奇普结绳记事、米塔劳役制','马丘比丘、抗震巨石建筑','梯田与上千种土豆,1533被征服'],ppl:['帕查库特克'],region:'美洲'},
+};
+
+// 行布局
+const ROW_H=24,REGION_GAP=5;
+const totalRows=ALL.length, gaps=REGIONS.length-1;
+const blockH=totalRows*ROW_H+gaps*REGION_GAP;
+let yC=PAD_TOP+(H-PAD_TOP-PAD_BOT-blockH)/2+ROW_H/2;
+const ROW_Y={};
+REGIONS.forEach(reg=>{reg._labelY=yC-ROW_H/2+2;reg.civs.forEach(c=>{ROW_Y[c.id]=yC;yC+=ROW_H;});yC+=REGION_GAP;});
+
+function darken(hex,amt){const c=hex.replace('#','');const r=Math.max(0,parseInt(c.slice(0,2),16)-Math.round(255*amt));const g=Math.max(0,parseInt(c.slice(2,4),16)-Math.round(255*amt));const b=Math.max(0,parseInt(c.slice(4,6),16)-Math.round(255*amt));return'#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');}
+function spanPct(c,w){const t=c.end-c.start;return t===0?50:Math.round(((c[w]-c.start)/t)*100);}
+
+function render(){
+  let svg=`<defs>${ALL.map(c=>`<radialGradient id="orb_${c.id}" cx="35%" cy="30%"><stop offset="0%" stop-color="rgba(255,255,255,.92)"/><stop offset="30%" stop-color="${c.color}"/><stop offset="100%" stop-color="${darken(c.color,.5)}"/></radialGradient><linearGradient id="span_${c.id}" x1="0%" x2="100%"><stop offset="0%" stop-color="${c.color}" stop-opacity="0.15"/><stop offset="${spanPct(c,'peak')}%" stop-color="${c.color}" stop-opacity="0.85"/><stop offset="100%" stop-color="${c.color}" stop-opacity="0.1"/></linearGradient>`).join('')}<filter id="oS" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000" flood-opacity="0.5"/></filter></defs>`;
+  // 网格
+  for(let y=300;y<=1500;y+=100){const x=yearToX(y);svg+=`<line class="grid-line" x1="${x}" y1="${PAD_TOP-10}" x2="${x}" y2="${H-PAD_BOT+10}"/><text class="grid-label" x="${x}" y="${PAD_TOP-22}">${yrTxt(y)}</text>`;}
+  // 区域标签+分隔
+  REGIONS.forEach((reg,ri)=>{svg+=`<text class="region-label" x="24" y="${reg._labelY}">${reg.name}</text>`;if(ri>0){const dy=ROW_Y[reg.civs[0].id]-ROW_H/2-REGION_GAP/2;svg+=`<line class="region-divider" x1="190" y1="${dy}" x2="${W-40}" y2="${dy}"/>`;}});
+  // 关系线
+  RELATIONS.forEach(r=>{const a=BYID[r.from],b=BYID[r.to];if(!a||!b)return;const ax=yearToX(a.peak),ay=ROW_Y[a.id],bx=yearToX(b.peak),by=ROW_Y[b.id];svg+=`<path class="relation-path ${r.type}" data-from="${r.from}" data-to="${r.to}" d="M ${ax} ${ay} Q ${(ax+bx)/2} ${(ay+by)/2-35} ${bx} ${by}"/>`;});
+  // 事件竖线
+  EVENTS.forEach(e=>{const x=yearToX(e.y);svg+=`<line class="event-line" x1="${x}" y1="${PAD_TOP-5}" x2="${x}" y2="${H-PAD_BOT+5}"/><text class="event-label" x="${x}" y="${H-PAD_BOT+26}">${e.t}</text>`;});
+  // 文明行
+  ALL.forEach(c=>{const y=ROW_Y[c.id];const x1=yearToX(c.start),x2=yearToX(c.end),xp=yearToX(c.peak);const r=10;const right=xp>W*0.66;const nx=right?xp-r-12:xp+r+12;const anc=right?'end':'start';
+    svg+=`<g class="civ-row" data-id="${c.id}"><rect class="civ-span" x="${x1}" y="${y-7}" width="${Math.max(x2-x1,4)}" height="14" rx="7" fill="url(#span_${c.id})" stroke="${c.color}" stroke-opacity="0.35" style="color:${c.color}"/><g class="orb-inner"><g class="civ-orb-body"><circle cx="${xp}" cy="${y}" r="${r*1.5}" fill="${c.color}" opacity="0.13"/><circle cx="${xp}" cy="${y}" r="${r}" fill="url(#orb_${c.id})" stroke="rgba(255,255,255,.35)" stroke-width="1.5" filter="url(#oS)"/><ellipse cx="${xp-r*0.18}" cy="${y-r*0.32}" rx="${r*0.4}" ry="${r*0.17}" fill="rgba(255,255,255,.5)"/><text x="${xp}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="${r*0.9}" style="pointer-events:none">${c.icon}</text></g></g><text class="civ-name" x="${nx}" y="${y+1}" font-size="12" text-anchor="${anc}">${c.name}</text></g>`;});
+  document.getElementById('canvas').innerHTML=svg;
+  document.querySelectorAll('.civ-row').forEach(el=>{const id=el.dataset.id;el.addEventListener('click',()=>openCiv(id));el.addEventListener('mouseenter',e=>{showTip(e,id);hi(id,1);});el.addEventListener('mousemove',moveTip);el.addEventListener('mouseleave',()=>{hideTip();hi(id,0);});});
+}
+function hi(id,on){document.querySelectorAll('.relation-path').forEach(p=>{if(p.dataset.from===id||p.dataset.to===id)p.classList.toggle('visible',!!on);});}
+function coexist(c){return ALL.filter(x=>x.id!==c.id&&x.start<c.end&&x.end>c.start).map(x=>x.name);}
+function showTip(e,id){const c=BYID[id];const co=coexist(c);const t=document.getElementById('tooltip');t.innerHTML=`<div class="nm">${c.icon} ${c.name}</div><div class="meta">${yrTxt(c.start)} – ${yrTxt(c.end)} · ${c.state}</div><div class="desc">${INFO[id]?INFO[id].narr.slice(0,60)+'…':''}</div><div style="font-size:11px;color:var(--warm);margin-top:6px">🌍 同期：${co.slice(0,5).join('、')}</div>`;t.style.display='block';moveTip(e);}
+function moveTip(e){const t=document.getElementById('tooltip');t.style.left=Math.min(e.clientX+16,innerWidth-330)+'px';t.style.top=Math.min(e.clientY+16,innerHeight-200)+'px';}
+function hideTip(){document.getElementById('tooltip').style.display='none';}
+
+// 点击文明 → 进入深度档案页 (与早期文明一致)
+function openCiv(id){ location.href='./contemporary-deep.html#/civ/'+id; }
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+// 对比表
+const AXIAL=[['主题','基督教欧洲','伊斯兰世界','中华(唐宋)','美洲'],['核心信仰','天主教/东正教','伊斯兰教','儒释道并行','太阳/多神崇拜'],['学术中心','修道院→大学','巴格达智慧宫','长安/书院·科举','玛雅天文/印加结绳'],['政治形态','封建分封·教权','哈里发·神权','中央集权·文官','神权帝国/城邦'],['科技','大学·哥特建筑','代数·医学·光学','印刷火药指南针','零·历法·梯田'],['对外','十字军·朝圣','大征服·商路','朝贡·丝路·海贸','相对孤立']];
+const EMPIRE=[['维度','蒙古帝国','阿拔斯','拜占庭','唐朝'],['面积峰值','约 2400 万 km²','约 1100 万 km²','约 130 万 km²(峰)','约 1200 万 km²'],['统治哲学','宗教宽容·实用·驿站','伊斯兰·吸纳希腊科学','东正教·罗马法','儒法并用·科举开放'],['扩张方式','骑兵闪击·恐怖威慑','信仰征服+贸易','防御·外交·希腊火','羁縻·册封·和亲'],['知识贡献','打通欧亚交流','代数/医学/保存古典','保存希腊典籍','科举/唐诗/印刷'],['衰亡','分裂为四大汗国','1258亡于蒙古','1453亡于奥斯曼','安史之乱→藩镇→907亡']];
+function fillTable(elId,data){const t=document.getElementById(elId);t.innerHTML='<thead><tr>'+data[0].map((h,i)=>`<th${i===0?' style="text-align:left"':''}>${h}</th>`).join('')+'</tr></thead><tbody>'+data.slice(1).map(row=>'<tr>'+row.map((cell,i)=>i===0?`<td class="row-h">${cell}</td>`:`<td>${cell}</td>`).join('')+'</tr>').join('')+'</tbody>';}
+function openAxial(){fillTable('axialTable',AXIAL);document.getElementById('axialModal').classList.add('open');}
+function openEmpire(){fillTable('empireTable',EMPIRE);document.getElementById('empireModal').classList.add('open');}
+
+// 全局遗址地图 (Leaflet + CIV_MAP)
+let _wm=null;
+function openWorldMap(){document.getElementById('worldMapModal').classList.add('open');setTimeout(initWM,80);}
+function initWM(){
+  if(typeof L==='undefined'||typeof CIV_MAP==='undefined')return;
+  if(_wm){_wm.remove();_wm=null;}
+  _wm=L.map(document.getElementById('worldMap'),{scrollWheelZoom:true,worldCopyJump:true});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:13,minZoom:2,attribution:'© OpenStreetMap'}).addTo(_wm);
+  const meta={};(EARLY_CIV_EXPLORER.civilizations||[]).forEach(c=>meta[c.id]=c);
+  const all=[];
+  Object.keys(CIV_MAP).forEach(cid=>{const m=meta[cid]||{color:'#888',name:cid,icon:''};
+    CIV_MAP[cid].forEach(p=>{all.push(p.coords);
+      L.circleMarker(p.coords,{radius:7,color:'#2a1808',weight:1.5,fillColor:m.color,fillOpacity:.92}).addTo(_wm)
+        .bindPopup(`<b>${p.name}</b><br><span style="color:${m.color}">●</span> ${m.icon} ${m.name}<br>${p.note||''}<br><a href="./contemporary-deep.html#/civ/${cid}">进入该文明 →</a>`)
+        .bindTooltip(p.name,{direction:'top',className:'world-tip'});});});
+  if(all.length)_wm.fitBounds(all,{padding:[30,30],maxZoom:5});else _wm.setView([35,60],3);
+  setTimeout(()=>_wm&&_wm.invalidateSize(),120);
+  setTimeout(()=>{if(_wm){_wm.invalidateSize();if(all.length)_wm.fitBounds(all,{padding:[30,30],maxZoom:5});}},480);
+}
+window.openWorldMap=openWorldMap;
+
+// 主题
+function applyTheme(t){if(t&&t!=='deepblue')document.body.setAttribute('data-theme',t);else document.body.removeAttribute('data-theme');localStorage.setItem('civ_theme',t||'deepblue');document.querySelectorAll('#themeSwitch button').forEach(b=>b.classList.toggle('active',b.dataset.t===(t||'deepblue')));}
+document.getElementById('themeSwitch').addEventListener('click',e=>{const b=e.target.closest('button');if(b)applyTheme(b.dataset.t);});
+applyTheme(localStorage.getItem('civ_theme')||'textbook');
+render();
+
+// AI (千问 SSE)
+const AI_KEY='civ_qwen_key';
+function toggleAI(){document.getElementById('aiPanel').classList.toggle('open');document.getElementById('aiInput')?.focus();}
+function aiAppend(role,html,cur){const box=document.getElementById('aiMsgs');const d=document.createElement('div');d.className='ai-msg '+role;d.innerHTML=html+(cur?'<span class="cursor"></span>':'');box.appendChild(d);box.scrollTop=box.scrollHeight;return d;}
+async function sendAI(){const inp=document.getElementById('aiInput');const q=inp.value.trim();if(!q)return;const btn=document.getElementById('aiSend');inp.value='';btn.disabled=true;aiAppend('user',q.replace(/</g,'&lt;'));let key=localStorage.getItem(AI_KEY);if(!key){key=prompt('输入千问 API Key (一次性, 存本地)： https://dashscope.console.aliyun.com/');if(!key){btn.disabled=false;return;}localStorage.setItem(AI_KEY,key);}const bot=aiAppend('bot','',true);let acc='';const sys='你是 AI 中世纪文明实验室助手，面向 10-15 岁中学生，用生动语言。覆盖公元 500–1500 当代与未来文明文明：拜占庭、伊斯兰兴起与巴格达智慧宫、唐宋中国、日本、蒙古帝国、印度、东南亚、中世纪欧洲、十字军、非洲(马里)、美洲(玛雅/阿兹特克/印加)。只用学界共识，不编造，不知道就说不知道，200 字内。';
+  try{const resp=await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model:'qwen-turbo',messages:[{role:'system',content:sys},{role:'user',content:q}],stream:true,max_tokens:500})});if(!resp.ok)throw new Error('HTTP '+resp.status);const rd=resp.body.getReader();const dec=new TextDecoder();let buf='';while(true){const{done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});const lines=buf.split('\n');buf=lines.pop();for(const line of lines){if(!line.startsWith('data: '))continue;const data=line.slice(6).trim();if(data==='[DONE]')continue;try{const j=JSON.parse(data);const ch=j.choices?.[0]?.delta?.content||'';if(ch){acc+=ch;bot.innerHTML=acc.replace(/\n/g,'<br>')+'<span class="cursor"></span>';document.getElementById('aiMsgs').scrollTop=99999;}}catch(_){}}}bot.innerHTML=acc.replace(/\n/g,'<br>');}catch(err){bot.innerHTML='⚠️ 出错：'+err.message;}finally{btn.disabled=false;inp.focus();}}
+document.getElementById('aiForm').addEventListener('submit',e=>{e.preventDefault();sendAI();});
+</script>
+</body>
+</html>

@@ -1663,7 +1663,7 @@ const MAIN_NETWORK = {
       status:'active', featured:true, featured_stat:'7 主题 · 29 事件 · 73 人物' },
     { id:'STAGE_06', title:'当代与未来文明', title_en:'Contemporary & Future Civilization', icon:'🤖', y:1240, color:'#6a4a90',
       time_range:'1945-至今',       core_question:'科技、全球化、AI 如何改变文明？', core_question_en:'How are tech, globalization & AI changing civilization?',
-      status:'coming_soon' },
+      status:'active', featured:true, featured_stat:'7 主题 · 29 事件 · 54 人物' },
   ],
 
   // X 轴时间刻度（对数尺度感 — 史前压缩，近代展开）
