@@ -147,7 +147,7 @@ html,body{height:100%;overflow:hidden}
 <script>
 const W=1600,H=900;
 const PAD_L=210,PAD_R=250,PAD_TOP=110,PAD_BOT=80;
-const Y0=240,Y1=1560;
+const Y0=1740,Y1=1960;
 function yearToX(y){return PAD_L+((y-Y0)/(Y1-Y0))*(W-PAD_L-PAD_R);}
 function yrTxt(y){return y<0?'前 '+Math.abs(y):(y===0?'公元元年':'公元 '+y);}
 
@@ -233,7 +233,7 @@ function spanPct(c,w){const t=c.end-c.start;return t===0?50:Math.round(((c[w]-c.
 function render(){
   let svg=`<defs>${ALL.map(c=>`<radialGradient id="orb_${c.id}" cx="35%" cy="30%"><stop offset="0%" stop-color="rgba(255,255,255,.92)"/><stop offset="30%" stop-color="${c.color}"/><stop offset="100%" stop-color="${darken(c.color,.5)}"/></radialGradient><linearGradient id="span_${c.id}" x1="0%" x2="100%"><stop offset="0%" stop-color="${c.color}" stop-opacity="0.15"/><stop offset="${spanPct(c,'peak')}%" stop-color="${c.color}" stop-opacity="0.85"/><stop offset="100%" stop-color="${c.color}" stop-opacity="0.1"/></linearGradient>`).join('')}<filter id="oS" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000" flood-opacity="0.5"/></filter></defs>`;
   // 网格
-  for(let y=300;y<=1500;y+=100){const x=yearToX(y);svg+=`<line class="grid-line" x1="${x}" y1="${PAD_TOP-10}" x2="${x}" y2="${H-PAD_BOT+10}"/><text class="grid-label" x="${x}" y="${PAD_TOP-22}">${yrTxt(y)}</text>`;}
+  for(let y=1760;y<=1940;y+=20){const x=yearToX(y);svg+=`<line class="grid-line" x1="${x}" y1="${PAD_TOP-10}" x2="${x}" y2="${H-PAD_BOT+10}"/><text class="grid-label" x="${x}" y="${PAD_TOP-22}">${yrTxt(y)}</text>`;}
   // 区域标签+分隔
   REGIONS.forEach((reg,ri)=>{svg+=`<text class="region-label" x="24" y="${reg._labelY}">${reg.name}</text>`;if(ri>0){const dy=ROW_Y[reg.civs[0].id]-ROW_H/2-REGION_GAP/2;svg+=`<line class="region-divider" x1="190" y1="${dy}" x2="${W-40}" y2="${dy}"/>`;}});
   // 关系线
