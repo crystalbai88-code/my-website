@@ -1657,7 +1657,7 @@ const MAIN_NETWORK = {
       status:'active', featured:true, featured_stat:'22 文明 · 34 事件 · 98 人物' },
     { id:'STAGE_04', title:'全球连接时代',  title_en:'The Age of Global Connection', icon:'⛵', y:880, color:'#3a7868',
       time_range:'1500-1800',       core_question:'航海、殖民、贸易如何重组世界？', core_question_en:'How did voyages, colonies & trade reshape the world?',
-      status:'coming_soon' },
+      status:'active', featured:true, featured_stat:'10 主题 · 33 事件 · 63 人物' },
     { id:'STAGE_05', title:'工业与现代世界', title_en:'Industry & the Modern World', icon:'⚙️', y:1060, color:'#506890',
       time_range:'1750-1945',       core_question:'工业、民族国家、战争如何创造现代世界？', core_question_en:'How did industry, nations & war create the modern world?',
       status:'coming_soon' },
