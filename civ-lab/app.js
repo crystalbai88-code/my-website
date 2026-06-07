@@ -357,61 +357,46 @@ function renderStageCards() {
   const L = (window.I18N ? I18N.get() : 'zh');
   const T = (k)=> window.I18N ? I18N.T(k) : k;
 
+  const EN = (L==='en');
+  // 功能入口(按功能组织,不再按年代)
+  const ENTRIES = [
+    {href:'./meanwhile.html', icon:'🌍', t:'此时世界', te:'Meanwhile', d:'拖动年份，看全球同一时刻在发生什么', de:'Drag the year, see the whole world at once', c:'#c86820'},
+    {href:'./networks.html', icon:'🕸️', t:'人物关系图', te:'People Networks', d:'各文明的人物如何互相影响（点星图探索）', de:'How people shaped one another', c:'#8a5a90'},
+    {href:'./route.html', icon:'🗺️', t:'历史地图 · 路线', te:'Maps & Journeys', d:'在地图上跟着丝路、郑和、马可波罗旅行', de:'Travel the Silk Road, Zheng He & more', c:'#3a7868'},
+    {href:'./causality.html', icon:'🔗', t:'历史因果链', te:'Causal Chains', d:'世界为什么变成今天这样，并亲手重建', de:'Why the world became what it is', c:'#b83018'},
+    {href:'./perspectives.html', icon:'🗣️', t:'多角度看历史', te:'Many Voices', d:'同一件事，听见不同立场的声音', de:'One event, many viewpoints', c:'#b8862e'},
+    {href:'./evidence.html', icon:'🔍', t:'证据侦探', te:'Evidence Detective', d:'历史知识从哪里来——从文物里推理', de:'Where history comes from', c:'#5ab87a'},
+    {href:'./roleplay.html', icon:'🎭', t:'角色体验', te:'Role-play', d:'如果我活在那个时代，我会怎么选', de:'If you lived back then', c:'#5aa0c8'},
+    {href:'#ai', icon:'🤖', t:'AI 历史助手', te:'AI Assistant', d:'问我任何关于人类、文明、历史的问题', de:'Ask me anything about history', c:'#6a4a90', ai:true},
+    {href:'./profile.html', icon:'🧭', t:'我的思维画像', te:'My Profile', d:'看见我的兴趣方向与历史思维', de:'See your own way of thinking', c:'#506890'},
+  ];
   container.innerHTML = `
     <div class="stage-cards-intro">
       <div style="display:flex;justify-content:center;margin-bottom:8px">
-        <button id="langToggle" style="font-family:var(--mono,monospace);font-size:12px;font-weight:700;color:#fff;background:rgba(120,90,40,.5);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:5px 14px;cursor:pointer">${L==='en'?'中文':'EN'}</button>
+        <button id="langToggle" style="font-family:var(--mono,monospace);font-size:12px;font-weight:700;color:#fff;background:rgba(120,90,40,.5);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:5px 14px;cursor:pointer">${EN?'中文':'EN'}</button>
       </div>
-      <p>${T('intro_stages')}</p>
-      <p class="intro-sub">${T('intro_sub')}</p>
-      <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:9px;justify-content:center;max-width:760px;margin-left:auto;margin-right:auto">
-        ${[
-          ['./meanwhile.html','f_meanwhile','#c86820'],
-          ['./causality.html','f_causality','#b83018'],
-          ['./compare.html','f_compare','#5aa0c8'],
-          ['./evidence.html','f_evidence','#5ab87a'],
-          ['./roleplay.html','f_roleplay','#8a7ad0'],
-          ['./route.html','f_route','#d4708a'],
-          ['./perspectives.html','f_perspectives','#b8862e'],
-          ['./profile.html','f_profile','#3a7868'],
-        ].map(([href,key,c])=>`<a href="${href}" style="display:inline-block;padding:9px 17px;border-radius:999px;font-weight:700;font-size:13.5px;text-decoration:none;color:#fff;background:${c};box-shadow:0 3px 12px ${c}66;transition:transform .15s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">${T(key)}</a>`).join('')}
-      </div>
-      <p class="intro-sub" style="margin-top:8px;opacity:.75">${T('interactions')} · <a href="./family.html" style="color:var(--ink2,#9a8a70);text-decoration:underline">${T('family')}</a></p>
+      <p>${EN?'🌍 Explore world history your own way':'🌍 用你自己的方式探索世界历史'}</p>
+      <p class="intro-sub">${EN?'Pick a way to explore — by world, by people, by map, by question':'选一种探索方式：看世界 · 看人物 · 看地图 · 追问为什么'}</p>
     </div>
-    <div class="stage-cards-grid">
-      ${N.stages.filter(s => !s.hidden).map((stage, i) => {
-        const nodes = N.nodes.filter(n => n.stage === stage.id);
-        const linkedCount = nodes.filter(n => n.linked_lesson).length;
-        const total = nodes.length;
-        const completed = (state.completed || []).filter(c =>
-          nodes.some(n => n.linked_lesson === c)).length;
-        const isComing = stage.status === 'coming_soon';
-        return `
-          <button class="stage-card ${isComing ? 'coming-soon' : ''} ${stage.featured ? 'featured' : ''}"
-                  style="--stage-color:${stage.color}"
-                  data-stage="${stage.id}">
-            ${stage.featured ? `<div class="stage-card-feature">${L==='en'?'✨ Full':'✨ 完整版'}</div>` : ''}
-            <div class="stage-card-num">${L==='en'?'Stage':'阶段'} ${i}</div>
-            <div class="stage-card-icon">${stage.icon}</div>
-            <h3 class="stage-card-title">${L==='en'&&stage.title_en?stage.title_en:stage.title}</h3>
-            <p class="stage-card-time">${stage.time_range}</p>
-            <p class="stage-card-question">「${L==='en'&&stage.core_question_en?stage.core_question_en:stage.core_question}」</p>
-            <div class="stage-card-stats">
-              <span class="stage-card-count">📚 ${total} ${L==='en'?'topics':'个知识点'}</span>
-              ${stage.featured ? `<span class="stage-card-ready">${stage.featured_stat || ''}</span>` : (linkedCount > 0 ? `<span class="stage-card-ready">${linkedCount} 已开放${completed > 0 ? ` · ${completed} 已学` : ''}</span>` : '')}
-              ${isComing ? `<span class="stage-card-badge">⏳ ${T('coming')}</span>` : ''}
-            </div>
-            <div class="stage-card-cta">${isComing ? (L==='en'?'Coming soon':'敬请期待') : (L==='en'?'Enter →':(stage.featured ? '进入历史宇宙 →' : '进入探索 →'))}</div>
-          </button>`;
-      }).join('')}
+    <div class="fn-grid">
+      ${ENTRIES.map(e=>`
+        <a class="fn-card" href="${e.href}" data-ai="${e.ai?1:0}" style="--fc:${e.c}">
+          <div class="fn-ic">${e.icon}</div>
+          <div class="fn-t">${EN?e.te:e.t}</div>
+          <div class="fn-d">${EN?e.de:e.d}</div>
+          <div class="fn-go">${EN?'Open →':'进入 →'}</div>
+        </a>`).join('')}
     </div>
+    <p class="intro-sub" style="text-align:center;margin-top:14px;opacity:.7">${EN?'For parents & teachers':'👨‍👩‍👧 家长 / 教师入口'} · <a href="./family.html" style="color:var(--ink2,#9a8a70);text-decoration:underline">${EN?'open':'打开'}</a></p>
   `;
 
-  container.querySelectorAll('.stage-card').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const sid = btn.getAttribute('data-stage');
-      enterStage(sid);
-    });
+  container.querySelectorAll('.fn-card').forEach(card=>{
+    if(card.getAttribute('data-ai')==='1'){
+      card.addEventListener('click',(ev)=>{ ev.preventDefault();
+        try{ if(window.injectFloatingAI && !document.getElementById('aiFloatPanel')) injectFloatingAI(); }catch(e){}
+        if(window.toggleAIFloat) toggleAIFloat();
+      });
+    }
   });
   const lt = document.getElementById('langToggle');
   if (lt) lt.addEventListener('click', () => { if(window.I18N){ I18N.toggle(); renderHomeTimeline(); } });
