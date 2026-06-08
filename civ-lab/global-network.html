@@ -323,6 +323,9 @@ function draw(){
   ctx.clearRect(0,0,W,H);
   ctx.translate(panX,panY);
   ctx.scale(scale,scale);
+  // 选中某人:TA 与直接关联者加重,其余淡化(背景仍可见)
+  const focusSet = selId ? (()=>{const s=new Set([selId]);edges.forEach(e=>{if(e.a===selId)s.add(e.b);if(e.b===selId)s.add(e.a);});return s;})() : null;
+  const labelRects=[];
   // Edges
   edges.forEach(e=>{
     const a=nodes.find(n=>n.id===e.a),b=nodes.find(n=>n.id===e.b);
@@ -332,6 +335,7 @@ function draw(){
     ctx.save();
     if(relFilter!=='all' && !inFilter){ ctx.globalAlpha=0.05; ctx.strokeStyle=TH.edge; ctx.lineWidth=0.5; }
     else { ctx.globalAlpha=isHighlighted?0.9:0.32; ctx.strokeStyle=isHighlighted?(REL_CAT_COLOR[e.cat]||roleColor(a.data.r)):TH.edge; ctx.lineWidth=isHighlighted?1.8:0.7; }
+    if(selId && !isHighlighted) ctx.globalAlpha=0.07;
     if(!isHighlighted)ctx.setLineDash([3,4]);
     ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
     ctx.restore();
@@ -353,6 +357,7 @@ function draw(){
   // Nodes (头像图标节点)
   nodes.forEach(n=>{
     const p=n.data;
+    if(selId && focusSet && !focusSet.has(n.id)){ ctx.save();ctx.globalAlpha=0.2;ctx.beginPath();ctx.arc(n.x,n.y,9,0,Math.PI*2);ctx.fillStyle=roleColor(p.r);ctx.fill();ctx.restore(); return; }
     const col=roleColor(p.r);
     const isSel=n.id===selId,isHov=n.id===hovId;
     const r=isSel?21:isHov?18:15;
@@ -387,14 +392,18 @@ function draw(){
     ctx.strokeStyle=portrait&&portrait.naturalWidth?col:'rgba(255,255,255,.85)';
     ctx.lineWidth=portrait&&portrait.naturalWidth?2.5:1.5;ctx.stroke();
     ctx.restore();
-    // 名字(节点下方)
-    const showLabel=isSel||isHov||scale>1.05||nodes.length<28;
+    // 名字——选中时显示 TA 与关联者,智能避让不重叠
+    const showLabel=isSel||isHov||(focusSet&&focusSet.has(n.id))||scale>1.05||nodes.length<28;
     if(showLabel){
       ctx.save();
-      ctx.font=(isSel?'700 12px':'500 11px')+' "Noto Sans SC",system-ui,sans-serif';
+      ctx.font=(isSel?'700 12.5px':'600 11px')+' "Noto Sans SC",system-ui,sans-serif';
+      const _tw=ctx.measureText(p.n).width,_lh=14; let _ly=n.y+r+4;
+      const _rc={x:n.x-_tw/2-2,y:_ly,w:_tw+4,h:_lh}; let _g=0;
+      while(_g++<14 && labelRects.some(R=>_rc.x<R.x+R.w&&_rc.x+_rc.w>R.x&&_rc.y<R.y+R.h&&_rc.y+_rc.h>R.y)){ _ly+=_lh+1; _rc.y=_ly; }
+      labelRects.push(_rc);
       ctx.fillStyle=TH.ink;ctx.textAlign='center';ctx.textBaseline='top';
-      ctx.shadowColor=TH.chip||'rgba(0,0,0,.5)';ctx.shadowBlur=3;
-      ctx.fillText(p.n,n.x,n.y+r+4);
+      ctx.shadowColor='rgba(0,0,0,.8)';ctx.shadowBlur=4;
+      ctx.fillText(p.n,n.x,_ly);
       ctx.restore();
     }
   });
