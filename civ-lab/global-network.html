@@ -342,11 +342,12 @@ function draw(){
     // 选中节点时，在连线中点标出"两人之间是什么关系"
     const showLabel = e.t && selId && (a.id===selId||b.id===selId);
     if(showLabel){
-      const mx=(a.x+b.x)/2, my=(a.y+b.y)/2;
+      const mx=(a.x+b.x)/2; let my=(a.y+b.y)/2;
       ctx.save();
       ctx.font='600 10px "Noto Sans SC",system-ui,sans-serif';
       ctx.textAlign='center'; ctx.textBaseline='middle';
       const w=ctx.measureText(e.t).width+10;
+      { let _g=0; const _rc={x:mx-w/2,y:my-9,w:w,h:18}; while(_g++<10 && labelRects.some(R=>_rc.x<R.x+R.w&&_rc.x+_rc.w>R.x&&_rc.y<R.y+R.h&&_rc.y+_rc.h>R.y)){ my+=19; _rc.y=my-9; } labelRects.push(_rc); }
       ctx.globalAlpha=0.95; ctx.fillStyle=TH.chip||'rgba(0,0,0,.55)';
       const rr=7; const x=mx-w/2,y=my-9,h=18;
       ctx.beginPath();ctx.moveTo(x+rr,y);ctx.arcTo(x+w,y,x+w,y+h,rr);ctx.arcTo(x+w,y+h,x,y+h,rr);ctx.arcTo(x,y+h,x,y,rr);ctx.arcTo(x,y,x+w,y,rr);ctx.closePath();ctx.fill();
