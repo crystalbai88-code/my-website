@@ -50,7 +50,7 @@
   --bg:#131a2a; --bg-grad:linear-gradient(180deg,#131a2a 0%,#0e1422 55%,#131a2a 100%);
   --neb1:rgba(120,150,235,.20); --neb2:rgba(214,168,90,.14); --star:.30; --twinkle:.18;
   --ink:#e8e4d8; --ink2:#a6aec4; --ink3:#6b7088;
-  --gold:#d4a858; --warm:#e0b070; --vermilion:#c87850;
+  --gold:#d4a858; --warm:#e0b070; --vermilion:#c87850; --cyan:#5ab0e0; --purple:#a08aff;
   --label-ink:#fff; --label-shadow:0 2px 8px rgba(0,0,0,.95);
   --line:rgba(212,168,88,.10); --grid-ink:rgba(232,212,170,.78);
   --panel-bg:rgba(16,22,38,.82); --panel-line:rgba(212,168,88,.22); --topbar-bg:rgba(14,18,30,.6);
@@ -61,7 +61,7 @@ body[data-theme="museum"]{
   --bg:#f7f3ea; --bg-grad:radial-gradient(ellipse at 50% 30%,#fdfbf5,#f2ece0);
   --neb1:transparent; --neb2:transparent; --star:0; --twinkle:0;
   --ink:#2a2622; --ink2:#6a6258; --ink3:#9a9286;
-  --gold:#9c5b34; --warm:#b07a4a; --vermilion:#9c5b34;
+  --gold:#9c5b34; --warm:#b07a4a; --vermilion:#9c5b34; --vermilion:#a8455a; --cyan:#2f8a7a; --purple:#7a5a9a;
   --label-ink:#2a2622; --label-shadow:none;
   --line:rgba(60,50,40,.10); --grid-ink:rgba(90,75,55,.7);
   --panel-bg:rgba(255,253,247,.92); --panel-line:rgba(156,91,52,.25); --topbar-bg:rgba(247,243,234,.85);
@@ -72,7 +72,7 @@ body[data-theme="textbook"]{
   --bg:#ffffff; --bg-grad:linear-gradient(180deg,#ffffff,#f4f7fb);
   --neb1:transparent; --neb2:transparent; --star:0; --twinkle:0;
   --ink:#1a2a3a; --ink2:#5a6678; --ink3:#9aa4b2;
-  --gold:#2d4a7c; --warm:#3a6ea5; --vermilion:#c0392b;
+  --gold:#2d4a7c; --warm:#3a6ea5; --vermilion:#c0392b; --cyan:#1f8a8a; --purple:#6a4a90;
   --label-ink:#1a2a3a; --label-shadow:none;
   --line:rgba(45,74,124,.10); --grid-ink:rgba(45,74,124,.6);
   --panel-bg:rgba(255,255,255,.96); --panel-line:rgba(45,74,124,.18); --topbar-bg:rgba(255,255,255,.9);
@@ -83,7 +83,7 @@ body[data-theme="parchment"]{
   --bg:#efe3c8; --bg-grad:radial-gradient(ellipse at 50% 25%,#f5ead2,#e8dabb);
   --neb1:rgba(180,130,70,.08); --neb2:rgba(150,110,60,.06); --star:0; --twinkle:0;
   --ink:#3a2a18; --ink2:#6e5536; --ink3:#9a8460;
-  --gold:#b5642a; --warm:#c47a3a; --vermilion:#a8451e;
+  --gold:#b5642a; --warm:#c47a3a; --vermilion:#a8451e; --cyan:#2f8a7a; --purple:#7a5a9a;
   --label-ink:#3a2a18; --label-shadow:none;
   --line:rgba(120,90,40,.14); --grid-ink:rgba(120,90,40,.7);
   --panel-bg:rgba(250,242,224,.92); --panel-line:rgba(181,100,42,.3); --topbar-bg:rgba(239,227,200,.85);
@@ -97,7 +97,7 @@ body[data-theme="aurora"]{
   --bg:#08161a; --bg-grad:linear-gradient(180deg,#0a1c20 0%,#06120f 55%,#0a201a 100%);
   --neb1:rgba(60,224,176,.22); --neb2:rgba(140,90,235,.20); --star:.34; --twinkle:.22;
   --ink:#e8f5ef; --ink2:#9fc8bc; --ink3:#5f8077;
-  --gold:#46e0b0; --warm:#7fe6c8; --vermilion:#3fd0c4;
+  --gold:#46e0b0; --warm:#7fe6c8; --vermilion:#3fd0c4; --vermilion:#7fd8ff; --cyan:#a8f060; --purple:#b09cff;
   --label-ink:#fff; --label-shadow:0 2px 8px rgba(0,0,0,.95);
   --line:rgba(70,224,176,.12); --grid-ink:rgba(180,240,225,.72);
   --panel-bg:rgba(9,28,28,.84); --panel-line:rgba(70,224,176,.26); --topbar-bg:rgba(7,18,18,.6);
@@ -108,7 +108,7 @@ body[data-theme="sunset"]{
   --bg:#1a0e1a; --bg-grad:linear-gradient(180deg,#221022 0%,#150a16 55%,#281024 100%);
   --neb1:rgba(255,110,150,.22); --neb2:rgba(255,170,80,.18); --star:.30; --twinkle:.2;
   --ink:#f6e8f0; --ink2:#cda8bb; --ink3:#8c6a7c;
-  --gold:#ff9a5a; --warm:#ffb87a; --vermilion:#ff6a8a;
+  --gold:#ff9a5a; --warm:#ffb87a; --vermilion:#ff6a8a; --cyan:#f0a0c0; --purple:#d88ae0;
   --label-ink:#fff; --label-shadow:0 2px 8px rgba(0,0,0,.95);
   --line:rgba(255,154,90,.12); --grid-ink:rgba(255,214,184,.72);
   --panel-bg:rgba(32,14,30,.86); --panel-line:rgba(255,154,90,.26); --topbar-bg:rgba(22,10,20,.6);
@@ -119,7 +119,7 @@ body[data-theme="nebula"]{
   --bg:#0c0a1f; --bg-grad:linear-gradient(180deg,#130e28 0%,#0a081a 55%,#170e2c 100%);
   --neb1:rgba(150,90,255,.24); --neb2:rgba(60,180,255,.18); --star:.38; --twinkle:.24;
   --ink:#ece6ff; --ink2:#b2a8d6; --ink3:#746a90;
-  --gold:#b894ff; --warm:#c8a6ff; --vermilion:#8a7ad0;
+  --gold:#b894ff; --warm:#c8a6ff; --vermilion:#8a7ad0; --cyan:#7ad8ff; --purple:#c8a6ff;
   --label-ink:#fff; --label-shadow:0 2px 8px rgba(0,0,0,.95);
   --line:rgba(150,120,255,.12); --grid-ink:rgba(212,196,255,.72);
   --panel-bg:rgba(18,12,36,.86); --panel-line:rgba(150,120,255,.26); --topbar-bg:rgba(12,8,24,.6);
