@@ -91,6 +91,16 @@
   .hint{position:fixed;left:50%;top:60px;transform:translateX(-50%);z-index:25;font-family:var(--sans);font-size:12px;
     color:var(--ink2);background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:999px;padding:6px 15px;backdrop-filter:blur(8px);transition:opacity .4s}
   .hint.hide{opacity:0;pointer-events:none}
+  /* 文明出现时的小知识卡片(播放时浮现) */
+  #kcards{position:absolute;inset:0;pointer-events:none;z-index:20;overflow:hidden}
+  .kcard{position:absolute;width:max-content;max-width:188px;background:var(--panel-bg);border:1px solid var(--panel-line);
+    border-left:3px solid var(--kc,#888);border-radius:11px;padding:7px 11px 8px;backdrop-filter:blur(12px);
+    box-shadow:0 8px 24px rgba(0,0,0,.45);opacity:1;transform:translate(-50%,-100%) translateY(-8px);animation:kcin .42s cubic-bezier(.22,1,.36,1)}
+  @keyframes kcin{from{transform:translate(-50%,-100%) translateY(7px) scale(.92)}to{transform:translate(-50%,-100%) translateY(-8px) scale(1)}}
+  .kcard.out{opacity:0;transform:translate(-50%,-100%) translateY(-18px) scale(.96);transition:opacity .4s,transform .4s}
+  .kcard .kc-h{font-family:var(--serif);font-weight:900;font-size:13.5px;color:var(--ink);line-height:1.22}
+  .kcard .kc-m{font-family:var(--mono);font-size:9.5px;color:var(--gold);letter-spacing:.04em;margin:2px 0 3px}
+  .kcard .kc-x{font-size:11px;color:var(--ink2);line-height:1.5}
 </style>
 </head>
 <body data-theme="deepblue">
@@ -104,7 +114,7 @@
       <button data-t="deepblue"></button><button data-t="museum"></button><button data-t="textbook"></button><button data-t="parchment"></button><button data-t="aurora" title="极光"></button><button data-t="sunset" title="暮霞"></button><button data-t="nebula" title="星云"></button>
     </div>
   </div>
-  <div id="mapwrap"><canvas id="c"></canvas></div>
+  <div id="mapwrap"><canvas id="c"></canvas><div id="kcards"></div></div>
   <div class="hint" id="hint">拖动时间轴,看文明在地图上此消彼长 · 点国家看它的历史</div>
   <div id="timebar">
     <div class="yearrow">
@@ -192,6 +202,33 @@ function w2s(lng,lat){ return { x:((lng+180)/360)*baseW*scale+panX, y:((90-lat)/
 
 function activeCivs(){ return MAP_CIVS.filter(c=> year>=c.s-1 && year<=c.e+1 ); }
 
+// ── 文明出现时的小知识卡片 ──
+const bornSet=new Set();
+function civHook(c){
+  const info=(window.CIV_INFO||{})[c.id];
+  if(info&&info.summary){ let t=info.summary.split(/[。!?；]/)[0]; if(t.length>26)t=t.slice(0,25)+'…'; return t; }
+  const evs=(CIV_EVENTS[c.id]||[]); if(evs.length) return evs[0].title;
+  return c.region+' · 文明登场';
+}
+function spawnKnowledgeCard(c){
+  const wrap=document.getElementById('kcards'); if(!wrap)return;
+  if(wrap.querySelector('.kcard')) return; // 同一时刻只显示一张,从容讲述、绝不重叠
+  const s=w2s(c.lng,c.lat);
+  if(s.x<14||s.x>W-14||s.y<70||s.y>H-96) return; // 屏外/被时间轴遮挡则不弹
+  const d=document.createElement('div'); d.className='kcard';
+  d.style.setProperty('--kc',regionColor(c.region));
+  d.style.left=s.x+'px'; d.style.top=(s.y-13)+'px';
+  d.innerHTML=`<div class="kc-h">${esc((c.icon||'')+' '+c.name)}</div><div class="kc-m">${esc(eraLabel(c.s)+' · '+c.region)}</div><div class="kc-x">${esc(civHook(c))}</div>`;
+  wrap.appendChild(d);
+  setTimeout(()=>{ d.classList.add('out'); setTimeout(()=>d.remove(),440); }, 2700);
+}
+function checkBorn(){ // 播放中:刚跨过起始年的文明弹卡片
+  let n=0;
+  for(const c of activeCivs()){
+    if(!bornSet.has(c.id) && year-c.s>=0 && year-c.s<=16){ bornSet.add(c.id); spawnKnowledgeCard(c); if(++n>=1)break; }
+  }
+}
+
 function draw(){
   ctx.clearRect(0,0,W,H);
   // 海洋背景渐隐(透明,露出 cosmos)。画陆地
@@ -243,7 +280,7 @@ function draw(){
     ctx.font=Math.round(r*0.95)+'px "Apple Color Emoji","Segoe UI Emoji",system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.fillText(c.icon||'•',s.x,s.y);
     // 名称
-    if(act.length<26||isSel||isHov||scale>1.6){
+    if(isSel||isHov||(!playing&&(act.length<26||scale>1.6))){ // 播放时隐藏小名字,让知识卡片来"讲述",更干净高级
       ctx.font=(isSel?'700 13px':'600 11.5px')+' "Noto Sans SC",system-ui';
       ctx.textBaseline='top'; ctx.lineWidth=3; ctx.strokeStyle='rgba(0,0,0,.55)';
       ctx.strokeText(c.name,s.x,s.y+r+3); ctx.fillStyle='#fff'; ctx.fillText(c.name,s.x,s.y+r+3);
@@ -343,7 +380,9 @@ function dist2(e){const a=e.touches[0],b=e.touches[1];return Math.hypot(a.client
 document.getElementById('slider').oninput=e=>{ setYear(+e.target.value); hideHint(); };
 function play(){ playing=!playing; document.getElementById('playBtn').textContent=playing?'⏸':'▶';
   clearInterval(playTimer);
-  if(playing){ hideHint(); if(year>=2025)setYear(-3500); playTimer=setInterval(()=>{ setYear(year+7); if(year>=2025){playing=false;document.getElementById('playBtn').textContent='▶';clearInterval(playTimer);} },72); } }
+  if(playing){ hideHint(); if(year>=2025)setYear(-3500);
+    bornSet.clear(); activeCivs().forEach(c=>bornSet.add(c.id)); // 已在场的不弹,只弹新登场的
+    playTimer=setInterval(()=>{ setYear(year+7); checkBorn(); if(year>=2025){playing=false;document.getElementById('playBtn').textContent='▶';clearInterval(playTimer);} },72); } }
 document.getElementById('playBtn').onclick=play;
 let hintTimer=setTimeout(()=>hideHint(),6000);
 function hideHint(){document.getElementById('hint').classList.add('hide');clearTimeout(hintTimer);}
