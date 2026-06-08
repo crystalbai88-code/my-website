@@ -563,6 +563,19 @@ resize();
 applyTheme(localStorage.getItem('civ_theme')||'textbook');
 buildGraph();
 draw();
+
+// ── 自动导览适配器 ──
+window.__net={
+  nodes:()=>nodes, edges:()=>edges, byId:id=>BY_ID[id],
+  viewport:()=>({W,H}),
+  getCamera:()=>({panX,panY,scale}),
+  setCamera:(px,py,s)=>{panX=px;panY=py;scale=s;},
+  select:id=>showDetail(id),
+  deselect:()=>{selId=null;document.getElementById('panel').classList.remove('show');},
+  freeze:()=>{alpha=0;}
+};
 </script>
+<script src="./tour.js?v=1"></script>
 </body>
+
 </html>
