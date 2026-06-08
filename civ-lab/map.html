@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>世界历史地图 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css"/>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;height:100dvh;display:flex;flex-direction:column}
+  .top{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;gap:9px;padding:11px 15px;
+    background:linear-gradient(180deg,rgba(0,0,0,.32),transparent)}
+  .top .brand{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink);text-shadow:var(--label-shadow)}
+  .top .spacer{margin-left:auto}
+  .tbtn{font-family:var(--sans);font-size:12.5px;font-weight:700;color:var(--ink2);background:var(--panel-bg);
+    border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;cursor:pointer;backdrop-filter:blur(8px);text-decoration:none;display:inline-block}
+  .tbtn.acc{color:#fff;background:linear-gradient(90deg,#c86820,#b83018);border:none}
+  #mapwrap{flex:1;position:relative;overflow:hidden}
+  canvas{position:absolute;inset:0;cursor:grab}
+  canvas.drag{cursor:grabbing}
+  /* 时间轴 */
+  #timebar{position:fixed;left:0;right:0;bottom:0;z-index:28;padding:12px 18px calc(14px + env(safe-area-inset-bottom));
+    background:linear-gradient(0deg,rgba(0,0,0,.42),transparent)}
+  .yearrow{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+  #playBtn{width:44px;height:44px;flex:0 0 auto;border-radius:50%;border:none;color:#fff;font-size:18px;cursor:pointer;
+    background:linear-gradient(135deg,#c86820,#b83018);box-shadow:0 4px 14px #0006}
+  #yearLabel{font-family:var(--serif);font-weight:900;font-size:24px;color:var(--ink);text-shadow:var(--label-shadow);min-width:120px}
+  #eraLabel{font-family:var(--mono);font-size:12px;color:var(--gold);letter-spacing:.06em}
+  #activeCount{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--ink2);text-align:right}
+  #slider{width:100%;-webkit-appearance:none;height:5px;border-radius:5px;background:rgba(255,255,255,.18);outline:none}
+  #slider::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#d4a858;cursor:pointer;box-shadow:0 0 0 4px rgba(212,168,88,.25)}
+  #slider::-moz-range-thumb{width:20px;height:20px;border:none;border-radius:50%;background:#d4a858;cursor:pointer}
+  .erajump{display:flex;gap:6px;overflow-x:auto;margin-top:9px;scrollbar-width:none}
+  .erajump::-webkit-scrollbar{display:none}
+  .ej{flex:0 0 auto;font-family:var(--sans);font-size:11px;font-weight:700;color:var(--ink2);background:var(--panel-bg);
+    border:1px solid var(--panel-line);border-radius:999px;padding:4px 11px;cursor:pointer;white-space:nowrap;backdrop-filter:blur(6px)}
+  /* 文明详情面板 */
+  #scrim{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .3s}
+  #scrim.show{opacity:1;pointer-events:auto}
+  #panel{position:fixed;z-index:41;background:var(--panel-bg,rgba(16,20,32,.97));border:1px solid var(--panel-line);
+    backdrop-filter:blur(20px);box-shadow:0 10px 50px #0008;display:flex;flex-direction:column;transition:transform .36s cubic-bezier(.22,1,.36,1)}
+  /* 桌面:右侧抽屉 */
+  @media(min-width:721px){ #panel{top:0;right:0;bottom:0;width:400px;border-radius:0;transform:translateX(102%)} #panel.show{transform:none} }
+  /* 移动:底部抽屉 */
+  @media(max-width:720px){ #panel{left:0;right:0;bottom:0;max-height:80dvh;border-radius:20px 20px 0 0;transform:translateY(102%)} #panel.show{transform:none} }
+  #panel .grip{width:42px;height:5px;border-radius:5px;background:var(--ink3);opacity:.5;margin:9px auto 2px}
+  @media(min-width:721px){ #panel .grip{display:none} }
+  #panel .phead{padding:16px 20px 10px;position:relative}
+  #panel .pclose{position:absolute;right:14px;top:14px;font-size:15px;color:var(--ink3);background:none;border:none;cursor:pointer}
+  .p-civname{font-family:var(--serif);font-weight:900;font-size:24px;color:var(--ink);line-height:1.2}
+  .p-meta{font-family:var(--mono);font-size:12px;color:var(--gold);margin-top:5px}
+  .p-region{font-family:var(--sans);font-size:12px;color:var(--ink3);margin-top:3px}
+  #pevents{overflow-y:auto;padding:4px 20px 40px;-webkit-overflow-scrolling:touch}
+  .ev{border-left:3px solid var(--gold);padding:4px 0 4px 13px;margin:0 0 4px;cursor:pointer}
+  .ev .ey{font-family:var(--mono);font-size:11px;color:var(--ink3)}
+  .ev .et{font-family:var(--serif);font-weight:700;font-size:15px;color:var(--ink);margin:2px 0;line-height:1.35}
+  .ev .eo{font-size:13px;color:var(--ink2);line-height:1.6;display:none}
+  .ev.open .eo{display:block;margin-top:5px}
+  .ev .edeep{display:none;margin-top:9px}
+  .ev.open .edeep{display:block}
+  .ev .dsec{margin-top:9px;padding-top:7px;border-top:1px dashed var(--panel-line)}
+  .ev .dsec h5{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;color:var(--gold);margin:0 0 6px;text-transform:uppercase}
+  .ev .di{font-size:12px;color:var(--ink2);line-height:1.6;margin-bottom:6px}
+  .ev .di b{color:var(--ink)}
+  .noev{font-size:13px;color:var(--ink3);padding:16px 0;line-height:1.7}
+  .timeline-head{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;margin:10px 0 12px}
+  .hint{position:fixed;left:50%;top:60px;transform:translateX(-50%);z-index:25;font-family:var(--sans);font-size:12px;
+    color:var(--ink2);background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:999px;padding:6px 15px;backdrop-filter:blur(8px);transition:opacity .4s}
+  .hint.hide{opacity:0;pointer-events:none}
+</style>
+</head>
+<body data-theme="deepblue">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="top">
+    <span class="brand">🗺 世界历史地图</span>
+    <div class="spacer"></div>
+    <a class="tbtn acc" href="./networks.html">🕸 人物关系</a>
+    <a class="tbtn" href="./feed.html">📜 时间长河</a>
+    <div class="ds-theme-switch" id="themeSwitch">
+      <button data-t="deepblue"></button><button data-t="museum"></button><button data-t="textbook"></button><button data-t="parchment"></button>
+    </div>
+  </div>
+  <div id="mapwrap"><canvas id="c"></canvas></div>
+  <div class="hint" id="hint">拖动时间轴,看文明在地图上此消彼长 · 点国家看它的历史</div>
+  <div id="timebar">
+    <div class="yearrow">
+      <button id="playBtn">▶</button>
+      <div><div id="yearLabel"></div><div id="eraLabel"></div></div>
+      <div id="activeCount"></div>
+    </div>
+    <input type="range" id="slider" min="-3500" max="2025" step="5" value="-3500">
+    <div class="erajump" id="erajump"></div>
+  </div>
+</div>
+<div id="scrim"></div>
+<div id="panel">
+  <div class="grip"></div>
+  <div class="phead"><button class="pclose" id="pclose">✕</button>
+    <div class="p-civname" id="pCivName"></div>
+    <div class="p-meta" id="pMeta"></div>
+    <div class="p-region" id="pRegion"></div>
+  </div>
+  <div id="pevents"></div>
+</div>
+
+<script src="./track.js?v=1"></script>
+<script src="./world_geo.js?v=1"></script>
+<script src="./map_data.js?v=1"></script>
+<script>
+const REGION_COLOR={"东亚":'#d4a858',"南亚":'#d4708a',"西亚·中东":'#c84830',"欧洲":'#5aa0c8',"非洲":'#5ab87a',"美洲":'#c89030',"东南亚":'#48b0a0',"全球":'#8a7ad0'};
+const esc=s=>String(s==null?'':s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
+const strong=s=>esc(s).replace(/\*\*([^*]+?)\*\*/g,'<strong>$1</strong>');
+function eraLabel(y){ if(y<0)return '公元前 '+(-y); return '公元 '+y; }
+function eraName(y){
+  if(y<-1000)return '早期文明'; if(y<-200)return '古典时代·诸子百家'; if(y<500)return '帝国时代';
+  if(y<1500)return '中世纪·多中心'; if(y<1760)return '大航海·全球连接'; if(y<1945)return '工业与现代'; return '当代世界';
+}
+
+const canvas=document.getElementById('c'), ctx=canvas.getContext('2d');
+let W=0,H=0,baseW=0,baseH=0,scale=1,panX=0,panY=0;
+let year=-3500, playing=false, playTimer=null, hovId=null, selId=null;
+let off={x:0,y:0};
+
+function resize(){
+  const wrap=document.getElementById('mapwrap'); W=wrap.clientWidth; H=wrap.clientHeight;
+  canvas.width=W*devicePixelRatio; canvas.height=H*devicePixelRatio;
+  canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  const r=canvas.getBoundingClientRect(); off={x:r.left,y:r.top};
+  baseW=W; baseH=W/2; // 等距投影 2:1
+  // 初始让地图竖直居中
+  if(!resize._init){ panY=(H-baseH)/2; resize._init=1; }
+  draw();
+}
+function w2s(lng,lat){ return { x:((lng+180)/360)*baseW*scale+panX, y:((90-lat)/180)*baseH*scale+panY }; }
+
+function activeCivs(){ return MAP_CIVS.filter(c=> year>=c.s-1 && year<=c.e+1 ); }
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  // 海洋背景渐隐(透明,露出 cosmos)。画陆地
+  ctx.lineJoin='round';
+  for(const country of WORLD_GEO){
+    for(const poly of country){
+      ctx.beginPath();
+      for(const ring of poly){
+        ring.forEach((p,i)=>{ const s=w2s(p[0],p[1]); if(i===0)ctx.moveTo(s.x,s.y); else ctx.lineTo(s.x,s.y); });
+        ctx.closePath();
+      }
+      ctx.fillStyle='rgba(120,135,160,.16)'; ctx.fill();
+      ctx.strokeStyle='rgba(150,170,200,.28)'; ctx.lineWidth=0.6; ctx.stroke();
+    }
+  }
+  // 文明标记
+  const act=activeCivs();
+  document.getElementById('activeCount').textContent=act.length+' 个文明存续';
+  act.forEach(c=>{
+    const s=w2s(c.lng,c.lat); const col=REGION_COLOR[c.region]||'#888';
+    const isSel=c.id===selId, isHov=c.id===hovId;
+    // 出现动画:接近起始年时略放大
+    const age=year-c.s; const grow=age<60?(0.6+0.4*Math.max(0,age)/60):1;
+    const r=(isSel?11:isHov?10:8)*Math.min(1,grow+0.2);
+    ctx.save();
+    // 光晕
+    ctx.beginPath(); ctx.arc(s.x,s.y,r+(isSel?7:4),0,7); ctx.fillStyle=col+'33'; ctx.fill();
+    // 主点
+    ctx.beginPath(); ctx.arc(s.x,s.y,r,0,7); ctx.fillStyle=col; ctx.globalAlpha=isSel||isHov?1:.92; ctx.fill();
+    ctx.globalAlpha=1; ctx.lineWidth=isSel?2.5:1.5; ctx.strokeStyle='rgba(255,255,255,.85)'; ctx.stroke();
+    // 图标
+    ctx.font=Math.round(r*1.1)+'px "Apple Color Emoji","Segoe UI Emoji",system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(c.icon||'•',s.x,s.y+0.5);
+    // 名称
+    if(act.length<26||isSel||isHov||scale>1.6){
+      ctx.font=(isSel?'700 13px':'600 11.5px')+' "Noto Sans SC",system-ui';
+      ctx.textBaseline='top'; ctx.lineWidth=3; ctx.strokeStyle='rgba(0,0,0,.55)';
+      ctx.strokeText(c.name,s.x,s.y+r+3); ctx.fillStyle='#fff'; ctx.fillText(c.name,s.x,s.y+r+3);
+    }
+    ctx.restore();
+  });
+}
+
+function setYear(y){ year=Math.max(-3500,Math.min(2025,y|0));
+  document.getElementById('yearLabel').textContent=eraLabel(year);
+  document.getElementById('eraLabel').textContent=eraName(year);
+  document.getElementById('slider').value=year; draw(); }
+
+// 命中检测
+function civAt(sx,sy){
+  const act=activeCivs(); let best=null,bd=1e9;
+  for(const c of act){ const s=w2s(c.lng,c.lat); const d=Math.hypot(s.x-(sx-off.x),s.y-(sy-off.y)); if(d<16&&d<bd){bd=d;best=c;} }
+  return best;
+}
+
+// 面板
+const panel=document.getElementById('panel'), scrim=document.getElementById('scrim');
+function openCiv(c){
+  selId=c.id; draw();
+  document.getElementById('pCivName').textContent=(c.icon||'')+' '+c.name;
+  document.getElementById('pMeta').textContent=eraLabel(c.s)+' — '+eraLabel(c.e);
+  document.getElementById('pRegion').textContent='📍 '+c.region+' · 共 '+c.nev+' 件大事';
+  const evs=(CIV_EVENTS[c.id]||[]);
+  const box=document.getElementById('pevents');
+  if(!evs.length){ box.innerHTML='<div class="noev">这个文明的大事年表还在从知识库补充中。<br>你可以先去「🕸 人物关系」看看这个时代的人物,或继续拖动时间轴探索其他文明。</div>'; }
+  else{
+    box.innerHTML='<div class="timeline-head">📜 大事年表 · 点击展开</div>'+evs.map((e,i)=>{
+      const dv=e.deep||{};
+      let deep='';
+      if(dv.evidence&&dv.evidence.length) deep+=`<div class="dsec"><h5>🏺 留下的证据</h5>`+dv.evidence.map(x=>`<div class="di"><b>${esc(x.artifact)}</b> — ${esc(x.what)} <span style="color:var(--ink3)">(${esc(x.held)})</span></div>`).join('')+`</div>`;
+      if(dv.same&&dv.same.length) deep+=`<div class="dsec"><h5>🌍 此时世界 · 别处正在发生</h5>`+dv.same.map(s=>`<div class="di">📍 <b>${esc(s.region)}</b> · ${esc(s.title)}</div>`).join('')+`</div>`;
+      return `<div class="ev" data-i="${i}"><div class="ey">${eraLabel(e.year)}</div><div class="et">${esc(e.title)}</div><div class="eo">${strong(e.one)}</div><div class="edeep">${deep}</div></div>`;
+    }).join('');
+    box.querySelectorAll('.ev').forEach(el=>el.onclick=()=>el.classList.toggle('open'));
+  }
+  box.scrollTop=0; panel.classList.add('show'); scrim.classList.add('show');
+  if(window.Track){Track.log('世界地图');Track.region&&Track.region(c.region);}
+}
+function closeCiv(){ panel.classList.remove('show'); scrim.classList.remove('show'); selId=null; draw(); }
+document.getElementById('pclose').onclick=closeCiv; scrim.onclick=closeCiv;
+
+// 交互:拖动/缩放/点击
+let down=false,dragged=false,dx0=0,dy0=0,px0=0,py0=0;
+canvas.addEventListener('mousedown',e=>{down=true;dragged=false;dx0=e.clientX;dy0=e.clientY;px0=panX;py0=panY;canvas.classList.add('drag');});
+window.addEventListener('mousemove',e=>{
+  if(down){ const mx=e.clientX-dx0,my=e.clientY-dy0; if(Math.abs(mx)+Math.abs(my)>4)dragged=true; panX=px0+mx; panY=py0+my; draw(); }
+  else{ const c=civAt(e.clientX,e.clientY); const id=c?c.id:null; if(id!==hovId){hovId=id;canvas.style.cursor=id?'pointer':'grab';draw();} }
+});
+window.addEventListener('mouseup',e=>{ if(down&&!dragged){ const c=civAt(e.clientX,e.clientY); if(c)openCiv(c); } down=false;canvas.classList.remove('drag'); });
+canvas.addEventListener('wheel',e=>{e.preventDefault(); const f=e.deltaY<0?1.12:0.89; const mx=e.clientX-off.x,my=e.clientY-off.y;
+  panX=mx-(mx-panX)*f; panY=my-(my-panY)*f; scale=Math.max(0.8,Math.min(8,scale*f)); draw();},{passive:false});
+// 触摸
+let t0=null,tdragged=false,tpx=0,tpy=0,pinch0=null,sc0=1;
+canvas.addEventListener('touchstart',e=>{
+  if(e.touches.length===1){const t=e.touches[0];t0={x:t.clientX,y:t.clientY};tdragged=false;tpx=panX;tpy=panY;}
+  else if(e.touches.length===2){pinch0=dist2(e);sc0=scale;}
+},{passive:true});
+canvas.addEventListener('touchmove',e=>{
+  if(e.touches.length===1&&t0){const t=e.touches[0];const mx=t.clientX-t0.x,my=t.clientY-t0.y;if(Math.abs(mx)+Math.abs(my)>5)tdragged=true;panX=tpx+mx;panY=tpy+my;draw();}
+  else if(e.touches.length===2&&pinch0){const d=dist2(e);scale=Math.max(0.8,Math.min(8,sc0*d/pinch0));draw();}
+},{passive:true});
+canvas.addEventListener('touchend',e=>{ if(t0&&!tdragged){ const t=(e.changedTouches[0]); const c=civAt(t.clientX,t.clientY); if(c)openCiv(c);} t0=null;pinch0=null; },{passive:true});
+function dist2(e){const a=e.touches[0],b=e.touches[1];return Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);}
+
+// 时间轴
+document.getElementById('slider').oninput=e=>{ setYear(+e.target.value); hideHint(); };
+function play(){ playing=!playing; document.getElementById('playBtn').textContent=playing?'⏸':'▶';
+  clearInterval(playTimer);
+  if(playing){ hideHint(); if(year>=2025)setYear(-3500); playTimer=setInterval(()=>{ setYear(year+14); if(year>=2025){playing=false;document.getElementById('playBtn').textContent='▶';clearInterval(playTimer);} },55); } }
+document.getElementById('playBtn').onclick=play;
+let hintTimer=setTimeout(()=>hideHint(),6000);
+function hideHint(){document.getElementById('hint').classList.add('hide');clearTimeout(hintTimer);}
+
+// 时代快跳
+const ERAS=[['🌱 起源',-3500],['📜 早期文明',-2500],['💡 古典',-500],['🏛 帝国',1],['🌍 中世纪',800],['⛵ 大航海',1500],['⚙️ 工业',1800],['🌐 现代',1900],['🤖 当代',1980]];
+document.getElementById('erajump').innerHTML=ERAS.map(([l,y])=>`<span class="ej" data-y="${y}">${l}</span>`).join('');
+document.querySelectorAll('.ej').forEach(ch=>ch.onclick=()=>{setYear(+ch.dataset.y);hideHint();});
+
+// 主题
+function applyTheme(t){ if(t&&t!=='deepblue')document.body.setAttribute('data-theme',t);else document.body.removeAttribute('data-theme');
+  localStorage.setItem('civ_theme',t||'deepblue');
+  document.querySelectorAll('#themeSwitch button').forEach(b=>b.classList.toggle('active',b.dataset.t===(t||'deepblue'))); draw();}
+document.getElementById('themeSwitch').onclick=e=>{const b=e.target.closest('button');if(b)applyTheme(b.dataset.t);};
+
+window.addEventListener('resize',resize);
+applyTheme(localStorage.getItem('civ_theme')||'deepblue');
+resize(); setYear(-3500);
+</script>
+</body>
+</html>
