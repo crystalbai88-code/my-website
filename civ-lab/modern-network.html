@@ -61,7 +61,8 @@
   </div>
   <div class="civ-row">
     <span class="ds-kicker" style="margin-right:2px">选择国度</span>
-        <button class="civ-pill on" data-civ="industrial">⚙️ 工业革命</button>
+        <button class="civ-pill" data-civ="all">🌐 全部</button>
+    <button class="civ-pill on" data-civ="industrial">⚙️ 工业革命</button>
     <button class="civ-pill" data-civ="french">🎩 法国大革命</button>
     <button class="civ-pill" data-civ="empire">🌍 帝国主义</button>
     <button class="civ-pill" data-civ="unify">🏴 意德统一</button>
@@ -81,7 +82,7 @@
       <div class="p-dates" id="p-dates"></div>
       <span class="p-role" id="p-role"></span>
       <div class="p-bio" id="p-bio"></div>
-      <div class="p-rels"><h4>本国关联人物</h4><div id="p-rels"></div></div>
+      <div class="p-rels"><h4>关联人物</h4><div id="p-rels"></div></div>
     </div></div>
     <div class="legend ds-panel" style="padding:10px 13px">
       <div class="leg-row"><div class="leg-dot" data-role="ruler"></div><span>统治者</span></div>
@@ -448,11 +449,11 @@ function showDetail(id){
   // 只列「本国」关联人物（同一国度），跨文明关系不显示
   const rels=p.rel.map(r=>{
     const rp=BY_ID[r.i];
-    if(!rp||rp.c!==p.c)return'';
+    if(!rp)return"";
     return`<div class="rel-item" onclick="showDetail('${r.i}')"><span class="rel-type">${r.t}</span><span>${rp.n}</span></div>`;
   }).filter(Boolean);
   const rh=document.querySelector('.p-rels h4');
-  document.getElementById('p-rels').innerHTML=rels.length?rels.join(''):'<div style="font-size:11.5px;color:var(--ink3)">（本国内无直接关联人物）</div>';
+  document.getElementById('p-rels').innerHTML=rels.length?rels.join(''):'<div style="font-size:11.5px;color:var(--ink3)">（暂无关联人物）</div>';
   document.getElementById('panel').classList.add('show');
 }
 
@@ -582,6 +583,7 @@ resize();
 applyTheme(localStorage.getItem('civ_theme')||'textbook');
 buildGraph();
 draw();
+(function(){if(new URLSearchParams(location.search).get("all")){var b=document.querySelector(".civ-pill[data-civ='all']");if(b)b.click();}})();
 
 // ── 自动导览适配器 ──
 window.__net={
