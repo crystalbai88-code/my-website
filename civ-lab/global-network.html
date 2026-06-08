@@ -97,6 +97,7 @@
     <div class="hint">拖拽节点 · 滚轮缩放 · 点击查看详情</div>
   </div>
 </div>
+<script src="./portraits/manifest.js?v=1"></script>
 <script src="./global_people.js?v=1"></script>
 <script>
 const CIV_NAMES={iberia:"西葡航海",dutch:"荷兰",britain:"英国",france:"法国",reform:"宗教改革",science:"科学革命",ottoman:"奥斯曼",china:"明清中国",japan:"德川日本",cross:"跨文明"};
@@ -115,7 +116,6 @@ function refreshTheme(){
   document.querySelectorAll('.leg-dot[data-role]').forEach(d=>d.style.background=TH.role[d.dataset.role]);
 }
 function roleColor(r){return (TH.role&&TH.role[r])||'#888';}
-function shade(c,amt){var m=/^#?([0-9a-f]{6})$/i.exec(c);if(!m){var rg=/(\d+),\s*(\d+),\s*(\d+)/.exec(c);if(!rg)return c;var R=+rg[1],G=+rg[2],B=+rg[3];}else{var n=parseInt(m[1],16),R=(n>>16)&255,G=(n>>8)&255,B=n&255;}var f=function(v){return Math.max(0,Math.min(255,Math.round(v+amt)))};return 'rgb('+f(R)+','+f(G)+','+f(B)+')';}
 
 const P=CLASSICAL_PEOPLE;
 
@@ -208,28 +208,17 @@ const WIKI_TITLE={
 function wikiTitle(p){ return WIKI_TITLE[p.id] || (p.n||'').replace(/[（(].*?[)）]/g,'').trim(); }
 // 批量取画像：一次请求最多 ~45 个标题，避免并发限流
 function loadPortraitsBatch(people){
-  const todo=people.filter(p=>PORTRAIT[p.id]===undefined);
-  if(!todo.length) return;
-  todo.forEach(p=>PORTRAIT[p.id]=null);
-  for(let i=0;i<todo.length;i+=45){
-    const chunk=todo.slice(i,i+45);
-    const origMap={}; chunk.forEach(p=>{origMap[wikiTitle(p)]=p;});
-    const titles=chunk.map(wikiTitle).join('|');
-    const url='https://zh.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=200&titles='+encodeURIComponent(titles);
-    fetch(url).then(r=>r.json()).then(j=>{
-      const q=j.query||{}; const back={};
-      (q.normalized||[]).forEach(n=>back[n.to]=n.from);
-      (q.redirects||[]).forEach(rr=>{back[rr.to]=back[rr.from]||rr.from;});
-      const resolve=t=>{let cur=t,g=0;while(g++<4){if(origMap[cur])return origMap[cur];if(back[cur]){cur=back[cur];continue;}break;}return origMap[cur]||null;};
-      const got=new Set();
-      Object.values(q.pages||{}).forEach(pg=>{
-        const person=resolve(pg.title); if(!person)return; got.add(person.id);
-        if(pg.thumbnail&&pg.thumbnail.source){const img=new Image();img.referrerPolicy='no-referrer';img.onload=()=>PORTRAIT[person.id]=img;img.onerror=()=>PORTRAIT[person.id]=false;img.src=pg.thumbnail.source;}
-        else PORTRAIT[person.id]=false;
-      });
-      chunk.forEach(p=>{ if(!got.has(p.id)&&PORTRAIT[p.id]===null) PORTRAIT[p.id]=false; });
-    }).catch(()=>{ chunk.forEach(p=>{ if(PORTRAIT[p.id]===null) PORTRAIT[p.id]=undefined; }); });
-  }
+  // 本地真实画像(已下载到 ./portraits,不再依赖被墙的维基)
+  people.forEach(p=>{
+    if(PORTRAIT[p.id]!==undefined) return;
+    const f=(typeof PORTRAITS!=='undefined')?PORTRAITS[p.id]:null;
+    if(!f){ PORTRAIT[p.id]=false; return; }
+    PORTRAIT[p.id]=null;
+    const img=new Image();
+    img.onload=()=>PORTRAIT[p.id]=img;
+    img.onerror=()=>PORTRAIT[p.id]=false;
+    img.src='./portraits/'+f;
+  });
 }
 function loadPortrait(p){ loadPortraitsBatch([p]); }
 
@@ -307,7 +296,6 @@ function tick(){
       if(!b.pinned){b.vx+=dx/d*f;b.vy+=dy/d*f;}
     }
   }
-  const labelRects=[]; // 文字避让用:记录已画的文字框
   // Edges
   edges.forEach(e=>{
     const a=nodes.find(n=>n.id===e.a),b=nodes.find(n=>n.id===e.b);
@@ -370,19 +358,14 @@ function draw(){
     const r=isSel?21:isHov?18:15;
     const icon=(typeof personIconOf==='function')?personIconOf(p):'👤';
     ctx.save();
-    // 立体投影(落在画布上的影子)
-    ctx.beginPath();ctx.ellipse(n.x,n.y+r*0.92,r*1.02,r*0.4,0,0,Math.PI*2);ctx.fillStyle='rgba(0,0,0,.3)';ctx.fill();
     // 强调外环(选中/悬浮)
     if(isSel||isHov){
       ctx.beginPath();ctx.arc(n.x,n.y,r+4,0,Math.PI*2);
       ctx.strokeStyle=col;ctx.lineWidth=2.5;ctx.globalAlpha=isSel?0.95:0.5;ctx.stroke();
     }
-    // 角色色球体(径向渐变 → 立体底座)
-    var _g=ctx.createRadialGradient(n.x-r*0.38,n.y-r*0.42,r*0.15,n.x,n.y,r*1.05);
-    _g.addColorStop(0,shade(col,80));_g.addColorStop(.5,col);_g.addColorStop(1,shade(col,-55));
+    // 角色色圆底(头像底座)
     ctx.beginPath();ctx.arc(n.x,n.y,r,0,Math.PI*2);
-    ctx.fillStyle=_g;ctx.globalAlpha=isSel||isHov?1:0.92;ctx.fill();ctx.globalAlpha=1;
-    ctx.beginPath();ctx.arc(n.x-r*0.34,n.y-r*0.36,r*0.22,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,.4)';ctx.fill();
+    ctx.fillStyle=col;ctx.globalAlpha=isSel||isHov?1:0.9;ctx.fill();ctx.globalAlpha=1;
     const portrait=PORTRAIT[n.id];
     if(portrait && portrait.naturalWidth){
       // 真实画像(圆形裁剪, cover 填充)
@@ -404,18 +387,14 @@ function draw(){
     ctx.strokeStyle=portrait&&portrait.naturalWidth?col:'rgba(255,255,255,.85)';
     ctx.lineWidth=portrait&&portrait.naturalWidth?2.5:1.5;ctx.stroke();
     ctx.restore();
-    // 名字(节点下方)——原模式不变,仅做避让让字不互相压住
+    // 名字(节点下方)
     const showLabel=isSel||isHov||scale>1.05||nodes.length<28;
     if(showLabel){
       ctx.save();
       ctx.font=(isSel?'700 12px':'500 11px')+' "Noto Sans SC",system-ui,sans-serif';
-      const _tw=ctx.measureText(p.n).width,_lh=14; let _ly=n.y+r+4;
-      const _rc={x:n.x-_tw/2-2,y:_ly,w:_tw+4,h:_lh}; let _g=0;
-      while(_g++<14 && labelRects.some(R=>_rc.x<R.x+R.w&&_rc.x+_rc.w>R.x&&_rc.y<R.y+R.h&&_rc.y+_rc.h>R.y)){ _ly+=_lh+1; _rc.y=_ly; }
-      labelRects.push(_rc);
       ctx.fillStyle=TH.ink;ctx.textAlign='center';ctx.textBaseline='top';
       ctx.shadowColor=TH.chip||'rgba(0,0,0,.5)';ctx.shadowBlur=3;
-      ctx.fillText(p.n,n.x,_ly);
+      ctx.fillText(p.n,n.x,n.y+r+4);
       ctx.restore();
     }
   });
