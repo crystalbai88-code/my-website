@@ -48,7 +48,7 @@
 /* 默认：静夜深蓝 (深色) */
 :root{
   --bg:#131a2a; --bg-grad:linear-gradient(180deg,#131a2a 0%,#0e1422 55%,#131a2a 100%);
-  --neb1:rgba(120,140,200,.10); --neb2:rgba(200,160,90,.08); --star:.22; --twinkle:.14;
+  --neb1:rgba(120,150,235,.20); --neb2:rgba(214,168,90,.14); --star:.30; --twinkle:.18;
   --ink:#e8e4d8; --ink2:#a6aec4; --ink3:#6b7088;
   --gold:#d4a858; --warm:#e0b070; --vermilion:#c87850;
   --label-ink:#fff; --label-shadow:0 2px 8px rgba(0,0,0,.95);
@@ -92,6 +92,39 @@ body[data-theme="parchment"]{
 
 /* ───────── 3. 基础 ───────── */
 *{box-sizing:border-box;margin:0;padding:0}
+/* 极光 (aurora · 青碧极光) */
+body[data-theme="aurora"]{
+  --bg:#08161a; --bg-grad:linear-gradient(180deg,#0a1c20 0%,#06120f 55%,#0a201a 100%);
+  --neb1:rgba(60,224,176,.22); --neb2:rgba(140,90,235,.20); --star:.34; --twinkle:.22;
+  --ink:#e8f5ef; --ink2:#9fc8bc; --ink3:#5f8077;
+  --gold:#46e0b0; --warm:#7fe6c8; --vermilion:#3fd0c4;
+  --label-ink:#fff; --label-shadow:0 2px 8px rgba(0,0,0,.95);
+  --line:rgba(70,224,176,.12); --grid-ink:rgba(180,240,225,.72);
+  --panel-bg:rgba(9,28,28,.84); --panel-line:rgba(70,224,176,.26); --topbar-bg:rgba(7,18,18,.6);
+  --overlay:rgba(4,12,12,.85);
+}
+/* 暮霞 (sunset · 玫瑰暮光) */
+body[data-theme="sunset"]{
+  --bg:#1a0e1a; --bg-grad:linear-gradient(180deg,#221022 0%,#150a16 55%,#281024 100%);
+  --neb1:rgba(255,110,150,.22); --neb2:rgba(255,170,80,.18); --star:.30; --twinkle:.2;
+  --ink:#f6e8f0; --ink2:#cda8bb; --ink3:#8c6a7c;
+  --gold:#ff9a5a; --warm:#ffb87a; --vermilion:#ff6a8a;
+  --label-ink:#fff; --label-shadow:0 2px 8px rgba(0,0,0,.95);
+  --line:rgba(255,154,90,.12); --grid-ink:rgba(255,214,184,.72);
+  --panel-bg:rgba(32,14,30,.86); --panel-line:rgba(255,154,90,.26); --topbar-bg:rgba(22,10,20,.6);
+  --overlay:rgba(12,6,12,.85);
+}
+/* 星云 (nebula · 紫蓝星云) */
+body[data-theme="nebula"]{
+  --bg:#0c0a1f; --bg-grad:linear-gradient(180deg,#130e28 0%,#0a081a 55%,#170e2c 100%);
+  --neb1:rgba(150,90,255,.24); --neb2:rgba(60,180,255,.18); --star:.38; --twinkle:.24;
+  --ink:#ece6ff; --ink2:#b2a8d6; --ink3:#746a90;
+  --gold:#b894ff; --warm:#c8a6ff; --vermilion:#8a7ad0;
+  --label-ink:#fff; --label-shadow:0 2px 8px rgba(0,0,0,.95);
+  --line:rgba(150,120,255,.12); --grid-ink:rgba(212,196,255,.72);
+  --panel-bg:rgba(18,12,36,.86); --panel-line:rgba(150,120,255,.26); --topbar-bg:rgba(12,8,24,.6);
+  --overlay:rgba(8,6,18,.85);
+}
 html,body{min-height:100%;font-family:var(--sans);background:var(--bg);color:var(--ink);transition:background .4s ease}
 
 /* ───────── 4. 宇宙背景 (固定铺底) ───────── */
@@ -151,6 +184,9 @@ html,body{min-height:100%;font-family:var(--sans);background:var(--bg);color:var
 .ds-theme-switch button[data-t="museum"]{background:#f2ece0}
 .ds-theme-switch button[data-t="textbook"]{background:#2d4a7c}
 .ds-theme-switch button[data-t="parchment"]{background:#e8dabb}
+.ds-theme-switch button[data-t="aurora"]{background:linear-gradient(135deg,#0a1a16,#46e0b0)}
+.ds-theme-switch button[data-t="sunset"]{background:linear-gradient(135deg,#241020,#ff6a8a)}
+.ds-theme-switch button[data-t="nebula"]{background:linear-gradient(135deg,#0d0a1f,#b894ff)}
 
 /* ───────── 8. 圆形浮动操作按钮 (FAB) ───────── */
 .ds-fab{width:var(--fab);height:var(--fab);border-radius:50%;background:var(--fab-gold);color:#fff;border:none;cursor:pointer;font-size:24px;box-shadow:var(--sh-md);transition:transform .2s;display:flex;align-items:center;justify-content:center}
