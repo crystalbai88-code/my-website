@@ -144,6 +144,7 @@ function eraName(y){
 const canvas=document.getElementById('c'), ctx=canvas.getContext('2d');
 let W=0,H=0,baseW=0,baseH=0,scale=1,panX=0,panY=0;
 let year=-3500, playing=false, playTimer=null, hovId=null, selId=null;
+let present=false; // 走到当代时点亮"今天的世界"
 let off={x:0,y:0};
 
 function resize(){
@@ -172,9 +173,16 @@ function draw(){
         ring.forEach((p,i)=>{ const s=w2s(p[0],p[1]); if(i===0)ctx.moveTo(s.x,s.y); else ctx.lineTo(s.x,s.y); });
         ctx.closePath();
       }
-      ctx.fillStyle='rgba(120,135,160,.16)'; ctx.fill();
-      ctx.strokeStyle='rgba(150,170,200,.28)'; ctx.lineWidth=0.6; ctx.stroke();
+      // 走到当代:点亮"今天的世界"——陆地更明亮
+      ctx.fillStyle=present?'rgba(120,150,185,.42)':'rgba(120,135,160,.16)'; ctx.fill();
+      ctx.strokeStyle=present?'rgba(180,205,235,.55)':'rgba(150,170,200,.28)'; ctx.lineWidth=present?0.8:0.6; ctx.stroke();
     }
+  }
+  if(present){
+    ctx.save(); ctx.textAlign='center'; ctx.textBaseline='top';
+    ctx.font='800 16px "Noto Serif SC",serif'; ctx.lineWidth=4; ctx.strokeStyle='rgba(0,0,0,.5)';
+    ctx.strokeText('🌍 今天的世界',W/2,18); ctx.fillStyle='#eaf2ff'; ctx.fillText('🌍 今天的世界',W/2,18);
+    ctx.restore();
   }
   // 文明标记
   const act=activeCivs();
@@ -205,8 +213,9 @@ function draw(){
 }
 
 function setYear(y){ year=Math.max(-3500,Math.min(2025,y|0));
+  present = year>=2000; // 进入当代即点亮现代世界
   document.getElementById('yearLabel').textContent=eraLabel(year);
-  document.getElementById('eraLabel').textContent=eraName(year);
+  document.getElementById('eraLabel').textContent=present?'今天的世界':eraName(year);
   document.getElementById('slider').value=year; draw(); }
 
 // 命中检测
@@ -224,7 +233,7 @@ function openCiv(c){
   document.getElementById('pMeta').textContent=eraLabel(c.s)+' — '+eraLabel(c.e);
   document.getElementById('pRegion').textContent='📍 '+c.region+' · 共 '+c.nev+' 件大事';
   // 人物关系网入口(按时代映射到对应关系网,默认"全部"朋友圈视图)
-  const NET={classical:'classical-network.html',medieval:'medieval-network.html',global:'global-network.html',modern:'modern-network.html',contemporary:'contemporary-network.html'};
+  const NET={early:'early-network.html',classical:'classical-network.html',medieval:'medieval-network.html',global:'global-network.html',modern:'modern-network.html',contemporary:'contemporary-network.html'};
   const pNet=document.getElementById('pNet');
   if(NET[c.chapter]){ pNet.style.display='inline-block'; pNet.href='./'+NET[c.chapter]+'?all=1'; }
   else pNet.style.display='none';
@@ -294,7 +303,7 @@ function dist2(e){const a=e.touches[0],b=e.touches[1];return Math.hypot(a.client
 document.getElementById('slider').oninput=e=>{ setYear(+e.target.value); hideHint(); };
 function play(){ playing=!playing; document.getElementById('playBtn').textContent=playing?'⏸':'▶';
   clearInterval(playTimer);
-  if(playing){ hideHint(); if(year>=2025)setYear(-3500); playTimer=setInterval(()=>{ setYear(year+14); if(year>=2025){playing=false;document.getElementById('playBtn').textContent='▶';clearInterval(playTimer);} },55); } }
+  if(playing){ hideHint(); if(year>=2025)setYear(-3500); playTimer=setInterval(()=>{ setYear(year+7); if(year>=2025){playing=false;document.getElementById('playBtn').textContent='▶';clearInterval(playTimer);} },72); } }
 document.getElementById('playBtn').onclick=play;
 let hintTimer=setTimeout(()=>hideHint(),6000);
 function hideHint(){document.getElementById('hint').classList.add('hide');clearTimeout(hintTimer);}

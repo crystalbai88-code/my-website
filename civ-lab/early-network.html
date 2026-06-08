@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>古典思想与帝国 · 人物关系网</title>
+<title>早期文明 · 人物关系网</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Cinzel:wght@500;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="./cosmos-design-system.css"/>
 <style>
@@ -50,8 +50,8 @@
 <div id="app">
   <div class="nav">
     <a href="./index.html" class="ds-pill">⌂ 返回</a>
-    <span class="title">古典思想与帝国 · 人物关系网</span>
-    <span class="sub">前 1000 — 公元 550</span>
+    <span class="title">早期文明 · 人物关系网</span>
+    <span class="sub">前 3500 — 前 1000</span>
     <div class="ds-theme-switch" id="themeSwitch" style="margin-left:auto">
       <button data-t="deepblue" title="静夜深蓝"></button>
       <button data-t="museum" title="博物馆典藏"></button>
@@ -62,13 +62,11 @@
   <div class="civ-row">
     <span class="ds-kicker" style="margin-right:2px">选择国度</span>
     <button class="civ-pill" data-civ="all">🌐 全部</button>
-    <button class="civ-pill on" data-civ="china">🐉 中国</button>
-    <button class="civ-pill" data-civ="greece">🏛 希腊</button>
-    <button class="civ-pill" data-civ="rome">🦅 罗马</button>
-    <button class="civ-pill" data-civ="persia">🔥 波斯</button>
-    <button class="civ-pill" data-civ="india">☸ 印度·佛教</button>
-    <button class="civ-pill" data-civ="near_east">🦁 西亚</button>
-    <button class="civ-pill" data-civ="levant">✡️ 黎凡特</button>
+    <button class="civ-pill on" data-civ="meso">🏛 两河</button>
+    <button class="civ-pill" data-civ="egypt">🔺 埃及</button>
+    <button class="civ-pill" data-civ="anatolia">🛡 赫梯</button>
+    <button class="civ-pill" data-civ="aegean">🏺 爱琴海</button>
+    <button class="civ-pill" data-civ="china">🐉 华夏</button>
   </div>
   <div class="civ-row" id="relFilterRow" style="padding-top:0">
     <span class="ds-kicker" style="margin-right:2px">关系类型</span>
@@ -95,9 +93,9 @@
     <div class="hint">拖拽节点 · 滚轮缩放 · 点击查看详情</div>
   </div>
 </div>
-<script src="./classical_people.js?v=9"></script>
+<script src="./early_people.js?v=1"></script>
 <script>
-const CIV_NAMES={china:"中国",greece:"希腊",rome:"罗马",persia:"波斯",india:"印度/佛教",near_east:"西亚",levant:"黎凡特",cross:"跨文明"};
+const CIV_NAMES={meso:"两河流域",egypt:"古埃及",anatolia:"赫梯",aegean:"爱琴海",china:"华夏",cross:"跨文明"};
 const ROLE_NAMES={ruler:"统治者",general:"将领",thinker:"思想家",religious:"宗教人物",other:"其他人物"};
 // 节点按角色着色，色值映射到设计系统变量，主题切换时刷新
 const ROLE_VAR={ruler:'--gold',general:'--vermilion',thinker:'--cyan',religious:'--purple',other:'--ink3'};
@@ -137,22 +135,7 @@ P.forEach(p=>{BY_ID[p.id]=p});
 // ── 真实画像 (维基百科 pageimages；多为公有领域：半身像/古画/钱币像) ──
 const PORTRAIT={}; // id -> Image(已加载) | false(无) | null(加载中)
 // 部分人物维基条目标题与中文名不同，做映射以提高命中率
-const WIKI_TITLE={
-  zhouwu:'周武王', zhougong:'周公旦', jiangziya:'姜子牙', ashurbanipal:'亞述巴尼拔',
-  nebuchadnezzar2:'尼布甲尼撒二世', david:'大卫', solomon:'所罗门', isaiah:'以赛亚',
-  homer:'荷马', romulus:'罗慕路斯',
-  samudragupta:'沙摩陀罗·笈多', chandragupta2:'旃陀罗·笈多二世', aryabhata:'阿耶波多', kalidasa:'迦梨陀娑',
-  zhang_daoling:'張道陵', titus:'提圖斯', josephus:'弗拉維奧·約瑟夫斯',
-  buddha:'释迦牟尼', mahavira:'笩駄摩那', goujian:'勾践', liuche:'班超', lvhou:'吕雉',
-  qin_shihuang:'秦始皇', wudi_han:'汉武帝', simarqian:'司马迁', helv:'阖闾', fucha:'夫差',
-  cyrus:'居鲁士二世', darius1:'大流士一世', darius3:'大流士三世', xerxes:'薛西斯一世',
-  zoroaster:'琐罗亚斯德', cambyses:'冈比西斯二世', artaxerxes:'阿尔塔薛西斯一世',
-  alexander:'亚历山大大帝', philip2:'腓力二世 (马其顿)', leonidas:'列奥尼达一世', darius3:'大流士三世',
-  octavian:'奥古斯都', caesar:'尤利乌斯·恺撒', marcus_aurelius:'马尔库斯·奥列里乌斯',
-  zeno_stoic:'季蒂昂的芝诺', jesus:'耶稣', peter_apos:'圣伯多禄', paul_apos:'大数的扫罗',
-  ashoka:'阿育王', chandragupta:'旃陀罗笈多·孔雀', nagarjuna:'龙树', mahakassapa:'摩诃迦叶',
-  ajatasattu:'阿阇世王', bimbisara:'频婆娑罗', constantine:'君士坦丁大帝', cleopatra:'克利奥帕特拉七世',
-};
+const WIKI_TITLE={"hammurabi":"汉谟拉比","sargon":"萨尔贡","gilgamesh":"吉尔伽美什","naramsin":"纳拉姆辛","urnammu":"乌尔纳姆","enheduanna":"恩赫杜安娜","narmer":"納爾邁","djoser":"左塞尔","imhotep":"印何闐","khufu":"胡夫","khafre":"卡夫拉","sneferu":"斯尼夫魯","hatshepsut":"哈特謝普蘇特","thutmose3":"圖特摩斯三世","akhenaten":"阿肯那頓","nefertiti":"娜芙蒂蒂","tutankhamun":"圖坦卡門","ramesses2":"拉美西斯二世","mursili1":"穆爾西里一世","suppiluliuma1":"蘇庇路里烏瑪一世","hattusili3":"哈圖西里三世","muwatalli2":"穆瓦塔里二世","agamemnon":"阿伽門農","minos":"米諾斯","dayu":"大禹","tang":"商汤","wuding":"武丁","fuhao":"妇好","dixin":"帝辛","yiyin":"伊尹","taijia":"太甲","jie":"桀","bigan":"比干","qi":"启"};
 function wikiTitle(p){ return WIKI_TITLE[p.id] || (p.n||'').replace(/[（(].*?[)）]/g,'').trim(); }
 // 批量取画像：一次请求最多 ~45 个标题，避免并发限流
 function loadPortraitsBatch(people){

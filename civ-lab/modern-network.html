@@ -293,23 +293,23 @@ function buildGraph(){
   });
   document.getElementById('stats').textContent=nodes.length+'位人物  '+edges.length+'条关系';
   loadPortraitsBatch(vis); // 批量拉取真实画像(1-2个请求)
-  alpha=1; // 重新布局时重新加热
+  alpha=(nodes.length>40?0.5:0.9); // 大图低能量,避免狂晃
 }
 
 let alpha=1; // 模拟"能量"，随时间冷却；稳定后定格，点击更顺滑
 function tick(){
   if(alpha<0.008) return;      // 已稳定 → 节点停止漂移，便于点击
-  alpha*=0.992;
-  const rep=5600,k=124;        // 头像更大，间距相应加大
-  const damp=0.82;
+  alpha*=(nodes.length>40?0.965:0.99);
+  const rep=(nodes.length>40?3200:5200),k=124;        // 头像更大，间距相应加大
+  const damp=0.78;
   nodes.forEach(n=>{if(!n.pinned){n.vx*=damp;n.vy*=damp;}});
   // Repulsion
   for(let i=0;i<nodes.length;i++){
     for(let j=i+1;j<nodes.length;j++){
       const a=nodes[i],b=nodes[j];
       const dx=b.x-a.x,dy=b.y-a.y;
-      const d=Math.sqrt(dx*dx+dy*dy)||1;
-      const f=rep/(d*d);
+      const d=Math.max(15,Math.sqrt(dx*dx+dy*dy));
+      const f=rep/(d*d)*(0.4+0.6*alpha);
       if(!a.pinned){a.vx-=dx/d*f;a.vy-=dy/d*f;}
       if(!b.pinned){b.vx+=dx/d*f;b.vy+=dy/d*f;}
     }
@@ -319,7 +319,7 @@ function tick(){
     const a=nodes.find(n=>n.id===e.a),b=nodes.find(n=>n.id===e.b);
     if(!a||!b)return;
     const dx=b.x-a.x,dy=b.y-a.y;
-    const d=Math.sqrt(dx*dx+dy*dy)||1;
+    const d=Math.max(15,Math.sqrt(dx*dx+dy*dy));
     const f=(d-k)*0.03;
     if(!a.pinned){a.vx+=dx/d*f;a.vy+=dy/d*f;}
     if(!b.pinned){b.vx-=dx/d*f;b.vy-=dy/d*f;}
@@ -329,7 +329,7 @@ function tick(){
     if(!n.pinned){
       n.vx+=(W/2-n.x)*0.005;
       n.vy+=(H/2-n.y)*0.005;
-      n.x+=n.vx;n.y+=n.vy;
+      n.vx=Math.max(-18,Math.min(18,n.vx));n.vy=Math.max(-18,Math.min(18,n.vy));n.x+=n.vx;n.y+=n.vy;
       n.x=Math.max(30,Math.min(W-30,n.x));
       n.y=Math.max(30,Math.min(H-30,n.y));
     }
