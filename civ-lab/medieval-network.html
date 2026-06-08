@@ -268,8 +268,9 @@ function tick(){
       if(!b.pinned){b.vx+=dx/d*f;b.vy+=dy/d*f;}
     }
   }
-  // 聚焦模式:选中某人时,只突出 TA 和直接相连的人
+  // 选中某人时:只让 TA 与关联者的名字"出现"(关系网本身不变)
   const focusSet = selId ? (()=>{const s=new Set([selId]);edges.forEach(e=>{if(e.a===selId)s.add(e.b);if(e.b===selId)s.add(e.a);});return s;})() : null;
+  const labelRects=[]; // 已放置的文字框,后续文字智能避让、不互相压字
   // Edges
   edges.forEach(e=>{
     const a=nodes.find(n=>n.id===e.a),b=nodes.find(n=>n.id===e.b);
@@ -306,18 +307,18 @@ function draw(){
     ctx.save();
     if(relFilter!=='all' && !inFilter){ ctx.globalAlpha=0.05; ctx.strokeStyle=TH.edge; ctx.lineWidth=0.5; }
     else { ctx.globalAlpha=isHighlighted?0.9:0.32; ctx.strokeStyle=isHighlighted?(REL_CAT_COLOR[e.cat]||roleColor(a.data.r)):TH.edge; ctx.lineWidth=isHighlighted?1.8:0.7; }
-    if(selId && !(a.id===selId||b.id===selId)) ctx.globalAlpha=0.045;
     if(!isHighlighted)ctx.setLineDash([3,4]);
     ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
     ctx.restore();
     // 选中节点时，在连线中点标出"两人之间是什么关系"
     const showLabel = e.t && selId && (a.id===selId||b.id===selId);
     if(showLabel){
-      const mx=(a.x+b.x)/2, my=(a.y+b.y)/2;
+      const mx=(a.x+b.x)/2; let my=(a.y+b.y)/2;
       ctx.save();
       ctx.font='600 10px "Noto Sans SC",system-ui,sans-serif';
       ctx.textAlign='center'; ctx.textBaseline='middle';
       const w=ctx.measureText(e.t).width+10;
+      { let _g=0; const _rc={x:mx-w/2,y:my-9,w:w,h:18}; while(_g++<12 && labelRects.some(R=>_rc.x<R.x+R.w&&_rc.x+_rc.w>R.x&&_rc.y<R.y+R.h&&_rc.y+_rc.h>R.y)){ my+=19; _rc.y=my-9; } labelRects.push(_rc); }
       ctx.globalAlpha=0.95; ctx.fillStyle=TH.chip||'rgba(0,0,0,.55)';
       const rr=7; const x=mx-w/2,y=my-9,h=18;
       ctx.beginPath();ctx.moveTo(x+rr,y);ctx.arcTo(x+w,y,x+w,y+h,rr);ctx.arcTo(x+w,y+h,x,y+h,rr);ctx.arcTo(x,y+h,x,y,rr);ctx.arcTo(x,y,x+w,y,rr);ctx.closePath();ctx.fill();
@@ -328,7 +329,6 @@ function draw(){
   // Nodes (头像图标节点)
   nodes.forEach(n=>{
     const p=n.data;
-    if(selId && focusSet && !focusSet.has(n.id)){ ctx.save();ctx.globalAlpha=0.07;ctx.beginPath();ctx.arc(n.x,n.y,3.5,0,Math.PI*2);ctx.fillStyle=roleColor(p.r);ctx.fill();ctx.restore();return; }
     const col=roleColor(p.r);
     const isSel=n.id===selId,isHov=n.id===hovId;
     const r=isSel?21:isHov?18:15;
@@ -368,14 +368,18 @@ function draw(){
     ctx.strokeStyle=portrait&&portrait.naturalWidth?col:'rgba(255,255,255,.85)';
     ctx.lineWidth=portrait&&portrait.naturalWidth?2.5:1.5;ctx.stroke();
     ctx.restore();
-    // 名字(节点下方)
-    const showLabel=isSel||isHov||scale>1.05||nodes.length<28;
+    // 名字(节点下方)——选中时让 TA 与关联者的名字出现,智能避让、不互相压字
+    const showLabel=isSel||isHov||(focusSet&&focusSet.has(n.id))||scale>1.05||nodes.length<28;
     if(showLabel){
       ctx.save();
-      ctx.font=(isSel?'700 12px':'500 11px')+' "Noto Sans SC",system-ui,sans-serif';
+      ctx.font=(isSel?'700 12.5px':'600 11px')+' "Noto Sans SC",system-ui,sans-serif';
+      const _tw=ctx.measureText(p.n).width,_lh=14; let _ly=n.y+r+4;
+      const _rc={x:n.x-_tw/2-2,y:_ly,w:_tw+4,h:_lh}; let _g=0;
+      while(_g++<12 && labelRects.some(R=>_rc.x<R.x+R.w&&_rc.x+_rc.w>R.x&&_rc.y<R.y+R.h&&_rc.y+_rc.h>R.y)){ _ly+=_lh+1; _rc.y=_ly; }
+      labelRects.push(_rc);
       ctx.fillStyle=TH.ink;ctx.textAlign='center';ctx.textBaseline='top';
-      ctx.shadowColor=TH.chip||'rgba(0,0,0,.5)';ctx.shadowBlur=3;
-      ctx.fillText(p.n,n.x,n.y+r+4);
+      ctx.shadowColor='rgba(0,0,0,.82)';ctx.shadowBlur=4;
+      ctx.fillText(p.n,n.x,_ly);
       ctx.restore();
     }
   });

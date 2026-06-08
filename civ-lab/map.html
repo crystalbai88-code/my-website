@@ -210,8 +210,6 @@ function syncCards(){
   const wrap=document.getElementById('kcards'); if(!wrap)return;
   const act=activeCivs(); const live=new Set();
   for(const c of act){
-    // 聚焦:选中某文明时,只显示它这一张卡;不点时全部显示
-    if(selId && c.id!==selId){ if(cardEls[c.id]){ cardEls[c.id].remove(); delete cardEls[c.id]; } continue; }
     const s=w2s(c.lng,c.lat);
     const onScreen = s.x>12 && s.x<W-12 && s.y>66 && s.y<H-92;
     let el=cardEls[c.id];
