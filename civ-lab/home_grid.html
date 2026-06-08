@@ -1,0 +1,748 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI世界文明实验室</title>
+  <link rel="stylesheet" href="./styles.css?v=99" />
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     用户注册 / 登录 弹窗 (首次访问必填)
+════════════════════════════════════════ -->
+<div class="register-overlay hidden" id="registerOverlay">
+  <div class="register-modal">
+    <div class="register-head">
+      <h2>📜 欢迎来到 AI 世界文明实验室</h2>
+      <p>填写一些基本信息，开启你的文明探索之旅</p>
+    </div>
+    <form id="registerForm" class="register-form">
+      <label>
+        <span>你的昵称 <em>*</em></span>
+        <input type="text" name="nickname" required maxlength="20" placeholder="例如：小明 / 阿宝"/>
+      </label>
+      <label>
+        <span>年龄 <em>*</em></span>
+        <input type="number" name="age" required min="6" max="99" placeholder="10"/>
+      </label>
+      <label>
+        <span>性别</span>
+        <div class="register-gender">
+          <label class="radio-chip"><input type="radio" name="gender" value="boy"/><span>👦 男生</span></label>
+          <label class="radio-chip"><input type="radio" name="gender" value="girl"/><span>👧 女生</span></label>
+          <label class="radio-chip"><input type="radio" name="gender" value="other" checked/><span>🌈 不想说</span></label>
+        </div>
+      </label>
+      <label>
+        <span>所在年级（选填）</span>
+        <select name="grade">
+          <option value="">不选</option>
+          <option value="小学低年级">小学 1-3 年级</option>
+          <option value="小学高年级">小学 4-6 年级</option>
+          <option value="初中">初中</option>
+          <option value="高中">高中</option>
+          <option value="其他">其他</option>
+        </select>
+      </label>
+      <label>
+        <span>你最感兴趣的历史方向（可多选）</span>
+        <div class="register-interests">
+          <label class="check-chip"><input type="checkbox" name="interest" value="人物"/><span>👤 历史人物</span></label>
+          <label class="check-chip"><input type="checkbox" name="interest" value="战争"/><span>⚔️ 战争与帝国</span></label>
+          <label class="check-chip"><input type="checkbox" name="interest" value="文化"/><span>🎨 艺术与文化</span></label>
+          <label class="check-chip"><input type="checkbox" name="interest" value="科技"/><span>🔬 科技与发明</span></label>
+          <label class="check-chip"><input type="checkbox" name="interest" value="生活"/><span>🏘 日常生活</span></label>
+          <label class="check-chip"><input type="checkbox" name="interest" value="探索"/><span>🗺 探险与发现</span></label>
+        </div>
+      </label>
+      <button type="submit" class="register-submit">🚀 开始我的文明之旅</button>
+      <p class="register-note">📊 你的所有信息只保存在本地浏览器，不会上传到服务器。</p>
+    </form>
+  </div>
+</div>
+
+<!-- 右上角用户徽章（注册后显示） -->
+<div class="user-badge hidden" id="userBadge">
+  <span class="user-avatar" id="userAvatar">👤</span>
+  <span class="user-nickname" id="userNickname"></span>
+  <button class="user-profile-btn" onclick="showUserProfile()" title="查看我的学习画像">📊</button>
+</div>
+
+<!-- 我的学习画像 弹窗 -->
+<div class="profile-overlay hidden" id="profileOverlay" onclick="if(event.target===this)hideUserProfile()">
+  <div class="profile-modal">
+    <div class="profile-head">
+      <h2>📊 我的学习画像</h2>
+      <button class="profile-close" onclick="hideUserProfile()">✕</button>
+    </div>
+    <div class="profile-body" id="profileBody">
+      <!-- 由 JS 动态渲染 -->
+    </div>
+  </div>
+</div>
+
+
+<!-- STARS -->
+<div id="stars"></div>
+
+<!-- ════════════════════════════════════════
+     SCREEN 1: HOME TIMELINE
+════════════════════════════════════════ -->
+<div class="screen" id="s-home">
+  <div class="tl-header">
+    <h1>AI 世界文明实验室</h1>
+    <p>Global Civilization · 公元前3000年 — 公元1000年</p>
+    <div class="tl-subtitle">🕸 知识网络 · 点击任意节点深入探索</div>
+  </div>
+
+  <!-- 🕸 主知识网络 (Level 0) -->
+  <div class="main-network-container" id="mainNetworkContainer">
+    <!-- 由 JS 渲染 SVG -->
+  </div>
+
+  <div class="tl-wrap hidden-deprecated" id="tlWrap" style="display:none">
+    <div class="tl-semester">第一学期 · 文明诞生到公元1000年</div>
+    <div class="tl-line"><div class="tl-line-fill" id="tlLineFill"></div></div>
+    <div class="tl-dots" id="tlDots"></div>
+<!-- tl-figure 已删除：原男女探险角色 -->
+  </div>
+
+  <!-- 旧 legend 已隐藏（mn-legend display:none）— 新版用 stage 卡片导航 -->
+</div>
+
+<!-- ════════════════════════════════════════
+     SCREEN 2: LESSON (map + tabs)
+════════════════════════════════════════ -->
+<div class="screen hidden" id="s-lesson">
+
+  <!-- Topbar -->
+  <div class="lesson-topbar">
+    <button class="back-btn" id="backBtn">← 知识网络</button>
+    <div class="map-time-chip" id="lessonTimeChip">公元前3000年</div>
+    <div class="lesson-title-label" id="lessonTitleLabel">文明从哪里开始？</div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+      <div class="search-box-inline">
+        <input id="searchInput" type="search" placeholder="搜索知识库…" />
+        <button id="searchButton" class="topbar-icon-btn" title="搜索">⌕</button>
+      </div>
+      <button id="voiceButton" class="topbar-tool-btn" title="语音搜索">🎤</button>
+      <button id="readButton" class="topbar-tool-btn" title="朗读课程">🔊</button>
+      <button id="settingsBtn" class="topbar-tool-btn" title="设置">⚙</button>
+    </div>
+  </div>
+
+  <!-- Tab bar -->
+  <nav class="lesson-tab-bar" role="tablist">
+    <button class="ltab active" data-tab="map" role="tab">🗺 探索地图</button>
+    <button class="ltab" data-tab="chat" role="tab">💬 AI对话</button>
+    <button class="ltab" data-tab="create" role="tab">✏ 我的创作</button>
+    <button class="ltab" data-tab="history" role="tab">📖 历史轨迹</button>
+  </nav>
+
+  <!-- Search overlay -->
+  <div class="search-overlay hidden" id="searchOverlay">
+    <div class="search-panel">
+      <div class="search-header">
+        <h3>知识库搜索结果</h3>
+        <button id="closeSearch" class="icon-button">✕</button>
+      </div>
+      <div id="searchResults" class="search-results"></div>
+    </div>
+  </div>
+
+  <!-- ── TAB: 探索地图 ── -->
+  <div class="ltab-content active" id="ltab-map">
+    <div class="map-body">
+      <!-- SVG world map -->
+      <div class="map-area">
+        <svg id="world-svg" viewBox="0 0 1000 520" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <radialGradient id="civGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#f0c060" stop-opacity=".6"/>
+              <stop offset="100%" stop-color="#f0c060" stop-opacity="0"/>
+            </radialGradient>
+            <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <!-- 国风手绘地图 defs -->
+          <defs>
+            <linearGradient id="oceanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#c0d8ea"/>
+              <stop offset="100%" stop-color="#98c0d8"/>
+            </linearGradient>
+            <radialGradient id="civGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#c86820" stop-opacity=".55"/>
+              <stop offset="100%" stop-color="#c86820" stop-opacity="0"/>
+            </radialGradient>
+            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="3" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <rect id="ocean" width="1000" height="520" fill="url(#oceanGrad)"/>
+
+          <!-- Hand-drawn wave lines 手绘波浪 -->
+          <g stroke="#6a98c0" stroke-width="1.3" fill="none" opacity="0.5">
+            <path d="M 20,175 Q 50,169 80,175 Q 110,181 140,175 Q 170,169 200,175"/>
+            <path d="M 20,188 Q 50,182 80,188 Q 110,194 140,188"/>
+            <path d="M 320,380 Q 355,373 390,380 Q 425,387 460,380"/>
+            <path d="M 580,440 Q 620,433 660,440 Q 700,447 740,440"/>
+            <path d="M 880,200 Q 920,193 960,200 Q 990,207 999,203"/>
+            <path d="M 40,440 Q 70,433 100,440 Q 130,447 160,440"/>
+          </g>
+
+          <g id="continents">
+            <!-- ── NORTH AMERICA: mixed terrain ── -->
+            <!-- Base (forests/plains) -->
+            <path id="north-america" fill="#4a8c38"
+              d="M 90,60 C 120,45 160,40 195,55 L 230,70 255,90 270,120 265,160 280,190 270,220 255,260 235,300 215,330 190,340 165,320 145,290 120,265 100,235 85,200 75,165 70,130 80,95 Z"/>
+            <!-- Rocky Mountains (western) -->
+            <path fill="#9a7a55" d="M 110,80 L 125,65 145,80 155,120 145,160 130,180 115,160 105,130 Z"/>
+            <!-- Great Plains (centre) -->
+            <path fill="#c4b050" d="M 155,130 L 200,115 230,130 235,170 220,210 195,220 165,210 150,175 Z"/>
+            <!-- Central America -->
+            <path fill="#3d8030" d="M 215,330 L 232,340 227,360 212,370 202,355 207,340 Z"/>
+
+            <!-- ── SOUTH AMERICA: Amazon + Andes ── -->
+            <!-- Base greenery -->
+            <path id="south-america" fill="#3a8c28"
+              d="M 205,370 C 225,365 255,370 270,390 L 285,420 285,460 270,490 245,505 220,500 200,475 190,445 195,415 200,390 Z"/>
+            <!-- Amazon rainforest (dark green) -->
+            <path fill="#206018" d="M 210,375 Q 255,368 272,392 L 282,430 265,455 235,460 215,440 205,415 210,390 Z"/>
+            <!-- Andes (mountain) -->
+            <path fill="#8c7050" d="M 205,370 L 215,368 220,385 215,430 208,450 202,440 195,415 198,390 Z"/>
+            <!-- Pampas (grassland) -->
+            <path fill="#8ab840" d="M 230,455 L 270,460 275,490 250,505 225,500 220,475 Z"/>
+
+            <!-- ── EUROPE: temperate green ── -->
+            <path id="europe" fill="#6aaa3e"
+              d="M 445,75 C 465,65 495,68 515,80 L 525,95 530,115 515,135 500,148 475,150 460,138 445,120 440,100 Z"/>
+            <!-- Alps mountain range -->
+            <path fill="#c8bca0" d="M 465,115 L 480,108 498,112 505,125 495,132 475,133 462,126 Z"/>
+            <!-- Iberian Peninsula -->
+            <path fill="#c0a858" d="M 440,120 L 450,130 445,148 430,150 425,135 430,122 Z"/>
+            <!-- British Isles -->
+            <path fill="#5aa830" d="M 445,78 L 455,70 460,78 452,86 443,82 Z"/>
+            <!-- Scandinavia (taiga) -->
+            <path fill="#4a8a38" d="M 470,50 L 490,42 505,55 495,70 475,68 Z"/>
+
+            <!-- ── AFRICA: rich terrain diversity ── -->
+            <!-- Base (varied) -->
+            <path id="africa" fill="#d4a840"
+              d="M 445,155 C 475,148 515,155 545,175 L 565,205 580,245 575,290 565,335 545,375 520,405 490,425 460,415 440,385 425,345 425,300 432,258 440,215 440,180 Z"/>
+            <!-- Sahara Desert (sandy) -->
+            <path fill="#e8c860" d="M 445,160 L 540,160 L 565,205 L 560,230 L 440,230 L 432,210 Z"/>
+            <!-- Central Africa rainforest -->
+            <path fill="#2a7020" d="M 445,260 L 530,255 L 555,295 L 545,335 L 490,340 L 450,325 L 435,295 Z"/>
+            <!-- East Africa savanna (golden) -->
+            <path fill="#c8a838" d="M 540,260 L 565,270 L 565,335 L 548,355 L 535,330 L 545,300 Z"/>
+            <!-- Southern tip (grassland) -->
+            <path fill="#80b040" d="M 460,380 L 520,375 L 535,400 L 515,418 L 490,422 L 462,412 Z"/>
+            <!-- Nile corridor (green strip) -->
+            <path fill="#508840" d="M 512,160 L 522,165 L 520,220 L 510,220 L 508,165 Z"/>
+
+            <!-- ── ARABIA: desert ── -->
+            <path id="arabia" fill="#e0b84a"
+              d="M 560,180 L 590,172 615,185 620,215 610,240 590,248 570,238 558,215 Z"/>
+            <!-- Sand dune highlights -->
+            <path fill="#eecc70" d="M 568,185 Q 585,178 600,183 L 610,200 Q 595,194 578,198 Z" opacity=".5"/>
+
+            <!-- ── ASIA: huge terrain diversity ── -->
+            <!-- Base (green/mixed) -->
+            <path id="asia" fill="#6a9838"
+              d="M 525,72 C 580,55 660,50 745,58 L 840,70 900,95 920,130 905,160 880,175 850,180 820,195 790,215 765,240 740,265 715,285 690,295 665,290 645,275 620,260 598,245 575,225 558,200 548,175 535,145 525,110 Z"/>
+            <!-- Siberian taiga (north, grey-green) -->
+            <path fill="#507040" d="M 620,58 L 750,58 L 840,70 L 850,100 L 810,105 L 745,90 L 680,80 L 625,75 Z"/>
+            <!-- Gobi/Central Asian desert (tan) -->
+            <path fill="#c8a848" d="M 650,110 L 750,105 L 800,130 L 790,165 L 745,175 L 690,168 L 655,148 Z"/>
+            <!-- Chinese plains (fertile green) -->
+            <path fill="#78b840" d="M 780,155 L 840,145 L 870,160 L 865,195 L 840,205 L 800,200 L 775,185 Z"/>
+            <!-- Himalayas/Tibet (mountain plateau) -->
+            <path fill="#c0aaaa" d="M 650,168 L 695,162 L 720,175 L 718,200 L 688,208 L 658,200 L 644,185 Z"/>
+            <!-- Mesopotamia / Fertile Crescent (lush) -->
+            <path fill="#88b840" d="M 555,180 L 590,175 L 610,195 L 605,225 L 580,232 L 558,218 Z"/>
+
+            <!-- ── INDIAN SUBCONTINENT ── -->
+            <path id="india" fill="#90c050"
+              d="M 660,215 L 690,210 715,225 720,258 700,285 675,290 655,275 645,248 Z"/>
+            <!-- Thar Desert (northwest India) -->
+            <path fill="#d4b860" d="M 648,220 L 666,216 L 672,238 L 658,242 L 646,232 Z"/>
+
+            <!-- ── SOUTHEAST ASIA ── -->
+            <path fill="#3a8c28" d="M 755,250 L 790,240 815,255 820,280 800,295 775,285 755,265 Z"/>
+
+            <!-- ── JAPAN ── -->
+            <path fill="#70a838" d="M 845,140 L 860,130 870,142 862,158 847,155 Z"/>
+            <path fill="#70a838" d="M 855,110 L 870,105 877,118 868,130 854,125 Z"/>
+
+            <!-- ── AUSTRALIA: outback + coasts ── -->
+            <!-- Outback (red-brown) -->
+            <path id="australia" fill="#c47830"
+              d="M 755,355 C 790,340 835,345 865,368 L 875,400 860,430 825,440 790,432 765,408 750,378 Z"/>
+            <!-- Coastal green fringe -->
+            <path fill="#6a9830" d="M 756,380 Q 762,360 775,358 L 800,358 L 820,365 L 832,380 L 820,388 L 795,385 L 768,388 Z"/>
+            <path fill="#6a9830" d="M 820,418 L 855,408 L 862,425 L 840,435 L 820,432 Z"/>
+          </g>
+          <!-- ── 手绘山脉符号 Mountain symbols ── -->
+          <g id="mountain-symbols" stroke="#8a6030" stroke-width="1.5" stroke-linejoin="round" fill="#c8a860" opacity="0.75">
+            <!-- Himalayas 喜马拉雅 -->
+            <path d="M656,210 L662,198 L668,210 Z"/>
+            <path d="M664,212 L672,196 L680,212 Z"/>
+            <path d="M676,210 L684,194 L692,210 Z"/>
+            <path d="M686,208 L692,197 L698,208 Z"/>
+            <!-- Tibetan plateau 青藏高原 -->
+            <path d="M648,222 L655,212 L662,222 Z"/>
+            <path d="M660,220 L668,209 L676,220 Z"/>
+            <!-- Alps 阿尔卑斯 -->
+            <path d="M462,115 L467,106 L472,115 Z"/>
+            <path d="M469,116 L475,104 L481,116 Z"/>
+            <path d="M476,114 L482,105 L488,114 Z"/>
+            <!-- Rockies 落基山 -->
+            <path d="M108,88 L114,77 L120,88 Z"/>
+            <path d="M116,90 L122,78 L128,90 Z"/>
+            <path d="M122,88 L128,78 L134,88 Z"/>
+            <!-- Andes 安第斯 -->
+            <path d="M203,375 L208,364 L213,375 Z"/>
+            <path d="M210,378 L215,367 L220,378 Z"/>
+            <path d="M216,376 L221,366 L226,376 Z"/>
+            <!-- Atlas / Ethiopian highlands -->
+            <path d="M450,178 L455,169 L460,178 Z"/>
+            <path d="M458,176 L463,167 L468,176 Z"/>
+            <!-- Zagros / Caucasus -->
+            <path d="M590,175 L595,166 L600,175 Z"/>
+            <path d="M598,174 L603,165 L608,174 Z"/>
+            <!-- Australian ranges -->
+            <path d="M808,370 L813,362 L818,370 Z"/>
+          </g>
+
+          <!-- ── 手绘树木符号 Tree symbols (forests) ── -->
+          <g id="tree-symbols" fill="none" stroke="#3a6828" stroke-width="1.2" opacity="0.6">
+            <!-- Amazon 亚马逊 -->
+            <g fill="#2a6018" stroke="none" opacity="0.7">
+              <circle cx="228" cy="405" r="5"/><circle cx="238" cy="400" r="5"/>
+              <circle cx="248" cy="408" r="5"/><circle cx="235" cy="414" r="4"/>
+              <circle cx="245" cy="396" r="4"/><circle cx="255" cy="410" r="4"/>
+              <circle cx="260" cy="398" r="5"/><circle cx="268" cy="412" r="4"/>
+            </g>
+            <!-- Central Africa 中非雨林 -->
+            <g fill="#2a6018" stroke="none" opacity="0.6">
+              <circle cx="470" cy="290" r="5"/><circle cx="480" cy="284" r="5"/>
+              <circle cx="492" cy="292" r="5"/><circle cx="478" cy="300" r="4"/>
+              <circle cx="500" cy="285" r="5"/><circle cx="510" cy="296" r="4"/>
+            </g>
+            <!-- Siberia 西伯利亚 -->
+            <g fill="#4a6830" stroke="none" opacity="0.45">
+              <circle cx="680" cy="75" r="4"/><circle cx="692" cy="70" r="4"/>
+              <circle cx="704" cy="76" r="4"/><circle cx="716" cy="72" r="4"/>
+              <circle cx="728" cy="77" r="3"/><circle cx="740" cy="71" r="4"/>
+            </g>
+            <!-- SE Asia 东南亚 -->
+            <g fill="#3a6820" stroke="none" opacity="0.65">
+              <circle cx="768" cy="260" r="4"/><circle cx="778" cy="255" r="4"/>
+              <circle cx="788" cy="263" r="4"/><circle cx="798" cy="256" r="3"/>
+            </g>
+          </g>
+
+          <!-- ── 手绘河流线 River lines ── -->
+          <g stroke="#5a88b0" stroke-width="1.5" fill="none" opacity="0.55" stroke-linecap="round">
+            <!-- Nile 尼罗河 -->
+            <path d="M 512,158 Q 510,200 512,240 Q 514,268 508,285"/>
+            <!-- Tigris-Euphrates 底格里斯-幼发拉底 -->
+            <path d="M 580,185 Q 574,200 570,220 Q 565,240 560,250"/>
+            <path d="M 595,182 Q 592,200 588,218 Q 582,238 575,255"/>
+            <!-- Yangtze 长江 -->
+            <path d="M 790,210 Q 820,205 850,212 Q 880,218 900,210"/>
+            <!-- Yellow River 黄河 -->
+            <path d="M 775,190 Q 810,182 840,188 Q 865,193 878,188"/>
+            <!-- Indus 印度河 -->
+            <path d="M 658,220 Q 660,240 658,260 Q 656,276 655,285"/>
+            <!-- Ganges 恒河 -->
+            <path d="M 680,222 Q 695,228 710,225 Q 718,248 700,275"/>
+          </g>
+
+          <!-- ── Ink stroke outlines on continents ── -->
+          <g id="continent-outlines" fill="none" stroke="#8a6020" stroke-width="1.5" stroke-linejoin="round" opacity="0.4">
+            <path d="M 90,60 C 120,45 160,40 195,55 L 230,70 255,90 270,120 265,160 280,190 270,220 255,260 235,300 215,330 190,340 165,320 145,290 120,265 100,235 85,200 75,165 70,130 80,95 Z"/>
+            <path d="M 205,370 C 225,365 255,370 270,390 L 285,420 285,460 270,490 245,505 220,500 200,475 190,445 195,415 200,390 Z"/>
+            <path d="M 445,75 C 465,65 495,68 515,80 L 525,95 530,115 515,135 500,148 475,150 460,138 445,120 440,100 Z"/>
+            <path d="M 445,155 C 475,148 515,155 545,175 L 565,205 580,245 575,290 565,335 545,375 520,405 490,425 460,415 440,385 425,345 425,300 432,258 440,215 440,180 Z"/>
+            <path d="M 525,72 C 580,55 660,50 745,58 L 840,70 900,95 920,130 905,160 880,175 850,180 820,195 790,215 765,240 740,265 715,285 690,295 665,290 645,275 620,260 598,245 575,225 558,200 548,175 535,145 525,110 Z"/>
+          </g>
+
+          <!-- ══ 海洋·地名标注 Ocean & geo labels ══ -->
+          <g id="geo-labels" font-family="STSong,'Noto Serif SC','SimSun','Times New Roman',serif" pointer-events="none">
+
+            <!-- 大洋名称 Ocean names (italic, spacious) -->
+            <text x="285" y="310" font-size="13" fill="#4a7aaa" opacity="0.55" font-style="italic" letter-spacing="3" text-anchor="middle">大 西 洋</text>
+            <text x="650" y="395" font-size="13" fill="#4a7aaa" opacity="0.55" font-style="italic" letter-spacing="3" text-anchor="middle">印 度 洋</text>
+            <text x="880" y="310" font-size="12" fill="#4a7aaa" opacity="0.5" font-style="italic" letter-spacing="3" text-anchor="middle">太 平 洋</text>
+            <text x="462" y="157" font-size="10" fill="#3a6aaa" opacity="0.55" font-style="italic" letter-spacing="2" text-anchor="middle">地 中 海</text>
+            <text x="538" y="182" font-size="9"  fill="#4a7aaa" opacity="0.45" font-style="italic" text-anchor="middle">红海</text>
+            <text x="790" y="320" font-size="9"  fill="#4a7aaa" opacity="0.45" font-style="italic" text-anchor="middle">南海</text>
+
+            <!-- 山脉标注 Mountain ranges -->
+            <text x="672" y="214" font-size="8.5" fill="#7a5530" opacity="0.7" transform="rotate(-6,672,214)" letter-spacing="1">喜马拉雅山</text>
+            <text x="462" y="144" font-size="8"   fill="#7a5530" opacity="0.65" transform="rotate(-3,462,144)" letter-spacing="1">阿尔卑斯山</text>
+            <text x="116" y="98"  font-size="7.5" fill="#7a5530" opacity="0.55" transform="rotate(12,116,98)"  letter-spacing="1">落基山</text>
+            <text x="206" y="392" font-size="7.5" fill="#7a5530" opacity="0.55" transform="rotate(14,206,392)" letter-spacing="1">安第斯山</text>
+            <text x="598" y="182" font-size="7.5" fill="#7a5530" opacity="0.55" letter-spacing="1">扎格罗斯山</text>
+
+            <!-- 河流标注 River labels -->
+            <text x="508" y="298" font-size="8" fill="#3a6888" opacity="0.65" transform="rotate(84,508,260)" letter-spacing="1">尼 罗 河</text>
+            <text x="565" y="198" font-size="7.5" fill="#3a6888" opacity="0.6" transform="rotate(-10,565,198)" letter-spacing="1">幼发拉底河</text>
+            <text x="820" y="218" font-size="7.5" fill="#3a6888" opacity="0.6" transform="rotate(-4,820,218)" letter-spacing="1">长江</text>
+            <text x="800" y="192" font-size="7.5" fill="#3a6888" opacity="0.6" transform="rotate(-8,800,192)" letter-spacing="1">黄河</text>
+            <text x="658" y="255" font-size="7.5" fill="#3a6888" opacity="0.6" transform="rotate(82,658,240)" letter-spacing="1">印度河</text>
+          </g>
+
+          <!-- ══ 历史城市标注 Historical city markers (with label backgrounds) ══ -->
+          <g id="city-markers-fixed" font-family="STSong,'Noto Serif SC','SimSun',serif" font-size="10" font-weight="700" pointer-events="none">
+
+            <!-- Helper macro: each city = dot + label background rect + text -->
+            <!-- 近东 Near East ─────────────────────────────── -->
+            <g class="hcity"><!-- 乌鲁克 Uruk -->
+              <circle cx="583" cy="244" r="5.5" fill="#c84820" stroke="#f0c060" stroke-width="1.2"/>
+              <rect x="567" y="230" width="32" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="583" y="240" text-anchor="middle" fill="#5a1a06">乌鲁克</text>
+            </g>
+            <g class="hcity"><!-- 孟菲斯 Memphis -->
+              <circle cx="512" cy="232" r="5" fill="#c84820" stroke="#f0c060" stroke-width="1"/>
+              <rect x="496" y="218" width="32" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="512" y="228" text-anchor="middle" fill="#5a1a06">孟菲斯</text>
+            </g>
+            <g class="hcity"><!-- 巴比伦 Babylon -->
+              <circle cx="573" cy="228" r="4.5" fill="#a83818" stroke="#f0c060" stroke-width="1"/>
+              <rect x="557" y="214" width="32" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="573" y="224" text-anchor="middle" fill="#5a1a06">巴比伦</text>
+            </g>
+            <g class="hcity"><!-- 耶利哥 Jericho -->
+              <circle cx="527" cy="220" r="4" fill="#a83818" stroke="#f0c060" stroke-width="1"/>
+              <rect x="511" y="206" width="32" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="527" y="216" text-anchor="middle" fill="#5a1a06">耶利哥</text>
+            </g>
+
+            <!-- 地中海 Mediterranean ──────────────────────── -->
+            <g class="hcity"><!-- 雅典 Athens -->
+              <circle cx="490" cy="178" r="5" fill="#8a3020" stroke="#f0c060" stroke-width="1"/>
+              <rect x="475" y="164" width="30" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="490" y="174" text-anchor="middle" fill="#3a1206">雅典</text>
+            </g>
+            <g class="hcity"><!-- 罗马 Rome -->
+              <circle cx="470" cy="165" r="5" fill="#8a3020" stroke="#f0c060" stroke-width="1"/>
+              <rect x="455" y="151" width="30" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="470" y="161" text-anchor="middle" fill="#3a1206">罗马</text>
+            </g>
+            <g class="hcity"><!-- 迦太基 Carthage -->
+              <circle cx="463" cy="196" r="4.5" fill="#8a3020" stroke="#f0c060" stroke-width="1"/>
+              <rect x="444" y="182" width="38" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="463" y="192" text-anchor="middle" fill="#3a1206">迦太基</text>
+            </g>
+            <g class="hcity"><!-- 亚历山大 Alexandria -->
+              <circle cx="508" cy="216" r="4.5" fill="#8a3020" stroke="#f0c060" stroke-width="1"/>
+              <rect x="482" y="202" width="52" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="508" y="212" text-anchor="middle" fill="#3a1206">亚历山大港</text>
+            </g>
+
+            <!-- 中亚·丝绸之路 Silk Road ───────────────────── -->
+            <g class="hcity"><!-- 撒马尔罕 Samarkand -->
+              <circle cx="635" cy="183" r="4.5" fill="#7a4020" stroke="#f0c060" stroke-width="1"/>
+              <rect x="614" y="169" width="42" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="635" y="179" text-anchor="middle" fill="#3a1206">撒马尔罕</text>
+            </g>
+            <g class="hcity"><!-- 巴格达 Baghdad -->
+              <circle cx="582" cy="226" r="4.5" fill="#7a4020" stroke="#f0c060" stroke-width="1"/>
+              <rect x="565" y="212" width="34" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="582" y="222" text-anchor="middle" fill="#3a1206">巴格达</text>
+            </g>
+
+            <!-- 南亚 South Asia ─────────────────────────────── -->
+            <g class="hcity"><!-- 哈拉帕 Harappa -->
+              <circle cx="648" cy="244" r="5" fill="#386818" stroke="#f0c060" stroke-width="1"/>
+              <rect x="630" y="230" width="36" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="648" y="240" text-anchor="middle" fill="#1a3a06">哈拉帕</text>
+            </g>
+            <g class="hcity"><!-- 华氏城 Pataliputra -->
+              <circle cx="686" cy="248" r="4" fill="#386818" stroke="#f0c060" stroke-width="1"/>
+              <rect x="667" y="234" width="38" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="686" y="244" text-anchor="middle" fill="#1a3a06">华氏城</text>
+            </g>
+
+            <!-- 东亚·中国 East Asia / China ────────────────── -->
+            <g class="hcity"><!-- 安阳 Anyang -->
+              <circle cx="793" cy="202" r="5" fill="#8a3020" stroke="#f0c060" stroke-width="1"/>
+              <rect x="777" y="188" width="32" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="793" y="198" text-anchor="middle" fill="#3a1206">安阳</text>
+            </g>
+            <g class="hcity"><!-- 长安 Chang'an -->
+              <circle cx="776" cy="196" r="5" fill="#8a3020" stroke="#f0c060" stroke-width="1"/>
+              <rect x="760" y="182" width="32" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="776" y="192" text-anchor="middle" fill="#3a1206">长安</text>
+            </g>
+            <g class="hcity"><!-- 洛阳 Luoyang -->
+              <circle cx="790" cy="208" r="4" fill="#7a2818" stroke="#f0c060" stroke-width="1"/>
+              <rect x="774" y="210" width="32" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="790" y="220" text-anchor="middle" fill="#3a1206">洛阳</text>
+            </g>
+            <g class="hcity"><!-- 杭州 Hangzhou -->
+              <circle cx="814" cy="220" r="4" fill="#7a2818" stroke="#f0c060" stroke-width="1"/>
+              <rect x="798" y="206" width="32" height="12" rx="3" fill="rgba(255,248,220,0.88)"/>
+              <text x="814" y="216" text-anchor="middle" fill="#3a1206">杭州</text>
+            </g>
+          </g>
+
+          <!-- ══ 动态文明标记（JS控制） Dynamic civ markers ══ -->
+          <g id="civ-markers"></g>
+        </svg>
+      </div>
+
+      <!-- Side panel -->
+      <div class="map-panel" id="mapPanel">
+        <div id="panelNoCiv" class="panel-no-civ">
+          <div class="arrow-icon">←</div>
+          <p style="font-size:13px;color:var(--ink3);line-height:1.8">在地图上选择一个文明标记<br>了解那里的人类历史</p>
+        </div>
+        <div id="panelCivContent" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+          <div class="panel-civ-header">
+            <div class="panel-civ-era" id="panelEra"></div>
+            <div class="panel-civ-name" id="panelCivName"></div>
+            <div class="panel-civ-desc" id="panelCivDesc"></div>
+            <div class="panel-civ-people" id="panelPeople"></div>
+          </div>
+          <div class="panel-events-title">重要历史事件</div>
+          <div class="panel-events" id="panelEvents"></div>
+          <button class="map-complete-btn" id="mapCompleteBtn" onclick="showSummary()">
+            ✦ 完成本课探索 → 领取知识卡
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB: AI对话 ── -->
+  <div class="ltab-content hidden" id="ltab-chat">
+    <section class="chat-section">
+      <div class="chat-header">
+        <div>
+          <p class="eyebrow">AI Civilization Tutor</p>
+          <h3>文明探索助手</h3>
+        </div>
+        <div class="chat-context">
+          <span class="context-chip" id="chatLessonChip">第1课 · 公元前3000年</span>
+          <span class="context-note">助手了解当前课程内容</span>
+        </div>
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-message ai">
+          <div class="message-avatar">AI</div>
+          <div class="message-bubble">
+            <p>你好！我是文明探索助手 🌍</p>
+            <p>我了解这节课的所有内容，可以回答你关于当前课程的问题，也可以帮你完成创作任务。</p>
+            <p>试着问我：<em>为什么要修水渠？</em> 或 <em>苏美尔人怎么记录粮食？</em></p>
+          </div>
+        </div>
+      </div>
+      <div class="chat-suggestions" id="chatSuggestions"></div>
+      <div class="chat-input-row">
+        <textarea id="chatInput" placeholder="问任何关于这节课的问题..." rows="2"></textarea>
+        <button id="chatSendBtn" class="primary-button">发送</button>
+      </div>
+      <div class="api-hint" id="apiHint">
+        <span>💡 内置知识库模式。</span>
+        <button onclick="openSettings()" class="link-btn">输入API密钥升级为真实AI对话 →</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- ── TAB: 我的创作 ── -->
+  <div class="ltab-content hidden" id="ltab-create">
+    <section class="create-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Creative Task</p>
+          <h3 id="taskTitle">创作任务</h3>
+        </div>
+        <span class="time-chip small" id="taskTimeChip"></span>
+      </div>
+      <div class="create-layout">
+        <div class="task-form-panel">
+          <div class="task-brief" id="taskBrief"></div>
+          <form id="taskForm">
+            <div id="taskFields"></div>
+            <div class="form-actions">
+              <button type="submit" class="primary-button">生成文明方案</button>
+              <button type="button" id="checkArtifact" class="secondary-button">历史质检</button>
+            </div>
+          </form>
+          <div id="artifactOutput" class="artifact-output-area"></div>
+        </div>
+        <div class="drawing-panel">
+          <div class="drawing-header">
+            <p class="eyebrow">Drawing Studio</p>
+            <h4>文明绘图板</h4>
+          </div>
+          <div class="drawing-toolbar">
+            <div class="tool-group">
+              <button class="draw-tool active" data-tool="pencil" title="铅笔">✏</button>
+              <button class="draw-tool" data-tool="brush" title="粗笔刷">🖌</button>
+              <button class="draw-tool" data-tool="eraser" title="橡皮">⬜</button>
+            </div>
+            <div class="tool-group colors">
+              <button class="color-btn active" data-color="#d4a853" style="background:#d4a853" title="金沙"></button>
+              <button class="color-btn" data-color="#8b4513" style="background:#8b4513" title="赤土"></button>
+              <button class="color-btn" data-color="#4a7c59" style="background:#4a7c59" title="田绿"></button>
+              <button class="color-btn" data-color="#2d6b8f" style="background:#2d6b8f" title="河蓝"></button>
+              <button class="color-btn" data-color="#c0a882" style="background:#c0a882" title="石灰"></button>
+              <button class="color-btn" data-color="#1a1a1a" style="background:#1a1a1a" title="墨黑"></button>
+              <button class="color-btn" data-color="#f5e6c8" style="background:#f5e6c8" title="纸白"></button>
+            </div>
+            <div class="tool-group size-group">
+              <label class="size-label">笔触</label>
+              <input type="range" id="brushSize" min="2" max="20" value="4" class="size-slider" />
+            </div>
+          </div>
+          <div class="stamps-row">
+            <span class="stamps-label">印章：</span>
+            <button class="stamp-btn" data-stamp="temple">🏛</button>
+            <button class="stamp-btn" data-stamp="river">〰</button>
+            <button class="stamp-btn" data-stamp="farm">🌾</button>
+            <button class="stamp-btn" data-stamp="house">🏠</button>
+            <button class="stamp-btn" data-stamp="grain">🛖</button>
+            <button class="stamp-btn" data-stamp="wall">⛩</button>
+            <button class="stamp-btn" data-stamp="scroll">📜</button>
+          </div>
+          <canvas id="drawingCanvas" width="480" height="360"></canvas>
+          <div class="canvas-actions">
+            <button id="clearCanvas" class="secondary-button small">清除</button>
+            <button id="saveDrawing" class="secondary-button small">保存图稿</button>
+            <button id="downloadDrawing" class="secondary-button small">下载</button>
+          </div>
+          <div class="saved-drawings" id="savedDrawings"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ── TAB: 历史轨迹 ── -->
+  <div class="ltab-content hidden" id="ltab-history">
+    <section class="history-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">My Learning Journey</p>
+          <h3>我的学习历史轨迹</h3>
+        </div>
+        <button id="clearHistory" class="secondary-button small">清除记录</button>
+      </div>
+      <div class="history-stats" id="historyStats"></div>
+      <div class="history-timeline" id="historyTimeline">
+        <p class="empty-state">开始探索课程，你的学习轨迹会记录在这里。</p>
+      </div>
+    </section>
+  </div>
+
+</div><!-- end s-lesson -->
+
+<!-- ════════════════════════════════════════
+     EVENT OVERLAY
+════════════════════════════════════════ -->
+<div id="event-overlay">
+  <div class="event-modal">
+    <button class="event-modal-close" onclick="closeEvent()">✕</button>
+    <div class="event-modal-tag" id="evModalTag"></div>
+    <h2 id="evModalTitle"></h2>
+    <div class="event-modal-year" id="evModalYear"></div>
+    <div class="event-modal-body" id="evModalBody"></div>
+    <div class="event-modal-insight">
+      <strong>🏛 历史意义</strong>
+      <span id="evModalInsight"></span>
+    </div>
+    <button class="event-learn-btn" id="evLearnBtn" onclick="markEventLearned()">✓ 已学习，继续探索</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     SCREEN 3: KNOWLEDGE CARD (SUMMARY)
+════════════════════════════════════════ -->
+<div class="screen hidden" id="s-summary">
+  <div class="summary-card">
+    <div class="summary-era-icon" id="sumIcon"></div>
+    <div class="summary-tag">课程知识卡 · Knowledge Card</div>
+    <div class="summary-title" id="sumTitle"></div>
+    <div class="summary-quote" id="sumQuote"></div>
+    <div class="summary-points" id="sumPoints"></div>
+    <div style="font-size:11px;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px">本课探索的文明</div>
+    <div class="summary-civs" id="sumCivs"></div>
+    <div class="summary-actions">
+      <button class="summary-btn-primary" onclick="completeLesson()">✦ 完成本课，回到知识网络</button>
+      <button class="summary-btn-secondary" onclick="backToLesson()">← 继续探索地图</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     SCREEN 4: PREHISTORIC OVERVIEW (8 eras)
+════════════════════════════════════════ -->
+<div class="screen hidden" id="s-pre-overview">
+  <div class="pre-topbar">
+    <button class="back-btn" id="preHomeBtn">← 知识网络</button>
+    <div class="pre-topbar-center">
+      <div class="pre-topbar-title">史前文明探索</div>
+      <div class="pre-topbar-sub">从人类出现到第一座城市 · 约30万年 — 约3000年前</div>
+    </div>
+  </div>
+  <div class="pre-intro-band">
+    <p id="preIntroText"></p>
+  </div>
+  <div class="pre-era-grid" id="preEraGrid"></div>
+</div>
+
+<!-- ════════════════════════════════════════
+     SCREEN 5: PREHISTORIC ERA (9 layers)
+════════════════════════════════════════ -->
+<div class="screen hidden" id="s-pre-era">
+  <div class="pre-era-topbar">
+    <button class="back-btn" id="preEraBackBtn">← 返回史前文明</button>
+    <div class="pre-era-topbar-info" id="preEraTopInfo"></div>
+    <div class="pre-layer-pills" id="preLayerPills"></div>
+  </div>
+  <div class="pre-era-body" id="preEraBody"></div>
+</div>
+
+<!-- ════════════════════════════════════════
+     SETTINGS MODAL
+════════════════════════════════════════ -->
+<div class="modal-overlay hidden" id="settingsModal">
+  <div class="modal dark-modal">
+    <div class="modal-header">
+      <h3>设置</h3>
+      <button id="closeSettings" class="icon-button">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="setting-group">
+        <label>Anthropic API 密钥（可选）</label>
+        <p class="setting-desc">输入后，AI对话将使用真实的Claude模型。密钥仅存储在本地浏览器中，不会上传。</p>
+        <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." class="setting-input" />
+      </div>
+      <div class="setting-group">
+        <label>语音朗读速度</label>
+        <div class="range-row">
+          <input type="range" id="speechRate" min="0.7" max="1.3" step="0.1" value="0.95" class="size-slider" />
+          <span id="speechRateLabel">0.95×</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button id="saveSettings" class="primary-button">保存设置</button>
+    </div>
+  </div>
+</div>
+
+<script src="./i18n.js?v=1"></script>
+<script src="./data.js?v=102"></script>
+<script src="./prehistoric.js?v=98"></script>
+<script src="./prehistoric_kb.js?v=98"></script>
+<script src="./early_civ_kb.js?v=98"></script>
+<script src="./early_civ.js?v=98"></script>
+<script src="./knowledge_base.js?v=98"></script>
+<script src="./app.js?v=107"></script>
+</body>
+</html>
