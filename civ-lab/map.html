@@ -215,6 +215,7 @@ function openCiv(c){
     box.innerHTML='<div class="timeline-head">📜 大事年表 · 点击展开</div>'+evs.map((e,i)=>{
       const dv=e.deep||{};
       let deep='';
+      if(dv.detail) deep+=`<div class="di" style="margin-bottom:6px">${strong(dv.detail)}</div>`;
       if(dv.evidence&&dv.evidence.length) deep+=`<div class="dsec"><h5>🏺 留下的证据</h5>`+dv.evidence.map(x=>`<div class="di"><b>${esc(x.artifact)}</b> — ${esc(x.what)} <span style="color:var(--ink3)">(${esc(x.held)})</span></div>`).join('')+`</div>`;
       if(dv.same&&dv.same.length) deep+=`<div class="dsec"><h5>🌍 此时世界 · 别处正在发生</h5>`+dv.same.map(s=>`<div class="di">📍 <b>${esc(s.region)}</b> · ${esc(s.title)}</div>`).join('')+`</div>`;
       return `<div class="ev" data-i="${i}"><div class="ey">${eraLabel(e.year)}</div><div class="et">${esc(e.title)}</div><div class="eo">${strong(e.one)}</div><div class="edeep">${deep}</div></div>`;
