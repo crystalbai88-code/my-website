@@ -435,7 +435,7 @@ function nodeAt(sx,sy){
 
 function showDetail(id){
   selId=id;
-  const p=BY_ID[id];if(!p)return;
+  const p=BY_ID[id];if(!p)return; window.__aiCtx="用户正在「人物关系网」查看人物:"+p.n+"("+(p.d||"")+")。"+(p.b||"");
   const col=roleColor(p.r);
   document.getElementById('p-civ').textContent=CIV_NAMES[p.c]||p.c;
   document.getElementById('p-name').textContent=p.n;
@@ -597,6 +597,7 @@ window.__net={
 };
 </script>
 <script src="./tour.js?v=1"></script>
+<script src="./ai_float.js?v=1"></script>
 </body>
 
 </html>
