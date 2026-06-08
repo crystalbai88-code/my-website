@@ -116,6 +116,7 @@ function refreshTheme(){
   document.querySelectorAll('.leg-dot[data-role]').forEach(d=>d.style.background=TH.role[d.dataset.role]);
 }
 function roleColor(r){return (TH.role&&TH.role[r])||'#888';}
+function shade(c,amt){var m=/^#?([0-9a-f]{6})$/i.exec(c);if(!m){var rg=/(\d+),\s*(\d+),\s*(\d+)/.exec(c);if(!rg)return c;var R=+rg[1],G=+rg[2],B=+rg[3];}else{var n=parseInt(m[1],16),R=(n>>16)&255,G=(n>>8)&255,B=n&255;}var f=function(v){return Math.max(0,Math.min(255,Math.round(v+amt)))};return 'rgb('+f(R)+','+f(G)+','+f(B)+')';}
 
 const P=CLASSICAL_PEOPLE;
 
@@ -329,14 +330,19 @@ function draw(){
     const r=isSel?21:isHov?18:15;
     const icon=(typeof personIconOf==='function')?personIconOf(p):'👤';
     ctx.save();
+    // 立体投影(落在画布上的影子)
+    ctx.beginPath();ctx.ellipse(n.x,n.y+r*0.92,r*1.02,r*0.4,0,0,Math.PI*2);ctx.fillStyle='rgba(0,0,0,.3)';ctx.fill();
     // 强调外环(选中/悬浮)
     if(isSel||isHov){
       ctx.beginPath();ctx.arc(n.x,n.y,r+4,0,Math.PI*2);
       ctx.strokeStyle=col;ctx.lineWidth=2.5;ctx.globalAlpha=isSel?0.95:0.5;ctx.stroke();
     }
-    // 角色色圆底(头像底座)
+    // 角色色球体(径向渐变 → 立体底座)
+    var _g=ctx.createRadialGradient(n.x-r*0.38,n.y-r*0.42,r*0.15,n.x,n.y,r*1.05);
+    _g.addColorStop(0,shade(col,80));_g.addColorStop(.5,col);_g.addColorStop(1,shade(col,-55));
     ctx.beginPath();ctx.arc(n.x,n.y,r,0,Math.PI*2);
-    ctx.fillStyle=col;ctx.globalAlpha=isSel||isHov?1:0.9;ctx.fill();ctx.globalAlpha=1;
+    ctx.fillStyle=_g;ctx.globalAlpha=isSel||isHov?1:0.92;ctx.fill();ctx.globalAlpha=1;
+    ctx.beginPath();ctx.arc(n.x-r*0.34,n.y-r*0.36,r*0.22,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,.4)';ctx.fill();
     const portrait=PORTRAIT[n.id];
     if(portrait && portrait.naturalWidth){
       // 真实画像(圆形裁剪, cover 填充)
