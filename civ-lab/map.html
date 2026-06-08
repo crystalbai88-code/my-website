@@ -11,7 +11,8 @@
   #app{position:relative;z-index:10;height:100dvh;display:flex;flex-direction:column}
   .top{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;gap:9px;padding:11px 15px;
     background:linear-gradient(180deg,rgba(0,0,0,.32),transparent)}
-  .top .brand{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink);text-shadow:var(--label-shadow)}
+  .top .brand{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink);text-shadow:var(--label-shadow);white-space:nowrap}
+  @media(max-width:480px){ .top .brand{font-size:13px} .tbtn{padding:6px 10px;font-size:11.5px} }
   .top .spacer{margin-left:auto}
   .tbtn{font-family:var(--sans);font-size:12.5px;font-weight:700;color:var(--ink2);background:var(--panel-bg);
     border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;cursor:pointer;backdrop-filter:blur(8px);text-decoration:none;display:inline-block}
@@ -67,6 +68,25 @@
   .ev .di{font-size:12px;color:var(--ink2);line-height:1.6;margin-bottom:6px}
   .ev .di b{color:var(--ink)}
   .noev{font-size:13px;color:var(--ink3);padding:16px 0;line-height:1.7}
+  .civ-sum{font-size:13.5px;color:var(--ink);line-height:1.78;margin:2px 0 12px}
+  .civ-facts{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+  .cf{display:flex;gap:6px;align-items:center;background:rgba(255,255,255,.05);border:1px solid var(--panel-line);border-radius:8px;padding:4px 9px}
+  .cf .cfk{font-family:var(--mono);font-size:9.5px;color:var(--gold)}
+  .cf .cfv{font-size:11.5px;color:var(--ink2)}
+  .civ-secs{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+  .csec .cseh{width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center;
+    font-family:var(--serif);font-weight:700;font-size:13.5px;color:var(--ink);background:rgba(255,255,255,.04);
+    border:1px solid var(--panel-line);border-radius:9px;padding:9px 12px;cursor:pointer}
+  .csec .cseh .cv{color:var(--gold);font-weight:400}
+  .csec.open .cseh .cv{transform:rotate(45deg)}
+  .csec .cseb{display:none;font-size:12.5px;color:var(--ink2);line-height:1.72;padding:9px 12px 2px}
+  .csec.open .cseb{display:block}
+  .civ-links{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .clink{font-family:var(--sans);font-size:12px;font-weight:700;color:var(--gold);text-decoration:none;
+    background:rgba(200,160,60,.12);border:1px solid rgba(200,160,60,.4);border-radius:999px;padding:6px 13px}
+  .clink:active{transform:scale(.97)}
+  .evlink{margin-top:8px}
+  .evlink a{font-family:var(--sans);font-size:11.5px;font-weight:700;color:var(--cyan,#5aa0c8);text-decoration:none}
   .timeline-head{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;margin:10px 0 12px}
   .hint{position:fixed;left:50%;top:60px;transform:translateX(-50%);z-index:25;font-family:var(--sans);font-size:12px;
     color:var(--ink2);background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:999px;padding:6px 15px;backdrop-filter:blur(8px);transition:opacity .4s}
@@ -79,7 +99,7 @@
   <div class="top">
     <span class="brand">🗺 世界历史地图</span>
     <div class="spacer"></div>
-    <a class="tbtn acc" href="./networks.html">🕸 人物关系网</a>
+    <a class="tbtn acc" href="./networks.html">🕸 关系网</a>
     <div class="ds-theme-switch" id="themeSwitch">
       <button data-t="deepblue"></button><button data-t="museum"></button><button data-t="textbook"></button><button data-t="parchment"></button>
     </div>
@@ -110,7 +130,7 @@
 
 <script src="./track.js?v=1"></script>
 <script src="./world_geo.js?v=1"></script>
-<script src="./map_data.js?v=1"></script>
+<script src="./map_data.js?v=2"></script>
 <script>
 const REGION_COLOR={"东亚":'#d4a858',"南亚":'#d4708a',"西亚·中东":'#c84830',"欧洲":'#5aa0c8',"非洲":'#5ab87a',"美洲":'#c89030',"东南亚":'#48b0a0',"全球":'#8a7ad0'};
 const esc=s=>String(s==null?'':s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
@@ -208,20 +228,37 @@ function openCiv(c){
   const pNet=document.getElementById('pNet');
   if(NET[c.chapter]){ pNet.style.display='inline-block'; pNet.href='./'+NET[c.chapter]+'?all=1'; }
   else pNet.style.display='none';
+  const info=(window.CIV_INFO||{})[c.id];
   const evs=(CIV_EVENTS[c.id]||[]);
   const box=document.getElementById('pevents');
-  if(!evs.length){ box.innerHTML='<div class="noev">这个文明的大事年表还在从知识库补充中。<br>你可以先去「🕸 人物关系」看看这个时代的人物,或继续拖动时间轴探索其他文明。</div>'; }
+  // ① 文明档案(概览 + 档案卡 + 可折叠的政治/经济/文化/宗教/衰亡)
+  let prof='';
+  if(info){
+    if(info.summary) prof+=`<div class="civ-sum">${strong(info.summary)}</div>`;
+    if(info.facts&&info.facts.length) prof+=`<div class="civ-facts">`+info.facts.map(f=>`<div class="cf"><span class="cfk">${esc(f[0])}</span><span class="cfv">${esc(f[1])}</span></div>`).join('')+`</div>`;
+    if(info.sections&&info.sections.length) prof+=`<div class="civ-secs">`+info.sections.map(sec=>`<div class="csec"><button class="cseh">${esc(sec[0])}<span class="cv">＋</span></button><div class="cseb">${strong(sec[1])}</div></div>`).join('')+`</div>`;
+  }
+  // ② 深度链接(一键到底)
+  let links='<div class="civ-links">';
+  if(c.chapter==='early') links+=`<a class="clink" href="./civ-deep.html#/civ/${c.id}" target="_blank" rel="noopener">📖 完整文明档案 ↗</a>`;
+  links+=`<a class="clink" href="https://zh.wikipedia.org/wiki/Special:搜索/${encodeURIComponent((info&&info.wiki)||c.name)}" target="_blank" rel="noopener">🔎 维基百科 ↗</a></div>`;
+  // ③ 大事年表
+  let evHtml;
+  if(!evs.length){ evHtml='<div class="noev">这个文明的大事年表还在从知识库补充中。</div>'; }
   else{
-    box.innerHTML='<div class="timeline-head">📜 大事年表 · 点击展开</div>'+evs.map((e,i)=>{
+    evHtml='<div class="timeline-head">📜 大事年表 · 点击展开</div>'+evs.map((e,i)=>{
       const dv=e.deep||{};
       let deep='';
       if(dv.detail) deep+=`<div class="di" style="margin-bottom:6px">${strong(dv.detail)}</div>`;
       if(dv.evidence&&dv.evidence.length) deep+=`<div class="dsec"><h5>🏺 留下的证据</h5>`+dv.evidence.map(x=>`<div class="di"><b>${esc(x.artifact)}</b> — ${esc(x.what)} <span style="color:var(--ink3)">(${esc(x.held)})</span></div>`).join('')+`</div>`;
       if(dv.same&&dv.same.length) deep+=`<div class="dsec"><h5>🌍 此时世界 · 别处正在发生</h5>`+dv.same.map(s=>`<div class="di">📍 <b>${esc(s.region)}</b> · ${esc(s.title)}</div>`).join('')+`</div>`;
+      deep+=`<div class="evlink"><a href="https://zh.wikipedia.org/wiki/Special:搜索/${encodeURIComponent(e.title)}" target="_blank" rel="noopener">🔎 维基了解更多 ↗</a></div>`;
       return `<div class="ev" data-i="${i}"><div class="ey">${eraLabel(e.year)}</div><div class="et">${esc(e.title)}</div><div class="eo">${strong(e.one)}</div><div class="edeep">${deep}</div></div>`;
     }).join('');
-    box.querySelectorAll('.ev').forEach(el=>el.onclick=()=>el.classList.toggle('open'));
   }
+  box.innerHTML=prof+links+evHtml;
+  box.querySelectorAll('.ev').forEach(el=>el.onclick=()=>el.classList.toggle('open'));
+  box.querySelectorAll('.csec .cseh').forEach(b=>b.onclick=()=>b.parentElement.classList.toggle('open'));
   box.scrollTop=0; panel.classList.add('show'); scrim.classList.add('show');
   if(window.Track){Track.log('世界地图');Track.region&&Track.region(c.region);}
 }
