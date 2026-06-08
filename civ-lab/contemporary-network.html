@@ -296,6 +296,8 @@ function tick(){
       if(!b.pinned){b.vx+=dx/d*f;b.vy+=dy/d*f;}
     }
   }
+  // 聚焦模式:选中某人时,只突出 TA 和直接相连的人
+  const focusSet = selId ? (()=>{const s=new Set([selId]);edges.forEach(e=>{if(e.a===selId)s.add(e.b);if(e.b===selId)s.add(e.a);});return s;})() : null;
   // Edges
   edges.forEach(e=>{
     const a=nodes.find(n=>n.id===e.a),b=nodes.find(n=>n.id===e.b);
@@ -332,6 +334,7 @@ function draw(){
     ctx.save();
     if(relFilter!=='all' && !inFilter){ ctx.globalAlpha=0.05; ctx.strokeStyle=TH.edge; ctx.lineWidth=0.5; }
     else { ctx.globalAlpha=isHighlighted?0.9:0.32; ctx.strokeStyle=isHighlighted?(REL_CAT_COLOR[e.cat]||roleColor(a.data.r)):TH.edge; ctx.lineWidth=isHighlighted?1.8:0.7; }
+    if(selId && !(a.id===selId||b.id===selId)) ctx.globalAlpha=0.045;
     if(!isHighlighted)ctx.setLineDash([3,4]);
     ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
     ctx.restore();
@@ -353,6 +356,7 @@ function draw(){
   // Nodes (头像图标节点)
   nodes.forEach(n=>{
     const p=n.data;
+    if(selId && focusSet && !focusSet.has(n.id)){ ctx.save();ctx.globalAlpha=0.07;ctx.beginPath();ctx.arc(n.x,n.y,3.5,0,Math.PI*2);ctx.fillStyle=roleColor(p.r);ctx.fill();ctx.restore();return; }
     const col=roleColor(p.r);
     const isSel=n.id===selId,isHov=n.id===hovId;
     const r=isSel?21:isHov?18:15;
