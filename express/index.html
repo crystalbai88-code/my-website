@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>AI 表达课 · 把你脑子里的东西说出来</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="app">
+
+  <!-- 顶部 -->
+  <header class="topbar">
+    <div class="brand-row">
+      <div class="brand-mark">语</div>
+      <div>
+        <div class="brand-title">AI 表达课</div>
+        <div class="brand-sub">AI 不替你写，AI 帮你把想说的说清楚</div>
+      </div>
+      <div class="session-badges" id="sessionBadges"></div>
+    </div>
+    <nav class="tabbar" id="tabbar">
+      <button class="tab active" data-tab="course">课程</button>
+      <button class="tab" data-tab="work">我的作品</button>
+      <button class="tab" data-tab="parent">家长报告</button>
+      <button class="tab" data-tab="teacher">教师后台</button>
+    </nav>
+  </header>
+
+  <!-- 课程主区 -->
+  <main id="tab-course">
+    <div class="stage-rail" id="stageRail"></div>
+    <div id="stageHost"><!-- 由 JS 渲染当前阶段 --></div>
+  </main>
+
+  <!-- 我的作品 -->
+  <section id="tab-work" class="hidden"></section>
+
+  <!-- 家长报告 -->
+  <section id="tab-parent" class="hidden"></section>
+
+  <!-- 教师后台 -->
+  <section id="tab-teacher" class="hidden"></section>
+
+</div>
+
+<!-- 底部操作条 -->
+<div class="footer-bar" id="footerBar">
+  <div class="footer-inner" id="footerInner"></div>
+</div>
+
+<script src="data/kb.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
