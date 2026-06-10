@@ -18,6 +18,8 @@ const CFG_KEY = "ai-exp-settings";
 /* ===================================================================== */
 let CFG = { aiMode: false, apiKey: "", model: "", checker: true };
 let PROXY = { available: false, hasKey: false, provider: "", models: [], defaultModel: "" };
+/* 代理地址：本地 serve.py 留空（同源）；公开站在 config.js 里填 Cloudflare Worker 地址 */
+const API_BASE = (typeof window !== "undefined" && window.AI_PROXY_URL) ? String(window.AI_PROXY_URL).replace(/\/$/, "") : "";
 function loadCfg() { try { Object.assign(CFG, JSON.parse(localStorage.getItem(CFG_KEY)) || {}); } catch (_) {} }
 function saveCfg() { localStorage.setItem(CFG_KEY, JSON.stringify(CFG)); }
 function proxyReady() { return PROXY.available && PROXY.hasKey; }
@@ -32,7 +34,7 @@ function activeModel() {
 
 async function initProxy() {
   try {
-    const r = await fetch("/api/status");
+    const r = await fetch(API_BASE + "/api/status");
     if (r.ok) {
       const j = await r.json();
       PROXY = { available: !!j.proxy, hasKey: !!j.has_key, provider: j.provider || "", models: j.models || [], defaultModel: j.default_model || "" };
@@ -124,7 +126,7 @@ function fillTemplate(tpl, vars) {
    否则浏览器直连（用本机填的 key）。两条路都要求返回结构化 JSON。 */
 async function callClaudeJSON(systemText, userText, schema, maxTokens = 400) {
   const useProxy = proxyReady();
-  const url = useProxy ? "/api/claude" : "https://api.anthropic.com/v1/messages";
+  const url = useProxy ? (API_BASE + "/api/claude") : "https://api.anthropic.com/v1/messages";
   const headers = useProxy
     ? { "content-type": "application/json" }
     : {
