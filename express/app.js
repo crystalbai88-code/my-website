@@ -10,13 +10,35 @@
  * ===================================================================== */
 
 const KB = window.KB;
-const SAVE_KEY = "ai-exp-course-v1";
+const ENRICH = window.ENRICH;
+const SAVE_KEY = "ai-exp-course-v2";   // v2：双语伙伴版（旧 v1 存档结构不兼容）
 const CFG_KEY = "ai-exp-settings";
+
+/* ===================================================================== */
+/* 双语层 · i18n（中 / EN / 双语对照）                                      */
+/* ===================================================================== */
+function T(zh, en) {                       // 块级：双语时英文另起一行
+  if (CFG.lang === "en") return en || zh;
+  if (CFG.lang === "both" && en) return `${zh}<span class="en-line">${en}</span>`;
+  return zh;
+}
+function TI(zh, en) {                      // 行内：双语时用 · 连接（按钮等短文本）
+  if (CFG.lang === "en") return en || zh;
+  if (CFG.lang === "both" && en) return `${zh} · ${en}`;
+  return zh;
+}
+function buddyName() { return TI(ENRICH.buddy.name.zh, ENRICH.buddy.name.en); }
+function pickPraise() { const p = ENRICH.buddy.praise; return p[Math.floor(Math.random() * p.length)]; }
+/* 伙伴气泡（小羽）：q 为 {zh,en} 或纯字符串 */
+function bubble(zh, en, extra) {
+  return `<div class="coach"><div class="avatar">🦉</div>
+    <div class="bubble"><span class="buddy-tag">${buddyName()}</span>${typeof zh === "string" ? T(zh, en) : ""}${extra || ""}</div></div>`;
+}
 
 /* ===================================================================== */
 /* 真实模型设置（浏览器直连 Claude API；离线时自动回退到规则引擎）          */
 /* ===================================================================== */
-let CFG = { aiMode: false, apiKey: "", model: "", checker: true };
+let CFG = { aiMode: false, apiKey: "", model: "", checker: true, lang: "both" };
 let PROXY = { available: false, hasKey: false, provider: "", models: [], defaultModel: "" };
 /* 代理地址：本地 serve.py 留空（同源）；公开站在 config.js 里填 Cloudflare Worker 地址 */
 const API_BASE = (typeof window !== "undefined" && window.AI_PROXY_URL) ? String(window.AI_PROXY_URL).replace(/\/$/, "") : "";
@@ -24,12 +46,19 @@ function loadCfg() { try { Object.assign(CFG, JSON.parse(localStorage.getItem(CF
 function saveCfg() { localStorage.setItem(CFG_KEY, JSON.stringify(CFG)); }
 function proxyReady() { return PROXY.available && PROXY.hasKey; }
 function aiEnabled() { return !!(CFG.aiMode && (CFG.apiKey || proxyReady())); }
-/* 当前要发给后端的模型 id：代理可用时用代理给的模型清单 */
+/* 浏览器直连模式可选的国产模型（千问允许跨域直连） */
+const DIRECT_MODELS = [
+  { id: "qwen-plus", label: "通义千问 Plus（均衡·推荐）" },
+  { id: "qwen-max", label: "通义千问 Max（最强）" },
+  { id: "qwen-turbo", label: "通义千问 Turbo（最快最省）" },
+];
+/* 当前要用的模型 id：代理可用时用代理给的清单，否则用直连清单（默认千问） */
 function activeModel() {
   if (PROXY.models.length) {
     return PROXY.models.some(m => m.id === CFG.model) ? CFG.model : PROXY.defaultModel;
   }
-  return CFG.model || "claude-opus-4-8";
+  return DIRECT_MODELS.some(m => m.id === CFG.model) ? CFG.model
+    : (/^claude/.test(CFG.model) ? CFG.model : "qwen-plus");
 }
 
 async function initProxy() {
@@ -42,22 +71,32 @@ async function initProxy() {
   } catch (_) { /* file:// 或纯静态服务器：无代理 */ }
 }
 
-/* ---------- 九阶段（与 controller 对齐） ---------- */
+/* ---------- 十二站冒险（写作主线沿用 controller 九阶段；新增暖身/通识/思辨三站） ---------- */
 const STAGES = [
-  { id: "diagnose",   name: "找到要写的事", icon: "🔍", kind: "qa",
-    candidates: ["D01", "D02"], primary: "D01" },
-  { id: "input",      name: "补充素材",     icon: "🧺", kind: "input" },
-  { id: "recall",     name: "唤起回忆",     icon: "💭", kind: "qa",
-    candidates: ["D02", "D01"], primary: "D01" },
-  { id: "detail",     name: "放大细节",     icon: "🔬", kind: "qa",
-    candidates: ["D04", "D05", "D09", "D03"], primary: "D04" },
-  { id: "structure",  name: "理清顺序",     icon: "🧭", kind: "qa",
-    candidates: ["D06", "D03"], primary: "D06" },
-  { id: "point",      name: "确认中心",     icon: "🎯", kind: "qa",
-    candidates: ["D13", "D11", "D05"], primary: "D13" },
-  { id: "draft",      name: "写下初稿",     icon: "✏️", kind: "draft" },
-  { id: "revision",   name: "修改打磨",     icon: "🔧", kind: "revision" },
-  { id: "reflection", name: "回看成长",     icon: "🌱", kind: "reflection" },
+  { id: "warmup",     name: "开脑洞",       nameEn: "Warm-Up",        icon: "🎈", kind: "warmup",
+    goalZh: "用一个好玩的问题叫醒你的想法（没有对错）", goalEn: "Wake up your ideas with a silly question — no wrong answers" },
+  { id: "diagnose",   name: "找到要写的事", nameEn: "Find Your Story", icon: "🔍", kind: "qa",
+    candidates: ["D01", "D02"], primary: "D01", goalEn: "Find one small, real moment worth telling" },
+  { id: "input",      name: "素材侦探",     nameEn: "Gather Clues",   icon: "🧺", kind: "input",
+    goalEn: "Borrow a writer's trick and collect fresh clues" },
+  { id: "recall",     name: "唤起回忆",     nameEn: "Rewind",         icon: "💭", kind: "qa",
+    candidates: ["D02", "D01"], primary: "D01", goalEn: "Replay the moment like a tiny video" },
+  { id: "knowledge",  name: "通识加油站",   nameEn: "Wonder Stop",    icon: "🧠", kind: "knowledge",
+    goalZh: "认识一个和你的故事有关的大想法", goalEn: "Meet a big idea connected to your story" },
+  { id: "detail",     name: "放大细节",     nameEn: "Zoom In",        icon: "🔬", kind: "qa",
+    candidates: ["D04", "D05", "D09", "D03"], primary: "D04", goalEn: "Zoom into actions, senses and thoughts" },
+  { id: "debate",     name: "思辨角",       nameEn: "Debate Corner",  icon: "⚖️", kind: "debate",
+    goalZh: "和小羽辩一辩——重要的不是赢，是说出理由", goalEn: "Debate with Quill — it's not about winning, it's about reasons" },
+  { id: "structure",  name: "理清顺序",     nameEn: "Story Map",      icon: "🧭", kind: "qa",
+    candidates: ["D06", "D03"], primary: "D06", goalEn: "Map your story: Beginning → Change → Ending" },
+  { id: "point",      name: "确认中心",     nameEn: "Find the Heart", icon: "🎯", kind: "qa",
+    candidates: ["D13", "D11", "D05"], primary: "D13", goalEn: "Find the one sentence readers should remember" },
+  { id: "draft",      name: "写下初稿",     nameEn: "First Draft",    icon: "✏️", kind: "draft",
+    goalEn: "Write your own first draft — every word yours" },
+  { id: "revision",   name: "修改打磨",     nameEn: "Polish",         icon: "🔧", kind: "revision",
+    goalEn: "Polish one thing at a time, and say why" },
+  { id: "reflection", name: "回看成长",     nameEn: "Look Back",      icon: "🌱", kind: "reflection",
+    goalEn: "Look back — then teach Quill what YOU learned" },
 ];
 
 /* ---------- 诊断启发式（源自 03_difficulty_library 的 detection_signals） ---------- */
@@ -110,8 +149,15 @@ function taskById(id) { return KB.tasks.tasks.find(t => t.task_id === id); }
 function rubricForGrade(g) { return KB.rubrics.grades.find(r => r.grade === g); }
 
 /* 入门支架选项（D01/D02 连续短答时启用，仍只问一个问题） */
-const ENTRY_SCAFFOLDS = ["今天上学路上", "今天的课间", "放学回到家", "吃饭的时候", "睡觉前", "和同学之间"];
-const DETAIL_ANGLES = ["当时手在做什么", "身体有什么反应", "脑子里冒出什么念头", "你说了或听到了哪句话"];
+const ENTRY_SCAFFOLDS = [
+  { zh: "今天上学路上", en: "On the way to school" }, { zh: "今天的课间", en: "At recess" },
+  { zh: "放学回到家", en: "Back home after school" }, { zh: "吃饭的时候", en: "At dinner" },
+  { zh: "睡觉前", en: "Before bed" }, { zh: "和同学之间", en: "With classmates" },
+];
+const DETAIL_ANGLES = [
+  { zh: "当时手在做什么", en: "What were your hands doing" }, { zh: "身体有什么反应", en: "What did your body do" },
+  { zh: "脑子里冒出什么念头", en: "What popped into your head" }, { zh: "你说了或听到了哪句话", en: "What did you say or hear" },
+];
 
 /* ===================================================================== */
 /* 真实模型调用（使用知识库 12_ai_prompt_templates 的两段系统提示）         */
@@ -122,37 +168,54 @@ function fillTemplate(tpl, vars) {
   return t;
 }
 
-/* 调 Claude Messages API：优先走 serve.py 后端代理（密钥在服务器），
-   否则浏览器直连（用本机填的 key）。两条路都要求返回结构化 JSON。 */
+const QWEN_DIRECT_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions";
+
+/* 调真实模型，要求返回结构化 JSON。三条路：
+   1) 后端代理（密钥在服务器，最安全）；
+   2) 浏览器直连「通义千问」（DashScope 允许跨域；key 只在本机浏览器）；
+   3) 浏览器直连 Claude（遗留）。 */
 async function callClaudeJSON(systemText, userText, schema, maxTokens = 400) {
-  const useProxy = proxyReady();
-  const url = useProxy ? (API_BASE + "/api/claude") : "https://api.anthropic.com/v1/messages";
-  const headers = useProxy
-    ? { "content-type": "application/json" }
-    : {
-        "content-type": "application/json",
-        "x-api-key": CFG.apiKey,
-        "anthropic-version": "2023-06-01",
-        "anthropic-dangerous-direct-browser-access": "true",
-      };
-  const res = await fetch(url, {
-    method: "POST",
-    headers,
-    body: JSON.stringify({
-      model: activeModel(),
-      max_tokens: maxTokens,
-      output_config: { effort: "low", format: { type: "json_schema", schema } },
-      system: systemText,
-      messages: [{ role: "user", content: userText }],
-    }),
-  });
-  if (!res.ok) {
-    const detail = await res.text().catch(() => "");
-    throw new Error(`API ${res.status}: ${detail.slice(0, 200)}`);
+  const model = activeModel();
+
+  // 1) 后端代理
+  if (proxyReady()) {
+    const res = await fetch(API_BASE + "/api/claude", {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ model, max_tokens: maxTokens,
+        output_config: { effort: "low", format: { type: "json_schema", schema } },
+        system: systemText, messages: [{ role: "user", content: userText }] }),
+    });
+    if (!res.ok) throw new Error(`API ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
+    const data = await res.json();
+    return JSON.parse((data.content || []).filter(b => b.type === "text").map(b => b.text).join(""));
   }
+
+  // 2) 浏览器直连 通义千问（OpenAI 兼容；只用你本机填的 key）
+  if (/^qwen/.test(model)) {
+    const res = await fetch(QWEN_DIRECT_URL, {
+      method: "POST",
+      headers: { "content-type": "application/json", "authorization": "Bearer " + CFG.apiKey },
+      body: JSON.stringify({ model,
+        messages: [{ role: "system", content: systemText }, { role: "user", content: userText }],
+        max_tokens: maxTokens, temperature: 0.3, response_format: { type: "json_object" } }),
+    });
+    if (!res.ok) throw new Error(`千问 ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
+    const data = await res.json();
+    return JSON.parse(data?.choices?.[0]?.message?.content || "");
+  }
+
+  // 3) 浏览器直连 Claude（遗留）
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-api-key": CFG.apiKey,
+      "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
+    body: JSON.stringify({ model, max_tokens: maxTokens,
+      output_config: { effort: "low", format: { type: "json_schema", schema } },
+      system: systemText, messages: [{ role: "user", content: userText }] }),
+  });
+  if (!res.ok) throw new Error(`API ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
   const data = await res.json();
-  const text = (data.content || []).filter(b => b.type === "text").map(b => b.text).join("");
-  return JSON.parse(text);
+  return JSON.parse((data.content || []).filter(b => b.type === "text").map(b => b.text).join(""));
 }
 
 const TEACH_SCHEMA = {
@@ -162,6 +225,7 @@ const TEACH_SCHEMA = {
     action: { type: "string" },
     diagnosis_code: { type: ["string", "null"] },
     message_to_child: { type: "string" },
+    message_to_child_en: { type: "string" },
     evidence_used: { type: "array", items: { type: "string" } },
     missing_field: { type: ["string", "null"] },
     ready_to_advance: { type: "boolean" },
@@ -198,7 +262,7 @@ async function aiTeach(stage, ans) {
     known_evidence: JSON.stringify(S.evidence.map(e => e.text)),
     missing_field: "由你判断",
     strategy_records: JSON.stringify(strat),
-  }) + `\n\n候选卡点（只能从中选一个或返回null）：${JSON.stringify(candDiff)}\n本阶段单轮汉字上限：${cs.output_limit}。`;
+  }) + `\n\n候选卡点（只能从中选一个或返回null）：${JSON.stringify(candDiff)}\n本阶段单轮汉字上限：${cs.output_limit}。\n额外要求：除 message_to_child（中文）外，再给出 message_to_child_en——同一个问题的自然、适龄英文版（像母语者对8-12岁孩子说话，不要逐字直译）。`;
 
   const user = `孩子刚才说：「${ans}」。请只生成一个适龄追问。`;
   const out = await callClaudeJSON(sys, user, TEACH_SCHEMA);
@@ -277,12 +341,18 @@ function render() {
 }
 
 function renderBadges() {
-  if (!S) { badges.innerHTML = ""; return; }
+  const langBtns = `<span class="lang-toggle">${[["zh", "中"], ["en", "EN"], ["both", "双语"]]
+    .map(([v, l]) => `<button class="lang-btn ${CFG.lang === v ? "on" : ""}" data-lang="${v}">${l}</button>`).join("")}</span>`;
+  if (!S) { badges.innerHTML = langBtns; wireLang(); return; }
   const task = taskById(S.taskId);
-  const prof = KB.profiles.profiles.find(p => p.profile_id === S.profileId);
-  badges.innerHTML = `<span class="badge">${S.grade}年级</span>
+  badges.innerHTML = `<span class="badge">${TI(S.grade + "年级", "Grade " + S.grade)}</span>
     <span class="badge accent">${task ? task.title : "—"}</span>
-    <span class="badge">${prof ? prof.name : ""}</span>`;
+    ${langBtns}`;
+  wireLang();
+}
+function wireLang() {
+  document.querySelectorAll(".lang-btn").forEach(b =>
+    b.onclick = () => { CFG.lang = b.dataset.lang; saveCfg(); render(); });
 }
 
 /* ---------- 课程主流程 ---------- */
@@ -291,17 +361,30 @@ function renderCourse() {
   renderRail();
   const stage = STAGES[S.stageIndex];
   ({ qa: renderQA, input: renderInput, draft: renderDraft,
-     revision: renderRevision, reflection: renderReflection }[stage.kind])(stage);
+     revision: renderRevision, reflection: renderReflection,
+     warmup: renderWarmup, knowledge: renderKnowledge, debate: renderDebate }[stage.kind])(stage);
 }
 
 function renderRail() {
   rail.innerHTML = STAGES.map((s, i) => {
     const cls = i < S.stageIndex ? "done" : i === S.stageIndex ? "active" : "";
-    return `<span class="stage-pill ${cls}">${s.icon} ${s.name}</span>`;
+    const label = CFG.lang === "en" ? s.nameEn : s.name;
+    return `<span class="stage-pill ${cls}" title="${s.name} · ${s.nameEn}">${i < S.stageIndex ? "✓" : s.icon} ${label}</span>`;
   }).join("");
 }
 
-function footerNav({ canBack = true, canNext = true, nextLabel = "我说完了，下一步 →", nextEnabled = true, onNext, extra = "" } = {}) {
+/* 站点标题条：第 X 站 + 双语名 + 双语目标 */
+function stageHead(stage) {
+  const cs = controllerStage(stage.id);
+  const goalZh = stage.goalZh || (cs ? cs.goal : "");
+  return `
+    <div class="eyebrow">${TI(`第 ${S.stageIndex + 1} / ${STAGES.length} 站`, `Stop ${S.stageIndex + 1} of ${STAGES.length}`)} · ${stage.name} · ${stage.nameEn}</div>
+    <h2>${stage.icon} ${T(stage.name, stage.nameEn)}</h2>
+    <p class="goal">${T(goalZh, stage.goalEn)}</p>`;
+}
+
+function footerNav({ canBack = true, canNext = true, nextLabel = null, nextEnabled = true, onNext, extra = "" } = {}) {
+  if (!nextLabel) nextLabel = TI("我说完了，下一步", "Done, next stop") + " →";
   footer.innerHTML =
     `${canBack ? '<button class="btn ghost small" id="fBack">← 上一步</button>' : ""}
      ${extra}
@@ -330,61 +413,74 @@ function openerFor(stage) {
     case "diagnose": {
       // 用任务 + 卡点 D01 的第一条策略当开场
       const st = strategiesFor("D01", S.grade)[0];
-      return `我们这次想写《${task.title}》——${task.task_brief}。${st ? st.prompt : "最近有没有哪一分钟和平常不一样？"}`;
+      return {
+        zh: `我们这次的探险任务是《${task.title}》——${task.task_brief}。${st ? st.prompt : "最近有没有哪一分钟和平常不一样？"}`,
+        en: `Our quest this time: "${task.title}". Think of one recent little moment that felt different from usual — what happened?`,
+      };
     }
     case "recall":
-      return "你刚才说的那件事，把它当成一段小录像。最开始的那一秒，画面里有谁、在哪里？";
+      return { zh: "你刚才说的那件事，把它当成一段小录像。最开始的那一秒，画面里有谁、在哪里？",
+               en: "Play that moment like a tiny video. In the very first second — who is in the picture, and where are you?" };
     case "detail":
-      return "现在我们放大其中最重要的一个瞬间。那一刻，你做了什么动作？";
+      return { zh: "现在我们放大其中最重要的一个瞬间。那一刻，你的手在做什么？",
+               en: "Let's zoom into the most important moment. What were your hands doing right then?" };
     case "structure":
-      return "把这件事分成三站：开始 → 中间发生变化 → 结果。先说说『开始』那一站发生了什么？";
+      return { zh: "把这件事分成三站：开始 → 中间发生变化 → 结果。先说说『开始』那一站发生了什么？",
+               en: "Split your story into three stops: Beginning → Change → Ending. What happened at the Beginning?" };
     case "point":
-      return "如果只能让别人记住一句话，你最想让他们记住的是什么？";
+      return { zh: "如果读你故事的人只能记住一句话，你最想让他们记住哪一句？",
+               en: "If readers could remember only ONE sentence of your story, which should it be?" };
     default:
-      return cs ? cs.goal : "我们继续。";
+      return { zh: cs ? cs.goal : "我们继续。", en: "Let's keep going." };
   }
 }
 
+/* 情绪入口（recall 站）：选一个表情，把心情先抓住 */
+const MOOD_EMOJIS = ["😄", "😢", "😨", "😡", "😳", "🤔", "😮", "💪"];
+
 function renderQA(stage) {
   const d = stageData(stage.id);
-  const cs = controllerStage(stage.id);
-  if (!d.currentQ) d.currentQ = openerFor(stage);
+  if (!d.currentQ) { const o = openerFor(stage); d.currentQ = o.zh; d.currentQEn = o.en; }
 
   const showScaffold = (stage.id === "diagnose" || stage.id === "recall") && d.shortStreak >= 2 && S.grade <= 4;
   const showAngles = d.code === "D04";
+  const showMood = stage.id === "recall" && d.turns.length === 0;     // 情绪表情入口
+  const showBuckets = stage.id === "structure" && S.evidence.length >= 2;  // 故事地图分桶
 
   host.innerHTML = `
     <div class="card">
-      <div class="eyebrow">第 ${S.stageIndex + 1} / 9 步 · ${stage.name}</div>
-      <h2>${stage.icon} ${stage.name}</h2>
-      <p class="goal">这一步的目标：${cs.goal}（AI 只问，不替你写）</p>
+      ${stageHead(stage)}
 
       ${d.turns.map(t => `
-        <div class="coach"><div class="avatar">🦉</div><div class="bubble">${escapeHtml(t.q)}</div></div>
-        <div style="text-align:right;margin:-8px 0 14px;">
-          <span style="display:inline-block;background:var(--accent-soft);color:#b5611f;padding:8px 14px;border-radius:16px 4px 16px 16px;font-size:.95rem;max-width:80%;">${escapeHtml(t.a)}</span>
-        </div>`).join("")}
+        ${bubble(escapeHtml(t.q), t.qEn ? escapeHtml(t.qEn) : null)}
+        <div class="kid-line"><span class="kid-bubble">${escapeHtml(t.a)}</span></div>`).join("")}
 
       <div class="coach ${d.refuse ? "refuse" : ""}">
         <div class="avatar">🦉</div>
-        <div class="bubble">${escapeHtml(d.currentQ)}
-          ${d.code ? `<span class="why">（我在帮你：${difficulty(d.code).teaching_goal}）</span>` : ""}
+        <div class="bubble"><span class="buddy-tag">${buddyName()}</span>${T(escapeHtml(d.currentQ), d.currentQEn ? escapeHtml(d.currentQEn) : null)}
+          ${d.code ? `<span class="why">${TI("（我在帮你：" + difficulty(d.code).teaching_goal + "）", "")}</span>` : ""}
         </div>
       </div>
 
+      ${showBuckets ? bucketsHtml() : ""}
+
+      ${showMood ? `<div class="chips" id="moodRow">
+          <span class="small muted" style="width:100%">${TI("先抓住当时的心情（点一个）：", "First, catch the feeling (tap one):")}</span>
+          ${MOOD_EMOJIS.map(e => `<button class="chip ghost mood" data-e="${e}">${e}</button>`).join("")}
+        </div>` : ""}
       ${showScaffold ? `<div class="chips" id="scaffold">
-          <span class="small muted" style="width:100%">不知道从哪说起？先选一个时间点：</span>
-          ${ENTRY_SCAFFOLDS.map(c => `<button class="chip ghost" data-fill="在${c}，">${c}</button>`).join("")}
+          <span class="small muted" style="width:100%">${TI("不知道从哪说起？先选一个时间点：", "Not sure where to start? Pick a time:")}</span>
+          ${ENTRY_SCAFFOLDS.map(c => `<button class="chip ghost" data-fill="在${c.zh}，">${TI(c.zh, c.en)}</button>`).join("")}
         </div>` : ""}
       ${showAngles ? `<div class="chips" id="angles">
-          <span class="small muted" style="width:100%">可以从这里说起（任选其一）：</span>
-          ${DETAIL_ANGLES.map(c => `<button class="chip ghost" data-fill="">${c}</button>`).join("")}
+          <span class="small muted" style="width:100%">${TI("可以从这里说起（任选其一）：", "Try starting from one of these:")}</span>
+          ${DETAIL_ANGLES.map(c => `<button class="chip ghost" data-fill="${c.zh}：">${TI(c.zh, c.en)}</button>`).join("")}
         </div>` : ""}
 
       <div class="answer-box">${answerWidget("qaInput")}</div>
       <div class="actions">
-        <button class="btn accent small" id="qaSend" ${d.thinking ? "disabled" : ""}>${d.thinking ? "AI 正在想一个问题…" : "说给 AI 听"}</button>
-        ${d.pool.length > 1 && !d.thinking ? `<button class="btn ghost small" id="qaSwitch">换种问法</button>` : ""}
+        <button class="btn accent small" id="qaSend" ${d.thinking ? "disabled" : ""}>${d.thinking ? TI("小羽正在想问题…", "Quill is thinking…") : TI("说给小羽听", "Tell Quill")}</button>
+        ${d.pool.length > 1 && !d.thinking ? `<button class="btn ghost small" id="qaSwitch">${TI("换种问法", "Ask differently")}</button>` : ""}
         ${aiEnabled() ? '<span class="badge accent" style="align-self:center">🟢 真实AI</span>' : ""}
       </div>
       ${d.guard ? `<div class="guard-banner">${d.guard}</div>` : ""}
@@ -396,18 +492,54 @@ function renderQA(stage) {
   wireAnswerWidget("qaInput");
   bindEvidenceBoard();
   host.querySelectorAll("#scaffold .chip, #angles .chip").forEach(btn => {
-    btn.onclick = () => { const ta = document.getElementById("qaInput"); ta.value = btn.dataset.fill + (btn.dataset.fill ? "" : btn.textContent + "："); ta.focus(); };
+    btn.onclick = () => { const ta = document.getElementById("qaInput"); ta.value = btn.dataset.fill; ta.focus(); };
   });
+  host.querySelectorAll("#moodRow .mood").forEach(btn => {
+    btn.onclick = () => { const ta = document.getElementById("qaInput"); ta.value = (ta.value || "") + btn.dataset.e; ta.focus(); };
+  });
+  if (showBuckets) wireBuckets(stage);
   document.getElementById("qaSend").onclick = () => (aiEnabled() ? submitQAAI(stage) : submitQA(stage));
   const sw = document.getElementById("qaSwitch");
-  if (sw) sw.onclick = () => { d.poolIdx = (d.poolIdx + 1) % d.pool.length; d.currentQ = d.pool[d.poolIdx].prompt; d.curStratId = d.pool[d.poolIdx].strategy_id; d.refuse = false; save(); renderQA(stage); };
+  if (sw) sw.onclick = () => { d.poolIdx = (d.poolIdx + 1) % d.pool.length; d.currentQ = d.pool[d.poolIdx].prompt; d.currentQEn = null; d.curStratId = d.pool[d.poolIdx].strategy_id; d.refuse = false; save(); renderQA(stage); };
 
   if (S.observe) wireTeacherStrip();
 
   footerNav({
     nextEnabled: d.turns.length > 0,
-    nextLabel: S.observe ? "教师同意，进入下一阶段 →" : (d.satisfied ? "做得好，下一步 →" : "我说完了，下一步 →"),
+    nextLabel: S.observe ? TI("教师同意，进入下一站", "Teacher approves, next stop") + " →"
+      : (d.satisfied ? TI("做得好，下一站", "Nice! Next stop") + " →" : TI("我说完了，下一站", "Done, next stop") + " →"),
     onNext: () => { if (S.observe) S.research.approvals[stage.id] = true; grantQAGrowth(stage, d); advance(); },
+  });
+}
+
+/* 故事地图：把证据板上的句子分进 开始/变化/结果 三个桶（点击循环切换） */
+function bucketsHtml() {
+  if (!S.structMap) S.structMap = {};
+  const B = [
+    { k: "b", zh: "① 开始", en: "Beginning" }, { k: "m", zh: "② 变化", en: "Change" },
+    { k: "e", zh: "③ 结果", en: "Ending" },
+  ];
+  return `<div class="bucket-box">
+    <div class="small muted" style="margin-bottom:6px">${TI("小练习：点你说过的话，把它分进三站（再点可换）", "Mini-game: tap your own lines to sort them into the three stops")}</div>
+    ${S.evidence.map((e, i) => {
+      const cur = S.structMap[i];
+      const bk = B.find(x => x.k === cur);
+      return `<button class="bucket-item ${cur ? "tag-" + cur : ""}" data-i="${i}">
+        <span class="bk">${bk ? TI(bk.zh, bk.en) : TI("未分类", "unsorted")}</span>${escapeHtml(e.text.slice(0, 40))}${e.text.length > 40 ? "…" : ""}</button>`;
+    }).join("")}
+  </div>`;
+}
+function wireBuckets(stage) {
+  const order = [undefined, "b", "m", "e"];
+  host.querySelectorAll(".bucket-item").forEach(btn => {
+    btn.onclick = () => {
+      const i = +btn.dataset.i;
+      const cur = S.structMap[i];
+      const next = order[(order.indexOf(cur) + 1) % order.length];
+      if (next) S.structMap[i] = next; else delete S.structMap[i];
+      if (Object.keys(S.structMap).length >= 3) bump("sequence", 3);
+      save(); renderQA(stage);
+    };
   });
 }
 
@@ -463,9 +595,9 @@ async function submitQAAI(stage) {
       (stage.id === "detail" ? "只说一个你做过的动作就行。" : "先说一句你自己看到或听到的就好。");
     save(); renderQA(stage); return;
   }
-  if (!ans) { d.guard = "先随便说一句也行，哪怕只有几个字。"; save(); renderQA(stage); return; }
+  if (!ans) { d.guard = TI("先随便说一句也行，哪怕只有几个字。", "Even a few words count — just say anything!"); save(); renderQA(stage); return; }
 
-  d.turns.push({ q: d.currentQ, a: ans });
+  d.turns.push({ q: d.currentQ, qEn: d.currentQEn, a: ans });
   addEvidence(stage.name, ans);
   if (len(ans) < 10) d.shortStreak++; else d.shortStreak = 0;
   d.thinking = true; save(); renderQA(stage);
@@ -482,6 +614,7 @@ async function submitQAAI(stage) {
       d.curStratId = null;                          // 由 AI 生成，非固定策略
       d.pool = [];
       d.currentQ = out.message_to_child;
+      d.currentQEn = out.message_to_child_en || null;
       d.satisfied = !!out.ready_to_advance;
       if (out.safety_flag && out.safety_flag !== "none") d.guard = "（已注意安全/隐私，已转回写作任务）";
     }
@@ -509,10 +642,13 @@ function fallbackQuestion(stage, ans) {
     d.pool = strategiesFor(dg.code, S.grade); d.poolIdx = 0;
     d.curStratId = d.pool.length ? d.pool[0].strategy_id : null;
     d.currentQ = d.pool.length ? d.pool[0].prompt : difficulty(dg.code).recommended_strategy;
+    d.currentQEn = null;
     d.satisfied = false;
   } else {
     d.code = null; d.pool = []; d.curDiag = null; d.curStratId = null;
-    d.satisfied = true; d.currentQ = pickAffirm(stage, ans);
+    d.satisfied = true;
+    const aff = pickAffirm(stage, ans);
+    d.currentQ = aff.zh; d.currentQEn = aff.en;
   }
 }
 
@@ -528,9 +664,9 @@ function submitQA(stage) {
       (stage.id === "detail" ? "只说一个你做过的动作就行。" : "先说一句你自己看到或听到的就好。");
     save(); renderQA(stage); return;
   }
-  if (!ans) { d.guard = "先随便说一句也行，哪怕只有几个字。"; save(); renderQA(stage); return; }
+  if (!ans) { d.guard = TI("先随便说一句也行，哪怕只有几个字。", "Even a few words count — just say anything!"); save(); renderQA(stage); return; }
 
-  d.turns.push({ q: d.currentQ, a: ans });
+  d.turns.push({ q: d.currentQ, qEn: d.currentQEn, a: ans });
   addEvidence(stage.name, ans);
   if (len(ans) < 10) d.shortStreak++; else d.shortStreak = 0;
 
@@ -556,12 +692,14 @@ function submitQA(stage) {
     d.curDiag = dg.code;
     d.curStratId = d.pool.length ? d.pool[0].strategy_id : null;  // 下一个问题的来源
     d.currentQ = d.pool.length ? d.pool[0].prompt : difficulty(dg.code).recommended_strategy;
+    d.currentQEn = null;                          // 题库追问暂无英文版（AI 模式下有）
     d.satisfied = false;
   } else {
     // 这一轮表达已足够具体
     d.code = null; d.pool = []; d.satisfied = true;
     d.curDiag = null; d.curStratId = null;
-    d.currentQ = pickAffirm(stage, ans);
+    const aff = pickAffirm(stage, ans);
+    d.currentQ = aff.zh; d.currentQEn = aff.en;
   }
   // 三轮兜底：不无限追问
   if (d.turns.length >= 3) d.satisfied = true;
@@ -569,14 +707,15 @@ function submitQA(stage) {
 }
 
 function pickAffirm(stage, ans) {
+  const p = pickPraise();
   const map = {
-    diagnose: "好，这件事可以写！我已经把它记在『AI 听到了什么』里。点下一步，我们去补点素材。",
-    recall: "画面有了。继续——点下一步，我们去放大最重要的瞬间。",
-    detail: "这个细节很具体，别人能看见。点下一步，我们把顺序理一理。",
-    structure: "三站清楚了。点下一步，我们确认你最想表达的中心。",
-    point: "你的中心很清楚。点下一步，开始写你自己的初稿。",
+    diagnose: { zh: p.zh + " 这件事可以写！我把它记在『小羽听到了什么』里了。", en: p.en + " That's a story worth telling! I've saved it on my board." },
+    recall: { zh: p.zh + " 画面有了，我们去放大最重要的瞬间。", en: p.en + " I can see the scene — let's zoom into the biggest moment." },
+    detail: { zh: "这个细节我能看见！接下来把顺序理一理。", en: "I can SEE that detail! Next, let's map the order." },
+    structure: { zh: "三站连起来了。下一站，找你最想说的那句话。", en: "All three stops connect! Next, find the heart of your story." },
+    point: { zh: "你的中心很清楚。准备好写初稿了！", en: "Your heart-sentence is clear. Ready to draft!" },
   };
-  return map[stage.id] || "很好，点下一步继续。";
+  return map[stage.id] || { zh: "很好，点下一站继续。", en: "Great — on to the next stop." };
 }
 
 function grantQAGrowth(stage, d) {
@@ -590,6 +729,193 @@ function grantQAGrowth(stage, d) {
     case "point": bump("point", 3); bump("focus", 3); break;
   }
   save();
+}
+
+/* ===================================================================== */
+/* 新站点①：开脑洞（warmup）—— 好玩的问题，没有对错，建立表达安全感          */
+/* ===================================================================== */
+function renderWarmup(stage) {
+  const d = stageData("warmup");
+  if (!d.w) d.w = ENRICH.warmups[Math.floor(Math.random() * ENRICH.warmups.length)];
+  const w = d.w;
+
+  host.innerHTML = `
+    <div class="card">
+      ${stageHead(stage)}
+      ${d.turns.length === 0 ? bubble(escapeHtml(ENRICH.buddy.intro.zh), escapeHtml(ENRICH.buddy.intro.en)) : ""}
+      ${bubble(escapeHtml(w.zh), escapeHtml(w.en))}
+
+      ${d.turns.map(t => `
+        <div class="kid-line"><span class="kid-bubble">${escapeHtml(t.a)}</span></div>
+        ${t.react ? bubble(escapeHtml(t.react.zh), escapeHtml(t.react.en)) : ""}`).join("")}
+
+      ${d.turns.length === 0 ? `
+        ${w.chips ? `<div class="chips">${w.chips.map(c => `<button class="chip warm-chip" data-v="${escapeAttr(c.zh)}">${TI(c.zh, c.en)}</button>`).join("")}</div>` : ""}
+        <div class="answer-box">${answerWidget("wuInput")}</div>
+        <div class="actions">
+          <button class="btn accent small" id="wuSend">${TI("告诉小羽", "Tell Quill")}</button>
+          <button class="btn ghost small" id="wuSwap">${TI("换个问题", "Different question")}</button>
+        </div>` : ""}
+    </div>
+  `;
+  if (d.turns.length === 0) {
+    wireAnswerWidget("wuInput");
+    host.querySelectorAll(".warm-chip").forEach(b => b.onclick = () => {
+      const ta = document.getElementById("wuInput");
+      ta.value = "我选" + b.dataset.v + "，因为"; ta.focus();
+    });
+    document.getElementById("wuSwap").onclick = () => { d.w = ENRICH.warmups[Math.floor(Math.random() * ENRICH.warmups.length)]; save(); renderWarmup(stage); };
+    document.getElementById("wuSend").onclick = () => {
+      const v = val("wuInput"); if (!v) return;
+      const p = pickPraise();
+      d.turns.push({ a: v, react: { zh: p.zh + " 脑洞开好了，我们出发！", en: p.en + " Brain warmed up — let's go!" } });
+      save(); renderWarmup(stage);
+    };
+  }
+  footerNav({
+    canBack: false,
+    nextLabel: d.turns.length ? TI("出发！", "Let's go!") + " →" : TI("跳过，直接出发", "Skip — let's go") + " →",
+    onNext: () => advance(),
+  });
+}
+
+/* ===================================================================== */
+/* 新站点②：通识加油站（knowledge）—— 翻卡 + 想一想 + 小羽也试着答            */
+/* ===================================================================== */
+function renderKnowledge(stage) {
+  const d = stageData("knowledge");
+  const card = ENRICH.cardFor(taskById(S.taskId));
+
+  host.innerHTML = `
+    <div class="card">
+      ${stageHead(stage)}
+      ${bubble(
+        escapeHtml("写故事的人，脑袋里都装着别的故事。我带了一张和你的题目有关的『奇想卡』——点开看看！"),
+        escapeHtml("Storytellers carry other stories in their heads. I brought a Wonder Card connected to your topic — tap to open it!"))}
+
+      <div class="flip-card ${d.flipped ? "flipped" : ""}" id="wonderCard">
+        <div class="flip-inner">
+          <div class="flip-front">
+            <div class="flip-emoji">${card.emoji}</div>
+            <div class="flip-title">${T(card.title.zh, card.title.en)}</div>
+            <div class="flip-hint">${TI("点我翻开", "Tap to flip")} ✨</div>
+          </div>
+          <div class="flip-back">
+            <div class="flip-story">${T(escapeHtml(card.hook.zh), escapeHtml(card.hook.en))}</div>
+          </div>
+        </div>
+      </div>
+
+      ${d.flipped ? `
+        <div class="material" style="margin-top:12px">
+          <div class="mtitle">🔬 ${TI("还有这个", "And this")}</div>
+          <div class="mtext small">${T(escapeHtml(card.fact.zh), escapeHtml(card.fact.en))}</div>
+        </div>
+        <div class="quote-box">${T(escapeHtml(card.quote.zh), escapeHtml(card.quote.en))}</div>
+
+        ${bubble(escapeHtml("想一想：" + card.think.zh), escapeHtml("Think: " + card.think.en))}
+
+        ${d.turns.map(t => `
+          <div class="kid-line"><span class="kid-bubble">${escapeHtml(t.a)}</span></div>
+          ${bubble(escapeHtml(card.buddyTry.zh), escapeHtml(card.buddyTry.en))}`).join("")}
+
+        ${d.turns.length === 0 ? `
+          <div class="answer-box">${answerWidget("knInput")}</div>
+          <div class="actions"><button class="btn accent small" id="knSend">${TI("说说我的想法", "Share my thought")}</button></div>
+        ` : ""}
+      ` : ""}
+    </div>
+  `;
+  document.getElementById("wonderCard").onclick = () => { if (!d.flipped) { d.flipped = true; save(); renderKnowledge(stage); } };
+  if (d.flipped && d.turns.length === 0) {
+    wireAnswerWidget("knInput");
+    document.getElementById("knSend").onclick = () => {
+      const v = val("knInput"); if (!v) return;
+      d.turns.push({ a: v });
+      bump("material", 2); bump("point", 2);
+      save(); renderKnowledge(stage);
+    };
+  }
+  footerNav({
+    nextEnabled: !!d.flipped,
+    nextLabel: TI("加满油，下一站", "Fueled up! Next stop") + " →",
+    onNext: () => advance(),
+  });
+}
+
+/* ===================================================================== */
+/* 新站点③：思辨角（debate）—— 立场滑杆 + 小羽永远站对面 + 没有输赢          */
+/* ===================================================================== */
+function renderDebate(stage) {
+  const d = stageData("debate");
+  const db = ENRICH.debateFor(taskById(S.taskId));
+  if (d.stance == null) d.stance = 50;
+  const step = d.step || 0;   // 0=表态 1=小羽反驳后再回应 2=收尾
+
+  host.innerHTML = `
+    <div class="card">
+      ${stageHead(stage)}
+      ${bubble(
+        escapeHtml("我从猫头鹰辩论社带来一句话。先别急着同意——想想你站在哪边？"),
+        escapeHtml("I brought a claim from the Owl Debate Club. Don't agree too fast — where do YOU stand?"))}
+
+      <div class="claim-box">${T(escapeHtml(db.claim.zh), escapeHtml(db.claim.en))}</div>
+
+      <div class="stance-row">
+        <span class="small">${TI("不同意", "Disagree")}</span>
+        <input type="range" id="stance" min="0" max="100" value="${d.stance}" ${step >= 2 ? "disabled" : ""}/>
+        <span class="small">${TI("同意", "Agree")}</span>
+      </div>
+      <div class="stance-read" id="stanceRead">${stanceLabel(d.stance)}</div>
+
+      ${d.turns.map((t, i) => `
+        <div class="kid-line"><span class="kid-bubble">${escapeHtml(t.a)}</span></div>
+        ${t.counter ? bubble(escapeHtml(t.counter.zh), escapeHtml(t.counter.en)) : ""}`).join("")}
+
+      ${step === 0 ? `
+        <div class="field-label">${TI("你的理由是什么？（一句就够）", "What's your reason? One line is enough.")}</div>
+        <div class="answer-box">${answerWidget("dbInput")}</div>
+        <div class="actions"><button class="btn accent small" id="dbSend">${TI("亮出理由", "State my reason")}</button></div>
+      ` : ""}
+      ${step === 1 ? `
+        <div class="field-label">${TI("小羽唱了反调——你怎么回应？（也可以改变立场，拖上面的滑杆）", "Quill pushed back — how do you respond? You may also move the slider.")}</div>
+        <div class="answer-box">${answerWidget("dbInput")}</div>
+        <div class="actions"><button class="btn accent small" id="dbSend">${TI("我来回应", "My response")}</button></div>
+      ` : ""}
+      ${step >= 2 ? bubble(
+        escapeHtml("你刚才做了一件思考者才会做的事：站在自己的对面看问题。今天不需要改变想法——重要的是，你为想法找到了理由。"),
+        escapeHtml("You just did something real thinkers do: looked at your own idea from the other side. You don't have to change your mind today — what matters is you gave it reasons.")) : ""}
+    </div>
+  `;
+  const slider = document.getElementById("stance");
+  slider.oninput = () => { d.stance = +slider.value; document.getElementById("stanceRead").innerHTML = stanceLabel(d.stance); save(); };
+  if (step < 2) {
+    wireAnswerWidget("dbInput");
+    document.getElementById("dbSend").onclick = async () => {
+      const v = val("dbInput"); if (!v) return;
+      if (step === 0) {
+        const counter = d.stance >= 50 ? db.counterYes : db.counterNo;
+        d.turns.push({ a: v, counter });
+        d.step = 1;
+        if (taskById(S.taskId).type === "opinion") addEvidence("思辨", v);
+      } else {
+        d.turns.push({ a: v });
+        d.step = 2;
+        bump("point", 3);
+      }
+      save(); renderDebate(stage);
+    };
+  }
+  footerNav({
+    nextEnabled: (d.step || 0) >= 1,
+    nextLabel: TI("想清楚了，下一站", "Thought it through! Next") + " →",
+    onNext: () => advance(),
+  });
+}
+function stanceLabel(v) {
+  const zh = v < 20 ? "强烈不同意" : v < 45 ? "有点不同意" : v <= 55 ? "中间派" : v < 80 ? "有点同意" : "强烈同意";
+  const en = v < 20 ? "Strongly disagree" : v < 45 ? "Sort of disagree" : v <= 55 ? "On the fence" : v < 80 ? "Sort of agree" : "Strongly agree";
+  return `${v} · ${TI(zh, en)}`;
 }
 
 /* ===================================================================== */
@@ -608,28 +934,29 @@ function renderInput(stage) {
   const o = d.pick, m = d.micro;
   host.innerHTML = `
     <div class="card">
-      <div class="eyebrow">第 2 / 9 步 · 补充素材</div>
-      <h2>${stage.icon} 补充素材</h2>
-      <p class="goal">目标：${cs.goal}。先看一段示范，再做一个小观察，把新发现说给 AI。</p>
+      ${stageHead(stage)}
+      ${bubble(
+        escapeHtml("侦探出动！先看一段别人写的细节当『放大镜』，再去收集你自己的线索。"),
+        escapeHtml("Detective time! First borrow a magnifying glass — see how another writer caught a detail — then collect your own clues."))}
 
       <div class="material">
-        <div class="mtitle">📖 看别人怎么写细节（示范，不用背）</div>
+        <div class="mtitle">📖 ${TI("看别人怎么写细节（示范，不用背）", "How a writer catches details (just look, no memorizing)")}</div>
         <div class="mtext">${escapeHtml(m.text)}</div>
-        <div class="mq">想一想：${escapeHtml(m.teaching_question)}</div>
+        <div class="mq">${TI("想一想：", "Think: ")}${escapeHtml(m.teaching_question)}</div>
       </div>
 
       <div class="material">
-        <div class="mtitle">🔭 观察任务：${escapeHtml(o.title)}</div>
+        <div class="mtitle">🔭 ${TI("观察任务", "Observation mission")}：${escapeHtml(o.title)}</div>
         <div class="mtext">${escapeHtml(o.instruction)}</div>
-        <div class="mq">回来后告诉我：${o.return_fields.map(escapeHtml).join(" / ")}</div>
-        <div class="small muted" style="margin-top:6px">隐私：${escapeHtml(o.privacy_rule)}</div>
+        <div class="mq">${TI("回来后告诉我：", "Report back: ")}${o.return_fields.map(escapeHtml).join(" / ")}</div>
+        <div class="small muted" style="margin-top:6px">${TI("隐私：", "Privacy: ")}${escapeHtml(o.privacy_rule)}</div>
       </div>
 
       <div class="answer-box">
-        <div class="field-label">你的观察发现：</div>
+        <div class="field-label">${TI("你的观察发现：", "Your clue:")}</div>
         ${answerWidget("inInput")}
       </div>
-      <div class="actions"><button class="btn accent small" id="inSave">记下我的发现</button></div>
+      <div class="actions"><button class="btn accent small" id="inSave">${TI("记下我的发现", "Log my clue")}</button></div>
     </div>
     ${evidenceBoard()}
   `;
@@ -640,35 +967,43 @@ function renderInput(stage) {
     if (v) { addEvidence("观察发现", v); bump("detail", Math.max(2, S.growth.detail)); save(); }
     render();
   };
-  footerNav({ nextLabel: "素材够了，下一步 →", onNext: () => advance() });
+  footerNav({ nextLabel: TI("线索够了，下一站", "Clues collected! Next") + " →", onNext: () => advance() });
 }
 
 /* ===================================================================== */
 /* 阶段：写下初稿（draft）—— 孩子自己写，AI 只给句子开头/提醒                */
 /* ===================================================================== */
 function renderDraft(stage) {
-  const cs = controllerStage("draft");
   const task = taskById(S.taskId);
   if (!S.draftTitle) S.draftTitle = task ? task.title : "我的表达";
-  const starters = strategiesFor("D10", S.grade).slice(0, 4);
+  if (!S.draftLang) S.draftLang = "zh";
+  const starters = strategiesFor("D10", S.grade).slice(0, 3);
+  const EN_STARTERS = ["At that moment, ", "I still remember ", "It all started when "];
 
   host.innerHTML = `
     <div class="card">
-      <div class="eyebrow">第 7 / 9 步 · 写下初稿</div>
-      <h2>${stage.icon} 写下你自己的初稿</h2>
-      <p class="goal">目标：${cs.goal}。这里没有「一键生成」按钮——文字必须是你写的。卡住时，看看下面的句子开头。</p>
+      ${stageHead(stage)}
+      ${bubble(
+        escapeHtml("到你大显身手的时候了！这里没有「一键生成」——每个字都得是你的。我就在旁边，卡住了看下面的句子开头。"),
+        escapeHtml("Your big moment! There's no magic generate button here — every word must be yours. I'll be right beside you; if you get stuck, grab a sentence starter below."))}
+
+      <div class="field-label">${TI("这篇你想用什么语言写？", "Which language will you write in?")}</div>
+      <div class="chips" id="dLang">
+        ${[["zh", "中文", "Chinese"], ["en", "英文", "English"], ["mix", "中英混搭", "Mix both!"]]
+          .map(([v, z, e]) => `<button class="chip ${S.draftLang === v ? "selected" : ""}" data-v="${v}">${TI(z, e)}</button>`).join("")}
+      </div>
 
       ${evidenceMini()}
 
-      <div class="draft-meta"><input type="text" id="dTitle" value="${escapeAttr(S.draftTitle)}" placeholder="给作品起个题目" /></div>
-      <textarea id="dBody" rows="12" placeholder="从最想说的那一句开始写……">${escapeHtml(S.draftBody)}</textarea>
+      <div class="draft-meta"><input type="text" id="dTitle" value="${escapeAttr(S.draftTitle)}" placeholder="${TI("给作品起个题目", "Give it a title")}" /></div>
+      <textarea id="dBody" rows="12" placeholder="${TI("从最想说的那一句开始写……", "Start with the sentence you most want to say...")}">${escapeHtml(S.draftBody)}</textarea>
       <div class="wordcount" id="wc"></div>
 
-      <div class="field-label">✏️ 卡住了？挑一个句子开头（点了会填进去）：</div>
+      <div class="field-label">✏️ ${TI("卡住了？挑一个句子开头（点了会填进去）：", "Stuck? Tap a sentence starter:")}</div>
       <div class="starter-list" id="starters">
-        ${starters.map(s => `<button class="starter" data-s="${escapeAttr(s.prompt)}">${escapeHtml(s.prompt)}</button>`).join("")}
-        <button class="starter" data-s="那一刻，">那一刻，……</button>
-        <button class="starter" data-s="我记得，">我记得，……</button>
+        ${(S.draftLang !== "en" ? starters.map(s => `<button class="starter" data-s="${escapeAttr(s.prompt)}">${escapeHtml(s.prompt)}</button>`).join("")
+          + `<button class="starter" data-s="那一刻，">那一刻，……</button>` : "")}
+        ${(S.draftLang !== "zh" ? EN_STARTERS.map(s => `<button class="starter en-starter" data-s="${escapeAttr(s)}">${escapeHtml(s)}…</button>`).join("") : "")}
       </div>
       <div class="guard-banner" id="dGuard" style="display:none"></div>
     </div>
@@ -676,8 +1011,9 @@ function renderDraft(stage) {
   const body = document.getElementById("dBody");
   const title = document.getElementById("dTitle");
   const wc = document.getElementById("wc");
-  const updateWc = () => wc.textContent = `${len(body.value)} 字 · 自动保存中`;
+  const updateWc = () => wc.textContent = `${len(body.value)} ${TI("字 · 自动保存中", "chars · autosaved")}`;
   updateWc();
+  host.querySelectorAll("#dLang .chip").forEach(b => b.onclick = () => { S.draftLang = b.dataset.v; save(); renderDraft(stage); });
   const onChange = () => {
     if (GHOST_RE.test(body.value)) { /* 不拦截孩子写作内容，仅在请求代写时无效，这里无需处理 */ }
     S.draftBody = body.value; S.draftTitle = title.value.trim() || S.draftTitle;
@@ -690,7 +1026,7 @@ function renderDraft(stage) {
   });
   footerNav({
     nextEnabled: len(S.draftBody) >= 15,
-    nextLabel: "初稿写好了，去修改 →",
+    nextLabel: TI("初稿写好了，去打磨", "Draft done — let's polish") + " →",
     onNext: () => advance(),
   });
 }
@@ -730,11 +1066,12 @@ function renderRevision(stage) {
 
   host.innerHTML = `
     <div class="card">
-      <div class="eyebrow">第 8 / 9 步 · 修改打磨</div>
-      <h2>${stage.icon} 一次只改一个地方</h2>
-      <p class="goal">目标：${cs.goal}。AI 帮你找问题、做示范，但改写由你来，并说出你为什么这么改。</p>
+      ${stageHead(stage)}
+      ${bubble(
+        escapeHtml("好作品都是改出来的——但一次只磨一个地方。我找了个示范给你看，动手的还是你。"),
+        escapeHtml("Great writing is rewriting — but we polish ONE thing at a time. I found a demo for you; the hands-on part is all yours."))}
 
-      <div class="field-label">这一轮我们改：（AI 推荐 <b>${dimObj.name}</b>，你也可以换）</div>
+      <div class="field-label">${TI("这一轮我们改：（小羽推荐", "This round we polish: (Quill suggests")} <b>${dimObj.name}</b>${TI("，你也可以换）", ", but you choose)")}</div>
       <div class="dim-grid">
         ${DIMS.map(x => `<button class="dim-card ${x.id === d.dim ? "selected" : ""} ${x.id === recommendDim() ? "reco" : ""}" data-dim="${x.id}">
           <b>${x.name}</b><span>${x.hint}</span></button>`).join("")}
@@ -780,7 +1117,7 @@ function renderRevision(stage) {
   };
   footerNav({
     nextEnabled: S.revisionLog.length >= 1,
-    nextLabel: "改得差不多了，回看成长 →",
+    nextLabel: TI("打磨好了，回望来路", "Polished! Look back") + " →",
     onNext: () => advance(),
   });
 }
@@ -790,27 +1127,28 @@ function renderRevision(stage) {
 /* ===================================================================== */
 function renderReflection(stage) {
   const d = stageData("reflection");
-  const cs = controllerStage("reflection");
   const qs = [
-    "整篇里，你自己最喜欢哪一句？为什么？",
-    "这次你自己改了哪个地方，让它变得更好？",
+    { zh: "整篇里，你自己最喜欢哪一句？为什么？", en: "Which line of yours do you like best? Why that one?" },
+    { zh: "这次你自己改了哪个地方，让它变得更好？", en: "Which spot did you fix yourself — and how did it get better?" },
+    { zh: "最后，反转时刻🎓——今天换你当老师：把你这次学到的一招，教给小羽吧！（我真的会记进羽毛笔记本）", en: "Final twist 🎓 — now YOU are the teacher. Teach Quill ONE trick you learned today. (It really goes into my feather notebook!)" },
   ];
   if (!d.idx) d.idx = 0;
 
   host.innerHTML = `
     <div class="card">
-      <div class="eyebrow">第 9 / 9 步 · 回看成长</div>
-      <h2>${stage.icon} 你自己说说这次的创作</h2>
-      <p class="goal">目标：${cs.goal}。说出你的决定，比作文分数更重要。</p>
+      ${stageHead(stage)}
 
-      ${S.reflection.map(r => `<div class="coach"><div class="avatar">🦉</div><div class="bubble">${escapeHtml(r.q)}</div></div>
-        <div style="text-align:right;margin:-8px 0 14px;"><span style="display:inline-block;background:var(--accent-soft);color:#b5611f;padding:8px 14px;border-radius:16px 4px 16px 16px;max-width:80%;">${escapeHtml(r.a)}</span></div>`).join("")}
+      ${S.reflection.map((r, i) => `
+        ${bubble(escapeHtml(r.q), r.qEn ? escapeHtml(r.qEn) : null)}
+        <div class="kid-line"><span class="kid-bubble">${escapeHtml(r.a)}</span></div>
+        ${i === 2 ? bubble(escapeHtml(ENRICH.buddy.taught.zh), escapeHtml(ENRICH.buddy.taught.en)) : ""}`).join("")}
 
       ${d.idx < qs.length ? `
-        <div class="coach"><div class="avatar">🦉</div><div class="bubble">${qs[d.idx]}</div></div>
+        ${bubble(escapeHtml(qs[d.idx].zh), escapeHtml(qs[d.idx].en))}
         ${answerWidget("refIn")}
-        <div class="actions"><button class="btn accent small" id="refSend">说给 AI 听</button></div>
-      ` : `<div class="parent-note">🎉 你完成了一篇完全属于自己的表达。去『我的作品』看看，或在『家长报告』里看你这次的成长。</div>`}
+        <div class="actions"><button class="btn accent small" id="refSend">${d.idx === 2 ? TI("教给小羽", "Teach Quill") : TI("说给小羽听", "Tell Quill")}</button></div>
+      ` : `<div class="parent-note">🎉 ${T("你完成了一篇完全属于自己的表达——而且把小羽也教会了一招。去『我的作品』看看吧！",
+            "You finished a piece that is 100% yours — and you even taught Quill a trick. Go see it in My Work!")}</div>`}
     </div>
     ${growthPanel(false)}
   `;
@@ -818,14 +1156,14 @@ function renderReflection(stage) {
     wireAnswerWidget("refIn");
     document.getElementById("refSend").onclick = () => {
       const v = val("refIn"); if (!v) return;
-      S.reflection.push({ q: qs[d.idx], a: v });
+      S.reflection.push({ q: qs[d.idx].zh, qEn: qs[d.idx].en, a: v });
       d.idx++; bump("point", Math.max(3, S.growth.point)); bump("revision", Math.max(3, S.growth.revision));
       save(); renderReflection(stage);
     };
   }
   footerNav({
     canNext: d.idx >= qs.length,
-    nextLabel: "看我的作品 →",
+    nextLabel: TI("看我的作品", "See my work") + " →",
     onNext: () => { activeTab = "work"; render(); },
   });
 }
@@ -840,11 +1178,12 @@ function addEvidence(tag, text) {
 }
 function evidenceBoard() {
   return `<div class="card evidence-panel">
-    <h3>👂 AI 听到了什么</h3>
-    <p class="note">这里只放<strong>你自己说过的话</strong>。AI 不会偷偷加内容。提炼错了，点 × 删掉。</p>
+    <h3>👂 ${TI("小羽听到了什么", "What Quill Heard")}</h3>
+    <p class="note">${T("这里只放<strong>你自己说过的话</strong>。小羽不会偷偷加内容。记错了，点 × 删掉。",
+      "Only <strong>your own words</strong> live here. Quill never sneaks anything in. Tap × to remove a mistake.")}</p>
     <div id="eviList">${S.evidence.length
       ? S.evidence.map((e, i) => `<div class="evi-item"><span class="tag">${escapeHtml(e.tag)}</span><span class="txt">${escapeHtml(e.text)}</span><button class="del" data-i="${i}">×</button></div>`).join("")
-      : '<div class="evi-empty">你说的话会出现在这里。</div>'}</div>
+      : `<div class="evi-empty">${TI("你说的话会出现在这里。", "Your words will appear here.")}</div>`}</div>
   </div>`;
 }
 function evidenceMini() {
@@ -882,12 +1221,12 @@ function answerWidget(id, mode) {
   const rows = mode === "single" ? 2 : 3;
   return `
     <div class="input-mode" data-for="${id}">
-      <button class="mode-btn active" data-mode="text">⌨️ 打字</button>
-      <button class="mode-btn" data-mode="voice">🎤 说话</button>
+      <button class="mode-btn active" data-mode="text">⌨️ ${TI("打字", "Type")}</button>
+      <button class="mode-btn" data-mode="voice">🎤 ${TI("说话", "Speak")}</button>
     </div>
-    <textarea id="${id}" rows="${rows}" placeholder="打字，或点上面的「说话」用语音输入"></textarea>
+    <textarea id="${id}" rows="${rows}" placeholder="${TI("打字，或点上面的「说话」用语音输入", "Type here, or tap Speak to use your voice")}"></textarea>
     <div class="mic-row hidden" id="${id}-mic">
-      <button class="mic-btn" id="${id}-micbtn">🎤 按住说 / 点一下开始</button>
+      <button class="mic-btn" id="${id}-micbtn">🎤 ${TI("点一下开始说", "Tap and talk")}</button>
       <span class="mic-hint" id="${id}-michint"></span>
     </div>`;
 }
@@ -912,7 +1251,7 @@ function setupMic(id) {
   let rec = null, on = false;
   btn.onclick = () => {
     if (on && rec) { rec.stop(); return; }
-    rec = new SR(); rec.lang = "zh-CN"; rec.interimResults = true; rec.continuous = true;
+    rec = new SR(); rec.lang = CFG.lang === "en" ? "en-US" : "zh-CN"; rec.interimResults = true; rec.continuous = true;
     let base = ta.value;
     rec.onstart = () => { on = true; btn.classList.add("live"); btn.textContent = "🔴 正在听…点一下结束"; hint.textContent = "慢慢说，说错没关系。"; };
     rec.onresult = e => { let txt = ""; for (let i = 0; i < e.results.length; i++) txt += e.results[i][0].transcript; ta.value = (base ? base + " " : "") + txt; };
@@ -927,12 +1266,12 @@ function val(id) { const e = document.getElementById(id); return e ? (e.value ||
 /* 选择页（开始一次新表达）                                                */
 /* ===================================================================== */
 const TASK_TYPES = [
-  { type: "real_experience", label: "写真事" },
-  { type: "people_relationships", label: "写人" },
-  { type: "observation_discovery", label: "观察发现" },
-  { type: "imagination", label: "想象故事" },
-  { type: "knowledge_explanation", label: "讲明白一件事" },
-  { type: "opinion", label: "说观点" },
+  { type: "real_experience", label: "写真事", labelEn: "True stories" },
+  { type: "people_relationships", label: "写人", labelEn: "People" },
+  { type: "observation_discovery", label: "观察发现", labelEn: "Observation" },
+  { type: "imagination", label: "想象故事", labelEn: "Imagination" },
+  { type: "knowledge_explanation", label: "讲明白一件事", labelEn: "Explain it" },
+  { type: "opinion", label: "说观点", labelEn: "Opinions" },
 ];
 let setupSel = { grade: 4, type: "real_experience", taskId: null, profileId: "P01" };
 
@@ -943,15 +1282,16 @@ function renderSetup() {
 
   host.innerHTML = `
     <div class="card">
-      <div class="eyebrow">开始一次表达</div>
-      <h2>把你脑子里的东西，说出来 ✦</h2>
-      <p class="goal">这门课的 AI 是你的<strong>陪练</strong>：它会一个一个地问你，帮你把想说的说清楚——但每一个字都得是你写的。</p>
+      <div class="eyebrow">${TI("开始一次表达探险", "Start an Expression Quest")}</div>
+      <h2>${T("把你脑子里的东西，说出来 ✦", "Let the ideas in your head out ✦")}</h2>
+      <p class="goal">${T("你的旅伴是小羽🦉——一只爱提问的猫头鹰。它会陪你聊、跟你辩、给你讲世界的奇事——但每一个字都得是你写的。",
+        "Your travel buddy is Quill 🦉 — an owl full of questions. It chats with you, debates with you, shares wonders of the world — but every word of the story must be yours.")}</p>
 
-      <div class="field-label">① 你上几年级？</div>
-      <div class="opt-row">${[3, 4, 5, 6].map(g => `<button class="chip ${setupSel.grade === g ? "selected" : ""}" data-grade="${g}">${g}年级</button>`).join("")}</div>
+      <div class="field-label">① ${TI("你上几年级？", "What grade are you in?")}</div>
+      <div class="opt-row">${[3, 4, 5, 6].map(g => `<button class="chip ${setupSel.grade === g ? "selected" : ""}" data-grade="${g}">${TI(g + "年级", "Grade " + g)}</button>`).join("")}</div>
 
-      <div class="field-label" style="margin-top:14px">② 这次想写哪一类？</div>
-      <div class="opt-row">${TASK_TYPES.map(t => `<button class="chip ${setupSel.type === t.type ? "selected" : ""}" data-type="${t.type}">${t.label}</button>`).join("")}</div>
+      <div class="field-label" style="margin-top:14px">② ${TI("这次想写哪一类？", "What kind of piece this time?")}</div>
+      <div class="opt-row">${TASK_TYPES.map(t => `<button class="chip ${setupSel.type === t.type ? "selected" : ""}" data-type="${t.type}">${TI(t.label, t.labelEn)}</button>`).join("")}</div>
 
       <div class="field-label" style="margin-top:14px">③ 挑一个题目（${tasks.length} 个适合 ${setupSel.grade} 年级）</div>
       <div class="setup-grid" id="taskList">
@@ -984,16 +1324,14 @@ function renderSetup() {
         </div>
         <input type="hidden" id="aiKey" value=""/>
       ` : `
-        ${PROXY.available ? `<div class="guard-banner" style="margin-top:8px">检测到后端（厂商：${escapeHtml(PROXY.provider || "?")}），但服务器未配置密钥。更安全的用法：停止服务后运行 <code>export DASHSCOPE_API_KEY=sk-...</code> 再 <code>python3 serve.py</code>，密钥就不进浏览器了。</div>` : ""}
-        <div class="opt-row" style="margin-top:8px">
-          <input type="password" id="aiKey" placeholder="临时填 Claude Key（sk-ant-...，仅本机直连）" value="${escapeAttr(CFG.apiKey)}" style="flex:1;min-width:200px"/>
+        <p class="small muted" style="margin-top:8px">填入<strong>通义千问</strong> API Key，浏览器直接连千问（DashScope 允许跨域）。</p>
+        <div class="opt-row" style="margin-top:6px">
+          <input type="password" id="aiKey" placeholder="通义千问 API Key（sk-...，阿里云百炼）" value="${escapeAttr(CFG.apiKey)}" style="flex:1;min-width:200px"/>
           <select id="aiModel">
-            <option value="claude-opus-4-8" ${CFG.model === "claude-opus-4-8" ? "selected" : ""}>Opus 4.8（最强）</option>
-            <option value="claude-sonnet-4-6" ${CFG.model === "claude-sonnet-4-6" ? "selected" : ""}>Sonnet 4.6（快/省）</option>
-            <option value="claude-haiku-4-5" ${CFG.model === "claude-haiku-4-5" ? "selected" : ""}>Haiku 4.5（最快）</option>
+            ${DIRECT_MODELS.map(m => `<option value="${m.id}" ${activeModel() === m.id ? "selected" : ""}>${escapeHtml(m.label)}</option>`).join("")}
           </select>
         </div>
-        <div class="guard-banner" style="margin-top:8px">⚠️ 直连模式仅支持 Claude 且密钥存在本机浏览器，仅供本地试用。<strong>推荐用后端代理接通义千问</strong>：<code>export DASHSCOPE_API_KEY=sk-... && python3 serve.py</code>。</div>
+        <div class="guard-banner" style="margin-top:8px">🔑 key <strong>只存在你自己的浏览器</strong>（localStorage），别人看不到。<br>⚠️ 但<strong>不要把 key 硬写进公开网页源码</strong>——那样所有访客都能看到、盗刷你的额度。公开给多人用请改后端代理（serve.py / Cloudflare）。建议去阿里云百炼给 key 设个消费限额兜底。</div>
       `}
 
       <label class="toggle-row" style="margin-top:8px"><input type="checkbox" id="aiChecker" ${CFG.checker ? "checked" : ""}/>

@@ -257,6 +257,77 @@ textarea:focus, input[type=text]:focus { outline: none; border-color: var(--bran
 
 .hidden { display: none !important; }
 
+/* ---------- 双语伙伴版 ---------- */
+.en-line { display: block; margin-top: 4px; font-size: .85em; font-weight: 500; color: var(--ink-soft); font-style: italic; }
+.bubble .en-line { color: #4a6a5e; }
+.brand-en { font-size: .7rem; font-weight: 700; color: var(--accent); letter-spacing: 1px; margin-left: 4px; }
+.buddy-tag {
+  display: inline-block; font-size: .66rem; font-weight: 800; color: var(--brand);
+  background: #fff; border-radius: 999px; padding: 1px 8px; margin: 0 0 6px; letter-spacing: .5px;
+}
+.coach .bubble .buddy-tag { display: block; width: fit-content; }
+.kid-line { text-align: right; margin: -6px 0 14px; }
+.kid-bubble {
+  display: inline-block; background: var(--accent-soft); color: #b5611f;
+  padding: 8px 14px; border-radius: 16px 4px 16px 16px; font-size: .95rem; max-width: 80%; text-align: left;
+}
+
+/* 语言切换 */
+.lang-toggle { display: inline-flex; gap: 2px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 2px; }
+.lang-btn {
+  border: none; background: transparent; border-radius: 999px; padding: 3px 10px;
+  font-size: .72rem; font-weight: 800; color: var(--ink-soft); cursor: pointer;
+}
+.lang-btn.on { background: var(--brand); color: #fff; }
+
+/* 通识翻卡 */
+.flip-card { perspective: 1000px; cursor: pointer; margin: 12px 0; height: 200px; }
+.flip-inner { position: relative; width: 100%; height: 100%; transition: transform .6s; transform-style: preserve-3d; }
+.flip-card.flipped .flip-inner { transform: rotateY(180deg); }
+.flip-front, .flip-back {
+  position: absolute; inset: 0; backface-visibility: hidden; border-radius: var(--radius);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 18px; text-align: center;
+}
+.flip-front { background: linear-gradient(135deg, var(--brand), #3d8a74); color: #fff; box-shadow: var(--shadow); }
+.flip-emoji { font-size: 44px; margin-bottom: 8px; animation: floaty 2.4s ease-in-out infinite; }
+@keyframes floaty { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+.flip-title { font-weight: 800; font-size: 1.05rem; }
+.flip-title .en-line { color: #d8efe6; }
+.flip-hint { margin-top: 10px; font-size: .75rem; opacity: .85; }
+.flip-back { background: #fffaf0; border: 1.5px solid var(--gold); transform: rotateY(180deg); overflow-y: auto; justify-content: flex-start; text-align: left; }
+.flip-story { font-size: .92rem; line-height: 1.7; }
+.quote-box {
+  background: var(--brand-soft); border-left: 4px solid var(--brand); border-radius: 8px;
+  padding: 12px 14px; margin: 10px 0; font-size: .9rem; font-style: italic;
+}
+
+/* 思辨角 */
+.claim-box {
+  background: linear-gradient(135deg, #fff7ec, #fdeede); border: 2px dashed var(--accent);
+  border-radius: var(--radius-sm); padding: 16px; margin: 12px 0; font-weight: 800; font-size: 1.05rem; text-align: center;
+}
+.stance-row { display: flex; align-items: center; gap: 10px; margin: 12px 0 4px; }
+.stance-row input[type=range] { flex: 1; accent-color: var(--accent); height: 26px; }
+.stance-read { text-align: center; font-size: .85rem; font-weight: 800; color: var(--brand); margin-bottom: 10px; }
+
+/* 故事地图分桶 */
+.bucket-box { margin: 12px 0; }
+.bucket-item {
+  display: flex; align-items: center; gap: 8px; width: 100%; text-align: left;
+  border: 1.5px solid var(--line); background: #fff; border-radius: 10px;
+  padding: 8px 12px; margin-bottom: 6px; font-size: .88rem; cursor: pointer; transition: .15s;
+}
+.bucket-item .bk {
+  flex: 0 0 auto; font-size: .7rem; font-weight: 800; padding: 2px 8px; border-radius: 999px;
+  background: var(--line); color: var(--ink-soft);
+}
+.bucket-item.tag-b { border-color: #6aa9d8; } .bucket-item.tag-b .bk { background: #e3eff9; color: #2d6ca3; }
+.bucket-item.tag-m { border-color: var(--accent); } .bucket-item.tag-m .bk { background: var(--accent-soft); color: #b5611f; }
+.bucket-item.tag-e { border-color: var(--brand); } .bucket-item.tag-e .bk { background: var(--brand-soft); color: var(--brand); }
+
+.en-starter { font-style: italic; color: #4a6a5e; }
+.warm-chip { font-size: 1rem; }
+
 /* ---------- 教师后台 ---------- */
 .teacher-strip { background: #f1f5fb; border: 1px solid #d4e0f0; }
 .teacher-strip .chip.selected { background: #3b6fb0; border-color: #3b6fb0; color: #fff; }
