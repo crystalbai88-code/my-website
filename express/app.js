@@ -422,6 +422,22 @@ function controllerStage(id) { return KB.controller.stages.find(s => s.id === id
 function taskById(id) { return KB.tasks.tasks.find(t => t.task_id === id); }
 function rubricForGrade(g) { return KB.rubrics.grades.find(r => r.grade === g); }
 
+/* 聊天方向：开场由孩子挑，不预设任何题目 */
+const TOPICS = [
+  { id: "school",     emoji: "🏫", zh: "学校的事情",   en: "School stuff" },
+  { id: "story",      emoji: "📖", zh: "你喜欢的故事", en: "A story you love" },
+  { id: "video",      emoji: "📺", zh: "今天看到的视频", en: "A video you watched" },
+  { id: "game",       emoji: "🎮", zh: "你的游戏",     en: "Your games" },
+  { id: "classmates", emoji: "👫", zh: "你的同学",     en: "Your classmates" },
+  { id: "free",       emoji: "✨", zh: "别的也可以",   en: "Something else" },
+];
+/* 伪任务：让通识卡/思辨题按 方向+孩子的故事 匹配主题 */
+function topicTask() {
+  const typeMap = { school: "observation_discovery", story: "imagination", video: "opinion",
+    game: "real_experience", classmates: "people_relationships", free: "observation_discovery" };
+  return { title: S.storySeed || "", type: typeMap[(S.topic || {}).id] || "observation_discovery" };
+}
+
 /* 入门支架选项（D01/D02 连续短答时启用，仍只问一个问题） */
 const ENTRY_SCAFFOLDS = [
   { zh: "今天上学路上", en: "On the way to school" }, { zh: "今天的课间", en: "At recess" },
@@ -547,7 +563,6 @@ const PHASE_GOALS = {
 };
 
 function interviewSystem() {
-  const task = taskById(S.taskId);
   const band = S.grade <= 4 ? "三四年级：短句、具体、必要时给2-3个选项" : "五六年级：可以更开放，可请他说说理由";
   return `你是「小羽」，一只爱听故事的小猫头鹰，是一名儿童表达访谈者。对面是一个${S.grade}年级的孩子（${band}）。
 
@@ -565,7 +580,7 @@ function interviewSystem() {
 
 【铁律】绝不替孩子写句子或示范范文；绝不编造他没说过的经历；一轮最多一个问题；不问隐私（姓名/学校/住址/电话）；孩子提到被伤害或危险，温和建议告诉信任的大人并把 safety_flag 设为 "harm"。
 
-【这次访谈】主题：《${task.title}》——${task.task_brief}。访谈按阶段推进，阶段目标会在对话里以【课程提示】告诉你。当你判断当前阶段目标已达到，把 ready_for_next 设为 true（同时照常回应孩子）。
+【这次访谈】没有预设题目。孩子选择了想聊的方向：「${S.topic ? S.topic.zh : "随便聊聊"}」。你的任务是从这个方向出发，帮孩子在聊天中自己浮现出一件他真正经历、真正在意的具体小事，把它聊开、聊深——那件事就是他这次要写的故事。访谈按阶段推进，阶段目标会以【课程提示】告诉你；当你判断目标已达到，把 ready_for_next 设为 true（同时照常回应孩子）。
 
 【教师手册·提问灵感（参考，不必照搬）】
 ${kbDigest()}
@@ -665,6 +680,7 @@ function freshSession(grade, taskId, profileId) {
     draftBody: "",
     revisionLog: [],         // {dimension, dimName, before, after, why}
     feathers: 0,             // 收集的羽毛（游戏奖励）
+    topic: null,             // 孩子选的聊天方向（不预设题目）
     chat: [],                // 访谈全程对话（agent 记忆）
     pendingNotes: [],        // 待并入下一轮的课程提示
     lastPhase: null,
@@ -778,10 +794,9 @@ function renderBadges() {
     .map(([v, l]) => `<button class="lang-btn ${CFG.lang === v ? "on" : ""}" data-lang="${v}">${l}</button>`).join("")}
     <button class="lang-btn tts ${CFG.tts ? "on" : ""}" id="ttsToggle" title="${TI("小羽朗读开/关", "Quill reads aloud on/off")}">${CFG.tts ? "🔊" : "🔇"}</button></span>`;
   if (!S) { badges.innerHTML = langBtns; wireLang(); return; }
-  const task = taskById(S.taskId);
   badges.innerHTML = `<span class="badge feather-badge">🪶 <b id="featherCount">${S.feathers || 0}</b></span>
     <span class="badge">${TI(S.grade + "年级", "Grade " + S.grade)}</span>
-    <span class="badge accent">${task ? task.title : "—"}</span>
+    <span class="badge accent">${S.topic ? S.topic.emoji + " " + (CFG.lang === "en" ? S.topic.en : S.topic.zh) : TI("自由表达", "Free talk")}</span>
     ${langBtns}`;
   wireLang();
 }
@@ -869,16 +884,18 @@ function stageData(id) {
 }
 
 function openerFor(stage) {
-  const task = taskById(S.taskId);
   const cs = controllerStage(stage.id);
   switch (stage.id) {
     case "diagnose": {
-      // 用任务 + 卡点 D01 的第一条策略当开场
-      const st = strategiesFor("D01", S.grade)[0];
-      return {
-        zh: `我们这次的探险任务是《${task.title}》——${task.task_brief}。${st ? st.prompt : "最近有没有哪一分钟和平常不一样？"}`,
-        en: `Our quest this time: "${task.title}". Think of one recent little moment that felt different from usual — what happened?`,
+      const byTopic = {
+        school: { zh: "学校里最近有没有一件让你印象深的小事？大事小事都算数。", en: "Anything from school lately that stuck with you? Big or tiny, it all counts." },
+        story: { zh: "你最喜欢的那个故事里，哪个瞬间你一直忘不掉？", en: "In your favorite story, which moment can't you forget?" },
+        video: { zh: "最近看过的视频里，哪一个你特别想讲给别人听？它讲了什么？", en: "Which video you watched lately would you love to tell someone about? What was it?" },
+        game: { zh: "玩游戏的时候，有没有哪一局让你特别难忘？发生了什么？", en: "Was there one round of a game you'll never forget? What happened?" },
+        classmates: { zh: "想到你的同学，最先跳出来的是谁？最近发生了什么和ta有关的事？", en: "When you think of your classmates, who pops up first? What happened with them recently?" },
+        free: { zh: "那你来说——最近什么事老在你脑子里转来转去？", en: "You tell me — what's been spinning around in your head lately?" },
       };
+      return byTopic[(S.topic || {}).id] || byTopic.free;
     }
     case "recall": {
       const sd = seedShort();
@@ -1254,51 +1271,59 @@ function grantQAGrowth(stage, d) {
 /* ===================================================================== */
 function renderWarmup(stage) {
   const d = stageData("warmup");
-  if (!d.w) d.w = ENRICH.warmups[Math.floor(Math.random() * ENRICH.warmups.length)];
-  const w = d.w;
 
   host.innerHTML = `
     <div class="card">
       ${stageHead(stage)}
-      ${d.turns.length === 0 ? bubble(escapeHtml(ENRICH.buddy.intro.zh), escapeHtml(ENRICH.buddy.intro.en)) : ""}
-      ${bubble(escapeHtml(w.zh), escapeHtml(w.en))}
+      ${bubble(escapeHtml(ENRICH.buddy.intro.zh), escapeHtml(ENRICH.buddy.intro.en))}
+      ${bubble(
+        escapeHtml("今天你想跟我聊哪一方面的事情？挑一个吧——聊着聊着，要写的故事自己会冒出来。"),
+        escapeHtml("What would you like to chat about today? Pick one — the story will pop out by itself as we talk."))}
 
-      ${d.turns.map(t => `
-        <div class="kid-line"><span class="kid-bubble">${escapeHtml(t.a)}</span></div>
-        ${t.react ? bubble(escapeHtml(t.react.zh), escapeHtml(t.react.en)) : ""}`).join("")}
-
-      ${d.turns.length === 0 ? `
-        ${w.chips ? `<div class="chips">${w.chips.map(c => `<button class="chip warm-chip" data-v="${escapeAttr(c.zh)}">${TI(c.zh, c.en)}</button>`).join("")}</div>` : ""}
-        <div class="answer-box">${answerWidget("wuInput")}</div>
-        <div class="actions">
-          <button class="btn accent small" id="wuSend">${TI("告诉小羽", "Tell Quill")}</button>
-          <button class="btn ghost small" id="wuSwap">${TI("换个问题", "Different question")}</button>
-        </div>` : ""}
+      ${S.topic ? `
+        <div class="kid-line"><span class="kid-bubble">${S.topic.emoji} ${escapeHtml(CFG.lang === "en" ? S.topic.en : S.topic.zh)}${d.freeText ? "：" + escapeHtml(d.freeText) : ""}</span></div>
+        ${bubble(escapeHtml(`好耶，聊${S.topic.zh}！我已经准备好我的羽毛笔记本啦，出发！`),
+                 escapeHtml("Yes! I've got my feather notebook ready — let's go!"))}
+      ` : `
+        <div class="topic-grid">
+          ${TOPICS.map(t => `<button class="topic-card" data-t="${t.id}">
+            <span class="t-emoji">${t.emoji}</span><b>${TI(t.zh, t.en)}</b></button>`).join("")}
+        </div>
+        ${d.freeMode ? `
+          <div class="field-label" style="margin-top:10px">${TI("好呀，你想聊什么都行：", "Sure — anything you like:")}</div>
+          <div class="answer-box">${answerWidget("tpInput", "single")}</div>
+          <div class="actions"><button class="btn accent small" id="tpGo">${TI("就聊这个", "Let's talk about this")}</button></div>
+        ` : ""}
+      `}
     </div>
   `;
-  speakOnce("wu|" + (d.turns.length ? "react" : w.id),
-    d.turns.length ? d.turns[d.turns.length - 1].react.zh : w.zh,
-    d.turns.length ? d.turns[d.turns.length - 1].react.en : w.en);
-  if (d.turns.length === 0) {
-    wireAnswerWidget("wuInput");
-    host.querySelectorAll(".warm-chip").forEach(b => b.onclick = () => {
-      const ta = document.getElementById("wuInput");
-      ta.value = "我选" + b.dataset.v + "，因为"; ta.focus();
-    });
-    document.getElementById("wuSwap").onclick = () => { d.w = ENRICH.warmups[Math.floor(Math.random() * ENRICH.warmups.length)]; save(); renderWarmup(stage); };
-    document.getElementById("wuSend").onclick = () => {
-      const v = val("wuInput"); if (!v) return;
-      const p = pickPraise();
-      d.turns.push({ a: v, react: { zh: p.zh + " 脑洞开好了，我们出发！", en: p.en + " Brain warmed up — let's go!" } });
-      if (!S.pendingNotes) S.pendingNotes = [];
-      S.pendingNotes.push(`【课程记录】暖身问题「${d.w.zh}」孩子答：「${v}」`);
-      awardFeather(1);
-      save(); renderWarmup(stage);
-    };
+  speakOnce("tp|" + (S.topic ? "picked" : "ask"),
+    S.topic ? `好耶，聊${S.topic.zh}！出发！` : "今天你想跟我聊哪一方面的事情？挑一个吧。",
+    S.topic ? "Yes! Let's go!" : "What would you like to chat about today?");
+
+  const pick = (t, freeText) => {
+    S.topic = t;
+    d.freeText = freeText || "";
+    if (!S.pendingNotes) S.pendingNotes = [];
+    S.pendingNotes.push(`【课程记录】孩子选择想聊的方向：「${t.zh}${freeText ? "——" + freeText : ""}」`);
+    awardFeather(1);
+    save(); render();
+  };
+  host.querySelectorAll(".topic-card").forEach(b => b.onclick = () => {
+    const t = TOPICS.find(x => x.id === b.dataset.t);
+    if (t.id === "free") { d.freeMode = true; save(); renderWarmup(stage); }
+    else pick(t);
+  });
+  if (d.freeMode && !S.topic) {
+    wireAnswerWidget("tpInput");
+    const go = document.getElementById("tpGo");
+    if (go) go.onclick = () => { const v = val("tpInput"); if (v) pick(TOPICS.find(x => x.id === "free"), v); };
   }
+
   footerNav({
     canBack: false,
-    nextLabel: d.turns.length ? TI("出发！", "Let's go!") + " →" : TI("跳过，直接出发", "Skip — let's go") + " →",
+    canNext: !!S.topic,
+    nextLabel: TI("出发！", "Let's go!") + " →",
     onNext: () => advance(),
   });
 }
@@ -1308,7 +1333,7 @@ function renderWarmup(stage) {
 /* ===================================================================== */
 function renderKnowledge(stage) {
   const d = stageData("knowledge");
-  const card = ENRICH.cardFor(taskById(S.taskId));
+  const card = ENRICH.cardFor(topicTask());
 
   host.innerHTML = `
     <div class="card">
@@ -1382,7 +1407,7 @@ function renderKnowledge(stage) {
 /* ===================================================================== */
 function renderDebate(stage) {
   const d = stageData("debate");
-  const db = ENRICH.debateFor(taskById(S.taskId));
+  const db = ENRICH.debateFor(topicTask());
   if (d.stance == null) d.stance = 50;
   const step = d.step || 0;   // 0=表态 1=小羽反驳后再回应 2=收尾
 
@@ -1440,7 +1465,7 @@ function renderDebate(stage) {
         const counter = d.stance >= 50 ? db.counterYes : db.counterNo;
         d.turns.push({ a: v, counter });
         d.step = 1;
-        if (taskById(S.taskId).type === "opinion") addEvidence("思辨", v);
+        if ((S.topic || {}).id === "video") addEvidence("思辨", v);
       } else {
         S.pendingNotes.push(`【课程记录】被反驳后孩子回应：「${v}」`);
         d.turns.push({ a: v });
@@ -1525,8 +1550,7 @@ function renderInput(stage) {
 /* 阶段：写下初稿（draft）—— 孩子自己写，AI 只给句子开头/提醒                */
 /* ===================================================================== */
 function renderDraft(stage) {
-  const task = taskById(S.taskId);
-  if (!S.draftTitle) S.draftTitle = task ? task.title : "我的表达";
+  if (S.draftTitle == null) S.draftTitle = "";
   if (!S.draftLang) S.draftLang = "zh";
   const starters = strategiesFor("D10", S.grade).slice(0, 3);
   const EN_STARTERS = ["At that moment, ", "I still remember ", "It all started when "];
@@ -1843,9 +1867,6 @@ const TASK_TYPES = [
 let setupSel = { grade: 4, type: "real_experience", taskId: null, profileId: "P01" };
 
 function renderSetup() {
-  const profileQ = KB.profiles.profiles;
-  const tasks = KB.tasks.tasks.filter(t => t.type === setupSel.type && t.suitable_grades.includes(setupSel.grade));
-  if (!tasks.find(t => t.task_id === setupSel.taskId)) setupSel.taskId = tasks[0] && tasks[0].task_id;
 
   host.innerHTML = `
     <div class="card">
@@ -1858,23 +1879,10 @@ function renderSetup() {
       <p class="goal">${T("你的旅伴是小羽🦉——一只爱提问的猫头鹰。它会陪你聊、跟你辩、给你讲世界的奇事——但每一个字都得是你写的。",
         "Your travel buddy is Quill 🦉 — an owl full of questions. It chats with you, debates with you, shares wonders of the world — but every word of the story must be yours.")}</p>
 
-      <div class="field-label">① ${TI("你上几年级？", "What grade are you in?")}</div>
+      <div class="field-label">${TI("你上几年级？", "What grade are you in?")}</div>
       <div class="opt-row">${[3, 4, 5, 6].map(g => `<button class="chip ${setupSel.grade === g ? "selected" : ""}" data-grade="${g}">${TI(g + "年级", "Grade " + g)}</button>`).join("")}</div>
 
-      <div class="field-label" style="margin-top:14px">② ${TI("这次想写哪一类？", "What kind of piece this time?")}</div>
-      <div class="opt-row">${TASK_TYPES.map(t => `<button class="chip ${setupSel.type === t.type ? "selected" : ""}" data-type="${t.type}">${TI(t.label, t.labelEn)}</button>`).join("")}</div>
-
-      <div class="field-label" style="margin-top:14px">③ 挑一个题目（${tasks.length} 个适合 ${setupSel.grade} 年级）</div>
-      <div class="setup-grid" id="taskList">
-        ${tasks.map(t => `<button class="task-card ${setupSel.taskId === t.task_id ? "selected" : ""}" data-task="${t.task_id}">
-          <b>${escapeHtml(t.title)}</b><p>${escapeHtml(t.task_brief)}</p>
-          <p class="focus">学习重点：${escapeHtml(t.learning_focus)}</p></button>`).join("")}
-      </div>
-
-      <div class="field-label" style="margin-top:14px">④ 你更像哪种表达者？（决定 AI 怎么陪你）</div>
-      <div class="opt-row">${profileQ.map(p => `<button class="chip ${setupSel.profileId === p.profile_id ? "selected" : ""}" data-prof="${p.profile_id}">${p.name}</button>`).join("")}</div>
-      <p class="small muted" id="profHint" style="margin-top:6px">${profHintText(setupSel.profileId)}</p>
-
+      <p class="small muted" style="margin-top:14px">${TI("不用选题目——想聊什么，进去以后告诉小羽就行。", "No topic to pick here — just tell Quill what you'd like to chat about once you're in.")}</p>
       <div class="actions"><button class="btn" id="startBtn">开始这次表达 →</button></div>
     </div>
 
@@ -1984,10 +1992,7 @@ function renderSetup() {
       st.textContent = "✅ 连接成功，可以开始了";
     } catch (e) { st.textContent = "❌ " + (e.message || "连接失败"); }
   };
-  host.querySelectorAll("[data-grade]").forEach(b => b.onclick = () => { setupSel.grade = +b.dataset.grade; setupSel.taskId = null; renderSetup(); });
-  host.querySelectorAll("[data-type]").forEach(b => b.onclick = () => { setupSel.type = b.dataset.type; setupSel.taskId = null; renderSetup(); });
-  host.querySelectorAll("[data-task]").forEach(b => b.onclick = () => { setupSel.taskId = b.dataset.task; renderSetup(); });
-  host.querySelectorAll("[data-prof]").forEach(b => b.onclick = () => { setupSel.profileId = b.dataset.prof; renderSetup(); });
+  host.querySelectorAll("[data-grade]").forEach(b => b.onclick = () => { setupSel.grade = +b.dataset.grade; renderSetup(); });
   const vz = document.getElementById("voiceZhSel"), ve = document.getElementById("voiceEnSel");
   if (vz) vz.onchange = () => { CFG.voiceZh = vz.value; saveCfg(); };
   if (ve) ve.onchange = () => { CFG.voiceEn = ve.value; saveCfg(); };
@@ -1999,7 +2004,7 @@ function renderSetup() {
   if (avs) avs.onchange = () => { CFG.aiVoiceName = avs.value; saveCfg(); };
   if (tc) tc.onclick = () => { const st = tc.textContent; tc.textContent = "…"; speakSample(CFG.lang, true); setTimeout(() => tc.textContent = st, 1500); };
   document.getElementById("startBtn").onclick = () => {
-    S = freshSession(setupSel.grade, setupSel.taskId, setupSel.profileId);
+    S = freshSession(setupSel.grade, null, "P01");
     save(); render();
   };
   footer.innerHTML = "";
@@ -2084,7 +2089,7 @@ function downloadWork() {
   const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = `${S.draftTitle || "我的表达"}.md`;
+  a.download = `${S.draftTitle || "我的故事"}.md`;
   a.click();
 }
 
@@ -2128,7 +2133,7 @@ function renderTeacher() {
     <div class="card">
       <div class="eyebrow">教师后台 · 本次会话</div>
       <h2>👩‍🏫 首轮测试观察</h2>
-      <p class="goal">用于人工验证 AI 的教学动作是否正确（不自动用于模型微调）。样本号 <b>${S.sampleId}</b> · ${S.grade}年级 · ${escapeHtml(taskById(S.taskId)?.title || "")}</p>
+      <p class="goal">用于人工验证 AI 的教学动作是否正确（不自动用于模型微调）。样本号 <b>${S.sampleId}</b> · ${S.grade}年级 · ${escapeHtml(S.topic ? S.topic.zh : "自由表达")}</p>
 
       <label class="toggle-row"><input type="checkbox" id="obsToggle" ${S.observe ? "checked" : ""}/>
         <span><b>观察模式</b>：开启后，回到「课程」每答完一句，可给那句追问打效果标签（孩子端看不到）。</span></label>
@@ -2207,7 +2212,7 @@ function buildRecord() {
   return {
     sample_id: S.sampleId,
     grade: S.grade,
-    task_id: S.taskId,
+    task_id: (S.topic || {}).id || null,
     oral_transcript_redacted: t.map(x => x.answer_redacted).join(" / "),
     first_draft_redacted: redact(S.draftBody),
     teacher_question_ids: t.map(x => x.strategy_id).filter(Boolean),

@@ -559,3 +559,15 @@ body.quill-talking .quill .q-bob { animation-duration: .9s; }
 .bubble.typing .tdot:nth-child(4) { animation-delay: .4s; }
 @keyframes tblink { 0%,100% { opacity: .25; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-3px); } }
 .evi-item .tag:first-child:is(.gem) { color: #b5611f; }
+
+/* 话题选择（开场：想聊什么） */
+.topic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin: 12px 0; }
+.topic-card {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  background: #fff; border: 2.5px solid var(--line); border-radius: 18px;
+  padding: 18px 10px; font-size: .95rem; cursor: pointer; transition: .15s;
+  box-shadow: 0 4px 0 rgba(0,0,0,.07);
+}
+.topic-card:hover { transform: translateY(-3px) rotate(-1deg); border-color: var(--accent); }
+.topic-card:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,.07); }
+.topic-card .t-emoji { font-size: 34px; }
