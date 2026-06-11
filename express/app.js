@@ -62,27 +62,88 @@ function resolveVoice(lg) {
   for (const re of VOICE_RANK[lg]) { const hit = vs.find(v => re.test(v.name)); if (hit) return hit; }
   return vs.find(v => !v.localService) || vs[0] || null;   // 在线音通常更自然
 }
-function speakNow(zh, en) {
-  if (!("speechSynthesis" in window)) return;
-  speechSynthesis.cancel();
-  const parts = [];
-  if (CFG.lang !== "en" && zh) parts.push(["zh", stripForSpeech(zh)]);
-  if (CFG.lang !== "zh" && en) parts.push(["en", stripForSpeech(en)]);
-  for (const [lg, text] of parts) {
-    if (!text) continue;
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = lg === "zh" ? "zh-CN" : "en-US";
-    const v = resolveVoice(lg); if (v) u.voice = v;
-    u.rate = 0.98; u.pitch = 1.0;             // 自然为先，不做卡通化变调
-    u.onstart = () => document.body.classList.add("quill-talking");
-    u.onend = () => document.body.classList.remove("quill-talking");
-    speechSynthesis.speak(u);
-  }
+/* ---------- 云端真人声：千问TTS（CosyVoice 同源引擎），与对话共用同一个 DashScope key ---------- */
+const AI_VOICES = [
+  { id: "Cherry", label: "Cherry · 温暖女声（推荐）" },
+  { id: "Chelsie", label: "Chelsie · 活泼女声" },
+  { id: "Serena", label: "Serena · 温柔女声" },
+  { id: "Ethan", label: "Ethan · 阳光男声" },
+];
+const QWEN_TTS_URL = "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation";
+let curAudio = null;
+const ttsCache = new Map();                       // voice|text → 音频地址（重复台词不重复计费）
+function cloudVoiceReady() { return CFG.aiVoice && aiEnabled(); }
+function stopAllVoice() {
+  if ("speechSynthesis" in window) speechSynthesis.cancel();
+  if (curAudio) { try { curAudio.pause(); } catch (_) {} curAudio = null; }
+  document.body.classList.remove("quill-talking");
 }
-function speakSample(lg) {
+async function fetchTtsUrl(text) {
+  const voice = CFG.aiVoiceName || "Cherry";
+  const key = voice + "|" + text;
+  if (ttsCache.has(key)) return ttsCache.get(key);
+  let url = "";
+  if (proxyReady()) {                              // 走后端代理（密钥在服务器）
+    const r = await fetch(API_BASE + "/api/tts", {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ text, voice }),
+    });
+    if (!r.ok) throw new Error("tts " + r.status);
+    url = (await r.json()).url || "";
+  } else {                                         // 浏览器直连 DashScope（已验证 CORS 开放）
+    const r = await fetch(QWEN_TTS_URL, {
+      method: "POST",
+      headers: { "content-type": "application/json", "authorization": "Bearer " + CFG.apiKey },
+      body: JSON.stringify({ model: "qwen-tts", input: { text: text.slice(0, 500), voice } }),
+    });
+    if (!r.ok) throw new Error("tts " + r.status);
+    const data = await r.json();
+    url = (data && data.output && data.output.audio && data.output.audio.url) || "";
+  }
+  if (!url) throw new Error("no audio url");
+  if (ttsCache.size > 80) ttsCache.delete(ttsCache.keys().next().value);
+  ttsCache.set(key, url);
+  return url;
+}
+async function cloudSpeak(text) {
+  const url = await fetchTtsUrl(text);
+  stopAllVoice();
+  const a = new Audio(url);
+  curAudio = a;
+  a.onplay = () => document.body.classList.add("quill-talking");
+  a.onended = () => document.body.classList.remove("quill-talking");
+  a.onpause = () => document.body.classList.remove("quill-talking");
+  await a.play();
+}
+
+/* 本机系统声（免费兜底） */
+function webSpeak(text) {
   if (!("speechSynthesis" in window)) return;
   speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(lg === "zh" ? "你好呀！我是小羽，很高兴认识你。" : "Hi there! I'm Quill. So nice to meet you!");
+  const lg = CFG.lang === "en" ? "en" : "zh";
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lg === "zh" ? "zh-CN" : "en-US";
+  const v = resolveVoice(lg); if (v) u.voice = v;
+  u.rate = 0.98; u.pitch = 1.0;
+  u.onstart = () => document.body.classList.add("quill-talking");
+  u.onend = () => document.body.classList.remove("quill-talking");
+  speechSynthesis.speak(u);
+}
+function speakNow(zh, en) {
+  const text = stripForSpeech(CFG.lang === "en" ? (en || zh) : zh);
+  if (!text) return;
+  if (cloudVoiceReady()) { cloudSpeak(text).catch(() => webSpeak(text)); return; }
+  webSpeak(text);
+}
+function speakSample(lg, forceCloud) {
+  const text = lg === "zh" ? "你好呀！我是小羽，很高兴认识你。" : "Hi there! I'm Quill. So nice to meet you!";
+  if ((forceCloud || cloudVoiceReady()) && aiEnabled()) { cloudSpeak(text).catch(() => webSpeakSample(lg, text)); return; }
+  webSpeakSample(lg, text);
+}
+function webSpeakSample(lg, text) {
+  if (!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
   u.lang = lg === "zh" ? "zh-CN" : "en-US";
   const v = resolveVoice(lg); if (v) u.voice = v;
   u.rate = 0.98; u.pitch = 1.0;
@@ -231,7 +292,7 @@ document.addEventListener("click", e => {
 /* ===================================================================== */
 /* 真实模型设置（浏览器直连 Claude API；离线时自动回退到规则引擎）          */
 /* ===================================================================== */
-let CFG = { aiMode: false, apiKey: "", model: "", checker: true, lang: "zh", tts: true, voiceZh: "", voiceEn: "", pinParent: "", pinTeacher: "" };
+let CFG = { aiMode: false, apiKey: "", model: "", checker: true, lang: "zh", tts: true, voiceZh: "", voiceEn: "", pinParent: "", pinTeacher: "", aiVoice: true, aiVoiceName: "Cherry" };
 let PROXY = { available: false, hasKey: false, provider: "", models: [], defaultModel: "" };
 /* 代理地址：本地 serve.py 留空（同源）；公开站在 config.js 里填 Cloudflare Worker 地址 */
 const API_BASE = (typeof window !== "undefined" && window.AI_PROXY_URL) ? String(window.AI_PROXY_URL).replace(/\/$/, "") : "";
@@ -621,7 +682,7 @@ function wireLang() {
   const tts = document.getElementById("ttsToggle");
   if (tts) tts.onclick = () => {
     CFG.tts = !CFG.tts; saveCfg();
-    if (!CFG.tts && "speechSynthesis" in window) speechSynthesis.cancel();
+    if (!CFG.tts) stopAllVoice();
     render();
   };
 }
@@ -1637,7 +1698,23 @@ function renderSetup() {
 
     <div class="card">
       <div class="eyebrow">🔊 ${TI("小羽的声音", "Quill's Voice")}</div>
-      <p class="small muted">${TI("如果觉得声音太机器：换一个就好。带 Google / Microsoft / 在线 字样的声音最接近真人（Chrome / Edge 浏览器里最多）。", "If the voice sounds robotic, just switch it. Voices marked Google / Microsoft / Online sound the most human (best in Chrome / Edge).")}</p>
+
+      ${aiEnabled() ? `
+      <div class="cloud-voice">
+        <label class="toggle-row"><input type="checkbox" id="aiVoiceTg" ${CFG.aiVoice ? "checked" : ""}/>
+          <span><b>${TI("云端真人声（推荐）", "Cloud human voice (recommended)")}</b> · ${TI("千问TTS，和对话用同一把钥匙，按字数计费、很便宜；重复台词不重复计费", "Qwen-TTS — same key as chat, pay-per-character (cheap); repeated lines are cached")}</span></label>
+        <div class="opt-row" style="margin-top:6px">
+          <select id="aiVoiceSel" style="flex:1;min-width:180px">
+            ${AI_VOICES.map(v => `<option value="${v.id}" ${CFG.aiVoiceName === v.id ? "selected" : ""}>${v.label}</option>`).join("")}
+          </select>
+          <button class="btn ghost small" id="tryCloud">${TI("试听", "Play")}</button>
+        </div>
+        <p class="small muted" style="margin-top:4px">${TI("中英文同一把嗓子都能说；听不出机器味的那种。", "Each voice speaks both Chinese and English — the not-robotic kind.")}</p>
+      </div>
+      <hr style="border:none;border-top:1.5px dashed var(--line);margin:14px 0"/>
+      ` : `<div class="guard-banner" style="margin-bottom:10px">💡 ${TI("开启下方「真实AI」并填好千问钥匙后，这里会解锁「云端真人声」——和系统机器音是两个档次。", "Switch on Real AI below (with your Qwen key) to unlock cloud human voices — a different league from system voices.")}</div>`}
+
+      <p class="small muted">${TI("以下是本机系统声音（免费兜底）。带 ⭐ 的在线声音相对自然（Chrome / Edge 里最多）。", "Below are free system voices (fallback). ⭐ marks online ones that sound more natural (best in Chrome / Edge).")}</p>
       <div class="field-label">${TI("中文声音", "Chinese voice")}</div>
       <div class="opt-row">
         <select id="voiceZhSel" style="flex:1;min-width:180px">
@@ -1733,8 +1810,12 @@ function renderSetup() {
   if (vz) vz.onchange = () => { CFG.voiceZh = vz.value; saveCfg(); };
   if (ve) ve.onchange = () => { CFG.voiceEn = ve.value; saveCfg(); };
   const tz = document.getElementById("tryZh"), te = document.getElementById("tryEn");
-  if (tz) tz.onclick = () => speakSample("zh");
-  if (te) te.onclick = () => speakSample("en");
+  if (tz) tz.onclick = () => webSpeakSample("zh", "你好呀！我是小羽，很高兴认识你。");
+  if (te) te.onclick = () => webSpeakSample("en", "Hi there! I'm Quill. So nice to meet you!");
+  const avt = document.getElementById("aiVoiceTg"), avs = document.getElementById("aiVoiceSel"), tc = document.getElementById("tryCloud");
+  if (avt) avt.onchange = () => { CFG.aiVoice = avt.checked; saveCfg(); };
+  if (avs) avs.onchange = () => { CFG.aiVoiceName = avs.value; saveCfg(); };
+  if (tc) tc.onclick = () => { const st = tc.textContent; tc.textContent = "…"; speakSample(CFG.lang, true); setTimeout(() => tc.textContent = st, 1500); };
   document.getElementById("startBtn").onclick = () => {
     S = freshSession(setupSel.grade, setupSel.taskId, setupSel.profileId);
     save(); render();

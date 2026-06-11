@@ -11,6 +11,7 @@ const ALLOW_ORIGINS = [
   "http://localhost:3404",
 ];
 const QWEN_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions";
+const QWEN_TTS_URL = "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation";
 const MODELS = [
   { id: "qwen-plus", label: "通义千问 Plus（均衡·推荐）" },
   { id: "qwen-max", label: "通义千问 Max（最强）" },
@@ -42,7 +43,24 @@ export default {
     if (origin && !ALLOW_ORIGINS.includes(origin)) return json({ error: "origin not allowed" }, 403, h);
 
     if (url.pathname === "/api/status" && request.method === "GET") {
-      return json({ proxy: true, has_key: !!env.DASHSCOPE_API_KEY, provider: "通义千问", models: MODELS, default_model: DEFAULT_MODEL }, 200, h);
+      return json({ proxy: true, has_key: !!env.DASHSCOPE_API_KEY, provider: "通义千问", models: MODELS, default_model: DEFAULT_MODEL, tts: !!env.DASHSCOPE_API_KEY }, 200, h);
+    }
+
+    if (url.pathname === "/api/tts" && request.method === "POST") {
+      if (!env.DASHSCOPE_API_KEY) return json({ error: "服务器未配置 DASHSCOPE_API_KEY" }, 503, h);
+      let body;
+      try { body = await request.json(); } catch { return json({ error: "bad json" }, 400, h); }
+      const r = await fetch(QWEN_TTS_URL, {
+        method: "POST",
+        headers: { "content-type": "application/json", authorization: `Bearer ${env.DASHSCOPE_API_KEY}` },
+        body: JSON.stringify({ model: "qwen-tts", input: { text: String(body.text || "").slice(0, 500), voice: body.voice || "Cherry" } }),
+      });
+      if (!r.ok) {
+        const t = await r.text();
+        return new Response(t, { status: r.status, headers: { ...h, "content-type": "application/json; charset=utf-8" } });
+      }
+      const data = await r.json();
+      return json({ url: data?.output?.audio?.url || "" }, 200, h);
     }
 
     if (url.pathname === "/api/claude" && request.method === "POST") {
