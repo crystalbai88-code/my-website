@@ -33,15 +33,34 @@ function pickPraise() { const p = ENRICH.buddy.praise; return p[Math.floor(Math.
 /* ---------- 小羽的声音 · 朗读（Web Speech Synthesis，离线免费） ---------- */
 let VOICES = [];
 function loadVoices() { try { VOICES = speechSynthesis.getVoices(); } catch (_) {} }
-if ("speechSynthesis" in window) { loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
+if ("speechSynthesis" in window) {
+  loadVoices();
+  speechSynthesis.onvoiceschanged = () => {
+    loadVoices();
+    const sel = document.getElementById("voiceZhSel");
+    if (sel && sel.options.length <= 1 && typeof S !== "undefined" && !S) render();
+  };
+}
 function decodeEntities(s) { const d = document.createElement("textarea"); d.innerHTML = String(s || ""); return d.value; }
 function stripForSpeech(s) {
   return decodeEntities(String(s || "").replace(/<[^>]+>/g, " "))
     .replace(/[「」『』✨🎓🦉🔍🎈🧠⚖️🧭🎯✏️🔧🌱💭🧺🔬…—]/g, "").trim();
 }
-function pickVoice(prefix) {
-  const vs = VOICES.filter(v => (v.lang || "").toLowerCase().startsWith(prefix));
-  return vs.find(v => /xiaoxiao|huihui|tingting|meijia|samantha|karen|female/i.test(v.name)) || vs[0] || null;
+/* 选声：①用户挑过的 ②在线高质量音（Google/Microsoft，最接近真人） ③增强本地音 ④兜底 */
+const VOICE_RANK = {
+  zh: [/Xiaoxiao|晓晓/i, /Google.*(普通话|国语|中文)/i, /Yunxi|云希/i, /Tingting|婷婷/i, /Meijia|美佳/i, /Siri/i],
+  en: [/Microsoft (Aria|Jenny|Ana)/i, /Google US English/i, /Samantha/i, /Siri/i, /Karen|Daniel/i],
+};
+function voicesFor(lg) {
+  const pref = lg === "zh" ? "zh" : "en";
+  return VOICES.filter(v => (v.lang || "").toLowerCase().startsWith(pref));
+}
+function resolveVoice(lg) {
+  const chosen = lg === "zh" ? CFG.voiceZh : CFG.voiceEn;
+  const vs = voicesFor(lg);
+  if (chosen) { const hit = vs.find(v => v.name === chosen); if (hit) return hit; }
+  for (const re of VOICE_RANK[lg]) { const hit = vs.find(v => re.test(v.name)); if (hit) return hit; }
+  return vs.find(v => !v.localService) || vs[0] || null;   // 在线音通常更自然
 }
 function speakNow(zh, en) {
   if (!("speechSynthesis" in window)) return;
@@ -53,13 +72,23 @@ function speakNow(zh, en) {
     if (!text) continue;
     const u = new SpeechSynthesisUtterance(text);
     u.lang = lg === "zh" ? "zh-CN" : "en-US";
-    const v = pickVoice(lg); if (v) u.voice = v;
-    u.rate = 0.95; u.pitch = 1.08;            // 慢一点、亮一点，像小羽
+    const v = resolveVoice(lg); if (v) u.voice = v;
+    u.rate = 0.98; u.pitch = 1.0;             // 自然为先，不做卡通化变调
     u.onstart = () => document.body.classList.add("quill-talking");
     u.onend = () => document.body.classList.remove("quill-talking");
     speechSynthesis.speak(u);
   }
 }
+function speakSample(lg) {
+  if (!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(lg === "zh" ? "你好呀！我是小羽，很高兴认识你。" : "Hi there! I'm Quill. So nice to meet you!");
+  u.lang = lg === "zh" ? "zh-CN" : "en-US";
+  const v = resolveVoice(lg); if (v) u.voice = v;
+  u.rate = 0.98; u.pitch = 1.0;
+  speechSynthesis.speak(u);
+}
+
 let lastSpokenKey = null;
 function speakOnce(key, zh, en) {            // 新台词出现时自动读一次（开关可关）
   if (lastSpokenKey === key) return;
@@ -67,24 +96,73 @@ function speakOnce(key, zh, en) {            // 新台词出现时自动读一�
   if (CFG.tts) speakNow(zh, en);
 }
 
-/* ---------- 小羽形象：SVG 动画角色（眨眼/扑翅/说话晃动） ---------- */
+/* ---------- 小羽形象：魔法学院款（立体光影/巫师帽/圆眼镜/学院围巾/星光） ---------- */
+function injectQuillDefs() {
+  if (document.getElementById("quillDefs")) return;
+  const host = document.createElement("div");
+  host.innerHTML = `<svg id="quillDefs" width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <radialGradient id="qgBody" cx="35%" cy="26%" r="90%">
+      <stop offset="0%" stop-color="#73b09b"/><stop offset="52%" stop-color="#4a8273"/><stop offset="100%" stop-color="#315e52"/>
+    </radialGradient>
+    <linearGradient id="qgBelly" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fdf5de"/><stop offset="100%" stop-color="#ecd5a4"/>
+    </linearGradient>
+    <linearGradient id="qgWing" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4a8071"/><stop offset="100%" stop-color="#2c554b"/>
+    </linearGradient>
+    <linearGradient id="qgHat" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#544c8f"/><stop offset="100%" stop-color="#272050"/>
+    </linearGradient>
+  </defs></svg>`;
+  document.body.appendChild(host.firstChild);
+}
 function quillSVG(size = 46, cls = "") {
-  return `<svg viewBox="0 0 100 112" width="${size}" height="${Math.round(size * 1.12)}" class="quill ${cls}" aria-hidden="true">
+  return `<svg viewBox="0 0 100 132" width="${size}" height="${Math.round(size * 1.32)}" class="quill ${cls}" aria-hidden="true">
+    <ellipse cx="50" cy="127" rx="25" ry="4.5" fill="#000" opacity=".10"/>
     <g class="q-bob">
-      <path d="M27,27 L18,9 L37,19 Z" fill="#39685b"/>
-      <path d="M73,27 L82,9 L63,19 Z" fill="#39685b"/>
-      <ellipse cx="50" cy="62" rx="34" ry="40" fill="#4a8273"/>
-      <ellipse cx="50" cy="77" rx="21" ry="23" fill="#f7ecd7"/>
-      <path class="q-wing wl" d="M15,54 Q3,72 16,87 Q25,72 21,54 Z" fill="#39685b"/>
-      <path class="q-wing wr" d="M85,54 Q97,72 84,87 Q75,72 79,54 Z" fill="#39685b"/>
-      <circle cx="37" cy="44" r="14" fill="#fff"/>
-      <circle cx="63" cy="44" r="14" fill="#fff"/>
-      <circle class="q-pupil" cx="39" cy="46" r="6.5" fill="#27323b"/>
-      <circle class="q-pupil" cx="61" cy="46" r="6.5" fill="#27323b"/>
-      <circle class="q-lid" cx="37" cy="44" r="14.6" fill="#4a8273"/>
-      <circle class="q-lid" cx="63" cy="44" r="14.6" fill="#4a8273"/>
-      <path d="M50,52 L43,61 L57,61 Z" fill="#f0a04b"/>
-      <path d="M41,101 q1,7 5,9 M59,101 q-1,7 -5,9" stroke="#f0a04b" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <!-- 星光 -->
+      <path class="q-spark" d="M13,40 l2,5 5,2 -5,2 -2,5 -2,-5 -5,-2 5,-2 Z" fill="#ffd95e"/>
+      <path class="q-spark" style="animation-delay:.9s" d="M89,58 l1.6,4 4,1.6 -4,1.6 -1.6,4 -1.6,-4 -4,-1.6 4,-1.6 Z" fill="#ffd95e"/>
+      <path class="q-spark" style="animation-delay:1.7s" d="M82,10 l1.4,3.6 3.6,1.4 -3.6,1.4 -1.4,3.6 -1.4,-3.6 -3.6,-1.4 3.6,-1.4 Z" fill="#ffd95e"/>
+      <!-- 身体 -->
+      <ellipse cx="50" cy="82" rx="34" ry="40" fill="url(#qgBody)"/>
+      <ellipse cx="50" cy="96" rx="21" ry="23" fill="url(#qgBelly)"/>
+      <path d="M40,86 q10,-6 20,0" stroke="#d9bf8c" stroke-width="1.6" fill="none" opacity=".7"/>
+      <path d="M38,96 q12,-7 24,0" stroke="#d9bf8c" stroke-width="1.6" fill="none" opacity=".7"/>
+      <path class="q-wing wl" d="M15,74 Q3,92 16,107 Q25,92 21,74 Z" fill="url(#qgWing)"/>
+      <path class="q-wing wr" d="M85,74 Q97,92 84,107 Q75,92 79,74 Z" fill="url(#qgWing)"/>
+      <!-- 学院围巾（砖红+金条纹） -->
+      <path d="M25,78 Q50,90 75,78 L75,87 Q50,99 25,87 Z" fill="#8c3a3f"/>
+      <path d="M25,81.4 Q50,93.4 75,81.4 L75,84 Q50,96 25,84 Z" fill="#e0b14b"/>
+      <g transform="rotate(8 64 88)"><rect x="60" y="88" width="11" height="20" rx="4" fill="#8c3a3f"/>
+        <rect x="60" y="93" width="11" height="3.4" fill="#e0b14b"/><rect x="60" y="100" width="11" height="3.4" fill="#e0b14b"/>
+        <path d="M61,108 l2,4 M65.5,108 l0,4.6 M70,108 l-2,4" stroke="#8c3a3f" stroke-width="2" stroke-linecap="round"/></g>
+      <!-- 眼睛（带高光）+ 金边圆眼镜 -->
+      <circle cx="37" cy="62" r="14" fill="#fff"/>
+      <circle cx="63" cy="62" r="14" fill="#fff"/>
+      <circle class="q-pupil" cx="39" cy="64" r="6.5" fill="#27241d"/>
+      <circle class="q-pupil" cx="61" cy="64" r="6.5" fill="#27241d"/>
+      <circle cx="41.2" cy="61.6" r="2.2" fill="#fff"/>
+      <circle cx="63.2" cy="61.6" r="2.2" fill="#fff"/>
+      <circle cx="37.5" cy="67.5" r="1.1" fill="#fff" opacity=".8"/>
+      <circle cx="59.5" cy="67.5" r="1.1" fill="#fff" opacity=".8"/>
+      <circle class="q-lid" cx="37" cy="62" r="14.6" fill="#4a8273"/>
+      <circle class="q-lid" cx="63" cy="62" r="14.6" fill="#4a8273"/>
+      <circle cx="37" cy="62" r="15.6" fill="none" stroke="#caa84e" stroke-width="2.6"/>
+      <circle cx="63" cy="62" r="15.6" fill="none" stroke="#caa84e" stroke-width="2.6"/>
+      <path d="M52.6,62 q-2.6,-3.4 -5.2,0" stroke="#caa84e" stroke-width="2.4" fill="none"/>
+      <path d="M21.4,60 L16,56.5 M78.6,60 L84,56.5" stroke="#caa84e" stroke-width="2.2" stroke-linecap="round"/>
+      <!-- 喙 / 脚 -->
+      <path d="M50,71 L44,79 L56,79 Z" fill="#f0a04b"/>
+      <path d="M50,71 L47,75 L53,75 Z" fill="#ffc078" opacity=".75"/>
+      <path d="M41,121 q1,6 5,8 M59,121 q-1,6 -5,8" stroke="#f0a04b" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <!-- 巫师帽（戴在头顶，护住眨眼动画区之外） -->
+      <ellipse cx="50" cy="44" rx="30" ry="7.5" fill="url(#qgHat)"/>
+      <path d="M29,44 Q40,8 57,4 Q56,14 64,18 Q74,30 71,44 Q50,52 29,44 Z" fill="url(#qgHat)"/>
+      <path d="M57,4 Q63,2 66,7 Q62,9 60,8 Z" fill="#272050"/>
+      <path d="M31,38.6 Q50,46 69,38.6 L69,33.4 Q50,41 31,33.4 Z" fill="#e0b14b"/>
+      <path d="M44,24 l1.8,4.4 4.4,1.8 -4.4,1.8 -1.8,4.4 -1.8,-4.4 -4.4,-1.8 4.4,-1.8 Z" fill="#ffd95e"/>
+      <path d="M34,40 Q36,20 48,10" stroke="#fff" stroke-width="1.6" fill="none" opacity=".22" stroke-linecap="round"/>
     </g>
   </svg>`;
 }
@@ -153,11 +231,14 @@ document.addEventListener("click", e => {
 /* ===================================================================== */
 /* 真实模型设置（浏览器直连 Claude API；离线时自动回退到规则引擎）          */
 /* ===================================================================== */
-let CFG = { aiMode: false, apiKey: "", model: "", checker: true, lang: "both", tts: true };
+let CFG = { aiMode: false, apiKey: "", model: "", checker: true, lang: "zh", tts: true, voiceZh: "", voiceEn: "", pinParent: "", pinTeacher: "" };
 let PROXY = { available: false, hasKey: false, provider: "", models: [], defaultModel: "" };
 /* 代理地址：本地 serve.py 留空（同源）；公开站在 config.js 里填 Cloudflare Worker 地址 */
 const API_BASE = (typeof window !== "undefined" && window.AI_PROXY_URL) ? String(window.AI_PROXY_URL).replace(/\/$/, "") : "";
-function loadCfg() { try { Object.assign(CFG, JSON.parse(localStorage.getItem(CFG_KEY)) || {}); } catch (_) {} }
+function loadCfg() {
+  try { Object.assign(CFG, JSON.parse(localStorage.getItem(CFG_KEY)) || {}); } catch (_) {}
+  if (CFG.lang === "both") CFG.lang = "zh";   // 双语对照模式已下线
+}
 function saveCfg() { localStorage.setItem(CFG_KEY, JSON.stringify(CFG)); }
 function proxyReady() { return PROXY.available && PROXY.hasKey; }
 function aiEnabled() { return !!(CFG.aiMode && (CFG.apiKey || proxyReady())); }
@@ -461,14 +542,69 @@ function render() {
   document.body.classList.toggle("observe-on", !!(S && S.observe));
 
   renderBadges();
+  // 大人区域上锁标记
+  const pt = document.querySelector('.tab[data-tab="parent"]');
+  if (pt) pt.textContent = (GATE.parent ? "" : "🔒") + TI("家长报告", "Parents");
+  const tt = document.querySelector('.tab[data-tab="teacher"]');
+  if (tt) tt.textContent = (GATE.teacher ? "" : "🔒") + TI("教师后台", "Teacher");
   if (activeTab === "course") renderCourse();
   if (activeTab === "work") renderWork();
-  if (activeTab === "parent") renderParent();
-  if (activeTab === "teacher") renderTeacher();
+  if (activeTab === "parent") (GATE.parent ? renderParent() : renderGate("parent"));
+  if (activeTab === "teacher") (GATE.teacher ? renderTeacher() : renderGate("teacher"));
+}
+
+/* ---------- 大人门禁：家长/教师各自独立4位密码（只存本机） ---------- */
+const GATE = { parent: false, teacher: false };
+function renderGate(area) {
+  const wrap = document.getElementById("tab-" + area);
+  const label = area === "parent" ? TI("家长", "Parent") : TI("教师", "Teacher");
+  const pinKey = area === "parent" ? "pinParent" : "pinTeacher";
+  const hasPin = !!CFG[pinKey];
+  footer.innerHTML = "";
+  wrap.innerHTML = `<div class="card gate-card">
+    <div class="eyebrow">🔒 ${label}${TI("专区", " area")}</div>
+    <h2>${hasPin ? TI("请输入 4 位密码", "Enter the 4-digit PIN") : TI("首次使用：设置一个 4 位密码", "First time: set a 4-digit PIN")}</h2>
+    <p class="small muted">${TI("这个区域是给大人看的。密码只保存在这台设备的浏览器里。", "This area is for grown-ups only. The PIN is stored on this device.")}</p>
+    <div class="opt-row" style="align-items:center">
+      <input type="password" id="pin1" inputmode="numeric" maxlength="4" placeholder="••••" class="pin-input"/>
+      ${hasPin ? "" : `<input type="password" id="pin2" inputmode="numeric" maxlength="4" placeholder="${TI("再输一次", "repeat")}" class="pin-input"/>`}
+      <button class="btn small" id="pinGo">${hasPin ? TI("解锁", "Unlock") : TI("设置并进入", "Set & enter")}</button>
+    </div>
+    <p class="small" id="pinMsg" style="color:var(--warn);min-height:1.2em"></p>
+    ${hasPin ? `<button class="btn ghost small" id="pinForgot">${TI("忘记密码？", "Forgot PIN?")}</button>` : ""}
+  </div>`;
+  const msg = (t) => { document.getElementById("pinMsg").textContent = t; };
+  document.getElementById("pinGo").onclick = () => {
+    const v1 = (document.getElementById("pin1").value || "").trim();
+    if (!/^\d{4}$/.test(v1)) { msg(TI("请输入 4 位数字", "Please enter 4 digits")); return; }
+    if (hasPin) {
+      if (v1 === CFG[pinKey]) { GATE[area] = true; render(); }
+      else msg(TI("密码不对，再试试", "Wrong PIN, try again"));
+    } else {
+      const v2 = (document.getElementById("pin2").value || "").trim();
+      if (v1 !== v2) { msg(TI("两次输入不一致", "The two entries don't match")); return; }
+      CFG[pinKey] = v1; saveCfg(); GATE[area] = true; render();
+    }
+  };
+  const fg = document.getElementById("pinForgot");
+  if (fg) fg.onclick = () => {
+    const a = 11 + Math.floor(Math.random() * 14), b = 4 + Math.floor(Math.random() * 6);
+    const ans = window.prompt(TI(`请大人计算：${a} × ${b} = ?（答对后可重设密码）`, `Grown-up check: ${a} × ${b} = ?`));
+    if (ans !== null && +ans === a * b) { CFG[pinKey] = ""; saveCfg(); renderGate(area); }
+    else if (ans !== null) msg(TI("算错啦，请再点一次重试", "Not quite — tap again to retry"));
+  };
+}
+function grownBar(area) {
+  return `<div class="grown-bar"><span class="small muted">👀 ${TI("大人区域（孩子端已上锁）", "Grown-ups area (locked for kids)")}</span>
+    <button class="btn ghost small" id="lockArea" data-area="${area}">🔒 ${TI("锁上", "Lock")}</button></div>`;
+}
+function wireLockBar() {
+  const b = document.getElementById("lockArea");
+  if (b) b.onclick = () => { GATE[b.dataset.area] = false; activeTab = "course"; render(); };
 }
 
 function renderBadges() {
-  const langBtns = `<span class="lang-toggle">${[["zh", "中"], ["en", "EN"], ["both", "双语"]]
+  const langBtns = `<span class="lang-toggle">${[["zh", "中文"], ["en", "EN"]]
     .map(([v, l]) => `<button class="lang-btn ${CFG.lang === v ? "on" : ""}" data-lang="${v}">${l}</button>`).join("")}
     <button class="lang-btn tts ${CFG.tts ? "on" : ""}" id="ttsToggle" title="${TI("小羽朗读开/关", "Quill reads aloud on/off")}">${CFG.tts ? "🔊" : "🔇"}</button></span>`;
   if (!S) { badges.innerHTML = langBtns; wireLang(); return; }
@@ -1500,6 +1636,28 @@ function renderSetup() {
     </div>
 
     <div class="card">
+      <div class="eyebrow">🔊 ${TI("小羽的声音", "Quill's Voice")}</div>
+      <p class="small muted">${TI("如果觉得声音太机器：换一个就好。带 Google / Microsoft / 在线 字样的声音最接近真人（Chrome / Edge 浏览器里最多）。", "If the voice sounds robotic, just switch it. Voices marked Google / Microsoft / Online sound the most human (best in Chrome / Edge).")}</p>
+      <div class="field-label">${TI("中文声音", "Chinese voice")}</div>
+      <div class="opt-row">
+        <select id="voiceZhSel" style="flex:1;min-width:180px">
+          <option value="">${TI("自动选最佳", "Auto (best available)")}</option>
+          ${voicesFor("zh").map(v => `<option value="${escapeAttr(v.name)}" ${CFG.voiceZh === v.name ? "selected" : ""}>${escapeHtml(v.name)}${v.localService ? "" : " ⭐"}</option>`).join("")}
+        </select>
+        <button class="btn ghost small" id="tryZh">${TI("试听", "Play")}</button>
+      </div>
+      <div class="field-label" style="margin-top:10px">English voice</div>
+      <div class="opt-row">
+        <select id="voiceEnSel" style="flex:1;min-width:180px">
+          <option value="">${TI("自动选最佳", "Auto (best available)")}</option>
+          ${voicesFor("en").map(v => `<option value="${escapeAttr(v.name)}" ${CFG.voiceEn === v.name ? "selected" : ""}>${escapeHtml(v.name)}${v.localService ? "" : " ⭐"}</option>`).join("")}
+        </select>
+        <button class="btn ghost small" id="tryEn">${TI("试听", "Play")}</button>
+      </div>
+      <p class="small muted" style="margin-top:6px">⭐ = ${TI("在线高质量声音", "online high-quality voice")}</p>
+    </div>
+
+    <div class="card">
       <div class="eyebrow">AI 陪练模式</div>
       <h2 style="font-size:1rem">${aiEnabled() ? "🟢 已接入真实模型" : "⚪ 离线规则模式"}</h2>
       <p class="small muted">离线模式用规则引擎提问（够用但较固定）。开启真实模型后，AI 会<strong>真正读懂孩子这一句</strong>再生成针对性的追问；所有护栏（一次一问、不代写、只用孩子原话）不变。</p>
@@ -1571,6 +1729,12 @@ function renderSetup() {
   host.querySelectorAll("[data-type]").forEach(b => b.onclick = () => { setupSel.type = b.dataset.type; setupSel.taskId = null; renderSetup(); });
   host.querySelectorAll("[data-task]").forEach(b => b.onclick = () => { setupSel.taskId = b.dataset.task; renderSetup(); });
   host.querySelectorAll("[data-prof]").forEach(b => b.onclick = () => { setupSel.profileId = b.dataset.prof; renderSetup(); });
+  const vz = document.getElementById("voiceZhSel"), ve = document.getElementById("voiceEnSel");
+  if (vz) vz.onchange = () => { CFG.voiceZh = vz.value; saveCfg(); };
+  if (ve) ve.onchange = () => { CFG.voiceEn = ve.value; saveCfg(); };
+  const tz = document.getElementById("tryZh"), te = document.getElementById("tryEn");
+  if (tz) tz.onclick = () => speakSample("zh");
+  if (te) te.onclick = () => speakSample("en");
   document.getElementById("startBtn").onclick = () => {
     S = freshSession(setupSel.grade, setupSel.taskId, setupSel.profileId);
     save(); render();
@@ -1616,10 +1780,11 @@ function renderWork() {
 
 function renderParent() {
   const wrap = document.getElementById("tab-parent");
-  if (!S) { wrap.innerHTML = `<div class="card"><p class="muted">还没有数据。</p></div>`; footer.innerHTML = ""; return; }
+  if (!S) { wrap.innerHTML = `${grownBar("parent")}<div class="card"><p class="muted">还没有数据。孩子完成一次表达后，这里会出现成长报告。</p></div>`; wireLockBar(); footer.innerHTML = ""; return; }
   const r = rubricForGrade(S.grade);
   const turns = Object.values(S.stageData).reduce((n, d) => n + (d.turns ? d.turns.length : 0), 0);
   wrap.innerHTML = `
+    ${grownBar("parent")}
     <div class="card">
       <div class="eyebrow">家长报告</div>
       <h2>📈 孩子这次表达的成长</h2>
@@ -1642,6 +1807,7 @@ function renderParent() {
       <div class="parent-note">建议陪伴方式：请孩子读一段他最喜欢的句子给你听，并问问他「这一句你是怎么想出来的」。比起纠错，先肯定他自己找到的细节。</div>
     </div>
   `;
+  wireLockBar();
   footer.innerHTML = "";
 }
 
@@ -1677,9 +1843,10 @@ function renderTeacher() {
   const wrap = document.getElementById("tab-teacher");
   const store = researchStore();
   if (!S) {
-    wrap.innerHTML = `<div class="card"><div class="eyebrow">教师后台</div>
+    wrap.innerHTML = `${grownBar("teacher")}<div class="card"><div class="eyebrow">教师后台</div>
       <p class="muted">还没有进行中的会话。去「课程」开始一次表达后，这里会记录每一句追问的效果。</p></div>
       ${aggregateCard(store)}`;
+    wireLockBar();
     wireAggregate(store);
     footer.innerHTML = "";
     return;
@@ -1688,6 +1855,7 @@ function renderTeacher() {
   const tagged = turns.filter(t => t.teacher_tag).length;
 
   wrap.innerHTML = `
+    ${grownBar("teacher")}
     <div class="card">
       <div class="eyebrow">教师后台 · 本次会话</div>
       <h2>👩‍🏫 首轮测试观察</h2>
@@ -1737,6 +1905,7 @@ function renderTeacher() {
     ${aggregateCard(store)}
   `;
 
+  wireLockBar();
   document.getElementById("obsToggle").onclick = e => { S.observe = e.target.checked; save(); render(); };
   wrap.querySelectorAll(".rt-tags .chip").forEach(b => b.onclick = () => {
     const t = S.research.turns[+b.dataset.i];
@@ -1867,6 +2036,7 @@ document.getElementById("tabbar").addEventListener("click", e => {
 });
 loadCfg();
 load();
+injectQuillDefs();
 const _bm = document.querySelector(".brand-mark");
 if (_bm) { _bm.innerHTML = quillSVG(36); _bm.classList.add("brand-quill"); }
 render();

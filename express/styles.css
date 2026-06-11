@@ -517,3 +517,21 @@ body.quill-talking .quill .q-bob { animation-duration: .9s; }
   .map-node { width: 44px; height: 44px; font-size: 19px; }
   .hero-buddy { flex-direction: row; }
 }
+
+/* —— 魔法学院小羽补充 —— */
+.q-spark { animation: qspark 2.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes qspark { 0%,100% { opacity: .25; transform: scale(.7) rotate(0deg); } 50% { opacity: 1; transform: scale(1.15) rotate(18deg); } }
+.coach .avatar { width: 50px; height: 64px; }
+.map-quill { top: -46px; }
+
+/* —— 大人门禁 —— */
+.gate-card { text-align: left; }
+.pin-input {
+  width: 96px; text-align: center; font-size: 1.25rem; letter-spacing: .35em;
+  border-radius: 12px; flex: 0 0 auto;
+}
+.grown-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(255,255,255,.7); border: 1.5px dashed var(--line);
+  border-radius: 14px; padding: 8px 14px; margin-top: 14px;
+}
