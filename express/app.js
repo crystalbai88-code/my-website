@@ -448,8 +448,9 @@ const QWEN_DIRECT_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/
    1) 后端代理（密钥在服务器，最安全）；
    2) 浏览器直连「通义千问」（DashScope 允许跨域；key 只在本机浏览器）；
    3) 浏览器直连 Claude（遗留）。 */
-async function callClaudeJSON(systemText, userText, schema, maxTokens = 400) {
+async function callClaudeJSON(systemText, userOrMessages, schema, maxTokens = 400) {
   const model = activeModel();
+  const msgs = Array.isArray(userOrMessages) ? userOrMessages : [{ role: "user", content: userOrMessages }];
 
   // 1) 后端代理
   if (proxyReady()) {
@@ -457,7 +458,7 @@ async function callClaudeJSON(systemText, userText, schema, maxTokens = 400) {
       method: "POST", headers: { "content-type": "application/json" },
       body: JSON.stringify({ model, max_tokens: maxTokens,
         output_config: { effort: "low", format: { type: "json_schema", schema } },
-        system: systemText, messages: [{ role: "user", content: userText }] }),
+        system: systemText, messages: msgs }),
     });
     if (!res.ok) throw new Error(`API ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
     const data = await res.json();
@@ -470,8 +471,8 @@ async function callClaudeJSON(systemText, userText, schema, maxTokens = 400) {
       method: "POST",
       headers: { "content-type": "application/json", "authorization": "Bearer " + CFG.apiKey },
       body: JSON.stringify({ model,
-        messages: [{ role: "system", content: systemText }, { role: "user", content: userText }],
-        max_tokens: maxTokens, temperature: 0.3, response_format: { type: "json_object" } }),
+        messages: [{ role: "system", content: systemText }, ...msgs],
+        max_tokens: maxTokens, temperature: 0.55, response_format: { type: "json_object" } }),
     });
     if (!res.ok) throw new Error(`千问 ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
     const data = await res.json();
@@ -485,7 +486,7 @@ async function callClaudeJSON(systemText, userText, schema, maxTokens = 400) {
       "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
     body: JSON.stringify({ model, max_tokens: maxTokens,
       output_config: { effort: "low", format: { type: "json_schema", schema } },
-      system: systemText, messages: [{ role: "user", content: userText }] }),
+      system: systemText, messages: msgs }),
   });
   if (!res.ok) throw new Error(`API ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
   const data = await res.json();
@@ -518,7 +519,97 @@ const CHECK_SCHEMA = {
   required: ["approved", "violation_codes"],
 };
 
-/* 教学模型：读懂孩子这一句，生成一个真正针对它的追问 */
+/* ===================================================================== */
+/* 访谈 Agent：小羽的真实对话内核                                          */
+/* 设计原则：AI不急着要"答案"，而是让孩子多看见一点自己的经历。              */
+/* 目标体验：「原来这件事可以写」「原来那个动作很重要」「原来我有想法」。     */
+/* 知识库不再驱动流程，而是压缩成"教师手册"挂在 agent 身后当参考。          */
+/* ===================================================================== */
+
+/* 把15类卡点压缩成教师手册（一次构建，进系统提示） */
+let KB_DIGEST = null;
+function kbDigest() {
+  if (KB_DIGEST) return KB_DIGEST;
+  const lines = KB.difficulties.difficulties.map(d => {
+    const eg = (KB.strategies.strategies.find(x => x.difficulty_id === d.difficulty_id) || {}).prompt || "";
+    return `${d.difficulty_id} ${d.name}→${d.teaching_goal}（例：${eg}）`;
+  });
+  KB_DIGEST = lines.join("\n");
+  return KB_DIGEST;
+}
+
+const PHASE_GOALS = {
+  diagnose: "帮孩子找到一件他真正经历过、愿意讲的小事",
+  recall: "把那件事的画面唤回来：人物、地点、最初一秒",
+  detail: "放大最重要的瞬间：动作、声音、身体反应、念头",
+  structure: "和孩子一起理出 开始→变化→结果 的脉络",
+  point: "让孩子自己说出这件事里他最想让别人记住的那句话",
+};
+
+function interviewSystem() {
+  const task = taskById(S.taskId);
+  const band = S.grade <= 4 ? "三四年级：短句、具体、必要时给2-3个选项" : "五六年级：可以更开放，可请他说说理由";
+  return `你是「小羽」，一只爱听故事的小猫头鹰，是一名儿童表达访谈者。对面是一个${S.grade}年级的孩子（${band}）。
+
+你的使命不是教写作，而是访谈：帮孩子把心里和经历里的东西说出来。你从不急着要"答案"，而是让孩子每说一轮，都多看见一点自己的经历。你要让孩子心里冒出三种感觉：
+「原来这件事可以写。」「原来我刚才那个动作很重要。」「原来我不是没想法，只是不知道从哪里开始说。」
+
+【访谈方式】
+1. 先接住，再提问：每轮先用孩子的原词回应他刚说的（复述要点/真诚的惊讶/会心），让他确信你真的听见了；然后最多问一个小问题。
+2. 问小不问大：问看得见摸得着的（"你的手当时在做什么""那一刻你听见了什么"），不问抽象的（"你有什么感受"），不连续问"为什么"。
+3. 看见价值就说出来：孩子说出具体的动作、声音、念头时，明确告诉他"这个细节特别值钱"，并把那句原话摘进 worth_keeping。
+4. 允许"不知道"：孩子说不知道/不记得时，绝不重复同一个问题，换一个更小的入口或给两三个方向让他挑。
+5. 跑偏先跟一步：孩子聊到别处，先回应一句表示听见了，再用一个问题轻轻带回这次的故事。
+6. 不评判、不纠正、不教大道理、不催、不空夸（"真棒"无效，指出具体哪里好才有效）。
+7. 语气温暖、好奇、有点孩子气，像同桌不像老师。每轮不超过70个字（不含英文）。
+
+【铁律】绝不替孩子写句子或示范范文；绝不编造他没说过的经历；一轮最多一个问题；不问隐私（姓名/学校/住址/电话）；孩子提到被伤害或危险，温和建议告诉信任的大人并把 safety_flag 设为 "harm"。
+
+【这次访谈】主题：《${task.title}》——${task.task_brief}。访谈按阶段推进，阶段目标会在对话里以【课程提示】告诉你。当你判断当前阶段目标已达到，把 ready_for_next 设为 true（同时照常回应孩子）。
+
+【教师手册·提问灵感（参考，不必照搬）】
+${kbDigest()}
+
+【输出】只输出 JSON：{"say":"对孩子说的话(中文)","say_en":"同义的自然英文","worth_keeping":"孩子话里最值钱的一句原话摘录,无则null","difficulty_guess":"D01-D15或null","ready_for_next":false,"safety_flag":"none"}`;
+}
+
+const INTERVIEW_SCHEMA = {
+  type: "object", additionalProperties: false,
+  properties: {
+    say: { type: "string" },
+    say_en: { type: "string" },
+    worth_keeping: { type: ["string", "null"] },
+    difficulty_guess: { type: ["string", "null"] },
+    ready_for_next: { type: "boolean" },
+    safety_flag: { type: "string", enum: ["none", "privacy", "harm", "other"] },
+  },
+  required: ["say", "say_en", "ready_for_next", "safety_flag"],
+};
+
+/* 一轮访谈：带全程记忆。ans 为 null 表示请小羽开场 */
+async function agentTurn(stage, ans) {
+  if (!S.chat) S.chat = [];
+  if (!S.pendingNotes) S.pendingNotes = [];
+  // 阶段切换 → 作为课程提示并入下一条用户消息（不打断对话流）
+  if (S.lastPhase !== stage.id) {
+    S.pendingNotes.push(`【课程提示】进入新阶段「${stage.name}」，目标：${PHASE_GOALS[stage.id] || stage.goalZh || ""}。请自然衔接，不要宣布"我们进入了新阶段"。`);
+    S.lastPhase = stage.id;
+  }
+  const notes = S.pendingNotes.length ? S.pendingNotes.join("\n") + "\n" : "";
+  S.pendingNotes = [];
+  const userContent = ans == null
+    ? notes + "【课程提示】访谈开始。请用一两句话亲切开场，并问出第一个小问题。"
+    : notes + ans;
+  S.chat.push({ role: "user", content: userContent });
+
+  const out = await callClaudeJSON(interviewSystem(), S.chat, INTERVIEW_SCHEMA, 500);
+  S.chat.push({ role: "assistant", content: JSON.stringify(out) });
+  if (S.chat.length > 60) S.chat.splice(0, S.chat.length - 60);   // 防极端超长
+  save();
+  return out;
+}
+
+/* 旧的单轮教学调用（已由访谈 agent 取代，离线规则引擎仍走 submitQA） */
 async function aiTeach(stage, ans) {
   const cs = controllerStage(stage.id);
   const grade = S.grade;
@@ -574,6 +665,9 @@ function freshSession(grade, taskId, profileId) {
     draftBody: "",
     revisionLog: [],         // {dimension, dimName, before, after, why}
     feathers: 0,             // 收集的羽毛（游戏奖励）
+    chat: [],                // 访谈全程对话（agent 记忆）
+    pendingNotes: [],        // 待并入下一轮的课程提示
+    lastPhase: null,
     reflection: [],          // {q, a}
     growth,
     growthBefore: { ...growth },  // rubric_before 快照
@@ -586,7 +680,15 @@ function freshSession(grade, taskId, profileId) {
 
 function save() { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }
 function load() {
-  try { const r = JSON.parse(localStorage.getItem(SAVE_KEY)); if (r && r.grade) { S = r; if (S.feathers == null) S.feathers = 0; } }
+  try {
+    const r = JSON.parse(localStorage.getItem(SAVE_KEY));
+    if (r && r.grade) {
+      S = r;
+      if (S.feathers == null) S.feathers = 0;
+      if (!S.chat) S.chat = [];
+      if (!S.pendingNotes) S.pendingNotes = [];
+    }
+  }
   catch (_) { localStorage.removeItem(SAVE_KEY); }
 }
 function bump(dim, to) { if (S.growth[dim] < to) { S.growth[dim] = to; } }
@@ -752,7 +854,7 @@ function footerNav({ canBack = true, canNext = true, nextLabel = null, nextEnabl
 
 function advance() {
   if (S.stageIndex < STAGES.length - 1) {
-    S.stageIndex++; save();
+    S.stageIndex++; S.agentReady = false; save();
     confetti(); sfx("tada"); awardFeather(2, { silent: true });   // 过站庆祝 + 收羽毛
     render(); window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -812,27 +914,42 @@ const MOOD_EMOJIS = ["😄", "😢", "😨", "😡", "😳", "🤔", "😮", "�
 
 function renderQA(stage) {
   const d = stageData(stage.id);
-  if (!d.currentQ) { const o = openerFor(stage); d.currentQ = o.zh; d.currentQEn = o.en; }
+  const agentMode = aiEnabled();
+  if (!agentMode && !d.currentQ) { const o = openerFor(stage); d.currentQ = o.zh; d.currentQEn = o.en; }
+
+  // 真实访谈模式：小羽主动开场（只在整场对话还没开始时）
+  if (agentMode && (!S.chat || S.chat.length === 0) && !d.thinking) {
+    d.thinking = true;
+    setTimeout(() => runAgent(stage, null), 0);
+  }
 
   const showScaffold = (stage.id === "diagnose" || stage.id === "recall") && d.shortStreak >= 2 && S.grade <= 4;
-  const showAngles = d.code === "D04";
+  const showAngles = !agentMode && d.code === "D04";
   const showMood = stage.id === "recall" && d.turns.length === 0;     // 情绪表情入口
   const showBuckets = stage.id === "structure" && S.evidence.length >= 2;  // 故事地图分桶
+
+  const typing = `<div class="coach"><div class="avatar">${quillSVG(46)}</div>
+    <div class="bubble typing"><span class="buddy-tag">${buddyName()}</span><i class="tdot"></i><i class="tdot"></i><i class="tdot"></i></div></div>`;
 
   host.innerHTML = `
     <div class="card">
       ${stageHead(stage)}
 
-      ${d.turns.map(t => `
-        ${bubble(escapeHtml(t.q), t.qEn ? escapeHtml(t.qEn) : null)}
-        <div class="kid-line"><span class="kid-bubble">${escapeHtml(t.a)}</span></div>`).join("")}
-
-      <div class="coach ${d.refuse ? "refuse" : ""}">
-        <div class="avatar">${quillSVG(46)}</div>
-        <div class="bubble"><span class="buddy-tag">${buddyName()}</span>${T(escapeHtml(d.currentQ), d.currentQEn ? escapeHtml(d.currentQEn) : null)}
-          ${d.code ? `<span class="why">${TI("（我在帮你：" + difficulty(d.code).teaching_goal + "）", "")}</span>` : ""}
-        </div>
-      </div>
+      ${agentMode
+        ? chatDisplay().map(it => it.who === "kid"
+            ? `<div class="kid-line"><span class="kid-bubble">${escapeHtml(it.text)}</span></div>`
+            : bubble(escapeHtml(it.zh), it.en ? escapeHtml(it.en) : null)).join("")
+          + (d.thinking ? typing : "")
+          + (d.guard && d.refuse ? bubble(escapeHtml(d.guard)) : "")
+        : `${d.turns.map(t => `
+            ${bubble(escapeHtml(t.q || ""), t.qEn ? escapeHtml(t.qEn) : null)}
+            <div class="kid-line"><span class="kid-bubble">${escapeHtml(t.a)}</span></div>`).join("")}
+          <div class="coach ${d.refuse ? "refuse" : ""}">
+            <div class="avatar">${quillSVG(46)}</div>
+            <div class="bubble"><span class="buddy-tag">${buddyName()}</span>${T(escapeHtml(d.currentQ || ""), d.currentQEn ? escapeHtml(d.currentQEn) : null)}
+              ${d.code ? `<span class="why">${TI("（我在帮你：" + difficulty(d.code).teaching_goal + "）", "")}</span>` : ""}
+            </div>
+          </div>`}
 
       ${showBuckets ? bucketsHtml() : ""}
 
@@ -855,7 +972,7 @@ function renderQA(stage) {
         ${d.pool.length > 1 && !d.thinking ? `<button class="btn ghost small" id="qaSwitch">${TI("换种问法", "Ask differently")}</button>` : ""}
         ${aiEnabled() ? '<span class="badge accent" style="align-self:center">🟢 真实AI</span>' : ""}
       </div>
-      ${d.guard ? `<div class="guard-banner">${d.guard}</div>` : ""}
+      ${d.guard && !(agentMode && d.refuse) ? `<div class="guard-banner">${d.guard}</div>` : ""}
       ${!aiEnabled() ? `<p class="small muted offline-hint">💡 ${TI("现在是离线模式，问题来自题库。想让小羽真正听懂每句话，请爸爸妈妈在开始页打开「真实AI」。", "Offline mode: questions come from a library. To let Quill truly understand you, ask a grown-up to switch on Real AI on the start page.")}</p>` : ""}
     </div>
     ${teacherStripHtml(stage)}
@@ -879,7 +996,7 @@ function renderQA(stage) {
   if (S.observe) wireTeacherStrip();
 
   footerNav({
-    nextEnabled: d.turns.length > 0,
+    nextEnabled: agentMode ? (d.turns.length > 0 && (S.agentReady || d.turns.length >= 2)) : d.turns.length > 0,
     nextLabel: S.observe ? TI("教师同意，进入下一站", "Teacher approves, next stop") + " →"
       : (d.satisfied ? TI("做得好，下一站", "Nice! Next stop") + " →" : TI("我说完了，下一站", "Done, next stop") + " →"),
     onNext: () => { if (S.observe) S.research.approvals[stage.id] = true; grantQAGrowth(stage, d); advance(); },
@@ -956,7 +1073,21 @@ function redact(text) {
     .trim();
 }
 
-/* AI 模式：真实模型读懂孩子的回答，生成针对性的下一个追问 */
+/* 把访谈记忆整理成可显示的气泡列表（滤掉课程提示） */
+function chatDisplay() {
+  const items = [];
+  for (const m of (S.chat || [])) {
+    if (m.role === "user") {
+      const txt = m.content.split("\n").filter(l => !l.startsWith("【课程")).join("\n").trim();
+      if (txt) items.push({ who: "kid", text: txt });
+    } else {
+      try { const o = JSON.parse(m.content); if (o.say) items.push({ who: "quill", zh: o.say, en: o.say_en }); } catch (_) {}
+    }
+  }
+  return items;
+}
+
+/* AI 模式 = 真实访谈：小羽带着全程记忆对话 */
 async function submitQAAI(stage) {
   const d = stageData(stage.id);
   const ta = document.getElementById("qaInput");
@@ -971,41 +1102,44 @@ async function submitQAAI(stage) {
   }
   if (!ans) { d.guard = TI("先随便说一句也行，哪怕只有几个字。", "Even a few words count — just say anything!"); save(); renderQA(stage); return; }
 
-  d.turns.push({ q: d.currentQ, qEn: d.currentQEn, a: ans });
+  d.turns.push({ a: ans });                       // 仅作门槛/成长统计
   addEvidence(stage.name, ans);
   if (stage.id === "diagnose" && !S.storySeed && len(ans) >= 6 && !isVague(ans)) S.storySeed = ans;
   awardFeather(1);
-  if (len(ans) < 10) d.shortStreak++; else d.shortStreak = 0;
+  if (ta) ta.value = "";
   d.thinking = true; save(); renderQA(stage);
+  await runAgent(stage, ans);
+}
 
+/* 调一轮访谈 agent 并落地结果（ans=null 表示请小羽开场） */
+async function runAgent(stage, ans) {
+  const d = stageData(stage.id);
   try {
-    const out = await aiTeach(stage, ans);
+    const out = await agentTurn(stage, ans);
     d.thinking = false;
-    if (out._rejected) {                           // 质检未通过 → 回退到规则引擎的安全追问
-      fallbackQuestion(stage, ans);
-      d.guard = "（这一句我换种问法）";
-    } else {
-      d.code = out.diagnosis_code || null;
-      d.curDiag = out.diagnosis_code || null;
-      d.curStratId = null;                          // 由 AI 生成，非固定策略
-      d.pool = [];
-      d.currentQ = out.message_to_child;
-      d.currentQEn = out.message_to_child_en || null;
-      d.satisfied = !!out.ready_to_advance;
-      if (out.safety_flag && out.safety_flag !== "none") d.guard = "（已注意安全/隐私，已转回写作任务）";
+    d.currentQ = out.say; d.currentQEn = out.say_en || null;
+    d.code = out.difficulty_guess || null; d.curDiag = d.code; d.curStratId = null; d.pool = [];
+    S.agentReady = !!out.ready_for_next;
+    d.satisfied = S.agentReady;
+    if (out.worth_keeping && len(out.worth_keeping) >= 3) {   // 小羽点亮的"值钱细节"
+      addEvidence("💎", out.worth_keeping);
+      awardFeather(1, { silent: true });
     }
+    if (out.safety_flag && out.safety_flag !== "none") d.guard = "（小羽提醒：这样的事，可以先告诉信任的大人。）";
     S.research.turns.push({
-      stage: stage.id, strategy_id: null, diagnosis_code: d.curDiag,
-      question: d.currentQ, answer_redacted: redact(ans), answer_len: len(ans),
-      auto_outcome: len(ans) >= 12 && !isVague(ans) ? "drew_content" : "partial",
-      source: "ai", teacher_tag: null, diagnosis_ok: null,
+      stage: stage.id, strategy_id: null, diagnosis_code: d.code,
+      question: out.say, answer_redacted: redact(ans || ""), answer_len: len(ans || ""),
+      auto_outcome: "drew_content", source: "agent", teacher_tag: null, diagnosis_ok: null,
     });
   } catch (e) {
     d.thinking = false;
-    fallbackQuestion(stage, ans);
-    d.guard = "（连不上真实模型，已切回离线提问：" + (e.message || "网络错误") + "）";
+    if (ans != null) {
+      fallbackQuestion(stage, ans);
+      d.guard = "（小羽走神了一下，先用备用问题：" + (e.message || "网络错误") + "）";
+    } else {
+      const o = openerFor(stage); d.currentQ = o.zh; d.currentQEn = o.en;
+    }
   }
-  if (d.turns.length >= 4) d.satisfied = true;
   save(); renderQA(stage);
 }
 
@@ -1156,6 +1290,8 @@ function renderWarmup(stage) {
       const v = val("wuInput"); if (!v) return;
       const p = pickPraise();
       d.turns.push({ a: v, react: { zh: p.zh + " 脑洞开好了，我们出发！", en: p.en + " Brain warmed up — let's go!" } });
+      if (!S.pendingNotes) S.pendingNotes = [];
+      S.pendingNotes.push(`【课程记录】暖身问题「${d.w.zh}」孩子答：「${v}」`);
       awardFeather(1);
       save(); renderWarmup(stage);
     };
@@ -1229,6 +1365,8 @@ function renderKnowledge(stage) {
       d.turns.push({ a: v });
       awardFeather(2);
       bump("material", 2); bump("point", 2);
+      if (!S.pendingNotes) S.pendingNotes = [];
+      S.pendingNotes.push(`【课程记录】孩子读了奇想卡《${card.title.zh}》，对"${card.think.zh}"的想法：「${v}」`);
       save(); renderKnowledge(stage);
     };
   }
@@ -1296,12 +1434,15 @@ function renderDebate(stage) {
     document.getElementById("dbSend").onclick = async () => {
       const v = val("dbInput"); if (!v) return;
       awardFeather(2);
+      if (!S.pendingNotes) S.pendingNotes = [];
       if (step === 0) {
+        S.pendingNotes.push(`【课程记录】思辨题「${db.claim.zh}」孩子立场${d.stance}/100，理由：「${v}」`);
         const counter = d.stance >= 50 ? db.counterYes : db.counterNo;
         d.turns.push({ a: v, counter });
         d.step = 1;
         if (taskById(S.taskId).type === "opinion") addEvidence("思辨", v);
       } else {
+        S.pendingNotes.push(`【课程记录】被反驳后孩子回应：「${v}」`);
         d.turns.push({ a: v });
         d.step = 2;
         bump("point", 3);
@@ -1369,7 +1510,12 @@ function renderInput(stage) {
   bindEvidenceBoard();
   document.getElementById("inSave").onclick = () => {
     const v = (document.getElementById("inInput").value || "").trim();
-    if (v) { addEvidence("观察发现", v); awardFeather(1); bump("detail", Math.max(2, S.growth.detail)); save(); }
+    if (v) {
+      addEvidence("观察发现", v); awardFeather(1); bump("detail", Math.max(2, S.growth.detail));
+      if (!S.pendingNotes) S.pendingNotes = [];
+      S.pendingNotes.push(`【课程记录】孩子完成观察任务「${d.pick.title}」，发现：「${v}」`);
+      save();
+    }
     render();
   };
   footerNav({ nextLabel: TI("线索够了，下一站", "Clues collected! Next") + " →", onNext: () => advance() });

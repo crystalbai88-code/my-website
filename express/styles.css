@@ -548,3 +548,14 @@ body.quill-talking .quill .q-bob { animation-duration: .9s; }
   padding: 8px 14px; margin: 2px 0 14px;
   font-size: .88rem; font-weight: 700; color: #8a6a14;
 }
+
+/* 小羽思考中的打字指示 */
+.bubble.typing .tdot {
+  display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--brand); margin: 0 2px; opacity: .3;
+  animation: tblink 1.2s infinite;
+}
+.bubble.typing .tdot:nth-child(3) { animation-delay: .2s; }
+.bubble.typing .tdot:nth-child(4) { animation-delay: .4s; }
+@keyframes tblink { 0%,100% { opacity: .25; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-3px); } }
+.evi-item .tag:first-child:is(.gem) { color: #b5611f; }
