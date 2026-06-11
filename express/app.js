@@ -29,16 +29,58 @@ function TI(zh, en) {                      // 行内：双语时用 · 连接（
 }
 function buddyName() { return TI(ENRICH.buddy.name.zh, ENRICH.buddy.name.en); }
 function pickPraise() { const p = ENRICH.buddy.praise; return p[Math.floor(Math.random() * p.length)]; }
-/* 伙伴气泡（小羽）：q 为 {zh,en} 或纯字符串 */
-function bubble(zh, en, extra) {
-  return `<div class="coach"><div class="avatar">🦉</div>
-    <div class="bubble"><span class="buddy-tag">${buddyName()}</span>${typeof zh === "string" ? T(zh, en) : ""}${extra || ""}</div></div>`;
+
+/* ---------- 小羽的声音 · 朗读（Web Speech Synthesis，离线免费） ---------- */
+let VOICES = [];
+function loadVoices() { try { VOICES = speechSynthesis.getVoices(); } catch (_) {} }
+if ("speechSynthesis" in window) { loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
+function decodeEntities(s) { const d = document.createElement("textarea"); d.innerHTML = String(s || ""); return d.value; }
+function stripForSpeech(s) {
+  return decodeEntities(String(s || "").replace(/<[^>]+>/g, " "))
+    .replace(/[「」『』✨🎓🦉🔍🎈🧠⚖️🧭🎯✏️🔧🌱💭🧺🔬…—]/g, "").trim();
 }
+function pickVoice(prefix) {
+  const vs = VOICES.filter(v => (v.lang || "").toLowerCase().startsWith(prefix));
+  return vs.find(v => /xiaoxiao|huihui|tingting|meijia|samantha|karen|female/i.test(v.name)) || vs[0] || null;
+}
+function speakNow(zh, en) {
+  if (!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const parts = [];
+  if (CFG.lang !== "en" && zh) parts.push(["zh", stripForSpeech(zh)]);
+  if (CFG.lang !== "zh" && en) parts.push(["en", stripForSpeech(en)]);
+  for (const [lg, text] of parts) {
+    if (!text) continue;
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lg === "zh" ? "zh-CN" : "en-US";
+    const v = pickVoice(lg); if (v) u.voice = v;
+    u.rate = 0.95; u.pitch = 1.08;            // 慢一点、亮一点，像小羽
+    speechSynthesis.speak(u);
+  }
+}
+let lastSpokenKey = null;
+function speakOnce(key, zh, en) {            // 新台词出现时自动读一次（开关可关）
+  if (lastSpokenKey === key) return;
+  lastSpokenKey = key;
+  if (CFG.tts) speakNow(zh, en);
+}
+
+/* 伙伴气泡（小羽）：自带 🔊 点读按钮 */
+let SPEAK_REG = [];
+function bubble(zh, en, extra) {
+  const i = SPEAK_REG.push({ zh, en }) - 1;
+  return `<div class="coach"><div class="avatar">🦉</div>
+    <div class="bubble"><span class="buddy-tag">${buddyName()}</span><button class="say-btn" data-i="${i}" title="${TI("读给我听", "Read to me")}">🔊</button>${typeof zh === "string" ? T(zh, en) : ""}${extra || ""}</div></div>`;
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest(".say-btn");
+  if (b) { const r = SPEAK_REG[+b.dataset.i]; if (r) speakNow(r.zh, r.en); }
+});
 
 /* ===================================================================== */
 /* 真实模型设置（浏览器直连 Claude API；离线时自动回退到规则引擎）          */
 /* ===================================================================== */
-let CFG = { aiMode: false, apiKey: "", model: "", checker: true, lang: "both" };
+let CFG = { aiMode: false, apiKey: "", model: "", checker: true, lang: "both", tts: true };
 let PROXY = { available: false, hasKey: false, provider: "", models: [], defaultModel: "" };
 /* 代理地址：本地 serve.py 留空（同源）；公开站在 config.js 里填 Cloudflare Worker 地址 */
 const API_BASE = (typeof window !== "undefined" && window.AI_PROXY_URL) ? String(window.AI_PROXY_URL).replace(/\/$/, "") : "";
@@ -115,6 +157,16 @@ const GHOST_RE = /(帮我写|直接写|你来写|写一篇|全文|替我写|给�
 function len(s) { return (s || "").trim().replace(/\s/g, "").length; }
 function isVague(s) { const t = (s || "").trim(); return VAGUE.includes(t) || VAGUE.some(v => t === v); }
 function hasEmo(s) { return EMO.some(e => s.includes(e)); }
+
+/* 从孩子的回答里摘一小段原话，用来"复述"——让离线追问也像在听 */
+function echoFrag(ans) {
+  const t = (ans || "").trim();
+  if (len(t) < 4 || isVague(t)) return "";
+  const pieces = t.split(/[，。！？,.!?；;\n]+/).filter(p => p.trim().length >= 3);
+  if (!pieces.length) return t.slice(0, 14);
+  const best = pieces.reduce((a, b) => (b.trim().length > a.trim().length ? b : a)).trim();
+  return best.length > 16 ? best.slice(0, 15) + "…" : best;
+}
 
 /* 返回 {code, confidence, reason} 或 null（说明孩子这一轮表达已足够） */
 function diagnose(text, candidates) {
@@ -326,6 +378,7 @@ const footer = document.getElementById("footerInner");
 let activeTab = "course";
 
 function render() {
+  SPEAK_REG = [];                      // 点读注册表随每次渲染重建
   document.querySelectorAll(".tab").forEach(b => b.classList.toggle("active", b.dataset.tab === activeTab));
   document.getElementById("tab-course").classList.toggle("hidden", activeTab !== "course");
   document.getElementById("tab-work").classList.toggle("hidden", activeTab !== "work");
@@ -342,7 +395,8 @@ function render() {
 
 function renderBadges() {
   const langBtns = `<span class="lang-toggle">${[["zh", "中"], ["en", "EN"], ["both", "双语"]]
-    .map(([v, l]) => `<button class="lang-btn ${CFG.lang === v ? "on" : ""}" data-lang="${v}">${l}</button>`).join("")}</span>`;
+    .map(([v, l]) => `<button class="lang-btn ${CFG.lang === v ? "on" : ""}" data-lang="${v}">${l}</button>`).join("")}
+    <button class="lang-btn tts ${CFG.tts ? "on" : ""}" id="ttsToggle" title="${TI("小羽朗读开/关", "Quill reads aloud on/off")}">${CFG.tts ? "🔊" : "🔇"}</button></span>`;
   if (!S) { badges.innerHTML = langBtns; wireLang(); return; }
   const task = taskById(S.taskId);
   badges.innerHTML = `<span class="badge">${TI(S.grade + "年级", "Grade " + S.grade)}</span>
@@ -351,8 +405,14 @@ function renderBadges() {
   wireLang();
 }
 function wireLang() {
-  document.querySelectorAll(".lang-btn").forEach(b =>
+  document.querySelectorAll(".lang-btn[data-lang]").forEach(b =>
     b.onclick = () => { CFG.lang = b.dataset.lang; saveCfg(); render(); });
+  const tts = document.getElementById("ttsToggle");
+  if (tts) tts.onclick = () => {
+    CFG.tts = !CFG.tts; saveCfg();
+    if (!CFG.tts && "speechSynthesis" in window) speechSynthesis.cancel();
+    render();
+  };
 }
 
 /* ---------- 课程主流程 ---------- */
@@ -484,10 +544,12 @@ function renderQA(stage) {
         ${aiEnabled() ? '<span class="badge accent" style="align-self:center">🟢 真实AI</span>' : ""}
       </div>
       ${d.guard ? `<div class="guard-banner">${d.guard}</div>` : ""}
+      ${!aiEnabled() ? `<p class="small muted offline-hint">💡 ${TI("现在是离线模式，问题来自题库。想让小羽真正听懂每句话，请爸爸妈妈在开始页打开「真实AI」。", "Offline mode: questions come from a library. To let Quill truly understand you, ask a grown-up to switch on Real AI on the start page.")}</p>` : ""}
     </div>
     ${teacherStripHtml(stage)}
     ${evidenceBoard()}
   `;
+  speakOnce("qa|" + stage.id + "|" + d.currentQ, d.currentQ, d.currentQEn);
 
   wireAnswerWidget("qaInput");
   bindEvidenceBoard();
@@ -641,7 +703,9 @@ function fallbackQuestion(stage, ans) {
     d.code = dg.code; d.curDiag = dg.code;
     d.pool = strategiesFor(dg.code, S.grade); d.poolIdx = 0;
     d.curStratId = d.pool.length ? d.pool[0].strategy_id : null;
-    d.currentQ = d.pool.length ? d.pool[0].prompt : difficulty(dg.code).recommended_strategy;
+    const q = d.pool.length ? d.pool[0].prompt : difficulty(dg.code).recommended_strategy;
+    const frag = echoFrag(ans);
+    d.currentQ = (frag && !/^你说/.test(q)) ? `你说"${frag}"——${q}` : q;
     d.currentQEn = null;
     d.satisfied = false;
   } else {
@@ -691,7 +755,9 @@ function submitQA(stage) {
     d.poolIdx = 0;
     d.curDiag = dg.code;
     d.curStratId = d.pool.length ? d.pool[0].strategy_id : null;  // 下一个问题的来源
-    d.currentQ = d.pool.length ? d.pool[0].prompt : difficulty(dg.code).recommended_strategy;
+    const q = d.pool.length ? d.pool[0].prompt : difficulty(dg.code).recommended_strategy;
+    const frag = echoFrag(ans);                   // 先复述孩子的原话，再追问
+    d.currentQ = (frag && !/^你说/.test(q)) ? `你说"${frag}"——${q}` : q;
     d.currentQEn = null;                          // 题库追问暂无英文版（AI 模式下有）
     d.satisfied = false;
   } else {
@@ -758,6 +824,9 @@ function renderWarmup(stage) {
         </div>` : ""}
     </div>
   `;
+  speakOnce("wu|" + (d.turns.length ? "react" : w.id),
+    d.turns.length ? d.turns[d.turns.length - 1].react.zh : w.zh,
+    d.turns.length ? d.turns[d.turns.length - 1].react.en : w.en);
   if (d.turns.length === 0) {
     wireAnswerWidget("wuInput");
     host.querySelectorAll(".warm-chip").forEach(b => b.onclick = () => {
@@ -826,6 +895,11 @@ function renderKnowledge(stage) {
       ` : ""}
     </div>
   `;
+  if (d.flipped) {
+    speakOnce("kn|" + (d.turns.length ? "try" : "think") + card.id,
+      d.turns.length ? card.buddyTry.zh : "想一想：" + card.think.zh,
+      d.turns.length ? card.buddyTry.en : "Think: " + card.think.en);
+  }
   document.getElementById("wonderCard").onclick = () => { if (!d.flipped) { d.flipped = true; save(); renderKnowledge(stage); } };
   if (d.flipped && d.turns.length === 0) {
     wireAnswerWidget("knInput");
@@ -887,6 +961,10 @@ function renderDebate(stage) {
         escapeHtml("You just did something real thinkers do: looked at your own idea from the other side. You don't have to change your mind today — what matters is you gave it reasons.")) : ""}
     </div>
   `;
+  const lastCounter = d.turns.length && d.turns[0].counter ? d.turns[0].counter : null;
+  speakOnce("db|" + db.id + "|" + step,
+    step === 0 ? db.claim.zh : step === 1 && lastCounter ? lastCounter.zh : "你刚才做了一件思考者才会做的事。",
+    step === 0 ? db.claim.en : step === 1 && lastCounter ? lastCounter.en : "You just did something real thinkers do.");
   const slider = document.getElementById("stance");
   slider.oninput = () => { d.stance = +slider.value; document.getElementById("stanceRead").innerHTML = stanceLabel(d.stance); save(); };
   if (step < 2) {
@@ -1152,6 +1230,9 @@ function renderReflection(stage) {
     </div>
     ${growthPanel(false)}
   `;
+  speakOnce("ref|" + d.idx,
+    d.idx < qs.length ? qs[d.idx].zh : ENRICH.buddy.taught.zh,
+    d.idx < qs.length ? qs[d.idx].en : ENRICH.buddy.taught.en);
   if (d.idx < qs.length) {
     wireAnswerWidget("refIn");
     document.getElementById("refSend").onclick = () => {
@@ -1331,7 +1412,17 @@ function renderSetup() {
             ${DIRECT_MODELS.map(m => `<option value="${m.id}" ${activeModel() === m.id ? "selected" : ""}>${escapeHtml(m.label)}</option>`).join("")}
           </select>
         </div>
-        <div class="guard-banner" style="margin-top:8px">🔑 key <strong>只存在你自己的浏览器</strong>（localStorage），别人看不到。<br>⚠️ 但<strong>不要把 key 硬写进公开网页源码</strong>——那样所有访客都能看到、盗刷你的额度。公开给多人用请改后端代理（serve.py / Cloudflare）。建议去阿里云百炼给 key 设个消费限额兜底。</div>
+        <details class="key-help">
+          <summary>🔑 怎么拿到千问钥匙？（约 2 分钟，新用户有免费额度）</summary>
+          <ol class="small">
+            <li>打开 <a href="https://bailian.console.aliyun.com/?apiKey=1#/api-key" target="_blank" rel="noopener"><b>阿里云百炼 · API-KEY 管理页</b></a>，用支付宝或淘宝账号登录；</li>
+            <li>首次进入会提示<b>开通「百炼大模型服务」</b>——免费开通，新用户通常各模型送一笔免费调用额度；</li>
+            <li>点<b>「创建我的 API-KEY」</b>，复制 <code>sk-</code> 开头的那串字符；</li>
+            <li>回到这里粘贴 → 点「测试连接」→ 勾选上面的开关，搞定！</li>
+          </ol>
+          <p class="small muted">建议顺手在百炼控制台给这个 key 设一个消费限额，安心。</p>
+        </details>
+        <div class="guard-banner" style="margin-top:8px">🔑 key <strong>只存在你自己的浏览器</strong>（localStorage），别人看不到。<br>⚠️ 但<strong>不要把 key 硬写进公开网页源码</strong>——那样所有访客都能看到、盗刷你的额度。公开给多人用请改后端代理（serve.py / Cloudflare）。</div>
       `}
 
       <label class="toggle-row" style="margin-top:8px"><input type="checkbox" id="aiChecker" ${CFG.checker ? "checked" : ""}/>

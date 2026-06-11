@@ -328,6 +328,24 @@ textarea:focus, input[type=text]:focus { outline: none; border-color: var(--bran
 .en-starter { font-style: italic; color: #4a6a5e; }
 .warm-chip { font-size: 1rem; }
 
+/* 小羽点读按钮 + 朗读开关 */
+.say-btn {
+  float: right; border: none; background: #fff; border-radius: 999px;
+  width: 28px; height: 28px; font-size: .85rem; cursor: pointer; margin-left: 8px;
+  box-shadow: 0 1px 4px rgba(60,50,35,.15); transition: .15s;
+}
+.say-btn:hover { transform: scale(1.12); }
+.lang-btn.tts { border-left: 1px solid var(--line); border-radius: 0 999px 999px 0; }
+
+/* 千问钥匙指南 */
+.key-help { margin-top: 10px; background: #f5f8f6; border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; }
+.key-help summary { cursor: pointer; font-size: .88rem; font-weight: 700; color: var(--brand); }
+.key-help ol { margin: 8px 0 4px; padding-left: 20px; line-height: 1.9; }
+.key-help a { color: var(--accent); font-weight: 700; }
+.key-help code { background: #fff; border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; }
+
+.offline-hint { margin: 8px 0 0; }
+
 /* ---------- 教师后台 ---------- */
 .teacher-strip { background: #f1f5fb; border: 1px solid #d4e0f0; }
 .teacher-strip .chip.selected { background: #3b6fb0; border-color: #3b6fb0; color: #fff; }
