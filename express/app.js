@@ -730,11 +730,13 @@ function stageHead(stage) {
 function footerNav({ canBack = true, canNext = true, nextLabel = null, nextEnabled = true, onNext, extra = "" } = {}) {
   if (!nextLabel) nextLabel = TI("我说完了，下一步", "Done, next stop") + " →";
   footer.innerHTML =
-    `${canBack ? '<button class="btn ghost small" id="fBack">← 上一步</button>' : ""}
+    `${canBack ? `<button class="btn ghost small" id="fBack">← ${TI("上一步", "Back")}</button>` : ""}
+     <button class="btn ghost small restart-btn" id="fRestart" title="${TI("清空这一篇，回到开始页重新选题", "Clear this piece and start over")}">⟲ ${TI("重新开始", "Restart")}</button>
      ${extra}
      <div class="spacer"></div>
      ${canNext ? `<button class="btn" id="fNext" ${nextEnabled ? "" : "disabled"}>${nextLabel}</button>` : ""}`;
   if (canBack) document.getElementById("fBack").onclick = () => { S.stageIndex = Math.max(0, S.stageIndex - 1); save(); render(); };
+  document.getElementById("fRestart").onclick = startNew;
   if (canNext) document.getElementById("fNext").onclick = onNext || (() => advance());
 }
 
@@ -1907,8 +1909,14 @@ function downloadWork() {
 }
 
 function startNew() {
-  if (!confirm("开始新的一篇会清空当前这篇，确定吗？")) return;
-  S = null; localStorage.removeItem(SAVE_KEY); activeTab = "course"; setupSel.taskId = null; render();
+  const msg = CFG.lang === "en"
+    ? "Start over? This clears everything in this piece (draft included) and goes back to the start page."
+    : "重新开始会清空这一篇的所有内容（包括初稿），回到开始页重新选题。确定吗？";
+  if (!confirm(msg)) return;
+  stopAllVoice();
+  S = null; localStorage.removeItem(SAVE_KEY); activeTab = "course"; setupSel.taskId = null;
+  window.scrollTo({ top: 0 });
+  render();
 }
 
 /* ===================================================================== */

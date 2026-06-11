@@ -535,3 +535,8 @@ body.quill-talking .quill .q-bob { animation-duration: .9s; }
   background: rgba(255,255,255,.7); border: 1.5px dashed var(--line);
   border-radius: 14px; padding: 8px 14px; margin-top: 14px;
 }
+
+/* 重新开始按钮（常驻底栏，warm 警示色调） */
+.restart-btn { color: #b5611f; border-color: #f0cdb0; }
+.restart-btn:hover { background: var(--accent-soft); }
+@media (max-width: 560px) { .restart-btn { padding: 8px 10px; } }
