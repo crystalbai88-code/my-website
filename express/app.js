@@ -55,6 +55,8 @@ function speakNow(zh, en) {
     u.lang = lg === "zh" ? "zh-CN" : "en-US";
     const v = pickVoice(lg); if (v) u.voice = v;
     u.rate = 0.95; u.pitch = 1.08;            // 慢一点、亮一点，像小羽
+    u.onstart = () => document.body.classList.add("quill-talking");
+    u.onend = () => document.body.classList.remove("quill-talking");
     speechSynthesis.speak(u);
   }
 }
@@ -65,11 +67,82 @@ function speakOnce(key, zh, en) {            // 新台词出现时自动读一�
   if (CFG.tts) speakNow(zh, en);
 }
 
+/* ---------- 小羽形象：SVG 动画角色（眨眼/扑翅/说话晃动） ---------- */
+function quillSVG(size = 46, cls = "") {
+  return `<svg viewBox="0 0 100 112" width="${size}" height="${Math.round(size * 1.12)}" class="quill ${cls}" aria-hidden="true">
+    <g class="q-bob">
+      <path d="M27,27 L18,9 L37,19 Z" fill="#39685b"/>
+      <path d="M73,27 L82,9 L63,19 Z" fill="#39685b"/>
+      <ellipse cx="50" cy="62" rx="34" ry="40" fill="#4a8273"/>
+      <ellipse cx="50" cy="77" rx="21" ry="23" fill="#f7ecd7"/>
+      <path class="q-wing wl" d="M15,54 Q3,72 16,87 Q25,72 21,54 Z" fill="#39685b"/>
+      <path class="q-wing wr" d="M85,54 Q97,72 84,87 Q75,72 79,54 Z" fill="#39685b"/>
+      <circle cx="37" cy="44" r="14" fill="#fff"/>
+      <circle cx="63" cy="44" r="14" fill="#fff"/>
+      <circle class="q-pupil" cx="39" cy="46" r="6.5" fill="#27323b"/>
+      <circle class="q-pupil" cx="61" cy="46" r="6.5" fill="#27323b"/>
+      <circle class="q-lid" cx="37" cy="44" r="14.6" fill="#4a8273"/>
+      <circle class="q-lid" cx="63" cy="44" r="14.6" fill="#4a8273"/>
+      <path d="M50,52 L43,61 L57,61 Z" fill="#f0a04b"/>
+      <path d="M41,101 q1,7 5,9 M59,101 q-1,7 -5,9" stroke="#f0a04b" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    </g>
+  </svg>`;
+}
+
+/* ---------- 游戏反馈：羽毛收集 / 彩纸 / 音效 ---------- */
+function awardFeather(n = 1, opts = {}) {
+  if (!S) return;
+  S.feathers = (S.feathers || 0) + n;
+  save();
+  const c = document.getElementById("featherCount");
+  if (c) {
+    c.textContent = S.feathers;
+    const badge = c.closest(".feather-badge");
+    if (badge) { badge.classList.remove("pop"); void badge.offsetWidth; badge.classList.add("pop"); }
+  }
+  const t = document.createElement("div");
+  t.className = "feather-toast"; t.textContent = `+${n} 🪶`;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 1100);
+  if (!opts.silent) sfx("ding");
+}
+function confetti() {
+  const colors = ["#FFB703", "#4CC9F0", "#FF8FAB", "#7C5CFF", "#2EC4B6", "#FF7B54"];
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement("i");
+    p.className = "confetti";
+    p.style.left = (15 + Math.random() * 70) + "vw";
+    p.style.background = colors[i % colors.length];
+    p.style.animationDelay = (Math.random() * 0.25) + "s";
+    p.style.setProperty("--spin", (Math.random() > 0.5 ? 1 : -1) * (420 + Math.random() * 400) + "deg");
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 1700);
+  }
+}
+let AC = null;
+function sfx(kind) {
+  if (!CFG.tts) return;   // 🔊 是总声音开关（朗读+音效）
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    const t0 = AC.currentTime;
+    const notes = kind === "tada" ? [[523, 0, .14], [659, .13, .14], [784, .26, .26]] : [[880, 0, .07], [1318, .07, .12]];
+    for (const [f, dt, dur] of notes) {
+      const o = AC.createOscillator(), g = AC.createGain();
+      o.frequency.value = f; o.type = "sine";
+      g.gain.setValueAtTime(.0001, t0 + dt);
+      g.gain.exponentialRampToValueAtTime(.16, t0 + dt + .02);
+      g.gain.exponentialRampToValueAtTime(.0001, t0 + dt + dur);
+      o.connect(g); g.connect(AC.destination);
+      o.start(t0 + dt); o.stop(t0 + dt + dur + .05);
+    }
+  } catch (_) {}
+}
+
 /* 伙伴气泡（小羽）：自带 🔊 点读按钮 */
 let SPEAK_REG = [];
 function bubble(zh, en, extra) {
   const i = SPEAK_REG.push({ zh, en }) - 1;
-  return `<div class="coach"><div class="avatar">🦉</div>
+  return `<div class="coach"><div class="avatar">${quillSVG(46)}</div>
     <div class="bubble"><span class="buddy-tag">${buddyName()}</span><button class="say-btn" data-i="${i}" title="${TI("读给我听", "Read to me")}">🔊</button>${typeof zh === "string" ? T(zh, en) : ""}${extra || ""}</div></div>`;
 }
 document.addEventListener("click", e => {
@@ -115,29 +188,29 @@ async function initProxy() {
 
 /* ---------- 十二站冒险（写作主线沿用 controller 九阶段；新增暖身/通识/思辨三站） ---------- */
 const STAGES = [
-  { id: "warmup",     name: "开脑洞",       nameEn: "Warm-Up",        icon: "🎈", kind: "warmup",
+  { id: "warmup", color: "#FFB703",     name: "开脑洞",       nameEn: "Warm-Up",        icon: "🎈", kind: "warmup",
     goalZh: "用一个好玩的问题叫醒你的想法（没有对错）", goalEn: "Wake up your ideas with a silly question — no wrong answers" },
-  { id: "diagnose",   name: "找到要写的事", nameEn: "Find Your Story", icon: "🔍", kind: "qa",
+  { id: "diagnose", color: "#4CC9F0",   name: "找到要写的事", nameEn: "Find Your Story", icon: "🔍", kind: "qa",
     candidates: ["D01", "D02"], primary: "D01", goalEn: "Find one small, real moment worth telling" },
-  { id: "input",      name: "素材侦探",     nameEn: "Gather Clues",   icon: "🧺", kind: "input",
+  { id: "input", color: "#B197FC",      name: "素材侦探",     nameEn: "Gather Clues",   icon: "🧺", kind: "input",
     goalEn: "Borrow a writer's trick and collect fresh clues" },
-  { id: "recall",     name: "唤起回忆",     nameEn: "Rewind",         icon: "💭", kind: "qa",
+  { id: "recall", color: "#FF8FAB",     name: "唤起回忆",     nameEn: "Rewind",         icon: "💭", kind: "qa",
     candidates: ["D02", "D01"], primary: "D01", goalEn: "Replay the moment like a tiny video" },
-  { id: "knowledge",  name: "通识加油站",   nameEn: "Wonder Stop",    icon: "🧠", kind: "knowledge",
+  { id: "knowledge", color: "#7C5CFF",  name: "通识加油站",   nameEn: "Wonder Stop",    icon: "🧠", kind: "knowledge",
     goalZh: "认识一个和你的故事有关的大想法", goalEn: "Meet a big idea connected to your story" },
-  { id: "detail",     name: "放大细节",     nameEn: "Zoom In",        icon: "🔬", kind: "qa",
+  { id: "detail", color: "#2EC4B6",     name: "放大细节",     nameEn: "Zoom In",        icon: "🔬", kind: "qa",
     candidates: ["D04", "D05", "D09", "D03"], primary: "D04", goalEn: "Zoom into actions, senses and thoughts" },
-  { id: "debate",     name: "思辨角",       nameEn: "Debate Corner",  icon: "⚖️", kind: "debate",
+  { id: "debate", color: "#FF7B54",     name: "思辨角",       nameEn: "Debate Corner",  icon: "⚖️", kind: "debate",
     goalZh: "和小羽辩一辩——重要的不是赢，是说出理由", goalEn: "Debate with Quill — it's not about winning, it's about reasons" },
-  { id: "structure",  name: "理清顺序",     nameEn: "Story Map",      icon: "🧭", kind: "qa",
+  { id: "structure", color: "#FFC53D",  name: "理清顺序",     nameEn: "Story Map",      icon: "🧭", kind: "qa",
     candidates: ["D06", "D03"], primary: "D06", goalEn: "Map your story: Beginning → Change → Ending" },
-  { id: "point",      name: "确认中心",     nameEn: "Find the Heart", icon: "🎯", kind: "qa",
+  { id: "point", color: "#FF5D8F",      name: "确认中心",     nameEn: "Find the Heart", icon: "🎯", kind: "qa",
     candidates: ["D13", "D11", "D05"], primary: "D13", goalEn: "Find the one sentence readers should remember" },
-  { id: "draft",      name: "写下初稿",     nameEn: "First Draft",    icon: "✏️", kind: "draft",
+  { id: "draft", color: "#74B816",      name: "写下初稿",     nameEn: "First Draft",    icon: "✏️", kind: "draft",
     goalEn: "Write your own first draft — every word yours" },
-  { id: "revision",   name: "修改打磨",     nameEn: "Polish",         icon: "🔧", kind: "revision",
+  { id: "revision", color: "#3BC9DB",   name: "修改打磨",     nameEn: "Polish",         icon: "🔧", kind: "revision",
     goalEn: "Polish one thing at a time, and say why" },
-  { id: "reflection", name: "回看成长",     nameEn: "Look Back",      icon: "🌱", kind: "reflection",
+  { id: "reflection", color: "#69B34C", name: "回看成长",     nameEn: "Look Back",      icon: "🌱", kind: "reflection",
     goalEn: "Look back — then teach Quill what YOU learned" },
 ];
 
@@ -351,6 +424,7 @@ function freshSession(grade, taskId, profileId) {
     draftTitle: "",
     draftBody: "",
     revisionLog: [],         // {dimension, dimName, before, after, why}
+    feathers: 0,             // 收集的羽毛（游戏奖励）
     reflection: [],          // {q, a}
     growth,
     growthBefore: { ...growth },  // rubric_before 快照
@@ -363,7 +437,7 @@ function freshSession(grade, taskId, profileId) {
 
 function save() { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }
 function load() {
-  try { const r = JSON.parse(localStorage.getItem(SAVE_KEY)); if (r && r.grade) S = r; }
+  try { const r = JSON.parse(localStorage.getItem(SAVE_KEY)); if (r && r.grade) { S = r; if (S.feathers == null) S.feathers = 0; } }
   catch (_) { localStorage.removeItem(SAVE_KEY); }
 }
 function bump(dim, to) { if (S.growth[dim] < to) { S.growth[dim] = to; } }
@@ -399,7 +473,8 @@ function renderBadges() {
     <button class="lang-btn tts ${CFG.tts ? "on" : ""}" id="ttsToggle" title="${TI("小羽朗读开/关", "Quill reads aloud on/off")}">${CFG.tts ? "🔊" : "🔇"}</button></span>`;
   if (!S) { badges.innerHTML = langBtns; wireLang(); return; }
   const task = taskById(S.taskId);
-  badges.innerHTML = `<span class="badge">${TI(S.grade + "年级", "Grade " + S.grade)}</span>
+  badges.innerHTML = `<span class="badge feather-badge">🪶 <b id="featherCount">${S.feathers || 0}</b></span>
+    <span class="badge">${TI(S.grade + "年级", "Grade " + S.grade)}</span>
     <span class="badge accent">${task ? task.title : "—"}</span>
     ${langBtns}`;
   wireLang();
@@ -423,14 +498,26 @@ function renderCourse() {
   ({ qa: renderQA, input: renderInput, draft: renderDraft,
      revision: renderRevision, reflection: renderReflection,
      warmup: renderWarmup, knowledge: renderKnowledge, debate: renderDebate }[stage.kind])(stage);
+  const first = host.querySelector(".card");          // 当前站主卡片戴上本站颜色
+  if (first) { first.classList.add("stage-card"); first.style.setProperty("--stage-c", stage.color || "#2f6f5e"); }
 }
 
+/* 冒险地图：高低起伏的彩色岛屿路线，小羽站在当前岛上，走过的岛盖⭐ */
 function renderRail() {
-  rail.innerHTML = STAGES.map((s, i) => {
-    const cls = i < S.stageIndex ? "done" : i === S.stageIndex ? "active" : "";
+  rail.innerHTML = `<div class="quest-map">${STAGES.map((s, i) => {
+    const state = i < S.stageIndex ? "done" : i === S.stageIndex ? "active" : "locked";
     const label = CFG.lang === "en" ? s.nameEn : s.name;
-    return `<span class="stage-pill ${cls}" title="${s.name} · ${s.nameEn}">${i < S.stageIndex ? "✓" : s.icon} ${label}</span>`;
-  }).join("");
+    return `${i > 0 ? '<div class="map-link"></div>' : ""}<div class="map-stop ${state} ${i % 2 ? "lo" : "hi"}" data-i="${i}" style="--stop-c:${s.color}">
+      ${i === S.stageIndex ? `<div class="map-quill">${quillSVG(40, "q-excited")}</div>` : ""}
+      <button class="map-node" title="${s.name} · ${s.nameEn}">${i < S.stageIndex ? "⭐" : s.icon}</button>
+      <span class="map-label">${label}</span>
+    </div>`;
+  }).join("")}</div>`;
+  rail.querySelectorAll(".map-stop.done .map-node").forEach(b => {
+    b.onclick = () => { S.stageIndex = +b.closest(".map-stop").dataset.i; save(); render(); };
+  });
+  const act = rail.querySelector(".map-stop.active");
+  if (act && act.scrollIntoView) act.scrollIntoView({ block: "nearest", inline: "center" });
 }
 
 /* 站点标题条：第 X 站 + 双语名 + 双语目标 */
@@ -455,7 +542,11 @@ function footerNav({ canBack = true, canNext = true, nextLabel = null, nextEnabl
 }
 
 function advance() {
-  if (S.stageIndex < STAGES.length - 1) { S.stageIndex++; save(); render(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+  if (S.stageIndex < STAGES.length - 1) {
+    S.stageIndex++; save();
+    confetti(); sfx("tada"); awardFeather(2, { silent: true });   // 过站庆祝 + 收羽毛
+    render(); window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 }
 
 /* ===================================================================== */
@@ -516,7 +607,7 @@ function renderQA(stage) {
         <div class="kid-line"><span class="kid-bubble">${escapeHtml(t.a)}</span></div>`).join("")}
 
       <div class="coach ${d.refuse ? "refuse" : ""}">
-        <div class="avatar">🦉</div>
+        <div class="avatar">${quillSVG(46)}</div>
         <div class="bubble"><span class="buddy-tag">${buddyName()}</span>${T(escapeHtml(d.currentQ), d.currentQEn ? escapeHtml(d.currentQEn) : null)}
           ${d.code ? `<span class="why">${TI("（我在帮你：" + difficulty(d.code).teaching_goal + "）", "")}</span>` : ""}
         </div>
@@ -661,6 +752,7 @@ async function submitQAAI(stage) {
 
   d.turns.push({ q: d.currentQ, qEn: d.currentQEn, a: ans });
   addEvidence(stage.name, ans);
+  awardFeather(1);
   if (len(ans) < 10) d.shortStreak++; else d.shortStreak = 0;
   d.thinking = true; save(); renderQA(stage);
 
@@ -732,6 +824,7 @@ function submitQA(stage) {
 
   d.turns.push({ q: d.currentQ, qEn: d.currentQEn, a: ans });
   addEvidence(stage.name, ans);
+  awardFeather(1);
   if (len(ans) < 10) d.shortStreak++; else d.shortStreak = 0;
 
   // 教师后台：记录"这句追问 → 孩子的回答"这一对（去标识化）
@@ -838,6 +931,7 @@ function renderWarmup(stage) {
       const v = val("wuInput"); if (!v) return;
       const p = pickPraise();
       d.turns.push({ a: v, react: { zh: p.zh + " 脑洞开好了，我们出发！", en: p.en + " Brain warmed up — let's go!" } });
+      awardFeather(1);
       save(); renderWarmup(stage);
     };
   }
@@ -900,12 +994,13 @@ function renderKnowledge(stage) {
       d.turns.length ? card.buddyTry.zh : "想一想：" + card.think.zh,
       d.turns.length ? card.buddyTry.en : "Think: " + card.think.en);
   }
-  document.getElementById("wonderCard").onclick = () => { if (!d.flipped) { d.flipped = true; save(); renderKnowledge(stage); } };
+  document.getElementById("wonderCard").onclick = () => { if (!d.flipped) { d.flipped = true; awardFeather(1); save(); renderKnowledge(stage); } };
   if (d.flipped && d.turns.length === 0) {
     wireAnswerWidget("knInput");
     document.getElementById("knSend").onclick = () => {
       const v = val("knInput"); if (!v) return;
       d.turns.push({ a: v });
+      awardFeather(2);
       bump("material", 2); bump("point", 2);
       save(); renderKnowledge(stage);
     };
@@ -971,6 +1066,7 @@ function renderDebate(stage) {
     wireAnswerWidget("dbInput");
     document.getElementById("dbSend").onclick = async () => {
       const v = val("dbInput"); if (!v) return;
+      awardFeather(2);
       if (step === 0) {
         const counter = d.stance >= 50 ? db.counterYes : db.counterNo;
         d.turns.push({ a: v, counter });
@@ -1042,7 +1138,7 @@ function renderInput(stage) {
   bindEvidenceBoard();
   document.getElementById("inSave").onclick = () => {
     const v = (document.getElementById("inInput").value || "").trim();
-    if (v) { addEvidence("观察发现", v); bump("detail", Math.max(2, S.growth.detail)); save(); }
+    if (v) { addEvidence("观察发现", v); awardFeather(1); bump("detail", Math.max(2, S.growth.detail)); save(); }
     render();
   };
   footerNav({ nextLabel: TI("线索够了，下一站", "Clues collected! Next") + " →", onNext: () => advance() });
@@ -1187,6 +1283,7 @@ function renderRevision(stage) {
     const before = val("revBefore"), after = val("revAfter"), why = val("revWhy");
     if (!before || !after) { alert("先填好原句和改写后的句子。"); return; }
     S.revisionLog.push({ dimension: d.dim, dimName: dimObj.name, before, after, why: why || "（还没说原因）" });
+    awardFeather(2);
     // 把改写同步进初稿
     if (S.draftBody.includes(before)) S.draftBody = S.draftBody.replace(before, after);
     bump("revision", S.revisionLog.length >= 2 ? 4 : 3);
@@ -1225,7 +1322,15 @@ function renderReflection(stage) {
         ${bubble(escapeHtml(qs[d.idx].zh), escapeHtml(qs[d.idx].en))}
         ${answerWidget("refIn")}
         <div class="actions"><button class="btn accent small" id="refSend">${d.idx === 2 ? TI("教给小羽", "Teach Quill") : TI("说给小羽听", "Tell Quill")}</button></div>
-      ` : `<div class="parent-note">🎉 ${T("你完成了一篇完全属于自己的表达——而且把小羽也教会了一招。去『我的作品』看看吧！",
+      ` : `
+        <div class="award-card">
+          ${quillSVG(72, "q-excited")}
+          <div>
+            <div class="award-title">🏅 ${TI("表达探险家", "Expression Explorer")}</div>
+            <div class="small">${TI(`这次冒险你收集了 ${S.feathers || 0} 根羽毛！`, `You collected ${S.feathers || 0} feathers on this quest!`)}</div>
+          </div>
+        </div>
+        <div class="parent-note">🎉 ${T("你完成了一篇完全属于自己的表达——而且把小羽也教会了一招。去『我的作品』看看吧！",
             "You finished a piece that is 100% yours — and you even taught Quill a trick. Go see it in My Work!")}</div>`}
     </div>
     ${growthPanel(false)}
@@ -1238,7 +1343,9 @@ function renderReflection(stage) {
     document.getElementById("refSend").onclick = () => {
       const v = val("refIn"); if (!v) return;
       S.reflection.push({ q: qs[d.idx].zh, qEn: qs[d.idx].en, a: v });
-      d.idx++; bump("point", Math.max(3, S.growth.point)); bump("revision", Math.max(3, S.growth.revision));
+      d.idx++; awardFeather(d.idx >= 3 ? 3 : 1);
+      if (d.idx >= 3) { confetti(); sfx("tada"); }
+      bump("point", Math.max(3, S.growth.point)); bump("revision", Math.max(3, S.growth.revision));
       save(); renderReflection(stage);
     };
   }
@@ -1363,6 +1470,10 @@ function renderSetup() {
 
   host.innerHTML = `
     <div class="card">
+      <div class="hero-buddy">
+        ${quillSVG(96, "q-excited")}
+        <div class="hero-bubble">${T("你好呀！我是小羽。准备好出发了吗？", "Hi there! I'm Quill. Ready for an adventure?")}</div>
+      </div>
       <div class="eyebrow">${TI("开始一次表达探险", "Start an Expression Quest")}</div>
       <h2>${T("把你脑子里的东西，说出来 ✦", "Let the ideas in your head out ✦")}</h2>
       <p class="goal">${T("你的旅伴是小羽🦉——一只爱提问的猫头鹰。它会陪你聊、跟你辩、给你讲世界的奇事——但每一个字都得是你写的。",
@@ -1756,5 +1867,7 @@ document.getElementById("tabbar").addEventListener("click", e => {
 });
 loadCfg();
 load();
+const _bm = document.querySelector(".brand-mark");
+if (_bm) { _bm.innerHTML = quillSVG(36); _bm.classList.add("brand-quill"); }
 render();
 initProxy().then(() => render());   // 探测后端代理后重渲染，反映「已通过后端代理连接」
