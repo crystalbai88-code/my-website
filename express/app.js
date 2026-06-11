@@ -373,6 +373,13 @@ function len(s) { return (s || "").trim().replace(/\s/g, "").length; }
 function isVague(s) { const t = (s || "").trim(); return VAGUE.includes(t) || VAGUE.some(v => t === v); }
 function hasEmo(s) { return EMO.some(e => s.includes(e)); }
 
+/* 孩子的故事主线（第一站说出的那件事），全程贯穿 */
+function seedShort() {
+  if (!S || !S.storySeed) return "";
+  const f = echoFrag(S.storySeed);
+  return f || S.storySeed.slice(0, 14);
+}
+
 /* 从孩子的回答里摘一小段原话，用来"复述"——让离线追问也像在听 */
 function echoFrag(ans) {
   const t = (ans || "").trim();
@@ -531,7 +538,7 @@ async function aiTeach(stage, ans) {
     strategy_records: JSON.stringify(strat),
   }) + `\n\n候选卡点（只能从中选一个或返回null）：${JSON.stringify(candDiff)}\n本阶段单轮汉字上限：${cs.output_limit}。\n额外要求：除 message_to_child（中文）外，再给出 message_to_child_en——同一个问题的自然、适龄英文版（像母语者对8-12岁孩子说话，不要逐字直译）。`;
 
-  const user = `孩子刚才说：「${ans}」。请只生成一个适龄追问。`;
+  const user = `孩子这次故事的主线：「${S.storySeed || "（还没确定）"}」。孩子刚才说：「${ans}」。请先用几个字呼应孩子刚说的内容（引用原词），再只问一个适龄追问，并和故事主线保持连贯。`;
   const out = await callClaudeJSON(sys, user, TEACH_SCHEMA);
 
   if (CFG.checker) {                                  // 第二层质量检查（知识库 quality_checker_system）
@@ -721,10 +728,13 @@ function renderRail() {
 function stageHead(stage) {
   const cs = controllerStage(stage.id);
   const goalZh = stage.goalZh || (cs ? cs.goal : "");
+  const ribbon = (S.storySeed && !["warmup", "diagnose"].includes(stage.id))
+    ? `<div class="story-ribbon">📖 ${TI("我们正在写", "Our story")}：「${escapeHtml(seedShort())}」</div>` : "";
   return `
     <div class="eyebrow">${TI(`第 ${S.stageIndex + 1} / ${STAGES.length} 站`, `Stop ${S.stageIndex + 1} of ${STAGES.length}`)} · ${stage.name} · ${stage.nameEn}</div>
     <h2>${stage.icon} ${T(stage.name, stage.nameEn)}</h2>
-    <p class="goal">${T(goalZh, stage.goalEn)}</p>`;
+    <p class="goal">${T(goalZh, stage.goalEn)}</p>
+    ${ribbon}`;
 }
 
 function footerNav({ canBack = true, canNext = true, nextLabel = null, nextEnabled = true, onNext, extra = "" } = {}) {
@@ -768,18 +778,30 @@ function openerFor(stage) {
         en: `Our quest this time: "${task.title}". Think of one recent little moment that felt different from usual — what happened?`,
       };
     }
-    case "recall":
-      return { zh: "你刚才说的那件事，把它当成一段小录像。最开始的那一秒，画面里有谁、在哪里？",
-               en: "Play that moment like a tiny video. In the very first second — who is in the picture, and where are you?" };
-    case "detail":
-      return { zh: "现在我们放大其中最重要的一个瞬间。那一刻，你的手在做什么？",
-               en: "Let's zoom into the most important moment. What were your hands doing right then?" };
-    case "structure":
-      return { zh: "把这件事分成三站：开始 → 中间发生变化 → 结果。先说说『开始』那一站发生了什么？",
-               en: "Split your story into three stops: Beginning → Change → Ending. What happened at the Beginning?" };
-    case "point":
-      return { zh: "如果读你故事的人只能记住一句话，你最想让他们记住哪一句？",
-               en: "If readers could remember only ONE sentence of your story, which should it be?" };
+    case "recall": {
+      const sd = seedShort();
+      return { zh: sd ? `把你说的「${sd}」当成一段小录像。最开始的那一秒，画面里有谁、在哪里？`
+                      : "你刚才说的那件事，把它当成一段小录像。最开始的那一秒，画面里有谁、在哪里？",
+               en: "Play your moment like a tiny video. In the very first second — who is in the picture, and where are you?" };
+    }
+    case "detail": {
+      const sd = seedShort();
+      return { zh: sd ? `回到「${sd}」。我们放大最重要的那个瞬间——那一刻，你的手在做什么？`
+                      : "现在我们放大其中最重要的一个瞬间。那一刻，你的手在做什么？",
+               en: "Back to your story — let's zoom into the biggest moment. What were your hands doing right then?" };
+    }
+    case "structure": {
+      const sd = seedShort();
+      return { zh: sd ? `现在把「${sd}」分成三站：开始 → 中间发生变化 → 结果。先说说『开始』那一站发生了什么？`
+                      : "把这件事分成三站：开始 → 中间发生变化 → 结果。先说说『开始』那一站发生了什么？",
+               en: "Now split your story into three stops: Beginning → Change → Ending. What happened at the Beginning?" };
+    }
+    case "point": {
+      const sd = seedShort();
+      return { zh: sd ? `「${sd}」这个故事快写成了！如果读的人只能记住一句话，你最想让他们记住哪一句？`
+                      : "如果读你故事的人只能记住一句话，你最想让他们记住哪一句？",
+               en: "Your story is almost ready! If readers could remember only ONE sentence, which should it be?" };
+    }
     default:
       return { zh: cs ? cs.goal : "我们继续。", en: "Let's keep going." };
   }
@@ -951,6 +973,7 @@ async function submitQAAI(stage) {
 
   d.turns.push({ q: d.currentQ, qEn: d.currentQEn, a: ans });
   addEvidence(stage.name, ans);
+  if (stage.id === "diagnose" && !S.storySeed && len(ans) >= 6 && !isVague(ans)) S.storySeed = ans;
   awardFeather(1);
   if (len(ans) < 10) d.shortStreak++; else d.shortStreak = 0;
   d.thinking = true; save(); renderQA(stage);
@@ -1023,6 +1046,7 @@ function submitQA(stage) {
 
   d.turns.push({ q: d.currentQ, qEn: d.currentQEn, a: ans });
   addEvidence(stage.name, ans);
+  if (stage.id === "diagnose" && !S.storySeed && len(ans) >= 6 && !isVague(ans)) S.storySeed = ans;
   awardFeather(1);
   if (len(ans) < 10) d.shortStreak++; else d.shortStreak = 0;
 
@@ -1066,12 +1090,14 @@ function submitQA(stage) {
 
 function pickAffirm(stage, ans) {
   const p = pickPraise();
+  const f = echoFrag(ans);
+  const q = f ? `「${f}」——` : "";
   const map = {
-    diagnose: { zh: p.zh + " 这件事可以写！我把它记在『小羽听到了什么』里了。", en: p.en + " That's a story worth telling! I've saved it on my board." },
-    recall: { zh: p.zh + " 画面有了，我们去放大最重要的瞬间。", en: p.en + " I can see the scene — let's zoom into the biggest moment." },
-    detail: { zh: "这个细节我能看见！接下来把顺序理一理。", en: "I can SEE that detail! Next, let's map the order." },
-    structure: { zh: "三站连起来了。下一站，找你最想说的那句话。", en: "All three stops connect! Next, find the heart of your story." },
-    point: { zh: "你的中心很清楚。准备好写初稿了！", en: "Your heart-sentence is clear. Ready to draft!" },
+    diagnose: { zh: `${q}${p.zh} 这件事可以写！我把它记在『小羽听到了什么』里了。`, en: p.en + " That's a story worth telling! I've saved it on my board." },
+    recall: { zh: `${q}画面一下子出来了！接下来我们去放大最重要的瞬间。`, en: p.en + " I can see the scene — let's zoom into the biggest moment." },
+    detail: { zh: `${q}这个细节我能看见画面！接下来把顺序理一理。`, en: "I can SEE that detail! Next, let's map the order." },
+    structure: { zh: `${q}三站连起来了。下一站，找你最想说的那句话。`, en: "All three stops connect! Next, find the heart of your story." },
+    point: { zh: `${q}就是这句！把它放在心里，去写初稿吧。`, en: "That's the one! Keep it in mind — time to draft." },
   };
   return map[stage.id] || { zh: "很好，点下一站继续。", en: "Great — on to the next stop." };
 }
@@ -1152,8 +1178,10 @@ function renderKnowledge(stage) {
     <div class="card">
       ${stageHead(stage)}
       ${bubble(
-        escapeHtml("写故事的人，脑袋里都装着别的故事。我带了一张和你的题目有关的『奇想卡』——点开看看！"),
-        escapeHtml("Storytellers carry other stories in their heads. I brought a Wonder Card connected to your topic — tap to open it!"))}
+        escapeHtml(seedShort()
+          ? `你的「${seedShort()}」让我想起一张『奇想卡』——别人也遇到过和你有点像的事。点开看看！`
+          : "写故事的人，脑袋里都装着别的故事。我带了一张和你的题目有关的『奇想卡』——点开看看！"),
+        escapeHtml("Your story reminds me of a Wonder Card — someone once faced something a bit like yours. Tap to open it!"))}
 
       <div class="flip-card ${d.flipped ? "flipped" : ""}" id="wonderCard">
         <div class="flip-inner">
@@ -1224,8 +1252,10 @@ function renderDebate(stage) {
     <div class="card">
       ${stageHead(stage)}
       ${bubble(
-        escapeHtml("我从猫头鹰辩论社带来一句话。先别急着同意——想想你站在哪边？"),
-        escapeHtml("I brought a claim from the Owl Debate Club. Don't agree too fast — where do YOU stand?"))}
+        escapeHtml(seedShort()
+          ? `经历过「${seedShort()}」的人，最有资格聊这个问题。先别急着同意——想想你站在哪边？`
+          : "我从猫头鹰辩论社带来一句话。先别急着同意——想想你站在哪边？"),
+        escapeHtml("Someone who lived your story has earned a say on this question. Don't agree too fast — where do YOU stand?"))}
 
       <div class="claim-box">${T(escapeHtml(db.claim.zh), escapeHtml(db.claim.en))}</div>
 
@@ -1309,8 +1339,10 @@ function renderInput(stage) {
     <div class="card">
       ${stageHead(stage)}
       ${bubble(
-        escapeHtml("侦探出动！先看一段别人写的细节当『放大镜』，再去收集你自己的线索。"),
-        escapeHtml("Detective time! First borrow a magnifying glass — see how another writer caught a detail — then collect your own clues."))}
+        escapeHtml(seedShort()
+          ? `你刚才说到「${seedShort()}」——好故事需要好线索！先看别人怎么抓细节，再去收集你自己的。`
+          : "侦探出动！先看一段别人写的细节当『放大镜』，再去收集你自己的线索。"),
+        escapeHtml("You just told me your moment — great stories need great clues! See how another writer catches details, then collect your own."))}
 
       <div class="material">
         <div class="mtitle">📖 ${TI("看别人怎么写细节（示范，不用背）", "How a writer catches details (just look, no memorizing)")}</div>
@@ -1357,8 +1389,10 @@ function renderDraft(stage) {
     <div class="card">
       ${stageHead(stage)}
       ${bubble(
-        escapeHtml("到你大显身手的时候了！这里没有「一键生成」——每个字都得是你的。我就在旁边，卡住了看下面的句子开头。"),
-        escapeHtml("Your big moment! There's no magic generate button here — every word must be yours. I'll be right beside you; if you get stuck, grab a sentence starter below."))}
+        escapeHtml(seedShort()
+          ? `素材、细节、中心都齐了——现在把「${seedShort()}」写成完全属于你的故事吧！我就在旁边，卡住了看下面的句子开头。`
+          : "到你大显身手的时候了！这里没有「一键生成」——每个字都得是你的。我就在旁边，卡住了看下面的句子开头。"),
+        escapeHtml("Clues, details, heart — all collected! Now turn your moment into a story that's 100% yours. I'm right here; grab a sentence starter if you get stuck."))}
 
       <div class="field-label">${TI("这篇你想用什么语言写？", "Which language will you write in?")}</div>
       <div class="chips" id="dLang">

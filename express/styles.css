@@ -540,3 +540,11 @@ body.quill-talking .quill .q-bob { animation-duration: .9s; }
 .restart-btn { color: #b5611f; border-color: #f0cdb0; }
 .restart-btn:hover { background: var(--accent-soft); }
 @media (max-width: 560px) { .restart-btn { padding: 8px 10px; } }
+
+/* 故事丝带：每一站顶部的"我们正在写" */
+.story-ribbon {
+  background: linear-gradient(90deg, #fff8e6, #fff3d4);
+  border: 1.5px solid var(--gold); border-radius: 12px;
+  padding: 8px 14px; margin: 2px 0 14px;
+  font-size: .88rem; font-weight: 700; color: #8a6a14;
+}
