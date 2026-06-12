@@ -571,3 +571,124 @@ body.quill-talking .quill .q-bob { animation-duration: .9s; }
 .topic-card:hover { transform: translateY(-3px) rotate(-1deg); border-color: var(--accent); }
 .topic-card:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,.07); }
 .topic-card .t-emoji { font-size: 34px; }
+
+/* ============================================================
+   小羽老师直播间 · LIVE CLASSROOM
+   ============================================================ */
+.live-stage { margin: 14px 0 4px; }
+.live-frame {
+  position: relative; height: 230px; border-radius: 22px; overflow: hidden;
+  border: 3px solid #fff; box-shadow: 0 14px 36px rgba(47,80,70,.22);
+  background: linear-gradient(180deg, #fdf3e3 0%, #f7e8cf 70%, #e8d5b5 100%);
+}
+/* 教室背景 */
+.classroom { position: absolute; inset: 0; }
+.blackboard {
+  position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+  width: min(420px, 72%); padding: 12px 16px; text-align: center;
+  background: linear-gradient(135deg, #2e5648, #234639);
+  border: 6px solid #8a6437; border-radius: 10px; box-shadow: 0 6px 14px rgba(0,0,0,.18);
+  color: #eef7e9; font-weight: 800;
+}
+.bb-line1 { font-size: .95rem; letter-spacing: 1px; }
+.bb-line2 { font-size: .72rem; opacity: .8; margin-top: 3px; font-weight: 600; }
+.blackboard::after {            /* 粉笔托 */
+  content: ""; position: absolute; left: 12%; right: 12%; bottom: -12px; height: 6px;
+  background: #8a6437; border-radius: 3px;
+}
+.shelf { position: absolute; left: 14px; top: 26px; width: 64px; }
+.shelf i { display: block; height: 26px; margin-bottom: 8px; border-radius: 4px;
+  background: linear-gradient(90deg, #c96f4a 0 22%, #5d8aa8 22% 45%, #d9a441 45% 70%, #6aa177 70%);
+  box-shadow: 0 4px 0 #8a6437; }
+.shelf i:nth-child(2) { width: 80%; }
+.shelf i:nth-child(3) { width: 90%; }
+.shelf i:nth-child(4) { width: 70%; }
+.plant { position: absolute; right: 16px; bottom: 48px; font-size: 38px; }
+/* 老师与讲台 */
+.rig-holder {
+  position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%);
+  z-index: 2; transition: transform .3s;
+}
+.desk {
+  position: absolute; left: 50%; bottom: 0; transform: translateX(-50%);
+  width: min(300px, 62%); height: 34px; z-index: 3;
+  background: linear-gradient(180deg, #b07c46, #8a5e33);
+  border-radius: 10px 10px 0 0; box-shadow: 0 -3px 0 #c9954f inset;
+}
+/* 直播信息条 */
+.live-chrome {
+  position: absolute; top: 10px; left: 12px; z-index: 4;
+  display: flex; align-items: center; gap: 7px;
+  background: rgba(0,0,0,.55); color: #fff; backdrop-filter: blur(4px);
+  font-size: .72rem; font-weight: 800; padding: 5px 10px; border-radius: 999px;
+}
+.live-dot { width: 9px; height: 9px; border-radius: 50%; background: #ff4d4d; animation: livedot 1.4s infinite; }
+@keyframes livedot { 0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255,77,77,.6);} 50% { opacity: .6; box-shadow: 0 0 0 5px transparent; } }
+.live-clock { font-weight: 600; opacity: .9; margin-left: 2px; }
+.live-mute { border: none; background: transparent; color: #fff; font-size: .9rem; cursor: pointer; padding: 0 2px; }
+/* 字幕条 */
+.live-sub {
+  position: absolute; left: 50%; bottom: 40px; transform: translateX(-50%);
+  max-width: 86%; z-index: 4; padding: 6px 14px; border-radius: 10px;
+  background: rgba(0,0,0,.6); color: #fff; font-size: .85rem; font-weight: 600;
+  opacity: 0; transition: opacity .25s; pointer-events: none; text-align: center;
+}
+.live-sub.on { opacity: 1; }
+
+/* —— 数字人状态动画 —— */
+.q-jaw { transform: translateY(calc(var(--jaw, 0) * 5px)); transform-box: fill-box; will-change: transform; }
+.rig-holder .quill .q-bob { animation: qbob 3.4s ease-in-out infinite; }
+.rig-holder.is-talking .quill .q-bob { animation: qtalkbob 0.62s ease-in-out infinite; }
+@keyframes qtalkbob { 0%,100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-2px) rotate(0.6deg); } }
+.rig-holder.is-thinking .quill .q-pupil { transform: translate(-2.4px, -3.2px); transform-box: fill-box; }
+.rig-holder.is-thinking .quill .q-bob { animation-duration: 5s; transform: rotate(-3deg); }
+.rig-holder.is-listening { transform: translateX(-50%) scale(1.03) rotate(2deg); }
+.rig-holder.is-listening .quill .q-pupil { transform: translate(2.2px, 2.6px); transform-box: fill-box; }
+.rig-holder.is-waving .quill .q-wing.wr { animation: qwave .5s ease-in-out infinite; transform-origin: 10% 15%; }
+@keyframes qwave { 0%,100% { transform: rotate(0); } 50% { transform: rotate(55deg); } }
+.rig-holder.is-celebrating .quill { animation: qjump .55s ease-in-out 2; }
+.rig-holder.is-celebrating .quill .q-wing.wl { animation: qwl .3s ease-in-out 4; }
+.rig-holder.is-celebrating .quill .q-wing.wr { animation: qwr .3s ease-in-out 4; }
+@keyframes qjump { 0%,100% { transform: translateY(0); } 45% { transform: translateY(-22px); } }
+.q-pupil { transition: transform .3s; }
+
+@media (max-width: 560px) {
+  .live-frame { height: 196px; }
+  .blackboard { width: 86%; padding: 9px 10px; }
+  .bb-line1 { font-size: .82rem; }
+  .plant { font-size: 28px; right: 8px; }
+  .shelf { display: none; }
+  .rig-holder .quill { width: 118px; height: auto; }
+}
+
+/* 修正：进度区改为上下叠放（直播间在上，地图在下） */
+.stage-rail { display: block; overflow: visible; }
+.map-scroll { overflow-x: auto; scrollbar-width: none; margin-top: 10px; }
+.map-scroll::-webkit-scrollbar { display: none; }
+
+/* 构图修正：老师站左侧，黑板让到右侧（直播经典机位） */
+.blackboard {
+  left: auto; right: 14px; transform: none;
+  width: 54%; top: 14px;
+}
+.rig-holder { left: 26%; bottom: 20px; }
+.rig-holder .quill { width: 124px; height: auto; }
+.rig-holder.is-listening { transform: translateX(-50%) scale(1.03) rotate(2deg); }
+.desk { left: 26%; width: min(240px, 52%); }
+.shelf { left: 12px; top: 14px; width: 54px; }
+.shelf i { height: 20px; margin-bottom: 6px; }
+.plant { right: 14px; bottom: 8px; font-size: 32px; }
+.live-sub { bottom: 6px; max-width: 92%; }
+@media (max-width: 560px) {
+  .blackboard { width: 58%; right: 8px; top: 12px; }
+  .rig-holder { left: 27%; bottom: 16px; }
+  .rig-holder .quill { width: 100px; }
+  .desk { left: 27%; width: 46%; height: 28px; }
+  .plant { bottom: 4px; }
+}
+
+/* 手机端：黑板下移避开直播徽章 */
+@media (max-width: 560px) {
+  .blackboard { top: 44px; }
+  .live-chrome { font-size: .68rem; padding: 4px 9px; }
+}

@@ -76,7 +76,7 @@ function cloudVoiceReady() { return CFG.aiVoice && aiEnabled(); }
 function stopAllVoice() {
   if ("speechSynthesis" in window) speechSynthesis.cancel();
   if (curAudio) { try { curAudio.pause(); } catch (_) {} curAudio = null; }
-  document.body.classList.remove("quill-talking");
+  try { setTalking(null); } catch (_) { document.body.classList.remove("quill-talking"); }
 }
 async function fetchTtsUrl(text) {
   const voice = CFG.aiVoiceName || "Cherry";
@@ -105,14 +105,68 @@ async function fetchTtsUrl(text) {
   ttsCache.set(key, url);
   return url;
 }
+/* —— 数字人状态：说话(嘴型+字幕) / 思考 / 倾听 / 庆祝 —— */
+let jawRAF = null, jawAnalyser = null;
+function rigHolder() { return document.querySelector(".rig-holder"); }
+function startJaw(audioEl) {
+  cancelAnimationFrame(jawRAF);
+  let useAna = false, data = null, silentMs = 0;
+  if (audioEl) {
+    try {
+      AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+      if (AC.state === "suspended") AC.resume();
+      const src = AC.createMediaElementSource(audioEl);
+      jawAnalyser = AC.createAnalyser(); jawAnalyser.fftSize = 256;
+      src.connect(jawAnalyser); jawAnalyser.connect(AC.destination);
+      data = new Uint8Array(jawAnalyser.frequencyBinCount);
+      useAna = true;
+    } catch (_) { useAna = false; }
+  }
+  const loop = (now) => {
+    let jaw;
+    if (useAna && data) {                          // 真振幅驱动嘴型
+      jawAnalyser.getByteFrequencyData(data);
+      let sum = 0; for (let i = 2; i < 30; i++) sum += data[i];
+      const amp = sum / 28 / 255;
+      if (amp < 0.012) silentMs += 16; else silentMs = 0;
+      if (silentMs > 700) useAna = false;          // 拿不到能量（跨域媒体）→ 退化为节奏张合
+      jaw = Math.min(1, amp * 3.2);
+    }
+    if (!useAna) jaw = (Math.sin(now / 85) * 0.5 + 0.5) * (Math.sin(now / 215) * 0.3 + 0.7);
+    document.documentElement.style.setProperty("--jaw", jaw.toFixed(2));
+    jawRAF = requestAnimationFrame(loop);
+  };
+  jawRAF = requestAnimationFrame(loop);
+}
+function stopJaw() {
+  cancelAnimationFrame(jawRAF);
+  document.documentElement.style.setProperty("--jaw", "0");
+}
+function setTalking(text, audioEl) {
+  const h = rigHolder();
+  if (text != null) {
+    document.body.classList.add("quill-talking");
+    if (h) { h.classList.add("is-talking"); h.classList.remove("is-thinking", "is-listening"); }
+    const sub = document.getElementById("liveSub");
+    if (sub) { sub.textContent = text; sub.classList.add("on"); }
+    startJaw(audioEl || null);
+  } else {
+    document.body.classList.remove("quill-talking");
+    if (h) h.classList.remove("is-talking");
+    const sub = document.getElementById("liveSub");
+    if (sub) sub.classList.remove("on");
+    stopJaw();
+  }
+}
+
 async function cloudSpeak(text) {
   const url = await fetchTtsUrl(text);
   stopAllVoice();
   const a = new Audio(url);
   curAudio = a;
-  a.onplay = () => document.body.classList.add("quill-talking");
-  a.onended = () => document.body.classList.remove("quill-talking");
-  a.onpause = () => document.body.classList.remove("quill-talking");
+  a.onplay = () => setTalking(text, a);
+  a.onended = () => setTalking(null);
+  a.onpause = () => setTalking(null);
   await a.play();
 }
 
@@ -125,8 +179,8 @@ function webSpeak(text) {
   u.lang = lg === "zh" ? "zh-CN" : "en-US";
   const v = resolveVoice(lg); if (v) u.voice = v;
   u.rate = 0.98; u.pitch = 1.0;
-  u.onstart = () => document.body.classList.add("quill-talking");
-  u.onend = () => document.body.classList.remove("quill-talking");
+  u.onstart = () => setTalking(text, null);
+  u.onend = () => setTalking(null);
   speechSynthesis.speak(u);
 }
 function speakNow(zh, en) {
@@ -213,9 +267,10 @@ function quillSVG(size = 46, cls = "") {
       <circle cx="63" cy="62" r="15.6" fill="none" stroke="#caa84e" stroke-width="2.6"/>
       <path d="M52.6,62 q-2.6,-3.4 -5.2,0" stroke="#caa84e" stroke-width="2.4" fill="none"/>
       <path d="M21.4,60 L16,56.5 M78.6,60 L84,56.5" stroke="#caa84e" stroke-width="2.2" stroke-linecap="round"/>
-      <!-- 喙 / 脚 -->
-      <path d="M50,71 L44,79 L56,79 Z" fill="#f0a04b"/>
-      <path d="M50,71 L47,75 L53,75 Z" fill="#ffc078" opacity=".75"/>
+      <!-- 喙（上+可动下颌）/ 脚 -->
+      <path d="M50,70 L44,76.5 L56,76.5 Z" fill="#f0a04b"/>
+      <path d="M50,70 L47,74 L53,74 Z" fill="#ffc078" opacity=".75"/>
+      <g class="q-jaw"><path d="M45.5,77.5 L54.5,77.5 L50,83.5 Z" fill="#d98a3a"/></g>
       <path d="M41,121 q1,6 5,8 M59,121 q-1,6 -5,8" stroke="#f0a04b" stroke-width="3.5" fill="none" stroke-linecap="round"/>
       <!-- 巫师帽（戴在头顶，护住眨眼动画区之外） -->
       <ellipse cx="50" cy="44" rx="30" ry="7.5" fill="url(#qgHat)"/>
@@ -821,11 +876,59 @@ function renderCourse() {
      warmup: renderWarmup, knowledge: renderKnowledge, debate: renderDebate }[stage.kind])(stage);
   const first = host.querySelector(".card");          // 当前站主卡片戴上本站颜色
   if (first) { first.classList.add("stage-card"); first.style.setProperty("--stage-c", stage.color || "#2f6f5e"); }
+  const sd = S.stageData[stage.id];
+  const h = rigHolder();
+  if (h && !h.classList.contains("is-talking")) h.classList.toggle("is-thinking", !!(sd && sd.thinking));
+}
+
+/* 直播间舞台：小羽老师的"摄像头画面" */
+let clockTimer = null;
+function liveStageHtml() {
+  const stage = STAGES[S.stageIndex];
+  const topicLabel = S.topic ? (S.topic.emoji + " " + (CFG.lang === "en" ? S.topic.en : S.topic.zh)) : TI("等你来定", "You decide!");
+  return `
+  <div class="live-stage">
+    <div class="live-frame">
+      <div class="classroom">
+        <div class="blackboard">
+          <div class="bb-line1">${TI("今日聊天", "Today's chat")}：${escapeHtml(topicLabel)}</div>
+          <div class="bb-line2">${stage.icon} ${TI(stage.name, stage.nameEn)} · ${S.stageIndex + 1}/${STAGES.length}</div>
+        </div>
+        <div class="shelf"><i></i><i></i><i></i><i></i></div>
+        <div class="plant">🪴</div>
+      </div>
+      <div class="rig-holder">${quillSVG(150, "q-rig")}</div>
+      <div class="desk"></div>
+      <div class="live-chrome">
+        <span class="live-dot"></span>${TI("直播中", "LIVE")} · ${TI("小羽老师", "Teacher Quill")}
+        <span class="live-clock" id="liveClock">00:00</span>
+        <button class="live-mute" id="liveMute" title="${TI("声音开关", "Sound on/off")}">${CFG.tts ? "🔊" : "🔇"}</button>
+      </div>
+      <div class="live-sub" id="liveSub"></div>
+    </div>
+  </div>`;
+}
+function wireLiveStage() {
+  const m = document.getElementById("liveMute");
+  if (m) m.onclick = () => { CFG.tts = !CFG.tts; saveCfg(); if (!CFG.tts) stopAllVoice(); render(); };
+  if (!clockTimer) clockTimer = setInterval(() => {
+    const el = document.getElementById("liveClock");
+    if (el && S) {
+      const sec = Math.floor((Date.now() - S.createdAt) / 1000);
+      el.textContent = String(Math.floor(sec / 60)).padStart(2, "0") + ":" + String(sec % 60).padStart(2, "0");
+    }
+  }, 1000);
+}
+function rigCelebrate() {
+  const h = rigHolder();
+  if (!h) return;
+  h.classList.add("is-celebrating");
+  setTimeout(() => { const x = rigHolder(); if (x) x.classList.remove("is-celebrating"); }, 1600);
 }
 
 /* 冒险地图：高低起伏的彩色岛屿路线，小羽站在当前岛上，走过的岛盖⭐ */
 function renderRail() {
-  rail.innerHTML = `<div class="quest-map">${STAGES.map((s, i) => {
+  rail.innerHTML = liveStageHtml() + `<div class="map-scroll"><div class="quest-map">${STAGES.map((s, i) => {
     const state = i < S.stageIndex ? "done" : i === S.stageIndex ? "active" : "locked";
     const label = CFG.lang === "en" ? s.nameEn : s.name;
     return `${i > 0 ? '<div class="map-link"></div>' : ""}<div class="map-stop ${state} ${i % 2 ? "lo" : "hi"}" data-i="${i}" style="--stop-c:${s.color}">
@@ -833,12 +936,13 @@ function renderRail() {
       <button class="map-node" title="${s.name} · ${s.nameEn}">${i < S.stageIndex ? "⭐" : s.icon}</button>
       <span class="map-label">${label}</span>
     </div>`;
-  }).join("")}</div>`;
+  }).join("")}</div></div>`;
   rail.querySelectorAll(".map-stop.done .map-node").forEach(b => {
     b.onclick = () => { S.stageIndex = +b.closest(".map-stop").dataset.i; save(); render(); };
   });
   const act = rail.querySelector(".map-stop.active");
   if (act && act.scrollIntoView) act.scrollIntoView({ block: "nearest", inline: "center" });
+  wireLiveStage();
 }
 
 /* 站点标题条：第 X 站 + 双语名 + 双语目标 */
@@ -871,6 +975,7 @@ function advance() {
   if (S.stageIndex < STAGES.length - 1) {
     S.stageIndex++; S.agentReady = false; save();
     confetti(); sfx("tada"); awardFeather(2, { silent: true });   // 过站庆祝 + 收羽毛
+    setTimeout(rigCelebrate, 50);
     render(); window.scrollTo({ top: 0, behavior: "smooth" });
   }
 }
@@ -1297,6 +1402,7 @@ function renderWarmup(stage) {
       `}
     </div>
   `;
+  if (!S.topic) { const h = rigHolder(); if (h) { h.classList.add("is-waving"); setTimeout(() => { const x = rigHolder(); if (x) x.classList.remove("is-waving"); }, 2400); } }
   speakOnce("tp|" + (S.topic ? "picked" : "ask"),
     S.topic ? `好耶，聊${S.topic.zh}！出发！` : "今天你想跟我聊哪一方面的事情？挑一个吧。",
     S.topic ? "Yes! Let's go!" : "What would you like to chat about today?");
@@ -2308,6 +2414,13 @@ function escapeAttr(s) { return escapeHtml(s).replace(/"/g, "&quot;"); }
 document.getElementById("tabbar").addEventListener("click", e => {
   const b = e.target.closest(".tab"); if (!b) return; activeTab = b.dataset.tab; render();
 });
+document.addEventListener("focusin", e => {
+  if (e.target.tagName === "TEXTAREA") { const h = rigHolder(); if (h && !h.classList.contains("is-talking")) h.classList.add("is-listening"); }
+});
+document.addEventListener("focusout", e => {
+  if (e.target.tagName === "TEXTAREA") { const h = rigHolder(); if (h) h.classList.remove("is-listening"); }
+});
+
 loadCfg();
 load();
 injectQuillDefs();
