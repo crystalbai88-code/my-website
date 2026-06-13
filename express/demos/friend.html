@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>引擎② 记得你的朋友 · 小羽</title>
+<style>
+:root{--brand:#2f6f5e;--soft:#e4f0eb;--accent:#e8884a;--ink:#2c2a26;--soft2:#fce8d7;--gold:#d8a93a;--line:#ece4d7}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);
+ background:linear-gradient(180deg,#cdeafe,#e7f6ef 45%,#fbf7f0);display:flex;flex-direction:column;height:100dvh;line-height:1.6}
+button{font-family:inherit;cursor:pointer}
+.top{flex:0 0 auto;text-align:center;padding:10px}
+.eng{font-size:.72rem;font-weight:800;letter-spacing:1px;color:var(--accent)}
+h1{font-size:1.1rem;margin:2px 0}.sub{font-size:.76rem;color:#6b6459}
+.day{font-size:.74rem;color:var(--brand);font-weight:800;margin-top:2px}
+.wrap{flex:1 1 auto;overflow-y:auto;padding:4px 14px}
+.owltop{text-align:center;margin:6px 0}
+.row{margin:9px 0;display:flex}.row.kid{justify-content:flex-end}
+.bub{max-width:84%;padding:10px 14px;border-radius:16px;font-size:1.02rem}
+.row.q .bub{background:#fff;border:1.5px solid var(--soft);border-radius:4px 16px 16px 16px;font-weight:600}
+.row.kid .bub{background:var(--soft2);color:#a8521a;border-radius:16px 4px 16px 16px}
+.book{background:#fffaf0;border:1.5px dashed var(--gold);border-radius:14px;padding:12px 14px;margin:12px 0}
+.book h3{margin:0 0 6px;font-size:.92rem;color:#8a6a14}
+.note{font-size:.9rem;padding:5px 0;border-bottom:1px dotted #e8d9b5;display:flex;gap:8px}
+.note .t{font-size:.66rem;font-weight:800;background:#fff;border:1px solid var(--gold);color:#9a7a1f;border-radius:999px;padding:1px 7px;flex:0 0 auto;height:fit-content}
+.book .empty{font-size:.85rem;color:#9a8a66}
+.inbar{flex:0 0 auto;display:flex;gap:8px;padding:10px 12px calc(12px + env(safe-area-inset-bottom));background:rgba(255,255,255,.9);border-top:1px solid var(--line)}
+.tin{flex:1;border:1.5px solid var(--soft);border-radius:16px;padding:13px;font-size:1.04rem;font-family:inherit}
+.tin:focus{outline:none;border-color:var(--brand)}
+.go{border:none;border-radius:14px;background:var(--brand);color:#fff;font-weight:800;padding:0 16px;box-shadow:0 4px 0 #1f5447}
+.go:active{transform:translateY(3px);box-shadow:0 1px 0 #1f5447}
+.daybtn{display:block;margin:10px auto 4px;border:none;border-radius:14px;background:var(--accent);color:#fff;font-weight:800;padding:11px 20px;box-shadow:0 4px 0 #b35c1f}
+.daybtn:active{transform:translateY(3px);box-shadow:0 1px 0 #b35c1f}
+.owl .bob{animation:bob 3s ease-in-out infinite}@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.nav{position:fixed;top:8px;right:10px;font-size:.72rem;z-index:5}
+.nav a{color:var(--brand);text-decoration:none;background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 10px}
+</style></head>
+<body>
+<div class="nav"><a href="index.html">← 三选一</a></div>
+<div class="top">
+  <div class="eng">引擎② · 记得你的朋友（动森引擎）</div>
+  <h1>小羽记得你说过的每件事</h1>
+  <div class="sub">动力＝为了"一个记得我、想我的朋友"而回来</div>
+  <div class="day" id="day"></div>
+</div>
+
+<div class="wrap" id="wrap">
+  <div class="owltop" id="owltop"></div>
+  <div id="chat"></div>
+  <div class="book"><h3>📓 小羽的羽毛笔记本（它记住的关于你的事）</h3><div id="notes"><div class="empty">还空着——你说的话会被它记到这里。</div></div></div>
+  <button class="daybtn" id="nextDay">😴 假装过了一天，明天再来找小羽 →</button>
+</div>
+
+<div class="inbar">
+  <input class="tin" id="tin" placeholder="跟小羽说点你的事：喜欢什么、养了什么、今天遇到谁…"/>
+  <button class="go" id="go">说</button>
+</div>
+
+<script>
+let day=1, notes=[]; // {tag,text}
+const owl=`<svg class="owl" viewBox="0 0 100 110" width="92" style="overflow:visible"><g class="bob">
+<ellipse cx="50" cy="74" rx="30" ry="36" fill="#4a8273"/><ellipse cx="50" cy="87" rx="19" ry="21" fill="#f7ecd7"/>
+<circle cx="38" cy="58" r="12" fill="#fff"/><circle cx="62" cy="58" r="12" fill="#fff"/>
+<circle cx="40" cy="60" r="5.5" fill="#27241d"/><circle cx="60" cy="60" r="5.5" fill="#27241d"/>
+<circle cx="41.6" cy="57.6" r="1.8" fill="#fff"/><circle cx="61.6" cy="57.6" r="1.8" fill="#fff"/>
+<path d="M50,66 L45,72 L55,72 Z" fill="#f0a04b"/>
+<ellipse cx="50" cy="40" rx="22" ry="5" fill="#4a3f86"/><path d="M32,40 Q41,11 56,8 Q68,27 68,40 Q50,46 32,40 Z" fill="#4a3f86"/></g></svg>`;
+document.getElementById("owltop").innerHTML=owl;
+const chat=document.getElementById("chat");
+function esc(s){return (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]))}
+function add(who,t){const r=document.createElement("div");r.className="row "+who;r.innerHTML=`<div class="bub">${esc(t)}</div>`;chat.appendChild(r);document.getElementById("wrap").scrollTop=9e9;}
+
+// 极简"理解"：抓关键词归类（demo 用规则，真品用AI）
+function digest(v){
+  const m=[
+   [/养|有(只|条|个).*?(猫|狗|仓鼠|兔|鱼|鸟|乌龟)/,"养了",x=>(x.match(/猫|狗|仓鼠|兔|鱼|鸟|乌龟/)||[])[0]],
+   [/喜欢|最爱|爱玩|爱吃/,"喜欢",x=>x.replace(/.*?(喜欢|最爱|爱玩|爱吃)/,"").slice(0,10)],
+   [/怕|害怕|不敢/,"有点怕",x=>x.replace(/.*?(怕|害怕|不敢)/,"").slice(0,10)],
+   [/同学|朋友|老师|妈妈|爸爸|哥|姐|弟|妹/,"身边的人",x=>(x.match(/同学|朋友|老师|妈妈|爸爸|哥哥|姐姐|弟弟|妹妹/)||[])[0]],
+   [/今天|昨天|刚才|早上|放学|课间/,"最近发生",x=>x.slice(0,14)],
+  ];
+  for(const [re,tag,pick] of m){ if(re.test(v)){ const txt=(pick(v)||"").trim()||v.slice(0,12); return {tag,text:txt}; } }
+  return {tag:"你说过",text:v.slice(0,14)};
+}
+function renderNotes(){
+  document.getElementById("notes").innerHTML = notes.length
+    ? notes.slice(-8).map(n=>`<div class="note"><span class="t">${n.tag}</span><span>${esc(n.text)}</span></div>`).join("")
+    : `<div class="empty">还空着——你说的话会被它记到这里。</div>`;
+}
+function reactTo(d){
+  const r={"养了":`你养了${d.text}呀！它一定很可爱，多跟我讲讲它。`,
+    "喜欢":`原来你喜欢${d.text}！我记下了，下次专门陪你聊这个。`,
+    "有点怕":`谢谢你愿意告诉我你怕${d.text}——这种事说出来需要勇气。`,
+    "身边的人":`${d.text}是个怎样的人？最近你们之间发生了什么吗？`,
+    "最近发生":`这件事我记到本子上啦。它是在哪儿发生的呢？`,
+    "你说过":"嗯，我都记着呢。还想跟我说点什么？"};
+  return r[d.tag];
+}
+function say(){
+  const v=document.getElementById("tin").value.trim(); if(!v) return;
+  add("kid",v); document.getElementById("tin").value="";
+  const d=digest(v); notes.push(d); renderNotes();
+  setTimeout(()=>add("q",reactTo(d)),250);
+}
+document.getElementById("go").onclick=say;
+document.getElementById("tin").addEventListener("keydown",e=>{if(e.key==="Enter")say();});
+
+document.getElementById("day").textContent="第 "+day+" 天和小羽做朋友";
+function greet(){
+  if(notes.length===0){ add("q","你好呀！我是小羽。我有一本羽毛笔记本，专门记你的事。先随便跟我说一件你的事吧～"); return; }
+  const n=notes[Math.floor(Math.random()*notes.length)];
+  const g={"养了":`早呀！我一直在想你养的${n.text}，它今天还好吗？`,
+    "喜欢":`你来啦！昨天你说你喜欢${n.text}，我特意想了一晚上要问你什么。`,
+    "有点怕":`嘿，是你！上次你说你有点怕${n.text}，今天感觉好一点了吗？`,
+    "身边的人":`好久不见！${n.text}最近怎么样啦？`,
+    "最近发生":`你回来啦！我还记着你说的「${n.text}」，后来呢？`,
+    "你说过":`是你呀！我翻了翻笔记本，想起你说过「${n.text}」。`};
+  add("q",g[n.tag]||g["你说过"]);
+}
+greet();
+
+document.getElementById("nextDay").onclick=()=>{
+  day++; document.getElementById("day").textContent="第 "+day+" 天和小羽做朋友";
+  chat.innerHTML=""; greet();
+  document.getElementById("wrap").scrollTop=0;
+};
+</script>
+</body></html>

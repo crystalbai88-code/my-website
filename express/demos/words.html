@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>引擎③ 话变成东西 · 小羽</title>
+<style>
+:root{--brand:#2f6f5e;--soft:#e4f0eb;--accent:#e8884a;--ink:#2c2a26;--soft2:#fce8d7;--gold:#d8a93a;--line:#ece4d7}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);
+ background:linear-gradient(180deg,#cdeafe,#e7f6ef 45%,#fbf7f0);display:flex;flex-direction:column;height:100dvh;line-height:1.6}
+button{font-family:inherit;cursor:pointer}
+.top{flex:0 0 auto;text-align:center;padding:10px}
+.eng{font-size:.72rem;font-weight:800;letter-spacing:1px;color:var(--accent)}
+h1{font-size:1.1rem;margin:2px 0}.sub{font-size:.76rem;color:#6b6459}
+.stage{flex:1 1 auto;display:flex;flex-direction:column;padding:6px 14px;overflow-y:auto}
+.scene{position:relative;flex:1 1 auto;min-height:240px;border-radius:18px;overflow:hidden;
+ background:linear-gradient(180deg,#bfe3fb,#dff3ea 60%,#cfe8c4);border:3px solid #fff;box-shadow:0 8px 24px rgba(60,50,35,.12)}
+.scene .sun2{position:absolute;top:14px;right:18px;width:40px;height:40px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff6cf,#ffd95e 60%,rgba(255,217,94,0) 75%)}
+.scene .ground{position:absolute;left:0;right:0;bottom:0;height:34%;background:linear-gradient(180deg,#a9d68c,#8cc06e)}
+.item{position:absolute;font-size:42px;animation:drop .5s cubic-bezier(.2,1.4,.4,1);filter:drop-shadow(0 3px 3px rgba(0,0,0,.15))}
+@keyframes drop{0%{transform:translateY(-40px) scale(0);opacity:0}100%{transform:translateY(0) scale(1);opacity:1}}
+.placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:#5a7a86;font-size:.95rem;padding:20px}
+.cap{margin:10px 0 4px;font-size:1.02rem;background:#fff;border:1.5px solid var(--soft);border-radius:12px;padding:10px 13px}
+.cap b{background:#fff3c4;border-radius:5px;padding:0 3px;font-weight:800;color:#8a6a14}
+.meter{font-size:.86rem;font-weight:800;color:var(--brand);margin-top:6px}
+.owlsay{display:flex;gap:8px;align-items:flex-start;margin-top:8px}
+.owlsay .o{flex:0 0 auto;font-size:30px}
+.owlsay .b{background:var(--soft);border-radius:4px 14px 14px 14px;padding:9px 13px;font-size:.96rem;font-weight:600}
+.inbar{flex:0 0 auto;display:flex;gap:8px;padding:10px 12px calc(12px + env(safe-area-inset-bottom));background:rgba(255,255,255,.9);border-top:1px solid var(--line)}
+.tin{flex:1;border:1.5px solid var(--soft);border-radius:16px;padding:13px;font-size:1.04rem;font-family:inherit}
+.tin:focus{outline:none;border-color:var(--brand)}
+.go{border:none;border-radius:14px;background:var(--accent);color:#fff;font-weight:800;padding:0 16px;box-shadow:0 4px 0 #b35c1f}
+.go:active{transform:translateY(3px);box-shadow:0 1px 0 #b35c1f}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.chip{border:1.5px solid var(--soft);background:#fff;border-radius:999px;padding:5px 11px;font-size:.8rem}
+.nav{position:fixed;top:8px;right:10px;font-size:.72rem;z-index:5}
+.nav a{color:var(--brand);text-decoration:none;background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 10px}
+</style></head>
+<body>
+<div class="nav"><a href="index.html">← 三选一</a></div>
+<div class="top">
+  <div class="eng">引擎③ · 话变成东西（涂鸦冒险家引擎）</div>
+  <h1>你说得越具体，画面里东西越多</h1>
+  <div class="sub">动力＝说话本身变成魔法；顺便偷偷教孩子"写具体"</div>
+</div>
+
+<div class="stage">
+  <div class="scene" id="scene">
+    <div class="sun2"></div><div class="ground"></div>
+    <div class="placeholder" id="ph">下面说一句话试试——比如"我家的猫在窗台上晒太阳睡觉"</div>
+  </div>
+  <div class="cap" id="cap" style="display:none"></div>
+  <div class="meter" id="meter"></div>
+  <div class="owlsay" id="owlsay" style="display:none"><div class="o">🦉</div><div class="b" id="owlb"></div></div>
+  <div class="chips" id="chips"></div>
+</div>
+
+<div class="inbar">
+  <input class="tin" id="tin" placeholder="说一句话，看它变成画面…"/>
+  <button class="go" id="go">变！</button>
+</div>
+
+<script>
+// 词典：看得见/听得见的词 → emoji（demo 用，真品可由AI识别）
+const DICT=[
+ // 动物
+ ["猫","🐱"],["狗","🐶"],["仓鼠","🐹"],["兔","🐰"],["鸟","🐦"],["鱼","🐟"],["乌龟","🐢"],["蝴蝶","🦋"],["蚂蚁","🐜"],["鸡","🐔"],["马","🐴"],["熊","🐻"],["恐龙","🦖"],
+ // 自然/天气
+ ["太阳","☀️"],["月亮","🌙"],["星","⭐"],["云","☁️"],["雨","🌧️"],["雪","❄️"],["风","🌬️"],["树","🌳"],["花","🌸"],["草","🌿"],["山","⛰️"],["海","🌊"],["火","🔥"],["彩虹","🌈"],
+ // 地点/物
+ ["窗","🪟"],["门","🚪"],["床","🛏️"],["桌","🪑"],["椅","🪑"],["书","📖"],["球","⚽"],["车","🚗"],["自行车","🚲"],["伞","☂️"],["灯","💡"],["钟","🕐"],["蛋糕","🍰"],["冰淇淋","🍦"],["糖","🍬"],["水","💧"],["饭","🍚"],["面","🍜"],
+ ["篮球","🏀"],["足球","⚽"],["滑梯","🛝"],["秋千","🪅"],["楼梯","🪜"],["教室","🏫"],["操场","🏃"],
+ // 人/身体
+ ["妈妈","👩"],["爸爸","👨"],["老师","🧑‍🏫"],["同学","🧒"],["朋友","🧑‍🤝‍🧑"],["手","✋"],["脚","🦶"],["眼睛","👀"],["嘴","👄"],
+ // 动作/声音（看得见听得见）
+ ["跑","💨"],["跳","⤴️"],["哭","😢"],["笑","😄"],["睡","💤"],["喊","📣"],["叫","📣"],["摔","💥"],["飞","🕊️"],["唱","🎵"],["响","🔔"],["亮","✨"],
+];
+const VAGUE=/^(我很|好|挺|有点)?(开心|高兴|难过|伤心|紧张|害怕|无聊|生气|喜欢|讨厌|好玩|有趣|累)+[。.!！]?$/;
+let placed=0;
+
+function detect(v){
+  const found=[]; const seen=new Set();
+  for(const [w,e] of DICT){ if(v.includes(w)&&!seen.has(e)){ seen.add(e); found.push([w,e]); } }
+  return found;
+}
+function place(found){
+  const scene=document.getElementById("scene");
+  // 清掉上次
+  scene.querySelectorAll(".item").forEach(n=>n.remove());
+  document.getElementById("ph").style.display = found.length?"none":"flex";
+  found.forEach(([w,e],i)=>{
+    const it=document.createElement("div"); it.className="item"; it.textContent=e;
+    const cols=Math.min(found.length,5);
+    it.style.left=(10 + (i%cols)*(78/Math.max(1,cols-0+0.0001)) + Math.random()*6)+"%";
+    it.style.top=(28 + Math.floor(i/cols)*22 + Math.random()*10)+"%";
+    it.style.animationDelay=(i*0.08)+"s";
+    scene.appendChild(it);
+  });
+}
+function go(){
+  const v=document.getElementById("tin").value.trim(); if(!v) return;
+  const found=detect(v);
+  place(found);
+  // 高亮抓到的词
+  let cap=v; found.forEach(([w])=>{ cap=cap.replaceAll(w,`<b>${w}</b>`); });
+  const capEl=document.getElementById("cap"); capEl.style.display="block"; capEl.innerHTML="你说的："+cap;
+  document.getElementById("meter").textContent=`🔍 你的画面里有 ${found.length} 样看得见的东西！`;
+  const say=document.getElementById("owlsay"), b=document.getElementById("owlb"); say.style.display="flex";
+  if(found.length===0){
+    if(VAGUE.test(v)) b.textContent="嗯…「"+v+"」我画不出来——它在心里，但看不见。开心的时候，你的脸/手在做什么？说出来我就能画！";
+    else b.textContent="我还没找到能画的东西～试试说一个你看得见的：一个动物、一个地方、一个动作？";
+  } else if(found.length<=2){
+    b.textContent="画出来一点点啦！再加一样——当时旁边还有什么？发出了什么声音？";
+  } else {
+    b.textContent="哇！你一句话就变出了一整个画面——这就是写得具体的魔法。✨";
+  }
+  document.getElementById("tin").value="";
+}
+document.getElementById("go").onclick=go;
+document.getElementById("tin").addEventListener("keydown",e=>{if(e.key==="Enter")go();});
+const ideas=["我家的猫在窗台上晒太阳睡觉","操场上同学们在踢足球，太阳很大","下雨了，我和妈妈躲在一把伞下面","我很开心"];
+document.getElementById("chips").innerHTML=ideas.map(t=>`<button class="chip">${t}</button>`).join("");
+document.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{document.getElementById("tin").value=b.textContent;go();});
+</script>
+</body></html>
