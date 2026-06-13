@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>风格③ 你来当作者 · 小羽</title>
+<style>
+:root{--brand:#2f6f5e;--soft:#e4f0eb;--accent:#e8884a;--ink:#2c2a26;--soft2:#fce8d7;--gold:#d8a93a;--line:#ece4d7;--c:#74b816}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);
+ background:linear-gradient(180deg,#cdeafe,#e7f6ef 50%,#fbf7f0);display:flex;flex-direction:column;height:100dvh;line-height:1.6}
+button{font-family:inherit;cursor:pointer}
+.top{flex:0 0 auto;text-align:center;padding:10px}
+.eng{font-size:.72rem;font-weight:800;letter-spacing:1px;color:#5a8c10}
+h1{font-size:1.1rem;margin:2px 0}.sub{font-size:.76rem;color:#6b6459}
+.wrap{flex:1 1 auto;overflow-y:auto;padding:6px 14px}
+.label{font-size:.74rem;font-weight:800;color:#5a6a64;margin:8px 0 4px}
+.scenes{display:flex;gap:6px;flex-wrap:wrap}
+.sc{border:2px solid var(--soft);background:#fff;border-radius:12px;padding:7px 11px;font-size:.86rem}
+.sc.sel{border-color:var(--c);background:#eef7df}
+.stage{position:relative;height:200px;border-radius:18px;border:3px solid #fff;overflow:hidden;margin:8px 0;
+ box-shadow:0 8px 24px rgba(60,50,35,.12);transition:background .3s;background:#dff3ea}
+.stage.s_park{background:linear-gradient(180deg,#bfe3fb,#bfe3fb 55%,#a9d68c 55%)}
+.stage.s_class{background:linear-gradient(180deg,#fbeede,#fbeede 60%,#e8d3b0 60%)}
+.stage.s_space{background:linear-gradient(180deg,#2a2150,#3a2f6e)}
+.stage.s_sea{background:linear-gradient(180deg,#7fc6e8,#2f86b5)}
+.stage.s_home{background:linear-gradient(180deg,#fff3e0,#fff3e0 58%,#e9c9a0 58%)}
+.stage.s_space .ph,.stage.s_sea .ph{color:#dfe7ff}
+.ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:#5a7a86;font-size:.9rem;padding:18px}
+.actor{position:absolute;font-size:40px;animation:pop .4s cubic-bezier(.2,1.4,.4,1);cursor:grab;filter:drop-shadow(0 3px 3px rgba(0,0,0,.18))}
+@keyframes pop{0%{transform:scale(0)}100%{transform:scale(1)}}
+.tray{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0}
+.castbtn{font-size:26px;background:#fff;border:2px solid var(--soft);border-radius:12px;padding:5px 9px}
+.castbtn:active{transform:scale(.9)}
+.qrow{display:flex;gap:10px;align-items:flex-start;margin:10px 0 0}
+.qrow .o{font-size:28px;flex:0 0 auto}
+.qrow .b{background:var(--soft);border-radius:4px 14px 14px 14px;padding:9px 13px;font-size:1rem;font-weight:600}
+.script{background:#fff;border:1.5px solid var(--soft);border-radius:12px;padding:10px 13px;margin-top:8px;font-size:.96rem}
+.script .ln{padding:3px 0;border-bottom:1px dotted var(--line)}
+.script .ln:last-child{border:none}
+.inbar{flex:0 0 auto;display:flex;gap:8px;padding:10px 12px calc(12px + env(safe-area-inset-bottom));background:rgba(255,255,255,.9);border-top:1px solid var(--line)}
+.tin{flex:1;border:1.5px solid var(--soft);border-radius:16px;padding:13px;font-size:1.04rem;font-family:inherit}
+.tin:focus{outline:none;border-color:var(--brand)}
+.go{border:none;border-radius:14px;background:var(--c);color:#fff;font-weight:800;padding:0 16px;box-shadow:0 4px 0 #4e7a0f}
+.go:active{transform:translateY(3px);box-shadow:0 1px 0 #4e7a0f}
+.nav{position:fixed;top:8px;right:10px;font-size:.72rem;z-index:5}
+.nav a{color:var(--brand);text-decoration:none;background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 10px}
+</style></head>
+<body>
+<div class="nav"><a href="index.html">← 四选一</a></div>
+<div class="top">
+  <div class="eng">风格③ · 你来当作者（模拟人生 / Toca 引擎）</div>
+  <h1>你是导演，没有标准答案</h1>
+  <div class="sub">动力＝这个世界由你创造，小羽是入迷的观众</div>
+</div>
+
+<div class="wrap">
+  <div class="label">① 选个舞台</div>
+  <div class="scenes" id="scenes"></div>
+  <div class="stage" id="stage"><div class="ph" id="ph">选好舞台，再从下面点几个角色放上来 👇</div></div>
+  <div class="label">② 放上谁（想放几个放几个，点一下就上台）</div>
+  <div class="tray" id="tray"></div>
+  <div class="qrow" id="qrow" style="display:none"><div class="o">🦉</div><div class="b" id="qb"></div></div>
+  <div class="script" id="script" style="display:none"></div>
+</div>
+
+<div class="inbar">
+  <input class="tin" id="tin" placeholder="③ 导演，他们之间发生了什么？"/>
+  <button class="go" id="go">演给小羽看</button>
+</div>
+
+<script>
+const SCENES=[["park","🏞️ 公园"],["class","🏫 教室"],["space","🚀 太空"],["sea","🌊 海底"],["home","🏠 家里"]];
+const CAST=["🧒","👧","👩","👨","👵","🐱","🐶","🦖","🤖","👽","🧙","🦸","👻","🐉"];
+let scene=null, actors=0, lines=0;
+
+const scEl=document.getElementById("scenes"), stage=document.getElementById("stage"), tray=document.getElementById("tray");
+scEl.innerHTML=SCENES.map(([id,t])=>`<button class="sc" data-s="${id}">${t}</button>`).join("");
+tray.innerHTML=CAST.map(e=>`<button class="castbtn" data-e="${e}">${e}</button>`).join("");
+
+scEl.querySelectorAll(".sc").forEach(b=>b.onclick=()=>{
+  scene=b.dataset.s;
+  scEl.querySelectorAll(".sc").forEach(x=>x.classList.remove("sel")); b.classList.add("sel");
+  stage.className="stage s_"+scene;
+  if(actors===0) document.getElementById("ph").textContent="舞台搭好啦！点下面的角色放上来 👇";
+});
+tray.querySelectorAll(".castbtn").forEach(b=>b.onclick=()=>{
+  if(!scene){ document.getElementById("ph").textContent="先选一个舞台呀 👆"; return; }
+  document.getElementById("ph").style.display="none";
+  const a=document.createElement("div"); a.className="actor"; a.textContent=b.dataset.e;
+  a.style.left=(12+Math.random()*70)+"%"; a.style.top=(30+Math.random()*42)+"%";
+  stage.appendChild(a); actors++;
+  // 简易拖动
+  let drag=false;
+  a.onpointerdown=e=>{drag=true;a.setPointerCapture(e.pointerId);a.style.cursor="grabbing";};
+  a.onpointermove=e=>{if(!drag)return;const r=stage.getBoundingClientRect();
+    a.style.left=Math.max(2,Math.min(92,(e.clientX-r.left)/r.width*100))+"%";
+    a.style.top=Math.max(8,Math.min(86,(e.clientY-r.top)/r.height*100))+"%";};
+  a.onpointerup=()=>{drag=false;a.style.cursor="grab";};
+  if(actors===1) showQ("台上有角色啦！导演，他们之间，发生了一件什么事？");
+});
+
+const AUDIENCE=[
+ "哇，然后呢？他接下来做了什么？",
+ "有意思！那另一个角色，看到这一幕是什么反应？",
+ "他为什么要这么做呀？我好好奇。",
+ "他当时说了什么吗？说给我听听。",
+ "这一刻，他的表情/动作是怎样的？",
+ "后来怎么样了？我等不及想知道结局！",
+];
+function showQ(t){ document.getElementById("qrow").style.display="flex"; document.getElementById("qb").textContent=t; }
+function go(){
+  const v=document.getElementById("tin").value.trim(); if(!v) return;
+  if(!scene||actors===0){ showQ("先搭个舞台、放个角色，我们就开演～"); return; }
+  const sc=document.getElementById("script"); sc.style.display="block";
+  const ln=document.createElement("div"); ln.className="ln"; ln.textContent="🎬 "+v; sc.appendChild(ln);
+  lines++;
+  document.getElementById("tin").value="";
+  // 观众小羽追问（轮换 + 简单关键词）
+  let q;
+  if(/说|喊|叫|问/.test(v)) q="他说这句话的时候，是大声还是小声？";
+  else if(/跑|跳|冲|躲|摔/.test(v)) q="这个动作我能想象出来！做完之后呢？";
+  else q=AUDIENCE[lines % AUDIENCE.length];
+  setTimeout(()=>showQ(q),250);
+  document.getElementById("script").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+document.getElementById("go").onclick=go;
+document.getElementById("tin").addEventListener("keydown",e=>{if(e.key==="Enter")go();});
+</script>
+</body></html>

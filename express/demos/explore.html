@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>风格④ 好奇探索 · 小羽</title>
+<style>
+:root{--brand:#2f6f5e;--soft:#e4f0eb;--accent:#e8884a;--ink:#2c2a26;--soft2:#fce8d7;--gold:#d8a93a;--line:#ece4d7;--c:#3b86c9}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);
+ background:linear-gradient(180deg,#cdeafe,#e7f6ef 50%,#fbf7f0);display:flex;flex-direction:column;height:100dvh;line-height:1.6}
+button{font-family:inherit;cursor:pointer}
+.top{flex:0 0 auto;text-align:center;padding:10px}
+.eng{font-size:.72rem;font-weight:800;letter-spacing:1px;color:var(--c)}
+h1{font-size:1.1rem;margin:2px 0}.sub{font-size:.76rem;color:#6b6459}
+.cnt{font-size:.76rem;color:var(--c);font-weight:800;margin-top:2px}
+.wrap{flex:1 1 auto;overflow-y:auto;padding:6px 14px}
+.map{position:relative;height:300px;border-radius:20px;border:3px solid #fff;overflow:hidden;
+ background:linear-gradient(180deg,#bfe3fb 0%,#bfe3fb 42%,#a9d6f0 42%,#a9d6f0 56%,#cfe8c4 56%);box-shadow:0 8px 24px rgba(60,50,35,.12)}
+.spot{position:absolute;transform:translate(-50%,-50%);text-align:center;border:none;background:transparent;cursor:pointer}
+.spot .pin{font-size:34px;filter:drop-shadow(0 3px 3px rgba(0,0,0,.18));transition:.2s}
+.spot:not(.done) .pin{animation:glow 1.8s ease-in-out infinite}
+@keyframes glow{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.spot .nm{display:block;font-size:.66rem;font-weight:800;color:#2c4a5a;background:rgba(255,255,255,.8);border-radius:999px;padding:1px 7px;margin-top:1px}
+.spot.done .pin{filter:none;opacity:.55}
+.spot.done .nm::after{content:" ✨"}
+.panel{background:#fff;border:1.5px solid var(--soft);border-radius:16px;padding:14px;margin:12px 0}
+.qrow{display:flex;gap:10px;align-items:flex-start}
+.qrow .o{font-size:30px;flex:0 0 auto}
+.qrow .b{background:var(--soft);border-radius:4px 14px 14px 14px;padding:10px 13px;font-size:1.02rem;font-weight:600}
+.answer{margin-top:10px}
+.tin{width:100%;border:1.5px solid var(--soft);border-radius:12px;padding:12px;font-size:1.02rem;font-family:inherit}
+.tin:focus{outline:none;border-color:var(--brand)}
+.go{margin-top:8px;border:none;border-radius:12px;background:var(--c);color:#fff;font-weight:800;padding:10px 18px;box-shadow:0 4px 0 #2a6391}
+.go:active{transform:translateY(3px);box-shadow:0 1px 0 #2a6391}
+.react{margin-top:10px;background:#fffae8;border:1.5px solid var(--gold);border-radius:12px;padding:9px 13px;font-size:.92rem;color:#8a6a14;font-weight:600}
+.hint{font-size:.85rem;color:#5a7a86;text-align:center;margin:10px 0}
+.nav{position:fixed;top:8px;right:10px;font-size:.72rem;z-index:5}
+.nav a{color:var(--brand);text-decoration:none;background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 10px}
+</style></head>
+<body>
+<div class="nav"><a href="index.html">← 四选一</a></div>
+<div class="top">
+  <div class="eng">风格④ · 好奇探索（塞尔达 / 光遇引擎）</div>
+  <h1>你想先去哪儿？</h1>
+  <div class="sub">动力＝自己选路、"那边有什么"的好奇心，不是按课程表走</div>
+  <div class="cnt" id="cnt">点亮了 0 / 6 个地方</div>
+</div>
+
+<div class="wrap">
+  <div class="map" id="map"></div>
+  <div class="hint" id="hint">🗺️ 这是你的记忆小岛——哪个地方在闪，就点它，看小羽问你什么。想去哪先去哪。</div>
+  <div id="panel"></div>
+</div>
+
+<script>
+const SPOTS=[
+ {id:"peak",pin:"⛰️",nm:"山顶",x:22,y:24,
+  q:"你站在山顶上啦！你有没有一次站在很高的地方往下看？看到了什么，心里什么感觉？",
+  r:"站得高的时候，世界都变小了对吧——这种'往下看'的瞬间，特别适合写进故事。"},
+ {id:"sea",pin:"🏖️",nm:"海边",x:72,y:48,
+  q:"海边好安静。有没有一个地方，是你想一个人待着的时候会去的？那里有什么？",
+  r:"每个人都有一个'自己的角落'，你愿意告诉我，我很珍惜。"},
+ {id:"cabin",pin:"🏚️",nm:"小木屋",x:30,y:70,
+  q:"小木屋里藏着秘密哦。有没有一件事，是你记得特别清楚、但很少跟别人说的？",
+  r:"谢谢你把它从小木屋里拿出来给我看——这种事，最值得被写下来。"},
+ {id:"star",pin:"🌌",nm:"星空台",x:55,y:16,
+  q:"抬头看星星！如果今晚能许一个愿，你会许什么？为什么是这个？",
+  r:"这个愿望里，藏着你心里最在乎的东西。我记住了。"},
+ {id:"fair",pin:"🎪",nm:"热闹集市",x:80,y:74,
+  q:"集市好热闹！想到'人多'的时候，你脑子里先跳出来的是哪一次？发生了什么？",
+  r:"人多的地方总有故事——你刚说的那一幕，我都能想象出来。"},
+ {id:"tree",pin:"🌳",nm:"大树洞",x:48,y:78,
+  q:"大树洞里住着回忆。有没有一个你特别喜欢、一想起就开心的瞬间？",
+  r:"开心的回忆是宝藏。你愿意一想起就笑的那个画面，正是好故事的种子。"},
+];
+const map=document.getElementById("map");
+const done=new Set();
+function render(){
+  map.innerHTML="";
+  SPOTS.forEach(s=>{
+    const b=document.createElement("button"); b.className="spot"+(done.has(s.id)?" done":"");
+    b.style.left=s.x+"%"; b.style.top=s.y+"%";
+    b.innerHTML=`<span class="pin">${s.pin}</span><span class="nm">${s.nm}</span>`;
+    b.onclick=()=>open(s); map.appendChild(b);
+  });
+  document.getElementById("cnt").textContent=`点亮了 ${done.size} / ${SPOTS.length} 个地方`;
+}
+function open(s){
+  document.getElementById("hint").style.display="none";
+  const p=document.getElementById("panel");
+  p.innerHTML=`<div class="panel">
+    <div class="qrow"><div class="o">🦉</div><div class="b">${s.q}</div></div>
+    <div class="answer"><input class="tin" id="ans" placeholder="说说看…（说不出来也可以换个地方逛逛）"/>
+    <button class="go" id="goAns">告诉小羽</button></div>
+    <div id="react"></div></div>`;
+  p.scrollIntoView({behavior:"smooth",block:"nearest"});
+  document.getElementById("ans").focus();
+  const submit=()=>{
+    const v=document.getElementById("ans").value.trim(); if(!v) return;
+    done.add(s.id);
+    document.getElementById("react").innerHTML=`<div class="react">${s.r}</div>`;
+    document.getElementById("ans").disabled=true; document.getElementById("goAns").disabled=true;
+    render();
+    if(done.size===SPOTS.length){
+      setTimeout(()=>document.getElementById("react").innerHTML+=`<div class="react" style="margin-top:8px">🎉 整座岛都被你点亮了！你看，你心里其实装着这么多故事。</div>`,300);
+    }
+  };
+  document.getElementById("goAns").onclick=submit;
+  document.getElementById("ans").addEventListener("keydown",e=>{if(e.key==="Enter")submit();});
+}
+render();
+</script>
+</body></html>
