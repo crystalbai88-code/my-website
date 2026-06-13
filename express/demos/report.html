@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>成长报告 · 小羽</title>
+<style>
+:root{--brand:#2f6f5e;--soft:#e4f0eb;--accent:#e8884a;--ink:#2c2a26;--soft2:#fce8d7;--gold:#d8a93a;--line:#ece4d7;--purple:#7c5cff}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);
+ background:linear-gradient(180deg,#cdeafe,#e7f6ef 40%,#fbf7f0);line-height:1.6;padding:18px 14px 60px;min-height:100dvh}
+button{font-family:inherit;cursor:pointer}
+.wrap{max-width:640px;margin:0 auto}
+.eng{font-size:.72rem;font-weight:800;letter-spacing:1px;color:var(--accent);text-align:center}
+h1{font-size:1.3rem;margin:2px 0 4px;text-align:center}
+.lead{font-size:.84rem;color:#5a6a64;text-align:center;margin-bottom:14px}
+.card{background:#fff;border:1.5px solid var(--soft);border-radius:18px;padding:16px 18px;margin:14px 0;box-shadow:0 6px 20px rgba(60,50,35,.08)}
+.card.kid{border-left:9px solid var(--accent)}
+.card.parent{border-left:9px solid var(--brand)}
+.who{font-size:.74rem;font-weight:800;letter-spacing:.5px;color:#8a7a60;margin-bottom:6px}
+h2{font-size:1.08rem;margin:2px 0 8px}
+.src{background:#f6f9f6;border:1px dashed var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px}
+.src .lab{font-size:.74rem;color:#6b6459;margin-bottom:6px}
+textarea{width:100%;border:1.5px solid var(--soft);border-radius:10px;padding:10px;font-size:.92rem;font-family:inherit;line-height:1.8;background:#fffdf9;resize:vertical}
+.gen{display:block;margin:6px auto 0;border:none;border-radius:14px;background:var(--brand);color:#fff;font-weight:800;padding:12px 24px;font-size:1rem;box-shadow:0 4px 0 #1f5447}
+.gen:active{transform:translateY(3px);box-shadow:0 1px 0 #1f5447}
+.work{font-size:1.04rem;line-height:1.9;background:#fffaf2;border-radius:12px;padding:14px;border:1px solid var(--soft2)}
+.work .ti{font-weight:800;color:#a8521a;display:block;margin-bottom:6px}
+.tipkid{font-size:.78rem;color:#9a8f80;margin-top:8px}
+.big{display:flex;align-items:baseline;gap:8px;margin:6px 0}
+.bignum{font-size:2rem;font-weight:800;color:var(--brand)}
+.bigtxt{font-size:.86rem;color:#5a6a64}
+.curve{display:flex;align-items:flex-end;gap:14px;height:96px;margin:10px 0 4px;padding-top:6px}
+.col{flex:1;text-align:center;display:flex;flex-direction:column;justify-content:flex-end;height:100%}
+.col .b{background:linear-gradient(180deg,var(--accent),var(--brand));border-radius:6px 6px 0 0;transition:height .6s;min-height:3px}
+.col .v{font-size:.8rem;font-weight:800;color:var(--brand)}
+.col .lb{font-size:.72rem;color:#6b6459;margin-top:3px}
+.dim{margin:8px 0}
+.dimrow{display:flex;justify-content:space-between;font-size:.84rem;font-weight:700;margin-bottom:3px}
+.dimrow .lv{color:var(--brand)}
+.dbar{height:9px;background:var(--soft);border-radius:999px;overflow:hidden}
+.dbar>i{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--accent));border-radius:999px}
+.spark{font-size:.9rem;padding:6px 0;border-bottom:1px dotted var(--line)}
+.spark:last-child{border:none}
+.proc{font-size:.88rem;background:#f6f9f6;border-radius:12px;padding:10px 13px;margin-top:8px}
+.note{font-size:.8rem;color:#6b6459;background:#fffaf0;border:1px dashed var(--line);border-radius:12px;padding:11px 13px;margin-top:16px}
+.hint{font-size:.78rem;color:var(--purple);margin-top:6px}
+.nav{position:fixed;top:8px;right:10px;font-size:.72rem;z-index:5}
+.nav a{color:var(--brand);text-decoration:none;background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 10px}
+.muted{color:#8a8f86}
+</style></head>
+<body><div class="nav"><a href="index.html">← 全部</a></div>
+<div class="wrap">
+  <div class="eng">小羽 · 一次聊天结束后</div>
+  <h1>📊 这次聊出了什么？</h1>
+  <p class="lead">聊天不是白聊——它收口成两样东西：孩子带走一篇作品，家长看到一条成长曲线。</p>
+
+  <div class="card">
+    <div class="who">原料 · 孩子今天说出的话（可改，试试把"很好玩"改成具体的）</div>
+    <div class="src">
+      <div class="lab">一行一句（这是孩子说的，不是小羽说的）：</div>
+      <textarea id="lines" rows="7"></textarea>
+      <div class="hint" id="livehint"></div>
+    </div>
+    <button class="gen" id="gen">生成成长报告 →</button>
+  </div>
+
+  <div id="out"></div>
+</div>
+
+<script>
+const SAMPLE=[
+ "今天体育课跳长绳",
+ "我有点紧张",
+ "轮到我的时候我攥紧了拳头，腿有点抖",
+ "绳子甩得啪啪响",
+ "我冲进去了，绳子擦过我的头发",
+ "跳过去那一下我笑出了声",
+ "还好"
+].join("\n");
+document.getElementById("lines").value=SAMPLE;
+
+const ACT=/跑|跳|抓|推|拉|喊|叫|握|拿|踢|笑|哭|攥|捏|看见|听见|发抖|抖|出汗|翻|踩|碰|摸|咬|皱|扔|抱|蹲|爬|冲|躲|舔|撞|倒|擦/;
+const SENSE=/声音|啪|响|喵|汪|轰|颜色|味道|闻|冷|热|疼|香|亮|软|硬/;
+const NOUN=/猫|狗|仓鼠|兔|鸟|鱼|绳|球|花|树|窗|门|拳头|头发|腿|手|沙发|花盆|操场|教室|妈妈|爸爸|同学|老师/;
+const FEEL=/觉得|心里|念头|原来|没想到|犹豫|后悔|担心|舍不得|不敢|想到|明白/;
+const EMOpure=/^(我)?(很|好|有点|特别|挺)?(开心|高兴|难过|紧张|害怕|无聊|生气|累|还好|不错|好玩|有趣)+[。.!！~]*$/;
+
+function isConcrete(s){ return (ACT.test(s)||SENSE.test(s)||NOUN.test(s)) && !EMOpure.test(s); }
+
+function liveHint(){
+  const lines=document.getElementById("lines").value.split("\n").map(s=>s.trim()).filter(Boolean);
+  const c=lines.filter(isConcrete).length;
+  const pct=lines.length?Math.round(c/lines.length*100):0;
+  document.getElementById("livehint").textContent=`🔍 现在：${lines.length} 句里有 ${c} 句"看得见"（具体度 ${pct}%）`;
+}
+document.getElementById("lines").addEventListener("input",liveHint); liveHint();
+
+function lvl(p){ return p>=75?4:p>=50?3:p>=25?2:1; }
+function gen(){
+  const lines=document.getElementById("lines").value.split("\n").map(s=>s.trim()).filter(Boolean);
+  if(!lines.length) return;
+  const concrete=lines.filter(isConcrete);
+  const pct=Math.round(concrete.length/lines.length*100);
+  // 作品：用孩子的具体句拼（不改写）
+  const story=(concrete.length?concrete:lines).join("，").replace(/[，。]+$/,"")+"。";
+  const kw=(story.match(NOUN)||["这件事"])[0];
+  // 八维（demo 启发式）
+  const dims=[
+   ["观察细节", lvl(pct)],
+   ["素材发现", lines.length>=5?3:2],
+   ["感受表达", FEEL.test(lines.join(""))?3:(lines.some(EMOpure.test.bind(EMOpure))?2:1)],
+   ["顺序结构", lines.length>=4?3:2],
+   ["重点选择", concrete.length>=3?3:2],
+   ["语言清楚", 3],
+   ["观点形成", FEEL.test(lines.join(""))?2:1],
+   ["主动修改", 1],
+  ];
+  // 成长曲线（前两点为示例历史，最后一点是本次实测）
+  const curve=[["两周前",28],["上周",50],["本次",pct]];
+  const out=document.getElementById("out");
+  out.innerHTML=`
+   <div class="card kid">
+     <div class="who">👶 孩子看到的</div>
+     <h2>📖 你今天说出的故事</h2>
+     <div class="work"><span class="ti">《${kw}的那一下》</span>${story}</div>
+     <p class="tipkid">↑ 这一段全是你自己说的话，小羽只帮你排了顺序——一个字都没替你写。可以存下来、读给家人听。</p>
+   </div>
+
+   <div class="card parent">
+     <div class="who">👀 家长 / 老师看到的（孩子端看不到这些数字）</div>
+     <h2>📈 表达成长报告</h2>
+
+     <div class="big"><span class="bignum">${pct}%</span><span class="bigtxt">这次说出的话里，<b>${concrete.length}/${lines.length}</b> 句是"看得见的细节"<br>（动作 / 声音 / 画面，而不是"很好玩"）</span></div>
+
+     <div style="font-size:.82rem;font-weight:700;color:#5a6a64;margin-top:8px">具体度成长曲线</div>
+     <div class="curve">${curve.map(([t,v])=>`<div class="col"><div class="v">${v}%</div><div class="b" style="height:${v}%"></div><div class="lb">${t}</div></div>`).join("")}</div>
+     <p class="hint" style="color:#5a8c10">↑ 这条线就是量化结果：孩子从"很好玩"在慢慢学会说出看得见的细节。</p>
+
+     <div style="font-size:.82rem;font-weight:700;color:#5a6a64;margin:14px 0 4px">八维成长（依据知识库 08 量表，不看字数/好词好句）</div>
+     ${dims.map(([n,l])=>`<div class="dim"><div class="dimrow"><span>${n}</span><span class="lv">L${l}/4</span></div><div class="dbar"><i style="width:${l/4*100}%"></i></div></div>`).join("")}
+
+     <div style="font-size:.82rem;font-weight:700;color:#5a6a64;margin:14px 0 4px">✨ 这次的闪光句（孩子自己说出的好细节）</div>
+     ${concrete.length?concrete.map(s=>`<div class="spark">「${s}」</div>`).join(""):'<div class="muted" style="font-size:.85rem">这次还没出现看得见的细节——下次小羽会多引导他说动作和声音。</div>'}
+
+     <div class="proc">过程指标：本次主动说了 <b>${lines.length}</b> 句 · 其中 <b>${concrete.length}</b> 句带细节 · 产出 1 篇小作品<br>建议：晚饭时请孩子读一遍《${kw}的那一下》，问他"绳子擦过头发那下，你当时在想什么？"</div>
+   </div>
+
+   <div class="note">💡 关键分寸：<b>数字只给大人看，不给孩子当分数</b>。孩子那头只看到作品和长大的小窝——把表达变成"为了拿分"，兴趣就死了。这页是家长 / 老师后台（已上锁）里的内容。</div>
+  `;
+  out.scrollIntoView({behavior:"smooth",block:"start"});
+}
+document.getElementById("gen").onclick=gen;
+gen();
+</script>
+</body></html>
