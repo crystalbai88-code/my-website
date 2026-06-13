@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>合体版 · 小羽的小窝</title>
+<style>
+:root{--brand:#2f6f5e;--soft:#e4f0eb;--accent:#e8884a;--ink:#2c2a26;--soft2:#fce8d7;--gold:#d8a93a;--line:#ece4d7;--purple:#7c5cff}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);
+ background:linear-gradient(180deg,#cdeafe,#e7f6ef 45%,#fbf7f0);display:flex;flex-direction:column;height:100dvh;line-height:1.55}
+button{font-family:inherit;cursor:pointer}
+/* 小窝 */
+.nest{flex:0 0 auto;background:linear-gradient(180deg,#cfe9dd,#eaf4ee);padding:10px 14px 12px;border-bottom:1px solid var(--line)}
+.nrow{display:flex;align-items:center;gap:10px}
+.lvl{font-size:13px;font-weight:800;color:#214a3d}
+.meta{font-size:12px;color:#3a6e5e}
+.feather{font-size:12px;color:#8a6a14;font-weight:800}
+.bar{height:8px;background:#fff;border-radius:999px;overflow:hidden;margin-top:4px;width:160px;max-width:50vw}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--accent));width:0;transition:width .5s}
+.tiles{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px;min-height:30px}
+.tile{font-size:18px;background:#fff;border-radius:9px;padding:2px 6px;animation:pop .4s cubic-bezier(.2,1.5,.4,1)}
+@keyframes pop{0%{transform:scale(0)}100%{transform:scale(1)}}
+.tilehint{font-size:11px;color:#3a6e5e;align-self:center}
+.owl .bob{animation:bob 3s ease-in-out infinite}@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.owl.happy{animation:jump .5s}@keyframes jump{0%,100%{transform:translateY(0)}45%{transform:translateY(-16px)}}
+/* 对话 */
+.chat{flex:1 1 auto;overflow-y:auto;padding:10px 14px}
+.row{margin:8px 0;display:flex}.row.kid{justify-content:flex-end}
+.bub{max-width:84%;padding:9px 13px;border-radius:16px;font-size:1.02rem}
+.row.q .bub{background:#fff;border:1.5px solid var(--soft);border-radius:4px 16px 16px 16px;font-weight:600}
+.row.kid .bub{background:var(--soft2);color:#a8521a;border-radius:16px 4px 16px 16px}
+.fx{align-self:center;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;font-size:11px;margin:2px 0 4px}
+.fx span{font-weight:700}
+.mile{align-self:center;background:#fffae8;border:1.5px solid var(--gold);border-radius:12px;padding:7px 13px;font-size:.9rem;color:#8a6a14;font-weight:700;margin:4px 0;animation:pop .4s}
+.inbar{flex:0 0 auto;display:flex;gap:8px;padding:9px 12px calc(11px + env(safe-area-inset-bottom));background:rgba(255,255,255,.92);border-top:1px solid var(--line)}
+.mic{flex:0 0 auto;width:50px;height:50px;border-radius:50%;border:none;font-size:23px;background:var(--accent);color:#fff;box-shadow:0 4px 0 #b35c1f}
+.mic:active{transform:translateY(3px);box-shadow:0 1px 0 #b35c1f}.mic.live{background:#e0413a;animation:pulse 1.1s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.tin{flex:1;border:1.5px solid var(--soft);border-radius:16px;padding:12px;font-size:1.02rem;font-family:inherit}
+.tin:focus{outline:none;border-color:var(--brand)}
+.go{border:none;border-radius:14px;background:var(--brand);color:#fff;font-weight:800;padding:0 15px;box-shadow:0 4px 0 #1f5447}
+.go:active{transform:translateY(3px);box-shadow:0 1px 0 #1f5447}
+.dayb{border:none;background:#fff;border:1px solid var(--line);border-radius:999px;font-size:.74rem;color:var(--brand);padding:4px 10px}
+.nav{position:fixed;top:7px;right:10px;font-size:.72rem;z-index:5}
+.nav a{color:var(--brand);text-decoration:none;background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 9px}
+</style></head>
+<body>
+<div class="nav"><a href="index.html">← 全部</a></div>
+<div class="nest">
+  <div class="nrow">
+    <div id="owl"></div>
+    <div style="flex:1">
+      <div class="lvl" id="lvl">小羽 · 你的小窝</div>
+      <div class="meta" id="title"></div>
+      <div class="bar"><i id="barfill"></i></div>
+    </div>
+    <div style="text-align:right">
+      <div class="feather" id="feather">🪶 0</div>
+      <button class="dayb" id="dayb">😴 明天再来</button>
+    </div>
+  </div>
+  <div class="tiles" id="tiles"><span class="tilehint">你说出的东西，会住进这个小窝 →</span></div>
+</div>
+
+<div class="chat" id="chat"></div>
+
+<div class="inbar">
+  <button class="mic" id="mic" title="点一下说话">🎤</button>
+  <input class="tin" id="tin" placeholder="跟小羽说一件你今天的事…"/>
+  <button class="go" id="go">说</button>
+</div>
+
+<script>
+/* —— 三引擎共享状态 —— */
+let feathers=0, day=1;
+let world=[];      // Scribblenauts：小窝里的东西 [{w,e}]
+let notes=[];      // 动森：记住的事 [{tag,text}]
+const STAGES=[{min:0,l:"🥚 蛋宝宝",hat:0,sz:.72},{min:4,l:"🐣 小奶羽",hat:0,sz:.86},{min:9,l:"🦉 小羽",hat:0,sz:1},{min:16,l:"🎩 见习魔法师",hat:1,sz:1.08},{min:26,l:"✨ 大魔法师",hat:1,sz:1.16}];
+
+const DICT=[["猫","🐱"],["狗","🐶"],["仓鼠","🐹"],["兔","🐰"],["鸟","🐦"],["鱼","🐟"],["乌龟","🐢"],["蝴蝶","🦋"],["恐龙","🦖"],["鸡","🐔"],["马","🐴"],["熊","🐻"],
+["太阳","☀️"],["月亮","🌙"],["星","⭐"],["云","☁️"],["雨","🌧️"],["雪","❄️"],["风","🌬️"],["树","🌳"],["花","🌸"],["草","🌿"],["山","⛰️"],["海","🌊"],["火","🔥"],["彩虹","🌈"],
+["窗","🪟"],["门","🚪"],["床","🛏️"],["书","📖"],["球","⚽"],["车","🚗"],["自行车","🚲"],["伞","☂️"],["灯","💡"],["蛋糕","🍰"],["冰淇淋","🍦"],["糖","🍬"],["水","💧"],["饭","🍚"],["篮球","🏀"],["足球","⚽"],["滑梯","🛝"],["秋千","🎠"],["花盆","🪴"],
+["妈妈","👩"],["爸爸","👨"],["老师","🧑‍🏫"],["同学","🧒"],["朋友","🧑‍🤝‍🧑"],
+["跑","💨"],["跳","⤴️"],["哭","😢"],["笑","😄"],["睡","💤"],["喊","📣"],["叫","📣"],["摔","💥"],["飞","🕊️"],["唱","🎵"]];
+const ACT=/跑|跳|抓|推|拉|喊|叫|握|拿|踢|笑|哭|看见|听见|发抖|出汗|翻|踩|碰|摸|咬|皱|扔|抱|蹲|爬|冲|躲|舔|撞|倒/;
+const SENSE=/声音|颜色|味道|闻|听|看|冷|热|疼|香|响|亮|软|硬|喵|汪|啪|轰/;
+const VAGUE=/^(我)?(很|好|挺|有点|特别)?(开心|高兴|难过|伤心|紧张|害怕|无聊|生气|喜欢|讨厌|好玩|有趣|累|还好|不错)+[。.!！~]*$/;
+
+function owlSVG(){
+  let st=STAGES[0]; for(const x of STAGES) if(feathers>=x.min) st=x;
+  const hat=st.hat?`<ellipse cx="50" cy="40" rx="20" ry="5" fill="#4a3f86"/><path d="M32,40 Q41,13 56,10 Q67,28 67,40 Q50,46 32,40 Z" fill="#4a3f86"/><path d="M42,24 l1.4,3.4 3.4,1.4 -3.4,1.4 -1.4,3.4 -1.4,-3.4 -3.4,-1.4 3.4,-1.4 Z" fill="#ffd95e"/>`:"";
+  return `<svg class="owl" id="owlsvg" width="${Math.round(58*st.sz)}" viewBox="0 0 100 112" style="overflow:visible"><g class="bob">
+  <ellipse cx="50" cy="72" rx="30" ry="36" fill="#4a8273"/><ellipse cx="50" cy="86" rx="18" ry="20" fill="#f7ecd7"/>
+  <circle cx="38" cy="58" r="12" fill="#fff"/><circle cx="62" cy="58" r="12" fill="#fff"/>
+  <circle cx="40" cy="60" r="5.5" fill="#27241d"/><circle cx="60" cy="60" r="5.5" fill="#27241d"/>
+  <circle cx="41.6" cy="57.6" r="1.8" fill="#fff"/><circle cx="61.6" cy="57.6" r="1.8" fill="#fff"/>
+  <path d="M50,66 L45,72 L55,72 Z" fill="#f0a04b"/>${hat}</g></svg>`;
+}
+function stageLabel(){ let st=STAGES[0]; for(const x of STAGES) if(feathers>=x.min) st=x; return st.l; }
+function renderNest(){
+  document.getElementById("owl").innerHTML=owlSVG();
+  document.getElementById("title").textContent="Lv."+( [...STAGES].filter(x=>feathers>=x.min).length )+" "+stageLabel();
+  document.getElementById("feather").textContent="🪶 "+feathers;
+  let st=STAGES[0],nx=null; for(const x of STAGES){ if(feathers>=x.min)st=x; }
+  nx=STAGES.find(x=>x.min>feathers); const hi=nx?nx.min:st.min+8;
+  document.getElementById("barfill").style.width=Math.min(100,(feathers-st.min)/(hi-st.min)*100)+"%";
+  const t=document.getElementById("tiles");
+  t.innerHTML = world.length ? world.map(o=>`<span class="tile">${o.e}</span>`).join("")+`<span class="tilehint">${world.length} 样东西住进来了</span>` : `<span class="tilehint">你说出的东西，会住进这个小窝 →</span>`;
+}
+const chat=document.getElementById("chat");
+function esc(s){return (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]))}
+function add(who,t){const r=document.createElement("div");r.className="row "+who;r.innerHTML=`<div class="bub">${esc(t)}</div>`;chat.appendChild(r);chat.scrollTop=9e9;return r;}
+function addFx(parts){const r=document.createElement("div");r.className="fx";r.innerHTML=parts.join("");chat.appendChild(r);chat.scrollTop=9e9;}
+function addMile(t){const r=document.createElement("div");r.className="mile";r.textContent=t;chat.appendChild(r);chat.scrollTop=9e9;}
+
+function digest(v){
+  const m=[[/养|有(只|条|个).*?(猫|狗|仓鼠|兔|鱼|鸟|乌龟)/,"养了",x=>(x.match(/猫|狗|仓鼠|兔|鱼|鸟|乌龟/)||[])[0]],
+    [/喜欢|最爱|爱玩|爱吃/,"喜欢",x=>x.replace(/.*?(喜欢|最爱|爱玩|爱吃)/,"").slice(0,8)],
+    [/怕|害怕|不敢/,"有点怕",x=>x.replace(/.*?(怕|害怕|不敢)/,"").slice(0,8)],
+    [/同学|朋友|老师|妈妈|爸爸/,"身边的人",x=>(x.match(/同学|朋友|老师|妈妈|爸爸/)||[])[0]]];
+  for(const [re,tag,pick] of m){ if(re.test(v)) return {tag,text:(pick(v)||v.slice(0,10)).trim()}; }
+  return {tag:"你说过",text:v.slice(0,12)};
+}
+function react(d,objs,concrete){
+  if(!concrete){
+    if(VAGUE.test(d.raw)) return `「${d.raw}」是在你心里的，我画不出来呀～开心的时候，你的脸、你的手在做什么？说出来，它就能住进小窝！`;
+    return "嗯，记下了！再加一个看得见的东西呢——当时旁边有什么？";
+  }
+  const names=objs.map(o=>o.w).join("、");
+  const r=[`「${d.text}」——我能看见画面！${names?"："+names+" 都住进小窝啦":""}`,
+    `太好了，${names?names+"都搬进来了！":"这个细节真好！"}它发出什么声音了吗？`,
+    `这个我喜欢！${names?names+"我收下了。":""}然后呢？`];
+  return r[Math.floor(Math.random()*r.length)];
+}
+function say(){
+  const v=document.getElementById("tin").value.trim(); if(!v) return;
+  add("kid",v); document.getElementById("tin").value="";
+  // ① Scribblenauts：抓东西进小窝
+  const objs=[]; const have=new Set(world.map(o=>o.e));
+  for(const [w,e] of DICT){ if(v.includes(w)&&!have.has(e)){ have.add(e); objs.push({w,e}); world.push({w,e}); } }
+  const concrete = objs.length>0 || ACT.test(v) || SENSE.test(v);
+  // ② Finch：成长
+  let gain = !concrete ? (VAGUE.test(v)?0:1) : Math.min(3,1+objs.length);
+  const before=stageLabel(); feathers+=gain;
+  // ③ 动森：记忆
+  const d=digest(v); d.raw=v; if(concrete||gain) notes.push(d);
+  renderNest();
+  const sv=document.getElementById("owlsvg"); if(sv&&gain){sv.classList.add("happy");setTimeout(()=>sv.classList.remove("happy"),500);}
+  setTimeout(()=>{
+    add("q",react(d,objs,concrete));
+    if(concrete){
+      const fx=[]; if(objs.length) fx.push(`<span style="color:#7c5cff">＋变出 ${objs.map(o=>o.e).join("")}</span>`);
+      if(gain) fx.push(`<span style="color:#5a8c10">＋小羽 +${gain}🪶</span>`);
+      fx.push(`<span style="color:#9a6a14">＋记进笔记本</span>`); addFx(fx);
+    }
+    const after=stageLabel(); if(before!==after) addMile(`🎉 小羽长大啦：${after}！都是你喂出来的。`);
+  },260);
+}
+document.getElementById("go").onclick=say;
+document.getElementById("tin").addEventListener("keydown",e=>{if(e.key==="Enter")say();});
+
+/* 语音 */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition; const mic=document.getElementById("mic");
+if(!SR){mic.style.opacity=.4;mic.title="这台设备不支持语音，请打字";}
+let rec=null,live=false;
+mic.onclick=()=>{ if(!SR)return; if(live&&rec){rec.stop();return;}
+  rec=new SR();rec.lang="zh-CN";rec.interimResults=true;rec.continuous=false;
+  rec.onstart=()=>{live=true;mic.classList.add("live");mic.textContent="🔴";document.getElementById("tin").placeholder="在听你说…";};
+  rec.onresult=e=>{let t="";for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;document.getElementById("tin").value=t;};
+  rec.onend=()=>{live=false;mic.classList.remove("live");mic.textContent="🎤";const v=document.getElementById("tin").value.trim();if(v){document.getElementById("tin").value="";say();}};
+  rec.start();
+};
+
+/* 动森：明天再来，念叨记住的事 */
+function greet(){
+  if(notes.length===0){ add("q","你好呀！我是小羽。这是我们的小窝——你跟我说一件今天的事，它就会变成小窝里的东西。说什么都行！"); return; }
+  const n=notes[Math.floor(Math.random()*notes.length)];
+  const g={"养了":`早呀！我一直惦记你养的${n.text}，它今天怎么样啦？`,"喜欢":`你来啦！昨天你说喜欢${n.text}，今天还想聊它吗？`,
+    "有点怕":`嘿是你！上次你说有点怕${n.text}，今天好点了吗？`,"身边的人":`好久不见！${n.text}最近怎么样？`,
+    "你说过":`你回来啦！我翻了翻笔记本，还记着你说的「${n.text}」，后来呢？`};
+  add("q",g[n.tag]||g["你说过"]);
+}
+document.getElementById("dayb").onclick=()=>{ day++; chat.innerHTML=""; add("q",`🌙 第 ${day} 天啦——`); greet(); };
+renderNest(); greet();
+</script>
+</body></html>
