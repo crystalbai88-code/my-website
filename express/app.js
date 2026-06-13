@@ -347,7 +347,7 @@ document.addEventListener("click", e => {
 /* ===================================================================== */
 /* 真实模型设置（浏览器直连 Claude API；离线时自动回退到规则引擎）          */
 /* ===================================================================== */
-let CFG = { aiMode: false, apiKey: "", model: "", checker: true, lang: "zh", tts: true, voiceZh: "", voiceEn: "", pinParent: "", pinTeacher: "", aiVoice: true, aiVoiceName: "Cherry" };
+let CFG = { aiMode: false, apiKey: "", model: "", checker: true, lang: "zh", tts: true, voiceZh: "", voiceEn: "", pinParent: "", pinTeacher: "", aiVoice: true, aiVoiceName: "Cherry", learner: null };
 let PROXY = { available: false, hasKey: false, provider: "", models: [], defaultModel: "" };
 /* 代理地址：本地 serve.py 留空（同源）；公开站在 config.js 里填 Cloudflare Worker 地址 */
 const API_BASE = (typeof window !== "undefined" && window.AI_PROXY_URL) ? String(window.AI_PROXY_URL).replace(/\/$/, "") : "";
@@ -635,6 +635,8 @@ function interviewSystem() {
 
 【铁律】绝不替孩子写句子或示范范文；绝不编造他没说过的经历；一轮最多一个问题；不问隐私（姓名/学校/住址/电话）；孩子提到被伤害或危险，温和建议告诉信任的大人并把 safety_flag 设为 "harm"。
 
+【这个孩子】${CFG.learner ? `小羽通过开场互动认识到：他偏向「${CFG.learner.label_zh}」型学习者。陪他的方式：${CFG.learner.ai_style}。他喜欢的东西：${(CFG.learner.interests||[]).join("、")||"还在发现"}。（这只是起点假设，请边聊边修正，绝不给孩子贴标签或当面评判。）` : ""}
+
 【这次访谈】没有预设题目。孩子选择了想聊的方向：「${S.topic ? S.topic.zh : "随便聊聊"}」。你的任务是从这个方向出发，帮孩子在聊天中自己浮现出一件他真正经历、真正在意的具体小事，把它聊开、聊深——那件事就是他这次要写的故事。访谈按阶段推进，阶段目标会以【课程提示】告诉你；当你判断目标已达到，把 ready_for_next 设为 true（同时照常回应孩子）。
 
 【教师手册·提问灵感（参考，不必照搬）】
@@ -735,6 +737,7 @@ function freshSession(grade, taskId, profileId) {
     draftBody: "",
     revisionLog: [],         // {dimension, dimName, before, after, why}
     feathers: 0,             // 收集的羽毛（游戏奖励）
+    onb: { step: 0, mood: 55, picks: {}, interests: [], hi: "", hiMode: "" },  // 分院帽采集
     topic: null,             // 孩子选的聊天方向（不预设题目）
     chat: [],                // 访谈全程对话（agent 记忆）
     pendingNotes: [],        // 待并入下一轮的课程提示
@@ -869,6 +872,7 @@ function wireLang() {
 /* ---------- 课程主流程 ---------- */
 function renderCourse() {
   if (!S) { renderSetup(); rail.innerHTML = ""; footer.innerHTML = ""; return; }
+  if (!CFG.learner) { rail.innerHTML = ""; renderOnboarding(); return; }   // 先认识孩子，再上课
   renderRail();
   const stage = STAGES[S.stageIndex];
   ({ qa: renderQA, input: renderInput, draft: renderDraft,
@@ -2157,8 +2161,19 @@ function renderParent() {
   if (!S) { wrap.innerHTML = `${grownBar("parent")}<div class="card"><p class="muted">还没有数据。孩子完成一次表达后，这里会出现成长报告。</p></div>`; wireLockBar(); footer.innerHTML = ""; return; }
   const r = rubricForGrade(S.grade);
   const turns = Object.values(S.stageData).reduce((n, d) => n + (d.turns ? d.turns.length : 0), 0);
+  const L = CFG.learner;
+  const learnerCard = L ? `
+    <div class="card" style="border-top:8px solid ${L.color}">
+      <div class="eyebrow" style="color:${L.color}">🎩 孩子的学习画像</div>
+      <h2>${L.emoji} ${escapeHtml(L.label_zh)}</h2>
+      <p class="small">${escapeHtml((ARCHETYPES[L.archetype]||{}).blurb_zh || "")}${L.interests && L.interests.length ? "；喜欢：" + L.interests.join("、") : ""}</p>
+      <div class="material" style="margin-top:8px"><div class="mtitle">小羽会这样陪他</div><div class="mtext small">${escapeHtml(L.ai_style)}</div></div>
+      <div class="parent-note" style="margin-top:10px">这是小羽通过开场互动得到的<strong>起点假设，不是诊断或定论</strong>。孩子的状态每天都在变，小羽会在聊天中持续调整。它的用途是让 AI 更懂怎么陪他，而不是给孩子贴标签。</div>
+      <div class="actions"><button class="btn ghost small" id="redoLearner">重新认识孩子</button></div>
+    </div>` : "";
   wrap.innerHTML = `
     ${grownBar("parent")}
+    ${learnerCard}
     <div class="card">
       <div class="eyebrow">家长报告</div>
       <h2>📈 孩子这次表达的成长</h2>
@@ -2182,6 +2197,12 @@ function renderParent() {
     </div>
   `;
   wireLockBar();
+  const rl = document.getElementById("redoLearner");
+  if (rl) rl.onclick = () => {
+    if (!confirm("重新认识孩子？会清空当前的学习画像，下次进入课程时小羽会重新做一次分院。")) return;
+    CFG.learner = null; saveCfg();
+    alert("已清空。回到「课程」开始时，小羽会重新认识孩子。");
+  };
   footer.innerHTML = "";
 }
 
@@ -2420,6 +2441,205 @@ document.addEventListener("focusin", e => {
 document.addEventListener("focusout", e => {
   if (e.target.tagName === "TEXTAREA") { const h = rigHolder(); if (h) h.classList.remove("is-listening"); }
 });
+
+
+/* ===================================================================== */
+/* 「分院帽」开场：90 秒认识这个孩子 → 定制后面的陪伴方式                    */
+/* 用 4 种交互（情绪温度计/二选一图卡/兴趣多选/打招呼）采集信号，            */
+/* 由"儿童心理 + 学习科学"视角合成一份学习画像（正面、临时、非诊断）。       */
+/* ===================================================================== */
+const ARCHETYPES = {
+  explorer: { emoji: "🦁", zh: "探险家", en: "Explorer", color: "#FF7B54",
+    blurb_zh: "爱动手、点子多、先冲再说", blurb_en: "hands-on, full of ideas, dives right in",
+    ai_style: "步子可以大胆些，多问『你做了什么、接下来呢』，从动作和行动入手；他冲在前面时别拦，事后再帮他回看细节。" },
+  thinker: { emoji: "🦉", zh: "思想家", en: "Thinker", color: "#7C5CFF",
+    blurb_zh: "爱琢磨、想得深、安静有主意", blurb_en: "loves to ponder, thinks deep, quietly sharp",
+    ai_style: "给他思考的时间，珍惜他的停顿，别催；可以问『你当时怎么想的、为什么』，他会给你惊喜的答案。" },
+  teller: { emoji: "🐬", zh: "讲述家", en: "Teller", color: "#3BC9DB",
+    blurb_zh: "话多、爱聊、说着说着就想清楚了", blurb_en: "chatty, thinks out loud, talks it into shape",
+    ai_style: "先完整地听，别急着打断或纠正；多鼓励他用语音说；等他说够了，再帮他从一堆话里挑出最闪光的那句。" },
+  observer: { emoji: "🦊", zh: "观察家", en: "Observer", color: "#69B34C",
+    blurb_zh: "看得细、慢热、心里有数", blurb_en: "notices details, warms up slowly, quietly observant",
+    ai_style: "多给两三个选项让他挑，步子要小；允许他说『不知道』，绝不连续追问；先给足安全感，他会慢慢打开。" },
+};
+const ONB_PAIRS = [
+  { axis: "act", a: { emoji: "🤫", zh: "安静地看", en: "Watch quietly", v: "reflect" }, b: { emoji: "🛠️", zh: "动手去做", en: "Get hands-on", v: "act" } },
+  { axis: "soc", a: { emoji: "💭", zh: "自己慢慢想", en: "Think on my own", v: "solo" }, b: { emoji: "💬", zh: "找人聊一聊", en: "Talk it out", v: "social" } },
+  { axis: "plan", a: { emoji: "🧭", zh: "先想清楚再做", en: "Plan first", v: "plan" }, b: { emoji: "🚀", zh: "边做边想", en: "Figure it out as I go", v: "improv" } },
+];
+const ONB_INTERESTS = [
+  ["🐾","动物","Animals"],["🚀","太空","Space"],["🎮","游戏","Games"],["🎨","画画","Drawing"],
+  ["⚽","运动","Sports"],["📖","故事","Stories"],["🧱","搭建","Building"],["🎵","音乐","Music"],
+  ["🍳","美食","Food"],["🔬","科学","Science"],["🦖","恐龙","Dinosaurs"],["🌱","大自然","Nature"],
+];
+const ONB_STEPS = ["intro", "mood", "pair0", "pair1", "pair2", "interests", "hi", "result"];
+
+/* 离线启发式：根据二选一+打招呼方式给四院打分，选最高 */
+function heuristicArchetype(o) {
+  const sc = { explorer: 0, thinker: 0, teller: 0, observer: 0 };
+  const p = o.picks || {};
+  if (p.act === "act") sc.explorer += 2; else if (p.act === "reflect") { sc.thinker++; sc.observer++; }
+  if (p.soc === "social") sc.teller += 2; else if (p.soc === "solo") { sc.thinker++; sc.observer++; }
+  if (p.plan === "improv") sc.explorer += 2; else if (p.plan === "plan") { sc.thinker++; sc.observer++; }
+  if (o.hiMode === "voice") sc.teller += 2;
+  if (o.hiMode === "emoji") sc.observer += 2;
+  if (o.hiMode === "text" && (o.hi || "").length > 14) sc.teller++;
+  if (o.mood != null && o.mood < 35) sc.observer++;          // 此刻较安静 → 更需要安全感
+  let best = "explorer", bv = -1;
+  for (const k in sc) if (sc[k] > bv) { bv = sc[k]; best = k; }
+  return best;
+}
+
+/* 合成学习画像：优先用真实模型（心理+学习科学视角），否则离线启发式 */
+async function analyzeLearner(o) {
+  const interestsZh = (o.interests || []).map(i => i[1]);
+  if (aiEnabled()) {
+    try {
+      const sys = `你是一位儿童发展心理学家 + 学习科学专家，正在通过一段轻松的开场互动，为一个${S.grade}年级的孩子建立"学习画像"，好让 AI 老师小羽用最适合他的方式陪他。
+原则：①只看优点，绝不贴负面标签、绝不暗示孩子有问题；②结论是临时假设，措辞要留有余地；③对孩子说的话要温暖、具体、让他感到"被看见"，像揭晓魔法分院；④给小羽的适配建议要具体可执行。
+四个学习小院（择一最贴近）：explorer探险家(爱动手/先冲)、thinker思想家(爱琢磨/想得深)、teller讲述家(爱说/越说越清)、observer观察家(看得细/慢热/需要安全感)。
+孩子的信号：此刻心情能量=${o.mood}/100；二选一选择=${JSON.stringify(o.picks)}；喜欢=${interestsZh.join("、")||"未选"}；打招呼方式=${o.hiMode}，内容=「${o.hi||""}」。
+只输出JSON：{"archetype":"explorer|thinker|teller|observer","label_zh":"院名","label_en":"house name","to_child_zh":"对孩子揭晓的话(2-3句,正面有戏剧感)","to_child_en":"同义英文","ai_style":"给小羽的具体陪伴建议(1-2句中文)"}`;
+      const out = await callClaudeJSON(sys, [{ role: "user", content: "请揭晓这个孩子的学习小院。" }],
+        { type: "object", additionalProperties: false, properties: {
+          archetype: { type: "string", enum: ["explorer", "thinker", "teller", "observer"] },
+          label_zh: { type: "string" }, label_en: { type: "string" },
+          to_child_zh: { type: "string" }, to_child_en: { type: "string" }, ai_style: { type: "string" },
+        }, required: ["archetype", "to_child_zh", "to_child_en", "ai_style"] }, 500);
+      const A = ARCHETYPES[out.archetype] || ARCHETYPES.explorer;
+      return { archetype: out.archetype, emoji: A.emoji, color: A.color,
+        label_zh: out.label_zh || A.zh, label_en: out.label_en || A.en,
+        to_child_zh: out.to_child_zh, to_child_en: out.to_child_en,
+        ai_style: out.ai_style || A.ai_style, interests: interestsZh, provisional: true, by: "ai" };
+    } catch (_) { /* 落到离线 */ }
+  }
+  const key = heuristicArchetype(o); const A = ARCHETYPES[key];
+  return { archetype: key, emoji: A.emoji, color: A.color, label_zh: A.zh, label_en: A.en,
+    to_child_zh: `我看出来啦——你是一位${A.emoji}「${A.zh}」！${A.blurb_zh}。我会照着这个来陪你。`,
+    to_child_en: `I see it — you're a ${A.emoji} "${A.en}"! ${A.blurb_en}. I'll keep that in mind.`,
+    ai_style: A.ai_style, interests: interestsZh, provisional: true, by: "offline" };
+}
+
+function onbGoto(step) { S.onb.step = step; save(); renderOnboarding(); }
+
+function renderOnboarding() {
+  const o = S.onb || (S.onb = { step: 0, mood: 55, picks: {}, interests: [], hi: "", hiMode: "" });
+  const stepId = ONB_STEPS[o.step] || "intro";
+  const dots = `<div class="onb-dots">${ONB_STEPS.slice(0, -1).map((_, i) => `<i class="${i < o.step ? "done" : i === o.step ? "on" : ""}"></i>`).join("")}</div>`;
+  let body = "";
+
+  if (stepId === "intro") {
+    body = `${bubble(escapeHtml("欢迎来到表达魔法学院！我先戴上我的读心帽，花一小会儿认识认识你——这样我才知道怎么陪你最好玩。准备好啦？"),
+      escapeHtml("Welcome to the Expression Academy! Let me put on my mind-reading hat and get to know you for a moment — so I know how to be the best buddy for YOU. Ready?"))}
+      <div class="actions"><button class="btn" id="onbStart">${TI("开始认识我！", "Get to know me!")} ✨</button></div>`;
+  } else if (stepId === "mood") {
+    body = `${bubble(escapeHtml("先问问——你现在的电量是满满的，还是有点想安静一会儿？拖一拖告诉我。"),
+      escapeHtml("First — is your energy full today, or feeling a bit quiet? Slide to tell me."))}
+      <div class="mood-meter"><span>😴</span><input type="range" id="onbMood" min="0" max="100" value="${o.mood}"><span>⚡</span></div>
+      <div class="onb-next"><button class="btn small" id="onbNext">${TI("好啦", "Done")} →</button></div>`;
+  } else if (stepId.startsWith("pair")) {
+    const idx = +stepId.slice(4); const pr = ONB_PAIRS[idx];
+    body = `${bubble(escapeHtml(idx === 0 ? "如果有空，你更喜欢哪一种？没有对错，凭感觉选。" : "再来一个——你更像哪一种？"),
+      escapeHtml(idx === 0 ? "Which do you enjoy more? No right answer — go with your gut." : "One more — which is more like you?"))}
+      <div class="pair-grid">
+        ${[pr.a, pr.b].map(x => `<button class="pair-card ${o.picks[pr.axis] === x.v ? "sel" : ""}" data-axis="${pr.axis}" data-v="${x.v}">
+          <span class="p-emoji">${x.emoji}</span><b>${TI(x.zh, x.en)}</b></button>`).join("")}
+      </div>`;
+  } else if (stepId === "interests") {
+    body = `${bubble(escapeHtml("点几样你最喜欢的东西吧（想点几个都行）——这样我讲的例子你才爱听。"),
+      escapeHtml("Tap a few things you love (as many as you like) — so my examples are ones you'll enjoy."))}
+      <div class="onb-int">${ONB_INTERESTS.map(([e, zh, en]) => `<button class="int-chip ${o.interests.some(i => i[1] === zh) ? "sel" : ""}" data-e="${e}" data-zh="${zh}" data-en="${en}">${e} ${TI(zh, en)}</button>`).join("")}</div>
+      <div class="onb-next"><button class="btn small" id="onbNext" ${o.interests.length ? "" : "disabled"}>${TI("选好了", "Done")} →</button></div>`;
+  } else if (stepId === "hi") {
+    body = `${bubble(escapeHtml("最后一关——用你最舒服的方式，跟小羽打个招呼吧！"),
+      escapeHtml("Last one — say hi to me however feels most comfortable!"))}
+      <div class="hi-modes">
+        <button class="hi-mode ${o.hiMode === "text" ? "sel" : ""}" data-m="text">⌨️ ${TI("打字说", "Type")}</button>
+        <button class="hi-mode ${o.hiMode === "voice" ? "sel" : ""}" data-m="voice">🎤 ${TI("用声音", "Speak")}</button>
+        <button class="hi-mode ${o.hiMode === "emoji" ? "sel" : ""}" data-m="emoji">😊 ${TI("选表情", "Emoji")}</button>
+      </div>
+      <div id="hiArea"></div>`;
+  } else if (stepId === "result") {
+    body = `<div class="result-loading" id="onbResult">${quillSVG(64, "q-excited")}<div class="small muted">${TI("小羽正在读你的心……", "Quill is reading your mind…")}</div></div>`;
+  }
+
+  host.innerHTML = `<div class="card onb-card">
+    <div class="eyebrow">🎩 ${TI("分院帽 · 认识你", "Sorting Hat · Meet You")}</div>
+    ${dots}
+    <div class="onb-hat">${quillSVG(72, stepId === "result" ? "q-excited" : "")}</div>
+    ${body}
+  </div>`;
+  footer.innerHTML = "";
+
+  // —— 交互接线 ——
+  if (stepId === "intro") document.getElementById("onbStart").onclick = () => onbGoto(o.step + 1);
+  if (stepId === "mood") {
+    const sl = document.getElementById("onbMood"); sl.oninput = () => { o.mood = +sl.value; save(); };
+    document.getElementById("onbNext").onclick = () => onbGoto(o.step + 1);
+    speakOnce("onb-mood", "你现在的电量是满满的，还是想安静一会儿？", "Is your energy full, or a bit quiet?");
+  }
+  if (stepId.startsWith("pair")) {
+    host.querySelectorAll(".pair-card").forEach(b => b.onclick = () => {
+      o.picks[b.dataset.axis] = b.dataset.v; awardFeather(1, { silent: true }); sfx("ding"); onbGoto(o.step + 1);
+    });
+  }
+  if (stepId === "interests") {
+    host.querySelectorAll(".int-chip").forEach(b => b.onclick = () => {
+      const it = [b.dataset.e, b.dataset.zh, b.dataset.en];
+      const i = o.interests.findIndex(x => x[1] === it[1]);
+      if (i >= 0) o.interests.splice(i, 1); else o.interests.push(it);
+      save(); renderOnboarding();
+    });
+    const nx = document.getElementById("onbNext"); if (nx) nx.onclick = () => onbGoto(o.step + 1);
+  }
+  if (stepId === "hi") {
+    const area = document.getElementById("hiArea");
+    const renderHi = () => {
+      if (o.hiMode === "text") {
+        area.innerHTML = `<div class="answer-box">${answerWidget("hiInput", "single")}</div><div class="onb-next"><button class="btn small" id="hiGo">${TI("说给小羽", "Send")} →</button></div>`;
+        wireAnswerWidget("hiInput");
+        document.getElementById("hiGo").onclick = () => { o.hi = val("hiInput"); finishOnb(); };
+      } else if (o.hiMode === "voice") {
+        area.innerHTML = `<div class="answer-box">${answerWidget("hiInput", "single")}</div><p class="small muted">${TI("点上面的🎤说一句，再点下面继续", "Tap 🎤 to speak, then continue")}</p><div class="onb-next"><button class="btn small" id="hiGo">${TI("好了", "Done")} →</button></div>`;
+        wireAnswerWidget("hiInput");
+        const mb = document.querySelector('.input-mode[data-for="hiInput"] [data-mode="voice"]'); if (mb) mb.click();
+        document.getElementById("hiGo").onclick = () => { o.hi = val("hiInput"); finishOnb(); };
+      } else {
+        const set = ["😄","😎","🤗","😮","🤔","😺","🦄","🌈","🔥","💡"];
+        area.innerHTML = `<div class="emoji-hi">${set.map(e => `<button class="emoji-pick" data-e="${e}">${e}</button>`).join("")}</div>`;
+        area.querySelectorAll(".emoji-pick").forEach(b => b.onclick = () => { o.hi = b.dataset.e; finishOnb(); });
+      }
+    };
+    host.querySelectorAll(".hi-mode").forEach(b => b.onclick = () => { o.hiMode = b.dataset.m; save(); renderHi(); });
+    if (o.hiMode) renderHi();
+  }
+  if (stepId === "result") runOnbResult();
+}
+
+function finishOnb() { awardFeather(2, { silent: true }); onbGoto(ONB_STEPS.indexOf("result")); }
+
+async function runOnbResult() {
+  const o = S.onb;
+  const prof = await analyzeLearner(o);
+  CFG.learner = prof; saveCfg();
+  confetti(); sfx("tada");
+  const A = ARCHETYPES[prof.archetype] || ARCHETYPES.explorer;
+  host.innerHTML = `<div class="card onb-card result-card" style="--stage-c:${prof.color}">
+    <div class="eyebrow">🎩 ${TI("你的学习小院揭晓！", "Your House is revealed!")}</div>
+    <div class="house-badge" style="background:${prof.color}">${prof.emoji}</div>
+    <h2 style="text-align:center">${TI(prof.label_zh, prof.label_en)}</h2>
+    ${bubble(escapeHtml(prof.to_child_zh), escapeHtml(prof.to_child_en))}
+    <p class="small muted" style="text-align:center">${TI("（这是小羽现在的猜测，我们一边玩，它会一边更懂你）", "(Just my first guess — I'll understand you better as we play.)")}</p>
+    <div class="actions" style="justify-content:center">
+      <button class="btn" id="onbDone">${TI("出发上课！", "Start class!")} →</button>
+      <button class="btn ghost small" id="onbRedo">${TI("再读一次", "Read again")}</button>
+    </div>
+  </div>`;
+  footer.innerHTML = "";
+  speakOnce("onb-result", prof.to_child_zh, prof.to_child_en);
+  document.getElementById("onbDone").onclick = () => { save(); render(); };
+  document.getElementById("onbRedo").onclick = () => { CFG.learner = null; saveCfg(); S.onb = { step: 1, mood: 55, picks: {}, interests: [], hi: "", hiMode: "" }; save(); renderOnboarding(); };
+}
 
 loadCfg();
 load();
