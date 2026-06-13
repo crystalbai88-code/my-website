@@ -2,76 +2,114 @@
 <html lang="zh-CN"><head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-<title>小羽 · 四种游戏风格 Demo</title>
+<title>小羽 · 游戏模式 Demo 对比</title>
 <style>
-:root{--brand:#2f6f5e;--soft:#e4f0eb;--accent:#e8884a;--ink:#2c2a26;--line:#ece4d7}
+:root{--brand:#2f6f5e;--soft:#e4f0eb;--accent:#e8884a;--ink:#2c2a26;--line:#ece4d7;--gold:#d8a93a}
 *{box-sizing:border-box}body{margin:0;min-height:100dvh;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
- color:var(--ink);line-height:1.65;background:linear-gradient(180deg,#cdeafe,#e7f6ef 45%,#fbf7f0);padding:24px 16px 40px}
-.wrap{max-width:660px;margin:0 auto}
+ color:var(--ink);line-height:1.6;background:linear-gradient(180deg,#cdeafe,#e7f6ef 45%,#fbf7f0);padding:24px 16px 50px}
+.wrap{max-width:680px;margin:0 auto}
 h1{font-size:1.35rem;margin:.2em 0}.lead{color:#5a6a64;font-size:.92rem}
-.card{display:block;text-decoration:none;color:inherit;background:#fff;border:2px solid #fff;border-radius:20px;
- padding:16px 18px;margin:13px 0;box-shadow:0 8px 24px rgba(60,50,35,.1);transition:.15s;border-left:9px solid var(--c)}
+.sec{font-size:.78rem;font-weight:800;letter-spacing:1px;color:#8a7a60;margin:24px 4px 6px;border-bottom:1px dashed var(--line);padding-bottom:4px}
+.card{display:block;text-decoration:none;color:inherit;background:#fff;border:2px solid #fff;border-radius:18px;
+ padding:14px 16px;margin:11px 0;box-shadow:0 6px 18px rgba(60,50,35,.09);transition:.15s;border-left:9px solid var(--c)}
 .card:hover{transform:translateY(-3px)}
-.tag{font-size:.7rem;font-weight:800;letter-spacing:1px;color:var(--c)}
-.card h2{margin:3px 0;font-size:1.12rem}
-.card p{margin:4px 0 0;font-size:.88rem;color:#5a6a64}
-.card .ref{font-size:.76rem;color:#9a8f80;margin-top:6px}
-.alt{display:inline-block;margin-top:8px;font-size:.8rem;color:var(--c);font-weight:700;border:1.5px solid var(--c);border-radius:999px;padding:3px 10px;text-decoration:none}
-.go{display:inline-block;margin-top:8px;font-weight:800;color:var(--c)}
-.note{font-size:.82rem;color:#6b6459;background:#fffaf0;border:1px dashed var(--line);border-radius:12px;padding:12px 14px;margin-top:18px}
+.game{font-size:.72rem;font-weight:800;letter-spacing:.5px;color:var(--c)}
+.card h2{margin:3px 0;font-size:1.08rem}
+.card p{margin:4px 0 0;font-size:.86rem;color:#5a6a64}
+.go{display:inline-block;margin-top:7px;font-weight:800;color:var(--c);font-size:.9rem}
+.alt{display:inline-block;margin-top:7px;margin-left:10px;font-size:.82rem;color:var(--c);font-weight:700;border:1.5px solid var(--c);border-radius:999px;padding:2px 10px;text-decoration:none}
+.note{font-size:.82rem;color:#6b6459;background:#fffaf0;border:1px dashed var(--line);border-radius:12px;padding:12px 14px;margin-top:20px}
 </style></head>
 <body><div class="wrap">
-  <h1>🦉 小羽 · 四种游戏风格试玩</h1>
-  <p class="lead">四种"让孩子愿意一直表达"的引擎，各做了一个小 demo；外加一个把三个最强引擎拧在一起的<strong>合体版</strong>。不用钥匙、点开就玩。玩的时候只问自己：<strong>哪一个会让一个真实的孩子，想多说一句？</strong></p>
+  <h1>🦉 小羽 · 八种游戏模式，挑一个最拉得动孩子的</h1>
+  <p class="lead">你喜欢的那几款游戏，我都做成了能点开就玩的小 demo。每个都用同一件事考验：<strong>它会不会让一个真实的孩子，愿意多说一句话？</strong>选出一两个，我们就把小羽<strong>只立在那个引擎上</strong>往深里做。</p>
 
-  <a class="card" href="report.html" style="--c:#9a6a14;border:2px solid var(--gold,#d8a93a)">
-    <div class="tag">📊 这次聊出了什么？（产出 & 量化）</div>
+  <div class="sec">关系引擎 · 为"一个会长大、会记得我的伙伴"而回来</div>
+
+  <div class="card" style="--c:#e8884a">
+    <div class="game">🦊 动物森友会</div>
+    <h2>📓 记得你的朋友</h2>
+    <p>小羽把你说的事记进笔记本，明天再来时会主动念叨你——"你那只仓鼠后来怎样了？"被记住，所以想回来。</p>
+    <a class="go" href="friend.html">去玩 →</a>
+  </div>
+
+  <div class="card" style="--c:#5aa06a">
+    <div class="game">🔴 宝可梦</div>
+    <h2>📕 故事图鉴（收集）</h2>
+    <p>你每说一个生动的细节，就被"捕捉"成一张卡片收进图鉴。动力＝集齐它们，图鉴越厚越厉害。</p>
+    <a class="go" href="pokemon.html">去玩 →</a>
+  </div>
+
+  <div class="card" style="--c:#d68a3a">
+    <div class="game">🐣 Finch / 拓麻歌子（同类）</div>
+    <h2>🥚 表达养成</h2>
+    <p>你越表达，小羽这只蛋就越往上长——小奶羽→魔法师。陪伴一个因你而成长的小生命。</p>
+    <a class="go" href="grow.html">去玩 →</a>
+  </div>
+
+  <div class="sec">话即玩法 · 说话本身就是操作</div>
+
+  <a class="card" href="words.html" style="--c:#7c5cff">
+    <div class="game">🖍️ 涂鸦冒险家（Scribblenauts）</div>
+    <h2>🪄 话变成东西</h2>
+    <p>你说的话直接变成画面里的东西，越具体越热闹；说"我很开心"却画不出来——玩着就学会说具体。</p>
+    <span class="go">去玩 →</span>
+  </a>
+
+  <div class="sec">你来当作者 · 没有输赢，你创造世界</div>
+
+  <a class="card" href="author.html" style="--c:#74b816">
+    <div class="game">🎮 模拟人生（The Sims）</div>
+    <h2>🎬 小剧场（你当导演）</h2>
+    <p>选舞台、摆角色、说剧情——没有标准答案，你创造世界，小羽是入迷的观众，一直追问"然后呢"。</p>
+    <span class="go">去玩 →</span>
+  </a>
+
+  <a class="card" href="build.html" style="--c:#6b8e3d">
+    <div class="game">⛏️ 我的世界（Minecraft）</div>
+    <h2>🧱 搭一个世界</h2>
+    <p>你说的每样东西都变成一块方块，落进画面，一块块堆出"我自己的世界"，越说越大。</p>
+    <span class="go">去玩 →</span>
+  </a>
+
+  <a class="card" href="toca.html" style="--c:#e85a9c">
+    <div class="game">🏠 图卡世界（Toca World）</div>
+    <h2>🧸 想怎么玩就怎么玩</h2>
+    <p>一间小屋，拍冰箱、戳小猫、开灯都有反应；没有目标、没有对错，小羽在旁边追问"你让它做了什么"。</p>
+    <span class="go">去玩 →</span>
+  </a>
+
+  <div class="sec">好奇探索 · 自己选路，好奇心带着走</div>
+
+  <a class="card" href="explore.html" style="--c:#3b86c9">
+    <div class="game">🗡️ 国王之泪 / 塞尔达</div>
+    <h2>🗺️ 记忆小岛</h2>
+    <p>一座小岛，山顶、海边、星空台……哪个在闪点哪个，小羽抛一个勾人的问题。自己选路去探索。</p>
+    <span class="go">去玩 →</span>
+  </a>
+
+  <a class="card" href="journey.html" style="--c:#c98a3a">
+    <div class="game">🧣 风之旅人（Journey）</div>
+    <h2>🌅 一起走一段</h2>
+    <p>不计分、不评判。你每分享一点心里的事，就和小羽一起往前走一步，围巾慢慢变长。最安静的一种。</p>
+    <span class="go">去玩 →</span>
+  </a>
+
+  <div class="sec">组合 & 产出（在你选定方向后才需要）</div>
+
+  <a class="card" href="combined.html" style="--c:#2f6f5e">
+    <div class="game">⭐ 三引擎合体</div>
+    <h2>🪺 小羽的小窝</h2>
+    <p>森友会＋Finch＋涂鸦拧成一个动作：说一个具体细节 → 它变成东西住进小窝＋小羽长大＋被记住。</p>
+    <span class="go">去玩 →</span>
+  </a>
+
+  <a class="card" href="report.html" style="--c:#9a6a14">
+    <div class="game">📊 这次聊出了什么</div>
     <h2>📈 成长报告</h2>
-    <p>聊天的收口：孩子带走一篇<strong>用他自己的话拼成的小作品</strong>；家长看到一条<strong>"具体度"成长曲线</strong>＋八维成长＋本周闪光句。可改对话当场看数字变。</p>
-    <div class="ref">回答"不停聊天，最后产出什么"——孩子得作品，家长得成长</div>
+    <p>聊天的收口：孩子带走一篇用自己的话拼成的小作品；家长看到"具体度"成长曲线＋八维＋闪光句。</p>
     <span class="go">去看 →</span>
   </a>
 
-  <a class="card" href="combined.html" style="--c:#2f6f5e;border:2px solid var(--brand)">
-    <div class="tag">⭐ 合体版（推荐先玩这个）</div>
-    <h2>🪺 小羽的小窝</h2>
-    <p>三个引擎拧成一个动作：你说出一个具体细节 → ① 它变成东西住进小窝（涂鸦）② 小羽长大一点（Finch）③ 记进笔记本，明天念叨你（森友会）。说得越具体，回报越大。</p>
-    <div class="ref">＝ 森友会 ＋ Finch ＋ 涂鸦冒险家，合一</div>
-    <span class="go">去玩 →</span>
-  </a>
-
-  <div class="card" style="--c:#e8884a">
-    <div class="tag">风格① · 关系养成</div>
-    <h2>🥚 养成 ＋ 📓 记得你的朋友</h2>
-    <p>你越表达，伙伴越成长、越懂你。孩子为"一个会长大、会想念我的朋友"而回来。</p>
-    <div class="ref">灵感：Finch / 动物森友会 / 拓麻歌子 / 宝可梦</div>
-    <a class="go" href="grow.html">🥚 玩「表达养成」→</a><br>
-    <a class="alt" href="friend.html">📓 另一种：记得你的朋友</a>
-  </div>
-
-  <a class="card" href="words.html" style="--c:#7c5cff">
-    <div class="tag">风格② · 话即玩法</div>
-    <h2>🪄 话变成东西</h2>
-    <p>你说的话直接变成画面里的东西，说得越具体越热闹；说"我很开心"画不出来——玩着就学会写具体。</p>
-    <div class="ref">灵感：Scribblenauts 涂鸦冒险家</div>
-    <span class="go">去玩 →</span>
-  </a>
-
-  <a class="card" href="author.html" style="--c:#74b816">
-    <div class="tag">风格③ · 你来当作者</div>
-    <h2>🎬 小剧场（你当导演）</h2>
-    <p>选舞台、摆角色、说剧情——没有标准答案，你创造世界，小羽是入迷的观众，一直追问"然后呢"。</p>
-    <div class="ref">灵感：模拟人生 / Toca Boca / 我的世界</div>
-    <span class="go">去玩 →</span>
-  </a>
-
-  <a class="card" href="explore.html" style="--c:#3b86c9">
-    <div class="tag">风格④ · 好奇探索</div>
-    <h2>🗺️ 记忆小岛</h2>
-    <p>一座小岛，山顶、海边、星空台……哪个在闪点哪个，小羽抛一个勾人的问题。自己选路，好奇心带着走。</p>
-    <div class="ref">灵感：塞尔达旷野之息 / 光·遇 / Journey</div>
-    <span class="go">去玩 →</span>
-  </a>
-
-  <div class="note">💡 都是<strong>机制草图</strong>，简单规则跑起来给你找感觉，不是成品。选出最拉得动孩子的那个（或某两个的组合），我们就把小羽<strong>只立在那一个引擎上</strong>，对准它往深里做。</div>
+  <div class="note">💡 全是<strong>机制草图</strong>，用简单规则跑起来给你找感觉，不是成品（也不用钥匙）。建议带真实的孩子各玩两分钟，看他在哪个里面话最多——那个就是该往深里做的方向。</div>
 </div></body></html>

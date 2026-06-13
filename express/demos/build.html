@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>我的世界式 · 搭一个世界</title>
+<style>
+:root{--brand:#2f6f5e;--soft:#e4f0eb;--accent:#e8884a;--ink:#2c2a26;--line:#ece4d7;--c:#6b8e3d}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);
+ background:linear-gradient(180deg,#dbe8c9,#e7f1dd 45%,#fbf7f0);display:flex;flex-direction:column;height:100dvh;line-height:1.55}
+button{font-family:inherit;cursor:pointer}
+.top{flex:0 0 auto;text-align:center;padding:10px}
+.eng{font-size:.72rem;font-weight:800;letter-spacing:1px;color:#5a7a2e}
+h1{font-size:1.1rem;margin:2px 0}.sub{font-size:.76rem;color:#6b6459}
+.cnt{font-size:.78rem;color:#5a7a2e;font-weight:800;margin-top:2px}
+.wrap{flex:1 1 auto;overflow-y:auto;padding:6px 14px;display:flex;flex-direction:column}
+.world{flex:1 1 auto;min-height:240px;border-radius:14px;border:3px solid #fff;overflow:hidden;position:relative;
+ background:linear-gradient(180deg,#bfe3fb,#bfe3fb 60%,#9ccc6a 60%);box-shadow:0 8px 24px rgba(60,50,35,.12);
+ display:flex;align-items:flex-end;justify-content:center;padding:10px}
+.grid{display:grid;grid-auto-flow:column;grid-template-rows:repeat(8,26px);gap:3px;align-items:end}
+.colb{display:flex;flex-direction:column-reverse;gap:3px}
+.blk{width:26px;height:26px;border-radius:5px;display:grid;place-items:center;font-size:15px;
+ box-shadow:inset -3px -3px 0 rgba(0,0,0,.12);animation:drop .4s cubic-bezier(.2,1.5,.4,1)}
+@keyframes drop{0%{transform:translateY(-30px);opacity:0}100%{transform:translateY(0);opacity:1}}
+.ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#3a6e3e;font-size:.92rem;text-align:center;padding:18px}
+.say{background:#fff;border:1.5px solid var(--soft);border-radius:12px;padding:9px 12px;font-size:.96rem;font-weight:600;margin:8px 0 0}
+.inbar{flex:0 0 auto;display:flex;gap:8px;padding:10px 12px calc(12px + env(safe-area-inset-bottom));background:rgba(255,255,255,.9);border-top:1px solid var(--line)}
+.tin{flex:1;border:1.5px solid var(--soft);border-radius:16px;padding:13px;font-size:1.02rem;font-family:inherit}
+.tin:focus{outline:none;border-color:var(--c)}
+.go{border:none;border-radius:14px;background:var(--c);color:#fff;font-weight:800;padding:0 16px;box-shadow:0 4px 0 #4c6a28}
+.go:active{transform:translateY(3px);box-shadow:0 1px 0 #4c6a28}
+.nav{position:fixed;top:8px;right:10px;font-size:.72rem;z-index:5}
+.nav a{color:var(--brand);text-decoration:none;background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 10px}
+</style></head>
+<body><div class="nav"><a href="index.html">← 全部</a></div>
+<div class="top">
+  <div class="eng">我的世界式 · 建造引擎</div>
+  <h1>你说的每样东西，变成一块方块</h1>
+  <div class="sub">动力＝一块块搭出"我自己的世界"，越说越大</div>
+  <div class="cnt" id="cnt">🧱 已经搭了 0 块</div>
+</div>
+<div class="wrap">
+  <div class="world" id="world"><div class="ph" id="ph">说一句你今天的事，看到的东西会变成方块，落进你的世界 👇</div><div class="grid" id="grid"></div></div>
+  <div class="say" id="say"></div>
+</div>
+<div class="inbar">
+  <input class="tin" id="tin" placeholder="比如：操场上有棵大树，我和同学在踢球…"/>
+  <button class="go" id="go">放下方块</button>
+</div>
+<script>
+const BLK=[["树","🌳","#6cae4a"],["花","🌸","#e88ab0"],["草","🌿","#7cbf5a"],["水","💧","#5aa9d6"],["海","🌊","#4a90c2"],["山","⛰️","#9a8c78"],["石","🪨","#9aa0a6"],["火","🔥","#e8714a"],["太阳","☀️","#ffd95e"],["云","☁️","#cdd6dd"],["门","🚪","#a9763f"],["窗","🪟","#bcd6e8"],["床","🛏️","#caa","#caa"],["书","📖","#d6a24a"],["球","⚽","#e8e8e8"],["车","🚗","#e85a5a"],["猫","🐱","#e8b06a"],["狗","🐶","#caa06a"],["鸟","🐦","#6ab0e8"],["鱼","🐟","#5ac2c2"],["蛋糕","🍰","#f3c9d6"],["糖","🍬","#e88ab0"],["灯","💡","#ffe08a"],["旗","🚩","#e85a5a"],["桥","🌉","#9a8c78"],["房","🏠","#d6a24a"]];
+const ACT=/跑|跳|踢|搭|建|爬|挖|种|放/;
+let count=0;
+const grid=document.getElementById("grid");
+const cols={};   // 类别 → 列
+function addBlock(emoji,color,key){
+  if(!cols[key]){ const c=document.createElement("div"); c.className="colb"; grid.appendChild(c); cols[key]=c; }
+  const b=document.createElement("div"); b.className="blk"; b.style.background=color; b.textContent=emoji;
+  cols[key].appendChild(b); count++;
+}
+function go(){
+  const v=document.getElementById("tin").value.trim(); if(!v) return;
+  document.getElementById("tin").value="";
+  const found=[]; const seen=new Set();
+  for(const [w,e,c] of BLK){ if(v.includes(w)&&!seen.has(w)){ seen.add(w); found.push([w,e,c]); } }
+  if(!found.length){
+    document.getElementById("say").textContent="嗯…这句里我还没找到能变成方块的东西。说一个看得见的：一棵树、一个球、一只猫？";
+    return;
+  }
+  document.getElementById("ph").style.display="none";
+  found.forEach(([w,e,c])=>{ addBlock(e,c,w); });
+  document.getElementById("cnt").textContent=`🧱 已经搭了 ${count} 块`;
+  const names=found.map(f=>f[0]).join("、");
+  document.getElementById("say").textContent=`${names} 砌进你的世界啦！现在 ${count} 块。再加点什么——你的世界会越来越大。`;
+}
+document.getElementById("go").onclick=go;
+document.getElementById("tin").addEventListener("keydown",e=>{if(e.key==="Enter")go();});
+</script>
+</body></html>
