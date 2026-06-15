@@ -62,6 +62,32 @@
   #stamFill{ height:100%; width:100%; transition:width .12s, background .2s;}
   #stambar.empty #stamOuter{ border-color:#ff5252; box-shadow:0 0 8px #ff2a2a; }
 
+  /* 技能栏 */
+  #abilityBar{ position:absolute; left:50%; bottom:24px; transform:translateX(-50%); display:flex; gap:10px; pointer-events:auto; }
+  .abil{ width:74px; min-height:74px; border-radius:12px; background:rgba(10,14,26,.72); border:2px solid rgba(255,255,255,.25);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff; cursor:pointer; position:relative; overflow:hidden;}
+  .abil .ai{ font-size:26px; line-height:1;}
+  .abil .an{ font-size:11px; margin-top:2px; opacity:.9;}
+  .abil .ak{ position:absolute; top:2px; left:5px; font-size:11px; color:#9cf; font-weight:bold;}
+  .abil .ac{ position:absolute; top:2px; right:5px; font-size:13px; font-weight:bold; color:#ffd54a;}
+  .abil .cd{ position:absolute; inset:0; background:rgba(0,0,0,.6); display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:bold;}
+  .abil.ready{ border-color:#7CFC9B; box-shadow:0 0 8px rgba(124,252,155,.5);}
+
+  #headBars .hb{ position:absolute; width:46px; height:6px; transform:translate(-50%,-50%); background:rgba(0,0,0,.55); border-radius:3px; overflow:hidden; border:1px solid rgba(255,255,255,.4);}
+  #headBars .hb i{ display:block; height:100%; width:100%; background:#3ddc6a;}
+  /* 击杀横幅（紫色双引号 + 两条紫横杠） */
+  #killBanner{ position:absolute; left:50%; top:38%; transform:translate(-50%,-50%); text-align:center; opacity:0; pointer-events:none; z-index:14;}
+  #killBanner.show{ animation: kbpop 1.4s ease-out forwards;}
+  .kb-row{ display:flex; align-items:center; justify-content:center; gap:10px;}
+  .kb-txt{ font-size:56px; font-weight:bold; color:#fff; letter-spacing:8px; text-shadow:0 3px 10px #000, 0 0 16px #b06bff;}
+  .kb-q{ font-size:52px; font-weight:bold; color:#b06bff; text-shadow:0 0 12px #8e44ff;}
+  .kb-bars{ margin-top:8px; display:flex; flex-direction:column; gap:5px; align-items:center;}
+  .kb-bars i{ display:block; width:130px; height:6px; background:#b06bff; border-radius:3px; box-shadow:0 0 10px #b06bff;}
+  @keyframes kbpop{ 0%{opacity:0; transform:translate(-50%,-50%) scale(.55);} 14%{opacity:1; transform:translate(-50%,-50%) scale(1.12);} 28%{transform:translate(-50%,-50%) scale(1);} 78%{opacity:1;} 100%{opacity:0; transform:translate(-50%,-50%) scale(1);} }
+
+  #flashOverlay{ position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none; z-index:12; transition:opacity .12s;}
+  #blindMsg{ position:absolute; left:50%; top:58%; transform:translateX(-50%); color:#fff; font-size:30px; font-weight:bold; text-shadow:0 0 10px #000; display:none; z-index:13;}
+
   #weaponInfo{ position:absolute; right:24px; bottom:28px; text-align:right; text-shadow:0 1px 3px #000;}
   #weaponInfo .wname{ font-size:26px; font-weight:bold; }
   #ammo{ font-size:40px; font-weight:bold; }
@@ -112,6 +138,13 @@
       <div class="card lego sel" data-scene="lego">乐高城市<small>积木方块世界</small></div>
       <div class="card desert" data-scene="desert">沙漠城<small>黄沙与土墙</small></div>
       <div class="card roof" data-scene="roof">房顶<small>高楼天台</small></div>
+      <div class="card" data-scene="night" style="background:linear-gradient(135deg,#0b1026,#1c2550);">夜战<small>黑夜·爆闪超亮</small></div>
+    </div>
+
+    <div style="font-size:18px;margin:14px 0 6px;">② 选择角色（技能不同）</div>
+    <div class="row" id="charRow">
+      <div class="card sel" data-char="redwolf" style="width:240px;background:linear-gradient(135deg,#6e0f0f,#c0392b);">🐺 红狼<small>榴弹炮·3连发秒杀(50秒)</small></div>
+      <div class="card" data-char="medic" style="width:240px;background:linear-gradient(135deg,#0e5a3e,#16a085);">⛑️ 医疗兵<small>补血枪·给队友和自己回血</small></div>
     </div>
 
     <div class="row">
@@ -160,7 +193,7 @@
       <div style="font-size:60px;font-weight:bold;color:#fff;text-shadow:0 2px 6px #000;"><span id="respawnSec">3</span> 秒后复活</div>
     </div>
     <div class="hintbox">
-W前 S后 A左 D右 ·空格 跳<br>Shift/C 滑铲 ·左键 开枪 ·右键 瞄准<br>1 手枪 ·2 狙击 ·3 刀<br>9 左探头 ·0 右探头 ·R 换弹<br>ESC 释放鼠标
+W前 S后 A左 D右 ·空格 跳 ·Shift/C 滑铲<br>左键 开枪 ·右键 瞄准 ·1手枪 2狙击 3刀<br>Z 爆闪 ·X 烟雾 ·G 长烟 ·V 技能 ·H 治疗<br>9 左探头 ·0 右探头 ·R 换弹 ·ESC 释放鼠标
     </div>
     <div id="hpbar">
       <div class="label">血量 <span id="hpText">100/100</span> <span id="armorTag"></span></div>
@@ -174,6 +207,20 @@ W前 S后 A左 D右 ·空格 跳<br>Shift/C 滑铲 ·左键 开枪 ·右键 瞄�
       <div class="wname" id="wname">手枪</div>
       <div id="ammo">13<small>/13</small></div>
       <div id="reloadMsg"></div>
+    </div>
+    <div id="abilityBar">
+      <div class="abil" id="ab-flash" title="爆闪"><span class="ak">Z</span><span class="ac" id="ab-flash-c">1</span><span class="ai">⚡</span><span class="an">爆闪</span><div class="cd" id="ab-flash-cd" style="display:none"></div></div>
+      <div class="abil" id="ab-smoke" title="烟雾弹"><span class="ak">X</span><span class="ac" id="ab-smoke-c">3</span><span class="ai">💨</span><span class="an">烟雾弹</span></div>
+      <div class="abil" id="ab-drone" title="长烟无人机"><span class="ak">G</span><span class="ac" id="ab-drone-c">2</span><span class="ai">🛸</span><span class="an">长烟</span></div>
+      <div class="abil" id="ab-skill" title="角色技能"><span class="ak" id="ab-skill-k">V</span><span class="ai" id="ab-skill-i">💥</span><span class="an" id="ab-skill-n">榴弹炮</span><div class="cd" id="ab-skill-cd" style="display:none"></div></div>
+      <div class="abil" id="ab-heal" title="治疗钥匙" style="display:none"><span class="ak">H</span><span class="ac" id="ab-heal-c">6</span><span class="ai">➕</span><span class="an">治疗</span></div>
+    </div>
+    <div id="flashOverlay"></div>
+    <div id="blindMsg">⚡ 被爆闪了！</div>
+    <div id="headBars" style="position:absolute;inset:0;display:none;"></div>
+    <div id="killBanner">
+      <div class="kb-row"><span class="kb-q">“</span><span class="kb-txt" id="kb-txt">颗秒</span><span class="kb-q">”</span></div>
+      <div class="kb-bars"><i></i><i></i></div>
     </div>
   </div>
 </div>
@@ -251,6 +298,11 @@ document.addEventListener('keydown', e=>{
   if(e.code==='KeyR') startReload();
   if(e.code==='Space'){ jump(); e.preventDefault(); }
   if(e.code==='ShiftLeft'||e.code==='ShiftRight'||e.code==='KeyC'){ slide(); }
+  if(e.code==='KeyZ') useFlash();
+  if(e.code==='KeyX') useSmoke();
+  if(e.code==='KeyG') useDrone();
+  if(e.code==='KeyV') useSkill();
+  if(e.code==='KeyH') useHealKey();
 });
 document.addEventListener('keyup', e=>{
   keys[e.code]=false;
@@ -301,6 +353,28 @@ const STAM_JUMP = STAM_MAX/35;   // 跳35次累
 const STAM_SLIDE = STAM_MAX/15;  // 滑15次累
 const STAM_WALK = STAM_MAX/600;  // 走10分钟才空（每秒）
 const STAM_RECOVER = STAM_MAX/20;// 20秒回满（每秒），10秒回一半
+
+// ===== 角色 & 技能 =====
+let isNight=false;
+let chosenChar='redwolf';
+const CHARS={ redwolf:{name:'红狼',emoji:'🐺',skill:'榴弹炮'}, medic:{name:'医疗兵',emoji:'⛑️',skill:'补血枪'} };
+// 技能/消耗（每局重置）
+const ab = {
+  flash:1, flashRegenAt:0,        // 爆闪充能：每20秒+1，可叠加（Z使用）
+  smoke:3, drone:2,               // 开局3烟雾弹、2长烟无人机
+  skillReadyAt:0,                 // 签名技能冷却结束时间
+  grenadeArmed:false,             // 红狼榴弹炮已架设(第一下架，第二下发射)
+  healKeys:6, healRegenAt:0,      // 医疗兵自疗钥匙(6个,每10秒+1)
+  selfHealUntil:0, healTargets:{} // 治疗计时
+};
+function resetAbilities(t){
+  ab.flash=1; ab.flashRegenAt=t+20;
+  ab.smoke=3; ab.drone=2;
+  ab.skillReadyAt=t + (chosenChar==='redwolf'?50:0);
+  ab.grenadeArmed=false;
+  ab.healKeys=6; ab.healRegenAt=t+10;
+  ab.selfHealUntil=0; ab.healTargets={};
+}
 
 function resetPlayer(){
   player.maxHp = playerMaxHP();
@@ -774,7 +848,7 @@ function damageBot(b, dmg, head, byPlayer){
     b.dead=true; b.mesh.visible=false;
     b.respawnAt = clock.getElapsedTime() + RESPAWN_DELAY;
     // 击杀谁，就给对面那队加分
-    if(b.team==='red'){ blueScore++; if(byPlayer) addKill(`你击杀了 ${b.name}！我方+1`, '#7CFC9B'); else addKill(`队友击杀 ${b.name}，我方+1`,'#9fe'); }
+    if(b.team==='red'){ blueScore++; if(byPlayer){ addKill(`你击杀了 ${b.name}！我方+1`, '#7CFC9B'); showKillBanner(); } else addKill(`队友击杀 ${b.name}，我方+1`,'#9fe'); }
     else { redScore++; addKill(`${b.name} 被击杀，敌方+1`, '#ff9b9b'); }
     updateScoreboard();
     checkWin();
@@ -913,16 +987,23 @@ function buildSky(topCol, horizonCol, sunDir){
 function buildScene(type){
   clearWorld();
   sunGroup=cloudGroup=null;
+  isNight = (type==='night');
   let groundColor, fog, skyTop, skyHorizon, sunDir=new THREE.Vector3(0.42,0.82,0.28).normalize();
   if(type==='lego'){   groundColor=0x787d82; fog=0xd5e3f2; skyTop=0x3f78c8; skyHorizon=0xcfe0f2; hemiLight.color.setHex(0xdcebff); hemiLight.groundColor.setHex(0x6a6e72); }
   if(type==='desert'){ groundColor=0xcaa45f; fog=0xefdcaf; skyTop=0x5aa0e0; skyHorizon=0xeaddb4; hemiLight.color.setHex(0xfff0d0); hemiLight.groundColor.setHex(0xb88c4c); }
   if(type==='roof'){   groundColor=0x444b5a; fog=0xb6c6dc; skyTop=0x3a6fb8; skyHorizon=0xc3d3e6; hemiLight.color.setHex(0xdcebff); hemiLight.groundColor.setHex(0x484e58); }
+  if(type==='night'){  groundColor=0x14171f; fog=0x05060c; skyTop=0x01020a; skyHorizon=0x0b1024; hemiLight.color.setHex(0x2a3550); hemiLight.groundColor.setHex(0x05060a); }
   scene.background=new THREE.Color(skyHorizon);
-  scene.fog=new THREE.Fog(fog, 70, 240);
-  // 太阳光对齐到可见的太阳
+  scene.fog=new THREE.Fog(fog, isNight?30:70, isNight?120:240);
+  // 灯光：白天强太阳，夜晚很暗（爆闪才会亮）
+  sunLight.intensity = isNight ? 0.12 : 1.85;
+  hemiLight.intensity = isNight ? 0.35 : 0.9;
+  renderer.toneMappingExposure = isNight ? 1.05 : 1.3;
   sunLight.position.copy(sunDir.clone().multiplyScalar(90));
   sunLight.target.position.set(0,0,0); sunLight.target.updateMatrixWorld();
   buildSky(skyTop, skyHorizon, sunDir);
+  if(sunGroup) sunGroup.visible=!isNight;   // 夜晚没太阳
+  if(cloudGroup) cloudGroup.visible=!isNight;
   const sky=skyHorizon;
 
   // 地面
@@ -931,8 +1012,8 @@ function buildScene(type){
 
   const blocked=(x,z)=> (Math.abs(x)<5&&Math.abs(z)<5) || (x*x+(z-12)*(z-12)<100) || (x*x+(z+12)*(z+12)<64);
 
-  if(type==='lego'){
-    // 真实城市：水泥/砖楼带窗户，马路，路灯
+  if(type==='lego'||type==='night'){
+    // 真实城市（夜战=同城市但黑夜）：水泥/砖楼带窗户，马路，路灯
     // 马路（深色长条）
     addBox(0,0.02,0, 8,0.05,90, 0x2b2e33, {solid:false,cast:false});
     addBox(0,0.02,0, 90,0.05,8, 0x2b2e33, {solid:false,cast:false});
@@ -1037,6 +1118,7 @@ function collide(pos, radius){
 // ===================== 更新循环 =====================
 function update(dt){
   const t=clock.getElapsedTime();
+  updateAbilities(dt,t); updateHeadBars(); updateAbilityHUD();
 
   // 死亡 → 不能动不能打，倒计时复活
   if(player.dead){
@@ -1127,6 +1209,11 @@ function update(dt){
 function updateBots(dt,t){
   for(const b of bots){
     if(b.dead) continue;
+    // 被无人机标记的闪烁效果
+    if(b.blinkUntil && t<b.blinkUntil){ b.mesh.visible = (Math.floor(t*8)%2===0); }
+    else if(b.blinkUntil){ b.mesh.visible=true; b.blinkUntil=0; }
+    // 被爆闪/无人机致盲 → 定住，不动不开枪
+    if(b.blindUntil && t<b.blindUntil){ continue; }
     // 找最近的敌人（锁定能力）
     let target=null, td=1e9;
     if(b.team==='red' && player.hp>0){
@@ -1227,6 +1314,15 @@ function rayHitSphere(orig, dir, center, radius){
 function hitscanPlayer(w){
   const orig=camera.position.clone();
   const dir=new THREE.Vector3(); camera.getWorldDirection(dir);
+  // 医疗兵：打到队友 = 给他补血（10秒回满），不打伤
+  if(chosenChar==='medic'){
+    let bt=1e9, heal=null;
+    for(const b of bots){ if(b.dead||b.team!=='blue') continue;
+      const c=b.mesh.position.clone(); c.y+=0.9;
+      const tt=rayHitSphere(orig,dir,c,0.7);
+      if(tt>0&&tt<bt){ bt=tt; heal=b; } }
+    if(heal){ ab.healTargets[heal.mesh.id]=clock.getElapsedTime()+10; addKill('➕ 给队友补血(10秒)','#7CFC9B'); showHit(); return; }
+  }
   let bestT=1e9, bestBot=null, bestHead=false;
   for(const b of bots){
     if(b.dead||b.team==='blue') continue;
@@ -1243,6 +1339,125 @@ function hitscanPlayer(w){
     damageBot(bestBot, dmg, bestHead, true);
     showHit();
   }
+}
+
+// ===================== 技能系统 =====================
+let smokes=[], drones=[], grenades=[];
+function nearestRed(pos){ let best=null,bd=1e9; for(const b of bots){ if(b.dead||b.team!=='red')continue; const d=pos.distanceTo(b.mesh.position); if(d<bd){bd=d;best=b;} } return best; }
+function flashScreen(){ const f=$('flashOverlay'); f.style.transition='none'; f.style.opacity=1; setTimeout(()=>{ f.style.transition='opacity 1.2s'; f.style.opacity=0; },60); }
+
+// 1) 爆闪（Z）：致盲范围内敌人10秒，可叠加，每20秒回1个
+function useFlash(){
+  if(!running||player.dead||ab.flash<=0) return;
+  ab.flash--; flashScreen();
+  const t=clock.getElapsedTime();
+  bots.forEach(b=>{ if(!b.dead&&b.team==='red'&&b.mesh.position.distanceTo(player.pos)<45) b.blindUntil=t+10; });
+  addKill('⚡ 爆闪！敌人致盲10秒','#cfe8ff'); updateAbilityHUD();
+}
+// 2) 烟雾弹（X）：灰烟10秒
+function spawnSmoke(pos,dur,col){
+  const g=new THREE.Group();
+  for(let i=0;i<6;i++){ const m=new THREE.Mesh(new THREE.SphereGeometry(2.2+Math.random(),10,10), new THREE.MeshLambertMaterial({color:col||0x9a9a9a,transparent:true,opacity:0,depthWrite:false})); m.position.set((Math.random()-0.5)*3,1+Math.random()*1.6,(Math.random()-0.5)*3); g.add(m); }
+  g.position.copy(pos); scene.add(g);
+  smokes.push({grp:g, born:clock.getElapsedTime(), until:clock.getElapsedTime()+dur});
+}
+function useSmoke(){
+  if(!running||player.dead||ab.smoke<=0) return;
+  ab.smoke--; const dir=new THREE.Vector3(); camera.getWorldDirection(dir);
+  const pos=player.pos.clone().add(dir.setY(0).normalize().multiplyScalar(8)); pos.y=0;
+  spawnSmoke(pos,10,0x9a9a9a); addKill('💨 烟雾弹（10秒）','#ddd'); updateAbilityHUD();
+}
+// 3) 长烟无人机：飞出去撞敌人 -75血 + 闪烁1分钟 + 放烟1分钟
+function useDrone(){
+  if(!running||player.dead||ab.drone<=0) return;
+  ab.drone--;
+  const dir=new THREE.Vector3(); camera.getWorldDirection(dir); dir.y=0; dir.normalize();
+  const g=new THREE.Group();
+  g.add(new THREE.Mesh(new THREE.BoxGeometry(0.6,0.18,0.6), mat(0x2a2f3a,{metal:0.5,rough:0.4})));
+  [[-0.32,-0.32],[0.32,-0.32],[-0.32,0.32],[0.32,0.32]].forEach(p=>{ const r=new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.18,0.04,8), mat(0x6cf,{emissive:0x33aaff,emissiveIntensity:0.6})); r.position.set(p[0],0.12,p[1]); g.add(r); });
+  g.position.copy(player.pos).add(dir.clone().multiplyScalar(1.6)); g.position.y=2.2; scene.add(g);
+  drones.push({mesh:g, dir, target:nearestRed(player.pos), speed:20, life:7, hit:false});
+  addKill('🛸 长烟无人机出击！','#9cf'); updateAbilityHUD();
+}
+// 4) 角色技能（V）：红狼榴弹炮
+function useSkill(){
+  if(!running||player.dead) return;
+  const t=clock.getElapsedTime();
+  if(chosenChar!=='redwolf'){ addKill('医疗兵没有V技能，用左键打队友补血','#9fe'); return; }
+  if(t<ab.skillReadyAt){ return; }
+  if(!ab.grenadeArmed){ ab.grenadeArmed=true; addKill('💥 榴弹炮架设完成，再按V发射3连发','#ffd'); }
+  else { fireGrenades(); ab.grenadeArmed=false; ab.skillReadyAt=t+50; }
+  updateAbilityHUD();
+}
+function fireGrenades(){
+  const dir=new THREE.Vector3(); camera.getWorldDirection(dir);
+  for(let i=-1;i<=1;i++){ const d=dir.clone(); d.x+=i*0.09; d.normalize();
+    const m=new THREE.Mesh(new THREE.SphereGeometry(0.36,12,12), mat(0xff3b3b,{emissive:0xff2a2a,emissiveIntensity:0.7}));
+    m.position.copy(muzzlePos()); scene.add(m); grenades.push({mesh:m,dir:d,speed:45,life:3}); }
+  addKill('💥 榴弹三连发·一发秒杀！','#ff8');
+}
+// 治疗钥匙（H，医疗兵）：6个，每10秒+1，自疗5秒回满
+function useHealKey(){
+  if(chosenChar!=='medic'||!running||player.dead||ab.healKeys<=0) return;
+  ab.healKeys--; ab.selfHealUntil=clock.getElapsedTime()+5;
+  addKill('➕ 治疗自己（5秒回满）','#7CFC9B'); updateAbilityHUD();
+}
+
+// 每帧推进技能（在 update 里调用）
+function updateAbilities(dt,t){
+  // 充能：爆闪每20秒+1（可叠加），治疗钥匙每10秒+1（最多6）
+  if(t>=ab.flashRegenAt){ ab.flash++; ab.flashRegenAt=t+20; }
+  if(chosenChar==='medic' && ab.healKeys<6 && t>=ab.healRegenAt){ ab.healKeys++; ab.healRegenAt=t+10; }
+  // 自疗
+  if(t<ab.selfHealUntil && player.hp>0){ player.hp=Math.min(player.maxHp, player.hp + player.maxHp/5*dt); updateHpHUD(); }
+  // 给队友补血（10秒回满）
+  for(const id in ab.healTargets){
+    const b=bots.find(x=>x.mesh.id==id);
+    if(!b||b.dead){ delete ab.healTargets[id]; continue; }
+    if(t<ab.healTargets[id]){ b.hp=Math.min(b.maxHp, b.hp + b.maxHp/10*dt); } else delete ab.healTargets[id];
+  }
+  // 烟雾：淡入淡出，过期移除
+  for(let i=smokes.length-1;i>=0;i--){ const s=smokes[i]; const age=t-s.born, left=s.until-t;
+    const op = Math.min(0.85, age*2) * Math.min(1, left*1.2);
+    s.grp.children.forEach(m=>{ m.material.opacity=Math.max(0,op); m.rotation.y+=dt*0.3; });
+    if(left<=0){ scene.remove(s.grp); smokes.splice(i,1); } }
+  // 无人机：飞向目标，撞到敌人 -75 + 闪烁+放烟1分钟
+  for(let i=drones.length-1;i>=0;i--){ const d=drones[i]; d.life-=dt;
+    if(d.target && d.target.dead) d.target=nearestRed(d.mesh.position);
+    if(d.target){ const want=d.target.mesh.position.clone().setY(2.0).sub(d.mesh.position).normalize(); d.dir.lerp(want,0.06).normalize(); }
+    d.mesh.position.add(d.dir.clone().multiplyScalar(d.speed*dt)); d.mesh.rotation.y+=dt*6;
+    d.mesh.children.forEach((r,idx)=>{ if(idx>0) r.rotation.y+=dt*30; });
+    let boom=d.life<=0;
+    if(!d.hit) for(const b of bots){ if(b.dead||b.team!=='red')continue; if(d.mesh.position.distanceTo(b.mesh.position.clone().setY(1))<1.6){
+      damageBot(b,75,false,true); b.blindUntil=t+60; b.blinkUntil=t+60; spawnSmoke(b.mesh.position.clone().setY(0),60,0x8a8a8a); d.hit=true; boom=true; addKill('🛸 无人机命中！-75血+致盲1分钟','#9cf'); break; } }
+    if(boom){ scene.remove(d.mesh); drones.splice(i,1); } }
+  // 榴弹：直飞，撞到敌人秒杀
+  for(let i=grenades.length-1;i>=0;i--){ const g=grenades[i]; g.life-=dt; g.mesh.position.add(g.dir.clone().multiplyScalar(g.speed*dt));
+    let hit=g.life<=0||g.mesh.position.y<0;
+    for(const b of bots){ if(b.dead||b.team!=='red')continue; if(g.mesh.position.distanceTo(b.mesh.position.clone().setY(1))<1.8){ damageBot(b,9999,true,true); hit=true; break; } }
+    if(hit){ scene.remove(g.mesh); grenades.splice(i,1); } }
+}
+
+// 头顶血条（医疗兵专属）
+let headBars=[];
+function updateHeadBars(){
+  const show = (chosenChar==='medic' && running);
+  const cont=$('headBars');
+  if(!show){ cont.style.display='none'; return; }
+  cont.style.display='block';
+  const units=[];
+  bots.forEach(b=>{ if(!b.dead) units.push({pos:b.mesh.position.clone().setY(2.0), hp:b.hp, max:b.maxHp, team:b.team}); });
+  // 池化 div
+  while(headBars.length<units.length){ const d=document.createElement('div'); d.className='hb'; d.innerHTML='<i></i>'; cont.appendChild(d); headBars.push(d); }
+  headBars.forEach((d,i)=>{ if(i>=units.length){ d.style.display='none'; return; }
+    const u=units[i]; const v=u.pos.clone().project(camera);
+    if(v.z>1){ d.style.display='none'; return; }
+    d.style.display='block';
+    d.style.left=(v.x*0.5+0.5)*innerWidth+'px'; d.style.top=(-v.y*0.5+0.5)*innerHeight+'px';
+    const pct=Math.max(0,u.hp)/u.max*100;
+    d.firstChild.style.width=pct+'%';
+    d.firstChild.style.background = u.team==='blue' ? '#3ddc6a' : '#ff5252';
+  });
 }
 
 // ===================== 回合判定（先到目标分赢）=====================
@@ -1291,6 +1506,24 @@ function updateStaminaHUD(){
   $('stambar').classList.toggle('empty', tired);
   $('stamTired').textContent = tired? '累瘫了·休息中' : '';
 }
+function updateAbilityHUD(){
+  const t = clock? clock.getElapsedTime() : 0;
+  $('ab-flash-c').textContent = ab.flash;
+  $('ab-smoke-c').textContent = ab.smoke;
+  $('ab-drone-c').textContent = ab.drone;
+  // 角色技能格
+  if(chosenChar==='redwolf'){
+    $('ab-skill-i').textContent='💥'; $('ab-skill-n').textContent = ab.grenadeArmed?'发射!':'榴弹炮'; $('ab-skill-k').textContent='V';
+    const cd=Math.max(0, Math.ceil(ab.skillReadyAt-t));
+    const el=$('ab-skill-cd'); if(cd>0 && !ab.grenadeArmed){ el.style.display='flex'; el.textContent=cd; } else el.style.display='none';
+    $('ab-skill').classList.toggle('ready', cd<=0);
+    $('ab-heal').style.display='none';
+  } else {
+    $('ab-skill-i').textContent='🔫'; $('ab-skill-n').textContent='补血枪'; $('ab-skill-k').textContent='左键';
+    $('ab-skill-cd').style.display='none'; $('ab-skill').classList.add('ready');
+    $('ab-heal').style.display='flex'; $('ab-heal-c').textContent=ab.healKeys;
+  }
+}
 function updateWeaponHUD(){
   const w=WEAPONS[player.weapon];
   $('wname').textContent=w.name;
@@ -1325,6 +1558,10 @@ function addKill(text,color){
 function showHit(){
   const h=$('hitmark'); h.style.transition='none'; h.style.opacity=1;
   setTimeout(()=>{ h.style.transition='opacity .4s'; h.style.opacity=0; },30);
+}
+// 击杀横幅（两个字 + 紫色双引号 + 两条紫横杠）
+function showKillBanner(){
+  const k=$('killBanner'); k.classList.remove('show'); void k.offsetWidth; k.classList.add('show');
 }
 function flashDamage(){
   const f=$('dmgflash'); f.style.opacity=1;
@@ -1435,12 +1672,17 @@ function startGame(){
   resetPlayer();
   spawnBots();
   bullets.forEach(b=>scene.remove(b.mesh)); bullets=[];
+  // 清掉上一局残留的技能物体
+  smokes.forEach(s=>scene.remove(s.grp)); smokes=[];
+  drones.forEach(d=>scene.remove(d.mesh)); drones=[];
+  grenades.forEach(g=>scene.remove(g.mesh)); grenades=[];
+  resetAbilities(clock.getElapsedTime());
   roundOver=false;
   blueScore=0; redScore=0; playerHeadshots=0; teamHeadshots=0;
   $('respawnOverlay').style.display='none';
   applyPlayerArmorVisual();
   applyGunUpgrade();
-  updateWeaponHUD(); updateHpHUD(); updateScoreboard(); updateCoins(); updateStaminaHUD();
+  updateWeaponHUD(); updateHpHUD(); updateScoreboard(); updateCoins(); updateStaminaHUD(); updateAbilityHUD();
   $('menu').classList.add('hidden');
   $('result').classList.add('hidden');
   $('shop').classList.add('hidden');
@@ -1455,6 +1697,17 @@ $('sceneRow').addEventListener('click',e=>{
   document.querySelectorAll('#sceneRow .card').forEach(x=>x.classList.remove('sel'));
   c.classList.add('sel'); chosenScene=c.dataset.scene;
 });
+$('charRow').addEventListener('click',e=>{
+  const c=e.target.closest('.card'); if(!c) return;
+  document.querySelectorAll('#charRow .card').forEach(x=>x.classList.remove('sel'));
+  c.classList.add('sel'); chosenChar=c.dataset.char;
+});
+// 技能栏点击（爆闪/烟雾/长烟/技能/治疗）
+$('ab-flash').onclick=()=>useFlash();
+$('ab-smoke').onclick=()=>useSmoke();
+$('ab-drone').onclick=()=>useDrone();
+$('ab-skill').onclick=()=>useSkill();
+$('ab-heal').onclick=()=>useHealKey();
 $('startBtn').onclick=startGame;
 $('shopBtn').onclick=()=>{ $('menu').classList.add('hidden'); $('shop').classList.remove('hidden'); renderShop(); };
 $('shopBack').onclick=()=>{ $('shop').classList.add('hidden'); $('menu').classList.remove('hidden'); };
