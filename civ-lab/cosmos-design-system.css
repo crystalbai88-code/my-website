@@ -273,3 +273,6 @@ html,body{min-height:100%;font-family:var(--sans);background:var(--bg);color:var
   .ds-modal-content h2{font-size:22px}
   .ds-fab{width:48px;height:48px;font-size:21px}
 }
+
+/* 仅保留故宫国风一种风格,隐藏切换器 */
+.ds-theme-switch{display:none !important}

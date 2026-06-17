@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>世界历史地图 · CivLab</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="./cosmos-design-system.css?v=4"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=5"/>
 <style>
   html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
   #app{position:relative;z-index:10;height:100dvh;display:flex;flex-direction:column}
@@ -105,7 +105,7 @@
   .kcard .kc-m{font-family:var(--mono);font-size:8.5px;color:var(--gold);letter-spacing:.02em;margin-top:1px;white-space:nowrap}
 </style>
 </head>
-<body data-theme="deepblue">
+<body data-theme="palace">
 <div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
 <div id="app">
   <div class="top">
@@ -399,7 +399,7 @@ function applyTheme(t){ if(t&&t!=='deepblue')document.body.setAttribute('data-th
 document.getElementById('themeSwitch').onclick=e=>{const b=e.target.closest('button');if(b)applyTheme(b.dataset.t);};
 
 window.addEventListener('resize',resize);
-applyTheme(localStorage.getItem('civ_theme')||'deepblue');
+applyTheme('palace');
 resize(); setYear(-3500);
 
 window.__aiCtx="用户正在浏览世界历史地图。";
