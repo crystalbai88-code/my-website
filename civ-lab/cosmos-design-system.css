@@ -125,6 +125,17 @@ body[data-theme="nebula"]{
   --panel-bg:rgba(18,12,36,.86); --panel-line:rgba(150,120,255,.26); --topbar-bg:rgba(12,8,24,.6);
   --overlay:rgba(8,6,18,.85);
 }
+/* 故宫 (palace · 黛蓝夜 + 朱红石青明黄) */
+body[data-theme="palace"]{
+  --bg:#15202e; --bg-grad:linear-gradient(180deg,#1a2738 0%,#121b27 55%,#1b2434 100%);
+  --neb1:rgba(200,74,62,.16); --neb2:rgba(46,125,154,.18); --star:.28; --twinkle:.17;
+  --ink:#f2ead9; --ink2:#b7c0ca; --ink3:#7c8794;
+  --gold:#dca93f; --warm:#e8c468; --vermilion:#c84a3e; --cyan:#3e90b0; --purple:#9a7ab0;
+  --label-ink:#fff; --label-shadow:0 2px 8px rgba(0,0,0,.95);
+  --line:rgba(220,169,63,.13); --grid-ink:rgba(242,234,217,.72);
+  --panel-bg:rgba(21,30,46,.88); --panel-line:rgba(220,169,63,.26); --topbar-bg:rgba(16,23,34,.62);
+  --overlay:rgba(8,13,22,.85);
+}
 html,body{min-height:100%;font-family:var(--sans);background:var(--bg);color:var(--ink);transition:background .4s ease}
 
 /* ───────── 4. 宇宙背景 (固定铺底) ───────── */
@@ -187,6 +198,7 @@ html,body{min-height:100%;font-family:var(--sans);background:var(--bg);color:var
 .ds-theme-switch button[data-t="aurora"]{background:linear-gradient(135deg,#0a1a16,#46e0b0)}
 .ds-theme-switch button[data-t="sunset"]{background:linear-gradient(135deg,#241020,#ff6a8a)}
 .ds-theme-switch button[data-t="nebula"]{background:linear-gradient(135deg,#0d0a1f,#b894ff)}
+.ds-theme-switch button[data-t="palace"]{background:linear-gradient(135deg,#15202e,#c84a3e 60%,#dca93f)}
 
 /* ───────── 8. 圆形浮动操作按钮 (FAB) ───────── */
 .ds-fab{width:var(--fab);height:var(--fab);border-radius:50%;background:var(--fab-gold);color:#fff;border:none;cursor:pointer;font-size:24px;box-shadow:var(--sh-md);transition:transform .2s;display:flex;align-items:center;justify-content:center}

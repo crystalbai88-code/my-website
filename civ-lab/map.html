@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>世界历史地图 · CivLab</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="./cosmos-design-system.css?v=3"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=4"/>
 <style>
   html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
   #app{position:relative;z-index:10;height:100dvh;display:flex;flex-direction:column}
@@ -113,7 +113,7 @@
     <div class="spacer"></div>
     <a class="tbtn acc" href="./networks.html">🕸 关系网</a>
     <div class="ds-theme-switch" id="themeSwitch">
-      <button data-t="deepblue"></button><button data-t="museum"></button><button data-t="textbook"></button><button data-t="parchment"></button><button data-t="aurora" title="极光"></button><button data-t="sunset" title="暮霞"></button><button data-t="nebula" title="星云"></button>
+      <button data-t="deepblue"></button><button data-t="museum"></button><button data-t="textbook"></button><button data-t="parchment"></button><button data-t="aurora" title="极光"></button><button data-t="sunset" title="暮霞"></button><button data-t="nebula" title="星云"></button><button data-t="palace" title="故宫"></button>
     </div>
   </div>
   <div id="mapwrap"><canvas id="c"></canvas><div id="kcards"></div></div>
@@ -154,6 +154,7 @@ const PALETTES={
   museum:['#b06a2a','#b04a6a','#9c4030','#3a6ea5','#3a8050','#a07a2a','#2a8a7a','#7050a0'],
   textbook:['#2d6ab0','#b04a6a','#c0392b','#2d8ac8','#2a8050','#b07a2a','#1f8a8a','#7050a0'],
   parchment:['#b5642a','#b04a6a','#a8451e','#3a6ea5','#3a8050','#8a6028','#2a8a7a','#7050a0'],
+  palace:['#c84a3e','#cc8a3c','#2e8aa8','#4a6fa5','#5a8a5e','#dca93f','#3e9e8a','#9a7ab0'],
 };
 const LAND={ // [陆地填充, 描边, 当代填充, 当代描边]
   deepblue:['rgba(120,150,205,.17)','rgba(150,180,225,.32)','rgba(120,150,205,.42)','rgba(180,205,235,.6)'],
@@ -163,6 +164,7 @@ const LAND={ // [陆地填充, 描边, 当代填充, 当代描边]
   museum:['rgba(150,120,85,.22)','rgba(130,95,60,.5)','rgba(150,110,70,.4)','rgba(120,80,45,.7)'],
   textbook:['rgba(90,125,180,.18)','rgba(60,95,150,.42)','rgba(70,120,185,.42)','rgba(40,80,140,.7)'],
   parchment:['rgba(155,115,75,.22)','rgba(135,95,55,.5)','rgba(150,105,65,.42)','rgba(120,80,45,.7)'],
+  palace:['rgba(200,160,90,.16)','rgba(224,200,150,.34)','rgba(210,170,95,.42)','rgba(235,215,165,.62)'],
 };
 let curTheme=(localStorage.getItem('civ_theme')||'deepblue');
 function pal(){ return PALETTES[curTheme]||PALETTES.deepblue; }
