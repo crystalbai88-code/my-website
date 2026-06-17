@@ -382,7 +382,7 @@ document.getElementById('slider').oninput=e=>{ setYear(+e.target.value); hideHin
 function play(){ playing=!playing; document.getElementById('playBtn').textContent=playing?'⏸':'▶';
   clearInterval(playTimer);
   if(playing){ hideHint(); if(year>=2025)setYear(-3500);
-    playTimer=setInterval(()=>{ setYear(year+7); if(year>=2025){playing=false;document.getElementById('playBtn').textContent='▶';clearInterval(playTimer);} },72); } }
+    playTimer=setInterval(()=>{ const step=(activeCivs().length<=1)?30:7; setYear(year+step); if(year>=2025){playing=false;document.getElementById('playBtn').textContent='▶';clearInterval(playTimer);} },72); } }
 document.getElementById('playBtn').onclick=play;
 let hintTimer=setTimeout(()=>hideHint(),6000);
 function hideHint(){document.getElementById('hint').classList.add('hide');clearTimeout(hintTimer);}
