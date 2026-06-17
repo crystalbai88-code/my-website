@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>世界历史地图 · CivLab</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="./cosmos-design-system.css?v=5"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
 <style>
   html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
   #app{position:relative;z-index:10;height:100dvh;display:flex;flex-direction:column}
   .top{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;gap:9px;padding:11px 15px;
-    background:linear-gradient(180deg,rgba(0,0,0,.32),transparent)}
+    background:linear-gradient(180deg,rgba(var(--scrim,0,0,0),.4),transparent)}
   .top .brand{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink);text-shadow:var(--label-shadow);white-space:nowrap}
   @media(max-width:480px){ .top .brand{font-size:13px} .tbtn{padding:6px 10px;font-size:11.5px} }
   .top .spacer{margin-left:auto}
@@ -22,7 +22,7 @@
   canvas.drag{cursor:grabbing}
   /* 时间轴 */
   #timebar{position:fixed;left:0;right:0;bottom:0;z-index:28;padding:12px 18px calc(14px + env(safe-area-inset-bottom));
-    background:linear-gradient(0deg,rgba(0,0,0,.42),transparent)}
+    background:linear-gradient(0deg,rgba(var(--scrim,0,0,0),.5),transparent)}
   .yearrow{display:flex;align-items:center;gap:12px;margin-bottom:6px}
   #playBtn{width:44px;height:44px;flex:0 0 auto;border-radius:50%;border:none;color:#fff;font-size:18px;cursor:pointer;
     background:linear-gradient(135deg,#c86820,#b83018);box-shadow:0 4px 14px #0006}
@@ -105,7 +105,7 @@
   .kcard .kc-m{font-family:var(--mono);font-size:8.5px;color:var(--gold);letter-spacing:.02em;margin-top:1px;white-space:nowrap}
 </style>
 </head>
-<body data-theme="palace">
+<body data-theme="warm">
 <div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
 <div id="app">
   <div class="top">
@@ -155,6 +155,7 @@ const PALETTES={
   textbook:['#2d6ab0','#b04a6a','#c0392b','#2d8ac8','#2a8050','#b07a2a','#1f8a8a','#7050a0'],
   parchment:['#b5642a','#b04a6a','#a8451e','#3a6ea5','#3a8050','#8a6028','#2a8a7a','#7050a0'],
   palace:['#c84a3e','#cc8a3c','#2e8aa8','#4a6fa5','#5a8a5e','#dca93f','#3e9e8a','#9a7ab0'],
+  warm:['#e2603f','#df8a2c','#d4a72f','#3a9ec8','#4aa86a','#e8763a','#2f9e86','#b06aa0'],
 };
 const LAND={ // [陆地填充, 描边, 当代填充, 当代描边]
   deepblue:['rgba(120,150,205,.17)','rgba(150,180,225,.32)','rgba(120,150,205,.42)','rgba(180,205,235,.6)'],
@@ -165,6 +166,7 @@ const LAND={ // [陆地填充, 描边, 当代填充, 当代描边]
   textbook:['rgba(90,125,180,.18)','rgba(60,95,150,.42)','rgba(70,120,185,.42)','rgba(40,80,140,.7)'],
   parchment:['rgba(155,115,75,.22)','rgba(135,95,55,.5)','rgba(150,105,65,.42)','rgba(120,80,45,.7)'],
   palace:['rgba(200,160,90,.16)','rgba(224,200,150,.34)','rgba(210,170,95,.42)','rgba(235,215,165,.62)'],
+  warm:['rgba(206,166,116,.34)','rgba(150,112,72,.5)','rgba(214,174,120,.5)','rgba(150,112,72,.62)'],
 };
 let curTheme=(localStorage.getItem('civ_theme')||'deepblue');
 function pal(){ return PALETTES[curTheme]||PALETTES.deepblue; }
@@ -399,7 +401,7 @@ function applyTheme(t){ if(t&&t!=='deepblue')document.body.setAttribute('data-th
 document.getElementById('themeSwitch').onclick=e=>{const b=e.target.closest('button');if(b)applyTheme(b.dataset.t);};
 
 window.addEventListener('resize',resize);
-applyTheme('palace');
+applyTheme('warm');
 resize(); setYear(-3500);
 
 window.__aiCtx="用户正在浏览世界历史地图。";

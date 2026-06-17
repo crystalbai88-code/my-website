@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>当代与未来文明 · 人物关系网</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Cinzel:wght@500;700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="./cosmos-design-system.css?v=5"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
 <style>
   html,body{height:100%;overflow:hidden}
   #app{position:relative;z-index:10;display:flex;flex-direction:column;height:100vh}
@@ -45,7 +45,7 @@
   @media(max-width:768px){ #panel{width:calc(100vw - 28px)} .legend{display:none} }
 </style>
 </head>
-<body data-theme="palace">
+<body data-theme="warm">
 <div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
 <div id="app">
   <div class="nav">
@@ -392,7 +392,7 @@ function draw(){
       while(_g++<14 && labelRects.some(R=>_rc.x<R.x+R.w&&_rc.x+_rc.w>R.x&&_rc.y<R.y+R.h&&_rc.y+_rc.h>R.y)){ _ly+=_lh+1; _rc.y=_ly; }
       labelRects.push(_rc);
       ctx.fillStyle=TH.ink;ctx.textAlign='center';ctx.textBaseline='top';
-      ctx.shadowColor='rgba(0,0,0,.8)';ctx.shadowBlur=4;
+      ctx.shadowColor=TH.chip||'rgba(0,0,0,.5)';ctx.shadowBlur=4;
       ctx.fillText(p.n,n.x,_ly);
       ctx.restore();
     }
@@ -561,7 +561,7 @@ document.getElementById('themeSwitch').addEventListener('click',e=>{const b=e.ta
 window.addEventListener('resize',()=>{resize();});
 
 resize();
-applyTheme('palace');
+applyTheme('warm');
 buildGraph();
 draw();
 (function(){if(new URLSearchParams(location.search).get("all")){var b=document.querySelector(".civ-pill[data-civ='all']");if(b)b.click();}})();
