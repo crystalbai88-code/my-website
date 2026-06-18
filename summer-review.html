@@ -884,54 +884,45 @@ const VOCAB_SETS = {
 // Each day: vocabKey + poemId OR proseId (no activity, no writing)
 // ══════════════════════════════════════════
 const SCHEDULE = [
-  // ── Group 1 (诗诗文) ──
-  {day:1, title:'绝句', unit:'第一单元', poemId:'p1', vocabKey:'p1_v', harvest:'今天学了杜甫的《绝句》！迟日、花草香、飞燕子——四景合一，描绘了初春最美的画面！', harvestEmoji:'🌸'},
-  {day:2, title:'惠崇春江晚景', unit:'第一单元', poemId:'p2', vocabKey:'p2_v', harvest:'今天学了苏轼的《惠崇春江晚景》！"春江水暖鸭先知"——观察细心才能写出这样的妙句！', harvestEmoji:'🦆'},
-  {day:3, title:'燕子', unit:'第一单元', proseId:'pt1', vocabKey:'yanzi_v', harvest:'今天背诵了《燕子》第1-2自然段！三个"一"写外形，烂漫无比的春天真美！', harvestEmoji:'🐦'},
-  // ── Group 2 ──
-  {day:4, title:'三衢道中', unit:'第一单元', poemId:'p3', vocabKey:'p3_v', harvest:'今天学了曾几的《三衢道中》！梅雨晴天出游，归来还多了黄鹂鸣叫——出游真快乐！', harvestEmoji:'🌿'},
-  {day:5, title:'忆江南', unit:'第一单元', poemId:'p4', vocabKey:'p4_v', harvest:'今天学了白居易的《忆江南》！"日出江花红胜火，春来江水绿如蓝"——江南美景永难忘！', harvestEmoji:'🌺'},
-  {day:6, title:'荷花', unit:'第二单元', proseId:'pt2', vocabKey:'hehua_v', harvest:'今天背诵了《荷花》第2-3自然段！三个"有的"写姿态，"活的画"——叶圣陶把荷花写活了！', harvestEmoji:'🌸'},
-  // ── Group 3 ──
-  {day:7, title:'滁州西涧', unit:'第二单元', poemId:'p5', vocabKey:'p5_v', harvest:'今天学了韦应物的《滁州西涧》！"野渡无人舟自横"——清幽静谧，令人心旷神怡！', harvestEmoji:'🌾'},
-  {day:8, title:'元日', unit:'第三单元', poemId:'p6', vocabKey:'p6_v', harvest:'今天学了王安石的《元日》！爆竹、屠苏、春联——古代过春节和我们现在很像！', harvestEmoji:'🎆'},
-  {day:9, title:'火烧云', unit:'第二单元', proseId:'pt3', vocabKey:'huoshao_v', harvest:'今天背诵了《火烧云》第3-6自然段！颜色千变万化，马→狗→狮子——萧红把晚霞写得太生动了！', harvestEmoji:'🌅'},
-  // ── Group 4 ──
-  {day:10, title:'清明', unit:'第三单元', poemId:'p7', vocabKey:'p7_v', harvest:'今天学了杜牧的《清明》！雨中行人，牧童指路——短短四句，却满是生活气息！', harvestEmoji:'🌧️'},
-  {day:11, title:'九月九日忆山东兄弟', unit:'第三单元', poemId:'p8', vocabKey:'p8_v', harvest:'今天学了王维的《九月九日忆山东兄弟》！"每逢佳节倍思亲"——千古名句，说出无数游子心声！', harvestEmoji:'🏔️'},
-  {day:12, title:'燕子·复习', unit:'第一单元', proseId:'pt1', vocabKey:'yanzi_v', harvest:'今天复习了《燕子》！跟着语音反复听读，背得越来越流利！', harvestEmoji:'🐦'},
-  // ── Group 5 ──
-  {day:13, title:'大林寺桃花', unit:'第四单元', poemId:'p9', vocabKey:'p9_v', harvest:'今天学了白居易的《大林寺桃花》！山下花谢了，山上才盛开——意外发现的惊喜真美妙！', harvestEmoji:'🌸'},
-  {day:14, title:'守株待兔', unit:'第四单元', poemId:'p10', vocabKey:'p10_v', harvest:'今天学了《守株待兔》！文言文初体验——走=跑，释=放下，古今字义大不同！', harvestEmoji:'🐰'},
-  {day:15, title:'荷花·复习', unit:'第二单元', proseId:'pt2', vocabKey:'hehua_v', harvest:'今天复习了《荷花》！语音跟读感受节奏，三个"有的"排比背得更顺了！', harvestEmoji:'🌺'},
-  // ── Group 6 ──
-  {day:16, title:'绝句·复习', unit:'综合复习', poemId:'p1', vocabKey:'p1_v', harvest:'今天复习了《绝句》！四个景物都记牢了吗？迟日→花草→燕子→鸳鸯，全对！', harvestEmoji:'🌸'},
-  {day:17, title:'三衢道中·复习', unit:'综合复习', poemId:'p3', vocabKey:'p3_v', harvest:'今天复习了《三衢道中》！"添得黄鹂四五声"，旅途的喜悦永远在心中！', harvestEmoji:'🌿'},
-  {day:18, title:'火烧云·复习', unit:'第二单元', proseId:'pt3', vocabKey:'huoshao_v', harvest:'今天复习了《火烧云》！颜色变化和形状变化都记住了吗？葡萄灰、梨黄、茄子紫！', harvestEmoji:'🌅'},
-  // ── Group 7 ──
-  {day:19, title:'滁州西涧·复习', unit:'综合复习', poemId:'p5', vocabKey:'p5_v', harvest:'今天复习了《滁州西涧》！"野渡无人舟自横"背出来了吗？宁静的画面真美！', harvestEmoji:'🌾'},
-  {day:20, title:'清明·复习', unit:'综合复习', poemId:'p7', vocabKey:'p7_v', harvest:'今天复习了《清明》！牧童遥指杏花村，这个画面真生动，记住了！', harvestEmoji:'🌧️'},
-  {day:21, title:'燕子·精背', unit:'综合复习', proseId:'pt1', vocabKey:'yanzi_v', harvest:'今天精背了《燕子》！语音听读加背诵，越背越流利，加油！', harvestEmoji:'🐦'},
-  // ── Group 8 ──
-  {day:22, title:'惠崇春江晚景·复习', unit:'综合复习', poemId:'p2', vocabKey:'p2_v', harvest:'今天复习了《惠崇春江晚景》！"蒌蒿满地芦芽短"，背出来了！', harvestEmoji:'🦆'},
-  {day:23, title:'忆江南·复习', unit:'综合复习', poemId:'p4', vocabKey:'p4_v', harvest:'今天复习了《忆江南》！"能不忆江南？"——一背就想起那美丽画面！', harvestEmoji:'🌺'},
-  {day:24, title:'荷花·精背', unit:'综合复习', proseId:'pt2', vocabKey:'hehua_v', harvest:'今天精背了《荷花》！跟着语音节奏，背得越来越好！', harvestEmoji:'🌸'},
-  // ── Group 9 ──
-  {day:25, title:'元日·复习', unit:'综合复习', poemId:'p6', vocabKey:'p6_v', harvest:'今天复习了《元日》！过年的热闹场景历历在目，"曈曈日"这个词真好！', harvestEmoji:'🎆'},
-  {day:26, title:'九月九日·复习', unit:'综合复习', poemId:'p8', vocabKey:'p8_v', harvest:'今天复习了《九月九日忆山东兄弟》！"每逢佳节倍思亲"，这句话一辈子都不会忘！', harvestEmoji:'🏔️'},
-  {day:27, title:'火烧云·精背', unit:'综合复习', proseId:'pt3', vocabKey:'huoshao_v', harvest:'今天精背了《火烧云》！马、狗、狮子的形状变化，背得越来越流利！', harvestEmoji:'🌅'},
-  // ── Group 10 ──
-  {day:28, title:'大林寺桃花·复习', unit:'综合复习', poemId:'p9', vocabKey:'p9_v', harvest:'今天复习了《大林寺桃花》！"不知转入此中来"，意外发现的惊喜感受到了！', harvestEmoji:'🌸'},
-  {day:29, title:'守株待兔·复习', unit:'综合复习', poemId:'p10', vocabKey:'p10_v', harvest:'今天复习了《守株待兔》！文言文背下来了！兔不可复得，而身为宋国笑！', harvestEmoji:'🐰'},
-  {day:30, title:'燕子·冲刺', unit:'综合冲刺', proseId:'pt1', vocabKey:'yanzi_v', harvest:'今天冲刺背了《燕子》！跟语音反复听读，第1-2段已经能流利背出！', harvestEmoji:'🐦'},
-  // ── Group 11 ──
-  {day:31, title:'绝句·冲刺', unit:'综合冲刺', poemId:'p1', vocabKey:'p1_v', harvest:'今天冲刺复习了《绝句》！背诵检测通过了吗？迟日江山丽——全程流利！', harvestEmoji:'🌸'},
-  {day:32, title:'九月九日·冲刺', unit:'综合冲刺', poemId:'p8', vocabKey:'p8_v', harvest:'今天冲刺复习了《九月九日忆山东兄弟》！"倍思亲"——这份情感永远记住！', harvestEmoji:'🏔️'},
-  {day:33, title:'荷花·冲刺', unit:'综合冲刺', proseId:'pt2', vocabKey:'hehua_v', harvest:'今天冲刺背了《荷花》！"挨挨挤挤、大圆盘"——叶圣陶的比喻太经典了！', harvestEmoji:'🌺'},
-  // ── Group 12 ──
-  {day:34, title:'忆江南·冲刺', unit:'综合冲刺', poemId:'p4', vocabKey:'p4_v', harvest:'今天冲刺复习了《忆江南》！日出江花红胜火——背得流利漂亮！', harvestEmoji:'🌺'},
-  {day:35, title:'守株待兔·冲刺', unit:'综合冲刺', poemId:'p10', vocabKey:'p10_v', harvest:'今天冲刺复习了《守株待兔》！文言文能完整背出来了！升四年级，你准备好了！', harvestEmoji:'🐰'},
-  {day:36, title:'火烧云·结业', unit:'暑期结业', proseId:'pt3', vocabKey:'huoshao_v', harvest:'🎊 恭喜完成36天暑期复习！10首古诗+3篇课文全部搞定！升入四年级，你已经准备好了！', harvestEmoji:'🏆'},
+  // ── 第一阶段·初学（Day 1-20）奇数=诗 偶数=文，字词每天都有 ──
+  {day:1,  title:'绝句',               unit:'第一单元', poemId:'p1',  vocabKey:'p1_v',      harvest:'今天学了杜甫的《绝句》！迟日、花草香、飞燕子——四景合一，初春最美的画面！',            harvestEmoji:'🌸'},
+  {day:2,  title:'燕子',               unit:'第一单元', proseId:'pt1',vocabKey:'yanzi_v',   harvest:'今天背诵了《燕子》第1-2自然段！三个"一"写外形，烂漫无比的春天真美！',              harvestEmoji:'🐦'},
+  {day:3,  title:'惠崇春江晚景',        unit:'第一单元', poemId:'p2',  vocabKey:'p2_v',      harvest:'今天学了苏轼的《惠崇春江晚景》！"春江水暖鸭先知"——观察细心才能写出这样的妙句！',     harvestEmoji:'🦆'},
+  {day:4,  title:'荷花',               unit:'第一单元', proseId:'pt2',vocabKey:'hehua_v',   harvest:'今天背诵了《荷花》第2-3自然段！三个"有的"写姿态，"活的画"——叶圣陶把荷花写活了！', harvestEmoji:'🌸'},
+  {day:5,  title:'三衢道中',            unit:'第一单元', poemId:'p3',  vocabKey:'p3_v',      harvest:'今天学了曾几的《三衢道中》！梅雨晴天出游，归来还多了黄鹂鸣叫——出游真快乐！',        harvestEmoji:'🌿'},
+  {day:6,  title:'火烧云',              unit:'第二单元', proseId:'pt3',vocabKey:'huoshao_v', harvest:'今天背诵了《火烧云》第3-6自然段！颜色千变万化，马→狗→狮子——萧红把晚霞写得太生动了！',harvestEmoji:'🌅'},
+  {day:7,  title:'忆江南',              unit:'第一单元', poemId:'p4',  vocabKey:'p4_v',      harvest:'今天学了白居易的《忆江南》！"日出江花红胜火，春来江水绿如蓝"——江南美景永难忘！',    harvestEmoji:'🌺'},
+  {day:8,  title:'燕子·复习',           unit:'第一单元', proseId:'pt1',vocabKey:'yanzi_v',   harvest:'今天复习了《燕子》！跟着语音听读，节奏越来越准！',                              harvestEmoji:'🐦'},
+  {day:9,  title:'滁州西涧',            unit:'第三单元', poemId:'p5',  vocabKey:'p5_v',      harvest:'今天学了韦应物的《滁州西涧》！"野渡无人舟自横"——清幽静谧，令人心旷神怡！',        harvestEmoji:'🌾'},
+  {day:10, title:'荷花·复习',           unit:'第一单元', proseId:'pt2',vocabKey:'hehua_v',   harvest:'今天复习了《荷花》！跟着语音听读，排比句越背越顺了！',                          harvestEmoji:'🌺'},
+  {day:11, title:'元日',                unit:'第四单元', poemId:'p6',  vocabKey:'p6_v',      harvest:'今天学了王安石的《元日》！爆竹、屠苏、春联——古代过春节和现在很像！',               harvestEmoji:'🎆'},
+  {day:12, title:'火烧云·复习',         unit:'第二单元', proseId:'pt3',vocabKey:'huoshao_v', harvest:'今天复习了《火烧云》！"葡萄灰、梨黄、茄子紫"——颜色描写背出来了！',               harvestEmoji:'🌅'},
+  {day:13, title:'清明',                unit:'第四单元', poemId:'p7',  vocabKey:'p7_v',      harvest:'今天学了杜牧的《清明》！雨中行人，牧童指路——短短四句，满是生活气息！',              harvestEmoji:'🌧️'},
+  {day:14, title:'燕子·熟背',           unit:'第一单元', proseId:'pt1',vocabKey:'yanzi_v',   harvest:'今天熟背了《燕子》！三个"一"不看书也能说出来了，加油！',                        harvestEmoji:'🐦'},
+  {day:15, title:'九月九日忆山东兄弟',   unit:'第四单元', poemId:'p8',  vocabKey:'p8_v',      harvest:'今天学了王维的《九月九日忆山东兄弟》！"每逢佳节倍思亲"——千古名句！',               harvestEmoji:'🏔️'},
+  {day:16, title:'荷花·熟背',           unit:'第一单元', proseId:'pt2',vocabKey:'hehua_v',   harvest:'今天熟背了《荷花》！"挨挨挤挤、碧绿大圆盘"——画面感越来越强！',                  harvestEmoji:'🌸'},
+  {day:17, title:'大林寺桃花',           unit:'第四单元', poemId:'p9',  vocabKey:'p9_v',      harvest:'今天学了白居易的《大林寺桃花》！山下花谢了，山上才盛开——意外发现真惊喜！',          harvestEmoji:'🌸'},
+  {day:18, title:'火烧云·熟背',         unit:'第二单元', proseId:'pt3',vocabKey:'huoshao_v', harvest:'今天熟背了《火烧云》！马、狗、狮子三种形状变化，背得越来越流利！',                 harvestEmoji:'🌅'},
+  {day:19, title:'守株待兔',             unit:'第四单元', poemId:'p10', vocabKey:'p10_v',     harvest:'今天学了文言文《守株待兔》！走=跑，释=放下，古今字义真不同！',                   harvestEmoji:'🐰'},
+  {day:20, title:'燕子·巩固',           unit:'综合复习',  proseId:'pt1',vocabKey:'yanzi_v',   harvest:'今天巩固了《燕子》！语音跟读加自己背，节奏更稳了！',                            harvestEmoji:'🐦'},
+  // ── 第二阶段·复习（Day 21-30）字词仍每天都有 ──
+  {day:21, title:'绝句·复习',           unit:'综合复习',  poemId:'p1',  vocabKey:'p1_v',      harvest:'今天复习了《绝句》！四个景物记牢了吗？迟日→花草→燕子→鸳鸯，全对！',              harvestEmoji:'🌸'},
+  {day:22, title:'荷花·巩固',           unit:'综合复习',  proseId:'pt2',vocabKey:'hehua_v',   harvest:'今天巩固了《荷花》！三种姿态都能背出来了，继续加油！',                          harvestEmoji:'🌺'},
+  {day:23, title:'九月九日·复习',        unit:'综合复习',  poemId:'p8',  vocabKey:'p8_v',      harvest:'今天复习了《九月九日》！"遍插茱萸少一人"——这首诗一定要记住！',                   harvestEmoji:'🏔️'},
+  {day:24, title:'火烧云·巩固',          unit:'综合复习',  proseId:'pt3',vocabKey:'huoshao_v', harvest:'今天巩固了《火烧云》！"变化极多"这句中心句领着全段！',                          harvestEmoji:'🌅'},
+  {day:25, title:'惠崇春江晚景·复习',    unit:'综合复习',  poemId:'p2',  vocabKey:'p2_v',      harvest:'今天复习了《惠崇春江晚景》！"春江水暖鸭先知"要能脱口而出！',                     harvestEmoji:'🦆'},
+  {day:26, title:'燕子·精背',           unit:'综合复习',  proseId:'pt1',vocabKey:'yanzi_v',   harvest:'今天精背了《燕子》！跟TTS语音背了三遍，流利多了！',                             harvestEmoji:'🐦'},
+  {day:27, title:'大林寺桃花·复习',      unit:'综合复习',  poemId:'p9',  vocabKey:'p9_v',      harvest:'今天复习了《大林寺桃花》！山下芳菲尽，山上才盛开——温差有多大！',                 harvestEmoji:'🌸'},
+  {day:28, title:'荷花·精背',           unit:'综合复习',  proseId:'pt2',vocabKey:'hehua_v',   harvest:'今天精背了《荷花》！"一大幅活的画"这个比喻太形象了！',                          harvestEmoji:'🌸'},
+  {day:29, title:'三衢道中·复习',        unit:'综合复习',  poemId:'p3',  vocabKey:'p3_v',      harvest:'今天复习了《三衢道中》！"添得黄鹂四五声"，旅途归来的喜悦感受到了！',              harvestEmoji:'🌿'},
+  {day:30, title:'火烧云·精背',          unit:'综合复习',  proseId:'pt3',vocabKey:'huoshao_v', harvest:'今天精背了《火烧云》！三组"出现→变化→消失"背得越来越流利！',                    harvestEmoji:'🌅'},
+  // ── 第三阶段·冲刺（Day 31-36）字词仍每天都有 ──
+  {day:31, title:'守株待兔·复习',        unit:'综合冲刺',  poemId:'p10', vocabKey:'p10_v',     harvest:'今天复习了文言文《守株待兔》！"兔不可复得，而身为宋国笑"——背出来了！',            harvestEmoji:'🐰'},
+  {day:32, title:'燕子·冲刺',           unit:'综合冲刺',  proseId:'pt1',vocabKey:'yanzi_v',   harvest:'今天冲刺背了《燕子》！第5次了，一定能流利背出！',                              harvestEmoji:'🐦'},
+  {day:33, title:'元日·复习',            unit:'综合冲刺',  poemId:'p6',  vocabKey:'p6_v',      harvest:'今天复习了《元日》！"总把新桃换旧符"——春节的古韵背出来了！',                    harvestEmoji:'🎆'},
+  {day:34, title:'荷花·冲刺',           unit:'综合冲刺',  proseId:'pt2',vocabKey:'hehua_v',   harvest:'今天冲刺背了《荷花》！第5次了，排比句背得铿锵有力！',                           harvestEmoji:'🌺'},
+  {day:35, title:'清明·冲刺',            unit:'综合冲刺',  poemId:'p7',  vocabKey:'p7_v',      harvest:'今天冲刺了《清明》！"牧童遥指杏花村"——全诗脱口而出！',                         harvestEmoji:'🌧️'},
+  {day:36, title:'火烧云·结业',          unit:'暑期结业',  proseId:'pt3',vocabKey:'huoshao_v', harvest:'🎊 恭喜完成36天！10首古诗+3篇课文反复背诵，词语掌握扎实，升四年级准备好了！',       harvestEmoji:'🏆'},
 ];
 
 // ══════════════════════════════════════════
