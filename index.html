@@ -473,6 +473,66 @@ footer p{font-size:12px;color:var(--ink3);letter-spacing:0.08em}
   .hero-strip{grid-template-columns:1fr}
   .strip-item{border-right:none;border-bottom:1px solid var(--paper4)}
 }
+
+/* ══════════════════════════════════════════
+   PREMIUM DESIGN UPGRADE
+══════════════════════════════════════════ */
+
+/* 1 · Hero headline — architectural scale */
+.hero-h1{font-size:clamp(34px,5.2vw,72px);line-height:1.18;letter-spacing:-0.01em}
+
+/* 2 · Section spacing — generous breathing room */
+.belief{padding:88px 56px}
+.entries{padding:80px 56px}
+
+/* 3 · Entry cards — remove decorative sequence numbers */
+.ecard-num{display:none}
+/* Colored accent crown per entry */
+.ecard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:4px 4px 0 0;opacity:0.55;transition:opacity 0.35s}
+.ecard:hover::before{opacity:1}
+.entries-grid>.ecard:nth-child(1)::before{background:var(--warm)}
+.entries-grid>.ecard:nth-child(2)::before{background:var(--sky)}
+.entries-grid>.ecard:nth-child(3)::before{background:var(--moss)}
+.entries-grid>.ecard:nth-child(4)::before{background:var(--lav)}
+
+/* 4 · Project card thumbnails — restore visibility + category palettes */
+.proj-card-img{font-size:64px;opacity:1}
+.proj-img-humanities{background:linear-gradient(150deg,rgba(232,114,12,0.13),rgba(255,200,112,0.07))}
+.proj-img-science{background:linear-gradient(150deg,rgba(46,140,86,0.13),rgba(90,179,124,0.07))}
+.proj-img-engineering{background:linear-gradient(150deg,rgba(46,124,184,0.13),rgba(90,168,216,0.07))}
+.proj-img-business{background:linear-gradient(150deg,rgba(112,96,176,0.13),rgba(150,130,210,0.07))}
+
+/* 5 · Belief cards — richer depth on hover */
+.bcard:hover{transform:translateY(-5px);box-shadow:0 24px 56px rgba(43,29,14,0.13)}
+
+/* 6 · Hero text border — softer divider */
+.hero-text{border-top-color:rgba(232,114,12,0.1)}
+
+/* 7 · Contact band — dark signature finale across all pages */
+.contact-band{background:#1b1108}
+.contact-band::before{background:radial-gradient(circle,rgba(232,114,12,0.22),transparent 65%)}
+.contact-band .section-label{color:rgba(255,200,112,0.8)}
+.contact-band .section-label::before{background:var(--warm2)}
+.contact-band .contact-inner h2{color:#fff9f0}
+.contact-band .contact-inner>p{color:rgba(255,249,240,0.58)}
+.contact-band .crow-list{border-top-color:rgba(255,249,240,0.1)}
+.contact-band .crow{border-bottom-color:rgba(255,249,240,0.08)}
+.contact-band .crow-label{color:rgba(255,249,240,0.38)}
+.contact-band .crow-value{color:#fff9f0}
+.contact-band .crow-arrow{color:rgba(255,249,240,0.16)}
+.contact-band a.crow:hover .crow-arrow{color:var(--warm2)}
+
+/* 8 · Footer — dark continuation of contact band */
+footer{background:#130e06;border-top-color:rgba(255,249,240,0.05)}
+footer p{color:rgba(255,249,240,0.28)}
+.footer-mark{color:rgba(255,249,240,0.28)}
+.footer-contact a,.footer-contact span{color:rgba(255,249,240,0.28)}
+.footer-contact a:hover{color:var(--warm2)}
+
+/* 9 · Mobile padding adjustment */
+@media(max-width:900px){
+  .belief,.entries{padding-top:64px;padding-bottom:64px}
+}
 </style>
 </head>
 <body>
@@ -1255,7 +1315,7 @@ function renderProjects(){
   const filtered=currentFilter==='all'?projects:projects.filter(p=>p.category===currentFilter);
   grid.innerHTML=filtered.map(p=>`
     <div class="proj-card" onclick="openModal(${p.id})">
-      <div class="proj-card-img">${p.emoji}</div>
+      <div class="proj-card-img proj-img-${p.category}">${p.emoji}</div>
       <div class="proj-card-body">
         <div class="proj-house-tag">${p.house}</div>
         <h3>${p.title}</h3>
