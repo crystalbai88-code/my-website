@@ -384,6 +384,57 @@ input{font-family:inherit}
 }
 .dictation-feedback{margin-top:8px;font-family:var(--font-serif);font-size:.9rem;min-height:24px;text-align:center}
 .dictation-progress{font-size:.78rem;color:var(--ink-light);font-family:var(--font-serif)}
+
+/* ── Home hero upgrade ── */
+.home-hero{
+  padding:52px 24px 36px;
+  text-align:center;
+  background:linear-gradient(170deg,#EDE5CB 0%,#F7F2E6 100%);
+  border-bottom:1px solid var(--border);
+  position:relative;
+}
+.home-hero::after{display:none}
+.home-grade{
+  display:inline-block;font-family:var(--font-serif);
+  font-size:.76rem;font-weight:700;
+  color:var(--cinnabar);letter-spacing:.3em;
+  margin-bottom:10px;
+}
+.home-hero h1{
+  font-family:var(--font-brush);font-size:3.8rem;font-weight:400;
+  color:var(--ink);letter-spacing:.1em;line-height:1.2;
+}
+.home-hero>p{font-size:.92rem;color:var(--ink-light);margin-top:10px;line-height:1.6;font-family:var(--font-serif)}
+.start-today-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  margin-top:20px;
+  background:var(--cinnabar);color:#fff;
+  border-radius:var(--r);padding:14px 44px;
+  font-family:var(--font-brush);font-size:1.3rem;letter-spacing:.08em;
+  box-shadow:0 4px 20px rgba(192,59,44,.28);
+  transition:transform .12s,box-shadow .12s;border:none;cursor:pointer;
+}
+.start-today-btn:active{transform:scale(.97);box-shadow:0 2px 10px rgba(192,59,44,.2)}
+.home-settings-btn{
+  display:block;background:transparent;border:none;
+  color:var(--ink-light);font-family:var(--font-serif);
+  font-size:.75rem;letter-spacing:.04em;
+  text-decoration:underline;cursor:pointer;
+  margin-top:12px;
+}
+/* ── Prose TTS hero button ── */
+.prose-tts-hero{text-align:center;padding:20px 0 16px}
+.prose-play-btn{
+  width:72px;height:72px;border-radius:50%;
+  background:var(--jade);color:#fff;font-size:2rem;
+  display:inline-flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 16px rgba(43,122,86,.3);
+  transition:transform .12s,background .2s;border:none;cursor:pointer;
+}
+.prose-play-btn:active{transform:scale(.93)}
+.prose-play-btn.speaking{background:var(--cinnabar);animation:pulse .8s ease-in-out infinite}
+.prose-play-btn.loading{opacity:.6;cursor:wait;animation:pulse .6s ease-in-out infinite}
+.prose-play-label{font-size:.8rem;color:var(--ink-light);font-family:var(--font-serif);margin-top:8px}
 </style>
 </head>
 <body>
@@ -391,9 +442,11 @@ input{font-family:inherit}
 <!-- ══ HOME SCREEN ══ -->
 <div class="screen active" id="home">
   <div class="home-hero">
-    <h1>三年级语文暑期复习</h1>
+    <div class="home-grade">三年级语文</div>
+    <h1>暑期复习</h1>
     <p id="home-greeting">每天二十分钟，轻松温故知新</p>
-    <button onclick="showSettings()" style="margin-top:10px;background:transparent;border:none;color:var(--ink-light);font-family:var(--font-serif);font-size:.75rem;text-decoration:underline;cursor:pointer;letter-spacing:.04em">⚙ 设置开始日期</button>
+    <button class="start-today-btn" onclick="openTodayLesson()">📖 开始今天</button>
+    <button class="home-settings-btn" onclick="showSettings()">⚙ 设置开始日期</button>
   </div>
   <div class="stats-row">
     <div class="stat-chip">已完成 <b id="stat-days">0</b>/36 天</div>
@@ -827,51 +880,58 @@ const VOCAB_SETS = {
 };
 
 // ══════════════════════════════════════════
-// 36-DAY SCHEDULE — every day has vocab + activity + recitation + writing
-// actType: 'sentence'|'quiz'|'imitate'|'creative'|'riji'
-// recitation alternates poem/prose freely
+// 36-DAY SCHEDULE — 2-poem + 1-prose rotating cycle
+// Each day: vocabKey + poemId OR proseId (no activity, no writing)
 // ══════════════════════════════════════════
 const SCHEDULE = [
-  // ── Phase 1: 初学 (Days 1-13) ──
-  {day:1,title:'绝句·初学',unit:'第一单元',poemId:'p1',vocabKey:'p1_v',actType:'sentence',writingChars:['燕','暖'],harvest:'今天学了杜甫的《绝句》！迟日、花草香、飞燕子——四景合一，描绘了初春最美的画面！',harvestEmoji:'🌸'},
-  // Phase 1 days 2-13
-  {day:2,title:'燕子·初学',unit:'第一单元',proseId:'pt1',vocabKey:'yanzi_v',actType:'match',writingChars:['燕','烂'],harvest:'今天学了《燕子》！三个"一"写外形，蒙松雨、烂漫春——燕子真是春天最灵动的使者！',harvestEmoji:'🐦'},
-  {day:3,title:'惠崇春江晚景·初学',unit:'第一单元',poemId:'p2',vocabKey:'p2_v',actType:'sentence',writingChars:['桃','鸭'],harvest:'今天学了苏轼的《惠崇春江晚景》！"春江水暖鸭先知"——观察仔细才能写出这样的妙句！',harvestEmoji:'🦆'},
-  {day:4,title:'荷花·初学',unit:'第二单元',proseId:'pt2',vocabKey:'hehua_v',actType:'dictation',writingChars:['荷','碧'],harvest:'今天学了《荷花》！三个"有的"写姿态，"活的画"——叶圣陶把荷花写活了！',harvestEmoji:'🌸'},
-  {day:5,title:'三衢道中·初学',unit:'第一单元',poemId:'p3',vocabKey:'p3_v',actType:'sentence',writingChars:['溪','鹂'],harvest:'今天学了曾几的《三衢道中》！梅雨晴天出游，归来还多了黄鹂鸣叫——出游真快乐！',harvestEmoji:'🌿'},
-  {day:6,title:'火烧云·初学',unit:'第二单元',proseId:'pt3',vocabKey:'huoshao_v',actType:'match',writingChars:['烧','霞'],harvest:'今天学了《火烧云》！颜色千变万化，马→狗→狮子——萧红把晚霞写得太生动了！',harvestEmoji:'🌅'},
-  {day:7,title:'忆江南·初学',unit:'第一单元',poemId:'p4',vocabKey:'p4_v',actType:'sentence',writingChars:['江','蓝'],harvest:'今天学了白居易的《忆江南》！"日出江花红胜火，春来江水绿如蓝"——江南美景永难忘！',harvestEmoji:'🌺'},
-  {day:8,title:'滁州西涧·初学',unit:'第二单元',poemId:'p5',vocabKey:'p5_v',actType:'dictation',writingChars:['独','涧'],harvest:'今天学了韦应物的《滁州西涧》！"野渡无人舟自横"——清幽静谧，令人心旷神怡！',harvestEmoji:'🌾'},
-  {day:9,title:'元日·初学',unit:'第三单元',poemId:'p6',vocabKey:'p6_v',actType:'sentence',writingChars:['爆','符'],harvest:'今天学了王安石的《元日》！爆竹、屠苏、春联——古代过春节和我们现在很像！',harvestEmoji:'🎆'},
-  {day:10,title:'清明·初学',unit:'第三单元',poemId:'p7',vocabKey:'p7_v',actType:'match',writingChars:['清','断'],harvest:'今天学了杜牧的《清明》！雨中行人，牧童指路——短短四句，却满是生活气息！',harvestEmoji:'🌧️'},
-  {day:11,title:'九月九日忆山东兄弟·初学',unit:'第三单元',poemId:'p8',vocabKey:'p8_v',actType:'sentence',writingChars:['独','异'],harvest:'今天学了王维的《九月九日忆山东兄弟》！"每逢佳节倍思亲"——千古名句，说出无数游子心声！',harvestEmoji:'🏔️'},
-  {day:12,title:'大林寺桃花·初学',unit:'第四单元',poemId:'p9',vocabKey:'p9_v',actType:'dictation',writingChars:['芳','觅'],harvest:'今天学了白居易的《大林寺桃花》！山下花谢了，山上才盛开——这个意外发现真让人惊喜！',harvestEmoji:'🌸'},
-  {day:13,title:'守株待兔·初学',unit:'第四单元',poemId:'p10',vocabKey:'p10_v',actType:'sentence',writingChars:['耒','释'],harvest:'今天学了《守株待兔》！文言文初体验——走=跑，释=放下，古今字义大不同！',harvestEmoji:'🐰'},
-  // Phase 2: 深化与写作 (Days 14-24)
-  {day:14,title:'绝句·仿写',unit:'第一单元',poemId:'p1',vocabKey:'p1_v',actType:'imitate',actKey:'p1_i',writingChars:['迟','日'],harvest:'今天练习了仿写！参照《绝句》的句式，你也写出了自己的季节诗，太棒了！',harvestEmoji:'✍️'},
-  {day:15,title:'燕子·写作',unit:'第一单元',proseId:'pt1',vocabKey:'yanzi_v',actType:'creative',actKey:'pt1_c',writingChars:['灵','巧'],harvest:'今天写了动物描写！用"一...一...加上..."的句式，描写你喜欢的动物，妙笔生花！',harvestEmoji:'✍️'},
-  {day:16,title:'惠崇春江晚景·复习',unit:'第一单元',poemId:'p2',vocabKey:'p2_v',actType:'sentence',writingChars:['蒌','芦'],harvest:'今天复习了《惠崇春江晚景》！句子练习做得怎么样？"春江水暖鸭先知"背出来了吗？',harvestEmoji:'🦆'},
-  {day:17,title:'荷花·仿写',unit:'第二单元',proseId:'pt2',vocabKey:'hehua_v',actType:'imitate',actKey:'pt2_i',writingChars:['亭','亭'],harvest:'今天练习了"有的...有的...有的..."的排比句式！用它描写你见过的花朵，美极了！',harvestEmoji:'✍️'},
-  {day:18,title:'三衢道中·写话',unit:'第一单元',poemId:'p3',vocabKey:'p3_v',actType:'creative',actKey:'p3_c',writingChars:['梅','溪'],harvest:'今天想象了旅行途中的见闻！把你的旅行感受写出来，就像曾几写这首诗一样！',harvestEmoji:'✍️'},
-  {day:19,title:'火烧云·仿写',unit:'第二单元',proseId:'pt3',vocabKey:'huoshao_v',actType:'imitate',actKey:'pt3_i',writingChars:['彩','霞'],harvest:'今天学了颜色描写和变化描写！像萧红一样，把大自然的美妙色彩写下来！',harvestEmoji:'✍️'},
-  {day:20,title:'忆江南·日积月累',unit:'第一单元',poemId:'p4',vocabKey:'p4_v',actType:'riji',rijiKey:'riji2',writingChars:['谙','忆'],harvest:'今天积累了园地二的好词好句！词语积累是写作的基础，记住了就是你的财富！',harvestEmoji:'📚'},
-  {day:21,title:'元日·写话',unit:'第三单元',poemId:'p6',vocabKey:'p6_v',actType:'creative',actKey:'p6_c',writingChars:['岁','除'],harvest:'今天想象了穿越古代过年！把你的感受写出来，比王安石的诗还要丰富！',harvestEmoji:'✍️'},
-  {day:22,title:'清明·仿写',unit:'第三单元',poemId:'p7',vocabKey:'p7_v',actType:'imitate',actKey:'p7_i',writingChars:['行','人'],harvest:'今天仿写了节日诗！用"___时节___，路上行人___"的句式，描写你熟悉的节日！',harvestEmoji:'✍️'},
-  {day:23,title:'九月九日·思念写话',unit:'第三单元',poemId:'p8',vocabKey:'p8_v',actType:'creative',actKey:'p8_c',writingChars:['登','高'],harvest:'今天写了思念的信！当你在外地想念家人，你会写什么？真情流露就是最好的文章！',harvestEmoji:'✍️'},
-  {day:24,title:'大林寺桃花·日积月累',unit:'第四单元',poemId:'p9',vocabKey:'p9_v',actType:'riji',rijiKey:'riji4',writingChars:['芬','芳'],harvest:'今天积累了园地四的好词！多积累，多运用，词汇越来越丰富！',harvestEmoji:'📚'},
-  // Phase 3: 综合复习 (Days 25-36)
-  {day:25,title:'守株待兔·改写',unit:'第四单元',poemId:'p10',vocabKey:'p10_v',actType:'creative',actKey:'p10_c',writingChars:['株','兔'],harvest:'今天把文言文改写成现代故事！用自己的话讲故事，既懂古文又能表达，厉害！',harvestEmoji:'✍️'},
-  {day:26,title:'燕子·仿写',unit:'第一单元',proseId:'pt1',vocabKey:'yanzi_v',actType:'imitate',actKey:'pt1_i',writingChars:['翩','飞'],harvest:'今天仿写了燕子外形描写！用三个"一"描写小动物，结构清晰，描写生动！',harvestEmoji:'✍️'},
-  {day:27,title:'荷花·综合复习',unit:'第二单元',proseId:'pt2',vocabKey:'hehua_v',actType:'match',writingChars:['荷','香'],harvest:'今天综合复习了《荷花》！测验做完了吗？"活的画"——叶圣陶的比喻太妙了！',harvestEmoji:'🌸'},
-  {day:28,title:'火烧云·形状写话',unit:'第二单元',proseId:'pt3',vocabKey:'huoshao_v',actType:'creative',actKey:'pt3_c',writingChars:['变','幻'],harvest:'今天写了火烧云形状想象！你看到了什么动物的形状？把它变化消失写出来！',harvestEmoji:'✍️'},
-  {day:29,title:'春天古诗·日积月累',unit:'综合复习',poemId:'p1',vocabKey:'p1_v',actType:'riji',rijiKey:'riji6',writingChars:['春','暖'],harvest:'今天积累了园地六的语文知识！今天背的是《绝句》，看看你还记得多少！',harvestEmoji:'📚'},
-  {day:30,title:'忆江南·综合复习',unit:'综合复习',poemId:'p4',vocabKey:'p4_v',actType:'quiz',writingChars:['江','南'],harvest:'今天综合复习了《忆江南》！测验通过了吗？"能不忆江南"——一背就想起那美丽画面！',harvestEmoji:'🌺'},
-  {day:31,title:'清明·日积月累',unit:'综合复习',poemId:'p7',vocabKey:'p7_v',actType:'riji',rijiKey:'riji8',writingChars:['节','日'],harvest:'今天积累了园地八的词语！日积月累打下扎实语文基础，继续加油！',harvestEmoji:'📚'},
-  {day:32,title:'九月九日·综合复习',unit:'综合复习',poemId:'p8',vocabKey:'p8_v',actType:'quiz',writingChars:['思','乡'],harvest:'今天综合复习了《九月九日忆山东兄弟》！测验全对了吗？每逢佳节都要想起这首诗！',harvestEmoji:'🏔️'},
-  {day:33,title:'守株待兔·综合复习',unit:'综合复习',poemId:'p10',vocabKey:'p10_v',actType:'quiz',writingChars:['文','言'],harvest:'今天综合复习了《守株待兔》！文言文全背下来了吗？"守株待兔"这个成语就出自这里！',harvestEmoji:'🐰'},
-  {day:34,title:'燕子·冲刺复习',unit:'综合复习',proseId:'pt1',vocabKey:'yanzi_v',actType:'sentence',writingChars:['乌','剪'],harvest:'今天冲刺复习了《燕子》！句子填空顺利吗？背诵挑战怎么样？第1-2段要流利背出！',harvestEmoji:'🐦'},
-  {day:35,title:'荷花·写作升华',unit:'综合复习',proseId:'pt2',vocabKey:'hehua_v',actType:'imitate',actKey:'pt2_i2',writingChars:['莲','蓬'],harvest:'今天再次仿写了荷花！第三遍了，写得比第一次更好了吗？进步看得见！',harvestEmoji:'✍️'},
-  {day:36,title:'暑期结业·总挑战',unit:'暑期结业',poemId:'p10',vocabKey:'review',actType:'quiz',writingChars:['加','油'],harvest:'🎊 恭喜你完成了36天的暑期复习！古诗10首、课文3篇、仿写创作、日积月累——全都搞定！升入四年级，你已经准备好了！加油！',harvestEmoji:'🏆'},
+  // ── Group 1 (诗诗文) ──
+  {day:1, title:'绝句', unit:'第一单元', poemId:'p1', vocabKey:'p1_v', harvest:'今天学了杜甫的《绝句》！迟日、花草香、飞燕子——四景合一，描绘了初春最美的画面！', harvestEmoji:'🌸'},
+  {day:2, title:'惠崇春江晚景', unit:'第一单元', poemId:'p2', vocabKey:'p2_v', harvest:'今天学了苏轼的《惠崇春江晚景》！"春江水暖鸭先知"——观察细心才能写出这样的妙句！', harvestEmoji:'🦆'},
+  {day:3, title:'燕子', unit:'第一单元', proseId:'pt1', vocabKey:'yanzi_v', harvest:'今天背诵了《燕子》第1-2自然段！三个"一"写外形，烂漫无比的春天真美！', harvestEmoji:'🐦'},
+  // ── Group 2 ──
+  {day:4, title:'三衢道中', unit:'第一单元', poemId:'p3', vocabKey:'p3_v', harvest:'今天学了曾几的《三衢道中》！梅雨晴天出游，归来还多了黄鹂鸣叫——出游真快乐！', harvestEmoji:'🌿'},
+  {day:5, title:'忆江南', unit:'第一单元', poemId:'p4', vocabKey:'p4_v', harvest:'今天学了白居易的《忆江南》！"日出江花红胜火，春来江水绿如蓝"——江南美景永难忘！', harvestEmoji:'🌺'},
+  {day:6, title:'荷花', unit:'第二单元', proseId:'pt2', vocabKey:'hehua_v', harvest:'今天背诵了《荷花》第2-3自然段！三个"有的"写姿态，"活的画"——叶圣陶把荷花写活了！', harvestEmoji:'🌸'},
+  // ── Group 3 ──
+  {day:7, title:'滁州西涧', unit:'第二单元', poemId:'p5', vocabKey:'p5_v', harvest:'今天学了韦应物的《滁州西涧》！"野渡无人舟自横"——清幽静谧，令人心旷神怡！', harvestEmoji:'🌾'},
+  {day:8, title:'元日', unit:'第三单元', poemId:'p6', vocabKey:'p6_v', harvest:'今天学了王安石的《元日》！爆竹、屠苏、春联——古代过春节和我们现在很像！', harvestEmoji:'🎆'},
+  {day:9, title:'火烧云', unit:'第二单元', proseId:'pt3', vocabKey:'huoshao_v', harvest:'今天背诵了《火烧云》第3-6自然段！颜色千变万化，马→狗→狮子——萧红把晚霞写得太生动了！', harvestEmoji:'🌅'},
+  // ── Group 4 ──
+  {day:10, title:'清明', unit:'第三单元', poemId:'p7', vocabKey:'p7_v', harvest:'今天学了杜牧的《清明》！雨中行人，牧童指路——短短四句，却满是生活气息！', harvestEmoji:'🌧️'},
+  {day:11, title:'九月九日忆山东兄弟', unit:'第三单元', poemId:'p8', vocabKey:'p8_v', harvest:'今天学了王维的《九月九日忆山东兄弟》！"每逢佳节倍思亲"——千古名句，说出无数游子心声！', harvestEmoji:'🏔️'},
+  {day:12, title:'燕子·复习', unit:'第一单元', proseId:'pt1', vocabKey:'yanzi_v', harvest:'今天复习了《燕子》！跟着语音反复听读，背得越来越流利！', harvestEmoji:'🐦'},
+  // ── Group 5 ──
+  {day:13, title:'大林寺桃花', unit:'第四单元', poemId:'p9', vocabKey:'p9_v', harvest:'今天学了白居易的《大林寺桃花》！山下花谢了，山上才盛开——意外发现的惊喜真美妙！', harvestEmoji:'🌸'},
+  {day:14, title:'守株待兔', unit:'第四单元', poemId:'p10', vocabKey:'p10_v', harvest:'今天学了《守株待兔》！文言文初体验——走=跑，释=放下，古今字义大不同！', harvestEmoji:'🐰'},
+  {day:15, title:'荷花·复习', unit:'第二单元', proseId:'pt2', vocabKey:'hehua_v', harvest:'今天复习了《荷花》！语音跟读感受节奏，三个"有的"排比背得更顺了！', harvestEmoji:'🌺'},
+  // ── Group 6 ──
+  {day:16, title:'绝句·复习', unit:'综合复习', poemId:'p1', vocabKey:'p1_v', harvest:'今天复习了《绝句》！四个景物都记牢了吗？迟日→花草→燕子→鸳鸯，全对！', harvestEmoji:'🌸'},
+  {day:17, title:'三衢道中·复习', unit:'综合复习', poemId:'p3', vocabKey:'p3_v', harvest:'今天复习了《三衢道中》！"添得黄鹂四五声"，旅途的喜悦永远在心中！', harvestEmoji:'🌿'},
+  {day:18, title:'火烧云·复习', unit:'第二单元', proseId:'pt3', vocabKey:'huoshao_v', harvest:'今天复习了《火烧云》！颜色变化和形状变化都记住了吗？葡萄灰、梨黄、茄子紫！', harvestEmoji:'🌅'},
+  // ── Group 7 ──
+  {day:19, title:'滁州西涧·复习', unit:'综合复习', poemId:'p5', vocabKey:'p5_v', harvest:'今天复习了《滁州西涧》！"野渡无人舟自横"背出来了吗？宁静的画面真美！', harvestEmoji:'🌾'},
+  {day:20, title:'清明·复习', unit:'综合复习', poemId:'p7', vocabKey:'p7_v', harvest:'今天复习了《清明》！牧童遥指杏花村，这个画面真生动，记住了！', harvestEmoji:'🌧️'},
+  {day:21, title:'燕子·精背', unit:'综合复习', proseId:'pt1', vocabKey:'yanzi_v', harvest:'今天精背了《燕子》！语音听读加背诵，越背越流利，加油！', harvestEmoji:'🐦'},
+  // ── Group 8 ──
+  {day:22, title:'惠崇春江晚景·复习', unit:'综合复习', poemId:'p2', vocabKey:'p2_v', harvest:'今天复习了《惠崇春江晚景》！"蒌蒿满地芦芽短"，背出来了！', harvestEmoji:'🦆'},
+  {day:23, title:'忆江南·复习', unit:'综合复习', poemId:'p4', vocabKey:'p4_v', harvest:'今天复习了《忆江南》！"能不忆江南？"——一背就想起那美丽画面！', harvestEmoji:'🌺'},
+  {day:24, title:'荷花·精背', unit:'综合复习', proseId:'pt2', vocabKey:'hehua_v', harvest:'今天精背了《荷花》！跟着语音节奏，背得越来越好！', harvestEmoji:'🌸'},
+  // ── Group 9 ──
+  {day:25, title:'元日·复习', unit:'综合复习', poemId:'p6', vocabKey:'p6_v', harvest:'今天复习了《元日》！过年的热闹场景历历在目，"曈曈日"这个词真好！', harvestEmoji:'🎆'},
+  {day:26, title:'九月九日·复习', unit:'综合复习', poemId:'p8', vocabKey:'p8_v', harvest:'今天复习了《九月九日忆山东兄弟》！"每逢佳节倍思亲"，这句话一辈子都不会忘！', harvestEmoji:'🏔️'},
+  {day:27, title:'火烧云·精背', unit:'综合复习', proseId:'pt3', vocabKey:'huoshao_v', harvest:'今天精背了《火烧云》！马、狗、狮子的形状变化，背得越来越流利！', harvestEmoji:'🌅'},
+  // ── Group 10 ──
+  {day:28, title:'大林寺桃花·复习', unit:'综合复习', poemId:'p9', vocabKey:'p9_v', harvest:'今天复习了《大林寺桃花》！"不知转入此中来"，意外发现的惊喜感受到了！', harvestEmoji:'🌸'},
+  {day:29, title:'守株待兔·复习', unit:'综合复习', poemId:'p10', vocabKey:'p10_v', harvest:'今天复习了《守株待兔》！文言文背下来了！兔不可复得，而身为宋国笑！', harvestEmoji:'🐰'},
+  {day:30, title:'燕子·冲刺', unit:'综合冲刺', proseId:'pt1', vocabKey:'yanzi_v', harvest:'今天冲刺背了《燕子》！跟语音反复听读，第1-2段已经能流利背出！', harvestEmoji:'🐦'},
+  // ── Group 11 ──
+  {day:31, title:'绝句·冲刺', unit:'综合冲刺', poemId:'p1', vocabKey:'p1_v', harvest:'今天冲刺复习了《绝句》！背诵检测通过了吗？迟日江山丽——全程流利！', harvestEmoji:'🌸'},
+  {day:32, title:'九月九日·冲刺', unit:'综合冲刺', poemId:'p8', vocabKey:'p8_v', harvest:'今天冲刺复习了《九月九日忆山东兄弟》！"倍思亲"——这份情感永远记住！', harvestEmoji:'🏔️'},
+  {day:33, title:'荷花·冲刺', unit:'综合冲刺', proseId:'pt2', vocabKey:'hehua_v', harvest:'今天冲刺背了《荷花》！"挨挨挤挤、大圆盘"——叶圣陶的比喻太经典了！', harvestEmoji:'🌺'},
+  // ── Group 12 ──
+  {day:34, title:'忆江南·冲刺', unit:'综合冲刺', poemId:'p4', vocabKey:'p4_v', harvest:'今天冲刺复习了《忆江南》！日出江花红胜火——背得流利漂亮！', harvestEmoji:'🌺'},
+  {day:35, title:'守株待兔·冲刺', unit:'综合冲刺', poemId:'p10', vocabKey:'p10_v', harvest:'今天冲刺复习了《守株待兔》！文言文能完整背出来了！升四年级，你准备好了！', harvestEmoji:'🐰'},
+  {day:36, title:'火烧云·结业', unit:'暑期结业', proseId:'pt3', vocabKey:'huoshao_v', harvest:'🎊 恭喜完成36天暑期复习！10首古诗+3篇课文全部搞定！升入四年级，你已经准备好了！', harvestEmoji:'🏆'},
 ];
 
 // ══════════════════════════════════════════
@@ -992,6 +1052,10 @@ function goHome(){
   renderHome();
 }
 
+function openTodayLesson(){
+  openLesson(getTodayDayNum());
+}
+
 function openLesson(dayNum){
   currentDay=dayNum;
   const sched=SCHEDULE[dayNum-1];
@@ -1002,43 +1066,19 @@ function openLesson(dayNum){
   document.getElementById('lesson-title').textContent=sched.title;
   document.getElementById('lesson-day-badge').textContent='第'+dayNum+'天';
 
-  // Every day: intro → vocab → activity → recite → writing → harvest
+  // Every day: vocab → poem/prose → harvest
   currentSteps=[];
-  currentSteps.push({type:'intro', sched});
 
-  // Step 2: vocab for today's poem/prose
   if(sched.vocabKey && VOCAB_SETS[sched.vocabKey]){
     currentSteps.push({type:'vocab', vocabKey:sched.vocabKey});
   }
 
-  // Step 3: rotating activity
-  const at=sched.actType;
-  if(at==='sentence'){
-    const key=sched.poemId||sched.proseId;
-    currentSteps.push({type:'sentence', sentKey:key});
-  } else if(at==='quiz'){
-    currentSteps.push({type:'quiz', sched});
-  } else if(at==='match'){
-    currentSteps.push({type:'match', vocabKey:sched.vocabKey});
-  } else if(at==='dictation'){
-    currentSteps.push({type:'dictation', vocabKey:sched.vocabKey});
-  } else if(at==='imitate'||at==='creative'){
-    currentSteps.push({type:'writingPrompt', promptKey:sched.actKey, promptType:at});
-  } else if(at==='riji'){
-    currentSteps.push({type:'riji', rijiKey:sched.rijiKey});
-  }
-
-  // Step 4: recitation (poem or prose, alternates by schedule)
   if(sched.poemId){
     currentSteps.push({type:'poem', poem:POEMS.find(p=>p.id===sched.poemId)});
   } else if(sched.proseId){
     currentSteps.push({type:'prose', prose:PROSE_TEXTS.find(p=>p.id===sched.proseId)});
   }
 
-  // Step 5: writing (田字格)
-  currentSteps.push({type:'writing', chars:sched.writingChars});
-
-  // Step 6: harvest
   currentSteps.push({type:'harvest', sched});
 
   renderStepDots();
@@ -1508,15 +1548,16 @@ function renderProseSubStep(si){
 
   if(si===0){
     container.innerHTML=`
-      <div class="tts-bar">
-        <button class="tts-btn" onclick="ttsToggle(this,\`${pt.fullText}\`,0.82)">🔊 朗读课文</button>
+      <div class="prose-tts-hero">
+        <button class="prose-play-btn" onclick="ttsToggleProse(this,\`${pt.fullText}\`,0.82)">🔊</button>
+        <div class="prose-play-label">点击播放朗读</div>
       </div>
       <div class="prose-text">${pt.fullText}</div>
       <div class="info-box">
         <h3>${pt.emoji} 朗读提示</h3>
-        <p>先大声朗读两遍，注意句子节奏和停顿。感受文章的意境。</p>
+        <p>先点播放听一遍，再大声跟读两遍，注意句子节奏和停顿。</p>
       </div>
-      <div class="fade-guide">读完两遍了吗？点"继续"学习理解要点</div>
+      <div class="fade-guide">跟读两遍了吗？点"继续"学习理解要点</div>
     `;
   } else if(si===1){
     container.innerHTML=`
@@ -2147,9 +2188,9 @@ function renderWritingPromptStep(body,key,promptType){
 
 // ── HARVEST STEP ──
 function renderHarvestStep(body,sched){
-  const actLabels={sentence:'句子填空',quiz:'小测验',imitate:'仿写练习',creative:'想象写话',riji:'日积月累'};
   const reciteTitle=sched.poemId?POEMS.find(p=>p.id===sched.poemId)?.title:PROSE_TEXTS.find(p=>p.id===sched.proseId)?.title;
-  const reciteType=sched.poemId?'古诗':'课文';
+  const reciteType=sched.poemId?'古诗背诵':'课文朗读';
+  const vocabCount=sched.vocabKey&&VOCAB_SETS[sched.vocabKey]?VOCAB_SETS[sched.vocabKey].length:0;
   body.innerHTML=`
     <div class="harvest-card">
       <span class="harvest-emoji">${sched.harvestEmoji}</span>
@@ -2161,10 +2202,8 @@ function renderHarvestStep(body,sched){
     <div class="info-box">
       <h3>🎯 今天完成了</h3>
       <p>
-        📝 词语闯关 ${sched.vocabKey&&VOCAB_SETS[sched.vocabKey]?VOCAB_SETS[sched.vocabKey].length+' 个词语':'（积累）'}<br>
-        ${actLabels[sched.actType]||'练习'}：${sched.actType==='sentence'?'句子填空练习':sched.actType==='quiz'?'小测验挑战':sched.actType==='imitate'?'仿写句子':sched.actType==='creative'?'想象写话':sched.actType==='riji'?'日积月累词语':'练习'}<br>
-        🎤 ${reciteType}背诵：《${reciteTitle}》<br>
-        ✏️ 田字格练写：${sched.writingChars.join('、')}<br>
+        📝 词语闯关：${vocabCount} 个词语<br>
+        🎤 ${reciteType}：《${reciteTitle}》<br>
         ✅ 完成今天的打卡！
       </p>
     </div>
@@ -2251,6 +2290,29 @@ async function ttsToggle(btn, text, rate=0.85){
     btn.classList.remove('loading');
     btn.classList.add('speaking');
     btn.textContent = '⏹ 停止';
+  }
+}
+
+async function ttsToggleProse(btn, text, rate=0.85){
+  if(btn.classList.contains('speaking') || btn.classList.contains('loading')){
+    stopSpeak();
+    btn.classList.remove('speaking','loading');
+    btn.textContent = '🔊';
+    return;
+  }
+  document.querySelectorAll('.tts-btn.speaking,.tts-btn.loading').forEach(b=>{
+    b.classList.remove('speaking','loading'); b.textContent = '🔊 朗读';
+  });
+  btn.classList.add('loading');
+  btn.textContent = '○';
+  await speak(text, rate, ()=>{
+    btn.classList.remove('speaking','loading');
+    btn.textContent = '🔊';
+  });
+  if(btn.classList.contains('loading')){
+    btn.classList.remove('loading');
+    btn.classList.add('speaking');
+    btn.textContent = '⏹';
   }
 }
 
