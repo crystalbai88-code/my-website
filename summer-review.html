@@ -1,0 +1,2475 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>三年级语文暑期复习</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@300;400;600&display=swap">
+<style>
+:root{
+  --paper:#F7F2E6; --paper-card:#FDFAF2; --paper-warm:#EDE5CD;
+  --ink:#1C1310; --ink-mid:#4A3628; --ink-light:#7B6555;
+  --cinnabar:#C03B2C;  --cin-bg:#F9EEEC;
+  --jade:#2B7A56;      --jade-bg:#EAF5EE;
+  --gold:#B8841A;      --gold-bg:#FBF3E0;
+  --azure:#2C5F8A;     --azure-bg:#EBF1F8;
+  --purple:#7C4DB8;    --purple-bg:#F1ECF9;
+  --border:#D9CEBC;    --border-lt:#EDE7DA;
+  --sh-sm:0 1px 4px rgba(28,19,16,.08);
+  --sh-md:0 3px 12px rgba(28,19,16,.10);
+  --r:2px;
+  --font-brush:'Ma Shan Zheng','STKaiti',cursive;
+  --font-serif:'Noto Serif SC','STSong','SimSun',serif;
+  --font-sans:'PingFang SC','Microsoft YaHei',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--paper);color:var(--ink-mid);min-height:100vh;overflow-x:hidden}
+button{cursor:pointer;border:none;font-family:inherit}
+input{font-family:inherit}
+
+/* ── SCREENS ── */
+.screen{display:none;min-height:100vh;flex-direction:column}
+.screen.active{display:flex}
+
+/* ════ HOME ════ */
+#home{background:var(--paper)}
+.home-hero{
+  padding:32px 24px 22px;text-align:center;
+  border-bottom:1px solid var(--border);
+  position:relative;
+}
+.home-hero::after{
+  content:'';position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);
+  width:48px;height:2px;background:var(--cinnabar);
+}
+.home-hero h1{
+  font-family:var(--font-brush);font-size:2.1rem;font-weight:400;
+  color:var(--ink);line-height:1.3;letter-spacing:.06em;
+}
+.home-hero p{color:var(--ink-light);font-size:.88rem;margin-top:8px;line-height:1.6;font-family:var(--font-serif)}
+
+.stats-row{display:flex;gap:8px;padding:14px 16px 10px;justify-content:center;flex-wrap:wrap}
+.stat-chip{
+  background:var(--paper-card);border:1px solid var(--border);border-radius:var(--r);
+  padding:7px 16px;font-size:.9rem;display:flex;align-items:center;gap:5px;
+  color:var(--ink-mid);box-shadow:var(--sh-sm);
+}
+.stat-chip b{color:var(--cinnabar)}
+
+.progress-bar-wrap{padding:4px 16px 16px}
+.prog-bar{height:4px;background:var(--border-lt);position:relative;overflow:hidden;border-radius:2px}
+.prog-fill{height:100%;background:var(--cinnabar);transition:width .8s cubic-bezier(.4,0,.2,1);border-radius:2px}
+.prog-label{font-family:var(--font-serif);font-size:.76rem;color:var(--ink-light);margin-top:5px;text-align:right}
+
+/* calendar */
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;padding:4px 10px 28px}
+.cal-head{text-align:center;font-size:.72rem;color:var(--ink-light);padding:4px 0 6px;font-weight:600;letter-spacing:.06em}
+.day-cell{
+  aspect-ratio:1;border-radius:var(--r);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;position:relative;overflow:hidden;
+  border:1px solid var(--border-lt);background:var(--paper-card);
+  transition:transform .12s,box-shadow .12s,border-color .2s;
+}
+.day-cell:not(.locked):hover{transform:translateY(-1px);box-shadow:var(--sh-md);border-color:var(--border)}
+.day-cell.locked{background:var(--paper);border-color:transparent;cursor:not-allowed}
+.day-cell.today{background:var(--gold-bg);border-color:var(--gold);border-width:1.5px}
+.day-cell.poem-day{background:var(--jade-bg);border-color:#9AC9A8}
+/* stamp: completed day */
+.day-cell.done{background:var(--paper);border-color:var(--border-lt)}
+.day-cell.done .day-num,.day-cell.done .day-icon{opacity:.25}
+.day-cell.done::after{
+  content:'完';
+  position:absolute;inset:0;margin:auto;
+  width:60%;aspect-ratio:1;height:auto;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-brush);font-size:1.4rem;font-weight:400;
+  color:var(--cinnabar);
+  border:2px solid var(--cinnabar);border-radius:50%;
+  opacity:.8;transform:rotate(-12deg);
+  animation:stamp .4s cubic-bezier(.2,1.6,.4,1) both;
+}
+@keyframes stamp{from{transform:rotate(-12deg) scale(2.2);opacity:0}to{transform:rotate(-12deg) scale(1);opacity:.8}}
+
+.day-num{font-size:.8rem;font-weight:700;color:var(--ink-light);line-height:1;z-index:1;position:relative}
+.day-cell.today .day-num{color:var(--gold);font-weight:800}
+.day-cell.poem-day .day-num{color:var(--jade)}
+.day-cell.locked .day-num{color:var(--border)}
+.day-icon{font-size:1rem;line-height:1;z-index:1;position:relative;margin-top:3px;font-family:var(--font-brush);color:var(--ink-light)}
+.day-cell.poem-day .day-icon{color:var(--jade)}
+.day-cell.today .day-icon{color:var(--gold)}
+.day-cell.locked .day-icon{color:var(--border-lt)}
+
+/* ════ LESSON ════ */
+#lesson{background:var(--paper)}
+.lesson-header{
+  padding:11px 16px 9px;background:var(--paper-card);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;
+  position:sticky;top:0;z-index:50;box-shadow:var(--sh-sm);
+  position:sticky;
+}
+.lesson-header::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--cinnabar)}
+.back-btn{
+  width:36px;height:36px;border-radius:var(--r);
+  background:transparent;border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;color:var(--ink-mid);flex-shrink:0;
+}
+.lesson-title{flex:1;font-family:var(--font-serif);font-size:1rem;font-weight:600;color:var(--ink);line-height:1.2}
+.lesson-day-badge{background:var(--cinnabar);color:#fff;border-radius:var(--r);padding:3px 12px;font-size:.82rem;font-weight:700;letter-spacing:.04em;flex-shrink:0}
+
+/* step progress — ink dashes */
+.step-dots{display:flex;gap:6px;padding:10px 16px 6px;justify-content:center;align-items:center}
+.step-dot{height:5px;width:22px;border-radius:3px;background:var(--border);transition:background .25s,width .25s}
+.step-dot.done{background:var(--jade)}
+.step-dot.active{background:var(--cinnabar);width:38px}
+
+.lesson-body{flex:1;overflow-y:auto;padding:16px}
+
+/* step labels */
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.step-label{
+  font-size:.65rem;font-weight:700;color:var(--cinnabar);
+  letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px;
+  display:flex;align-items:center;gap:6px;
+}
+.step-label::before{content:'';display:inline-block;width:14px;height:1.5px;background:var(--cinnabar)}
+.step-heading{font-family:var(--font-serif);font-size:1.1rem;font-weight:600;color:var(--ink);margin-bottom:16px;line-height:1.45}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:var(--r);padding:13px 26px;font-size:.96rem;font-weight:700;transition:transform .12s,opacity .15s;letter-spacing:.02em}
+.btn:active{transform:scale(.97)}
+.btn-amber{background:var(--gold);color:#fff;box-shadow:0 2px 8px rgba(184,132,26,.28)}
+.btn-green{background:var(--jade);color:#fff;box-shadow:0 2px 8px rgba(43,122,86,.22)}
+.btn-blue{background:var(--azure);color:#fff;box-shadow:0 2px 8px rgba(44,95,138,.22)}
+.btn-purple{background:var(--purple);color:#fff;box-shadow:0 2px 8px rgba(124,77,184,.22)}
+.btn-red{background:var(--cinnabar);color:#fff;box-shadow:0 2px 8px rgba(192,59,44,.28)}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--ink-light)}
+.btn-full{width:100%;justify-content:center;margin-top:12px}
+.lesson-nav{padding:10px 16px 22px;display:flex;gap:10px}
+
+/* vocab cards */
+.vocab-list{display:flex;flex-direction:column;gap:9px;margin-bottom:16px}
+.vocab-card{
+  background:var(--paper-card);border-radius:var(--r);
+  border:1px solid var(--border);border-left:4px solid var(--cinnabar);
+  padding:14px 16px;cursor:pointer;
+  transition:border-left-color .18s,background .18s;
+  position:relative;
+}
+.vocab-card::after{content:'▸ 翻看';position:absolute;right:58px;top:50%;transform:translateY(-50%);font-size:.74rem;color:var(--border);transition:opacity .2s}
+.vocab-card.flipped::after{opacity:0}
+.vocab-word{font-family:var(--font-brush);font-size:1.9rem;font-weight:400;color:var(--ink);letter-spacing:.1em}
+.vocab-pinyin{font-size:.84rem;color:var(--ink-light);margin-bottom:3px;letter-spacing:.06em}
+.vocab-def{display:none;font-size:.92rem;color:var(--ink-mid);margin-top:9px;padding-top:9px;border-top:1px dashed var(--border);line-height:1.7}
+.vocab-card.flipped .vocab-def{display:block}
+.vocab-card.flipped{border-left-color:var(--jade);background:#F5FAF7}
+
+/* ════ POEM — 卷轴 scroll ════ */
+.poem-scroll{margin-bottom:16px}
+.scroll-rod{height:9px;border-radius:3px}
+.scroll-rod.top{background:linear-gradient(180deg,#7A2C1E,#C03B2C)}
+.scroll-rod.bot{background:linear-gradient(0deg,#7A2C1E,#C03B2C)}
+.scroll-body{
+  background:linear-gradient(180deg,#EFE9D5 0%,#F5F0E0 30%,#F5F0E0 70%,#EFE9D5 100%);
+  padding:26px 22px 22px;
+  border-left:1px solid rgba(192,59,44,.18);
+  border-right:1px solid rgba(192,59,44,.18);
+}
+.scroll-title{
+  display:flex;align-items:baseline;gap:10px;
+  border-bottom:1px solid rgba(192,59,44,.2);padding-bottom:12px;margin-bottom:20px;
+}
+.scroll-name{font-family:var(--font-brush);font-size:1.65rem;color:var(--ink);letter-spacing:.1em}
+.scroll-author{font-family:var(--font-serif);font-size:.78rem;color:var(--ink-light);letter-spacing:.06em}
+.scroll-lines{display:flex;flex-direction:column;gap:0}
+.scroll-line{
+  font-family:var(--font-serif);font-size:1.18rem;font-weight:400;
+  line-height:2.5;letter-spacing:.14em;color:var(--ink);text-align:center;
+}
+.scroll-line.classical{font-size:.98rem;text-align:left;line-height:2;letter-spacing:.06em}
+.prose-text{
+  background:var(--paper-warm);padding:18px 16px;margin:10px 0;
+  border-top:2px solid var(--cinnabar);border-bottom:2px solid var(--cinnabar);
+  font-family:var(--font-serif);font-size:.93rem;line-height:2.2;color:var(--ink);
+  white-space:pre-wrap;
+}
+.prose-tip{background:var(--gold-bg);border-left:3px solid var(--gold);padding:10px 14px;font-size:.82rem;line-height:1.7;color:var(--ink-mid);margin:10px 0;font-family:var(--font-serif)}
+#recite-phase2{display:none}
+
+/* meaning in scroll */
+.scroll-meaning{
+  font-family:var(--font-serif);font-size:.9rem;color:rgba(28,19,16,.8);
+  line-height:1.95;padding-top:4px;text-align:left;letter-spacing:.02em;
+}
+
+.poem-sub-dots{display:flex;gap:5px;justify-content:center;margin-bottom:14px}
+.poem-sub-dot{width:5px;height:5px;border-radius:50%;background:var(--border);transition:background .2s,transform .2s}
+.poem-sub-dot.done{background:var(--jade)}
+.poem-sub-dot.active{background:var(--cinnabar);transform:scale(1.35)}
+
+/* notes */
+.notes-list{display:flex;flex-direction:column;gap:5px;margin:12px 0}
+.note-item{background:var(--paper-card);border-left:3px solid var(--gold);padding:9px 13px;font-size:.86rem;line-height:1.65;color:var(--ink-mid)}
+.note-term{font-family:var(--font-serif);font-weight:600;color:var(--gold);margin-right:4px}
+
+/* appreciation */
+.appreciation-box{
+  background:var(--paper-card);border-left:4px solid var(--cinnabar);
+  padding:16px 18px;font-family:var(--font-serif);font-size:.9rem;line-height:1.95;
+  color:var(--ink-mid);margin:12px 0;
+}
+.appr-head{font-size:.65rem;font-weight:700;color:var(--cinnabar);letter-spacing:.12em;margin-bottom:9px;display:flex;align-items:center;gap:6px}
+.appr-head::before{content:'';display:inline-block;width:14px;height:1.5px;background:var(--cinnabar)}
+
+/* fill-in */
+.blank-question{margin:9px 0;padding:13px 15px;background:var(--paper-card);border:1px solid var(--border)}
+.blank-q-text{font-family:var(--font-serif);font-size:1.08rem;font-weight:400;margin-bottom:9px;line-height:2.1;letter-spacing:.12em;color:var(--ink)}
+.blank-input{border:1px solid var(--border);border-radius:var(--r);padding:7px 12px;font-size:.95rem;font-family:var(--font-serif);width:100%;outline:none;background:var(--paper);color:var(--ink);transition:border-color .18s}
+.blank-input:focus{border-color:var(--azure)}
+.blank-input.ok{border-color:var(--jade);background:var(--jade-bg)}
+.blank-input.bad{border-color:var(--cinnabar);background:var(--cin-bg)}
+.blank-ans{font-size:.8rem;margin-top:4px;display:none;line-height:1.5}
+.blank-ans.show{display:block}
+
+/* recitation */
+.recite-display{
+  background:var(--paper-warm);padding:24px 20px;margin:12px 0;text-align:center;
+  border-top:2px solid var(--cinnabar);border-bottom:2px solid var(--cinnabar);
+}
+.recite-poem{font-family:var(--font-serif);font-size:1.05rem;line-height:2.5;letter-spacing:.14em;color:var(--ink)}
+.recite-status{margin-top:10px;font-size:.82rem;color:var(--ink-light)}
+.recite-btn{width:66px;height:66px;border-radius:50%;background:var(--cinnabar);color:#fff;font-size:1.6rem;display:flex;align-items:center;justify-content:center;margin:14px auto;box-shadow:0 4px 16px rgba(192,59,44,.35);transition:transform .2s,box-shadow .2s}
+.recite-btn:active{transform:scale(.92)}
+.recite-btn.listening{animation:pulse 1.1s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 4px 16px rgba(192,59,44,.35)}50%{box-shadow:0 4px 32px rgba(192,59,44,.65)}}
+.recite-result{padding:10px 14px;font-size:.86rem;margin-top:8px;display:none;font-family:var(--font-serif);line-height:1.6}
+.recite-result.show{display:block}
+.recite-result.pass{background:var(--jade-bg);color:var(--jade);border-left:3px solid var(--jade)}
+.recite-result.fail{background:var(--cin-bg);color:var(--cinnabar);border-left:3px solid var(--cinnabar)}
+
+/* 田字格 */
+.tian-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;margin:16px 0}
+.tian-row{display:flex;gap:8px}
+.tian-canvas{border:1.5px solid var(--ink-mid);touch-action:none;background:#FFFEF8;cursor:crosshair}
+.tian-controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.tian-btn{border-radius:var(--r);padding:6px 14px;font-size:.8rem;font-weight:600;background:var(--paper-card);border:1px solid var(--border);color:var(--ink-mid);transition:background .14s}
+.tian-btn:hover{background:var(--paper-warm)}
+.char-to-write{font-family:var(--font-brush);font-size:2.8rem;font-weight:400;color:var(--ink);text-align:center;letter-spacing:.22em;margin-bottom:2px}
+.char-stroke-order{font-size:.76rem;color:var(--ink-light);text-align:center;font-family:var(--font-serif)}
+
+/* harvest — 证书 */
+.harvest-card{
+  background:linear-gradient(165deg,#FBF5E4 0%,#F5EDD0 100%);
+  border:1px solid var(--gold);padding:30px 24px;
+  text-align:center;position:relative;margin-bottom:16px;overflow:hidden;
+}
+.harvest-card::before{content:'';position:absolute;inset:7px;border:1px solid rgba(184,132,26,.28);pointer-events:none}
+.harvest-card::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:44px;height:3px;background:var(--cinnabar)}
+.harvest-emoji{font-size:2.8rem;display:block;margin-bottom:10px}
+.harvest-title{font-family:var(--font-brush);font-size:1.6rem;font-weight:400;color:var(--ink);margin-bottom:10px;letter-spacing:.1em}
+.harvest-text{font-family:var(--font-serif);font-size:.88rem;color:var(--ink-mid);line-height:1.95}
+.harvest-stars{font-size:1.3rem;margin-top:14px;letter-spacing:7px}
+.harvest-date{font-family:var(--font-serif);font-size:.7rem;color:var(--ink-light);margin-top:10px}
+
+/* confetti */
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:999;overflow:hidden}
+.confetti-piece{position:absolute;width:7px;height:7px;border-radius:1px;animation:confetti-fall 1.5s ease-in forwards}
+@keyframes confetti-fall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(540deg);opacity:0}}
+
+/* quiz */
+.quiz-question{margin-bottom:18px}
+.quiz-q-text{font-family:var(--font-serif);font-size:.92rem;margin-bottom:10px;line-height:1.75;color:var(--ink)}
+.quiz-options{display:flex;flex-direction:column;gap:4px}
+.quiz-opt{border-radius:var(--r);padding:9px 13px;font-size:.88rem;background:var(--paper-card);border:1px solid var(--border);text-align:left;transition:background .14s,border-color .14s;color:var(--ink-mid)}
+.quiz-opt.selected{border-color:var(--azure);background:var(--azure-bg);color:var(--azure)}
+.quiz-opt.correct{border-color:var(--jade);background:var(--jade-bg);color:var(--jade)}
+.quiz-opt.wrong{border-color:var(--cinnabar);background:var(--cin-bg);color:var(--cinnabar)}
+.quiz-feedback{padding:7px 12px;font-size:.82rem;margin-top:4px;display:none;line-height:1.55;font-family:var(--font-serif)}
+.quiz-feedback.show{display:block}
+.quiz-feedback.ok{background:var(--jade-bg);color:var(--jade);border-left:3px solid var(--jade)}
+.quiz-feedback.bad{background:var(--cin-bg);color:var(--cinnabar);border-left:3px solid var(--cinnabar)}
+.quiz-score{text-align:center;font-family:var(--font-brush);font-size:1.5rem;padding:14px;display:none;color:var(--ink);letter-spacing:.06em}
+.quiz-score.show{display:block}
+
+/* misc */
+.info-box{background:var(--paper-card);border:1px solid var(--border);border-left:3px solid var(--azure);padding:13px 15px;margin-bottom:12px}
+.info-box h3{font-family:var(--font-serif);font-size:.88rem;font-weight:600;margin-bottom:5px;color:var(--ink)}
+.info-box p{font-size:.83rem;color:var(--ink-light);line-height:1.7}
+.fade-guide{text-align:center;color:var(--ink-light);font-size:.8rem;padding:10px;font-family:var(--font-serif);animation:fadeIn .5s}
+
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:0}
+
+/* ── TTS button ── */
+.tts-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  background:transparent;border:1px solid var(--border);border-radius:var(--r);
+  padding:7px 14px;font-size:.88rem;color:var(--ink-light);cursor:pointer;
+  transition:background .15s,color .15s;
+}
+.tts-btn:hover{background:var(--cin-bg);color:var(--cinnabar);border-color:var(--cinnabar)}
+.tts-btn.speaking{background:var(--cin-bg);color:var(--cinnabar);border-color:var(--cinnabar);animation:pulse .8s ease-in-out infinite}
+.tts-btn.loading{background:var(--paper-warm);color:var(--ink-light);border-color:var(--border);cursor:wait;animation:pulse .6s ease-in-out infinite}
+.tts-seal.loading{opacity:.5;cursor:wait;animation:pulse .6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+.tts-bar{display:flex;gap:8px;margin:8px 0 4px;flex-wrap:wrap}
+
+/* ── Intro step paper strips ── */
+.intro-strips{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+.intro-strip{background:var(--paper-card);border:1px solid var(--border-lt);border-left:4px solid var(--border);border-radius:var(--r);padding:11px 14px;display:flex;align-items:center;gap:12px}
+.intro-strip-cin{border-left-color:var(--cinnabar)}
+.intro-strip-jade{border-left-color:var(--jade)}
+.intro-strip-gold{border-left-color:var(--gold)}
+.intro-strip-azure{border-left-color:var(--azure)}
+.intro-glyph{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-brush);font-size:1.2rem;flex-shrink:0}
+.intro-strip-cin .intro-glyph{background:var(--cin-bg);color:var(--cinnabar)}
+.intro-strip-jade .intro-glyph{background:var(--jade-bg);color:var(--jade)}
+.intro-strip-gold .intro-glyph{background:var(--gold-bg);color:var(--gold)}
+.intro-strip-azure .intro-glyph{background:var(--azure-bg);color:var(--azure)}
+.intro-strip-title{font-weight:700;color:var(--ink);font-family:var(--font-serif);font-size:.9rem}
+.intro-strip-sub{font-size:.78rem;color:var(--ink-light);margin-top:2px}
+/* ── TTS seal button (vocab cards) ── */
+.tts-seal{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--border);background:transparent;color:var(--ink-light);font-family:var(--font-brush);font-size:.95rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.tts-seal:hover{background:var(--cin-bg);color:var(--cinnabar);border-color:var(--cinnabar)}
+.tts-seal.speaking{background:var(--cin-bg);color:var(--cinnabar);border-color:var(--cinnabar);animation:pulse .8s ease-in-out infinite}
+
+/* ── Match game (连连看) ── */
+.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:10px 0}
+.match-item{
+  padding:13px 14px;border-radius:var(--r);border:1.5px solid var(--border);
+  background:var(--paper-card);font-family:var(--font-serif);
+  cursor:pointer;text-align:center;font-size:1rem;
+  transition:border-color .2s,background .2s,transform .12s;
+  user-select:none;line-height:1.4;
+}
+.match-item:hover:not(.matched):not(.wrong-flash){border-color:var(--ink-mid);transform:translateY(-1px)}
+.match-item.selected{border-color:var(--cinnabar);background:var(--cin-bg);color:var(--cinnabar)}
+.match-item.matched{border-color:var(--jade);background:var(--jade-bg);color:var(--jade);cursor:default}
+@keyframes wrongFlash{0%,100%{background:var(--paper-card)}30%,70%{background:#fee2e2;border-color:var(--cinnabar)}}
+.match-item.wrong-flash{animation:wrongFlash .5s ease}
+.match-score{text-align:center;font-family:var(--font-serif);font-size:1rem;padding:10px;color:var(--jade);font-weight:600;display:none}
+.match-score.show{display:block}
+
+/* ── Dictation (听写) ── */
+.dictation-speaker{
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+  padding:24px;background:var(--paper-card);border:1px solid var(--border);
+  border-radius:var(--r);margin:12px 0;
+}
+.dictation-play-btn{
+  width:72px;height:72px;border-radius:50%;
+  background:var(--cinnabar);color:#fff;font-size:2rem;
+  display:flex;align-items:center;justify-content:center;
+  border:none;cursor:pointer;box-shadow:0 4px 16px rgba(192,59,44,.3);
+  transition:transform .12s,box-shadow .12s;
+}
+.dictation-play-btn:active{transform:scale(.94)}
+.dictation-play-btn.playing{animation:pulse .8s ease-in-out infinite}
+.dictation-hint{font-size:.78rem;color:var(--ink-light);font-family:var(--font-serif)}
+.dictation-input-row{display:flex;gap:8px;width:100%}
+.dictation-input{
+  flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--r);
+  font-family:var(--font-serif);font-size:1rem;background:var(--paper-card);
+  outline:none;transition:border-color .2s;
+}
+.dictation-input:focus{border-color:var(--cinnabar)}
+.dictation-check-btn{
+  padding:10px 18px;background:var(--cinnabar);color:#fff;border:none;
+  border-radius:var(--r);font-size:.9rem;font-weight:700;cursor:pointer;
+  white-space:nowrap;
+}
+.dictation-feedback{margin-top:8px;font-family:var(--font-serif);font-size:.9rem;min-height:24px;text-align:center}
+.dictation-progress{font-size:.78rem;color:var(--ink-light);font-family:var(--font-serif)}
+</style>
+</head>
+<body>
+
+<!-- ══ HOME SCREEN ══ -->
+<div class="screen active" id="home">
+  <div class="home-hero">
+    <h1>三年级语文暑期复习</h1>
+    <p id="home-greeting">每天二十分钟，轻松温故知新</p>
+    <button onclick="showSettings()" style="margin-top:10px;background:transparent;border:none;color:var(--ink-light);font-family:var(--font-serif);font-size:.75rem;text-decoration:underline;cursor:pointer;letter-spacing:.04em">⚙ 设置开始日期</button>
+  </div>
+  <div class="stats-row">
+    <div class="stat-chip">已完成 <b id="stat-days">0</b>/36 天</div>
+    <div class="stat-chip">获得 <b id="stat-stars">0</b> 颗星</div>
+    <div class="stat-chip">已背 <b id="stat-poems">0</b>/13 首文</div>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="prog-label" id="prog-label">尚未开始</div>
+  </div>
+  <div class="calendar-grid" id="calendar-grid">
+    <!-- 7 column headers -->
+    <div class="cal-head">一</div><div class="cal-head">二</div>
+    <div class="cal-head">三</div><div class="cal-head">四</div>
+    <div class="cal-head">五</div><div class="cal-head">六</div>
+    <div class="cal-head">日</div>
+  </div>
+</div>
+
+<!-- ══ LESSON SCREEN ══ -->
+<div class="screen" id="lesson">
+  <div class="lesson-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div class="lesson-title" id="lesson-title">今日课程</div>
+    <div class="lesson-day-badge" id="lesson-day-badge">第1天</div>
+  </div>
+  <div class="step-dots" id="step-dots"></div>
+  <div class="lesson-body" id="lesson-body">
+    <!-- Steps injected here -->
+  </div>
+  <div class="lesson-nav" id="lesson-nav">
+    <button class="btn btn-ghost" id="btn-prev" onclick="prevStep()" style="display:none">← 上一步</button>
+    <button class="btn btn-amber btn-full" id="btn-next" onclick="nextStep()">继续 →</button>
+  </div>
+</div>
+
+<!-- Confetti container -->
+<div class="confetti" id="confetti"></div>
+
+<script>
+// ══════════════════════════════════════════
+// DATA — POEMS  (三年级下册全册必背古诗+文言文)
+// ══════════════════════════════════════════
+const POEMS = [
+  /* ─── p1 绝句 杜甫 ─── */
+  {
+    id:'p1', title:'绝句', author:'杜甫', dynasty:'唐',
+    tag:'春', emoji:'🌸',
+    bg:'linear-gradient(135deg,#065f46,#10b981)',
+    lines:['迟日江山丽，','春风花草香。','泥融飞燕子，','沙暖睡鸳鸯。'],
+    fullText:'迟日江山丽，春风花草香。泥融飞燕子，沙暖睡鸳鸯。',
+    notes:[
+      {term:'迟日',def:'春天太阳落山较晚，所以叫"迟日"，这里泛指春日。'},
+      {term:'丽',def:'美丽。'},
+      {term:'泥融',def:'冻土融化，泥土湿润松软。'},
+      {term:'鸳鸯',def:'一种美丽的水鸟，常成双出现。'},
+    ],
+    meaning:'春天阳光照耀，大好江山显得格外美丽；春风吹来，花草的香气扑鼻而来。泥土解冻，燕子飞翔着去衔泥筑巢；沙洲温暖，鸳鸯相依而眠。',
+    appreciation:'这首绝句以简洁的笔墨描绘了一幅初春生机勃勃的图景。诗人从视觉、嗅觉、触觉等角度写春天，四句四景，动静结合，表达了诗人对春天的喜爱之情。',
+    blanks:[
+      {before:'迟日江山',blank:'___',after:'，',answer:'丽'},
+      {before:'春风花草',blank:'___',after:'。',answer:'香'},
+      {before:'泥融飞',blank:'___',after:'，',answer:'燕子'},
+      {before:'沙暖睡',blank:'___',after:'。',answer:'鸳鸯'},
+    ],
+    writingChars:['燕','暖'],
+  },
+  {
+    id:'p2', title:'惠崇春江晚景', author:'苏轼', dynasty:'宋',
+    tag:'春江', emoji:'🦆',
+    bg:'linear-gradient(135deg,#065f46,#4ade80)',
+    lines:['竹外桃花三两枝，','春江水暖鸭先知。','蒌蒿满地芦芽短，','正是河豚欲上时。'],
+    fullText:'竹外桃花三两枝，春江水暖鸭先知。蒌蒿满地芦芽短，正是河豚欲上时。',
+    notes:[
+      {term:'惠崇',def:'宋代僧人，擅长绘画，这首诗是苏轼为他的画题写的。'},
+      {term:'蒌蒿',def:'一种植物，嫩茎可以吃，春天生长。'},
+      {term:'芦芽',def:'芦苇的嫩芽。'},
+      {term:'河豚',def:'一种鱼，春天时逆流而上。'},
+      {term:'欲上时',def:'正是要逆流而上的时候。'},
+    ],
+    meaning:'竹林外面有两三枝桃花开放，春天的江水变暖了，鸭子最先知道。满地是蒌蒿，芦苇嫩芽还很短，这正是河豚逆流而上的时候。',
+    appreciation:'苏轼题写在惠崇画上的诗。"春江水暖鸭先知"是想象，画面无法表现水温，却把春江初暖的气息写得生动，是流传千古的名句。',
+    blanks:[
+      {before:'竹外桃花',blank:'___',after:'枝，',answer:'三两'},
+      {before:'春江水暖',blank:'___',after:'先知。',answer:'鸭'},
+      {before:'蒌蒿满地',blank:'___',after:'短，',answer:'芦芽'},
+      {before:'正是',blank:'___',after:'欲上时。',answer:'河豚'},
+    ],
+    writingChars:['桃','鸭'],
+  },
+  {
+    id:'p3', title:'三衢道中', author:'曾几', dynasty:'宋',
+    tag:'初夏', emoji:'🌿',
+    bg:'linear-gradient(135deg,#166534,#16a34a)',
+    lines:['梅子黄时日日晴，','小溪泛尽却山行。','绿阴不减来时路，','添得黄鹂四五声。'],
+    fullText:'梅子黄时日日晴，小溪泛尽却山行。绿阴不减来时路，添得黄鹂四五声。',
+    notes:[
+      {term:'三衢',def:'地名，今浙江衢州一带。'},
+      {term:'道中',def:'途中，路上。'},
+      {term:'梅子黄时',def:'梅子变黄的时候，即初夏。'},
+      {term:'泛尽',def:'坐船走到了尽头。'},
+      {term:'却',def:'再，然后。'},
+      {term:'绿阴',def:'绿色的树荫。'},
+      {term:'黄鹂',def:'一种鸟，叫声悦耳，又叫黄莺。'},
+    ],
+    meaning:'初夏梅子黄时，日日晴朗；我泛舟到了溪的尽头，改走山路。回来时，绿树成荫，道路与去时一样，还多了黄鹂四五声悦耳的鸣叫。',
+    appreciation:'"梅子黄时日日晴"点明时节，"添得黄鹂四五声"以鸟鸣声写出游玩时的喜悦，以动衬静，令人心旷神怡。',
+    blanks:[
+      {before:'梅子黄时',blank:'___',after:'晴，',answer:'日日'},
+      {before:'小溪泛尽却',blank:'___',after:'行。',answer:'山'},
+      {before:'绿阴不减',blank:'___',after:'路，',answer:'来时'},
+      {before:'添得',blank:'___',after:'四五声。',answer:'黄鹂'},
+    ],
+    writingChars:['溪','鹂'],
+  },
+  {
+    id:'p4', title:'忆江南', author:'白居易', dynasty:'唐',
+    tag:'江南', emoji:'🌺',
+    bg:'linear-gradient(135deg,#9d174d,#ec4899)',
+    lines:['江南好，','风景旧曾谙。','日出江花红胜火，','春来江水绿如蓝。','能不忆江南？'],
+    fullText:'江南好，风景旧曾谙。日出江花红胜火，春来江水绿如蓝。能不忆江南？',
+    notes:[
+      {term:'忆江南',def:'词牌名（词的格式名称）。'},
+      {term:'谙',def:'熟悉。'},
+      {term:'江花',def:'江边的花。'},
+      {term:'红胜火',def:'比火还要红艳。'},
+      {term:'绿如蓝',def:'像蓝草一样绿（蓝草：一种植物，叶子是蓝绿色）。'},
+    ],
+    meaning:'江南的风景多么好啊，那里的风光我以前早已熟悉。太阳升起时，江边的花儿比火还要红艳；春天来临，江水碧绿如蓝草一般。怎能不让人思念江南？',
+    appreciation:'这是一首词（忆江南是词牌名）。"日出江花红胜火，春来江水绿如蓝"是千古名句，用"火"比花红、用"蓝"比水绿，色彩绚丽，令人如临其境。',
+    blanks:[
+      {before:'江南好，风景旧曾',blank:'___',after:'。',answer:'谙'},
+      {before:'日出江花红胜',blank:'___',after:'，',answer:'火'},
+      {before:'春来江水绿如',blank:'___',after:'。',answer:'蓝'},
+      {before:'能不忆',blank:'___',after:'？',answer:'江南'},
+    ],
+    writingChars:['江','蓝'],
+  },
+  {
+    id:'p5', title:'滁州西涧', author:'韦应物', dynasty:'唐',
+    tag:'春', emoji:'🌾',
+    bg:'linear-gradient(135deg,#14532d,#22c55e)',
+    lines:['独怜幽草涧边生，','上有黄鹂深树鸣。','春潮带雨晚来急，','野渡无人舟自横。'],
+    fullText:'独怜幽草涧边生，上有黄鹂深树鸣。春潮带雨晚来急，野渡无人舟自横。',
+    notes:[
+      {term:'独怜',def:'独自喜爱，特别爱惜。'},
+      {term:'幽草',def:'幽深茂盛的野草。'},
+      {term:'涧',def:'山间流水的沟。'},
+      {term:'深树',def:'枝叶茂密的树丛。'},
+      {term:'春潮',def:'春天涨起的潮水。'},
+      {term:'野渡',def:'野外无人管理的渡口。'},
+      {term:'舟自横',def:'小船独自横着漂浮。'},
+    ],
+    meaning:'我独爱那涧边幽深茂盛的野草，上面有黄鹂在茂密的树丛中鸣叫。傍晚时分春雨突至，春潮上涨；荒野的渡口无人摆渡，一条小船独自横着漂浮。',
+    appreciation:'"野渡无人舟自横"是传神之笔，营造出宁静、悠然自得的意境，也反映了诗人淡泊名利、向往自然的心境。',
+    blanks:[
+      {before:'独怜幽草',blank:'___',after:'生，',answer:'涧边'},
+      {before:'上有黄鹂',blank:'___',after:'鸣。',answer:'深树'},
+      {before:'春潮带雨晚来',blank:'___',after:'，',answer:'急'},
+      {before:'野渡无人舟自',blank:'___',after:'。',answer:'横'},
+    ],
+    writingChars:['独','涧'],
+  },
+  {
+    id:'p6', title:'元日', author:'王安石', dynasty:'宋',
+    tag:'春节', emoji:'🎆',
+    bg:'linear-gradient(135deg,#7f1d1d,#dc2626)',
+    lines:['爆竹声中一岁除，','春风送暖入屠苏。','千门万户曈曈日，','总把新桃换旧符。'],
+    fullText:'爆竹声中一岁除，春风送暖入屠苏。千门万户曈曈日，总把新桃换旧符。',
+    notes:[
+      {term:'元日',def:'农历正月初一，即大年初一。'},
+      {term:'一岁除',def:'一年过去了。'},
+      {term:'屠苏',def:'一种酒，古代新年时饮用，据说能驱邪避瘟。'},
+      {term:'曈曈',def:'太阳刚升起时光线明亮温暖的样子。'},
+      {term:'千门万户',def:'形容家家户户。'},
+      {term:'新桃换旧符',def:'用新的桃符（春联的前身）换下旧的。'},
+    ],
+    meaning:'爆竹声中送走了旧的一年，春风送来温暖，家家喝起了屠苏酒。初升的太阳照耀着千家万户，家家户户都把旧的桃符换上了新的。',
+    appreciation:'"爆竹声中一岁除"写辞旧迎新的喜庆，"千门万户曈曈日"写节日的热闹，"新桃换旧符"表达了对新年的美好期望。',
+    blanks:[
+      {before:'爆竹声中',blank:'___',after:'除，',answer:'一岁'},
+      {before:'春风送暖入',blank:'___',after:'。',answer:'屠苏'},
+      {before:'千门万户',blank:'___',after:'日，',answer:'曈曈'},
+      {before:'总把新桃换',blank:'___',after:'。',answer:'旧符'},
+    ],
+    writingChars:['爆','符'],
+  },
+  {
+    id:'p7', title:'清明', author:'杜牧', dynasty:'唐',
+    tag:'清明', emoji:'🌧️',
+    bg:'linear-gradient(135deg,#3730a3,#6366f1)',
+    lines:['清明时节雨纷纷，','路上行人欲断魂。','借问酒家何处有？','牧童遥指杏花村。'],
+    fullText:'清明时节雨纷纷，路上行人欲断魂。借问酒家何处有？牧童遥指杏花村。',
+    notes:[
+      {term:'清明',def:'二十四节气之一，4月4或5日前后，有扫墓、踏青等习俗。'},
+      {term:'纷纷',def:'不断地，形容雨下得多。'},
+      {term:'欲断魂',def:'十分伤心，形容思念故人而心情低落。'},
+      {term:'借问',def:'请问，向别人打听。'},
+      {term:'遥指',def:'远远地指向。'},
+      {term:'杏花村',def:'杏花盛开的村子，也可能是酒家的名字。'},
+    ],
+    meaning:'清明节前后，小雨纷纷飘落；路上的行人心情愁苦，好像断了魂一样。请问哪里有酒家？放牛的小孩儿远远地指向杏花村。',
+    appreciation:'"牧童遥指杏花村"以牧童的出现给全诗带来一抹亮色，给迷路的行人指路，充满生活气息，令人回味无穷。',
+    blanks:[
+      {before:'清明时节雨',blank:'___',after:'，',answer:'纷纷'},
+      {before:'路上行人欲',blank:'___',after:'。',answer:'断魂'},
+      {before:'借问酒家',blank:'___',after:'有？',answer:'何处'},
+      {before:'牧童遥指',blank:'___',after:'。',answer:'杏花村'},
+    ],
+    writingChars:['清','魂'],
+  },
+  {
+    id:'p8', title:'九月九日忆山东兄弟', author:'王维', dynasty:'唐',
+    tag:'重阳', emoji:'🏔️',
+    bg:'linear-gradient(135deg,#78350f,#d97706)',
+    lines:['独在异乡为异客，','每逢佳节倍思亲。','遥知兄弟登高处，','遍插茱萸少一人。'],
+    fullText:'独在异乡为异客，每逢佳节倍思亲。遥知兄弟登高处，遍插茱萸少一人。',
+    notes:[
+      {term:'九月九日',def:'重阳节，有登高、插茱萸、赏菊等习俗。'},
+      {term:'山东',def:'这里指华山以东，王维的家乡（今山西）。'},
+      {term:'异乡',def:'他乡，不是自己家乡的地方。'},
+      {term:'倍',def:'加倍，更加。'},
+      {term:'茱萸',def:'一种香草，重阳节有佩戴茱萸的习俗，认为可以驱邪。'},
+    ],
+    meaning:'我独自一人在他乡做外乡人，每逢节日就加倍思念家乡的亲人。远远地想到，兄弟们今日一定在登高，他们每人都插上了茱萸，却单单少了我一个人。',
+    appreciation:'"每逢佳节倍思亲"是千古名句，写出了漂泊在外的人思念亲人的情感。最后两句换个角度，不写自己想家，而写家人想到了自己，更加深沉感人。',
+    blanks:[
+      {before:'独在异乡为',blank:'___',after:'，',answer:'异客'},
+      {before:'每逢佳节倍',blank:'___',after:'。',answer:'思亲'},
+      {before:'遥知兄弟',blank:'___',after:'处，',answer:'登高'},
+      {before:'遍插茱萸少',blank:'___',after:'。',answer:'一人'},
+    ],
+    writingChars:['独','异'],
+  },
+  {
+    id:'p9', title:'大林寺桃花', author:'白居易', dynasty:'唐',
+    tag:'桃花', emoji:'🌸',
+    bg:'linear-gradient(135deg,#831843,#f472b6)',
+    lines:['人间四月芳菲尽，','山寺桃花始盛开。','长恨春归无觅处，','不知转入此中来。'],
+    fullText:'人间四月芳菲尽，山寺桃花始盛开。长恨春归无觅处，不知转入此中来。',
+    notes:[
+      {term:'人间',def:'山下平地，与山上的寺庙相对。'},
+      {term:'芳菲',def:'花草，泛指春天盛开的花朵。'},
+      {term:'山寺',def:'山上的寺庙，这里指庐山大林寺。'},
+      {term:'始',def:'才，刚刚开始。'},
+      {term:'长恨',def:'常常遗憾，一直叹惜。'},
+      {term:'无觅处',def:'找不到。'},
+    ],
+    meaning:'山下四月间，春花已经凋谢；而山上寺庙里的桃花才刚刚盛开。我常常遗憾春天来了又去，不知道去了哪里，原来是转移到这山中来了！',
+    appreciation:'山下"芳菲尽"与山寺"始盛开"形成强烈对比，"不知转入此中来"写出意外发现的惊喜，充满了发现之喜，令人心情愉快。',
+    blanks:[
+      {before:'人间四月芳菲',blank:'___',after:'，',answer:'尽'},
+      {before:'山寺桃花始盛',blank:'___',after:'。',answer:'开'},
+      {before:'长恨春归无',blank:'___',after:'处，',answer:'觅'},
+      {before:'不知转入',blank:'___',after:'来。',answer:'此中'},
+    ],
+    writingChars:['芳','菲'],
+  },
+  {
+    id:'p10', title:'守株待兔', author:'《韩非子》', dynasty:'先秦', type:'classical',
+    tag:'文言', emoji:'🐰',
+    bg:'linear-gradient(135deg,#44403c,#a16207)',
+    lines:['宋人有耕者，','田中有株。','兔走触株，折颈而死。','因释其耒而守株，','冀复得兔。','兔不可复得，','而身为宋国笑。'],
+    fullText:'宋人有耕者，田中有株。兔走触株，折颈而死。因释其耒而守株，冀复得兔。兔不可复得，而身为宋国笑。',
+    notes:[
+      {term:'宋人',def:'宋国的人。宋，是古代的一个国家。'},
+      {term:'株',def:'树桩，树被砍断后留在地面的部分。'},
+      {term:'走（古）',def:'古文中"走"是"跑"的意思；现代"走"在古文中叫"行"。'},
+      {term:'折颈',def:'折断了脖子。'},
+      {term:'耒',def:'古代耕地的农具，形状像犁。'},
+      {term:'冀',def:'希望，盼望。'},
+      {term:'为…笑',def:'被…嘲笑。"身为宋国笑"即被整个宋国的人嘲笑。'},
+    ],
+    meaning:'宋国有个种田的农夫，田里有一个树桩。一只兔子跑来撞上了树桩，折断脖子死了。于是他放下农具，守在树桩旁，希望再得到一只兔子。可是兔子再也没有来，他自己却成了整个宋国的笑柄。',
+    appreciation:'这则文言文出自《韩非子》，是成语"守株待兔"的来源。故事讽刺了农夫因一次偶然好运便放弃努力，痴痴等待奇迹，最终成为笑柄。寓意：成功要靠脚踏实地的劳动，不能抱有侥幸心理。',
+    blanks:[
+      {before:'兔走触株，折颈而',blank:'___',after:'。',answer:'死'},
+      {before:'因释其',blank:'___',after:'而守株，',answer:'耒'},
+      {before:'冀',blank:'___',after:'得兔。',answer:'复'},
+      {before:'而身为宋国',blank:'___',after:'。',answer:'笑'},
+    ],
+    writingChars:['株','耒'],
+  },
+];
+
+// ══════════════════════════════════════════
+// DATA — PROSE PASSAGES (三下课文背诵)
+// ══════════════════════════════════════════
+const PROSE_TEXTS = [
+  {id:'pt1', title:'燕子', lesson:'第2课', section:'第1-2自然段', emoji:'🐦', vocabKey:'yanzi_v',
+   fullText:'一身乌黑的羽毛，一对轻快有力的翅膀，加上剪刀似的尾巴，凑成了那样可爱的活泼的小燕子。\n\n二三月的春日里，轻风微微地吹拂着，如毛的细雨由天上洒落着，千条万条的柔柳，红的白的黄的花，青的草，绿的叶，都像赶集似的聚拢来，形成了烂漫无比的春天。这时候，那些小燕子，那么伶俐可爱的小燕子，也由南方飞来，加入这光彩夺目的图画中，为春光平添了许多生趣。',
+   tip:'第一段：三个"一"排比写燕子外形（羽毛→翅膀→尾巴）。\n第二段：抓住"轻风、细雨、柔柳、花草、燕子"描写烂漫无比的春天。',
+   harvest:'今天背诵了《燕子》第1-2自然段！三个"一"排比写出了燕子可爱的外形，烂漫无比的春天真美！', harvestEmoji:'🐦'},
+  {id:'pt2', title:'荷花', lesson:'第3课', section:'第2-3自然段', emoji:'🌺', vocabKey:'hehua_v',
+   fullText:'荷叶挨挨挤挤的，像一个个碧绿的大圆盘。白荷花在这些大圆盘之间冒出来。有的才展开两三片花瓣儿。有的花瓣儿全展开了，露出嫩黄色的小莲蓬。有的还是花骨朵儿，看起来饱胀得马上要破裂似的。\n\n这么多的白荷花，一朵有一朵的姿势。看看这一朵，很美；看看那一朵，也很美。如果把眼前的一池荷花看作一大幅活的画，那画家的本领可真了不起。',
+   tip:'第二段：三个"有的"排比写荷花三种姿态（展开→全展→花骨朵儿）。\n第三段：中心句"一朵有一朵的姿势"，结尾比喻"一大幅活的画"。',
+   harvest:'今天背诵了《荷花》第2-3自然段！"荷叶挨挨挤挤的，像一个个碧绿的大圆盘"比喻真形象！', harvestEmoji:'🌺'},
+  {id:'pt3', title:'火烧云', lesson:'第22课', section:'第3-6自然段', emoji:'🌅', vocabKey:'huoshao_v',
+   fullText:'这地方的火烧云变化极多，一会儿红彤彤的，一会儿金灿灿的，一会儿半紫半黄，一会儿半灰半百合色。葡萄灰、梨黄、茄子紫，这些颜色天空都有，还有些说也说不出来、见也没见过的颜色。\n\n一会儿，天空出现一匹马，马头向南，马尾向西。马是跪着的，像等人骑上它的背，它才站起来似的。过了两三秒钟，那匹马大起来了，腿伸开了，脖子也长了，尾巴却不见了。看的人正在寻找马尾巴，那匹马变模糊了。\n\n忽然又来了一条大狗。那条狗十分凶猛，在向前跑，后边似乎还跟着好几条小狗。跑着跑着，小狗不知哪里去了，大狗也不见了。\n\n接着又来了一头大狮子，跟庙门前的石头狮子一模一样，也那么大，也那样蹲着，很威武很镇静地蹲着。可是一转眼就变了，再也找不着了。',
+   tip:'第三段：中心句"变化极多"，颜色变化用"一会儿"排比。\n第4-6段：形状变化——马→狗→狮子，每种都经历"出现→变化→消失"过程。',
+   harvest:'今天背诵了《火烧云》第3-6自然段！"葡萄灰、梨黄、茄子紫"颜色描写精彩，马、狗、狮子的变化充满想象力！', harvestEmoji:'🌅'},
+];
+
+// ══════════════════════════════════════════
+// DATA — VOCABULARY SETS
+// ══════════════════════════════════════════
+const VOCAB_SETS = {
+  // ─── 古诗词语 ───
+  p1_v:[
+    {w:'迟日',py:'chí rì',def:'春天太阳落山较晚，这里泛指春日。'},
+    {w:'泥融',py:'ní róng',def:'冻土融化，泥土湿润松软。'},
+    {w:'鸳鸯',py:'yuān yāng',def:'一种美丽的水鸟，常成双出现。'},
+    {w:'江山丽',py:'jiāng shān lì',def:'大好河山显得格外美丽。'},
+  ],
+  p2_v:[
+    {w:'蒌蒿',py:'lóu hāo',def:'一种野草，嫩茎可食，春天生长。'},
+    {w:'芦芽',py:'lú yá',def:'芦苇的嫩芽。'},
+    {w:'河豚',py:'hé tún',def:'一种鱼，春天时逆流而上。'},
+    {w:'桃花',py:'táo huā',def:'桃树开的花，粉红色，春天盛开。'},
+  ],
+  p3_v:[
+    {w:'梅子',py:'méi zi',def:'梅树的果实，初夏成熟变黄。'},
+    {w:'泛尽',py:'fàn jìn',def:'坐船走到了尽头。'},
+    {w:'绿阴',py:'lǜ yīn',def:'绿色的树荫。'},
+    {w:'黄鹂',py:'huáng lí',def:'一种鸟，叫声悦耳，又叫黄莺。'},
+  ],
+  p4_v:[
+    {w:'谙',py:'ān',def:'熟悉。'},
+    {w:'江花',py:'jiāng huā',def:'江边的花。'},
+    {w:'红胜火',py:'hóng shèng huǒ',def:'比火还要红艳。'},
+    {w:'绿如蓝',py:'lǜ rú lán',def:'像蓝草一样绿。'},
+  ],
+  p5_v:[
+    {w:'独怜',py:'dú lián',def:'独自喜爱，特别爱惜。'},
+    {w:'幽草',py:'yōu cǎo',def:'幽深茂盛的野草。'},
+    {w:'涧',py:'jiàn',def:'山间流水的沟。'},
+    {w:'野渡',py:'yě dù',def:'野外无人管理的渡口。'},
+    {w:'舟自横',py:'zhōu zì héng',def:'小船独自横着漂浮。'},
+  ],
+  p6_v:[
+    {w:'屠苏',py:'tú sū',def:'一种酒，古代新年时饮用，据说能驱邪。'},
+    {w:'曈曈',py:'tóng tóng',def:'太阳刚升起时光线明亮温暖的样子。'},
+    {w:'桃符',py:'táo fú',def:'春联的前身，贴在门上驱邪迎福。'},
+    {w:'一岁除',py:'yī suì chú',def:'一年过去了。'},
+  ],
+  p7_v:[
+    {w:'纷纷',py:'fēn fēn',def:'不断地，形容雨下得多。'},
+    {w:'欲断魂',py:'yù duàn hún',def:'十分伤心，形容思念故人而心情低落。'},
+    {w:'借问',py:'jiè wèn',def:'请问，向别人打听。'},
+    {w:'杏花村',py:'xìng huā cūn',def:'杏花盛开的村子，也可能是酒家的名字。'},
+  ],
+  p8_v:[
+    {w:'异乡',py:'yì xiāng',def:'他乡，不是自己家乡的地方。'},
+    {w:'倍思亲',py:'bèi sī qīn',def:'加倍思念家乡的亲人。'},
+    {w:'茱萸',py:'zhū yú',def:'一种香草，重阳节有佩戴的习俗，认为可以驱邪。'},
+    {w:'登高',py:'dēng gāo',def:'重阳节登高的习俗，有祈福辟邪的意思。'},
+  ],
+  p9_v:[
+    {w:'芳菲',py:'fāng fēi',def:'花草，泛指春天盛开的花朵。'},
+    {w:'山寺',py:'shān sì',def:'山上的寺庙，这里指庐山大林寺。'},
+    {w:'长恨',py:'cháng hèn',def:'常常遗憾，一直叹惜。'},
+    {w:'无觅处',py:'wú mì chù',def:'找不到。'},
+  ],
+  p10_v:[
+    {w:'宋人',py:'sòng rén',def:'宋国的人。宋，是古代的一个国家。'},
+    {w:'株',py:'zhū',def:'树桩，树被砍断后留在地面的部分。'},
+    {w:'走（古义）',py:'zǒu',def:'古文中"走"是"跑"的意思。'},
+    {w:'耒',py:'lěi',def:'古代耕地的农具，形状像犁。'},
+    {w:'冀',py:'jì',def:'希望，盼望。'},
+  ],
+  // ─── 课文词语 ───
+  yanzi_v:[
+    {w:'乌黑',py:'wū hēi',def:'深黑色，形容颜色很黑很亮。'},
+    {w:'轻快',py:'qīng kuài',def:'动作轻盈灵活，不费力。'},
+    {w:'剪刀似的',py:'jiǎn dāo sì de',def:'像剪刀一样，形容燕子尾巴的形状。'},
+    {w:'吹拂',py:'chuī fú',def:'轻轻地吹动，形容微风轻柔。'},
+    {w:'伶俐',py:'líng lì',def:'聪明灵活，机灵。'},
+    {w:'烂漫',py:'làn màn',def:'颜色鲜艳而美丽；也形容自然、不做作。'},
+  ],
+  hehua_v:[
+    {w:'挨挨挤挤',py:'āi āi jǐ jǐ',def:'形容很多，紧密地挤在一起。'},
+    {w:'碧绿',py:'bì lǜ',def:'青绿色，形容颜色很绿。'},
+    {w:'莲蓬',py:'lián péng',def:'荷花的花托，里面有莲子。'},
+    {w:'花骨朵儿',py:'huā gū duo r',def:'含苞未放的花蕾。'},
+    {w:'饱胀',py:'bǎo zhàng',def:'因太饱或太满而胀起来。'},
+    {w:'姿势',py:'zī shì',def:'身体所保持的样子。'},
+  ],
+  huoshao_v:[
+    {w:'红彤彤',py:'hóng tōng tōng',def:'形容很红的样子。'},
+    {w:'金灿灿',py:'jīn càn càn',def:'形容金黄色很鲜艳夺目。'},
+    {w:'葡萄灰',py:'pú táo huī',def:'像葡萄一样的灰紫色。'},
+    {w:'威武',py:'wēi wǔ',def:'威严而勇武，气势雄壮。'},
+    {w:'镇静',py:'zhèn jìng',def:'遇到紧急情况不慌乱，冷静。'},
+    {w:'模糊',py:'mó hu',def:'不清楚，看不分明。'},
+  ],
+  // ─── 日积月累 ───
+  riji2:[
+    {w:'沉鱼落雁',py:'chén yú luò yàn',def:'形容女子容貌极美。'},
+    {w:'闭月羞花',py:'bì yuè xiū huā',def:'形容女子容貌极美，让月亮躲起来，花儿害羞。'},
+    {w:'出神入化',py:'chū shén rù huà',def:'形容技艺达到了绝妙的境界。'},
+    {w:'炉火纯青',py:'lú huǒ chún qīng',def:'比喻技艺或学问达到了纯熟完美的程度。'},
+    {w:'鬼斧神工',py:'guǐ fǔ shén gōng',def:'形容技艺十分高超，不像人力所能为。'},
+    {w:'巧夺天工',py:'qiǎo duó tiān gōng',def:'形容人工的精巧胜过天然，技艺高超。'},
+    {w:'栩栩如生',py:'xǔ xǔ rú shēng',def:'形容艺术形象非常逼真，像活的一样。'},
+    {w:'惟妙惟肖',py:'wéi miào wéi xiào',def:'形容描写或模仿得非常逼真。'},
+  ],
+  riji4:[
+    {w:'文房四宝',py:'wén fáng sì bǎo',def:'笔、墨、纸、砚，是文人书房必备的四样宝贝。'},
+    {w:'雅人四好',py:'yǎ rén sì hào',def:'琴、棋、书、画，是古代文人雅士的四种爱好。'},
+    {w:'花中四君子',py:'huā zhōng sì jūn zǐ',def:'梅、兰、竹、菊，象征高洁的品格。'},
+    {w:'中医四诊',py:'zhōng yī sì zhěn',def:'望、闻、问、切，是中医诊断病情的四种方法。'},
+  ],
+  riji6:[
+    {w:'莫道君行早，更有早行人',py:'mò dào jūn xíng zǎo，gèng yǒu zǎo xíng rén',def:'不要以为你来得早，还有比你更早的人。提醒人不要骄傲自满。'},
+    {w:'近水知鱼性，近山识鸟音',py:'jìn shuǐ zhī yú xìng，jìn shān shí niǎo yīn',def:'靠近水的人了解鱼的习性，靠近山的人能辨别鸟的叫声。说明实践出真知。'},
+    {w:'路遥知马力，日久见人心',py:'lù yáo zhī mǎ lì，rì jiǔ jiàn rén xīn',def:'路途远才能看出马的力气，时间久了才能看出人心的好坏。'},
+  ],
+  riji8:[
+    {w:'一表人才',py:'yī biǎo rén cái',def:'形容人仪表端正，风度不凡。'},
+    {w:'能说会道',py:'néng shuō huì dào',def:'形容口才很好，能言善辩。'},
+    {w:'多才多艺',py:'duō cái duō yì',def:'具有多种才能和技艺。'},
+    {w:'活灵活现',py:'huó líng huó xiàn',def:'形容描述或表演十分逼真生动。'},
+  ],
+  review:[
+    {w:'观察',py:'guān chá',def:'仔细查看，了解情况。'},
+    {w:'发现',py:'fā xiàn',def:'找到或了解到以前不知道的事物。'},
+    {w:'坚持',py:'jiān chí',def:'一直保持，不放弃。'},
+    {w:'认真',py:'rèn zhēn',def:'做事不马虎，态度严肃。'},
+    {w:'进步',py:'jìn bù',def:'水平提高，情况改善。'},
+  ],
+};
+
+// ══════════════════════════════════════════
+// 36-DAY SCHEDULE — every day has vocab + activity + recitation + writing
+// actType: 'sentence'|'quiz'|'imitate'|'creative'|'riji'
+// recitation alternates poem/prose freely
+// ══════════════════════════════════════════
+const SCHEDULE = [
+  // ── Phase 1: 初学 (Days 1-13) ──
+  {day:1,title:'绝句·初学',unit:'第一单元',poemId:'p1',vocabKey:'p1_v',actType:'sentence',writingChars:['燕','暖'],harvest:'今天学了杜甫的《绝句》！迟日、花草香、飞燕子——四景合一，描绘了初春最美的画面！',harvestEmoji:'🌸'},
+  // Phase 1 days 2-13
+  {day:2,title:'燕子·初学',unit:'第一单元',proseId:'pt1',vocabKey:'yanzi_v',actType:'match',writingChars:['燕','烂'],harvest:'今天学了《燕子》！三个"一"写外形，蒙松雨、烂漫春——燕子真是春天最灵动的使者！',harvestEmoji:'🐦'},
+  {day:3,title:'惠崇春江晚景·初学',unit:'第一单元',poemId:'p2',vocabKey:'p2_v',actType:'sentence',writingChars:['桃','鸭'],harvest:'今天学了苏轼的《惠崇春江晚景》！"春江水暖鸭先知"——观察仔细才能写出这样的妙句！',harvestEmoji:'🦆'},
+  {day:4,title:'荷花·初学',unit:'第二单元',proseId:'pt2',vocabKey:'hehua_v',actType:'dictation',writingChars:['荷','碧'],harvest:'今天学了《荷花》！三个"有的"写姿态，"活的画"——叶圣陶把荷花写活了！',harvestEmoji:'🌸'},
+  {day:5,title:'三衢道中·初学',unit:'第一单元',poemId:'p3',vocabKey:'p3_v',actType:'sentence',writingChars:['溪','鹂'],harvest:'今天学了曾几的《三衢道中》！梅雨晴天出游，归来还多了黄鹂鸣叫——出游真快乐！',harvestEmoji:'🌿'},
+  {day:6,title:'火烧云·初学',unit:'第二单元',proseId:'pt3',vocabKey:'huoshao_v',actType:'match',writingChars:['烧','霞'],harvest:'今天学了《火烧云》！颜色千变万化，马→狗→狮子——萧红把晚霞写得太生动了！',harvestEmoji:'🌅'},
+  {day:7,title:'忆江南·初学',unit:'第一单元',poemId:'p4',vocabKey:'p4_v',actType:'sentence',writingChars:['江','蓝'],harvest:'今天学了白居易的《忆江南》！"日出江花红胜火，春来江水绿如蓝"——江南美景永难忘！',harvestEmoji:'🌺'},
+  {day:8,title:'滁州西涧·初学',unit:'第二单元',poemId:'p5',vocabKey:'p5_v',actType:'dictation',writingChars:['独','涧'],harvest:'今天学了韦应物的《滁州西涧》！"野渡无人舟自横"——清幽静谧，令人心旷神怡！',harvestEmoji:'🌾'},
+  {day:9,title:'元日·初学',unit:'第三单元',poemId:'p6',vocabKey:'p6_v',actType:'sentence',writingChars:['爆','符'],harvest:'今天学了王安石的《元日》！爆竹、屠苏、春联——古代过春节和我们现在很像！',harvestEmoji:'🎆'},
+  {day:10,title:'清明·初学',unit:'第三单元',poemId:'p7',vocabKey:'p7_v',actType:'match',writingChars:['清','断'],harvest:'今天学了杜牧的《清明》！雨中行人，牧童指路——短短四句，却满是生活气息！',harvestEmoji:'🌧️'},
+  {day:11,title:'九月九日忆山东兄弟·初学',unit:'第三单元',poemId:'p8',vocabKey:'p8_v',actType:'sentence',writingChars:['独','异'],harvest:'今天学了王维的《九月九日忆山东兄弟》！"每逢佳节倍思亲"——千古名句，说出无数游子心声！',harvestEmoji:'🏔️'},
+  {day:12,title:'大林寺桃花·初学',unit:'第四单元',poemId:'p9',vocabKey:'p9_v',actType:'dictation',writingChars:['芳','觅'],harvest:'今天学了白居易的《大林寺桃花》！山下花谢了，山上才盛开——这个意外发现真让人惊喜！',harvestEmoji:'🌸'},
+  {day:13,title:'守株待兔·初学',unit:'第四单元',poemId:'p10',vocabKey:'p10_v',actType:'sentence',writingChars:['耒','释'],harvest:'今天学了《守株待兔》！文言文初体验——走=跑，释=放下，古今字义大不同！',harvestEmoji:'🐰'},
+  // Phase 2: 深化与写作 (Days 14-24)
+  {day:14,title:'绝句·仿写',unit:'第一单元',poemId:'p1',vocabKey:'p1_v',actType:'imitate',actKey:'p1_i',writingChars:['迟','日'],harvest:'今天练习了仿写！参照《绝句》的句式，你也写出了自己的季节诗，太棒了！',harvestEmoji:'✍️'},
+  {day:15,title:'燕子·写作',unit:'第一单元',proseId:'pt1',vocabKey:'yanzi_v',actType:'creative',actKey:'pt1_c',writingChars:['灵','巧'],harvest:'今天写了动物描写！用"一...一...加上..."的句式，描写你喜欢的动物，妙笔生花！',harvestEmoji:'✍️'},
+  {day:16,title:'惠崇春江晚景·复习',unit:'第一单元',poemId:'p2',vocabKey:'p2_v',actType:'sentence',writingChars:['蒌','芦'],harvest:'今天复习了《惠崇春江晚景》！句子练习做得怎么样？"春江水暖鸭先知"背出来了吗？',harvestEmoji:'🦆'},
+  {day:17,title:'荷花·仿写',unit:'第二单元',proseId:'pt2',vocabKey:'hehua_v',actType:'imitate',actKey:'pt2_i',writingChars:['亭','亭'],harvest:'今天练习了"有的...有的...有的..."的排比句式！用它描写你见过的花朵，美极了！',harvestEmoji:'✍️'},
+  {day:18,title:'三衢道中·写话',unit:'第一单元',poemId:'p3',vocabKey:'p3_v',actType:'creative',actKey:'p3_c',writingChars:['梅','溪'],harvest:'今天想象了旅行途中的见闻！把你的旅行感受写出来，就像曾几写这首诗一样！',harvestEmoji:'✍️'},
+  {day:19,title:'火烧云·仿写',unit:'第二单元',proseId:'pt3',vocabKey:'huoshao_v',actType:'imitate',actKey:'pt3_i',writingChars:['彩','霞'],harvest:'今天学了颜色描写和变化描写！像萧红一样，把大自然的美妙色彩写下来！',harvestEmoji:'✍️'},
+  {day:20,title:'忆江南·日积月累',unit:'第一单元',poemId:'p4',vocabKey:'p4_v',actType:'riji',rijiKey:'riji2',writingChars:['谙','忆'],harvest:'今天积累了园地二的好词好句！词语积累是写作的基础，记住了就是你的财富！',harvestEmoji:'📚'},
+  {day:21,title:'元日·写话',unit:'第三单元',poemId:'p6',vocabKey:'p6_v',actType:'creative',actKey:'p6_c',writingChars:['岁','除'],harvest:'今天想象了穿越古代过年！把你的感受写出来，比王安石的诗还要丰富！',harvestEmoji:'✍️'},
+  {day:22,title:'清明·仿写',unit:'第三单元',poemId:'p7',vocabKey:'p7_v',actType:'imitate',actKey:'p7_i',writingChars:['行','人'],harvest:'今天仿写了节日诗！用"___时节___，路上行人___"的句式，描写你熟悉的节日！',harvestEmoji:'✍️'},
+  {day:23,title:'九月九日·思念写话',unit:'第三单元',poemId:'p8',vocabKey:'p8_v',actType:'creative',actKey:'p8_c',writingChars:['登','高'],harvest:'今天写了思念的信！当你在外地想念家人，你会写什么？真情流露就是最好的文章！',harvestEmoji:'✍️'},
+  {day:24,title:'大林寺桃花·日积月累',unit:'第四单元',poemId:'p9',vocabKey:'p9_v',actType:'riji',rijiKey:'riji4',writingChars:['芬','芳'],harvest:'今天积累了园地四的好词！多积累，多运用，词汇越来越丰富！',harvestEmoji:'📚'},
+  // Phase 3: 综合复习 (Days 25-36)
+  {day:25,title:'守株待兔·改写',unit:'第四单元',poemId:'p10',vocabKey:'p10_v',actType:'creative',actKey:'p10_c',writingChars:['株','兔'],harvest:'今天把文言文改写成现代故事！用自己的话讲故事，既懂古文又能表达，厉害！',harvestEmoji:'✍️'},
+  {day:26,title:'燕子·仿写',unit:'第一单元',proseId:'pt1',vocabKey:'yanzi_v',actType:'imitate',actKey:'pt1_i',writingChars:['翩','飞'],harvest:'今天仿写了燕子外形描写！用三个"一"描写小动物，结构清晰，描写生动！',harvestEmoji:'✍️'},
+  {day:27,title:'荷花·综合复习',unit:'第二单元',proseId:'pt2',vocabKey:'hehua_v',actType:'match',writingChars:['荷','香'],harvest:'今天综合复习了《荷花》！测验做完了吗？"活的画"——叶圣陶的比喻太妙了！',harvestEmoji:'🌸'},
+  {day:28,title:'火烧云·形状写话',unit:'第二单元',proseId:'pt3',vocabKey:'huoshao_v',actType:'creative',actKey:'pt3_c',writingChars:['变','幻'],harvest:'今天写了火烧云形状想象！你看到了什么动物的形状？把它变化消失写出来！',harvestEmoji:'✍️'},
+  {day:29,title:'春天古诗·日积月累',unit:'综合复习',poemId:'p1',vocabKey:'p1_v',actType:'riji',rijiKey:'riji6',writingChars:['春','暖'],harvest:'今天积累了园地六的语文知识！今天背的是《绝句》，看看你还记得多少！',harvestEmoji:'📚'},
+  {day:30,title:'忆江南·综合复习',unit:'综合复习',poemId:'p4',vocabKey:'p4_v',actType:'quiz',writingChars:['江','南'],harvest:'今天综合复习了《忆江南》！测验通过了吗？"能不忆江南"——一背就想起那美丽画面！',harvestEmoji:'🌺'},
+  {day:31,title:'清明·日积月累',unit:'综合复习',poemId:'p7',vocabKey:'p7_v',actType:'riji',rijiKey:'riji8',writingChars:['节','日'],harvest:'今天积累了园地八的词语！日积月累打下扎实语文基础，继续加油！',harvestEmoji:'📚'},
+  {day:32,title:'九月九日·综合复习',unit:'综合复习',poemId:'p8',vocabKey:'p8_v',actType:'quiz',writingChars:['思','乡'],harvest:'今天综合复习了《九月九日忆山东兄弟》！测验全对了吗？每逢佳节都要想起这首诗！',harvestEmoji:'🏔️'},
+  {day:33,title:'守株待兔·综合复习',unit:'综合复习',poemId:'p10',vocabKey:'p10_v',actType:'quiz',writingChars:['文','言'],harvest:'今天综合复习了《守株待兔》！文言文全背下来了吗？"守株待兔"这个成语就出自这里！',harvestEmoji:'🐰'},
+  {day:34,title:'燕子·冲刺复习',unit:'综合复习',proseId:'pt1',vocabKey:'yanzi_v',actType:'sentence',writingChars:['乌','剪'],harvest:'今天冲刺复习了《燕子》！句子填空顺利吗？背诵挑战怎么样？第1-2段要流利背出！',harvestEmoji:'🐦'},
+  {day:35,title:'荷花·写作升华',unit:'综合复习',proseId:'pt2',vocabKey:'hehua_v',actType:'imitate',actKey:'pt2_i2',writingChars:['莲','蓬'],harvest:'今天再次仿写了荷花！第三遍了，写得比第一次更好了吗？进步看得见！',harvestEmoji:'✍️'},
+  {day:36,title:'暑期结业·总挑战',unit:'暑期结业',poemId:'p10',vocabKey:'review',actType:'quiz',writingChars:['加','油'],harvest:'🎊 恭喜你完成了36天的暑期复习！古诗10首、课文3篇、仿写创作、日积月累——全都搞定！升入四年级，你已经准备好了！加油！',harvestEmoji:'🏆'},
+];
+
+// ══════════════════════════════════════════
+// STATE & PERSISTENCE
+// ══════════════════════════════════════════
+function getStartDate(){
+  const saved=localStorage.getItem('sr_start_date');
+  return saved?new Date(saved):new Date('2026-07-01');
+}
+let START_DATE=getStartDate();
+
+function getProgress(){
+  try{return JSON.parse(localStorage.getItem('sr_progress')||'{}')}catch{return{}}
+}
+function saveProgress(p){localStorage.setItem('sr_progress',JSON.stringify(p))}
+
+function getDaysSinceStart(){
+  const now=new Date();
+  const diff=Math.floor((now-START_DATE)/(1000*60*60*24));
+  return Math.max(0,diff);
+}
+
+function getTodayDayNum(){
+  return Math.min(getDaysSinceStart()+1,36);
+}
+
+// ══════════════════════════════════════════
+// HOME SCREEN
+// ══════════════════════════════════════════
+function renderHome(){
+  const progress=getProgress();
+  const today=getTodayDayNum();
+  const doneDays=Object.keys(progress).filter(k=>progress[k].done).length;
+  const poemsDone=Object.keys(progress).filter(k=>progress[k].poemDone).length;
+  const totalStars=Object.values(progress).reduce((s,v)=>s+(v.stars||0),0);
+
+  document.getElementById('stat-days').textContent=doneDays;
+  document.getElementById('stat-stars').textContent=totalStars;
+  document.getElementById('stat-poems').textContent=poemsDone;
+
+  const pct=Math.round((doneDays/36)*100);
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-label').textContent=
+    doneDays===0?'尚未开始':doneDays===36?'全部完成！🎉':`已完成 ${pct}%，还有 ${36-doneDays} 天`;
+
+  // greeting
+  const greetEl=document.getElementById('home-greeting');
+  if(doneDays===0) greetEl.textContent='从今天开始，每天20分钟，快乐复习！';
+  else if(doneDays===36) greetEl.textContent='🎊 全部36天完成！你真的太棒了！';
+  else greetEl.textContent=`已坚持${doneDays}天，继续加油！第${today}天等你来打卡`;
+
+  // calendar
+  const grid=document.getElementById('calendar-grid');
+  // remove old cells (keep 7 headers)
+  while(grid.children.length>7) grid.removeChild(grid.lastChild);
+
+  // start day of week for July 1 2026 (Wednesday=3, 0=Monday in our grid)
+  const startDow=(START_DATE.getDay()+6)%7; // Mon=0..Sun=6
+  for(let i=0;i<startDow;i++){
+    const blank=document.createElement('div');
+    grid.appendChild(blank);
+  }
+
+  for(let d=1;d<=36;d++){
+    const sched=SCHEDULE[d-1];
+    const cell=document.createElement('div');
+    cell.className='day-cell';
+    const done=progress[d]&&progress[d].done;
+    const isPoemDay=!!sched.poemId;
+    const isToday=d===today;
+    const isLocked=d>today;
+
+    if(done){
+      cell.classList.add('done');
+    } else if(isToday){
+      cell.classList.add('today');
+    } else if(isLocked){
+      cell.classList.add('locked');
+    } else if(isPoemDay){
+      cell.classList.add('poem-day');
+    }
+
+    const stars=progress[d]&&progress[d].stars||0;
+    cell.innerHTML=`
+      <span class="day-num">${d}</span>
+      <span class="day-icon">${isPoemDay?'诗':'文'}</span>
+      ${stars>0?`<span class="day-star">${'⭐'.repeat(stars)}</span>`:''}
+    `;
+
+    if(!isLocked){
+      cell.onclick=()=>openLesson(d);
+    }
+    grid.appendChild(cell);
+  }
+}
+
+// ══════════════════════════════════════════
+// LESSON FLOW
+// ══════════════════════════════════════════
+let currentDay=null;
+let currentSteps=[];
+let currentStepIdx=0;
+let currentPoem=null;
+let poemStepIdx=0;
+let quizAnswered=[];
+let recognition=null;
+let drawing=false;
+let canvasCtx=null;
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function goHome(){
+  if(recognition){try{recognition.stop()}catch{}}
+  showScreen('home');
+  renderHome();
+}
+
+function openLesson(dayNum){
+  currentDay=dayNum;
+  const sched=SCHEDULE[dayNum-1];
+  currentStepIdx=0;
+  poemStepIdx=0;
+  quizAnswered=[];
+
+  document.getElementById('lesson-title').textContent=sched.title;
+  document.getElementById('lesson-day-badge').textContent='第'+dayNum+'天';
+
+  // Every day: intro → vocab → activity → recite → writing → harvest
+  currentSteps=[];
+  currentSteps.push({type:'intro', sched});
+
+  // Step 2: vocab for today's poem/prose
+  if(sched.vocabKey && VOCAB_SETS[sched.vocabKey]){
+    currentSteps.push({type:'vocab', vocabKey:sched.vocabKey});
+  }
+
+  // Step 3: rotating activity
+  const at=sched.actType;
+  if(at==='sentence'){
+    const key=sched.poemId||sched.proseId;
+    currentSteps.push({type:'sentence', sentKey:key});
+  } else if(at==='quiz'){
+    currentSteps.push({type:'quiz', sched});
+  } else if(at==='match'){
+    currentSteps.push({type:'match', vocabKey:sched.vocabKey});
+  } else if(at==='dictation'){
+    currentSteps.push({type:'dictation', vocabKey:sched.vocabKey});
+  } else if(at==='imitate'||at==='creative'){
+    currentSteps.push({type:'writingPrompt', promptKey:sched.actKey, promptType:at});
+  } else if(at==='riji'){
+    currentSteps.push({type:'riji', rijiKey:sched.rijiKey});
+  }
+
+  // Step 4: recitation (poem or prose, alternates by schedule)
+  if(sched.poemId){
+    currentSteps.push({type:'poem', poem:POEMS.find(p=>p.id===sched.poemId)});
+  } else if(sched.proseId){
+    currentSteps.push({type:'prose', prose:PROSE_TEXTS.find(p=>p.id===sched.proseId)});
+  }
+
+  // Step 5: writing (田字格)
+  currentSteps.push({type:'writing', chars:sched.writingChars});
+
+  // Step 6: harvest
+  currentSteps.push({type:'harvest', sched});
+
+  renderStepDots();
+  renderStep(0);
+  showScreen('lesson');
+}
+
+function renderStepDots(){
+  const dots=document.getElementById('step-dots');
+  dots.innerHTML='';
+  currentSteps.forEach((_,i)=>{
+    const d=document.createElement('div');
+    d.className='step-dot'+(i===0?' active':'');
+    dots.appendChild(d);
+  });
+}
+
+function updateDots(){
+  const dots=document.querySelectorAll('.step-dot');
+  dots.forEach((d,i)=>{
+    d.className='step-dot'+(i<currentStepIdx?' done':i===currentStepIdx?' active':'');
+  });
+}
+
+function renderStep(idx){
+  currentStepIdx=idx;
+  updateDots();
+  const step=currentSteps[idx];
+  const body=document.getElementById('lesson-body');
+  body.innerHTML='';
+
+  const prevBtn=document.getElementById('btn-prev');
+  const nextBtn=document.getElementById('btn-next');
+  prevBtn.style.display=idx>0?'inline-flex':'none';
+  // reset handlers (poem/prose steps override them, restore here)
+  nextBtn.onclick=nextStep;
+  prevBtn.onclick=prevStep;
+
+  if(step.type==='intro') renderIntroStep(body,step.sched);
+  else if(step.type==='vocab') renderVocabStep(body,step.vocabKey,'词语闯关');
+  else if(step.type==='sentence') renderSentenceStep(body,step.sentKey);
+  else if(step.type==='quiz') renderQuizStep(body,step.sched);
+  else if(step.type==='match') renderMatchStep(body,step.vocabKey);
+  else if(step.type==='dictation') renderDictationStep(body,step.vocabKey);
+  else if(step.type==='writingPrompt') renderWritingPromptStep(body,step.promptKey,step.promptType);
+  else if(step.type==='riji') renderVocabStep(body,step.rijiKey,'日积月累');
+  else if(step.type==='poem') renderPoemStep(body,step.poem);
+  else if(step.type==='prose') renderProseStep(body,step.prose);
+  else if(step.type==='writing') renderWritingStep(body,step.chars);
+  else if(step.type==='harvest') renderHarvestStep(body,step.sched);
+
+  const isLast=idx===currentSteps.length-1;
+  nextBtn.textContent=isLast?'完成今天 🎉':'继续 →';
+  nextBtn.className=isLast?'btn btn-green btn-full':'btn btn-amber btn-full';
+  body.scrollTop=0;
+}
+
+function prevStep(){
+  if(currentStepIdx>0) renderStep(currentStepIdx-1);
+}
+
+function nextStep(){
+  if(currentStepIdx===currentSteps.length-1){
+    finishDay();
+  } else {
+    renderStep(currentStepIdx+1);
+  }
+}
+
+function finishDay(){
+  const progress=getProgress();
+  const sched=SCHEDULE[currentDay-1];
+  if(!progress[currentDay]) progress[currentDay]={};
+  progress[currentDay].done=true;
+  progress[currentDay].stars=3;
+  progress[currentDay].poemDone=true;
+  saveProgress(progress);
+  launchConfetti();
+  setTimeout(()=>{goHome();},2000);
+}
+
+// ══════════════════════════════════════════
+// STEP RENDERERS
+// ══════════════════════════════════════════
+function renderIntroStep(body,sched){
+  const poem=sched.poemId?POEMS.find(p=>p.id===sched.poemId):null;
+  const prose=sched.proseId?PROSE_TEXTS.find(p=>p.id===sched.proseId):null;
+  const actLabels={
+    sentence:'句子填空 · 巩固记忆',
+    quiz:'小测验 · 检验学习',
+    match:'词义连连看 · 互动游戏',
+    dictation:'听写挑战 · 听音写词',
+    imitate:'仿写练习 · 创意写作',
+    creative:'想象写话 · 自由表达',
+    riji:'日积月累 · 积累词语',
+  };
+  body.innerHTML=`
+    <div class="step-label">今日任务</div>
+    <div class="step-heading">${sched.title}</div>
+    <div class="info-box">
+      <h3>${sched.unit}</h3>
+      <p>今天的内容：字词 → ${actLabels[sched.actType]||'练习'} → 背诵 → 写字</p>
+    </div>
+    <div class="intro-strips">
+      <div class="intro-strip intro-strip-cin">
+        <div class="intro-glyph">词</div>
+        <div><div class="intro-strip-title">词语闯关</div><div class="intro-strip-sub">${sched.vocabKey&&VOCAB_SETS[sched.vocabKey]?VOCAB_SETS[sched.vocabKey].length+' 个词语 · 翻牌记忆':'积累词语'}</div></div>
+      </div>
+      <div class="intro-strip intro-strip-azure">
+        <div class="intro-glyph">${{sentence:'填',quiz:'测',match:'连',dictation:'听',imitate:'仿',creative:'思',riji:'积'}[sched.actType]||'练'}</div>
+        <div><div class="intro-strip-title">${actLabels[sched.actType]||'练习'}</div><div class="intro-strip-sub">${sched.actType==='imitate'?'仿照例句，写出你的句子':sched.actType==='creative'?'发挥想象，自由表达':sched.actType==='dictation'?'听音辨字，写准确':sched.actType==='match'?'词语与意思配对':'读懂每句，填对每词'}</div></div>
+      </div>
+      ${poem?`
+        <div class="intro-strip intro-strip-jade">
+          <div class="intro-glyph">诵</div>
+          <div><div class="intro-strip-title">${poem.title} · ${poem.author}</div><div class="intro-strip-sub">读诗 → 注释 → 理解 → 填空 → 背诵</div></div>
+        </div>
+      `:''}
+      ${prose?`
+        <div class="intro-strip intro-strip-jade">
+          <div class="intro-glyph">背</div>
+          <div><div class="intro-strip-title">《${prose.title}》${prose.section}</div><div class="intro-strip-sub">读课文 → 理解 → 背诵挑战</div></div>
+        </div>
+      `:''}
+      <div class="intro-strip intro-strip-gold">
+        <div class="intro-glyph">字</div>
+        <div><div class="intro-strip-title">写字练习</div><div class="intro-strip-sub">田字格练写：${sched.writingChars.join('、')}</div></div>
+      </div>
+    </div>
+    <div class="fade-guide">准备好了吗？点击"继续"开始！</div>
+  `;
+}
+
+function renderVocabStep(body,vocabKey,label='词语闯关'){
+  const words=VOCAB_SETS[vocabKey]||[];
+  body.innerHTML=`
+    <div class="step-label">${label}</div>
+    <div class="step-heading">点击卡片，查看意思</div>
+    <div class="vocab-list">
+      ${words.map((v,i)=>`
+        <div class="vocab-card" onclick="this.classList.toggle('flipped')">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div class="vocab-pinyin">${v.py}</div>
+              <div class="vocab-word">${v.w}</div>
+            </div>
+            <button class="tts-seal" onclick="event.stopPropagation();speakWord('${v.w}',this)">声</button>
+          </div>
+          <div class="vocab-def">💡 ${v.def}</div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="fade-guide">全部看完了吗？点击"继续"继续！</div>
+  `;
+}
+
+function renderPoemStep(body,poem){
+  currentPoem=poem;
+  poemStepIdx=0;
+  body.innerHTML=`
+    <div class="step-label">古诗学习</div>
+    <div class="step-heading">${poem.title} · ${poem.author}</div>
+    <div class="poem-sub-dots" id="poem-sub-dots">
+      ${['读诗','注释','诗意','鉴赏','填空','背诵'].map((_,i)=>`<div class="poem-sub-dot${i===0?' active':''}"></div>`).join('')}
+    </div>
+    <div id="poem-step-container"></div>
+  `;
+  document.getElementById('btn-next').onclick=nextPoemStep;
+  document.getElementById('btn-prev').onclick=prevPoemOrStep;
+  renderPoemSubStep(0);
+}
+
+function prevPoemOrStep(){
+  if(poemStepIdx>0){
+    poemStepIdx--;
+    renderPoemSubStep(poemStepIdx);
+  } else {
+    prevStep();
+    document.getElementById('btn-next').onclick=nextStep;
+    document.getElementById('btn-prev').onclick=prevStep;
+  }
+}
+
+function nextPoemStep(){
+  if(poemStepIdx<5){
+    poemStepIdx++;
+    renderPoemSubStep(poemStepIdx);
+  } else {
+    // done with poem, go to next main step
+    document.getElementById('btn-next').onclick=nextStep;
+    document.getElementById('btn-prev').onclick=prevStep;
+    nextStep();
+  }
+}
+
+function renderPoemSubStep(si){
+  poemStepIdx=si;
+  const dots=document.querySelectorAll('.poem-sub-dot');
+  dots.forEach((d,i)=>{
+    d.className='poem-sub-dot'+(i<si?' done':i===si?' active':'');
+  });
+  const container=document.getElementById('poem-step-container');
+  const p=currentPoem;
+
+  const prevBtn=document.getElementById('btn-prev');
+  prevBtn.style.display='inline-flex';
+
+  if(si===0){
+    container.innerHTML=`
+      <div class="poem-scroll">
+        <div class="scroll-rod top"></div>
+        <div class="scroll-body">
+          <div class="scroll-title">
+            <span class="scroll-name">${p.title}</span>
+            <span class="scroll-author">${p.dynasty} · ${p.author}</span>
+          </div>
+          <div class="scroll-lines">
+            ${p.lines.map(l=>`<div class="scroll-line">${l}</div>`).join('')}
+          </div>
+        </div>
+        <div class="scroll-rod bot"></div>
+      </div>
+      <div class="tts-bar">
+        <button class="tts-btn" id="poem-tts-btn" onclick="ttsToggle(this,'${p.fullText}',0.8)">🔊 朗读全诗</button>
+        <button class="tts-btn" onclick="speak('${p.title}，${p.author}，${p.fullText}',0.75)">🔊 带标题朗读</button>
+      </div>
+      <div class="info-box">
+        <h3>${p.emoji} ${p.tag} · 朗读提示</h3>
+        <p>先大声朗读三遍，感受节奏与韵律。注意每句停顿：两字一顿或三字一顿。</p>
+      </div>
+      <div class="fade-guide">读完三遍了吗？点"继续"学习注释</div>
+    `;
+  } else if(si===1){
+    container.innerHTML=`
+      <div class="step-label">字词注释</div>
+      <div class="notes-list">
+        ${p.notes.map(n=>`
+          <div class="note-item"><span class="note-term">${n.term}：</span>${n.def}</div>
+        `).join('')}
+      </div>
+      <div class="fade-guide">注释看完了吗？点"继续"看诗意</div>
+    `;
+  } else if(si===2){
+    container.innerHTML=`
+      <div class="step-label">诗意理解</div>
+      <div class="poem-scroll" style="margin-bottom:12px">
+        <div class="scroll-rod top"></div>
+        <div class="scroll-body">
+          <div class="scroll-title">
+            <span class="scroll-name" style="font-size:1rem">📖 诗意</span>
+            <span class="scroll-author">${p.title} · ${p.author}</span>
+          </div>
+          <div class="scroll-meaning">${p.meaning}</div>
+        </div>
+        <div class="scroll-rod bot"></div>
+      </div>
+      <div class="fade-guide">理解了吗？点"继续"学习赏析</div>
+    `;
+  } else if(si===3){
+    container.innerHTML=`
+      <div class="step-label">诗歌赏析</div>
+      <div class="appreciation-box">
+        <div class="appr-head">赏析</div>
+        ${p.appreciation}
+      </div>
+      <div class="info-box">
+        <h3>记忆要点</h3>
+        <p>这首诗写了什么景？表达了什么情感？找出 1–2 句名句，默记在心。</p>
+      </div>
+      <div class="fade-guide">记住了吗？点"继续"进行填空练习</div>
+    `;
+  } else if(si===4){
+    container.innerHTML=`
+      <div class="step-label">填空练习</div>
+      <div id="blanks-container">
+        ${p.blanks.map((b,i)=>`
+          <div class="blank-question">
+            <div class="blank-q-text">${b.before}<strong style="color:var(--cinnabar)">${b.blank}</strong>${b.after}</div>
+            <input class="blank-input" id="blank-${i}" placeholder="填写缺少的字词"
+              oninput="checkBlank(${i},'${b.answer.replace(/'/g,"\\'")}')" autocomplete="off" autocorrect="off" spellcheck="false">
+            <div class="blank-ans" id="blank-ans-${i}"></div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="fade-guide">全部填完后点"继续"挑战背诵！</div>
+    `;
+  } else if(si===5){
+    const isClassical = p.type==='classical';
+    container.innerHTML=`
+      <div class="step-label">背诵检测</div>
+      <div id="recite-phase1">
+        <div class="poem-scroll" style="margin-bottom:10px">
+          <div class="scroll-rod top"></div>
+          <div class="scroll-body">
+            <div class="scroll-title">
+              <span class="scroll-name" style="font-size:1rem">📖 ${p.title}</span>
+              <span class="scroll-author">${p.dynasty} · ${p.author}</span>
+            </div>
+            <div class="scroll-lines">
+              ${p.lines.map(l=>`<div class="scroll-line${isClassical?' classical':''}">${l}</div>`).join('')}
+            </div>
+          </div>
+          <div class="scroll-rod bot"></div>
+        </div>
+        <div class="fade-guide">背熟了吗？点下面按钮，遮住诗文开始背诵挑战！</div>
+        <button class="btn btn-red btn-full" style="margin-top:8px" onclick="startRecitePhase2()">我背好了，遮住开始背 🎤</button>
+      </div>
+      <div id="recite-phase2">
+        <div class="recite-display">
+          <div class="recite-poem" id="recite-poem-text" style="filter:blur(6px);user-select:none;transition:filter .3s">${p.lines.join('<br>')}</div>
+          <div class="recite-status" id="recite-status">点击麦克风，大声背诵！</div>
+        </div>
+        <div style="text-align:center">
+          <button class="recite-btn" id="recite-btn" onclick="toggleRecite()">🎤</button>
+          <div class="recite-result" id="recite-result"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn btn-ghost" style="flex:1" onclick="peekPoem()">👁 偷看一眼</button>
+          <button class="btn btn-ghost" style="flex:1" onclick="skipRecite()">跳过 →</button>
+        </div>
+      </div>
+    `;
+  }
+  document.getElementById('lesson-body').scrollTop=0;
+}
+
+function checkBlank(i,answer){
+  const inp=document.getElementById('blank-'+i);
+  const ansEl=document.getElementById('blank-ans-'+i);
+  const val=inp.value.trim();
+  if(!val) return;
+  if(val===answer){
+    inp.className='blank-input ok';
+    ansEl.innerHTML='<span style="color:var(--accent2)">✓ 正确！</span>';
+    ansEl.className='blank-ans show';
+  } else if(val.length>=answer.length){
+    inp.className='blank-input bad';
+    ansEl.innerHTML=`<span style="color:var(--red)">✗ 正确答案：<strong>${answer}</strong></span>`;
+    ansEl.className='blank-ans show';
+  }
+}
+
+function toggleRecite(){
+  const btn=document.getElementById('recite-btn');
+  const status=document.getElementById('recite-status');
+  const result=document.getElementById('recite-result');
+
+  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){
+    result.className='recite-result show fail';
+    result.textContent='您的浏览器不支持语音识别，请尝试Chrome浏览器。可以手动默背或跳过。';
+    return;
+  }
+
+  if(recognition){
+    try{recognition.stop()}catch{}
+    recognition=null;
+    btn.classList.remove('listening');
+    btn.textContent='🎤';
+    status.textContent='已停止，点击再次尝试';
+    return;
+  }
+
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  recognition=new SR();
+  recognition.lang='zh-CN';
+  recognition.continuous=false;
+  recognition.interimResults=false;
+
+  btn.classList.add('listening');
+  btn.textContent='⏹';
+  status.textContent='🔴 正在听...请大声背诵古诗';
+  result.className='recite-result';
+
+  recognition.onresult=function(e){
+    const transcript=e.results[0][0].transcript.replace(/[，。！？\s]/g,'');
+    const expected=currentPoem.fullText.replace(/[，。！？\s]/g,'');
+    const hit=computeSimilarity(transcript,expected);
+    result.className='recite-result show '+(hit>=0.7?'pass':'fail');
+    if(hit>=0.7){
+      result.innerHTML=`✓ 太棒了！识别到：${transcript}<br>相似度：${Math.round(hit*100)}%，背诵成功！`;
+    } else {
+      result.innerHTML=`识别到：${transcript||'（未识别到）'}<br>相似度：${Math.round(hit*100)}%，再背一遍吧！`;
+    }
+    btn.classList.remove('listening');
+    btn.textContent='🎤';
+    status.textContent='点击再试，或点"继续"完成';
+    recognition=null;
+  };
+  recognition.onerror=function(){
+    btn.classList.remove('listening');
+    btn.textContent='🎤';
+    status.textContent='识别出错，请重试';
+    recognition=null;
+  };
+  recognition.onend=function(){
+    btn.classList.remove('listening');
+    btn.textContent='🎤';
+    recognition=null;
+  };
+  recognition.start();
+}
+
+function skipRecite(){
+  nextPoemStep();
+}
+
+function startRecitePhase2(){
+  document.getElementById('recite-phase1').style.display='none';
+  document.getElementById('recite-phase2').style.display='block';
+}
+
+function peekPoem(){
+  const el=document.getElementById('recite-poem-text');
+  if(!el) return;
+  el.style.filter=el.style.filter?'':'blur(6px)';
+}
+
+// ── PROSE STEP ──
+let currentProse=null;
+let proseStepIdx=0;
+
+function renderProseStep(body,prose){
+  currentProse=prose;
+  proseStepIdx=0;
+  body.innerHTML=`
+    <div class="step-label">课文背诵</div>
+    <div class="step-heading">${prose.emoji} 《${prose.title}》${prose.section}</div>
+    <div class="poem-sub-dots" id="poem-sub-dots">
+      ${['读课文','理解要点','背诵挑战'].map((_,i)=>`<div class="poem-sub-dot${i===0?' active':''}"></div>`).join('')}
+    </div>
+    <div id="poem-step-container"></div>
+  `;
+  document.getElementById('btn-next').onclick=nextProseStep;
+  document.getElementById('btn-prev').onclick=prevProseOrStep;
+  renderProseSubStep(0);
+}
+
+function prevProseOrStep(){
+  if(proseStepIdx>0){
+    proseStepIdx--;
+    renderProseSubStep(proseStepIdx);
+  } else {
+    prevStep();
+    document.getElementById('btn-next').onclick=nextStep;
+    document.getElementById('btn-prev').onclick=prevStep;
+  }
+}
+
+function nextProseStep(){
+  if(proseStepIdx<2){
+    proseStepIdx++;
+    renderProseSubStep(proseStepIdx);
+  } else {
+    document.getElementById('btn-next').onclick=nextStep;
+    document.getElementById('btn-prev').onclick=prevStep;
+    nextStep();
+  }
+}
+
+function renderProseSubStep(si){
+  proseStepIdx=si;
+  const dots=document.querySelectorAll('.poem-sub-dot');
+  dots.forEach((d,i)=>{d.className='poem-sub-dot'+(i<si?' done':i===si?' active':'')});
+  const container=document.getElementById('poem-step-container');
+  const pt=currentProse;
+  document.getElementById('btn-prev').style.display='inline-flex';
+
+  if(si===0){
+    container.innerHTML=`
+      <div class="tts-bar">
+        <button class="tts-btn" onclick="ttsToggle(this,\`${pt.fullText}\`,0.82)">🔊 朗读课文</button>
+      </div>
+      <div class="prose-text">${pt.fullText}</div>
+      <div class="info-box">
+        <h3>${pt.emoji} 朗读提示</h3>
+        <p>先大声朗读两遍，注意句子节奏和停顿。感受文章的意境。</p>
+      </div>
+      <div class="fade-guide">读完两遍了吗？点"继续"学习理解要点</div>
+    `;
+  } else if(si===1){
+    container.innerHTML=`
+      <div class="step-label">理解要点</div>
+      <div class="prose-tip">${pt.tip.replace(/\n/g,'<br>')}</div>
+      <div class="prose-text">${pt.fullText}</div>
+      <div class="fade-guide">记住要点了吗？点"继续"开始背诵挑战！</div>
+    `;
+  } else if(si===2){
+    container.innerHTML=`
+      <div class="step-label">背诵检测</div>
+      <div id="recite-phase1">
+        <div class="prose-text" style="max-height:200px;overflow:auto">${pt.fullText}</div>
+        <div class="fade-guide">看熟了吗？点下面按钮，遮住课文，大声背诵！</div>
+        <button class="btn btn-red btn-full" style="margin-top:8px" onclick="startProsePhase2()">我背好了，遮住开始背 🎤</button>
+      </div>
+      <div id="recite-phase2">
+        <div class="recite-display">
+          <div class="recite-poem" id="recite-poem-text" style="filter:blur(6px);user-select:none;transition:filter .3s;font-size:.88rem;line-height:2;text-align:left">${pt.fullText.replace(/\n/g,'<br>')}</div>
+          <div class="recite-status" id="recite-status">点击麦克风，大声背诵课文！</div>
+        </div>
+        <div style="text-align:center">
+          <button class="recite-btn" id="recite-btn" onclick="toggleProseRecite()">🎤</button>
+          <div class="recite-result" id="recite-result"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn btn-ghost" style="flex:1" onclick="peekPoem()">👁 偷看一眼</button>
+          <button class="btn btn-ghost" style="flex:1" onclick="nextProseStep()">跳过 →</button>
+        </div>
+      </div>
+    `;
+  }
+  document.getElementById('lesson-body').scrollTop=0;
+}
+
+function startProsePhase2(){
+  document.getElementById('recite-phase1').style.display='none';
+  document.getElementById('recite-phase2').style.display='block';
+}
+
+function toggleProseRecite(){
+  const btn=document.getElementById('recite-btn');
+  const status=document.getElementById('recite-status');
+  const result=document.getElementById('recite-result');
+
+  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){
+    result.className='recite-result show fail';
+    result.textContent='您的浏览器不支持语音识别，请尝试Chrome浏览器。可以手动默背或跳过。';
+    return;
+  }
+  if(recognition){
+    try{recognition.stop()}catch{}
+    recognition=null;
+    btn.classList.remove('listening');
+    btn.textContent='🎤';
+    status.textContent='已停止，点击再次尝试';
+    return;
+  }
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  recognition=new SR();
+  recognition.lang='zh-CN';
+  recognition.continuous=false;
+  recognition.interimResults=false;
+  btn.classList.add('listening');
+  btn.textContent='⏹';
+  status.textContent='🔴 正在听...请大声背诵课文';
+  result.className='recite-result';
+
+  recognition.onresult=function(e){
+    const transcript=e.results[0][0].transcript.replace(/[，。！？、\s]/g,'');
+    const expected=currentProse.fullText.replace(/[，。！？、\s\n]/g,'');
+    const hit=computeSimilarity(transcript,expected);
+    result.className='recite-result show '+(hit>=0.5?'pass':'fail');
+    if(hit>=0.5){
+      result.innerHTML=`✓ 太棒了！识别到：${transcript.slice(0,30)}…<br>相似度：${Math.round(hit*100)}%，背诵成功！`;
+    } else {
+      result.innerHTML=`识别到：${transcript.slice(0,30)||'（未识别到）'}…<br>相似度：${Math.round(hit*100)}%，再背一遍吧！`;
+    }
+    btn.classList.remove('listening');
+    btn.textContent='🎤';
+    status.textContent='点击再试，或点"继续"完成';
+    recognition=null;
+  };
+  recognition.onerror=function(){
+    btn.classList.remove('listening');
+    btn.textContent='🎤';
+    status.textContent='识别出错，请重试';
+    recognition=null;
+  };
+  recognition.onend=function(){
+    btn.classList.remove('listening');
+    btn.textContent='🎤';
+    recognition=null;
+  };
+  recognition.start();
+}
+
+function computeSimilarity(a,b){
+  if(!a||!b) return 0;
+  let match=0;
+  const shorter=a.length<b.length?a:b;
+  const longer=a.length<b.length?b:a;
+  for(let c of shorter){
+    if(longer.includes(c)) match++;
+  }
+  return match/Math.max(a.length,b.length);
+}
+
+// ── WRITING STEP ──
+function renderWritingStep(body,chars){
+  body.innerHTML=`
+    <div class="step-label">写字练习</div>
+    <div class="step-heading">在田字格里写一写</div>
+    <div class="char-to-write">${chars.join(' ')}</div>
+    <div class="char-stroke-order">👆 仔细观察笔顺，认真书写，注意结构</div>
+    <div class="tian-wrap">
+      <div class="tian-row" id="tian-row"></div>
+      <div class="tian-controls">
+        <button class="tian-btn" onclick="clearCanvas()">🗑️ 清除</button>
+        <button class="tian-btn" onclick="changePenSize(-2)">细笔</button>
+        <button class="tian-btn" onclick="changePenSize(2)">粗笔</button>
+      </div>
+    </div>
+    <div class="fade-guide">写完后点"继续"领取今日收获卡！</div>
+  `;
+  setupTianCanvas(chars.length);
+}
+
+let penSize=4;
+let activeCanvas=null;
+
+function setupTianCanvas(count){
+  const row=document.getElementById('tian-row');
+  row.innerHTML='';
+  const size=120;
+  const canvases=[];
+
+  for(let i=0;i<count;i++){
+    const cv=document.createElement('canvas');
+    cv.className='tian-canvas';
+    cv.width=size;cv.height=size;
+    const ctx=cv.getContext('2d');
+    drawTianGrid(ctx,size);
+    canvases.push(cv);
+    row.appendChild(cv);
+
+    // Drawing events
+    let isDrawing=false;
+    let lastX=0,lastY=0;
+
+    function getPos(e){
+      const r=cv.getBoundingClientRect();
+      const scaleX=cv.width/r.width;
+      const scaleY=cv.height/r.height;
+      if(e.touches){
+        return{x:(e.touches[0].clientX-r.left)*scaleX,y:(e.touches[0].clientY-r.top)*scaleY};
+      }
+      return{x:(e.clientX-r.left)*scaleX,y:(e.clientY-r.top)*scaleY};
+    }
+    function startDraw(e){
+      e.preventDefault();
+      isDrawing=true;
+      const p=getPos(e);
+      lastX=p.x;lastY=p.y;
+      activeCanvas=cv;
+    }
+    function draw(e){
+      if(!isDrawing)return;
+      e.preventDefault();
+      const p=getPos(e);
+      ctx.strokeStyle='#1e293b';
+      ctx.lineWidth=penSize;
+      ctx.lineCap='round';
+      ctx.lineJoin='round';
+      ctx.beginPath();
+      ctx.moveTo(lastX,lastY);
+      ctx.lineTo(p.x,p.y);
+      ctx.stroke();
+      lastX=p.x;lastY=p.y;
+    }
+    function stopDraw(){isDrawing=false;}
+    cv.addEventListener('mousedown',startDraw);
+    cv.addEventListener('mousemove',draw);
+    cv.addEventListener('mouseup',stopDraw);
+    cv.addEventListener('mouseleave',stopDraw);
+    cv.addEventListener('touchstart',startDraw,{passive:false});
+    cv.addEventListener('touchmove',draw,{passive:false});
+    cv.addEventListener('touchend',stopDraw);
+    cv.addEventListener('touchcancel',stopDraw);
+  }
+
+  // store refs
+  window._tiCanvases=canvases;
+}
+
+function drawTianGrid(ctx,size){
+  ctx.clearRect(0,0,size,size);
+  ctx.strokeStyle='#d1d5db';
+  ctx.lineWidth=1;
+  // outer border
+  ctx.strokeRect(1,1,size-2,size-2);
+  // dashed center lines
+  ctx.setLineDash([4,3]);
+  ctx.beginPath();
+  ctx.moveTo(size/2,0);ctx.lineTo(size/2,size);
+  ctx.moveTo(0,size/2);ctx.lineTo(size,size/2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function clearCanvas(){
+  if(window._tiCanvases){
+    window._tiCanvases.forEach(cv=>{
+      const ctx=cv.getContext('2d');
+      drawTianGrid(ctx,cv.width);
+    });
+  }
+}
+
+function changePenSize(delta){
+  penSize=Math.max(2,Math.min(12,penSize+delta));
+}
+
+// ── QUIZ STEP ──
+let _currentQuestions=[];
+function renderQuizStep(body,sched){
+  _currentQuestions=generateQuestions(sched);
+  quizAnswered=new Array(_currentQuestions.length).fill(null);
+  body.innerHTML=`
+    <div class="step-label">小测验</div>
+    <div class="step-heading">检验一下今天的学习成果！</div>
+    <div id="quiz-container">
+      ${_currentQuestions.map((q,qi)=>renderQuestionHTML(q,qi)).join('')}
+    </div>
+    <div class="quiz-score" id="quiz-score"></div>
+    <button class="btn btn-green btn-full" id="quiz-submit" onclick="submitQuiz()">提交答案 ✓</button>
+  `;
+}
+
+function renderQuestionHTML(q,qi){
+  return`<div class="quiz-question">
+    <div class="quiz-q-text">${qi+1}. ${q.q}</div>
+    <div class="quiz-options">
+      ${q.opts.map((o,oi)=>`<button class="quiz-opt" id="qopt-${qi}-${oi}" onclick="selectOpt(${qi},${oi},${q.opts.length})">${o}</button>`).join('')}
+    </div>
+    <div class="quiz-feedback" id="qfb-${qi}"></div>
+  </div>`;
+}
+
+function selectOpt(qi,oi,total){
+  quizAnswered[qi]=oi;
+  for(let i=0;i<total;i++){
+    const btn=document.getElementById(`qopt-${qi}-${i}`);
+    if(btn) btn.className='quiz-opt'+(i===oi?' selected':'');
+  }
+}
+
+function submitQuiz(){
+  const q=_currentQuestions;
+  if(!q||!q.length)return;
+  let correct=0;
+  q.forEach((qu,qi)=>{
+    const ans=quizAnswered[qi];
+    const fb=document.getElementById('qfb-'+qi);
+    for(let oi=0;oi<qu.opts.length;oi++){
+      const btn=document.getElementById(`qopt-${qi}-${oi}`);
+      if(btn){
+        if(oi===qu.correct) btn.className='quiz-opt correct';
+        else if(oi===ans) btn.className='quiz-opt wrong';
+        else btn.className='quiz-opt';
+        btn.disabled=true;
+      }
+    }
+    if(fb){
+      fb.className='quiz-feedback show '+(ans===qu.correct?'ok':'bad');
+      fb.textContent=ans===qu.correct?'✓ 正确！':'✗ '+qu.explanation;
+    }
+    if(ans===qu.correct) correct++;
+  });
+  const score=document.getElementById('quiz-score');
+  score.className='quiz-score show';
+  score.innerHTML=`你答对了 ${correct}/${q.length} 题 ${correct===q.length?'🎉 全对！太棒了！':correct>=q.length*0.7?'👍 不错哦！':' 多复习几遍吧！'}`;
+  document.getElementById('quiz-submit').style.display='none';
+}
+
+const QUESTION_BANK={
+  p1_v:[
+    {q:'"迟日"在诗中是什么意思？',opts:['太阳落山晚，这里泛指春日','正午的太阳','很慢的太阳','冬天的太阳'],correct:0,explanation:'迟日：春天太阳落山较晚，所以叫"迟日"，这里泛指春日。'},
+    {q:'"泥融飞燕子"中"泥融"是什么意思？',opts:['泥土很多','冻土融化、泥土湿润松软','泥土很黑','泥土干燥'],correct:1,explanation:'泥融：冻土融化，泥土湿润松软，燕子可以衔泥筑巢了。'},
+    {q:'《绝句》描写的是哪个季节？',opts:['秋天','冬天','春天','夏天'],correct:2,explanation:'迟日、花草香、飞燕子、暖沙——都是初春的景象。'},
+  ],
+  p2_v:[
+    {q:'"蒌蒿满地芦芽短"中"芦芽"是什么？',opts:['芦苇的嫩芽','一种花','树的枝芽','草的种子'],correct:0,explanation:'芦芽：芦苇的嫩芽，初春时刚刚冒出地面。'},
+    {q:'《惠崇春江晚景》是谁写的？',opts:['杜甫','白居易','苏轼','王安石'],correct:2,explanation:'这首诗是宋代大文学家苏轼题写在惠崇画作上的题画诗。'},
+    {q:'"春江水暖鸭先知"中"鸭先知"说明了什么？',opts:['鸭子最聪明','春天江水变暖，鸭子最先感受到','鸭子喜欢游泳','春天来了'],correct:1,explanation:'鸭子生活在水中，所以最先感受到春江水温的变化，这是诗人的细心观察和想象。'},
+  ],
+  p3_v:[
+    {q:'"梅子黄时"是什么季节？',opts:['深秋','初夏','严冬','早春'],correct:1,explanation:'梅子变黄是在初夏时节，也叫"黄梅时节"。'},
+    {q:'"小溪泛尽却山行"中"却"是什么意思？',opts:['但是','然后、再','退后','不是'],correct:1,explanation:'却：然后、再。泛舟到溪的尽头，然后再改走山路。'},
+    {q:'"添得黄鹂四五声"写出了什么？',opts:['黄鹂很多','归途更加愉快，以声衬静','春天很热闹','回家了'],correct:1,explanation:'回程多了黄鹂的鸣叫声，以动衬静，写出了诗人游玩的喜悦心情。'},
+  ],
+  p4_v:[
+    {q:'"江南好，风景旧曾谙"中"谙"是什么意思？',opts:['陌生','了解','熟悉','美丽'],correct:2,explanation:'谙：熟悉。白居易曾在江南做官，对那里的风景非常熟悉。'},
+    {q:'"日出江花红胜火"运用了什么修辞？',opts:['拟人','排比','比喻','对偶'],correct:2,explanation:'"红胜火"用火来比喻江花的红艳，是比喻的修辞手法。'},
+    {q:'《忆江南》是一首什么体裁的作品？',opts:['绝句','律诗','词','散文'],correct:2,explanation:'忆江南是词牌名，《忆江南》是一首词，不是诗。'},
+  ],
+  p5_v:[
+    {q:'"野渡无人舟自横"描绘了什么意境？',opts:['荒凉悲伤','宁静悠然','热闹繁华','孤独痛苦'],correct:1,explanation:'无人的渡口，小船自由横漂，营造出宁静、悠然自得的意境。'},
+    {q:'"独怜幽草涧边生"中"独怜"是什么意思？',opts:['孤独可怜','只有一人','独自喜爱','独自怜悯'],correct:2,explanation:'独怜：独自喜爱，特别爱惜。诗人对涧边幽草有着特别的爱惜之情。'},
+    {q:'"涧"是指什么？',opts:['小湖','山间流水的沟','大河','池塘'],correct:1,explanation:'涧：山间流水的沟，山涧。'},
+  ],
+  p6_v:[
+    {q:'"屠苏"在诗中是指什么？',opts:['一种食物','一种酒','一种花','一个地名'],correct:1,explanation:'屠苏是一种酒，古代新年时饮用，据说能驱邪避瘟，保佑平安。'},
+    {q:'"总把新桃换旧符"中"桃符"是什么？',opts:['新鲜桃子','桃木雕刻品','春联的前身','桃花图案'],correct:2,explanation:'桃符是贴在门上的桃木板，写有祈福避邪的字，是春联的前身。'},
+    {q:'《元日》描写的是哪个节日？',opts:['清明节','元宵节','春节（大年初一）','重阳节'],correct:2,explanation:'元日即农历正月初一，就是中国传统节日——春节。'},
+  ],
+  p7_v:[
+    {q:'"清明时节雨纷纷"中"纷纷"形容什么？',opts:['雨量很大','雨下得频繁不断','雨很美','雨很冷'],correct:1,explanation:'纷纷：不断地，形容雨下得多、频繁。'},
+    {q:'"路上行人欲断魂"表达了什么情感？',opts:['开心愉快','非常疲惫','思念故人，心情沉重','非常饥饿'],correct:2,explanation:'清明节扫墓祭祖，行人思念故人，心情沉重，好像断了魂一样。'},
+    {q:'"牧童遥指杏花村"有什么作用？',opts:['说明村子很远','给全诗带来生活气息和亮色','说明迷路了','说明酒好喝'],correct:1,explanation:'牧童的出现和指路，给雨中愁苦的氛围带来一抹亮色，充满生活气息。'},
+  ],
+  p8_v:[
+    {q:'"每逢佳节倍思亲"中"倍"是什么意思？',opts:['一倍','加倍、更加','少一点','一样'],correct:1,explanation:'倍：加倍，更加。每到节日，思念家人的情感就加倍强烈。'},
+    {q:'重阳节有什么传统习俗？',opts:['吃月饼','贴春联','登高、插茱萸','包粽子'],correct:2,explanation:'重阳节（九月九日）有登高、插茱萸、赏菊的习俗。'},
+    {q:'这首诗是王维在什么情况下写的？',opts:['在家过节','在外地思念家人','旅行途中','和朋友聚会'],correct:1,explanation:'王维17岁时独自在长安（外地）求学，重阳节思念家乡的兄弟，写下了这首诗。'},
+  ],
+  p9_v:[
+    {q:'"人间四月芳菲尽"中"芳菲"是什么意思？',opts:['芳香的草地','花草，泛指春天的花朵','春天的气味','绿色植物'],correct:1,explanation:'芳菲：花草，泛指春天盛开的花朵和草木。'},
+    {q:'"山寺桃花始盛开"为什么山上的桃花还没开？',opts:['山上桃树少','山上温度低，春天来得晚','山上没有阳光','山上水少'],correct:1,explanation:'山上海拔高，气温比山下低，所以春天来得晚，山下花谢了，山上才刚刚盛开。'},
+    {q:'这首诗表达了诗人什么心情？',opts:['失望沮丧','意外发现的惊喜','思念家乡','赞美桃花'],correct:1,explanation:'诗人遗憾春天已去，却在山寺发现桃花盛开，充满了意外发现的惊喜之情。'},
+  ],
+  p10_v:[
+    {q:'《守株待兔》中"走"的古义是什么？',opts:['行走','跑','飞奔','跳跃'],correct:1,explanation:'古文中"走"是"跑"的意思；现代"走路"在古文中叫"行"。'},
+    {q:'"耒"是什么东西？',opts:['一种武器','古代耕地的农具','一种容器','一种食物'],correct:1,explanation:'耒：古代耕地的农具，形状像犁，是农夫劳动的工具。'},
+    {q:'这则寓言讽刺了什么？',opts:['农夫太勤劳','不劳而获、靠侥幸心理','兔子太笨','农田太小'],correct:1,explanation:'农夫因一次偶然得到兔子，就放弃劳动守株等待，讽刺了不劳而获、靠侥幸的懒惰行为。'},
+  ],
+  yanzi_v:[
+    {q:'"一身乌黑的羽毛"中"乌黑"形容什么？',opts:['金黄色','深黑色很亮','白色','灰色'],correct:1,explanation:'乌黑：深黑色，形容燕子羽毛黑亮有光泽。'},
+    {q:'"剪刀似的尾巴"用了什么修辞？',opts:['拟人','比喻','排比','夸张'],correct:1,explanation:'"似的"是比喻词，把燕子尾巴比作剪刀，写出了尾巴分叉的形状。'},
+    {q:'第一段用了什么方法写燕子外形？',opts:['先总后分','三个"一"排比','问答式','对比'],correct:1,explanation:'三个"一"（一身、一对、加上）构成排比，依次写了羽毛、翅膀、尾巴。'},
+  ],
+  hehua_v:[
+    {q:'"荷叶挨挨挤挤的"中"挨挨挤挤"说明什么？',opts:['荷叶很少','荷叶紧密、数量很多','荷叶很大','荷叶很绿'],correct:1,explanation:'挨挨挤挤：形容很多，紧密地挤在一起，写出了荷叶茂盛的样子。'},
+    {q:'第二段用三个"有的"写了什么？',opts:['荷叶的颜色','荷花的三种不同姿态','荷花的数量','荷花的香气'],correct:1,explanation:'三个"有的"排比：展开两三片→全展开→花骨朵儿，写出荷花三种不同的姿态。'},
+    {q:'"如果把眼前的一池荷花看作一大幅活的画"用了什么修辞？',opts:['排比','拟人','比喻','夸张'],correct:2,explanation:'把一池荷花比作"一大幅活的画"，是比喻，写出了荷花的美丽和生命力。'},
+  ],
+  huoshao_v:[
+    {q:'"这地方的火烧云变化极多"是这段的什么句？',opts:['结尾句','过渡句','中心句','问句'],correct:2,explanation:'这句话概括了火烧云的特点，是这段的中心句，后面的内容都是围绕"变化极多"来写的。'},
+    {q:'"葡萄灰、梨黄、茄子紫"用了什么写法？',opts:['用水果蔬菜比喻颜色，生动形象','只是列举颜色','比较颜色深浅','说明颜色很少'],correct:0,explanation:'用葡萄、梨、茄子等日常事物来描绘颜色，让读者一下就能想象出是什么颜色，非常生动。'},
+    {q:'火烧云的形状变化按什么顺序写？',opts:['按颜色顺序','按马→狗→狮子出现消失的顺序','按时间先后','按大小顺序'],correct:1,explanation:'第4-6段依次写了马、狗、狮子三种动物形状的出现、变化和消失过程。'},
+  ],
+  riji2:[
+    {q:'"栩栩如生"形容什么？',opts:['人很聪明','艺术形象非常逼真像活的','速度很快','颜色很美'],correct:1,explanation:'栩栩如生：形容艺术形象非常逼真，像活的一样。'},
+    {q:'"巧夺天工"中"天工"是指什么？',opts:['天上的工作','天然形成的精巧','工匠的技艺','神仙的力量'],correct:1,explanation:'天工：天然形成的精巧。巧夺天工指人工的精巧胜过天然，技艺高超。'},
+    {q:'下面哪个成语形容技艺高超？',opts:['沉鱼落雁','炉火纯青','一表人才','能说会道'],correct:1,explanation:'炉火纯青比喻技艺或学问达到了纯熟完美的程度，形容技艺高超。'},
+  ],
+  riji4:[
+    {q:'"文房四宝"是指哪四样？',opts:['琴棋书画','笔墨纸砚','梅兰竹菊','望闻问切'],correct:1,explanation:'文房四宝：笔、墨、纸、砚，是文人书房必备的四样宝贝。'},
+    {q:'"雅人四好"中"四好"是指？',opts:['笔墨纸砚','春夏秋冬','琴棋书画','梅兰竹菊'],correct:2,explanation:'雅人四好：琴、棋、书、画，是古代文人雅士的四种爱好。'},
+    {q:'"中医四诊"是哪四种诊断方法？',opts:['问闻望切','望闻问切','切问望闻','闻望切问'],correct:1,explanation:'中医四诊：望（看）、闻（听/嗅）、问（询问）、切（号脉），是中医诊断病情的四种方法。'},
+  ],
+  riji6:[
+    {q:'"路遥知马力，日久见人心"的意思是？',opts:['路很远马很累','时间长了才能真正了解一个人','马很有力气','日子过得慢'],correct:1,explanation:'路途远才能看出马的力气大不大，时间久了才能看出人心好不好，说明了解人要经过时间考验。'},
+    {q:'"近水知鱼性，近山识鸟音"说明了什么道理？',opts:['住在水边好','实践出真知','鱼和鸟很重要','住在山边好'],correct:1,explanation:'靠近水才了解鱼，靠近山才识鸟音，说明实践出真知，要通过亲身经历才能真正了解事物。'},
+    {q:'"莫道君行早，更有早行人"告诉我们什么？',opts:['要早起','不要骄傲自满，山外有山','走路要快','要多运动'],correct:1,explanation:'不要以为自己来得早，还有比你更早的人，告诫人们不要骄傲自满。'},
+  ],
+  riji8:[
+    {q:'"一表人才"形容什么？',opts:['学习好','仪表端正，风度不凡','工作能力强','表演出色'],correct:1,explanation:'一表人才：形容人仪表端正，外貌出众，风度不凡。'},
+    {q:'"多才多艺"是什么意思？',opts:['学了很多才艺','具有多种才能和技艺','非常聪明','爱好广泛'],correct:1,explanation:'多才多艺：具有多种才能和技艺，在很多方面都很有本领。'},
+    {q:'"能说会道"形容什么？',opts:['爱说话','口才很好，能言善辩','说话很快','说话声音大'],correct:1,explanation:'能说会道：形容口才很好，能言善辩，说话有条理有说服力。'},
+  ],
+  review:[
+    {q:'"观察"是指什么？',opts:['随意看看','仔细察看了解情况','快速扫一眼','闭眼想象'],correct:1,explanation:'观察：用眼睛仔细查看，了解事物的情况。'},
+    {q:'写作文时最重要的是什么？',opts:['字数多','用华丽的词语','写真实感受，条理清晰','越快写完越好'],correct:2,explanation:'好作文需要表达真实感受，内容充实，条理清晰，语言准确。'},
+    {q:'下面哪个词语表示"一直不放弃"？',opts:['偶尔','坚持','忽然','慢慢'],correct:1,explanation:'坚持：一直保持做某事，不放弃，不停止。'},
+  ],
+};
+
+function generateQuestions(sched){
+  const key=sched.vocabKey&&QUESTION_BANK[sched.vocabKey]?sched.vocabKey:'review';
+  const bank=QUESTION_BANK[key];
+  const offset=(sched.day-1)%bank.length;
+  const pool=[...bank.slice(offset),...bank.slice(0,offset)];
+  return pool.slice(0,3);
+}
+
+// ══════════════════════════════════════════
+// SENTENCE EXERCISES
+// ══════════════════════════════════════════
+const SENTENCE_EXERCISES={
+  p1:[
+    {q:'迟日江山___，春风花草香。',a:'丽',hint:'"丽"表示美丽——春天阳光照耀下山河格外美___。'},
+    {q:'泥融飞___子，沙暖睡鸳鸯。',a:'燕',hint:'会衔泥筑巢的候鸟，每到春天都会飞来。'},
+    {q:'《绝句》描写了___天的景色：春风、花草香、飞___子、睡鸳鸯。',a:'春',hint:'诗中写了春风和花草香'},
+  ],
+  p2:[
+    {q:'竹外桃花三两___，春江水暖鸭先知。',a:'枝',hint:'桃花几___从竹丛中探出头来。'},
+    {q:'蒌蒿满地___芽短，正是河豚欲上时。',a:'芦',hint:'___苇的嫩芽，初春刚从地里冒出来。'},
+    {q:'春江水___鸭先知——鸭子在水里，最先感受到水温变化。',a:'暖',hint:'春天来了，江水温度升___了。'},
+  ],
+  p3:[
+    {q:'梅子___时日日晴，小溪泛尽却山行。',a:'黄',hint:'梅子成熟时变成___色，正是初夏。'},
+    {q:'绿阴不减来时路，添得黄___四五声。',a:'鹂',hint:'叫声婉转悦耳，"两个黄___鸣翠柳"。'},
+    {q:'诗人出游先坐___，到溪尽头后改走山路回家。',a:'船',hint:'在水面上行进的交通工具。'},
+  ],
+  p4:[
+    {q:'江南好，风景旧曾___。',a:'谙',hint:'"谙"的意思是熟悉——白居易对江南非常___悉。'},
+    {q:'日出江花红胜___，春来江水绿如蓝。',a:'火',hint:'"红胜火"——红得胜过___焰。'},
+    {q:'___不忆江南？——反问句，表达诗人对江南的深深___念。',a:'能',hint:'反问开头词，意思是"怎么___不想念"。'},
+  ],
+  p5:[
+    {q:'独___幽草涧边生，上有黄鹂深树鸣。',a:'怜',hint:'"独怜"意思是"独自喜___、格外爱惜"。'},
+    {q:'春潮带雨晚来___，野渡无人舟自横。',a:'急',hint:'春雨过后，溪水变得湍___了。'},
+    {q:'野渡无人、舟自___——这两句写出了宁___安静的意境。',a:'横',hint:'小舟横放在水面上，无人摆渡。'},
+  ],
+  p6:[
+    {q:'爆竹声中一岁___，春风送暖入屠苏。',a:'除',hint:'"一岁除"就是旧的一年过___了。'},
+    {q:'千门万户曈曈日，总把新___换旧符。',a:'桃',hint:'"___符"是古代贴在门上辟邪的木板。'},
+    {q:'过年要点___竹、喝屠苏酒、贴新桃符，热热闹闹迎新年。',a:'爆',hint:'"___竹声中一岁除"的第一个字。'},
+  ],
+  p7:[
+    {q:'清明时节雨纷纷，路上行人欲___魂。',a:'断',hint:'"欲断魂"表示思念亲人、心情极度___痛。'},
+    {q:'借问酒家何处有，___童遥指杏花村。',a:'牧',hint:'放牛放羊的孩子叫___童。'},
+    {q:'___明节行人思念故人，心情沉重如"欲___魂"。',a:'清',hint:'节日名称的第一个字。'},
+  ],
+  p8:[
+    {q:'独在___乡为异客，每逢佳节倍思亲。',a:'异',hint:'"异乡"就是不是自己家乡的地方，陌___之地。'},
+    {q:'遥知兄弟登高处，遍插茱___少一人。',a:'萸',hint:'重阳节插的植物叫茱___，用来辟邪。'},
+    {q:'每逢___节倍思亲——节日越热闹，越___念远方的家人。',a:'佳',hint:'"佳节"就是节日，美好的节日。'},
+  ],
+  p9:[
+    {q:'人间四月___菲尽，山寺桃花始盛开。',a:'芳',hint:'"芳菲"指花草——春天的花草全___谢了。'},
+    {q:'长恨春归无___处，不知转入此中来。',a:'觅',hint:'"无觅处"就是找不到——四处___找也找不到。'},
+    {q:'山下花谢了，山上才开——因为山上___度低，春天来得___。',a:'温',hint:'与气候冷暖有关的量。'},
+  ],
+  p10:[
+    {q:'宋人有耕___者，田中有株，兔走触株。',a:'田',hint:'农夫在___地里耕作。'},
+    {q:'因释___守株，冀复得兔。',a:'耒',hint:'"耒"是古代的耕地农具，像犁一样。'},
+    {q:'农夫放下农___，守着树桩等兔，最终成了___国的笑话。',a:'具',hint:'耕地、劳动用的工___。'},
+  ],
+  pt1:[
+    {q:'一身___黑的羽毛，一对剪刀似的尾巴。',a:'乌',hint:'"乌黑"就是深黑色——___鸦也叫"___"。'},
+    {q:'才下过几阵___松的细雨，到处是烂漫无比的春天。',a:'蒙',hint:'"蒙松"形容雨雾细小，像薄薄的___纱。'},
+    {q:'各色鲜艳的花都像赶集___的聚拢来，形成烂漫无比的春天。',a:'似',hint:'"___的"是比喻词，这里把花比作赶集的人。'},
+  ],
+  pt2:[
+    {q:'荷叶挨挨___挤，像一个个碧绿的大圆盘。',a:'挤',hint:'"挨挨挤挤"形容紧密地挤在一___。'},
+    {q:'有的还是花___朵儿，看起来饱胀得马上要破裂似的。',a:'骨',hint:'"花___朵儿"就是还没开放的花苞。'},
+    {q:'如果把这一池荷花看作一大幅___的画，画家本领真了不起！',a:'活',hint:'不是静止的画，是___动的画。'},
+  ],
+  pt3:[
+    {q:'天空中出现了一匹马，马头向南，马尾___西。',a:'朝',hint:'"___西"就是面向西边。'},
+    {q:'过了两三秒，那匹马___了，又来了一条大狗。',a:'不见',hint:'消失、看不见了。'},
+    {q:'火烧云变化极___——马、狗、狮子各种形状接连出现。',a:'多',hint:'形容变化种类非常___。'},
+  ],
+};
+
+// ══════════════════════════════════════════
+// WRITING PROMPTS (仿写 / 想象写话)
+// ══════════════════════════════════════════
+const WRITING_PROMPTS={
+  p1_i:{
+    title:'春景仿写',
+    model:'迟日江山丽，春风花草香。\n泥融飞燕子，沙暖睡鸳鸯。',
+    tip:'杜甫用四句写了四个景物：阳光、风、燕子、鸳鸯，每句只有5个字，却描绘了完整的春天画面。',
+    prompt:'仿照这首诗的句式，用2-4句话，写写你看到的夏天或秋天的一个场景。可以选两个你喜欢的景物来写。',
+    scaffold:'___天___，___风___草___。',
+    placeholder:'例如：烈日天空蓝，热风树叶摇。\n知了枝头叫，蜻蜓荷上飞。',
+  },
+  pt1_c:{
+    title:'描写你喜欢的动物',
+    model:null,
+    tip:null,
+    prompt:'《燕子》用"一身乌黑的羽毛，一对剪刀似的尾巴，加上一对轻快有力的翅膀"来介绍燕子的外形。\n\n选择一种你喜欢的动物，用"一...一...加上..."的句式描写它的外形，至少写3句话。注意要用上比喻，比如"剪刀似的尾巴"。',
+    scaffold:'一身___的___，一对___的___，加上___，凑成了那样可爱的小___。',
+    placeholder:'例如：一身雪白的皮毛，一对圆圆的大眼睛，加上两只竖起的长耳朵，凑成了那样可爱的小兔子。',
+  },
+  pt2_i:{
+    title:'有的...有的...有的... 排比仿写',
+    model:'有的才展开两三片花瓣儿；有的花瓣儿全展开了，露出嫩黄色的小莲蓬；有的还是花骨朵儿，看起来饱胀得马上要破裂似的。',
+    tip:'叶圣陶用三个"有的"分别写荷花三种不同的形态：刚开、全开、含苞待放，描写生动有层次。',
+    prompt:'用三个"有的"，描写一种你见过的花（玫瑰、菊花、桃花、迎春花等都可以），写出它三种不同的形态。',
+    scaffold:'有的___；有的___；有的___。',
+    placeholder:'例如：有的花苞紧闭，像一个小小的拳头；有的半开着，露出里面粉嫩的花瓣；有的已经全开了，像一张笑脸向着阳光。',
+  },
+  p3_c:{
+    title:'旅行见闻写话',
+    model:null,
+    tip:null,
+    prompt:'曾几在旅途中先坐船后爬山，看到了梅子、绿阴、黄鹂，写下了这首诗。\n\n回忆你有过的一次旅行（去公园、景区、爷爷奶奶家等都算），写下你旅途中看到的3种景物，以及你当时的心情。至少写3-4句话。',
+    scaffold:null,
+    placeholder:'例如：那天，我去公园游玩。路边的桃花开得粉红，微风一吹，花瓣像雪花一样飘落。小河边的柳树垂着细细的枝条，几只小鸟叽叽喳喳地跳来跳去。我非常开心，真想每天都来这里！',
+  },
+  pt3_i:{
+    title:'颜色描写仿写',
+    model:'天空中出现了一道红霞，慢慢地在扩大它的范围，加强它的亮光。\n一会儿，天空出现了一匹马，马头向南，马尾朝西。',
+    tip:'萧红用"颜色变化+形状变化"来描写火烧云。颜色有红、金、紫等；形状有马、狗、狮子，写得非常生动。',
+    prompt:'观察一次美丽的日落（或回忆一次），用2-3句话描写天空的颜色，再用2-3句话描写云朵变成的某个形状，最后写它怎么消失了。',
+    scaffold:null,
+    placeholder:'例如：天空中出现了一片金黄色的云，慢慢变成了橙红色，像着了火一样。云朵渐渐变成了一只大象的形状，大象伸着长鼻子，好像在喝水。过了一会儿，风一吹，大象散开了，消失得无影无踪。',
+  },
+  p6_c:{
+    title:'穿越古代过年',
+    model:null,
+    tip:null,
+    prompt:'如果你穿越到了王安石生活的宋朝，和他一起过春节，你会看到什么，听到什么，感受到什么？\n\n根据诗中写的爆竹、屠苏酒、桃符，发挥想象，写一段50字左右的话。',
+    scaffold:null,
+    placeholder:'例如：噼里啪啦的爆竹声把我惊醒了！原来我穿越到了古代的大年初一！家家户户门前都贴着新的桃符，街上飘着屠苏酒的香味。大人们端着酒杯互相祝福，孩子们追着爆竹的烟雾跑来跑去。真热闹啊！',
+  },
+  p7_i:{
+    title:'节日诗仿写',
+    model:'清明时节雨纷纷，路上行人欲断魂。\n借问酒家何处有？牧童遥指杏花村。',
+    tip:'这首诗先写节日天气（清明雨），再写人的心情（欲断魂），最后用一问一答（借问-遥指）结束，充满生活气息。',
+    prompt:'选一个你熟悉的节日（中秋、端午、春节、重阳等），仿照"___时节___，路上行人___"的句式，写两句描写节日场景的句子。',
+    scaffold:'___时节___，___上___人___。',
+    placeholder:'例如：中秋时节月正圆，家中老小盼团圆。\n借问月饼哪里买？阿婆遥指街东头。',
+  },
+  p8_c:{
+    title:'思念家人——写一封信',
+    model:null,
+    tip:null,
+    prompt:'王维独自在外求学，重阳节思念家人，写下了这首诗。\n\n如果你有一天离家在外，节日里最想家了，你会给家人写什么？写一封短信，至少表达两件你最想念的事情。',
+    scaffold:null,
+    placeholder:'例如：亲爱的妈妈，我在这里一切都好，只是今天是中秋节，看到别人家一起赏月，我好想你们。我想念妈妈做的月饼，也想念爸爸讲的故事。希望明年中秋节我们能团圆！',
+  },
+  p10_c:{
+    title:'守株待兔——改写成现代故事',
+    model:null,
+    tip:null,
+    prompt:'《守株待兔》是一个古代寓言故事。请把它改写成一个现代版：有个学生某次考试没复习，结果碰巧考了高分，于是他以后再也不复习了……\n\n你来写下这个故事的经过和结局，并说明道理。至少写4句话。',
+    scaffold:null,
+    placeholder:'例如：小明有一次数学考试没有复习，却意外得了100分。从那以后，他觉得不需要复习也能考好，上课不认真，作业也不做。期末考试到了，他一道题也不会做，最后只得了30分，成了全班的笑话。这个故事告诉我们：成功要靠踏实努力，不能靠侥幸！',
+  },
+  pt1_i:{
+    title:'动物外形仿写（进阶版）',
+    model:'一身乌黑的羽毛，一对剪刀似的尾巴，加上一对轻快有力的翅膀，凑成了那样可爱的活泼的小燕子。',
+    tip:'作者郑振铎用了三个"一"（一身、一对、加上）来介绍燕子，句式整齐，并用了比喻"剪刀似的尾巴"，描写清晰生动。',
+    prompt:'选一种你观察过的动物，用相同的句式（一...一...加上...凑成了...）介绍它的外形。注意要用上比喻，让描写更生动！',
+    scaffold:'一身___的___，一对___似的___，加上___，凑成了那样___的___。',
+    placeholder:'例如：一身橙红的皮毛，一条粗壮蓬松的大尾巴，加上两只灵活转动的小耳朵，凑成了那样机灵可爱的小松鼠。',
+  },
+  pt3_c:{
+    title:'火烧云形状想象写话',
+    model:'一会儿，天空出现了一匹马，马头向南，马尾朝西。马是跪着的，像等人骑上它的背似的。过了两三秒钟，那匹马大起来了，腿伸开了，脖子也长了，尾巴可不见了。',
+    tip:'萧红写云朵形状，先说朝向，再描述姿态，最后写它怎么变化消失——很有层次感。',
+    prompt:'你来接着写火烧云！那条大狗消失后，又出现了一只什么动物？模仿萧红的写法，写出：形状→姿态→变化消失。至少写5句话。',
+    scaffold:null,
+    placeholder:'例如：一会儿，天空出现了一只大老虎，虎头朝东，虎尾向西。老虎嘴巴大开，好像在咆哮，条纹橙黑分明。过了几秒钟，老虎越来越模糊，身体变扁了，最后散成一片薄薄的云，消失了。',
+  },
+  pt2_i2:{
+    title:'植物描写仿写（升华版）',
+    model:'荷叶挨挨挤挤的，像一个个碧绿的大圆盘。白荷花在这些大圆盘之间冒出来。',
+    tip:'叶圣陶先用拟人"挨挨挤挤"写荷叶茂密，再用比喻"碧绿的大圆盘"写荷叶形状，最后写荷花"冒出来"，动感十足。',
+    prompt:'选一个你去过的有花草的地方（公园、花圃、田野），先用拟人或比喻写一种叶子或草，再写出从中"冒出来"的花朵，模仿叶圣陶的写法，写2-3句话。',
+    scaffold:null,
+    placeholder:'例如：菜园里的南瓜叶子一片接着一片，像一把把撑开的绿伞。嫩黄色的南瓜花就在这些大绿伞之间冒出来，小小的，像一只只小喇叭。',
+  },
+};
+
+// ── SENTENCE STEP ──
+function renderSentenceStep(body,key){
+  const exs=SENTENCE_EXERCISES[key];
+  if(!exs){
+    body.innerHTML=`<div class="step-label">句子练习</div><div class="fade-guide">暂无句子练习，点"继续"</div>`;
+    return;
+  }
+  body.innerHTML=`
+    <div class="step-label">句子练习</div>
+    <div class="step-heading">根据原文，填写横线上的字</div>
+    <div id="sentence-list">
+      ${exs.map((s,i)=>`
+        <div class="blank-question">
+          <div class="blank-q-text">${s.q.replace('___','<span style="display:inline-block;border-bottom:2px solid var(--cinnabar);min-width:2em;color:transparent">__</span>')}</div>
+          <input class="blank-input" id="sent-${i}" placeholder="填写横线处"
+            oninput="checkSent(${i},'${s.a.replace(/'/g,"\\'")}')" autocomplete="off" autocorrect="off" spellcheck="false">
+          <div class="blank-ans" id="sent-ans-${i}"></div>
+          <div class="prose-tip" style="margin-top:6px;font-size:.78rem">${s.hint}</div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="fade-guide">全部填完后点"继续"！</div>
+  `;
+}
+
+function checkSent(i,answer){
+  const inp=document.getElementById('sent-'+i);
+  const ansEl=document.getElementById('sent-ans-'+i);
+  const val=inp.value.trim();
+  if(!val) return;
+  if(val===answer){
+    inp.className='blank-input ok';
+    ansEl.innerHTML='<span style="color:var(--jade)">✓ 正确！</span>';
+    ansEl.className='blank-ans show';
+  } else if(val.length>=answer.length){
+    inp.className='blank-input bad';
+    ansEl.innerHTML=`<span style="color:var(--cinnabar)">✗ 正确答案：<strong>${answer}</strong></span>`;
+    ansEl.className='blank-ans show';
+  }
+}
+
+// ── WRITING PROMPT STEP ──
+function renderWritingPromptStep(body,key,promptType){
+  const pr=WRITING_PROMPTS[key];
+  if(!pr){
+    body.innerHTML=`<div class="step-label">写作练习</div><div class="fade-guide">暂无写作内容，点"继续"</div>`;
+    return;
+  }
+  const label=promptType==='imitate'?'仿写练习':'想象写话';
+  const accentColor=promptType==='imitate'?'var(--azure)':'var(--purple)';
+  const accentBg=promptType==='imitate'?'var(--azure-bg)':'var(--purple-bg)';
+  body.innerHTML=`
+    <div class="step-label">${label}</div>
+    <div class="step-heading">${pr.title}</div>
+    ${pr.model?`
+      <div class="prose-text" style="border-top-color:${accentColor};border-bottom-color:${accentColor}">${pr.model.replace(/\n/g,'<br>')}</div>
+      <div class="prose-tip" style="background:${accentBg};border-left-color:${accentColor}">💡 ${pr.tip}</div>
+    `:''}
+    <div class="prose-tip" style="background:var(--gold-bg);border-left-color:var(--gold);margin-top:10px">
+      <strong>✏️ 写作任务：</strong><br>${pr.prompt.replace(/\n/g,'<br>')}
+    </div>
+    ${pr.scaffold?`<div class="prose-tip" style="margin-top:8px;font-family:var(--font-serif)">🏗️ 句式参考：<em style="color:var(--ink)">${pr.scaffold}</em></div>`:''}
+    <textarea id="writing-ta" placeholder="${pr.placeholder||'在这里写下你的句子...'}"
+      style="width:100%;min-height:130px;margin-top:12px;padding:12px;border:1px solid var(--border);border-radius:var(--r);font-family:var(--font-serif);font-size:.95rem;line-height:2;background:var(--paper-card);color:var(--ink);resize:vertical;outline:none"
+      onfocus="this.style.borderColor='var(--cinnabar)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+    <div class="fade-guide" style="margin-top:4px">写完了吗？点"继续"进行背诵挑战！</div>
+  `;
+}
+
+// ── HARVEST STEP ──
+function renderHarvestStep(body,sched){
+  const actLabels={sentence:'句子填空',quiz:'小测验',imitate:'仿写练习',creative:'想象写话',riji:'日积月累'};
+  const reciteTitle=sched.poemId?POEMS.find(p=>p.id===sched.poemId)?.title:PROSE_TEXTS.find(p=>p.id===sched.proseId)?.title;
+  const reciteType=sched.poemId?'古诗':'课文';
+  body.innerHTML=`
+    <div class="harvest-card">
+      <span class="harvest-emoji">${sched.harvestEmoji}</span>
+      <div class="harvest-title">今日收获卡</div>
+      <div class="harvest-text">${sched.harvest}</div>
+      <div class="harvest-stars">${'⭐'.repeat(3)}</div>
+      <div class="harvest-date">第 ${currentDay} 天 · ${new Date().toLocaleDateString('zh-CN')}</div>
+    </div>
+    <div class="info-box">
+      <h3>🎯 今天完成了</h3>
+      <p>
+        📝 词语闯关 ${sched.vocabKey&&VOCAB_SETS[sched.vocabKey]?VOCAB_SETS[sched.vocabKey].length+' 个词语':'（积累）'}<br>
+        ${actLabels[sched.actType]||'练习'}：${sched.actType==='sentence'?'句子填空练习':sched.actType==='quiz'?'小测验挑战':sched.actType==='imitate'?'仿写句子':sched.actType==='creative'?'想象写话':sched.actType==='riji'?'日积月累词语':'练习'}<br>
+        🎤 ${reciteType}背诵：《${reciteTitle}》<br>
+        ✏️ 田字格练写：${sched.writingChars.join('、')}<br>
+        ✅ 完成今天的打卡！
+      </p>
+    </div>
+    <div class="fade-guide">点"完成今天 🎉"领取奖励！</div>
+  `;
+}
+
+// ══════════════════════════════════════════
+// TTS — MINIMAX T2A v2
+// ══════════════════════════════════════════
+const MM_KEY   = 'sk-cp-L4NDfWkm3NEiTPPmwVMY4S5cZSc2vkGs2yKPil3Ii8Dur43mZRs-YZ_xGxld0YbeSaECrr6YJtcz1Ykr4ZrPiUvIpgp3ENJLTuPqPO_IS8pduv1fQCh2WPM';
+const MM_GROUP = '2055126194306687029';
+const MM_VOICE = 'female-shaonv';
+
+let _mmAudio = null;
+let currentUtterance = null; // browser TTS fallback
+
+async function speak(text, rate=0.85, onEnd){
+  stopSpeak();
+  const mmSpeed = Math.max(0.5, Math.min(2.0, rate + 0.1));
+  try {
+    const res = await fetch(
+      `https://api.minimax.chat/v1/t2a_v2?GroupId=${MM_GROUP}`,
+      {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${MM_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'speech-02-hd',
+          text,
+          stream: false,
+          voice_setting: { voice_id: MM_VOICE, speed: mmSpeed, vol: 1.0, pitch: 0 },
+          audio_setting: { sample_rate: 32000, bitrate: 128000, format: 'mp3', channel: 1 }
+        })
+      }
+    );
+    const json = await res.json();
+    if(json.base_resp?.status_code !== 0) throw new Error(json.base_resp?.status_msg || 'API error');
+    const hex = json.data?.audio;
+    if(!hex) throw new Error('no audio data');
+    const bytes = new Uint8Array(hex.match(/../g).map(h => parseInt(h, 16)));
+    const blob = new Blob([bytes], { type: 'audio/mpeg' });
+    const url = URL.createObjectURL(blob);
+    _mmAudio = new Audio(url);
+    _mmAudio.onended = () => { URL.revokeObjectURL(url); _mmAudio = null; if(onEnd) onEnd(); };
+    await _mmAudio.play();
+  } catch(e) {
+    console.warn('MiniMax TTS 失败，回退浏览器语音:', e);
+    _speakFallback(text, rate, onEnd);
+  }
+}
+
+function _speakFallback(text, rate=0.85, onEnd){
+  if(!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  currentUtterance = new SpeechSynthesisUtterance(text);
+  currentUtterance.lang = 'zh-CN';
+  currentUtterance.rate = rate;
+  if(onEnd) currentUtterance.onend = onEnd;
+  speechSynthesis.speak(currentUtterance);
+}
+
+function stopSpeak(){
+  if(_mmAudio){ _mmAudio.pause(); _mmAudio = null; }
+  if('speechSynthesis' in window) speechSynthesis.cancel();
+}
+
+async function ttsToggle(btn, text, rate=0.85){
+  if(btn.classList.contains('speaking') || btn.classList.contains('loading')){
+    stopSpeak();
+    btn.classList.remove('speaking','loading');
+    btn.textContent = '🔊 朗读';
+    return;
+  }
+  document.querySelectorAll('.tts-btn.speaking,.tts-btn.loading').forEach(b=>{
+    b.classList.remove('speaking','loading'); b.textContent = '🔊 朗读';
+  });
+  btn.classList.add('loading');
+  btn.textContent = '◎ 生成中';
+  await speak(text, rate, ()=>{
+    btn.classList.remove('speaking','loading');
+    btn.textContent = '🔊 朗读';
+  });
+  if(btn.classList.contains('loading')){
+    btn.classList.remove('loading');
+    btn.classList.add('speaking');
+    btn.textContent = '⏹ 停止';
+  }
+}
+
+async function speakWord(word, btn){
+  if(btn){ btn.classList.add('loading'); }
+  await speak(word, 0.75, ()=>{ if(btn) btn.classList.remove('loading'); });
+  if(btn && btn.classList.contains('loading')){ btn.classList.remove('loading'); }
+}
+
+// ══════════════════════════════════════════
+// MATCH GAME (词义连连看)
+// ══════════════════════════════════════════
+let _matchSelected=null;
+let _matchCorrect=0;
+let _matchTotal=0;
+
+function renderMatchStep(body,vocabKey){
+  const words=(VOCAB_SETS[vocabKey]||[]).slice(0,5);
+  _matchSelected=null; _matchCorrect=0; _matchTotal=words.length;
+
+  const defs=[...words].sort(()=>Math.random()-.5);
+
+  body.innerHTML=`
+    <div class="step-label">词义连连看</div>
+    <div class="step-heading">点左边词语 → 再点右边意思，完成配对！</div>
+    <div class="match-grid" id="match-grid">
+      ${words.map((w,i)=>`
+        <div class="match-item" id="mw-${i}" data-type="word" data-idx="${i}"
+          onclick="matchClick('word',${i},'${w.w.replace(/'/g,"\\'")}')">
+          <div style="font-weight:700;font-size:1.1rem;letter-spacing:.08em">${w.w}</div>
+          <div style="font-size:.72rem;color:var(--ink-light);margin-top:2px">${w.py}</div>
+        </div>
+        <div class="match-item" id="md-${i}" data-type="def" data-word="${defs[i].w.replace(/'/g,"\\'")}""
+          onclick="matchClick('def',${i},'${defs[i].w.replace(/'/g,"\\'")}')">
+          <div style="font-size:.82rem;line-height:1.5;color:var(--ink-mid)">${defs[i].def}</div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="match-score" id="match-score"></div>
+    <div class="fade-guide">配对完成后点"继续"！</div>
+  `;
+}
+
+function matchClick(type,idx,word){
+  if(type==='word'){
+    // deselect previous word
+    if(_matchSelected&&_matchSelected.type==='word'){
+      const old=document.getElementById('mw-'+_matchSelected.idx);
+      if(old&&!old.classList.contains('matched')) old.classList.remove('selected');
+    }
+    const el=document.getElementById('mw-'+idx);
+    if(!el||el.classList.contains('matched')) return;
+    el.classList.add('selected');
+    _matchSelected={type:'word',idx,word};
+  } else {
+    // clicked a def
+    const defEl=document.getElementById('md-'+idx);
+    if(!defEl||defEl.classList.contains('matched')) return;
+    const defWord=defEl.dataset.word;
+    if(!_matchSelected||_matchSelected.type!=='word') return;
+    const wordEl=document.getElementById('mw-'+_matchSelected.idx);
+    if(_matchSelected.word===defWord){
+      // correct
+      wordEl.classList.remove('selected');
+      wordEl.classList.add('matched');
+      defEl.classList.add('matched');
+      _matchCorrect++;
+      speak(defWord,0.75);
+      _matchSelected=null;
+      if(_matchCorrect===_matchTotal){
+        const sc=document.getElementById('match-score');
+        if(sc){sc.textContent='🎉 全部配对成功！太棒了！';sc.classList.add('show');}
+      }
+    } else {
+      // wrong — flash both
+      wordEl.classList.add('wrong-flash');
+      defEl.classList.add('wrong-flash');
+      setTimeout(()=>{wordEl.classList.remove('wrong-flash','selected');defEl.classList.remove('wrong-flash')},500);
+      _matchSelected=null;
+    }
+  }
+}
+
+// ══════════════════════════════════════════
+// DICTATION (听写挑战)
+// ══════════════════════════════════════════
+let _dictWords=[];
+let _dictIdx=0;
+let _dictCorrect=0;
+
+function renderDictationStep(body,vocabKey){
+  const pool=(VOCAB_SETS[vocabKey]||[]).slice(0,5);
+  _dictWords=pool.sort(()=>Math.random()-.5);
+  _dictIdx=0; _dictCorrect=0;
+  body.innerHTML=`
+    <div class="step-label">听写挑战</div>
+    <div class="step-heading">听声音，把词语写出来！</div>
+    <div id="dictation-body"></div>
+  `;
+  renderDictationItem();
+}
+
+function renderDictationItem(){
+  const container=document.getElementById('dictation-body');
+  if(!container) return;
+  if(_dictIdx>=_dictWords.length){
+    container.innerHTML=`
+      <div class="dictation-speaker">
+        <div style="font-size:2.5rem">🎉</div>
+        <div style="font-family:var(--font-serif);font-size:1.1rem;font-weight:700;color:var(--jade)">
+          听写完成！答对 ${_dictCorrect}/${_dictWords.length} 个
+        </div>
+        <div style="font-size:.85rem;color:var(--ink-light);font-family:var(--font-serif)">
+          ${_dictCorrect===_dictWords.length?'全对！听力超棒！':_dictCorrect>=_dictWords.length*0.6?'不错！继续加油！':'多听几遍练练吧！'}
+        </div>
+      </div>
+      <div class="fade-guide">点"继续"进行背诵！</div>
+    `;
+    return;
+  }
+  const w=_dictWords[_dictIdx];
+  container.innerHTML=`
+    <div class="dictation-speaker">
+      <div class="dictation-progress">第 ${_dictIdx+1}/${_dictWords.length} 个词</div>
+      <button class="dictation-play-btn" id="dict-play" onclick="playDictWord()">🔊</button>
+      <div class="dictation-hint">点喇叭收听，再写出这个词语</div>
+    </div>
+    <div class="dictation-input-row">
+      <input class="dictation-input" id="dict-input" placeholder="在这里写出听到的词语"
+        autocomplete="off" autocorrect="off" spellcheck="false"
+        onkeydown="if(event.key==='Enter')checkDictation()">
+      <button class="dictation-check-btn" onclick="checkDictation()">确认</button>
+    </div>
+    <div class="dictation-feedback" id="dict-fb"></div>
+    <div class="fade-guide" style="margin-top:16px">听不清？可以再听一遍</div>
+  `;
+  setTimeout(()=>playDictWord(),400);
+}
+
+function playDictWord(){
+  if(_dictIdx>=_dictWords.length) return;
+  const btn=document.getElementById('dict-play');
+  if(btn) btn.classList.add('playing');
+  speak(_dictWords[_dictIdx].w,0.7,()=>{
+    const b=document.getElementById('dict-play');
+    if(b) b.classList.remove('playing');
+  });
+}
+
+function checkDictation(){
+  const inp=document.getElementById('dict-input');
+  const fb=document.getElementById('dict-fb');
+  if(!inp||!fb) return;
+  const val=inp.value.trim();
+  if(!val){inp.focus();return;}
+  const answer=_dictWords[_dictIdx].w;
+  if(val===answer){
+    fb.innerHTML=`<span style="color:var(--jade);font-weight:700">✓ 正确！是「${answer}」</span>`;
+    _dictCorrect++;
+    inp.disabled=true;
+    setTimeout(()=>{_dictIdx++;renderDictationItem();},900);
+  } else {
+    fb.innerHTML=`<span style="color:var(--cinnabar)">✗ 是「${answer}」，读了几遍就能记住啦！</span>`;
+    inp.value='';
+    inp.disabled=true;
+    speak(answer,0.7);
+    setTimeout(()=>{_dictIdx++;renderDictationItem();},1400);
+  }
+}
+
+// ══════════════════════════════════════════
+// CONFETTI
+// ══════════════════════════════════════════
+function launchConfetti(){
+  const container=document.getElementById('confetti');
+  container.innerHTML='';
+  const colors=['#f59e0b','#10b981','#3b82f6','#ec4899','#8b5cf6','#f97316'];
+  for(let i=0;i<50;i++){
+    const p=document.createElement('div');
+    p.className='confetti-piece';
+    p.style.cssText=`
+      left:${Math.random()*100}%;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      animation-delay:${Math.random()*0.5}s;
+      animation-duration:${1+Math.random()}s;
+      width:${6+Math.random()*6}px;
+      height:${6+Math.random()*6}px;
+      border-radius:${Math.random()>0.5?'50%':'2px'};
+    `;
+    container.appendChild(p);
+  }
+  setTimeout(()=>{container.innerHTML=''},2500);
+}
+
+// ══════════════════════════════════════════
+// SETTINGS
+// ══════════════════════════════════════════
+function showSettings(){
+  const cur=START_DATE.toISOString().slice(0,10);
+  const val=prompt(`设置暑假开始日期（格式：YYYY-MM-DD）\n\n当前开始日期：${cur}\n\n提示：设为今天可以立即预览所有天的内容`, cur);
+  if(!val) return;
+  const d=new Date(val);
+  if(isNaN(d.getTime())){alert('日期格式不正确，请用 YYYY-MM-DD 格式');return;}
+  localStorage.setItem('sr_start_date',val);
+  START_DATE=d;
+  renderHome();
+}
+
+function resetProgress(){
+  if(confirm('确定要清除所有进度吗？')){
+    localStorage.removeItem('sr_progress');
+    renderHome();
+  }
+}
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+renderHome();
+</script>
+</body>
+</html>
