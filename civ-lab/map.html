@@ -136,6 +136,7 @@
     <div class="p-meta" id="pMeta"></div>
     <div class="p-region" id="pRegion"></div>
     <a class="p-netbtn" id="pNet" style="display:none">🕸 看这个时代的人物关系网 →</a>
+    <a class="p-netbtn" id="pRead" style="display:none;background:linear-gradient(90deg,var(--gold),var(--vermilion))">📚 这个时代的阅读之旅 →</a>
   </div>
   <div id="pevents"></div>
 </div>
@@ -317,6 +318,7 @@ function openCiv(c){
   const pNet=document.getElementById('pNet');
   if(NET[c.chapter]){ pNet.style.display='inline-block'; pNet.href='./'+NET[c.chapter]+'?all=1'; }
   else pNet.style.display='none';
+  const pRead=document.getElementById('pRead'); pRead.style.display='inline-block'; pRead.href='./reading.html?era='+c.chapter;
   const info=(window.CIV_INFO||{})[c.id];
   const evs=(CIV_EVENTS[c.id]||[]);
   const box=document.getElementById('pevents');
@@ -403,6 +405,8 @@ document.getElementById('themeSwitch').onclick=e=>{const b=e.target.closest('but
 window.addEventListener('resize',resize);
 applyTheme('warm');
 resize(); setYear(-3500);
+// 从阅读卡片等处 ?civ=<id> 直达某文明
+(function(){ try{ const cid=new URLSearchParams(location.search).get('civ'); if(cid){ const c=MAP_CIVS.find(x=>x.id===cid); if(c){ setYear(Math.round((c.s+c.e)/2)); setTimeout(()=>openCiv(c),60); } } }catch(e){} })();
 
 window.__aiCtx="用户正在浏览世界历史地图。";
 </script>
