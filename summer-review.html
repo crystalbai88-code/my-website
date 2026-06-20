@@ -435,6 +435,39 @@ input{font-family:inherit}
 .prose-play-btn.speaking{background:var(--cinnabar);animation:pulse .8s ease-in-out infinite}
 .prose-play-btn.loading{opacity:.6;cursor:wait;animation:pulse .6s ease-in-out infinite}
 .prose-play-label{font-size:.8rem;color:var(--ink-light);font-family:var(--font-serif);margin-top:8px}
+/* ── Discovery Step ── */
+.discovery-wrap{display:flex;flex-direction:column;align-items:center;gap:20px;padding:8px 0 20px}
+.discovery-lantern{font-size:2.6rem;line-height:1;animation:lantern-glow 2s ease-in-out infinite alternate}
+@keyframes lantern-glow{from{filter:drop-shadow(0 0 6px rgba(199,56,38,.3))}to{filter:drop-shadow(0 0 16px rgba(199,56,38,.7))}}
+.discovery-label{font-family:var(--font-brush);font-size:1.15rem;color:var(--cinnabar);letter-spacing:.12em}
+.discovery-card{
+  background:linear-gradient(135deg,#FFF8F0 0%,#FFF3E8 100%);
+  border:1.5px solid rgba(199,56,38,.22);
+  border-radius:14px;padding:20px 22px;
+  position:relative;
+  box-shadow:0 2px 12px rgba(199,56,38,.08);
+  width:100%;box-sizing:border-box;
+}
+.discovery-card::before{
+  content:'✦';position:absolute;top:-11px;left:50%;transform:translateX(-50%);
+  font-size:1.1rem;color:var(--cinnabar);background:var(--paper);padding:0 8px;
+}
+.discovery-text{
+  font-family:var(--font-serif);font-size:1.02rem;color:var(--ink);
+  line-height:1.75;text-align:justify;
+}
+.discovery-hint{
+  font-size:.82rem;color:var(--ink-light);font-family:var(--font-serif);
+  margin-top:12px;padding-top:12px;border-top:1px dashed rgba(199,56,38,.18);
+}
+.discovery-go-btn{
+  background:var(--cinnabar);color:#fff;
+  font-family:var(--font-brush);font-size:1.05rem;letter-spacing:.08em;
+  border:none;border-radius:50px;padding:12px 36px;cursor:pointer;
+  box-shadow:0 3px 12px rgba(199,56,38,.32);
+  transition:transform .12s,box-shadow .12s;
+}
+.discovery-go-btn:active{transform:scale(.96);box-shadow:0 1px 6px rgba(199,56,38,.2)}
 </style>
 </head>
 <body>
@@ -885,44 +918,116 @@ const VOCAB_SETS = {
 // ══════════════════════════════════════════
 const SCHEDULE = [
   // ── 第一阶段·初学（Day 1-20）奇数=诗 偶数=文，字词每天都有 ──
-  {day:1,  title:'绝句',               unit:'第一单元', poemId:'p1',  vocabKey:'p1_v',      harvest:'今天学了杜甫的《绝句》！迟日、花草香、飞燕子——四景合一，初春最美的画面！',            harvestEmoji:'🌸'},
-  {day:2,  title:'燕子',               unit:'第一单元', proseId:'pt1',vocabKey:'yanzi_v',   harvest:'今天背诵了《燕子》第1-2自然段！三个"一"写外形，烂漫无比的春天真美！',              harvestEmoji:'🐦'},
-  {day:3,  title:'惠崇春江晚景',        unit:'第一单元', poemId:'p2',  vocabKey:'p2_v',      harvest:'今天学了苏轼的《惠崇春江晚景》！"春江水暖鸭先知"——观察细心才能写出这样的妙句！',     harvestEmoji:'🦆'},
-  {day:4,  title:'荷花',               unit:'第一单元', proseId:'pt2',vocabKey:'hehua_v',   harvest:'今天背诵了《荷花》第2-3自然段！三个"有的"写姿态，"活的画"——叶圣陶把荷花写活了！', harvestEmoji:'🌸'},
-  {day:5,  title:'三衢道中',            unit:'第一单元', poemId:'p3',  vocabKey:'p3_v',      harvest:'今天学了曾几的《三衢道中》！梅雨晴天出游，归来还多了黄鹂鸣叫——出游真快乐！',        harvestEmoji:'🌿'},
-  {day:6,  title:'火烧云',              unit:'第二单元', proseId:'pt3',vocabKey:'huoshao_v', harvest:'今天背诵了《火烧云》第3-6自然段！颜色千变万化，马→狗→狮子——萧红把晚霞写得太生动了！',harvestEmoji:'🌅'},
-  {day:7,  title:'忆江南',              unit:'第一单元', poemId:'p4',  vocabKey:'p4_v',      harvest:'今天学了白居易的《忆江南》！"日出江花红胜火，春来江水绿如蓝"——江南美景永难忘！',    harvestEmoji:'🌺'},
-  {day:8,  title:'燕子·复习',           unit:'第一单元', proseId:'pt1',vocabKey:'yanzi_v',   harvest:'今天复习了《燕子》！跟着语音听读，节奏越来越准！',                              harvestEmoji:'🐦'},
-  {day:9,  title:'滁州西涧',            unit:'第三单元', poemId:'p5',  vocabKey:'p5_v',      harvest:'今天学了韦应物的《滁州西涧》！"野渡无人舟自横"——清幽静谧，令人心旷神怡！',        harvestEmoji:'🌾'},
-  {day:10, title:'荷花·复习',           unit:'第一单元', proseId:'pt2',vocabKey:'hehua_v',   harvest:'今天复习了《荷花》！跟着语音听读，排比句越背越顺了！',                          harvestEmoji:'🌺'},
-  {day:11, title:'元日',                unit:'第四单元', poemId:'p6',  vocabKey:'p6_v',      harvest:'今天学了王安石的《元日》！爆竹、屠苏、春联——古代过春节和现在很像！',               harvestEmoji:'🎆'},
-  {day:12, title:'火烧云·复习',         unit:'第二单元', proseId:'pt3',vocabKey:'huoshao_v', harvest:'今天复习了《火烧云》！"葡萄灰、梨黄、茄子紫"——颜色描写背出来了！',               harvestEmoji:'🌅'},
-  {day:13, title:'清明',                unit:'第四单元', poemId:'p7',  vocabKey:'p7_v',      harvest:'今天学了杜牧的《清明》！雨中行人，牧童指路——短短四句，满是生活气息！',              harvestEmoji:'🌧️'},
-  {day:14, title:'燕子·熟背',           unit:'第一单元', proseId:'pt1',vocabKey:'yanzi_v',   harvest:'今天熟背了《燕子》！三个"一"不看书也能说出来了，加油！',                        harvestEmoji:'🐦'},
-  {day:15, title:'九月九日忆山东兄弟',   unit:'第四单元', poemId:'p8',  vocabKey:'p8_v',      harvest:'今天学了王维的《九月九日忆山东兄弟》！"每逢佳节倍思亲"——千古名句！',               harvestEmoji:'🏔️'},
-  {day:16, title:'荷花·熟背',           unit:'第一单元', proseId:'pt2',vocabKey:'hehua_v',   harvest:'今天熟背了《荷花》！"挨挨挤挤、碧绿大圆盘"——画面感越来越强！',                  harvestEmoji:'🌸'},
-  {day:17, title:'大林寺桃花',           unit:'第四单元', poemId:'p9',  vocabKey:'p9_v',      harvest:'今天学了白居易的《大林寺桃花》！山下花谢了，山上才盛开——意外发现真惊喜！',          harvestEmoji:'🌸'},
-  {day:18, title:'火烧云·熟背',         unit:'第二单元', proseId:'pt3',vocabKey:'huoshao_v', harvest:'今天熟背了《火烧云》！马、狗、狮子三种形状变化，背得越来越流利！',                 harvestEmoji:'🌅'},
-  {day:19, title:'守株待兔',             unit:'第四单元', poemId:'p10', vocabKey:'p10_v',     harvest:'今天学了文言文《守株待兔》！走=跑，释=放下，古今字义真不同！',                   harvestEmoji:'🐰'},
-  {day:20, title:'燕子·巩固',           unit:'综合复习',  proseId:'pt1',vocabKey:'yanzi_v',   harvest:'今天巩固了《燕子》！语音跟读加自己背，节奏更稳了！',                            harvestEmoji:'🐦'},
+  {day:1,  title:'绝句',               unit:'第一单元', poemId:'p1',  vocabKey:'p1_v',
+   discovery:'杜甫没说"春天很美"，他写了四个画面：阳光→花草香→燕子飞→鸳鸯睡。找一找：哪两个画面是动的，哪两个是静的？动静放在一起，春天就活了！',
+   harvest:'今天学了杜甫的《绝句》！迟日、花草香、飞燕子——四景合一，初春最美的画面！', harvestEmoji:'🌸'},
+  {day:2,  title:'燕子',               unit:'第一单元', proseId:'pt1',vocabKey:'yanzi_v',
+   discovery:'叶圣陶写燕子的样子，用了三个"一"：一身羽毛、一对翅膀、一把剪刀似的尾巴。数数三个"一"在哪里——连读三句，燕子的形象是不是就出来了？',
+   harvest:'今天背诵了《燕子》第1-2自然段！三个"一"写外形，烂漫无比的春天真美！', harvestEmoji:'🐦'},
+  {day:3,  title:'惠崇春江晚景',        unit:'第一单元', poemId:'p2',  vocabKey:'p2_v',
+   discovery:'"春江水暖鸭先知"——苏轼是在看一幅静止的画，但他感受到了画里的水温！你闭上眼睛，能感受到江水从冬天的冷慢慢变暖吗？这就叫"诗中有画，画中有诗"。',
+   harvest:'今天学了苏轼的《惠崇春江晚景》！"春江水暖鸭先知"——观察细心才能写出这样的妙句！', harvestEmoji:'🦆'},
+  {day:4,  title:'荷花',               unit:'第一单元', proseId:'pt2',vocabKey:'hehua_v',
+   discovery:'叶圣陶写了三种荷花的样子：全开的、半开的、还是花骨朵儿的。他用"有的……有的……有的……"，没说哪个最美——让你自己感受。你最喜欢哪种？',
+   harvest:'今天背诵了《荷花》第2-3自然段！三个"有的"写姿态，"活的画"——叶圣陶把荷花写活了！', harvestEmoji:'🌸'},
+  {day:5,  title:'三衢道中',            unit:'第一单元', poemId:'p3',  vocabKey:'p3_v',
+   discovery:'曾几回家时没说"今天很开心"——只写了"添得黄鹂四五声"。那几声鸟鸣，你感受到他的心情了吗？这叫：不说情，只写景，景里藏着情！',
+   harvest:'今天学了曾几的《三衢道中》！梅雨晴天出游，归来还多了黄鹂鸣叫——出游真快乐！', harvestEmoji:'🌿'},
+  {day:6,  title:'火烧云',              unit:'第二单元', proseId:'pt3',vocabKey:'huoshao_v',
+   discovery:'萧红写颜色：葡萄灰、梨黄、茄子紫——都是食物！为什么不说"深紫色、浅黄色"？因为食物的颜色你一下子就想象出来了！好的文字让你"看见"，不只是"知道"。',
+   harvest:'今天背诵了《火烧云》第3-6自然段！颜色千变万化，马→狗→狮子——萧红把晚霞写得太生动了！', harvestEmoji:'🌅'},
+  {day:7,  title:'忆江南',              unit:'第一单元', poemId:'p4',  vocabKey:'p4_v',
+   discovery:'"日出江花红胜火"——花比火还红！"春来江水绿如蓝"——水比蓝草还绿！白居易用"比较"让颜色更鲜艳，这叫夸张。把这两句大声读一遍，感受那种强烈的色彩！',
+   harvest:'今天学了白居易的《忆江南》！"日出江花红胜火，春来江水绿如蓝"——江南美景永难忘！', harvestEmoji:'🌺'},
+  {day:8,  title:'燕子·复习',           unit:'第一单元', proseId:'pt1',vocabKey:'yanzi_v',
+   discovery:'上次找了三个"一"，这次听节奏：读"一身乌黑光亮的羽毛"时，停顿在哪里？好的文字读起来像有节拍，试着打着节拍背一遍！',
+   harvest:'今天复习了《燕子》！跟着语音听读，节奏越来越准！', harvestEmoji:'🐦'},
+  {day:9,  title:'滁州西涧',            unit:'第三单元', poemId:'p5',  vocabKey:'p5_v',
+   discovery:'"野渡无人舟自横"——船自己横在那里，没有人撑它。为什么不说"舟停岸边"？一个"横"字，让那条船变得懒洋洋、自由自在。你感受到了吗？',
+   harvest:'今天学了韦应物的《滁州西涧》！"野渡无人舟自横"——清幽静谧，令人心旷神怡！', harvestEmoji:'🌾'},
+  {day:10, title:'荷花·复习',           unit:'第一单元', proseId:'pt2',vocabKey:'hehua_v',
+   discovery:'这次背诵前，想象自己站在荷花池边。叶圣陶说他"忘记了自己"，感觉自己"也是一朵荷花"。背完后试着说：我感觉自己是……',
+   harvest:'今天复习了《荷花》！跟着语音听读，排比句越背越顺了！', harvestEmoji:'🌺'},
+  {day:11, title:'元日',                unit:'第四单元', poemId:'p6',  vocabKey:'p6_v',
+   discovery:'王安石写新年早晨，用了三个细节：爆竹（耳朵听）→屠苏酒（嘴巴喝）→春联（眼睛看）。耳、口、眼都调动了！这叫用多种感官来写作。',
+   harvest:'今天学了王安石的《元日》！爆竹、屠苏、春联——古代过春节和现在很像！', harvestEmoji:'🎆'},
+  {day:12, title:'火烧云·复习',         unit:'第二单元', proseId:'pt3',vocabKey:'huoshao_v',
+   discovery:'这次注意萧红怎么写马：出现→越来越清晰→忽然不见了。用三个阶段写变化，不是一下子消失的。感受那种"渐渐看清，又突然消失"的感觉！',
+   harvest:'今天复习了《火烧云》！"葡萄灰、梨黄、茄子紫"——颜色描写背出来了！', harvestEmoji:'🌅'},
+  {day:13, title:'清明',                unit:'第四单元', poemId:'p7',  vocabKey:'p7_v',
+   discovery:'《清明》只有28个字，却藏着：天气（雨）、人物（行人+牧童）、情绪（欲断魂）、问和答、目的地（杏花村）。这么短，信息这么多——这就是诗的力量！',
+   harvest:'今天学了杜牧的《清明》！雨中行人，牧童指路——短短四句，满是生活气息！', harvestEmoji:'🌧️'},
+  {day:14, title:'燕子·熟背',           unit:'第一单元', proseId:'pt1',vocabKey:'yanzi_v',
+   discovery:'背了三次了！试试：把"三个一"的写法用来写你喜欢的动物："一身______的______，一对______的______，一把______似的______。"先想好，再背课文！',
+   harvest:'今天熟背了《燕子》！三个"一"不看书也能说出来了，加油！', harvestEmoji:'🐦'},
+  {day:15, title:'九月九日忆山东兄弟',   unit:'第四单元', poemId:'p8',  vocabKey:'p8_v',
+   discovery:'"每逢佳节倍思亲"——过节为什么更想家？因为快乐时你特别想和最亲的人分享。王维说出了每个人都有过的感受，所以这句话流传了1300多年！',
+   harvest:'今天学了王维的《九月九日忆山东兄弟》！"每逢佳节倍思亲"——千古名句！', harvestEmoji:'🏔️'},
+  {day:16, title:'荷花·熟背',           unit:'第一单元', proseId:'pt2',vocabKey:'hehua_v',
+   discovery:'叶圣陶写荷花有顺序：先写大景（一大片）→再写细节（三种姿态）→最后写感受（忘了自己）。从远到近，从外到内。这次背的时候，跟着这个顺序走！',
+   harvest:'今天熟背了《荷花》！"挨挨挤挤、碧绿大圆盘"——画面感越来越强！', harvestEmoji:'🌸'},
+  {day:17, title:'大林寺桃花',           unit:'第四单元', poemId:'p9',  vocabKey:'p9_v',
+   discovery:'白居易出门时很失落（山下花都谢了），没想到山上还有桃花开着！他用"长恨春归无觅处"说失落，用"不知转入此中来"说惊喜。失落→惊喜，你有过这种感觉吗？',
+   harvest:'今天学了白居易的《大林寺桃花》！山下花谢了，山上才盛开——意外发现真惊喜！', harvestEmoji:'🌸'},
+  {day:18, title:'火烧云·熟背',         unit:'第二单元', proseId:'pt3',vocabKey:'huoshao_v',
+   discovery:'萧红写了马、狗、狮子三种形状，每种都是：出现→变化→消失。三个一样的节奏排在一起，叫"排比段"。背的时候感受这个节奏，像一首歌的三段副歌！',
+   harvest:'今天熟背了《火烧云》！马、狗、狮子三种形状变化，背得越来越流利！', harvestEmoji:'🌅'},
+  {day:19, title:'守株待兔',             unit:'第四单元', poemId:'p10', vocabKey:'p10_v',
+   discovery:'文言文只用50个字讲完了整个故事！现代话要200字。古人写作原则：能用一个字，绝不用两个字。"走"在古文里是"跑"，"耒"是农具——你能找到几个这样的字？',
+   harvest:'今天学了文言文《守株待兔》！走=跑，释=放下，古今字义真不同！', harvestEmoji:'🐰'},
+  {day:20, title:'燕子·巩固',           unit:'综合复习',  proseId:'pt1',vocabKey:'yanzi_v',
+   discovery:'背了四次了！这次闭上眼睛背，一边背一边"看见"燕子。背完后说说：你脑子里的燕子在哪里？是在飞还是在停？颜色是什么？这就是语言变成画面！',
+   harvest:'今天巩固了《燕子》！语音跟读加自己背，节奏更稳了！', harvestEmoji:'🐦'},
   // ── 第二阶段·复习（Day 21-30）字词仍每天都有 ──
-  {day:21, title:'绝句·复习',           unit:'综合复习',  poemId:'p1',  vocabKey:'p1_v',      harvest:'今天复习了《绝句》！四个景物记牢了吗？迟日→花草→燕子→鸳鸯，全对！',              harvestEmoji:'🌸'},
-  {day:22, title:'荷花·巩固',           unit:'综合复习',  proseId:'pt2',vocabKey:'hehua_v',   harvest:'今天巩固了《荷花》！三种姿态都能背出来了，继续加油！',                          harvestEmoji:'🌺'},
-  {day:23, title:'九月九日·复习',        unit:'综合复习',  poemId:'p8',  vocabKey:'p8_v',      harvest:'今天复习了《九月九日》！"遍插茱萸少一人"——这首诗一定要记住！',                   harvestEmoji:'🏔️'},
-  {day:24, title:'火烧云·巩固',          unit:'综合复习',  proseId:'pt3',vocabKey:'huoshao_v', harvest:'今天巩固了《火烧云》！"变化极多"这句中心句领着全段！',                          harvestEmoji:'🌅'},
-  {day:25, title:'惠崇春江晚景·复习',    unit:'综合复习',  poemId:'p2',  vocabKey:'p2_v',      harvest:'今天复习了《惠崇春江晚景》！"春江水暖鸭先知"要能脱口而出！',                     harvestEmoji:'🦆'},
-  {day:26, title:'燕子·精背',           unit:'综合复习',  proseId:'pt1',vocabKey:'yanzi_v',   harvest:'今天精背了《燕子》！跟TTS语音背了三遍，流利多了！',                             harvestEmoji:'🐦'},
-  {day:27, title:'大林寺桃花·复习',      unit:'综合复习',  poemId:'p9',  vocabKey:'p9_v',      harvest:'今天复习了《大林寺桃花》！山下芳菲尽，山上才盛开——温差有多大！',                 harvestEmoji:'🌸'},
-  {day:28, title:'荷花·精背',           unit:'综合复习',  proseId:'pt2',vocabKey:'hehua_v',   harvest:'今天精背了《荷花》！"一大幅活的画"这个比喻太形象了！',                          harvestEmoji:'🌸'},
-  {day:29, title:'三衢道中·复习',        unit:'综合复习',  poemId:'p3',  vocabKey:'p3_v',      harvest:'今天复习了《三衢道中》！"添得黄鹂四五声"，旅途归来的喜悦感受到了！',              harvestEmoji:'🌿'},
-  {day:30, title:'火烧云·精背',          unit:'综合复习',  proseId:'pt3',vocabKey:'huoshao_v', harvest:'今天精背了《火烧云》！三组"出现→变化→消失"背得越来越流利！',                    harvestEmoji:'🌅'},
+  {day:21, title:'绝句·复习',           unit:'综合复习',  poemId:'p1',  vocabKey:'p1_v',
+   discovery:'上次找动静，这次找感官："迟日"（看光）→"花草香"（闻香气）→"泥融飞燕子"（看动作）→"沙暖睡鸳鸯"（感受温度）。杜甫用眼睛和鼻子写了一个春天！',
+   harvest:'今天复习了《绝句》！四个景物记牢了吗？迟日→花草→燕子→鸳鸯，全对！', harvestEmoji:'🌸'},
+  {day:22, title:'荷花·巩固',           unit:'综合复习',  proseId:'pt2',vocabKey:'hehua_v',
+   discovery:'注意标点：三个"有的……"后面都是逗号，不是句号。三种姿态并排放，地位相等，没有哪个更重要。连着读三个"有的"，感受一下这种"平等"的节奏！',
+   harvest:'今天巩固了《荷花》！三种姿态都能背出来了，继续加油！', harvestEmoji:'🌺'},
+  {day:23, title:'九月九日·复习',        unit:'综合复习',  poemId:'p8',  vocabKey:'p8_v',
+   discovery:'"遍插茱萸少一人"——少的那个人是谁？是王维自己！他站在远处，想象兄弟们都在一起，只缺了他。这个角度的转换，让思念变得更深了。',
+   harvest:'今天复习了《九月九日》！"遍插茱萸少一人"——这首诗一定要记住！', harvestEmoji:'🏔️'},
+  {day:24, title:'火烧云·巩固',          unit:'综合复习',  proseId:'pt3',vocabKey:'huoshao_v',
+   discovery:'萧红给火烧云里的马加上了动作："马是跑着的，尾巴是跑着的，鬃毛也是跑着的"——连鬃毛都在跑！给没有生命的东西加上性格和动作，叫拟人化。你能感受到那匹马的速度吗？',
+   harvest:'今天巩固了《火烧云》！"变化极多"这句中心句领着全段！', harvestEmoji:'🌅'},
+  {day:25, title:'惠崇春江晚景·复习',    unit:'综合复习',  poemId:'p2',  vocabKey:'p2_v',
+   discovery:'苏轼看的是一幅静止的画，但他写出了声音和动作：鸭子在叫、芦芽在生长、河豚在水里游动。从"看见"到"想象到"——这就是诗人比普通人多的那一步。',
+   harvest:'今天复习了《惠崇春江晚景》！"春江水暖鸭先知"要能脱口而出！', harvestEmoji:'🦆'},
+  {day:26, title:'燕子·精背',           unit:'综合复习',  proseId:'pt1',vocabKey:'yanzi_v',
+   discovery:'背了五次了！挑战：把课文第一段用自己的话说一遍，再背一遍原文，比较一下：为什么原文更好读？（提示：节奏感、三个"一"的排比、每句长度差不多。）',
+   harvest:'今天精背了《燕子》！跟TTS语音背了三遍，流利多了！', harvestEmoji:'🐦'},
+  {day:27, title:'大林寺桃花·复习',      unit:'综合复习',  poemId:'p9',  vocabKey:'p9_v',
+   discovery:'"不知转入此中来"——白居易说"不知道"，但他是真的不知道吗？还是故意用"不知道"来表达意外的惊喜感？这种说法让结尾更有诗意，你感受到了吗？',
+   harvest:'今天复习了《大林寺桃花》！山下芳菲尽，山上才盛开——温差有多大！', harvestEmoji:'🌸'},
+  {day:28, title:'荷花·精背',           unit:'综合复习',  proseId:'pt2',vocabKey:'hehua_v',
+   discovery:'"如果把眼前的一池荷花看作一大幅活的画"——"活的"比"美丽的"好在哪里？"活"说明荷花在动、在生长，不只是好看！背完后用一句话说说这个道理。',
+   harvest:'今天精背了《荷花》！"一大幅活的画"这个比喻太形象了！', harvestEmoji:'🌸'},
+  {day:29, title:'三衢道中·复习',        unit:'综合复习',  poemId:'p3',  vocabKey:'p3_v',
+   discovery:'前两句写出发，后两句写回来：出发时"绿阴不减来时路"，回来时"添得黄鹂四五声"。出发和回来的路一样，但世界多了鸟鸣。一来一回，心情就不同了！',
+   harvest:'今天复习了《三衢道中》！"添得黄鹂四五声"，旅途归来的喜悦感受到了！', harvestEmoji:'🌿'},
+  {day:30, title:'火烧云·精背',          unit:'综合复习',  proseId:'pt3',vocabKey:'huoshao_v',
+   discovery:'萧红每次写消失都说"不见了"，不说"消失了"。"不见了"比"消失了"多了一点什么？（更突然？更让人惋惜？）一个词的选择，读者的感受就不一样了！',
+   harvest:'今天精背了《火烧云》！三组"出现→变化→消失"背得越来越流利！', harvestEmoji:'🌅'},
   // ── 第三阶段·冲刺（Day 31-36）字词仍每天都有 ──
-  {day:31, title:'守株待兔·复习',        unit:'综合冲刺',  poemId:'p10', vocabKey:'p10_v',     harvest:'今天复习了文言文《守株待兔》！"兔不可复得，而身为宋国笑"——背出来了！',            harvestEmoji:'🐰'},
-  {day:32, title:'燕子·冲刺',           unit:'综合冲刺',  proseId:'pt1',vocabKey:'yanzi_v',   harvest:'今天冲刺背了《燕子》！第5次了，一定能流利背出！',                              harvestEmoji:'🐦'},
-  {day:33, title:'元日·复习',            unit:'综合冲刺',  poemId:'p6',  vocabKey:'p6_v',      harvest:'今天复习了《元日》！"总把新桃换旧符"——春节的古韵背出来了！',                    harvestEmoji:'🎆'},
-  {day:34, title:'荷花·冲刺',           unit:'综合冲刺',  proseId:'pt2',vocabKey:'hehua_v',   harvest:'今天冲刺背了《荷花》！第5次了，排比句背得铿锵有力！',                           harvestEmoji:'🌺'},
-  {day:35, title:'清明·冲刺',            unit:'综合冲刺',  poemId:'p7',  vocabKey:'p7_v',      harvest:'今天冲刺了《清明》！"牧童遥指杏花村"——全诗脱口而出！',                         harvestEmoji:'🌧️'},
-  {day:36, title:'火烧云·结业',          unit:'暑期结业',  proseId:'pt3',vocabKey:'huoshao_v', harvest:'🎊 恭喜完成36天！10首古诗+3篇课文反复背诵，词语掌握扎实，升四年级准备好了！',       harvestEmoji:'🏆'},
+  {day:31, title:'守株待兔·复习',        unit:'综合冲刺',  poemId:'p10', vocabKey:'p10_v',
+   discovery:'故事最后"而身为宋国笑"——被全国人嘲笑。这个结果是他自己造成的。古人把道理藏在故事里，不直接说教——你能用一句话说出这个道理吗？',
+   harvest:'今天复习了文言文《守株待兔》！"兔不可复得，而身为宋国笑"——背出来了！', harvestEmoji:'🐰'},
+  {day:32, title:'燕子·冲刺',           unit:'综合冲刺',  proseId:'pt1',vocabKey:'yanzi_v',
+   discovery:'背了六次了！最后挑战：背完第一段，然后试着在纸上画出那只燕子。语言的最高境界：读了文字，脑子里有画面，画面可以用手画出来！',
+   harvest:'今天冲刺背了《燕子》！第5次了，一定能流利背出！', harvestEmoji:'🐦'},
+  {day:33, title:'元日·复习',            unit:'综合冲刺',  poemId:'p6',  vocabKey:'p6_v',
+   discovery:'"总把新桃换旧符"——换门上的符，也是换掉旧的自己，迎接新的一年。好的诗，表面写一件事，心里说的是另一件事。你感受到王安石说的"另一件事"了吗？',
+   harvest:'今天复习了《元日》！"总把新桃换旧符"——春节的古韵背出来了！', harvestEmoji:'🎆'},
+  {day:34, title:'荷花·冲刺',           unit:'综合冲刺',  proseId:'pt2',vocabKey:'hehua_v',
+   discovery:'背了六次了！问问自己三个问题：① 三种姿态是什么？② "活的画"是什么意思？③ 你有没有过"忘记了自己"的时刻？语文不只是背，是让你联系自己的生活！',
+   harvest:'今天冲刺背了《荷花》！第5次了，排比句背得铿锵有力！', harvestEmoji:'🌺'},
+  {day:35, title:'清明·冲刺',            unit:'综合冲刺',  poemId:'p7',  vocabKey:'p7_v',
+   discovery:'再读一次《清明》，数一数：几个人？（2个）几个天气？（1种）几种情绪？（悲伤→有了方向）几个地点？（路上、杏花村）28个字里，世界比你想象的丰富！',
+   harvest:'今天冲刺了《清明》！"牧童遥指杏花村"——全诗脱口而出！', harvestEmoji:'🌧️'},
+  {day:36, title:'火烧云·结业',          unit:'暑期结业',  proseId:'pt3',vocabKey:'huoshao_v',
+   discovery:'最后一次！萧红1942年去世，只活了31岁。她把自己看过的火烧云留在了这篇文章里，让所有读到它的人也"看见"了。好的文字，让美永远存在。🌅',
+   harvest:'🎊 恭喜完成36天！10首古诗+3篇课文反复背诵，词语掌握扎实，升四年级准备好了！', harvestEmoji:'🏆'},
 ];
 
 // ══════════════════════════════════════════
@@ -1057,11 +1162,15 @@ function openLesson(dayNum){
   document.getElementById('lesson-title').textContent=sched.title;
   document.getElementById('lesson-day-badge').textContent='第'+dayNum+'天';
 
-  // Every day: vocab → poem/prose → harvest
+  // Every day: vocab → discovery → poem/prose → harvest
   currentSteps=[];
 
   if(sched.vocabKey && VOCAB_SETS[sched.vocabKey]){
     currentSteps.push({type:'vocab', vocabKey:sched.vocabKey});
+  }
+
+  if(sched.discovery){
+    currentSteps.push({type:'discovery', text:sched.discovery, title:sched.title});
   }
 
   if(sched.poemId){
@@ -1110,6 +1219,7 @@ function renderStep(idx){
 
   if(step.type==='intro') renderIntroStep(body,step.sched);
   else if(step.type==='vocab') renderVocabStep(body,step.vocabKey,'词语闯关');
+  else if(step.type==='discovery') renderDiscoveryStep(body,step.text,step.title);
   else if(step.type==='sentence') renderSentenceStep(body,step.sentKey);
   else if(step.type==='quiz') renderQuizStep(body,step.sched);
   else if(step.type==='match') renderMatchStep(body,step.vocabKey);
@@ -2178,6 +2288,19 @@ function renderWritingPromptStep(body,key,promptType){
 }
 
 // ── HARVEST STEP ──
+function renderDiscoveryStep(body,text,title){
+  body.innerHTML=`
+    <div class="discovery-wrap">
+      <div class="discovery-lantern">🏮</div>
+      <div class="discovery-label">今日发现</div>
+      <div class="discovery-card">
+        <div class="discovery-text">${text}</div>
+      </div>
+      <div class="fade-guide" style="font-size:.85rem;color:var(--ink-light);font-family:var(--font-serif)">读完之后，带着这个发现去背诵《${title}》</div>
+    </div>
+  `;
+}
+
 function renderHarvestStep(body,sched){
   const reciteTitle=sched.poemId?POEMS.find(p=>p.id===sched.poemId)?.title:PROSE_TEXTS.find(p=>p.id===sched.proseId)?.title;
   const reciteType=sched.poemId?'古诗背诵':'课文朗读';
@@ -2194,6 +2317,7 @@ function renderHarvestStep(body,sched){
       <h3>🎯 今天完成了</h3>
       <p>
         📝 词语闯关：${vocabCount} 个词语<br>
+        🏮 今日发现：语言之美 × 1<br>
         🎤 ${reciteType}：《${reciteTitle}》<br>
         ✅ 完成今天的打卡！
       </p>
