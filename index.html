@@ -12,7 +12,7 @@
 :root{
   --ink:#2b1d0e;
   --ink2:#6b4a24;
-  --ink3:#b08c5c;
+  --ink3:#8a6736;
   --paper:#fffcf5;
   --paper2:#fff8ec;
   --paper3:#fdefd4;
@@ -30,7 +30,7 @@
   --sans:'Noto Sans SC',sans-serif;
 }
 html{scroll-behavior:smooth}
-body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-weight:300;line-height:1.8;overflow-x:hidden}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-weight:400;line-height:1.7;overflow-x:hidden}
 
 /* ══ NAV ══ */
 nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:16px 56px;display:flex;justify-content:space-between;align-items:center;background:rgba(255,252,245,0.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(232,114,12,0.12);box-shadow:0 2px 20px rgba(232,114,12,0.06);transition:padding 0.4s}
@@ -75,6 +75,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:16px 56px;display:fl
 /* Carousel: 3 frames */
 .scene-track{
   display:flex;width:300%;height:100%;
+  flex-shrink:0;
   transition:none;
 }
 .scene-frame{
