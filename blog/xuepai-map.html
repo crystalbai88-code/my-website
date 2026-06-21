@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 时代学习 · 8 大认知阵营地图 | 白白的教育思考</title>
+<style>
+  :root{
+    --bg-0:#0a1320; --bg-1:#0e1c30; --panel:#13243d; --panel-2:#16294480;
+    --navy:#1e3a5f; --navy-line:#2a486a;
+    --amber:#e8a33d; --amber-br:#ffc56b; --amber-dim:#a9802f;
+    --ink:#eaf1fa; --muted:#8ea4c0; --muted-2:#5e7691;
+    --line:#27405f; --conflict:#e8a33d;
+    --serif:"Songti SC","STSong","Noto Serif SC",Georgia,serif;
+    --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:var(--sans); color:var(--ink);
+    background:
+      radial-gradient(1200px 700px at 50% -10%, #16335a55 0%, transparent 60%),
+      radial-gradient(900px 600px at 85% 110%, #3a2a1233 0%, transparent 55%),
+      linear-gradient(180deg,#0b1626 0%, #0a1320 100%);
+    background-attachment:fixed;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.6;
+  }
+  .wrap{max-width:1280px;margin:0 auto;padding:34px 26px 60px}
+  /* ---------- header ---------- */
+  header{text-align:center;margin-bottom:22px;position:relative}
+  .kicker{font-size:12.5px;letter-spacing:.32em;color:var(--amber);font-weight:600;margin-bottom:14px}
+  h1{font-family:var(--serif);font-weight:700;font-size:clamp(26px,4.4vw,42px);letter-spacing:.02em;line-height:1.25}
+  h1 .hl{color:var(--amber-br)}
+  .sub{margin-top:12px;color:var(--muted);font-size:clamp(13px,1.7vw,15.5px)}
+  .sub b{color:#cdb98a;font-weight:600}
+  /* ---------- toolbar ---------- */
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:24px 0 18px}
+  .tbtn{
+    font-family:var(--sans);font-size:13px;color:var(--muted);
+    background:#11233c;border:1px solid var(--line);border-radius:999px;
+    padding:7px 16px;cursor:pointer;transition:.18s;letter-spacing:.02em
+  }
+  .tbtn:hover{color:var(--ink);border-color:var(--amber-dim)}
+  .tbtn.on{color:#0c1626;background:linear-gradient(180deg,var(--amber-br),var(--amber));border-color:var(--amber);font-weight:600}
+  /* ---------- stage ---------- */
+  .stage{display:grid;grid-template-columns:1fr 384px;gap:22px;align-items:start}
+  .mapcard{
+    position:relative;background:linear-gradient(180deg,#0c1a2e 0%,#0a1525 100%);
+    border:1px solid var(--line);border-radius:20px;overflow:hidden;
+    box-shadow:0 30px 70px -40px #000, inset 0 1px 0 #ffffff0a
+  }
+  svg{display:block;width:100%;height:auto}
+  .hint{position:absolute;left:18px;bottom:14px;font-size:11.5px;color:var(--muted-2);letter-spacing:.04em}
+  /* ---------- nodes ---------- */
+  .camp{cursor:pointer}
+  .camp .halo{opacity:0;transition:.2s}
+  .camp:hover .halo, .camp.sel .halo{opacity:1}
+  .camp .disc{transition:.2s}
+  .camp:hover .disc{filter:url(#glow)}
+  .camp.sel .disc{stroke:var(--amber-br);stroke-width:2.4}
+  .camp .num{font-family:var(--serif);font-weight:700;fill:var(--amber-br);font-size:21px;text-anchor:middle;pointer-events:none}
+  .camp .nm{font-family:var(--sans);fill:var(--ink);font-size:15px;font-weight:600;text-anchor:middle;pointer-events:none}
+  .camp.dim{opacity:.32}
+  .chord{stroke:var(--conflict);stroke-width:1.3;fill:none;opacity:.28;transition:.2s;cursor:pointer;stroke-dasharray:5 5}
+  .chord:hover, .chord.sel{opacity:.95;stroke-width:2.2;stroke-dasharray:none}
+  .core{cursor:pointer}
+  .core .cring{transition:.2s}
+  .core:hover .cring, .core.sel .cring{stroke:var(--amber-br)}
+  .core .ct{font-family:var(--serif);fill:var(--amber-br);text-anchor:middle;font-weight:700}
+  .axislbl{fill:var(--muted-2);font-size:11.5px;font-family:var(--sans);letter-spacing:.06em}
+  /* full overview labels */
+  .sharp-lbl{font-family:var(--sans);font-size:10.5px;fill:#bcae8c;display:none}
+  body.overview .sharp-lbl{display:block}
+  /* ---------- panel ---------- */
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:18px;
+    padding:24px 24px 26px;min-height:520px;position:sticky;top:18px;
+    box-shadow:0 24px 60px -44px #000
+  }
+  .panel .ptag{display:inline-block;font-size:11px;letter-spacing:.22em;color:var(--amber);
+    border:1px solid var(--amber-dim);border-radius:6px;padding:3px 9px;margin-bottom:16px}
+  .panel h2{font-family:var(--serif);font-size:23px;font-weight:700;line-height:1.3;margin-bottom:6px}
+  .panel h2 small{display:block;font-family:var(--sans);font-size:13px;font-weight:500;color:var(--amber-br);margin-top:7px;letter-spacing:.02em}
+  .row{margin-top:18px}
+  .row .lab{font-size:11.5px;letter-spacing:.18em;color:var(--muted);margin-bottom:6px}
+  .row .val{font-size:14.5px;color:#dde7f3}
+  .sharp{margin-top:20px;padding:16px 18px;background:#0e2036;border-left:3px solid var(--amber);border-radius:0 10px 10px 0;
+    font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--amber-br)}
+  .witness{color:#aebfd4;font-size:13px;line-height:1.75}
+  .keyq{margin-top:16px;padding:14px 16px;background:#16294480;border:1px dashed var(--amber-dim);border-radius:10px}
+  .keyq .kk{font-size:11.5px;letter-spacing:.16em;color:var(--amber);margin-bottom:7px}
+  .keyq .kv{font-family:var(--serif);font-size:16px;color:var(--amber-br);line-height:1.5}
+  .vs{font-size:13px;color:var(--muted);margin-top:4px}
+  /* lists in panel */
+  ol.plist,ul.plist{margin:6px 0 0;padding-left:0;list-style:none;counter-reset:p}
+  ol.plist li{counter-increment:p;position:relative;padding:11px 0 11px 38px;border-bottom:1px solid #ffffff0d;font-size:14px;color:#dbe6f2}
+  ol.plist li::before{content:counter(p);position:absolute;left:0;top:10px;width:25px;height:25px;
+    background:#0e2036;border:1px solid var(--amber-dim);color:var(--amber-br);border-radius:50%;
+    font-family:var(--serif);font-size:13px;display:flex;align-items:center;justify-content:center}
+  ol.plist li:last-child{border-bottom:none}
+  ol.plist li b{color:var(--amber-br);font-weight:600}
+  .panel .lead{color:var(--muted);font-size:14px;line-height:1.8}
+  .panel .lead b{color:#cdb98a}
+  /* overview legend grid */
+  .ovgrid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:6px}
+  .ovrow{padding:12px 14px;background:#0e2036;border:1px solid var(--line);border-radius:10px}
+  .ovrow .h{font-size:13.5px;font-weight:600;color:var(--amber-br);margin-bottom:4px}
+  .ovrow .h em{font-style:normal;color:var(--muted);font-weight:500;font-size:12px;margin-left:6px}
+  .ovrow .s{font-family:var(--serif);font-size:13.5px;color:#cdd9e8;line-height:1.5}
+  footer{text-align:center;margin-top:34px;color:var(--muted-2);font-size:12.5px;letter-spacing:.04em}
+  footer b{color:var(--muted)}
+  @media (max-width:980px){
+    .stage{grid-template-columns:1fr}
+    .panel{position:static;min-height:auto}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">白白的教育思考 · 拆书地图系列</div>
+    <h1>AI 时代,我们到底该<span class="hl">怎么学</span></h1>
+    <div class="sub">把一场仍在进行的论战,蒸馏成一张能用的认知地图 —— <b>8 大阵营 · 6 场打架 · 5 条共识</b></div>
+  </header>
+
+  <div class="toolbar">
+    <button class="tbtn on" data-view="map">认知星图</button>
+    <button class="tbtn" data-view="conflicts">专家打架 · 6 议题</button>
+    <button class="tbtn" data-view="consensus">跨派共识 · 5 条</button>
+    <button class="tbtn" data-view="illusions">9 个错觉</button>
+    <button class="tbtn" data-view="formulas">现场公式 · 8 招</button>
+    <button class="tbtn" id="ovBtn" data-view="overview">📋 一图全览</button>
+  </div>
+
+  <div class="stage">
+    <div class="mapcard">
+      <svg id="map" viewBox="0 0 920 860" role="img" aria-label="认知星图">
+        <defs>
+          <radialGradient id="coreg" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#e8a33d" stop-opacity=".30"/>
+            <stop offset="60%" stop-color="#e8a33d" stop-opacity=".05"/>
+            <stop offset="100%" stop-color="#e8a33d" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="discg" cx="50%" cy="40%" r="70%">
+            <stop offset="0%" stop-color="#1c3a60"/>
+            <stop offset="100%" stop-color="#0f2138"/>
+          </radialGradient>
+          <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+            <feGaussianBlur stdDeviation="6" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <g id="rings"></g>
+        <g id="stars"></g>
+        <g id="chords"></g>
+        <g id="coreLayer"></g>
+        <g id="camps"></g>
+        <g id="axes"></g>
+      </svg>
+      <div class="hint">点击星点看阵营 · 点击虚线看打架 · 点击中心看共识</div>
+    </div>
+
+    <aside class="panel" id="panel"><!-- filled by JS --></aside>
+  </div>
+
+  <footer>白白的教育思考 · 用 Claude Code 蒸馏一场论战 &nbsp;|&nbsp; <b>地图已摊开,路还得各自走</b></footer>
+</div>
+
+<script>
+/* ---------------- data ---------------- */
+const CAMPS = [
+  {id:1,a:0,  name:'增强派',sub:'AI 是认知外骨骼',
+   claim:'AI 是史上最强的认知放大器,真问题不是要不要用,而是如何与它共生。',
+   wit:'Ethan Mollick《共生思维》· Salman Khan《Brave New Words》',
+   sharp:'拒绝 AI,等于让孩子裸手对抗带工具的同龄人。'},
+  {id:2,a:315,name:'警惕派',sub:'用进废退 · 认知卸载',
+   claim:'把思考外包给 AI,被外包掉的那部分能力就会萎缩;便利的代价是变浅。',
+   wit:'Nicholas Carr《浅薄》《玻璃笼子》· MIT「Your Brain on ChatGPT」',
+   sharp:'每一次"让 AI 帮我想",都是一个没做的脑力俯卧撑。'},
+  {id:3,a:90, name:'基础知识派',sub:'没底子,AI 是空中楼阁',
+   claim:'批判性思维寄生在背景知识之上,"反正能查"是最危险的幻觉。',
+   wit:'E.D. Hirsch《知识的力量》· Natalie Wexler《知识的鸿沟》',
+   sharp:'你无法对你一无所知的东西,进行批判性思考。'},
+  {id:4,a:45, name:'精熟派',sub:'学习科学 · 必须有摩擦',
+   claim:'真正的学习来自提取与挣扎,AI 制造的"流畅感"恰是学会的假象。',
+   wit:'《认知天性》· Ericsson《刻意练习》· Oakley《学习之道》',
+   sharp:'AI 让答案变顺滑,而学习恰恰发生在不顺滑的地方。'},
+  {id:5,a:135,name:'认知负荷派',sub:'别给新手太多自由',
+   claim:'工作记忆极其有限,新手需要明确指导而非自主探索。',
+   wit:'John Sweller 认知负荷理论 · Willingham《为什么学生不喜欢上学》',
+   sharp:'人脑天生不爱思考——工具该替它省力,而不是替它逃避。'},
+  {id:6,a:180,name:'自主建构派',sub:'做造物者,而非接收者',
+   claim:'学习的核心是内在动机与创造,AI 应服务于"造东西",而非"喂答案"。',
+   wit:'Papert《因思而学》· Mitra 自组织学习 · Deci & Ryan 自我决定论',
+   sharp:'给孩子一个能造的 AI,而不是一个能抄的 AI。'},
+  {id:7,a:225,name:'个性化派',sub:'终于能规模化的一对一',
+   claim:'Bloom 的「2 Sigma 难题」困了教育界四十年,AI 第一次让它有解。',
+   wit:'Benjamin Bloom「2 Sigma」· 可汗学院 Khanmigo',
+   sharp:'过去只有富人买得起家教,现在每个孩子兜里都揣着一个。'},
+  {id:8,a:270,name:'全人素养派',sub:'教机器学不会的',
+   claim:'可被 AI 替代的知识在贬值,重心应移向品格、协作、提问与创造。',
+   wit:'OECD 学习指南针 2030 · 赵勇 · Tony Wagner《全球成就鸿沟》',
+   sharp:'当答案变得免费,会提问的人才值钱。'},
+];
+const CONFLICTS = [
+  {a:1,b:4,title:'该不该让孩子用 AI 写作业?',vs:'增强派 ⚔ 精熟派',
+   key:'先合上 AI 自己挣扎三分钟,再用 AI 当批改,而不是当枪手。'},
+  {a:1,b:3,title:'AI 时代,记忆还重要吗?',vs:'增强派 ⚔ 基础知识派',
+   key:'能查的别背,但用来判断 AI 对错的底子,一定要背。'},
+  {a:7,b:8,title:'AI 导师能替代老师吗?',vs:'个性化派 ⚔ 全人素养派',
+   key:'AI 负责教知识,人负责教"为什么值得学"。'},
+  {a:6,b:5,title:'该自主探索,还是先手把手?',vs:'自主建构派 ⚔ 认知负荷派',
+   key:'新手要脚手架,熟手才放养——按"会不会"切换,而不是按年龄。'},
+  {a:1,b:8,title:'"提示词工程"算核心素养吗?',vs:'增强派 ⚔ 全人素养派',
+   key:'提示词是会过时的技巧,会提好问题才是能迁移的素养。'},
+  {a:2,b:1,title:'AI 让人变笨还是变强?',vs:'警惕派 ⚔ 增强派',
+   key:'把 AI 省下的力气投回思考就变强,省下就跑就变笨。'},
+];
+const CONSENSUS = [
+  '没有"提取与挣扎",就没有真正的学习——AI 替不了这一步。',
+  '<b>元认知</b>是 AI 时代第一能力:知道自己懂没懂,才知道何时该信 AI。',
+  '动机与提问能力,高于答案获取能力——答案越廉价,会问的人越稀缺。',
+  '背景知识仍是判断 AI 对错的前提,它是识别 AI 幻觉的免疫系统。',
+  '人际、品格与创造,是机器短期内拿不走的护城河。',
+];
+const ILLUSIONS = [
+  'AI 时代,记忆不重要了。','孩子是数字原住民,天生会用 AI。',
+  '个性化学习,就是让 AI 给他推送题目。','用 AI = 作弊。',
+  '提示词工程是未来的核心技能。','AI 辅导能替代老师。',
+  '信息随手可得,所以不必再学知识。','AI 让学习更轻松了。',
+  '最安全的做法,是禁止孩子用。',
+];
+const FORMULAS = [
+  '<b>三分钟法则</b>:用 AI 前先自己想满三分钟,把卡点写下来再问。',
+  '<b>苏格拉底开关</b>:命令 AI "只用提问引导我,不要直接给答案"。',
+  '<b>检索优先</b>:先合上 AI 凭记忆复述,再用 AI 核对补漏。',
+  '<b>造物指令</b>:让孩子用 AI 做出一个东西,而不是要一个答案。',
+  '<b>错误猎人</b>:故意让 AI 出错,训练孩子抓它的漏洞。',
+  '<b>解释权回收</b>:AI 给完答案,要孩子用自己的话讲一遍才算过。',
+  '<b>脚手架递减</b>:同类任务让 AI 的帮助一次比一次少。',
+  '<b>离屏沉淀</b>:学完合上屏幕,手写一张"今天我真正懂了什么"。',
+];
+
+/* ---------------- geometry ---------------- */
+const CX=460, CY=400, R=300, NODE=46;
+const rad = d => (d-90)*Math.PI/180; // 0deg = top
+function pos(angle){ const t=(angle)*Math.PI/180; return {x:CX+R*Math.sin(t), y:CY-R*Math.cos(t)}; }
+CAMPS.forEach(c=>{ const p=pos(c.a); c.x=p.x; c.y=p.y; });
+const byId = id => CAMPS.find(c=>c.id===id);
+
+const SVGNS='http://www.w3.org/2000/svg';
+const el=(n,at={})=>{const e=document.createElementNS(SVGNS,n);for(const k in at)e.setAttribute(k,at[k]);return e;};
+
+/* rings + stars background */
+const ringsG=document.getElementById('rings');
+[R, R*0.62, R*0.3].forEach((r,i)=>ringsG.appendChild(el('circle',{cx:CX,cy:CY,r,fill:'none',stroke:'#21405f',
+  'stroke-width':1,'stroke-opacity':i===0?.5:.28,'stroke-dasharray':i===0?'none':'3 7'})));
+const starsG=document.getElementById('stars');
+for(let i=0;i<70;i++){const ang=Math.random()*2*Math.PI, rr=80+Math.random()*340;
+  starsG.appendChild(el('circle',{cx:CX+Math.cos(ang)*rr*0.95,cy:CY+Math.sin(ang)*rr*0.7,
+  r:Math.random()*1.3+.3,fill:'#cfe0f5','fill-opacity':Math.random()*.5+.12}));}
+
+/* chords */
+const chordsG=document.getElementById('chords');
+CONFLICTS.forEach((cf,i)=>{
+  const A=byId(cf.a),B=byId(cf.b);
+  const mx=(A.x+B.x)/2, my=(A.y+B.y)/2;
+  const qx=mx+(CX-mx)*0.28, qy=my+(CY-my)*0.28; // bend toward center
+  const path=el('path',{d:`M${A.x},${A.y} Q${qx},${qy} ${B.x},${B.y}`,class:'chord','data-cf':i});
+  path.addEventListener('click',e=>{e.stopPropagation();showConflict(i);});
+  chordsG.appendChild(path);
+});
+
+/* core */
+const coreLayer=document.getElementById('coreLayer');
+coreLayer.appendChild(el('circle',{cx:CX,cy:CY,r:96,fill:'url(#coreg)'}));
+const coreG=el('g',{class:'core'}); coreG.setAttribute('data-core','1');
+coreG.appendChild(el('circle',{class:'cring',cx:CX,cy:CY,r:58,fill:'#0e1f36','fill-opacity':.85,stroke:'var(--amber-dim)','stroke-width':1.4}));
+const ct1=el('text',{class:'ct',x:CX,y:CY-6,'font-size':16}); ct1.textContent='跨派';
+const ct2=el('text',{class:'ct',x:CX,y:CY+16,'font-size':16}); ct2.textContent='共识核';
+coreG.appendChild(ct1); coreG.appendChild(ct2);
+coreG.addEventListener('click',e=>{e.stopPropagation();showConsensus();});
+coreLayer.appendChild(coreG);
+
+/* camps */
+const campsG=document.getElementById('camps');
+CAMPS.forEach(c=>{
+  const g=el('g',{class:'camp','data-id':c.id});
+  g.appendChild(el('circle',{class:'halo',cx:c.x,cy:c.y,r:NODE+13,fill:'url(#coreg)'}));
+  g.appendChild(el('circle',{class:'disc',cx:c.x,cy:c.y,r:NODE,fill:'url(#discg)',stroke:'var(--amber-dim)','stroke-width':1.5}));
+  const num=el('text',{class:'num',x:c.x,y:c.y+1}); num.textContent=c.id; g.appendChild(num);
+  // name below or above depending on vertical half
+  const below=c.y<CY; const ny=below?c.y-NODE-12:c.y+NODE+22;
+  const nm=el('text',{class:'nm',x:c.x,y:ny}); nm.textContent=c.name; g.appendChild(nm);
+  // overview sharp label
+  const sy=below?ny-16:ny+18;
+  const sl=el('text',{class:'sharp-lbl',x:c.x,y:sy,'text-anchor':'middle'});
+  sl.textContent='「'+c.sharp.replace(/。$/,'')+'」';
+  // wrap long sharp text
+  g.appendChild(sl);
+  g.addEventListener('click',e=>{e.stopPropagation();showCamp(c.id);});
+  campsG.appendChild(g);
+});
+
+/* ---------------- panel rendering ---------------- */
+const panel=document.getElementById('panel');
+const tbtns=[...document.querySelectorAll('.tbtn')];
+function setActive(view){ tbtns.forEach(b=>b.classList.toggle('on',b.dataset.view===view)); }
+function clearSel(){ document.querySelectorAll('.camp,.chord,.core').forEach(n=>n.classList.remove('sel','dim')); }
+
+function showCamp(id){
+  document.body.classList.remove('overview'); setActive('map'); clearSel();
+  const c=byId(id);
+  document.querySelector(`.camp[data-id="${id}"]`).classList.add('sel');
+  // dim non-connected camps
+  const linked=new Set([id]); CONFLICTS.forEach(cf=>{if(cf.a===id)linked.add(cf.b);if(cf.b===id)linked.add(cf.a);});
+  CAMPS.forEach(o=>{if(!linked.has(o.id))document.querySelector(`.camp[data-id="${o.id}"]`).classList.add('dim');});
+  const fights=CONFLICTS.filter(cf=>cf.a===id||cf.b===id)
+     .map(cf=>`<li>${cf.title}<br><span style="color:#8ea4c0;font-size:12.5px">${cf.vs}</span></li>`).join('');
+  panel.innerHTML=`
+    <span class="ptag">阵营 0${id}</span>
+    <h2>${c.name}<small>${c.sub}</small></h2>
+    <div class="sharp">「${c.sharp}」</div>
+    <div class="row"><div class="lab">核 心 主 张</div><div class="val">${c.claim}</div></div>
+    <div class="row"><div class="lab">证 人 著 作</div><div class="witness">${c.wit}</div></div>
+    <div class="row"><div class="lab">它 卷 入 的 打 架</div><ol class="plist">${fights||'<li>(本派暂未在主议题中正面交锋)</li>'}</ol></div>`;
+}
+function showConflict(i){
+  document.body.classList.remove('overview'); setActive('conflicts'); clearSel();
+  const cf=CONFLICTS[i];
+  document.querySelector(`.chord[data-cf="${i}"]`).classList.add('sel');
+  [cf.a,cf.b].forEach(id=>document.querySelector(`.camp[data-id="${id}"]`).classList.add('sel'));
+  CAMPS.forEach(o=>{if(o.id!==cf.a&&o.id!==cf.b)document.querySelector(`.camp[data-id="${o.id}"]`).classList.add('dim');});
+  panel.innerHTML=`
+    <span class="ptag">专家打架 · ${i+1}/6</span>
+    <h2>${cf.title}</h2>
+    <div class="vs">${cf.vs}</div>
+    <div class="keyq" style="margin-top:22px"><div class="kk">判 断 口 诀</div><div class="kv">${cf.key}</div></div>
+    <div class="row"><div class="lab">其 余 五 场 打 架</div><ol class="plist">${
+      CONFLICTS.map((c,j)=>j===i?'':`<li onclick="showConflict(${j})" style="cursor:pointer">${c.title}<br><span style="color:#8ea4c0;font-size:12.5px">${c.vs}</span></li>`).join('')
+    }</ol></div>`;
+}
+function showConsensus(){
+  document.body.classList.remove('overview'); setActive('consensus'); clearSel();
+  document.querySelector('.core').classList.add('sel');
+  panel.innerHTML=`
+    <span class="ptag">跨派共识</span>
+    <h2>五条定海神针<small>八派吵归吵,这片共识区先守住</small></h2>
+    <ol class="plist" style="margin-top:14px">${CONSENSUS.map(t=>`<li>${t}</li>`).join('')}</ol>`;
+}
+function showIllusions(){
+  document.body.classList.remove('overview'); setActive('illusions'); clearSel();
+  panel.innerHTML=`
+    <span class="ptag">反常识开局</span>
+    <h2>九个错觉<small>它们流行,是因为专家自己就吵得不可开交</small></h2>
+    <ol class="plist" style="margin-top:14px">${ILLUSIONS.map(t=>`<li>“${t}”</li>`).join('')}</ol>`;
+}
+function showFormulas(){
+  document.body.classList.remove('overview'); setActive('formulas'); clearSel();
+  panel.innerHTML=`
+    <span class="ptag">现场即用</span>
+    <h2>八个现场公式<small>动词开头,明天就能做</small></h2>
+    <ol class="plist" style="margin-top:14px">${FORMULAS.map(t=>`<li>${t}</li>`).join('')}</ol>`;
+}
+function showOverview(){
+  document.body.classList.add('overview'); setActive('overview'); clearSel();
+  panel.innerHTML=`
+    <span class="ptag">一图全览 · 可截图</span>
+    <h2>八派一句话<small>左图为认知星座,下为全派锋利话</small></h2>
+    <div class="ovgrid">${CAMPS.map(c=>`
+      <div class="ovrow"><div class="h">0${c.id} ${c.name}<em>${c.sub}</em></div>
+      <div class="s">「${c.sharp}」</div></div>`).join('')}</div>`;
+}
+function showIntro(){
+  setActive('map'); clearSel(); document.body.classList.remove('overview');
+  panel.innerHTML=`
+    <span class="ptag">如何看这张图</span>
+    <h2>不站队,先看地图<small>谁在和谁对打 · 各自站在哪块地基上</small></h2>
+    <p class="lead" style="margin-top:14px">关于"AI 时代该怎么学",<b>专家们自己就吵得不可开交</b>。与其随便挑一派站队,不如先把这张"专家打架"的地图摊开。</p>
+    <div class="row"><div class="lab">三 种 看 法</div>
+    <ol class="plist">
+      <li>点 <b>星点</b> → 看某一阵营的主张、证人与最锋利的一句话</li>
+      <li>点 <b>琥珀虚线</b> → 看两派在哪个议题上打架 + 判断口诀</li>
+      <li>点 <b>中心核</b> → 看吵完之后,八派仍共守的五条底线</li>
+    </ol></div>
+    <p class="lead" style="margin-top:18px">顶端的 <b>增强派</b> 一派连出四条琥珀虚线——它卷入了六场打架中的四场,正是整张图的风暴眼:几乎每一次争论,都绕不开"到底要不要、以及怎样拥抱 AI"。</p>`;
+}
+tbtns.forEach(b=>b.addEventListener('click',()=>{
+  ({map:showIntro,conflicts:()=>{showConflict(0);},consensus:showConsensus,
+    illusions:showIllusions,formulas:showFormulas,overview:showOverview}[b.dataset.view])();
+}));
+document.getElementById('map').addEventListener('click',()=>{ if(!document.body.classList.contains('overview')) showIntro(); });
+showIntro();
+</script>
+</body>
+</html>
