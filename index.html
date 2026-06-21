@@ -6,7 +6,7 @@
 <title>少年创造者俱乐部 · 为有想法的孩子</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Noto+Serif+SC:wght@300;400;600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -28,6 +28,7 @@
   --lav:#7060b0;
   --serif:'Noto Serif SC',serif;
   --sans:'Noto Sans SC',sans-serif;
+  --display:'Fraunces',var(--serif);
 }
 html{scroll-behavior:smooth}
 body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-weight:400;line-height:1.7;overflow-x:hidden}
@@ -89,7 +90,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:16px 56px;display:fl
 }
 .scene-step{
   position:absolute;bottom:20px;right:56px;
-  font-size:10px;letter-spacing:0.12em;color:var(--warm);font-family:'Arial',sans-serif;
+  font-size:12px;letter-spacing:0.04em;color:var(--warm);font-family:var(--display);font-variant-numeric:tabular-nums;
 }
 /* auto-slide via animation */
 .scene-track{animation:sceneSlide 12s ease-in-out infinite}
@@ -153,7 +154,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:16px 56px;display:fl
   background:var(--paper2);
   border-top:2px solid var(--paper4);
 }
-.hero-eyebrow{font-size:10px;letter-spacing:0.28em;color:var(--warm);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:12px}
+.hero-eyebrow{font-family:var(--display);font-style:italic;font-size:16px;font-weight:500;letter-spacing:0.01em;color:var(--warm);margin-bottom:16px;display:flex;align-items:center;gap:12px}
 .hero-eyebrow::before{content:'';display:block;width:24px;height:2px;background:var(--warm);border-radius:1px}
 .hero-h1{font-family:var(--serif);font-size:clamp(32px,4vw,54px);font-weight:300;line-height:1.25;color:var(--ink)}
 .hero-h1 em{font-style:normal;color:var(--warm)}
@@ -271,7 +272,7 @@ a.crow:hover .crow-arrow{color:var(--warm);transform:translate(4px,-4px)}
 .cohort-item p{font-size:14px;color:var(--ink2);line-height:2;margin-bottom:14px}
 .cohort-spec{display:flex;gap:28px;margin-top:24px;padding-top:20px;border-top:1px solid var(--paper3)}
 .spec-item{text-align:center}
-.spec-num{font-family:var(--serif);font-size:32px;font-weight:300;color:var(--warm);line-height:1}
+.spec-num{font-family:var(--display);font-size:40px;font-weight:500;color:var(--warm);line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-0.01em}
 .spec-label{font-size:11px;color:var(--ink3);letter-spacing:0.08em;margin-top:4px}
 
 /* PBL */
