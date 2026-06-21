@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>抉择时刻 · 历史人物故事 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;padding-bottom:60px}
+  .nav{display:flex;align-items:center;gap:9px;padding:13px 18px 2px;flex-wrap:wrap}
+  .nav a.pill{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.08em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .nav .title{font-family:var(--serif);font-weight:900;font-size:17px;color:var(--ink);margin-left:4px;text-shadow:var(--label-shadow)}
+  .hero{text-align:center;max-width:640px;margin:18px auto 4px;padding:0 20px}
+  .hero .ic{font-size:42px;line-height:1}
+  .hero h1{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);margin:8px 0 6px}
+  .hero p{font-family:var(--serif);font-size:14.5px;color:var(--ink2);line-height:1.75;margin:0 auto;max-width:24em}
+  .hero p b{color:var(--gold)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;max-width:980px;margin:24px auto 0;padding:0 20px}
+  .story{position:relative;display:flex;flex-direction:column;text-decoration:none;overflow:hidden;
+    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-left:5px solid var(--ac,#888);
+    border-radius:16px;padding:18px 19px 17px;backdrop-filter:blur(10px);transition:transform .15s,box-shadow .15s,border-color .15s;cursor:pointer}
+  .story:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(0,0,0,.18);border-color:var(--ac,#888)}
+  .story .row{display:flex;align-items:center;gap:12px}
+  .story .ic{font-size:38px;line-height:1}
+  .story .who .nm{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);line-height:1.1}
+  .story .who .era{font-family:var(--mono);font-size:10.5px;color:var(--ink3);margin-top:3px;letter-spacing:.03em}
+  .story .theme{display:inline-block;align-self:flex-start;margin-top:13px;font-family:var(--sans);font-size:10.5px;font-weight:800;
+    color:#fff;background:var(--ac,#888);border-radius:999px;padding:3px 11px}
+  .story .ask{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--ink);line-height:1.6;margin:12px 0 0}
+  .story .go{margin-top:15px;align-self:flex-start;font-family:var(--sans);font-weight:800;font-size:13.5px;color:#fff;
+    background:linear-gradient(90deg,var(--ac,#888),var(--ac2,#888));border-radius:999px;padding:9px 18px;box-shadow:0 5px 14px rgba(0,0,0,.16)}
+  .more{max-width:980px;margin:22px auto 0;padding:0 20px}
+  .more .card{background:var(--panel-bg);border:1px dashed var(--panel-line);border-radius:16px;padding:18px 20px;text-align:center}
+  .more .card .t{font-family:var(--serif);font-weight:800;font-size:15px;color:var(--ink2)}
+  .more .card .s{font-family:var(--sans);font-size:12.5px;color:var(--ink3);margin-top:6px;line-height:1.6}
+  .tip{font-family:var(--sans);font-size:12px;color:var(--ink3);text-align:center;margin:26px auto 0;max-width:30em;padding:0 20px;line-height:1.7}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="nav">
+    <a class="pill" href="./index.html">⌂ 首页</a>
+    <a class="pill" href="./map.html">🗺 地图</a>
+    <a class="pill" href="./networks.html">🕸 关系网</a>
+    <span class="title">🎯 抉择时刻</span>
+  </div>
+
+  <div class="hero">
+    <div class="ic">🎯</div>
+    <h1>替历史人物,做一次选择</h1>
+    <p>每个故事都是一个真实的历史十字路口。<b>先弄懂当时的一切,再代入那个人</b>——换作是你,会怎么选?</p>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="more">
+    <div class="card">
+      <div class="t">⏳ 更多抉择,正在路上…</div>
+      <div class="s">哈特谢普苏特要不要称王、华盛顿要不要连任、林肯要不要签署解放宣言……一个个十字路口,会陆续加进来。</div>
+    </div>
+  </div>
+
+  <div class="tip">💡 这些故事,也散落在<a href="./map.html" style="color:var(--gold);font-weight:700;text-decoration:none">世界地图</a>上——当时间轴走到那个年代,对应的地点就会浮起一枚 🎯 抉择钉子。</div>
+</div>
+
+<script>
+// 抉择故事清单(与地图上的 DECISIONS 对应;新增抉择时在这里加一条即可)
+const STORIES=[
+  {id:'socrates', person:'苏格拉底', icon:'🏛️', era:'古典希腊 · 雅典 · 约公元前399',
+   theme:'良心 vs 法律', ask:'门开着——你逃走求生,还是留下赴死?',
+   ac:'#e2603f', ac2:'#b06aa0', url:'./decision-socrates.html', year:-399},
+  {id:'shangyang', person:'商鞅', icon:'⚖️', era:'战国 · 秦国 · 约公元前356',
+   theme:'家国权衡', ask:'太子犯了你亲手定的新法——罚,还是不罚?',
+   ac:'#e08a2c', ac2:'#e2603f', url:'./decision-shangyang.html', year:-356},
+  {id:'hanwudi', person:'汉武帝', icon:'👑', era:'西汉 · 长安 · 约公元前133',
+   theme:'家国权衡', ask:'打,还是不打匈奴?这一仗,要押上整个国家。',
+   ac:'#df8a2c', ac2:'#e2603f', url:'./decision-hanwudi.html', year:-133},
+];
+const esc=s=>String(s==null?'':s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
+document.getElementById('grid').innerHTML=STORIES.sort((a,b)=>a.year-b.year).map(s=>`
+  <a class="story" style="--ac:${s.ac};--ac2:${s.ac2}" href="${s.url}">
+    <div class="row"><div class="ic">${s.icon}</div>
+      <div class="who"><div class="nm">${esc(s.person)}</div><div class="era">${esc(s.era)}</div></div></div>
+    <span class="theme">${esc(s.theme)}</span>
+    <div class="ask">${esc(s.ask)}</div>
+    <span class="go">▶ 进入抉择</span>
+  </a>`).join('');
+</script>
+<script src="./ai_float.js?v=1"></script>
+</body>
+</html>
