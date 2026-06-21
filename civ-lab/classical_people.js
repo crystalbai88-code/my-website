@@ -54,6 +54,12 @@ const CLASSICAL_PEOPLE=[
 {id:"zhangqian",n:"张骞",e:"Zhang Qian",c:"china",r:"other",d:"约前164—前114",b:"两次出使西域，被匈奴俘虏10年仍不辱使命，实际开通丝绸之路，获封博望侯。",rel:[{i:"wudi_han",t:"奉命"},{i:"liuche",t:"丝路后继者班超"}]},
 {id:"simarqian",n:"司马迁",e:"Sima Qian",c:"china",r:"other",d:"约前145—前86",b:"《史记》作者，因为李陵辩护遭宫刑，忍辱完成中国第一部纪传体通史，史家之绝唱。",rel:[{i:"wudi_han",t:"供职被宫刑"}]},
 {id:"liuche",n:"班超",e:"Ban Chao",c:"china",r:"general",d:"32—102",b:"以36人在西域纵横30年，恢复汉朝西域控制，派甘英出使大秦（罗马），投笔从戎典故。",rel:[{i:"zhangqian",t:"承张骞所辟丝路"}]},
+// ═══ 史记补充（古籍拆解·批次1）═══
+{id:"gongziqian",n:"公子虔",e:"Gongzi Qian",c:"china",r:"other",d:"战国·秦",b:"秦国公族，太子驷的师傅。太子犯法，商鞅依新法处他劓刑（割鼻），从此与商鞅结下死仇；二十余年后助新王清算商鞅。据《史记·商君列传》。",rel:[{i:"shangyang",t:"宿仇"},{i:"qin_huiwen",t:"辅佐"}]},
+{id:"qin_huiwen",n:"秦惠文王",e:"King Huiwen of Qin",c:"china",r:"ruler",d:"前337—前311在位",b:"名驷，少年为太子时因犯法连累师傅受刑。即位后第一件大事便是车裂商鞅；却又沿用商鞅之法，秦国继续强大——'商鞅虽死，秦法未败'。",rel:[{i:"shangyang",t:"清算"},{i:"qin_xiaogong",t:"继位"},{i:"gongziqian",t:"师傅"}]},
+{id:"dongzhongshu",n:"董仲舒",e:"Dong Zhongshu",c:"china",r:"thinker",d:"前179—前104",b:"汉代大儒，向汉武帝进言'罢黜百家，独尊儒术'，从此儒学成为中国两千年的官方思想；'天人感应'学说亦出其手。",rel:[{i:"wudi_han",t:"进言"},{i:"kongzi",t:"尊崇"}]},
+{id:"liguang",n:"李广",e:"Li Guang",c:"china",r:"general",d:"？—前119",b:"西汉名将'飞将军'，匈奴闻之丧胆，箭术神乎其神（射石没镞）；却一生难封侯，终因迷路失期、不愿受辱而自刎，'李广难封'成为怀才不遇的千古之叹。",rel:[{i:"wudi_han",t:"效力"},{i:"weiqing",t:"同征匈奴"},{i:"liling",t:"祖父"}]},
+{id:"liling",n:"李陵",e:"Li Ling",c:"china",r:"general",d:"？—前74",b:"李广之孙，率五千步兵深入匈奴血战，矢尽援绝被迫投降。汉武帝震怒族其家；唯司马迁为他辩护，反遭宫刑——《史记》正是在这场屈辱之后写成。",rel:[{i:"liguang",t:"孙"},{i:"simarqian",t:"受其辩护"},{i:"wudi_han",t:"获罪"}]},
 
 // ═══ 希腊 ═══
 {id:"thales",n:"泰利斯",e:"Thales",c:"greece",r:"thinker",d:"约前624—前546",b:"第一位哲学家，预测前585年日食，'万物本质是水'，从神话到理性解释的第一人。",rel:[{i:"anaximander",t:"学生"}]},
