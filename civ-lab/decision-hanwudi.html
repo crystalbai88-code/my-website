@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>抉择时刻 · 汉武帝伐匈奴 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;display:flex;flex-direction:column;align-items:center}
+  .top{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:12px 16px;
+    background:linear-gradient(180deg,rgba(var(--scrim,0,0,0),.25),transparent);position:sticky;top:0;z-index:20}
+  .top a.back{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.1em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .top .brand{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink)}
+  .prog{display:flex;gap:5px;margin-left:auto}
+  .prog i{width:13px;height:4px;border-radius:3px;background:var(--panel-line)}
+  .prog i.on{background:var(--gold)}
+  .wrap{width:min(660px,92%);margin:8px auto 70px;flex:1}
+  .beat{animation:fin .5s cubic-bezier(.22,1,.36,1)}
+  @keyframes fin{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;font-weight:700;text-align:center;margin-top:18px}
+  .htitle{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);text-align:center;line-height:1.3;margin:6px 0 4px;text-shadow:var(--label-shadow)}
+  .hsub{font-family:var(--mono);font-size:12px;color:var(--ink3);text-align:center;letter-spacing:.08em;margin-bottom:18px}
+  .scene{font-family:var(--serif);font-size:clamp(15px,3.8vw,17.5px);color:var(--ink);line-height:1.95;
+    background:var(--panel-bg);border:1px solid var(--panel-line);border-left:4px solid var(--gold);border-radius:14px;
+    padding:18px 20px;backdrop-filter:blur(8px)}
+  .scene b{color:var(--gold)}
+  .dossier-intro{font-family:var(--sans);font-size:14.5px;color:var(--ink2);text-align:center;line-height:1.7;margin:4px 0 16px}
+  .dcount{font-family:var(--mono);font-size:12px;color:var(--gold);text-align:center;font-weight:700;margin-bottom:12px}
+  .dcard{background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:14px;margin-bottom:11px;overflow:hidden;
+    cursor:pointer;transition:border-color .2s}
+  .dcard.open{border-color:var(--gold)}
+  .dhead{display:flex;align-items:center;gap:11px;padding:15px 17px}
+  .dhead .di{font-size:21px}
+  .dhead .dt{font-family:var(--sans);font-weight:800;font-size:15.5px;color:var(--ink);flex:1}
+  .dhead .dchev{font-family:var(--mono);font-size:11px;color:var(--ink3);transition:transform .2s}
+  .dcard.open .dchev{transform:rotate(90deg);color:var(--gold)}
+  .dhead .ddot{width:8px;height:8px;border-radius:50%;background:var(--vermilion);flex:none}
+  .dcard.open .ddot{background:var(--cyan)}
+  .dbody{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .dbody-in{padding:0 17px 16px;font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.85}
+  .dbody-in b{color:var(--gold)}
+  .dbody-in ul{margin:8px 0 0;padding-left:2px;list-style:none}
+  .dbody-in li{margin:7px 0;padding-left:16px;position:relative}
+  .dbody-in li:before{content:'·';position:absolute;left:3px;color:var(--vermilion);font-weight:900}
+  .dbody-in li b{color:var(--vermilion)}
+  .ask{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);text-align:center;margin:22px 0 6px}
+  .asksub{font-family:var(--sans);font-size:13.5px;color:var(--ink2);text-align:center;margin-bottom:16px;line-height:1.6}
+  .choices{display:flex;flex-direction:column;gap:11px}
+  .choice{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink);background:var(--panel-bg);
+    border:1.5px solid var(--panel-line);border-radius:14px;padding:15px 17px;cursor:pointer;transition:all .15s;text-align:left;line-height:1.5}
+  .choice:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+  .choice .ckey{font-weight:900;color:var(--gold);margin-right:8px}
+  .choice.picked{border-color:var(--gold);background:rgba(224,138,44,.1)}
+  .reaction{margin-top:14px;font-size:14.5px;color:var(--ink);line-height:1.75;background:rgba(224,138,44,.1);
+    border-left:4px solid var(--gold);border-radius:8px;padding:13px 16px;display:none}
+  .reaction.show{display:block;animation:fin .4s}
+  .lines{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+  .line{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:12px;padding:13px 16px}
+  .line .lh{font-family:var(--serif);font-weight:900;font-size:14px;color:var(--gold);margin-bottom:4px}
+  .line .lt{font-size:14px;color:var(--ink);line-height:1.7}
+  .line .lt b{color:var(--vermilion)}
+  .voice{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:13px;padding:13px 16px;margin-bottom:10px}
+  .voice .vw{font-family:var(--sans);font-weight:800;font-size:14px;color:var(--ink);margin-bottom:5px}
+  .voice .va{font-size:14px;color:var(--ink2);line-height:1.7}
+  .note{font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:center;margin-top:12px}
+  .q{font-family:var(--serif);font-size:16.5px;color:var(--ink);line-height:1.75;margin:14px 0;padding-left:14px;border-left:3px solid var(--gold)}
+  .q b{color:var(--gold)}
+  textarea{width:100%;box-sizing:border-box;margin-top:10px;font-family:var(--sans);font-size:15px;color:var(--ink);
+    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:12px;padding:13px 15px;min-height:80px;outline:none;resize:vertical}
+  .btnrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
+  .nextbtn{font-family:var(--sans);font-weight:800;font-size:15px;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));
+    border:none;border-radius:999px;padding:13px 30px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.16)}
+  .nextbtn:active{transform:scale(.97)}
+  .nextbtn[disabled]{opacity:.4;cursor:not-allowed;box-shadow:none}
+  .ghost{font-family:var(--sans);font-weight:700;font-size:14px;color:var(--gold);background:var(--panel-bg);
+    border:1px solid var(--panel-line);border-radius:999px;padding:11px 20px;cursor:pointer;text-decoration:none;display:inline-block}
+  .gate{text-align:center;font-family:var(--sans);font-size:12.5px;color:var(--ink3);margin-top:6px}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="top">
+    <a class="back" href="./map.html">⌂ 地图</a>
+    <span class="brand">🎯 抉择时刻</span>
+    <div class="prog" id="prog"></div>
+  </div>
+  <div class="wrap"><div class="beat" id="beat"></div></div>
+</div>
+<script src="./track.js?v=1"></script>
+<script>
+window.__aiCtx='用户正在体验"抉择时刻·汉武帝伐匈奴":孩子先了解西汉的国力(文景之治积累的家底)、匈奴的威胁与屈辱的和亲、主战与主和之争,再代入汉武帝刘彻做抉择——是否对匈奴全面开战。真实的汉武帝选择了开战:卫青、霍去病大破匈奴、封狼居胥、打通河西走廊与丝绸之路,汉的声威与版图空前;但几十年战争耗空国库、赋税徭役沉重、民生凋敝,他晚年下《轮台罪己诏》罕见地向天下认错。请用适合10-12岁孩子的语言陪他思考,多反问,不要替他下结论。';
+let pick=null;
+const DOSSIER=[
+  {i:'👑',t:'你是谁',b:'你是<b>汉武帝刘彻</b>,16岁继位的少年天子,雄心勃勃,想做前几代皇帝都没敢做的大事。<br>你常想:难道大汉就要一直忍气吞声下去吗?'},
+  {i:'🏯',t:'你的大汉',b:'从你的曾祖父汉高祖,到祖父、父亲的"<b>文景之治</b>",大汉休养生息了七十年。<br>如今国库里的钱多到<b>串钱的绳子都烂了</b>,粮仓堆得满出来发了霉。这是几代人攒下的家底——也是你手里最大的本钱。'},
+  {i:'🐎',t:'北方的匈奴',b:'草原上的<b>匈奴</b>骑兵,来去如风。几十年来,大汉一直靠"<b>和亲</b>"——送公主、送财物——去换边境的平安。<br>可即便如此,匈奴还是年年南下劫掠,边境百姓被掳走、村庄被烧。当年汉高祖被困<b>白登山</b>七天七夜的耻辱,谁也没忘。'},
+  {i:'⚖️',t:'朝堂上的两种声音',b:'<ul><li><b>主和派</b>:打仗劳民伤财,匈奴在草原上打不完;祖宗都忍下来了,何必逞强?</li><li><b>主战派</b>:屈辱换来的和平不是真和平;趁国力最强,该一劳永逸地解决边患!</li></ul>'},
+  {i:'🗡️',t:'你手里的牌',b:'你身边有<b>卫青、霍去病</b>这样百年难遇的少年将才,有充盈的国库,有几十年攒下的战马和粮草。<br>但你也清楚:战争是个<b>无底洞</b>,匈奴飘忽不定,没有人能保证一定打得赢、打得完。'},
+  {i:'⚡',t:'眼前的难题',b:'你曾在<b>马邑</b>设下埋伏,想一举聚歼匈奴主力,结果计划败露、无功而返。<br>现在,摆在你面前的是:就此罢手、维持和亲;还是<b>从此与匈奴全面开战</b>,用整个国家去赌一个未来?'},
+];
+let opened=new Set();
+const beats=[];
+beats.push(()=>`
+  <div class="kicker">公元前 133 年 · 长安</div>
+  <div class="htitle">用整个国家,去赌一场战争?</div>
+  <div class="hsub">即将由你 —— 汉武帝刘彻 —— 决定</div>
+  <div class="scene">公元前133年,你是大汉的皇帝<b>刘彻</b>。祖辈给你留下了一个富庶安定的帝国,也留下了一个老问题:北方的匈奴。<br><br>很快,你要做一个决定——它会决定千万人的命运,也会决定"汉"这个名字将以什么姿态被后世记住。<br><br>但是——<b>在你决定之前,先别急。</b> 先把这盘棋,看清楚。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(1)">📂 先弄懂这盘棋 →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第一步 · 了解</div>
+  <div class="htitle" style="font-size:23px">看清这盘棋</div>
+  <div class="dossier-intro">点开下面每一张情报卡,弄懂当时的国力、敌人和两难。<br>全部看完,你才有资格替汉武帝做决定。</div>
+  <div class="dcount" id="dcount">已了解 0 / ${DOSSIER.length}</div>
+  <div id="dwrap">${DOSSIER.map((d,i)=>`
+    <div class="dcard" data-i="${i}" onclick="flip(${i})">
+      <div class="dhead"><span class="ddot"></span><span class="di">${d.i}</span><span class="dt">${d.t}</span><span class="dchev">▶</span></div>
+      <div class="dbody" id="db${i}"><div class="dbody-in">${d.b}</div></div>
+    </div>`).join('')}</div>
+  <div class="btnrow"><button class="nextbtn" id="toChoice" onclick="go(2)" disabled>换作是你,你会怎么做? →</button></div>
+  <div class="gate" id="gate">(看完全部 ${DOSSIER.length} 张情报卡后解锁)</div>`);
+beats.push(()=>`
+  <div class="kicker">第二步 · 此刻,你就是汉武帝</div>
+  <div class="ask">打,还是不打?</div>
+  <div class="asksub">你已经看清了整盘棋——殷实的国库、剽悍的匈奴、朝堂的分歧、手中的名将。<br>现在,这个决定由你来下。</div>
+  <div class="choices">
+    <div class="choice" data-k="A" onclick="choose('A')"><span class="ckey">A</span>全面开战——倾全国之力,把匈奴彻底打垮,一劳永逸。</div>
+    <div class="choice" data-k="B" onclick="choose('B')"><span class="ckey">B</span>适可而止——打几仗夺回要地、立威,见好就收。</div>
+    <div class="choice" data-k="C" onclick="choose('C')"><span class="ckey">C</span>维持和亲——战争太烧钱,祖宗的休养生息不能丢。</div>
+  </div>
+  <div class="reaction" id="reaction"></div>`);
+beats.push(()=>`
+  <div class="kicker">第三步 · 真实的他</div>
+  <div class="htitle" style="font-size:22px">汉武帝,选了 A</div>
+  <div class="scene">他决心:<b>不再忍了。</b><br><br>他起用卫青、霍去病,对匈奴发动了一场又一场大战。霍去病一路追杀,直打到今天的蒙古高原,在狼居胥山祭天——史称"<b>封狼居胥</b>",成了后世武将一生最高的荣耀。<br><br>匈奴远遁,"<b>漠南无王庭</b>";河西走廊被打通,通往西域的<b>丝绸之路</b>就此开启。<br><br>他赢得了空前的疆域与威名。但他押上的,是整个国家几十年的家底。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(4)">那……代价呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第四步 · 一个决定,延伸出三条线</div>
+  <div class="lines">
+    <div class="line"><div class="lh">⚡ 短期</div><div class="lt">卫青、霍去病横扫漠北,收复河套、打通河西走廊,匈奴远遁,边患大为缓解。</div></div>
+    <div class="line"><div class="lh">🌅 长期</div><div class="lt"><b>丝绸之路</b>打通,东西方第一次大规模相连;大汉的版图与声威空前,"<b>汉人</b>""汉族"之名由此而盛。</div></div>
+    <div class="line"><div class="lh">🥀 代价</div><div class="lt">几十年战争<b>耗空了文景之治的家底</b>,赋税徭役沉重,百姓困苦,户口锐减。晚年汉武帝下《<b>轮台罪己诏</b>》,罕见地向天下认了错。</div></div>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(5)">别人怎么看这场战争? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第五步 · 同一场战争,不同的声音</div>
+  <div class="voice"><div class="vw">⚔️ 主战派(桑弘羊)</div><div class="va">"不打,边境永无宁日。开疆拓土、扬威异域,功在千秋,后人会感谢陛下。"</div></div>
+  <div class="voice"><div class="vw">🌾 一个种田的百姓</div><div class="va">"一将功成万骨枯。我的儿子死在了漠北,我的家被战时的重税压垮了。"</div></div>
+  <div class="voice"><div class="vw">📜 后世史家(司马光)</div><div class="va">"他有亡秦之失,却幸免亡秦之祸——多亏他晚年悔悟,大汉才没像秦朝那样崩掉。"</div></div>
+  <div class="voice"><div class="vw">🐎 一个戍边的士兵</div><div class="va">"我们夺回了土地,封了狼居胥山。可是……我再也没能回到家乡。"</div></div>
+  <div class="note">同一场战争,没有标准答案。 · 史料:《史记》《汉书》《盐铁论》</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(6)">它如何改变了世界? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第六步 · 一个决定,改变了世界</div>
+  <div class="scene">汉武帝的这一战,像推倒了一连串骨牌:<br><br>击退匈奴 → 打通<b>河西走廊与丝绸之路</b> → 中国的丝绸、西域的物产与文化第一次大规模往来 → 被逼西迁的匈奴,有人认为间接搅动了后来欧亚大陆的民族大迁徙。<br><br><b>而"汉"这个字,从此成了一个民族、一种文化的名字。</b><br><br>一个少年天子的雄心,塑造了我们今天仍在使用的"汉"。</div>
+  <div class="btnrow" style="margin-top:16px">
+    <a class="ghost" href="./map.html?civ=xihan">🗺 去地图看 西汉</a>
+    <a class="ghost" href="./classical-network.html?all=1">🕸 看这个时代的人物关系网</a>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(7)">那……换作是你呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">最后 · 回到你</div>
+  <div class="htitle" style="font-size:22px">换作是你呢?</div>
+  <div class="q">用无数人的代价,换一个强大的国家和长远的安全——你觉得,<b>值吗</b>?</div>
+  <div class="q">如果你是汉武帝,你会在<b>哪一刻</b>停下来、收手?</div>
+  <div class="q">你最开始选的是 <b id="myPick">?</b>,和汉武帝(A)一样吗?走到这里,你的想法<b>变了</b>吗?</div>
+  <div style="font-family:var(--sans);font-weight:700;color:var(--ink);margin-top:18px">✍️ 写下你从汉武帝的抉择里,看懂的一句话:</div>
+  <textarea id="myNote" placeholder="比如:强大是有代价的,问题是这代价由谁来付……"></textarea>
+  <div class="btnrow"><button class="nextbtn" onclick="saveNote(event)">💾 记下我的收获</button></div>
+  <div class="btnrow" style="margin-top:8px">
+    <button class="ghost" onclick="if(window.toggleAIFloat)toggleAIFloat()">🤖 和 AI 聊聊这个抉择</button>
+    <button class="ghost" onclick="pick=null;opened=new Set();go(0)">↺ 重新走一遍</button>
+  </div>`);
+
+let cur=0;
+function render(){
+  document.getElementById('beat').innerHTML=beats[cur]();
+  document.getElementById('prog').innerHTML=beats.map((_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('');
+  if(cur===1){ refreshGate(); }
+  if(cur===7){ const m=document.getElementById('myPick'); if(m)m.textContent=pick||'?'; const n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('decision_hanwudi')||''; }
+  window.scrollTo({top:0,behavior:'instant'});
+  if(window.Track) Track.log('抉择时刻');
+}
+function go(n){ cur=n; render(); }
+function flip(i){
+  const card=document.querySelector('.dcard[data-i="'+i+'"]');
+  const body=document.getElementById('db'+i);
+  const isOpen=card.classList.toggle('open');
+  body.style.maxHeight=isOpen?(body.scrollHeight+'px'):'0';
+  if(isOpen){ opened.add(i); refreshGate(); }
+}
+function refreshGate(){
+  const c=document.getElementById('dcount'); if(c)c.textContent='已了解 '+opened.size+' / '+DOSSIER.length;
+  const btn=document.getElementById('toChoice'); const gate=document.getElementById('gate');
+  if(opened.size>=DOSSIER.length){ if(btn)btn.disabled=false; if(gate)gate.textContent='✅ 你已看清整盘棋,可以决定了'; }
+}
+function choose(k){
+  pick=k;
+  document.querySelectorAll('.choice').forEach(c=>{c.classList.toggle('picked',c.dataset.k===k);c.onclick=null;});
+  const react={A:'果决!可整个国家的家底,真的押得起这一场没有期限的战争吗?',
+    B:'懂得分寸。但匈奴来去如风,打了又退、退了又来——"见好就收",真收得住吗?',
+    C:'体恤民力。可是……一直用财物换来的和平,边境的百姓真的安全吗?'}[k];
+  const r=document.getElementById('reaction');
+  r.innerHTML=react+'<div class="btnrow" style="margin-top:14px"><button class="nextbtn" onclick="go(3)">👉 看真实的汉武帝怎么选</button></div>';
+  r.classList.add('show');
+}
+function saveNote(e){ const n=document.getElementById('myNote'); if(n){localStorage.setItem('decision_hanwudi',n.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的收获',1500);} }
+render();
+</script>
+<script src="./ai_float.js?v=1"></script>
+</body>
+</html>

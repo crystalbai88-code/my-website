@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>抉择时刻 · 苏格拉底的最后一夜 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;display:flex;flex-direction:column;align-items:center}
+  .top{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:12px 16px;
+    background:linear-gradient(180deg,rgba(var(--scrim,0,0,0),.25),transparent);position:sticky;top:0;z-index:20}
+  .top a.back{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.1em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .top .brand{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink)}
+  .prog{display:flex;gap:5px;margin-left:auto}
+  .prog i{width:13px;height:4px;border-radius:3px;background:var(--panel-line)}
+  .prog i.on{background:var(--gold)}
+  .wrap{width:min(660px,92%);margin:8px auto 70px;flex:1}
+  .beat{animation:fin .5s cubic-bezier(.22,1,.36,1)}
+  @keyframes fin{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;font-weight:700;text-align:center;margin-top:18px}
+  .htitle{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);text-align:center;line-height:1.3;margin:6px 0 4px;text-shadow:var(--label-shadow)}
+  .hsub{font-family:var(--mono);font-size:12px;color:var(--ink3);text-align:center;letter-spacing:.08em;margin-bottom:18px}
+  .scene{font-family:var(--serif);font-size:clamp(15px,3.8vw,17.5px);color:var(--ink);line-height:1.95;
+    background:var(--panel-bg);border:1px solid var(--panel-line);border-left:4px solid var(--gold);border-radius:14px;
+    padding:18px 20px;backdrop-filter:blur(8px)}
+  .scene b{color:var(--gold)}
+  .dossier-intro{font-family:var(--sans);font-size:14.5px;color:var(--ink2);text-align:center;line-height:1.7;margin:4px 0 16px}
+  .dcount{font-family:var(--mono);font-size:12px;color:var(--gold);text-align:center;font-weight:700;margin-bottom:12px}
+  .dcard{background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:14px;margin-bottom:11px;overflow:hidden;
+    cursor:pointer;transition:border-color .2s}
+  .dcard.open{border-color:var(--gold)}
+  .dhead{display:flex;align-items:center;gap:11px;padding:15px 17px}
+  .dhead .di{font-size:21px}
+  .dhead .dt{font-family:var(--sans);font-weight:800;font-size:15.5px;color:var(--ink);flex:1}
+  .dhead .dchev{font-family:var(--mono);font-size:11px;color:var(--ink3);transition:transform .2s}
+  .dcard.open .dchev{transform:rotate(90deg);color:var(--gold)}
+  .dhead .ddot{width:8px;height:8px;border-radius:50%;background:var(--vermilion);flex:none}
+  .dcard.open .ddot{background:var(--cyan)}
+  .dbody{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .dbody-in{padding:0 17px 16px;font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.85}
+  .dbody-in b{color:var(--gold)}
+  .dbody-in ul{margin:8px 0 0;padding-left:2px;list-style:none}
+  .dbody-in li{margin:7px 0;padding-left:16px;position:relative}
+  .dbody-in li:before{content:'·';position:absolute;left:3px;color:var(--vermilion);font-weight:900}
+  .dbody-in li b{color:var(--vermilion)}
+  .ask{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);text-align:center;margin:22px 0 6px}
+  .asksub{font-family:var(--sans);font-size:13.5px;color:var(--ink2);text-align:center;margin-bottom:16px;line-height:1.6}
+  .choices{display:flex;flex-direction:column;gap:11px}
+  .choice{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink);background:var(--panel-bg);
+    border:1.5px solid var(--panel-line);border-radius:14px;padding:15px 17px;cursor:pointer;transition:all .15s;text-align:left;line-height:1.5}
+  .choice:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+  .choice .ckey{font-weight:900;color:var(--gold);margin-right:8px}
+  .choice.picked{border-color:var(--gold);background:rgba(224,138,44,.1)}
+  .reaction{margin-top:14px;font-size:14.5px;color:var(--ink);line-height:1.75;background:rgba(224,138,44,.1);
+    border-left:4px solid var(--gold);border-radius:8px;padding:13px 16px;display:none}
+  .reaction.show{display:block;animation:fin .4s}
+  .lines{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+  .line{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:12px;padding:13px 16px}
+  .line .lh{font-family:var(--serif);font-weight:900;font-size:14px;color:var(--gold);margin-bottom:4px}
+  .line .lt{font-size:14px;color:var(--ink);line-height:1.7}
+  .line .lt b{color:var(--vermilion)}
+  .voice{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:13px;padding:13px 16px;margin-bottom:10px}
+  .voice .vw{font-family:var(--sans);font-weight:800;font-size:14px;color:var(--ink);margin-bottom:5px}
+  .voice .va{font-size:14px;color:var(--ink2);line-height:1.7}
+  .note{font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:center;margin-top:12px}
+  .q{font-family:var(--serif);font-size:16.5px;color:var(--ink);line-height:1.75;margin:14px 0;padding-left:14px;border-left:3px solid var(--gold)}
+  .q b{color:var(--gold)}
+  textarea{width:100%;box-sizing:border-box;margin-top:10px;font-family:var(--sans);font-size:15px;color:var(--ink);
+    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:12px;padding:13px 15px;min-height:80px;outline:none;resize:vertical}
+  .btnrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
+  .nextbtn{font-family:var(--sans);font-weight:800;font-size:15px;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));
+    border:none;border-radius:999px;padding:13px 30px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.16)}
+  .nextbtn:active{transform:scale(.97)}
+  .nextbtn[disabled]{opacity:.4;cursor:not-allowed;box-shadow:none}
+  .ghost{font-family:var(--sans);font-weight:700;font-size:14px;color:var(--gold);background:var(--panel-bg);
+    border:1px solid var(--panel-line);border-radius:999px;padding:11px 20px;cursor:pointer;text-decoration:none;display:inline-block}
+  .gate{text-align:center;font-family:var(--sans);font-size:12.5px;color:var(--ink3);margin-top:6px}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="top">
+    <a class="back" href="./map.html">⌂ 地图</a>
+    <span class="brand">🎯 抉择时刻</span>
+    <div class="prog" id="prog"></div>
+  </div>
+  <div class="wrap"><div class="beat" id="beat"></div></div>
+</div>
+<script src="./track.js?v=1"></script>
+<script>
+window.__aiCtx='用户正在体验"抉择时刻·苏格拉底的最后一夜":孩子先了解苏格拉底其人、雅典民主制的处境、他被控的罪名(不敬神、蛊惑青年)与死刑判决、学生克力同已安排好的越狱机会,以及苏格拉底一生坚守"守正义、守与城邦的约定"的信念;再代入苏格拉底做抉择——逃狱求生,还是留下赴死。真实的苏格拉底拒绝越狱、平静地喝下毒堇汁而死,理由是:用一桩不义(逃避城邦的判决)去回应另一桩不义,会背叛他一生所讲的道理;他的死经由学生柏拉图记录下来,成为西方哲学的起点,也成为"个人良心与国家法律冲突"这一永恒难题的象征。这是一个没有标准答案的道德两难。请用适合10-12岁孩子的语言陪他思考,多反问,不要替他下结论。';
+let pick=null;
+const DOSSIER=[
+  {i:'🧓',t:'你是谁',b:'你是<b>苏格拉底</b>,雅典70岁的老哲人。你一辈子在街头巷尾追问人们:"什么是正义?什么是善?"<br>你常说:"<b>我唯一知道的,就是我什么都不知道。</b>" 可你的追问,总能把那些自以为很懂的人,问得哑口无言。'},
+  {i:'🏛️',t:'你的雅典',b:'雅典是世界上最早的<b>民主城邦</b>,大事由公民投票决定。但它刚刚打输了一场漫长的大战,人心惶惶、互相猜忌。<br>你那些刨根问底的追问,让不少有权有势的人下不来台——你,树敌不少。'},
+  {i:'⚖️',t:'你的罪名',b:'你被控两条罪:"<b>不敬城邦的神</b>"和"<b>蛊惑青年</b>"。<br>由500位普通公民组成的陪审团,投票判你<b>有罪</b>,并处以死刑——在牢里喝下一杯毒堇汁。你始终认为这是个冤枉的判决。'},
+  {i:'🚪',t:'逃走的机会',b:'你的学生兼好友<b>克力同</b>,已经买通了狱卒,一切都安排妥当:<b>今夜你就能逃出雅典</b>,到别的城邦去,继续活着、继续讲学。<br>所有的朋友都在求你:走吧!'},
+  {i:'🧭',t:'你信的东西',b:'可是你一生都在教别人:要<b>守正义</b>,要遵守自己和城邦之间的约定。<br>你心里反复问自己:法律这次判错了,但如果我用"<b>偷偷逃跑</b>"去回应这份不义——那我这一辈子讲的那些道理,还算数吗?'},
+  {i:'⚡',t:'眼前的难题',b:'今夜,你必须做一个决定:<br><b>越狱求生</b>,去别处继续追求真理;还是<b>留下赴死</b>,用自己的生命,为你一生坚信的东西作证?<br>天一亮,就来不及了。'},
+];
+let opened=new Set();
+const beats=[];
+beats.push(()=>`
+  <div class="kicker">公元前 399 年 · 雅典 · 深夜的牢房</div>
+  <div class="htitle">门开着,你逃,还是不逃?</div>
+  <div class="hsub">即将由你 —— 苏格拉底 —— 决定</div>
+  <div class="scene">公元前399年的一个深夜,你是雅典的老哲人<b>苏格拉底</b>。你被判了死刑,关在牢里。<br><br>牢门外,学生已经为你安排好了逃走的一切。再过几个钟头,天就要亮了。<br><br>很快,你要做一个决定——它无关疆土、无关胜负,却会成为<b>两千年里人们反复争论的一幕</b>。<br><br>但在你决定之前,<b>先别急。</b> 先把这件事,想清楚。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(1)">📂 先把这件事想清楚 →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第一步 · 了解</div>
+  <div class="htitle" style="font-size:23px">想清楚这件事</div>
+  <div class="dossier-intro">点开下面每一张卡片,弄懂你是谁、你的城邦、你的罪名,以及你心里那道过不去的坎。<br>全部看完,你才有资格替苏格拉底做决定。</div>
+  <div class="dcount" id="dcount">已了解 0 / ${DOSSIER.length}</div>
+  <div id="dwrap">${DOSSIER.map((d,i)=>`
+    <div class="dcard" data-i="${i}" onclick="flip(${i})">
+      <div class="dhead"><span class="ddot"></span><span class="di">${d.i}</span><span class="dt">${d.t}</span><span class="dchev">▶</span></div>
+      <div class="dbody" id="db${i}"><div class="dbody-in">${d.b}</div></div>
+    </div>`).join('')}</div>
+  <div class="btnrow"><button class="nextbtn" id="toChoice" onclick="go(2)" disabled>换作是你,你会怎么做? →</button></div>
+  <div class="gate" id="gate">(看完全部 ${DOSSIER.length} 张卡片后解锁)</div>`);
+beats.push(()=>`
+  <div class="kicker">第二步 · 此刻,你就是苏格拉底</div>
+  <div class="ask">逃,还是不逃?</div>
+  <div class="asksub">你已经想清楚了——冤枉的判决、敞开的牢门、朋友的恳求,还有你一生坚守的那句话。<br>现在,这个决定由你来下。</div>
+  <div class="choices">
+    <div class="choice" data-k="A" onclick="choose('A')"><span class="ckey">A</span>连夜逃走——活着才能继续追求真理,我没义务服从一个错误的判决。</div>
+    <div class="choice" data-k="B" onclick="choose('B')"><span class="ckey">B</span>留下,平静赴死——我一生守正义、守约定,不能临到自己头上就毁了它。</div>
+    <div class="choice" data-k="C" onclick="choose('C')"><span class="ckey">C</span>向雅典低头认错、请求改判流放——先保住性命再说。</div>
+  </div>
+  <div class="reaction" id="reaction"></div>`);
+beats.push(()=>`
+  <div class="kicker">第三步 · 真实的他</div>
+  <div class="htitle" style="font-size:22px">苏格拉底,选了 B</div>
+  <div class="scene">他对苦苦相劝的克力同说:重要的不是"活着",而是"<b>好好地、正当地活着</b>"。<br><br>他说:我一辈子受着雅典法律的庇护长大;如今只因判决对我不利,就偷偷逃走、破坏它——那我从前讲的正义,岂不全成了空话?<b>一个人不能用不义,去回应不义。</b><br><br>于是他留了下来。在与朋友们从容地谈论完灵魂之后,他平静地<b>喝下了那杯毒堇汁</b>。<br><br>他用自己的死,给一生的信念,盖上了最重的印章。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(4)">那……后来呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第四步 · 一个决定,延伸出三条线</div>
+  <div class="lines">
+    <div class="line"><div class="lh">🕯️ 当时</div><div class="lt">他平静赴死。在场的学生们悲痛欲绝,而他自己,却像谈论一件寻常事一样从容。</div></div>
+    <div class="line"><div class="lh">🌅 长远</div><div class="lt">他的学生<b>柏拉图</b>把他的言行写成了书;柏拉图又教出了<b>亚里士多德</b>——整个<b>西方哲学</b>的源头,就从这一夜延伸出去。</div></div>
+    <div class="line"><div class="lh">⚖️ 一个永恒的问题</div><div class="lt">他用死亡,让"<b>宁可受不义,也不行不义</b>"这句话有了千钧之重。两千多年后,人们依然在问:他,到底该不该逃?</div></div>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(5)">别人怎么看他的选择? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第五步 · 同一个决定,不同的声音</div>
+  <div class="voice"><div class="vw">📖 柏拉图(学生)</div><div class="va">"老师用生命给我上了最后一课——什么叫坚守原则。我要把他说过的每一句话都记下来。"</div></div>
+  <div class="voice"><div class="vw">😢 克力同(挚友)</div><div class="va">"你本可以活下来的!你的死是雅典的耻辱,也是我一生的痛。我到死都不明白你为什么不走。"</div></div>
+  <div class="voice"><div class="vw">🏛️ 一个普通雅典公民</div><div class="va">"法律就是法律。他既然一辈子享受城邦的好处,就该服从城邦的判决——哪怕这次判错了。"</div></div>
+  <div class="voice"><div class="vw">🤔 一个今天的人</div><div class="va">"可如果法律本身就是错的、是恶的呢?那时候,我们到底该服从它,还是反抗它?"</div></div>
+  <div class="note">同一个抉择,没有标准答案。 · 据柏拉图《克力同篇》《斐多篇》</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(6)">它如何改变了世界? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第六步 · 一夜之间,埋下两千年的问题</div>
+  <div class="scene">苏格拉底这一夜的选择,像投下了一颗石子,涟漪荡了两千多年:<br><br>他的死 → 柏拉图写下《理想国》 → 教出亚里士多德 → <b>西方哲学与科学的源头</b>就此奔流。<br><br>同时,他也亲手立起了一个至今无解的难题:<b>当个人的良心,撞上国家的法律,该听谁的?</b><br><br>一个老人在牢房里的一次选择,成了人类不断回头追问的一面镜子。</div>
+  <div class="btnrow" style="margin-top:16px">
+    <a class="ghost" href="./map.html?civ=greece_classical">🗺 去地图看 古典希腊</a>
+    <a class="ghost" href="./classical-network.html?all=1">🕸 看这个时代的人物关系网</a>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(7)">那……换作是你呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">最后 · 回到你</div>
+  <div class="htitle" style="font-size:22px">换作是你呢?</div>
+  <div class="q">如果一条法律明明判错了,你会<b>服从它</b>,还是<b>反抗它</b>?</div>
+  <div class="q">为了一个自己坚信的东西去死,值得吗?如果是你,你今夜会<b>逃</b>吗?</div>
+  <div class="q">你最开始选的是 <b id="myPick">?</b>,和苏格拉底(B)一样吗?走到这里,你的想法<b>变了</b>吗?</div>
+  <div style="font-family:var(--sans);font-weight:700;color:var(--ink);margin-top:18px">✍️ 写下你从苏格拉底的抉择里,看懂的一句话:</div>
+  <textarea id="myNote" placeholder="比如:有些东西,比活着更重要……(或者:活着才有一切?)"></textarea>
+  <div class="btnrow"><button class="nextbtn" onclick="saveNote(event)">💾 记下我的收获</button></div>
+  <div class="btnrow" style="margin-top:8px">
+    <button class="ghost" onclick="if(window.toggleAIFloat)toggleAIFloat()">🤖 和 AI 聊聊这个抉择</button>
+    <button class="ghost" onclick="pick=null;opened=new Set();go(0)">↺ 重新走一遍</button>
+  </div>`);
+
+let cur=0;
+function render(){
+  document.getElementById('beat').innerHTML=beats[cur]();
+  document.getElementById('prog').innerHTML=beats.map((_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('');
+  if(cur===1){ refreshGate(); }
+  if(cur===7){ const m=document.getElementById('myPick'); if(m)m.textContent=pick||'?'; const n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('decision_socrates')||''; }
+  window.scrollTo({top:0,behavior:'instant'});
+  if(window.Track) Track.log('抉择时刻');
+}
+function go(n){ cur=n; render(); }
+function flip(i){
+  const card=document.querySelector('.dcard[data-i="'+i+'"]');
+  const body=document.getElementById('db'+i);
+  const isOpen=card.classList.toggle('open');
+  body.style.maxHeight=isOpen?(body.scrollHeight+'px'):'0';
+  if(isOpen){ opened.add(i); refreshGate(); }
+}
+function refreshGate(){
+  const c=document.getElementById('dcount'); if(c)c.textContent='已了解 '+opened.size+' / '+DOSSIER.length;
+  const btn=document.getElementById('toChoice'); const gate=document.getElementById('gate');
+  if(opened.size>=DOSSIER.length){ if(btn)btn.disabled=false; if(gate)gate.textContent='✅ 你已想清楚,可以决定了'; }
+}
+function choose(k){
+  pick=k;
+  document.querySelectorAll('.choice').forEach(c=>{c.classList.toggle('picked',c.dataset.k===k);c.onclick=null;});
+  const react={A:'活着才有一切——这很有道理。可苏格拉底会问你:用一桩不义,去回应另一桩不义,真的对吗?',
+    B:'你愿意为信念付出最重的代价。可朋友们会哭着问你:难道活着继续讲学,不是更好吗?',
+    C:'保命要紧,人之常情。但对一个一辈子追求真理的人来说,低头认一个莫须有的错,他做得到吗?'}[k];
+  const r=document.getElementById('reaction');
+  r.innerHTML=react+'<div class="btnrow" style="margin-top:14px"><button class="nextbtn" onclick="go(3)">👉 看真实的苏格拉底怎么选</button></div>';
+  r.classList.add('show');
+}
+function saveNote(e){ const n=document.getElementById('myNote'); if(n){localStorage.setItem('decision_socrates',n.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的收获',1500);} }
+render();
+</script>
+<script src="./ai_float.js?v=1"></script>
+</body>
+</html>

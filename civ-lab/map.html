@@ -103,6 +103,22 @@
   .kcard.sel{border-color:var(--kc,#888);box-shadow:0 0 0 2px var(--kc,#888),0 8px 22px rgba(0,0,0,.5)}
   .kcard .kc-h{font-family:var(--serif);font-weight:800;font-size:11.5px;color:var(--ink);line-height:1.2;white-space:nowrap}
   .kcard .kc-m{font-family:var(--mono);font-size:8.5px;color:var(--gold);letter-spacing:.02em;margin-top:1px;white-space:nowrap}
+  /* 抉择时刻:走到那个年代,历史人物的"十字路口"停在地图上,可点进去替他选择 */
+  #dcards{position:absolute;inset:0;pointer-events:none;z-index:22;overflow:hidden}
+  .dpin{position:absolute;pointer-events:auto;cursor:pointer;width:max-content;max-width:172px;text-align:center;
+    transform:translate(-50%,-100%);
+    background:linear-gradient(135deg,rgba(255,248,232,.98),rgba(255,232,198,.98));
+    border:1.5px solid var(--gold);border-radius:13px;padding:7px 13px 9px;
+    box-shadow:0 0 0 4px rgba(226,96,63,.18),0 9px 24px rgba(0,0,0,.38);
+    animation:dpfloat 1.9s ease-in-out infinite}
+  @keyframes dpfloat{0%,100%{transform:translate(-50%,-100%) translateY(0);box-shadow:0 0 0 4px rgba(226,96,63,.16),0 9px 24px rgba(0,0,0,.34)}
+    50%{transform:translate(-50%,-100%) translateY(-5px);box-shadow:0 0 0 8px rgba(226,96,63,.09),0 13px 28px rgba(0,0,0,.42)}}
+  .dpin:hover{filter:brightness(1.04)}
+  .dpin .dp-k{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.12em;color:var(--vermilion)}
+  .dpin .dp-n{font-family:var(--serif);font-weight:900;font-size:14.5px;color:var(--ink);margin-top:1px;white-space:nowrap}
+  .dpin .dp-t{font-family:var(--sans);font-size:10.5px;color:var(--ink2);margin-top:3px;line-height:1.4;white-space:normal}
+  .dpin .dp-go{font-family:var(--sans);font-weight:800;font-size:10.5px;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));border-radius:999px;padding:3px 11px;margin-top:7px;display:inline-block}
+  .dpin:after{content:'';position:absolute;left:50%;bottom:-7px;transform:translateX(-50%);border:7px solid transparent;border-top-color:var(--gold);border-bottom:0}
 </style>
 </head>
 <body data-theme="warm">
@@ -116,7 +132,7 @@
       <button data-t="deepblue"></button><button data-t="museum"></button><button data-t="textbook"></button><button data-t="parchment"></button><button data-t="aurora" title="极光"></button><button data-t="sunset" title="暮霞"></button><button data-t="nebula" title="星云"></button><button data-t="palace" title="故宫"></button>
     </div>
   </div>
-  <div id="mapwrap"><canvas id="c"></canvas><div id="kcards"></div></div>
+  <div id="mapwrap"><canvas id="c"></canvas><div id="kcards"></div><div id="dcards"></div></div>
   <div class="hint" id="hint">拖动时间轴,看文明在地图上此消彼长 · 点国家看它的历史</div>
   <div id="timebar">
     <div class="yearrow">
@@ -211,6 +227,37 @@ function w2s(lng,lat){ return { x:((lng+180)/360)*baseW*scale+panX, y:((90-lat)/
 
 function activeCivs(){ return MAP_CIVS.filter(c=> year>=c.s-1 && year<=c.e+1 ); }
 
+// ── 抉择时刻:历史人物的"十字路口"。走到那个年代,就在地图上对应地点浮现,可点进去替他做选择 ──
+const DECISIONS=[
+  {id:'shangyang', person:'商鞅', icon:'⚖️', lng:108.9, lat:34.3, year:-356, from:-410, to:-211,
+   tip:'太子犯了你的新法,罚,还是不罚?', url:'./decision-shangyang.html'},
+  {id:'socrates', person:'苏格拉底', icon:'🏛️', lng:23.7, lat:38.0, year:-399, from:-430, to:-360,
+   tip:'门开着,你逃,还是留下赴死?', url:'./decision-socrates.html'},
+  {id:'hanwudi', person:'汉武帝', icon:'👑', lng:108.9, lat:34.3, year:-133, from:-140, to:-87,
+   tip:'打,还是不打匈奴?用整个国家去赌。', url:'./decision-hanwudi.html'},
+];
+function activeDecisions(){ return DECISIONS.filter(d=> year>=d.from && year<=d.to ); }
+const dpinEls={};
+function syncDecisions(){
+  const wrap=document.getElementById('dcards'); if(!wrap)return;
+  const live=new Set();
+  for(const d of activeDecisions()){
+    const s=w2s(d.lng,d.lat);
+    const onScreen = s.x>14 && s.x<W-14 && s.y>78 && s.y<H-96;
+    let el=dpinEls[d.id];
+    if(!onScreen){ if(el){ el.remove(); delete dpinEls[d.id]; } continue; }
+    live.add(d.id);
+    if(!el){
+      el=document.createElement('div'); el.className='dpin';
+      el.innerHTML=`<div class="dp-k">🎯 抉择时刻</div><div class="dp-n">${esc(d.icon+' '+d.person)}</div><div class="dp-t">${esc(d.tip)}</div><div class="dp-go">▶ 替他做个选择</div>`;
+      el.addEventListener('click',(ev)=>{ ev.stopPropagation(); location.href=d.url; });
+      wrap.appendChild(el); dpinEls[d.id]=el;
+    }
+    el.style.left=s.x+'px'; el.style.top=(s.y-17)+'px';
+  }
+  for(const id in dpinEls){ if(!live.has(id)){ dpinEls[id].remove(); delete dpinEls[id]; } }
+}
+
 // ── 每个在场文明的"时间卡":只要球在,卡就在(可点进去) ──
 const cardEls={}; // civ id -> 卡片元素
 function syncCards(){
@@ -290,7 +337,21 @@ function draw(){
     // 名称交给 HTML 时间卡渲染(每个球常驻一张可点的卡)
     ctx.restore();
   });
+  // 抉择时刻:金色脉冲光点(画在地图上,提示"这里有个十字路口")
+  activeDecisions().forEach(d=>{
+    const s=w2s(d.lng,d.lat); if(!isFinite(s.x)||!isFinite(s.y))return;
+    ctx.save();
+    ctx.beginPath(); ctx.arc(s.x,s.y,17,0,7); ctx.fillStyle='rgba(226,96,63,.16)'; ctx.fill();
+    const gg=ctx.createRadialGradient(s.x-3,s.y-4,2,s.x,s.y,11);
+    gg.addColorStop(0,'#ffe0a0'); gg.addColorStop(1,'#e2603f');
+    ctx.beginPath(); ctx.arc(s.x,s.y,9.5,0,7); ctx.fillStyle=gg; ctx.fill();
+    ctx.lineWidth=2; ctx.strokeStyle='rgba(255,255,255,.95)'; ctx.stroke();
+    ctx.font='11px "Apple Color Emoji","Segoe UI Emoji",system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('🎯',s.x,s.y);
+    ctx.restore();
+  });
   syncCards();
+  syncDecisions();
 }
 
 function setYear(y){ year=Math.max(-3500,Math.min(2025,y|0));

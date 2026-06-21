@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>抉择时刻 · 商鞅变法 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;display:flex;flex-direction:column;align-items:center}
+  .top{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:12px 16px;
+    background:linear-gradient(180deg,rgba(var(--scrim,0,0,0),.25),transparent);position:sticky;top:0;z-index:20}
+  .top a.back{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.1em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .top .brand{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink)}
+  .prog{display:flex;gap:5px;margin-left:auto}
+  .prog i{width:13px;height:4px;border-radius:3px;background:var(--panel-line)}
+  .prog i.on{background:var(--gold)}
+  .wrap{width:min(660px,92%);margin:8px auto 70px;flex:1}
+  .beat{animation:fin .5s cubic-bezier(.22,1,.36,1)}
+  @keyframes fin{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;font-weight:700;text-align:center;margin-top:18px}
+  .htitle{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);text-align:center;line-height:1.3;margin:6px 0 4px;text-shadow:var(--label-shadow)}
+  .hsub{font-family:var(--mono);font-size:12px;color:var(--ink3);text-align:center;letter-spacing:.08em;margin-bottom:18px}
+  .scene{font-family:var(--serif);font-size:clamp(15px,3.8vw,17.5px);color:var(--ink);line-height:1.95;
+    background:var(--panel-bg);border:1px solid var(--panel-line);border-left:4px solid var(--gold);border-radius:14px;
+    padding:18px 20px;backdrop-filter:blur(8px)}
+  .scene b{color:var(--gold)}
+  /* 了解盘棋 */
+  .dossier-intro{font-family:var(--sans);font-size:14.5px;color:var(--ink2);text-align:center;line-height:1.7;margin:4px 0 16px}
+  .dcount{font-family:var(--mono);font-size:12px;color:var(--gold);text-align:center;font-weight:700;margin-bottom:12px}
+  .dcard{background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:14px;margin-bottom:11px;overflow:hidden;
+    cursor:pointer;transition:border-color .2s}
+  .dcard.open{border-color:var(--gold)}
+  .dhead{display:flex;align-items:center;gap:11px;padding:15px 17px}
+  .dhead .di{font-size:21px}
+  .dhead .dt{font-family:var(--sans);font-weight:800;font-size:15.5px;color:var(--ink);flex:1}
+  .dhead .dchev{font-family:var(--mono);font-size:11px;color:var(--ink3);transition:transform .2s}
+  .dcard.open .dchev{transform:rotate(90deg);color:var(--gold)}
+  .dhead .ddot{width:8px;height:8px;border-radius:50%;background:var(--vermilion);flex:none}
+  .dcard.open .ddot{background:var(--cyan)}
+  .dbody{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .dbody-in{padding:0 17px 16px;font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.85}
+  .dbody-in b{color:var(--gold)}
+  .dbody-in ul{margin:8px 0 0;padding-left:2px;list-style:none}
+  .dbody-in li{margin:7px 0;padding-left:16px;position:relative}
+  .dbody-in li:before{content:'·';position:absolute;left:3px;color:var(--vermilion);font-weight:900}
+  .dbody-in li b{color:var(--vermilion)}
+  /* 抉择 */
+  .ask{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);text-align:center;margin:22px 0 6px}
+  .asksub{font-family:var(--sans);font-size:13.5px;color:var(--ink2);text-align:center;margin-bottom:16px;line-height:1.6}
+  .choices{display:flex;flex-direction:column;gap:11px}
+  .choice{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink);background:var(--panel-bg);
+    border:1.5px solid var(--panel-line);border-radius:14px;padding:15px 17px;cursor:pointer;transition:all .15s;text-align:left;line-height:1.5}
+  .choice:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+  .choice .ckey{font-weight:900;color:var(--gold);margin-right:8px}
+  .choice.picked{border-color:var(--gold);background:rgba(224,138,44,.1)}
+  .reaction{margin-top:14px;font-size:14.5px;color:var(--ink);line-height:1.75;background:rgba(224,138,44,.1);
+    border-left:4px solid var(--gold);border-radius:8px;padding:13px 16px;display:none}
+  .reaction.show{display:block;animation:fin .4s}
+  .lines{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+  .line{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:12px;padding:13px 16px}
+  .line .lh{font-family:var(--serif);font-weight:900;font-size:14px;color:var(--gold);margin-bottom:4px}
+  .line .lt{font-size:14px;color:var(--ink);line-height:1.7}
+  .line .lt b{color:var(--vermilion)}
+  .voice{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:13px;padding:13px 16px;margin-bottom:10px}
+  .voice .vw{font-family:var(--sans);font-weight:800;font-size:14px;color:var(--ink);margin-bottom:5px}
+  .voice .va{font-size:14px;color:var(--ink2);line-height:1.7}
+  .note{font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:center;margin-top:12px}
+  .q{font-family:var(--serif);font-size:16.5px;color:var(--ink);line-height:1.75;margin:14px 0;padding-left:14px;border-left:3px solid var(--gold)}
+  .q b{color:var(--gold)}
+  textarea{width:100%;box-sizing:border-box;margin-top:10px;font-family:var(--sans);font-size:15px;color:var(--ink);
+    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:12px;padding:13px 15px;min-height:80px;outline:none;resize:vertical}
+  .btnrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
+  .nextbtn{font-family:var(--sans);font-weight:800;font-size:15px;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));
+    border:none;border-radius:999px;padding:13px 30px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.16)}
+  .nextbtn:active{transform:scale(.97)}
+  .nextbtn[disabled]{opacity:.4;cursor:not-allowed;box-shadow:none}
+  .ghost{font-family:var(--sans);font-weight:700;font-size:14px;color:var(--gold);background:var(--panel-bg);
+    border:1px solid var(--panel-line);border-radius:999px;padding:11px 20px;cursor:pointer;text-decoration:none;display:inline-block}
+  .gate{text-align:center;font-family:var(--sans);font-size:12.5px;color:var(--ink3);margin-top:6px}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="top">
+    <a class="back" href="./map.html">⌂ 地图</a>
+    <span class="brand">🎯 抉择时刻</span>
+    <div class="prog" id="prog"></div>
+  </div>
+  <div class="wrap"><div class="beat" id="beat"></div></div>
+</div>
+<script src="./track.js?v=1"></script>
+<script>
+window.__aiCtx='用户正在体验"抉择时刻·商鞅变法":孩子先了解战国时代、秦国处境、各方势力、徙木立信与新法,再代入商鞅做抉择——太子犯法,商鞅没有直接处罚储君,而是重罚了太子的两位师傅(公子虔受劓刑、公孙贾被黥面),以此让新法立威;秦因此强大,百年后秦统一中国,但商鞅本人在秦孝公死后被新王(当年的太子,秦惠文王)车裂。请用适合10-12岁孩子的语言陪他思考,多反问,不要替他下结论。';
+let pick=null;
+
+// ===== 了解盘棋 的6张情报卡 =====
+const DOSSIER=[
+  {i:'👤',t:'你是谁',b:'你是<b>卫鞅</b>(后人称商鞅),卫国公族的后裔,从小钻研法家之学,带着李悝写的《法经》来到秦国。<br>你坚信一句话:<b>一个国家强不强,不靠贵族的血统,靠的是制度。</b>'},
+  {i:'🏔️',t:'你的秦国',b:'秦国地处西陲,被东方六国当成"戎狄"瞧不起。国力贫弱、土地荒芜,高位被贵族世世代代把持着。<br>但新国君<b>秦孝公</b>刚刚即位,发布了《求贤令》:谁能让秦国强大,他愿意<b>与之共享江山</b>。这是你一生难得的机会。'},
+  {i:'⚔️',t:'这是什么时代',b:'这是<b>战国</b>。七雄并立、弱肉强食,不强大就会被吞并。<br>魏国靠李悝变法、楚国靠吴起变法,都曾强盛一时——可是<b>吴起最后被旧贵族乱箭射死</b>。变法图强,从来都要拿命去赌。'},
+  {i:'🎭',t:'牌桌上的各方',b:'你要面对的人:<ul><li><b>秦孝公</b>:你最大的靠山。但他能在位多久,谁也说不准。</li><li><b>旧贵族</b>:世袭特权的既得利益者,人多势众,恨你入骨。</li><li><b>老百姓</b>:被朝令夕改坑怕了,根本不信官府说的话。</li><li><b>太子驷</b>:未来的国君。</li></ul>'},
+  {i:'📜',t:'你已经做的',b:'为了让百姓相信新法,你做了"<b>徙木立信</b>":在城门口立一根木头,宣布谁把它搬到北门就赏五十金。起初没人信,真有人搬了,你<b>当场如数兑现</b>——秦人这才信:新法,说到做到。<br>接着你立下新法:<b>奖励耕战</b>(有军功才有爵位)、<b>连坐</b>(一家犯法,邻里同罪)、<b>废除贵族世袭特权</b>。'},
+  {i:'⚡',t:'眼前的难题',b:'新法才刚推行,<b>太子就触犯了法令</b>。<br>这是新法公信力的第一次大考:连太子都敢罚,法律才真有牙齿;可太子是<b>未来的王</b>,罚了他,等于为自己埋下杀身之祸。<br><b>罚,还是不罚?</b>'},
+];
+let opened=new Set();
+
+const beats=[];
+// 0 入境
+beats.push(()=>`
+  <div class="kicker">公元前 356 年 · 秦国</div>
+  <div class="htitle">一个改变中国两千年的决定</div>
+  <div class="hsub">即将由你 —— 商鞅 —— 做出</div>
+  <div class="scene">公元前356年,你是从卫国来的改革家<b>商鞅</b>。秦孝公把整个国家交到你手里,让你变法图强。<br><br>很快,你会站到一个十字路口,做一个影响深远的选择。<br><br>但是——<b>在你决定之前,先别急。</b> 一个什么都没弄懂就做的选择,是没有意义的。<br>先把这盘棋,看清楚。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(1)">📂 先弄懂这盘棋 →</button></div>`);
+// 1 了解盘棋
+beats.push(()=>`
+  <div class="kicker">第一步 · 了解</div>
+  <div class="htitle" style="font-size:23px">看清这盘棋</div>
+  <div class="dossier-intro">点开下面每一张情报卡,弄懂当时的人、势、利害。<br>全部看完,你才有资格替商鞅做决定。</div>
+  <div class="dcount" id="dcount">已了解 0 / ${DOSSIER.length}</div>
+  <div id="dwrap">${DOSSIER.map((d,i)=>`
+    <div class="dcard" data-i="${i}" onclick="flip(${i})">
+      <div class="dhead"><span class="ddot"></span><span class="di">${d.i}</span><span class="dt">${d.t}</span><span class="dchev">▶</span></div>
+      <div class="dbody" id="db${i}"><div class="dbody-in">${d.b}</div></div>
+    </div>`).join('')}</div>
+  <div class="btnrow"><button class="nextbtn" id="toChoice" onclick="go(2)" disabled>换作是你,你会怎么做? →</button></div>
+  <div class="gate" id="gate">(看完全部 ${DOSSIER.length} 张情报卡后解锁)</div>`);
+// 2 抉择
+beats.push(()=>`
+  <div class="kicker">第二步 · 此刻,你就是商鞅</div>
+  <div class="ask">罚,还是不罚?</div>
+  <div class="asksub">你已经看清了整盘棋——孝公的支持、贵族的虎视、百姓的将信将疑、太子的身份。<br>现在,这个决定由你来下。</div>
+  <div class="choices">
+    <div class="choice" data-k="A" onclick="choose('A')"><span class="ckey">A</span>严办太子——王子犯法与庶民同罪,绝不退让。</div>
+    <div class="choice" data-k="B" onclick="choose('B')"><span class="ckey">B</span>不动太子,但重罚教导他的两位师傅,让法律照样立威。</div>
+    <div class="choice" data-k="C" onclick="choose('C')"><span class="ckey">C</span>这次先放过,法律可以慢慢来,别急着得罪未来的国君。</div>
+  </div>
+  <div class="reaction" id="reaction"></div>`);
+// 3 他怎么选
+beats.push(()=>`
+  <div class="kicker">第三步 · 真实的他</div>
+  <div class="htitle" style="font-size:22px">商鞅,选了 B</div>
+  <div class="scene">他说:"太子是国家储君,不能施刑;但他犯法,是因为<b>师傅没教好</b>。"<br><br>于是,他重罚了太子的两位老师——公子虔被处以<b>劓刑(割去鼻子)</b>,公孙贾被<b>黥面(脸上刺字)</b>。<br><br>第二天,秦国上下,再没有人敢轻视新法。<br><br>他既让法律<b>见了血、立了威</b>,又用政治智慧绕开了直接动储君。但他心里清楚:他得罪的,是<b>未来的国君</b>。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(4)">那……后来呢? →</button></div>`);
+// 4 后果
+beats.push(()=>`
+  <div class="kicker">第四步 · 一个决定,延伸出三条线</div>
+  <div class="lines">
+    <div class="line"><div class="lh">⚡ 短期</div><div class="lt">秦人震慑,新法令行禁止,"路不拾遗,山无盗贼",秦国迅速变强。</div></div>
+    <div class="line"><div class="lh">🌅 长期</div><div class="lt">奖励耕战、国力暴涨。一百多年后,<b>秦始皇统一中国</b>——而这一切的地基,正是这场变法。</div></div>
+    <div class="line"><div class="lh">🥀 他自己</div><div class="lt">当年被羞辱的太子,后来成了<b>秦惠文王</b>。秦孝公一死,新王立刻清算,把商鞅处以<b>车裂(五马分尸)</b>。<br>商鞅死了,可他的法留了下来——史称"<b>商鞅虽死,秦法未败</b>"。</div></div>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(5)">别人怎么看这场变法? →</button></div>`);
+// 5 众声
+beats.push(()=>`
+  <div class="kicker">第五步 · 同一场变法,不同的声音</div>
+  <div class="voice"><div class="vw">⚖️ 法家(韩非)</div><div class="va">"对!法不阿贵、绳不挠曲——正因为连权贵都怕它,秦才能强。"</div></div>
+  <div class="voice"><div class="vw">📜 儒家</div><div class="va">"严刑峻法、不近人情。赢了国家,却输了仁德;他最后的惨死,正是刻薄寡恩的报应。"</div></div>
+  <div class="voice"><div class="vw">👨‍🌾 一个秦国农夫</div><div class="va">"法律终于对所有人一样了,我靠军功也能挣个爵位!——可'连坐'太狠,邻里互相告发,人人自危。"</div></div>
+  <div class="voice"><div class="vw">👑 太子 / 旧贵族</div><div class="va">"他羞辱了我,夺走我们世袭的特权。不杀他,难平我心头之恨。"</div></div>
+  <div class="note">同一场变法,没有标准答案。 · 史料:《史记·商君列传》</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(6)">它如何改变了整个中国? →</button></div>`);
+// 6 连锁
+beats.push(()=>`
+  <div class="kicker">第六步 · 第一张多米诺骨牌</div>
+  <div class="scene">商鞅的这场变法,像第一张倒下的骨牌:<br><br>秦国变法图强 → 成为<b>战国最强</b> → <b>秦始皇统一六国</b> → 郡县制、书同文、中央集权……<br><br><b>此后两千年,中国大一统帝国的模板,源头就在这一场变法里。</b><br><br>一个人在十字路口的一次选择,改变了一整个文明的走向。</div>
+  <div class="btnrow" style="margin-top:16px">
+    <a class="ghost" href="./map.html?civ=qin">🗺 去地图看 秦朝</a>
+    <a class="ghost" href="./classical-network.html?all=1">🕸 看商鞅的关系网</a>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(7)">那……换作是你呢? →</button></div>`);
+// 7 回到你
+beats.push(()=>`
+  <div class="kicker">最后 · 回到你</div>
+  <div class="htitle" style="font-size:22px">换作是你呢?</div>
+  <div class="q">法律,应该对最有权势的人也一样吗?<b>今天</b>呢?</div>
+  <div class="q">明知会得罪未来的王,商鞅还是让法律立了威。你觉得,<b>值吗</b>?</div>
+  <div class="q">你最开始选的是 <b id="myPick">?</b>,和商鞅(B)一样吗?走到这里,你的想法<b>变了</b>吗?</div>
+  <div style="font-family:var(--sans);font-weight:700;color:var(--ink);margin-top:18px">✍️ 写下你从商鞅的抉择里,看懂的一句话:</div>
+  <textarea id="myNote" placeholder="比如:权力越大,越应该被规则管住……"></textarea>
+  <div class="btnrow">
+    <button class="nextbtn" onclick="saveNote(event)">💾 记下我的收获</button>
+  </div>
+  <div class="btnrow" style="margin-top:8px">
+    <button class="ghost" onclick="if(window.toggleAIFloat)toggleAIFloat()">🤖 和 AI 聊聊这个抉择</button>
+    <button class="ghost" onclick="pick=null;opened=new Set();go(0)">↺ 重新走一遍</button>
+  </div>`);
+
+let cur=0;
+function render(){
+  document.getElementById('beat').innerHTML=beats[cur]();
+  document.getElementById('prog').innerHTML=beats.map((_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('');
+  if(cur===1){ refreshGate(); }
+  if(cur===7){ const m=document.getElementById('myPick'); if(m)m.textContent=pick||'?'; const n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('decision_shangyang')||''; }
+  window.scrollTo({top:0,behavior:'instant'});
+  if(window.Track) Track.log('抉择时刻');
+}
+function go(n){ cur=n; render(); }
+function flip(i){
+  const card=document.querySelector('.dcard[data-i="'+i+'"]');
+  const body=document.getElementById('db'+i);
+  const isOpen=card.classList.toggle('open');
+  body.style.maxHeight=isOpen?(body.scrollHeight+'px'):'0';
+  if(isOpen){ opened.add(i); refreshGate(); }
+}
+function refreshGate(){
+  const c=document.getElementById('dcount'); if(c)c.textContent='已了解 '+opened.size+' / '+DOSSIER.length;
+  const btn=document.getElementById('toChoice'); const gate=document.getElementById('gate');
+  if(opened.size>=DOSSIER.length){ if(btn)btn.disabled=false; if(gate)gate.textContent='✅ 你已看清整盘棋,可以决定了'; }
+}
+function choose(k){
+  pick=k;
+  document.querySelectorAll('.choice').forEach(c=>{c.classList.toggle('picked',c.dataset.k===k);c.onclick=null;});
+  const react={A:'硬刚到底——可太子是储君,真能动得了他吗?这一步,险极了。',
+    B:'高明:既让法律见了血,又没直接碰储君。真实的商鞅,正是这么想的。',
+    C:'稳妥。但是……一部连太子都不敢碰的法,老百姓会真心相信它吗?'}[k];
+  const r=document.getElementById('reaction');
+  r.innerHTML=react+'<div class="btnrow" style="margin-top:14px"><button class="nextbtn" onclick="go(3)">👉 看真实的商鞅怎么选</button></div>';
+  r.classList.add('show');
+}
+function saveNote(e){ const n=document.getElementById('myNote'); if(n){localStorage.setItem('decision_shangyang',n.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的收获',1500);} }
+render();
+</script>
+<script src="./ai_float.js?v=1"></script>
+</body>
+</html>
