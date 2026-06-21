@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>找规律 · 把两段历史放一起看 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;padding-bottom:70px}
+  .nav{display:flex;align-items:center;gap:9px;padding:13px 18px 2px;flex-wrap:wrap}
+  .nav a.pill{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.08em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .nav .title{font-family:var(--serif);font-weight:900;font-size:17px;color:var(--ink);margin-left:4px;text-shadow:var(--label-shadow)}
+  .wrap{width:min(680px,92%);margin:0 auto}
+  .hero{text-align:center;margin:18px auto 6px}
+  .hero .ic{font-size:42px;line-height:1}
+  .hero h1{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);margin:8px 0 6px}
+  .hero p{font-family:var(--serif);font-size:14.5px;color:var(--ink2);line-height:1.75;margin:0 auto;max-width:24em}
+  .hero p b{color:var(--gold)}
+  /* 母题头 */
+  .motif{background:var(--panel-bg);border:1.5px solid var(--panel-line);border-top:5px solid var(--gold);border-radius:16px;
+    padding:17px 19px;margin-top:20px;text-align:center;backdrop-filter:blur(10px)}
+  .motif .tag{display:inline-block;font-family:var(--sans);font-size:11px;font-weight:800;color:#fff;background:var(--gold);border-radius:999px;padding:3px 12px}
+  .motif .mt{font-family:var(--serif);font-weight:900;font-size:21px;color:var(--ink);margin:9px 0 4px}
+  .motif .mq{font-family:var(--serif);font-size:14.5px;color:var(--ink2);line-height:1.7}
+  /* 两位主角 */
+  .heads{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+  .head{background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:13px;padding:13px 12px;text-align:center}
+  .head.a{border-top:4px solid #e08a2c}.head.b{border-top:4px solid #b06aa0}
+  .head .hic{font-size:30px;line-height:1}
+  .head .hn{font-family:var(--serif);font-weight:900;font-size:17px;color:var(--ink);margin-top:4px}
+  .head .he{font-family:var(--mono);font-size:9.5px;color:var(--ink3);margin-top:2px}
+  /* 对照行 */
+  .cmp{margin-top:14px}
+  .crow{margin-bottom:11px}
+  .cdim{font-family:var(--sans);font-size:12px;font-weight:800;color:var(--ink2);text-align:center;margin-bottom:6px}
+  .ccells{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .ccell{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:11px;padding:11px 12px;
+    font-family:var(--serif);font-size:13.5px;color:var(--ink);line-height:1.6}
+  .ccell.a{border-left:3px solid #e08a2c}.ccell.b{border-left:3px solid #b06aa0}
+  .crow.cost .cdim{color:var(--vermilion)}
+  .crow.cost .ccell{border-color:var(--vermilion);background:rgba(226,96,63,.07)}
+  .crow.cost .ccell b{color:var(--vermilion)}
+  /* 提炼规律 */
+  .stepbtn{display:block;width:100%;box-sizing:border-box;margin:22px 0 0;font-family:var(--sans);font-weight:800;font-size:15.5px;color:#fff;
+    background:linear-gradient(90deg,var(--gold),var(--vermilion));border:none;border-radius:14px;padding:15px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.16)}
+  .stepbtn:active{transform:scale(.99)}
+  .hidden{display:none}
+  .distill{margin-top:22px;animation:fin .5s cubic-bezier(.22,1,.36,1)}
+  @keyframes fin{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+  .dq{font-family:var(--serif);font-weight:900;font-size:18px;color:var(--ink);text-align:center;margin-bottom:5px}
+  .dsub{font-family:var(--sans);font-size:13px;color:var(--ink2);text-align:center;margin-bottom:14px;line-height:1.6}
+  .opt{font-family:var(--sans);font-size:14.5px;font-weight:600;color:var(--ink);background:var(--panel-bg);
+    border:1.5px solid var(--panel-line);border-radius:13px;padding:14px 16px;cursor:pointer;transition:all .15s;text-align:left;line-height:1.55;margin-bottom:10px}
+  .opt:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.12)}
+  .opt.picked{border-color:var(--gold);background:rgba(224,138,44,.1)}
+  .fb{margin-top:6px;font-size:14px;color:var(--ink);line-height:1.75;background:rgba(224,138,44,.1);
+    border-left:4px solid var(--gold);border-radius:8px;padding:13px 16px;display:none}
+  .fb.show{display:block;animation:fin .4s}
+  /* 规律揭晓 */
+  .law{margin-top:22px;background:linear-gradient(135deg,rgba(255,248,232,.96),rgba(255,232,200,.96));
+    border:1.5px solid var(--gold);border-radius:16px;padding:20px;text-align:center}
+  .law .lk{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--vermilion);font-weight:700;text-transform:uppercase}
+  .law .lt{font-family:var(--serif);font-weight:900;font-size:clamp(17px,4.6vw,21px);color:var(--ink);line-height:1.55;margin:9px 0 0}
+  .law .le{font-family:var(--serif);font-size:14px;color:var(--ink2);line-height:1.75;margin-top:11px}
+  .law .le b{color:var(--vermilion)}
+  /* 迁移 */
+  .move{margin-top:22px}
+  .move .mk{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--gold);font-weight:700;text-transform:uppercase;text-align:center}
+  .move .q{font-family:var(--serif);font-size:16px;color:var(--ink);line-height:1.75;margin:12px 0;padding-left:14px;border-left:3px solid var(--gold)}
+  .move .q b{color:var(--gold)}
+  .hints{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:8px 0 4px}
+  .hint{font-family:var(--sans);font-size:12px;color:var(--ink2);background:var(--panel-bg);border:1px dashed var(--panel-line);border-radius:999px;padding:6px 12px}
+  textarea{width:100%;box-sizing:border-box;margin-top:8px;font-family:var(--sans);font-size:15px;color:var(--ink);
+    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:12px;padding:13px 15px;min-height:84px;outline:none;resize:vertical}
+  .btnrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:18px}
+  .nextbtn{font-family:var(--sans);font-weight:800;font-size:14.5px;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));
+    border:none;border-radius:999px;padding:12px 24px;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.16)}
+  .ghost{font-family:var(--sans);font-weight:700;font-size:13.5px;color:var(--gold);background:var(--panel-bg);
+    border:1px solid var(--panel-line);border-radius:999px;padding:11px 18px;cursor:pointer;text-decoration:none;display:inline-block}
+  .more{margin-top:26px;text-align:center}
+  .more .t{font-family:var(--serif);font-weight:800;font-size:14px;color:var(--ink2)}
+  .more .s{font-family:var(--sans);font-size:12.5px;color:var(--ink3);margin-top:5px;line-height:1.6}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="nav">
+    <a class="pill" href="./index.html">⌂ 首页</a>
+    <a class="pill" href="./stories.html">🎯 抉择</a>
+    <a class="pill" href="./map.html">🗺 地图</a>
+    <span class="title">🧩 找规律</span>
+  </div>
+  <div class="wrap">
+    <div class="hero">
+      <div class="ic">🧩</div>
+      <h1>把两段历史,放一起看</h1>
+      <p>一个故事,讲的是一个人;<b>两个故事放一起,你能看见"规律"</b>。</p>
+    </div>
+
+    <div class="motif">
+      <span class="tag">家国权衡</span>
+      <div class="mt">强盛的代价</div>
+      <div class="mq">把一个国家推向强大,要付出什么?<br>而这代价,又该由谁来付?</div>
+    </div>
+
+    <div class="heads">
+      <div class="head a"><div class="hic">⚖️</div><div class="hn">商鞅</div><div class="he">战国 · 秦 · 前356</div></div>
+      <div class="head b"><div class="hic">👑</div><div class="hn">汉武帝</div><div class="he">西汉 · 长安 · 前133</div></div>
+    </div>
+
+    <div class="cmp" id="cmp"></div>
+
+    <button class="stepbtn" id="toDistill" onclick="showDistill()">🤔 那么……它们藏着什么共同的规律?</button>
+
+    <!-- 提炼规律 -->
+    <div class="distill hidden" id="distill">
+      <div class="dq">你来提炼</div>
+      <div class="dsub">看完上面的对照,你觉得这两个故事,藏着哪一条共同的规律?<br>先自己选一个,再看揭晓。</div>
+      <div id="opts"></div>
+      <div class="fb" id="fb"></div>
+    </div>
+
+    <!-- 规律揭晓 -->
+    <div class="law hidden" id="law">
+      <div class="lk">🔑 藏在背后的规律</div>
+      <div class="lt">强盛,几乎从来不是免费的——<br>真正的问题是:<b>这代价,由谁来付。</b></div>
+      <div class="le">商鞅,用<b>自己的命</b>付了代价;汉武帝,让<b>千万百姓</b>付了代价。<br>同样是把国家推向强大,谁来承担那份沉重,结局就大不相同。</div>
+    </div>
+
+    <!-- 迁移 -->
+    <div class="move hidden" id="move">
+      <div class="mk">· 把规律用起来 ·</div>
+      <div class="q">这条规律,你还能在<b>别的历史</b>里见到吗?</div>
+      <div class="hints"><span class="hint">秦始皇修长城?</span><span class="hint">隋炀帝开大运河?</span><span class="hint">近代国家的工业化?</span></div>
+      <div class="q" style="border-color:var(--vermilion)">如果让你来,你会怎样<b>让代价更公平一点</b>?</div>
+      <div style="font-family:var(--sans);font-weight:700;color:var(--ink);margin-top:8px">✍️ 写下你发现的规律,或你想到的另一个例子:</div>
+      <textarea id="myNote" placeholder="比如:强大是要付代价的,但不该总让最普通的人去扛……"></textarea>
+      <div class="btnrow">
+        <button class="nextbtn" onclick="saveNote(event)">💾 记下我的发现</button>
+        <button class="ghost" onclick="if(window.toggleAIFloat)toggleAIFloat()">🤖 和 AI 聊聊这条规律</button>
+      </div>
+      <div class="more">
+        <div class="t">⏳ 更多"规律对照",正在路上…</div>
+        <div class="s">改革者如何对抗既得利益、帝国为何总会衰亡、思想如何改变世界……一组组对照,会陆续加进来。</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="./track.js?v=1"></script>
+<script>
+window.__aiCtx='用户正在体验"找规律·强盛的代价":把商鞅变法与汉武帝伐匈奴两个案例放在一起对照,引导孩子自己提炼共同规律——把国家推向强大几乎总要付出沉重代价,关键在于这代价由谁来承担(商鞅用自己的命、汉武帝让百姓承担),并把这条规律迁移到新的例子(如秦始皇修长城、隋炀帝开大运河、近代工业化)。请用适合10-12岁孩子的语言陪他思考,多反问,鼓励他举出自己的例子,不要替他下结论。';
+const ROWS=[
+  {dim:'🎯 他想做的事', a:'变法图强,把弱秦变成强国', b:'击垮匈奴,一雪和亲之辱、开疆拓土'},
+  {dim:'⚔️ 他硬碰的', a:'旧贵族世袭的特权', b:'几代人攒下的国库与民力'},
+  {dim:'⚡ 短期结果', a:'秦国令行禁止,迅速变强', b:'卫青霍去病大破匈奴,丝路打通'},
+  {dim:'🌅 长远影响', a:'百年后,秦统一了中国', b:'"汉"成了一个民族的名字'},
+  {dim:'🥀 付出的代价', a:'他自己<b>被车裂而死</b>', b:'<b>百姓困苦</b>、国库耗空,晚年下罪己诏', cost:true},
+];
+document.getElementById('cmp').innerHTML=ROWS.map(r=>`
+  <div class="crow${r.cost?' cost':''}">
+    <div class="cdim">${r.dim}</div>
+    <div class="ccells"><div class="ccell a">${r.a}</div><div class="ccell b">${r.b}</div></div>
+  </div>`).join('');
+
+const OPTS=[
+  {t:'强大的国家,几乎总是用<b>沉重的代价</b>换来的——区别只在于:代价由谁来付。', ok:true,
+   fb:'✅ 你抓住了!这正是两个故事最深的共同点。往下看揭晓——'},
+  {t:'想做大事的人,最后都<b>没有好下场</b>。', ok:false,
+   fb:'再想想:商鞅确实惨死,可汉武帝是善终的呀。"下场"不是它们真正的共同点。'},
+  {t:'只要手段够狠,国家<b>就一定能变强</b>。', ok:false,
+   fb:'有点像,但太简单了:它只看到了"变强",却没看到背后"谁付了代价"——而那才是关键。'},
+];
+function showDistill(){
+  document.getElementById('toDistill').classList.add('hidden');
+  const d=document.getElementById('distill'); d.classList.remove('hidden');
+  document.getElementById('opts').innerHTML=OPTS.map((o,i)=>`<div class="opt" data-i="${i}" onclick="pickOpt(${i})">${o.t}</div>`).join('');
+  d.scrollIntoView({behavior:'smooth',block:'start'});
+  if(window.Track) Track.log('找规律');
+}
+let answered=false;
+function pickOpt(i){
+  document.querySelectorAll('.opt').forEach(el=>el.classList.toggle('picked',+el.dataset.i===i));
+  const fb=document.getElementById('fb'); fb.innerHTML=OPTS[i].fb; fb.classList.add('show');
+  if(OPTS[i].ok && !answered){
+    answered=true;
+    setTimeout(()=>{
+      document.getElementById('law').classList.remove('hidden');
+      document.getElementById('move').classList.remove('hidden');
+      document.getElementById('law').scrollIntoView({behavior:'smooth',block:'start'});
+    },650);
+  }else if(!OPTS[i].ok){
+    // 答错也给机会:1.2秒后仍可揭晓
+    if(!document.getElementById('reveal2')){
+      const b=document.createElement('button'); b.id='reveal2'; b.className='ghost'; b.style.marginTop='10px';
+      b.textContent='看看哪条才是最深的规律 →'; b.onclick=()=>{answered=true;
+        document.getElementById('law').classList.remove('hidden');document.getElementById('move').classList.remove('hidden');
+        document.getElementById('law').scrollIntoView({behavior:'smooth',block:'start'});};
+      document.getElementById('fb').after(b);
+    }
+  }
+}
+function saveNote(e){ const n=document.getElementById('myNote'); if(n){localStorage.setItem('pattern_cost',n.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的发现',1500);} }
+window.addEventListener('DOMContentLoaded',()=>{const n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('pattern_cost')||'';});
+</script>
+<script src="./ai_float.js?v=1"></script>
+</body>
+</html>
