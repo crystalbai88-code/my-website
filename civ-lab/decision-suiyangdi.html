@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>抉择时刻 · 汉武帝伐匈奴 · CivLab</title>
+<title>抉择时刻 · 隋炀帝开大运河 · CivLab</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
 <style>
@@ -29,8 +29,7 @@
   .scene b{color:var(--gold)}
   .dossier-intro{font-family:var(--sans);font-size:14.5px;color:var(--ink2);text-align:center;line-height:1.7;margin:4px 0 16px}
   .dcount{font-family:var(--mono);font-size:12px;color:var(--gold);text-align:center;font-weight:700;margin-bottom:12px}
-  .dcard{background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:14px;margin-bottom:11px;overflow:hidden;
-    cursor:pointer;transition:border-color .2s}
+  .dcard{background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:14px;margin-bottom:11px;overflow:hidden;cursor:pointer;transition:border-color .2s}
   .dcard.open{border-color:var(--gold)}
   .dhead{display:flex;align-items:center;gap:11px;padding:15px 17px}
   .dhead .di{font-size:21px}
@@ -84,7 +83,7 @@
 <div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
 <div id="app">
   <div class="top">
-    <a class="back" href="./map.html">⌂ 地图</a>
+    <a class="back" href="./stories.html">⌂ 抉择</a>
     <span class="brand">🎯 抉择时刻</span>
     <div class="prog" id="prog"></div>
   </div>
@@ -92,28 +91,28 @@
 </div>
 <script src="./track.js?v=1"></script>
 <script>
-window.__aiCtx='用户正在体验"抉择时刻·汉武帝伐匈奴":孩子先了解西汉的国力(文景之治积累的家底)、匈奴的威胁与屈辱的和亲、主战与主和之争,再代入汉武帝刘彻做抉择——是否对匈奴全面开战。真实的汉武帝选择了开战:卫青、霍去病大破匈奴、封狼居胥、打通河西走廊与丝绸之路,汉的声威与版图空前;但几十年战争耗空国库、赋税徭役沉重、民生凋敝,他晚年下《轮台罪己诏》罕见地向天下认错。请用适合10-12岁孩子的语言陪他思考,多反问,不要替他下结论。';
+window.__aiCtx='用户正在体验"抉择时刻·隋炀帝开大运河"(母题:举国的豪赌,与汉武帝伐匈奴同一条线):孩子先了解隋朝刚统一、国库充盈,以及南北被阻隔的难题,再代入隋炀帝杨广做抉择——要不要倾举国之力、全速开凿贯通南北的大运河(并营建东都、征高句丽)。真实的隋炀帝选择了全速并举:大运河确实成为此后一千多年的经济命脉(功在千秋),但百万民夫死于苦役、民怨沸腾、天下大乱,隋朝二世而亡,他本人被部下缢杀。与汉武帝晚年下罪己诏"踩了刹车"形成对照——关键差别在于君主能否在民力透支前停下来。请用适合10-12岁孩子的语言陪他思考,多反问,不要替他下结论。';
 let pick=null;
 const DOSSIER=[
-  {i:'👑',t:'你是谁',b:'你是<b>汉武帝刘彻</b>,16岁继位的少年天子,雄心勃勃,想做前几代皇帝都没敢做的大事。<br>你常想:难道大汉就要一直忍气吞声下去吗?'},
-  {i:'🏯',t:'你的大汉',b:'从你的曾祖父汉高祖,到祖父、父亲的"<b>文景之治</b>",大汉休养生息了七十年。<br>如今国库里的钱多到<b>串钱的绳子都烂了</b>,粮仓堆得满出来发了霉。这是几代人攒下的家底——也是你手里最大的本钱。'},
-  {i:'🐎',t:'北方的匈奴',b:'草原上的<b>匈奴</b>骑兵,来去如风。几十年来,大汉一直靠"<b>和亲</b>"——送公主、送财物——去换边境的平安。<br>可即便如此,匈奴还是年年南下劫掠,边境百姓被掳走、村庄被烧。当年汉高祖被困<b>白登山</b>七天七夜的耻辱,谁也没忘。'},
-  {i:'⚖️',t:'朝堂上的两种声音',b:'<ul><li><b>主和派</b>:打仗劳民伤财,匈奴在草原上打不完;祖宗都忍下来了,何必逞强?</li><li><b>主战派</b>:屈辱换来的和平不是真和平;趁国力最强,该一劳永逸地解决边患!</li></ul>'},
-  {i:'🗡️',t:'你手里的牌',b:'你身边有<b>卫青、霍去病</b>这样百年难遇的少年将才,有充盈的国库,有几十年攒下的战马和粮草。<br>但你也清楚:战争是个<b>无底洞</b>,匈奴飘忽不定,没有人能保证一定打得赢、打得完。'},
-  {i:'⚡',t:'眼前的难题',b:'你曾在<b>马邑</b>设下埋伏,想一举聚歼匈奴主力,结果计划败露、无功而返。<br>现在,摆在你面前的是:就此罢手、维持和亲;还是<b>从此与匈奴全面开战</b>,用整个国家去赌一个未来?'},
+  {i:'👑',t:'你是谁',b:'你是<b>隋炀帝杨广</b>,刚从父亲手里接过一个<b>刚刚统一、国库满溢</b>的隋朝。<br>你雄心勃勃,一心想做"前无古人"的大事,让自己被千秋万代记住。'},
+  {i:'🌏',t:'你的隋朝',b:'你的父亲隋文帝,结束了几百年的分裂,让天下重新归于一统。<br>仓库里粮食堆积如山——传说多到<b>够全国吃几十年</b>。你接手的,是一份空前殷实的家底。'},
+  {i:'🚧',t:'南北的难题',b:'国家虽然统一了,可<b>北方的政治中心</b>和<b>南方的鱼米之乡</b>,被千里之遥隔开。<br>粮食、兵马、政令来回运转极慢,南北的人心也不齐。这个庞大的国家,像血脉不通。'},
+  {i:'💡',t:'你的大计划',b:'你想开凿一条贯通南北、几千里长的<b>大运河</b>,把整个国家像血管一样连起来;同时还想营建东都洛阳、远征高句丽。<br>每一件,都是惊天动地的大工程。'},
+  {i:'👷',t:'代价是什么',b:'这些工程,需要<b>征发几百万民夫</b>——他们要在农忙时离开土地,在繁重的苦役里累死、病死。<br>百姓的怨气,正在悄悄地、一点点积累。'},
+  {i:'⚡',t:'眼前的难题',b:'你可以<b>趁家底还厚、趁自己还年轻,一次性、全速</b>把这些大工程统统上马;<br>也可以悠着点,只挑一件、慢慢来,留些力气给百姓。<br><b>要不要现在就倾尽举国之力,一口气干完?</b>'},
 ];
 let opened=new Set();
 const beats=[];
 beats.push(()=>`
-  <div class="kicker">公元前 133 年 · 长安</div>
-  <div class="htitle">用整个国家,去赌一场战争?</div>
-  <div class="hsub">即将由你 —— 汉武帝刘彻 —— 决定</div>
-  <div class="scene">公元前133年,你是大汉的皇帝<b>刘彻</b>。祖辈给你留下了一个富庶安定的帝国,也留下了一个老问题:北方的匈奴。<br><br>很快,你要做一个决定——它会决定千万人的命运,也会决定"汉"这个名字将以什么姿态被后世记住。<br><br>但是——<b>在你决定之前,先别急。</b> 先把这盘棋,看清楚。</div>
+  <div class="kicker">公元 605 年 · 隋 · 洛阳</div>
+  <div class="htitle">倾尽举国之力,办一件不朽的大事?</div>
+  <div class="hsub">即将由你 —— 隋炀帝杨广 —— 决定</div>
+  <div class="scene">公元605年,你是大隋的皇帝<b>杨广</b>。父亲给你留下一个刚刚统一、富得流油的帝国。<br><br>你眼前有一个足以名垂千古的宏图——把南北连成一体。可它也可能,把这个年轻的王朝拖向深渊。<br><br>但是——<b>在你决定之前,先别急。</b> 先把这盘棋,看清楚。</div>
   <div class="btnrow"><button class="nextbtn" onclick="go(1)">📂 先弄懂这盘棋 →</button></div>`);
 beats.push(()=>`
   <div class="kicker">第一步 · 了解</div>
   <div class="htitle" style="font-size:23px">看清这盘棋</div>
-  <div class="dossier-intro">点开下面每一张情报卡,弄懂当时的国力、敌人和两难。<br>全部看完,你才有资格替汉武帝做决定。</div>
+  <div class="dossier-intro">点开下面每一张情报卡,弄懂当时的家底、难题和代价。<br>全部看完,你才有资格替隋炀帝做决定。</div>
   <div class="dcount" id="dcount">已了解 0 / ${DOSSIER.length}</div>
   <div id="dwrap">${DOSSIER.map((d,i)=>`
     <div class="dcard" data-i="${i}" onclick="flip(${i})">
@@ -123,55 +122,55 @@ beats.push(()=>`
   <div class="btnrow"><button class="nextbtn" id="toChoice" onclick="go(2)" disabled>换作是你,你会怎么做? →</button></div>
   <div class="gate" id="gate">(看完全部 ${DOSSIER.length} 张情报卡后解锁)</div>`);
 beats.push(()=>`
-  <div class="kicker">第二步 · 此刻,你就是汉武帝</div>
-  <div class="ask">打,还是不打?</div>
-  <div class="asksub">你已经看清了整盘棋——殷实的国库、剽悍的匈奴、朝堂的分歧、手中的名将。<br>现在,这个决定由你来下。</div>
+  <div class="kicker">第二步 · 此刻,你就是隋炀帝</div>
+  <div class="ask">全速干,还是悠着点?</div>
+  <div class="asksub">你已经看清了整盘棋——满溢的国库、南北的阻隔、宏大的蓝图,还有民力这根绷着的弦。<br>现在,这个决定由你来下。</div>
   <div class="choices">
-    <div class="choice" data-k="A" onclick="choose('A')"><span class="ckey">A</span>全面开战——倾全国之力,把匈奴彻底打垮,一劳永逸。</div>
-    <div class="choice" data-k="B" onclick="choose('B')"><span class="ckey">B</span>适可而止——打几仗夺回要地、立威,见好就收。</div>
-    <div class="choice" data-k="C" onclick="choose('C')"><span class="ckey">C</span>维持和亲——战争太烧钱,祖宗的休养生息不能丢。</div>
+    <div class="choice" data-k="A" onclick="choose('A')"><span class="ckey">A</span>全速上马——趁家底厚,几大工程一起干,我要在我手上建成不朽功业。</div>
+    <div class="choice" data-k="B" onclick="choose('B')"><span class="ckey">B</span>只挑一件、放慢节奏——先修运河就好,别把民力一次榨干。</div>
+    <div class="choice" data-k="C" onclick="choose('C')"><span class="ckey">C</span>先休养生息——百姓刚从乱世缓过来,大工程留给后人慢慢做。</div>
   </div>
   <div class="reaction" id="reaction"></div>`);
 beats.push(()=>`
   <div class="kicker">第三步 · 真实的他</div>
-  <div class="htitle" style="font-size:22px">汉武帝,选了 A</div>
-  <div class="scene">他决心:<b>不再忍了。</b><br><br>他起用卫青、霍去病,对匈奴发动了一场又一场大战。霍去病一路追杀,直打到今天的蒙古高原,在狼居胥山祭天——史称"<b>封狼居胥</b>",成了后世武将一生最高的荣耀。<br><br>匈奴远遁,"<b>漠南无王庭</b>";河西走廊被打通,通往西域的<b>丝绸之路</b>就此开启。<br><br>他赢得了空前的疆域与威名。但他押上的,是整个国家几十年的家底。</div>
-  <div class="btnrow"><button class="nextbtn" onclick="go(4)">那……代价呢? →</button></div>`);
+  <div class="htitle" style="font-size:22px">隋炀帝,选了 A</div>
+  <div class="scene">他<b>什么都要,而且现在就要。</b><br><br>开凿大运河、营建东都洛阳、三次远征高句丽——几大惊天工程,被他<b>挤在短短十几年里</b>一起上马。<br><br>几百万民夫被征发,在河堤上、在工地里成批地累死。大运河确实一寸寸贯通了,可帝国的民力,也被他一点点<b>榨到了尽头</b>。<br><br>他要的是不朽,可他始终没有问自己一句:百姓,还撑得住吗?</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(4)">那……后来呢? →</button></div>`);
 beats.push(()=>`
   <div class="kicker">第四步 · 一个决定,延伸出三条线</div>
   <div class="lines">
-    <div class="line"><div class="lh">⚡ 短期</div><div class="lt">卫青、霍去病横扫漠北,收复河套、打通河西走廊,匈奴远遁,边患大为缓解。</div></div>
-    <div class="line"><div class="lh">🌅 长期</div><div class="lt"><b>丝绸之路</b>打通,东西方第一次大规模相连;大汉的版图与声威空前,"<b>汉人</b>""汉族"之名由此而盛。</div></div>
-    <div class="line"><div class="lh">🥀 代价</div><div class="lt">几十年战争<b>耗空了文景之治的家底</b>,赋税徭役沉重,百姓困苦,户口锐减。晚年汉武帝下《<b>轮台罪己诏</b>》,罕见地向天下认了错。</div></div>
+    <div class="line"><div class="lh">⚡ 短期</div><div class="lt">大运河、东都、连年征战,工程浩大、声势空前,隋朝看上去强盛到了顶点。</div></div>
+    <div class="line"><div class="lh">🌅 长远(他留下的)</div><div class="lt"><b>大运河贯通南北,此后一千多年成为中国的经济命脉</b>——连唐、宋的繁荣都受它的恩惠。"功在千秋",是真的。</div></div>
+    <div class="line"><div class="lh">🥀 代价 / 结局</div><div class="lt">百万民夫死于苦役,天下民怨沸腾、起义四起。<b>一个富得流油的王朝,被他几年就耗光、葬送——隋朝二世而亡</b>,他自己也被部下缢死。</div></div>
   </div>
-  <div class="btnrow"><button class="nextbtn" onclick="go(5)">别人怎么看这场战争? →</button></div>`);
+  <div class="btnrow"><button class="nextbtn" onclick="go(5)">别人怎么看这件事? →</button></div>`);
 beats.push(()=>`
-  <div class="kicker">第五步 · 同一场战争,不同的声音</div>
-  <div class="voice"><div class="vw">⚔️ 主战派(桑弘羊)</div><div class="va">"不打,边境永无宁日。开疆拓土、扬威异域,功在千秋,后人会感谢陛下。"</div></div>
-  <div class="voice"><div class="vw">🌾 一个种田的百姓</div><div class="va">"一将功成万骨枯。我的儿子死在了漠北,我的家被战时的重税压垮了。"</div></div>
-  <div class="voice"><div class="vw">📜 后世史家(司马光)</div><div class="va">"他有亡秦之失,却幸免亡秦之祸——多亏他晚年悔悟,大汉才没像秦朝那样崩掉。"</div></div>
-  <div class="voice"><div class="vw">🐎 一个戍边的士兵</div><div class="va">"我们夺回了土地,封了狼居胥山。可是……我再也没能回到家乡。"</div></div>
-  <div class="note">同一场战争,没有标准答案。 · 史料:《史记》《汉书》《盐铁论》</div>
-  <div class="btnrow"><button class="nextbtn" onclick="go(6)">它如何改变了世界? →</button></div>`);
+  <div class="kicker">第五步 · 同一条运河,不同的声音</div>
+  <div class="voice"><div class="vw">🛶 后世诗人(皮日休)</div><div class="va">"若不是他太过荒淫,单凭这条运河之功,他几乎可以和大禹治水相比。"——评价就是这样撕裂:罪在当代,利在千秋。</div></div>
+  <div class="voice"><div class="vw">👷 一个被征发的民夫</div><div class="va">"我们累死在河堤上,只为了让皇帝的龙舟,从这条河上风风光光地开过去。"</div></div>
+  <div class="voice"><div class="vw">📜 史家</div><div class="va">"他不是没本事,是<b>太急了、不知道停</b>——把好几代人才该干完的事,硬逼着一代人干完。"</div></div>
+  <div class="voice"><div class="vw">🌾 一个农民</div><div class="va">"田里没人种,租税还照样收。活不下去了,我们只能反。"</div></div>
+  <div class="note">同一件大事,没有标准答案。 · 史料:《隋书》《资治通鉴》</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(6)">它如何改变了后来的中国? →</button></div>`);
 beats.push(()=>`
-  <div class="kicker">第六步 · 一个决定,改变了世界</div>
-  <div class="scene">汉武帝的这一战,像推倒了一连串骨牌:<br><br>击退匈奴 → 打通<b>河西走廊与丝绸之路</b> → 中国的丝绸、西域的物产与文化第一次大规模往来 → 被逼西迁的匈奴,有人认为间接搅动了后来欧亚大陆的民族大迁徙。<br><br><b>而"汉"这个字,从此成了一个民族、一种文化的名字。</b><br><br>一个少年天子的雄心,塑造了我们今天仍在使用的"汉"。</div>
+  <div class="kicker">第六步 · 一个王朝的覆灭,换来的教训</div>
+  <div class="scene">隋朝的崩塌,像一记警钟,被下一个王朝牢牢记住:<br><br>隋亡 → <b>唐朝在它的废墟上建立</b>,处处吸取"隋为什么亡"的教训,轻徭薄赋、与民休息 → 才有了贞观之治和盛唐气象。<br><br>隋炀帝用<b>整个王朝的覆灭</b>,给后世留下了两样东西:<br>一条惠泽千年的<b>大运河</b>,和一句血写的教训——<b>不要竭泽而渔。</b></div>
   <div class="btnrow" style="margin-top:16px">
-    <a class="ghost" href="./map.html?civ=xihan">🗺 去地图看 西汉</a>
-    <a class="ghost" href="./classical-network.html?all=1">🕸 看这个时代的人物关系网</a>
+    <a class="ghost" href="./map.html?civ=tang">🗺 去地图看 唐朝(隋之后)</a>
+    <a class="ghost" href="./medieval-network.html?all=1">🕸 看这个时代的人物关系网</a>
   </div>
   <div class="btnrow"><button class="nextbtn" onclick="go(7)">那……换作是你呢? →</button></div>`);
 beats.push(()=>`
   <div class="kicker">最后 · 回到你</div>
   <div class="htitle" style="font-size:22px">换作是你呢?</div>
-  <div class="q">用无数人的代价,换一个强大的国家和长远的安全——你觉得,<b>值吗</b>?</div>
-  <div class="q">如果你是汉武帝,你会在<b>哪一刻</b>停下来、收手?</div>
-  <div class="q">你最开始选的是 <b id="myPick">?</b>,和汉武帝(A)一样吗?走到这里,你的想法<b>变了</b>吗?</div>
-  <div style="font-family:var(--sans);font-weight:700;color:var(--ink);margin-top:18px">✍️ 写下你从汉武帝的抉择里,看懂的一句话:</div>
-  <textarea id="myNote" placeholder="比如:强大是有代价的,问题是这代价由谁来付……"></textarea>
+  <div class="q">一件"<b>功在千秋、罪在当代</b>"的事,该做吗?那个"当代"的苦,该由谁来扛?</div>
+  <div class="q">同样是倾尽国力——汉武帝晚年下罪己诏、<b>踩了刹车</b>,保住了汉朝;隋炀帝<b>没有刹车</b>,丢了天下。你觉得,差别到底在哪?</div>
+  <div class="q">你最开始选的是 <b id="myPick">?</b>,和隋炀帝(A)一样吗?走到这里,你的想法<b>变了</b>吗?</div>
+  <div style="font-family:var(--sans);font-weight:700;color:var(--ink);margin-top:18px">✍️ 写下你从隋炀帝的抉择里,看懂的一句话:</div>
+  <textarea id="myNote" placeholder="比如:再好的事,逼得太急、不知道停,也会变成灾难……"></textarea>
   <div class="btnrow"><button class="nextbtn" onclick="saveNote(event)">💾 记下我的收获</button></div>
   <div class="btnrow" style="margin-top:14px">
-    <a class="nextbtn" href="./stories.html" style="text-decoration:none">🧩 回到「举国的豪赌」这条线:和隋炀帝放一起找规律 →</a>
+    <a class="nextbtn" href="./stories.html" style="text-decoration:none">🧩 回到这条线:和汉武帝放一起「找规律」 →</a>
   </div>
   <div class="btnrow" style="margin-top:8px">
     <button class="ghost" onclick="if(window.toggleAIFloat)toggleAIFloat()">🤖 和 AI 聊聊这个抉择</button>
@@ -183,7 +182,7 @@ function render(){
   document.getElementById('beat').innerHTML=beats[cur]();
   document.getElementById('prog').innerHTML=beats.map((_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('');
   if(cur===1){ refreshGate(); }
-  if(cur===7){ const m=document.getElementById('myPick'); if(m)m.textContent=pick||'?'; const n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('decision_hanwudi')||''; }
+  if(cur===7){ const m=document.getElementById('myPick'); if(m)m.textContent=pick||'?'; const n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('decision_suiyangdi')||''; }
   window.scrollTo({top:0,behavior:'instant'});
   if(window.Track) Track.log('抉择时刻');
 }
@@ -203,14 +202,14 @@ function refreshGate(){
 function choose(k){
   pick=k;
   document.querySelectorAll('.choice').forEach(c=>{c.classList.toggle('picked',c.dataset.k===k);c.onclick=null;});
-  const react={A:'果决!可整个国家的家底,真的押得起这一场没有期限的战争吗?',
-    B:'懂得分寸。但匈奴来去如风,打了又退、退了又来——"见好就收",真收得住吗?',
-    C:'体恤民力。可是……一直用财物换来的和平,边境的百姓真的安全吗?'}[k];
+  const react={A:'气魄惊人!可几大工程一起压上来,民力这根弦……绷得住吗?',
+    B:'懂得留余地。只是宏图要慢慢来,你忍得住"在我手上看不到建成"的遗憾吗?',
+    C:'体恤民力。但父亲留下的大好家底搁着不用,你甘心把名垂青史的机会让给后人吗?'}[k];
   const r=document.getElementById('reaction');
-  r.innerHTML=react+'<div class="btnrow" style="margin-top:14px"><button class="nextbtn" onclick="go(3)">👉 看真实的汉武帝怎么选</button></div>';
+  r.innerHTML=react+'<div class="btnrow" style="margin-top:14px"><button class="nextbtn" onclick="go(3)">👉 看真实的隋炀帝怎么选</button></div>';
   r.classList.add('show');
 }
-function saveNote(e){ const n=document.getElementById('myNote'); if(n){localStorage.setItem('decision_hanwudi',n.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的收获',1500);} }
+function saveNote(e){ const n=document.getElementById('myNote'); if(n){localStorage.setItem('decision_suiyangdi',n.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的收获',1500);} }
 render();
 </script>
 <script src="./ai_float.js?v=1"></script>

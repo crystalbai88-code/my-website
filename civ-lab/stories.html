@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>抉择时刻 · 历史人物故事 · CivLab</title>
+<title>抉择时刻 · 顺着母题看历史 · CivLab</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
 <style>
@@ -13,30 +13,66 @@
   .nav a.pill{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.08em;
     background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
   .nav .title{font-family:var(--serif);font-weight:900;font-size:17px;color:var(--ink);margin-left:4px;text-shadow:var(--label-shadow)}
-  .hero{text-align:center;max-width:640px;margin:18px auto 4px;padding:0 20px}
+  .wrap{width:min(680px,92%);margin:0 auto}
+  .hero{text-align:center;margin:18px auto 6px}
   .hero .ic{font-size:42px;line-height:1}
   .hero h1{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);margin:8px 0 6px}
-  .hero p{font-family:var(--serif);font-size:14.5px;color:var(--ink2);line-height:1.75;margin:0 auto;max-width:24em}
+  .hero p{font-family:var(--serif);font-size:14.5px;color:var(--ink2);line-height:1.75;margin:0 auto;max-width:25em}
   .hero p b{color:var(--gold)}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;max-width:980px;margin:24px auto 0;padding:0 20px}
-  .story{position:relative;display:flex;flex-direction:column;text-decoration:none;overflow:hidden;
-    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-left:5px solid var(--ac,#888);
-    border-radius:16px;padding:18px 19px 17px;backdrop-filter:blur(10px);transition:transform .15s,box-shadow .15s,border-color .15s;cursor:pointer}
-  .story:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(0,0,0,.18);border-color:var(--ac,#888)}
-  .story .row{display:flex;align-items:center;gap:12px}
-  .story .ic{font-size:38px;line-height:1}
-  .story .who .nm{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);line-height:1.1}
-  .story .who .era{font-family:var(--mono);font-size:10.5px;color:var(--ink3);margin-top:3px;letter-spacing:.03em}
-  .story .theme{display:inline-block;align-self:flex-start;margin-top:13px;font-family:var(--sans);font-size:10.5px;font-weight:800;
-    color:#fff;background:var(--ac,#888);border-radius:999px;padding:3px 11px}
-  .story .ask{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--ink);line-height:1.6;margin:12px 0 0}
-  .story .go{margin-top:15px;align-self:flex-start;font-family:var(--sans);font-weight:800;font-size:13.5px;color:#fff;
-    background:linear-gradient(90deg,var(--ac,#888),var(--ac2,#888));border-radius:999px;padding:9px 18px;box-shadow:0 5px 14px rgba(0,0,0,.16)}
-  .more{max-width:980px;margin:22px auto 0;padding:0 20px}
-  .more .card{background:var(--panel-bg);border:1px dashed var(--panel-line);border-radius:16px;padding:18px 20px;text-align:center}
-  .more .card .t{font-family:var(--serif);font-weight:800;font-size:15px;color:var(--ink2)}
-  .more .card .s{font-family:var(--sans);font-size:12.5px;color:var(--ink3);margin-top:6px;line-height:1.6}
+  /* 母题块 */
+  .motif{margin-top:24px;background:var(--panel-bg);border:1.5px solid var(--panel-line);border-top:5px solid var(--ac,var(--gold));
+    border-radius:18px;padding:18px 18px 20px;backdrop-filter:blur(10px)}
+  .motif .mh{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+  .motif .mtag{font-family:var(--sans);font-size:11px;font-weight:800;color:#fff;background:var(--ac,var(--gold));border-radius:999px;padding:3px 11px}
+  .motif .mt{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink)}
+  .motif .mcount{font-family:var(--mono);font-size:10.5px;color:var(--ink3);margin-left:auto}
+  .motif .ms{font-family:var(--serif);font-size:14px;color:var(--ink2);line-height:1.72;margin:9px 0 2px}
+  /* 时间线动线 */
+  .line{margin-top:14px;position:relative;padding-left:20px}
+  .line:before{content:'';position:absolute;left:5px;top:6px;bottom:18px;width:2px;background:var(--panel-line)}
+  .station{position:relative;margin-bottom:11px;display:block;text-decoration:none}
+  .station:before{content:'';position:absolute;left:-19px;top:16px;width:11px;height:11px;border-radius:50%;
+    background:var(--ac,var(--gold));border:2px solid var(--panel-bg);box-shadow:0 0 0 2px var(--ac,var(--gold))}
+  .scard{background:var(--bg2,rgba(255,255,255,.04));border:1.5px solid var(--panel-line);border-radius:13px;
+    padding:12px 14px;display:flex;align-items:center;gap:12px;transition:transform .14s,border-color .14s,box-shadow .14s;cursor:pointer}
+  .station:hover .scard{transform:translateX(3px);border-color:var(--ac,var(--gold));box-shadow:0 6px 16px rgba(0,0,0,.14)}
+  .scard .sic{font-size:28px;line-height:1}
+  .scard .sbody{flex:1;min-width:0}
+  .scard .syr{font-family:var(--mono);font-size:10px;color:var(--ac,var(--gold));font-weight:700;letter-spacing:.04em}
+  .scard .snm{font-family:var(--serif);font-weight:900;font-size:16px;color:var(--ink);margin:1px 0}
+  .scard .sone{font-family:var(--sans);font-size:12.5px;color:var(--ink2);line-height:1.5}
+  .scard .sgo{font-family:var(--sans);font-size:11px;font-weight:800;color:#fff;background:var(--ac,var(--gold));border-radius:999px;padding:6px 11px;white-space:nowrap}
+  .seed{position:relative;margin-top:2px}
+  .seed:before{content:'';position:absolute;left:-19px;top:11px;width:9px;height:9px;border-radius:50%;background:var(--panel-line)}
+  .seed .st{font-family:var(--sans);font-size:12px;color:var(--ink3);padding:5px 0 0}
+  /* 找规律(动线终点) */
+  .findbtn{display:block;width:100%;box-sizing:border-box;margin-top:8px;font-family:var(--sans);font-weight:800;font-size:14px;color:#fff;
+    background:linear-gradient(90deg,var(--ac,var(--gold)),var(--vermilion));border:none;border-radius:12px;padding:13px;cursor:pointer;box-shadow:0 5px 14px rgba(0,0,0,.14)}
+  .findbtn:active{transform:scale(.99)}
+  .hidden{display:none}
+  .find{margin-top:12px;animation:fin .45s cubic-bezier(.22,1,.36,1)}
+  @keyframes fin{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .find .fq{font-family:var(--serif);font-weight:800;font-size:15.5px;color:var(--ink);line-height:1.6;margin-bottom:10px}
+  .opt{font-family:var(--sans);font-size:14px;font-weight:600;color:var(--ink);background:var(--panel-bg);
+    border:1.5px solid var(--panel-line);border-radius:12px;padding:13px 15px;cursor:pointer;transition:all .15s;text-align:left;line-height:1.55;margin-bottom:9px}
+  .opt:hover{border-color:var(--gold)}
+  .opt.picked{border-color:var(--gold);background:rgba(224,138,44,.1)}
+  .opt b{color:var(--gold)}
+  .fb{margin-top:4px;font-size:13.5px;color:var(--ink);line-height:1.7;background:rgba(224,138,44,.1);border-left:4px solid var(--gold);border-radius:8px;padding:12px 14px;display:none}
+  .fb.show{display:block;animation:fin .35s}
+  .law{margin-top:12px;background:linear-gradient(135deg,rgba(255,248,232,.96),rgba(255,232,200,.96));border:1.5px solid var(--gold);border-radius:14px;padding:16px}
+  .law .lk{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--vermilion);font-weight:700;text-transform:uppercase}
+  .law .lt{font-family:var(--serif);font-weight:900;font-size:16.5px;color:var(--ink);line-height:1.55;margin:8px 0 0}
+  .law .le{font-family:var(--serif);font-size:13.5px;color:var(--ink2);line-height:1.72;margin-top:9px}
+  .law .le b{color:var(--vermilion)}
+  .move{margin-top:12px}
+  .move .mq{font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.7;padding-left:12px;border-left:3px solid var(--gold);margin-bottom:6px}
+  .move .mq b{color:var(--gold)}
+  textarea{width:100%;box-sizing:border-box;font-family:var(--sans);font-size:14.5px;color:var(--ink);background:var(--panel-bg);
+    border:1.5px solid var(--panel-line);border-radius:12px;padding:12px 14px;min-height:70px;outline:none;resize:vertical}
+  .savebtn{margin-top:10px;font-family:var(--sans);font-weight:800;font-size:13.5px;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));border:none;border-radius:999px;padding:10px 20px;cursor:pointer}
   .tip{font-family:var(--sans);font-size:12px;color:var(--ink3);text-align:center;margin:26px auto 0;max-width:30em;padding:0 20px;line-height:1.7}
+  .tip a{color:var(--gold);font-weight:700;text-decoration:none}
 </style>
 </head>
 <body data-theme="warm">
@@ -49,52 +85,100 @@
     <span class="title">🎯 抉择时刻</span>
   </div>
 
-  <div class="hero">
-    <div class="ic">🎯</div>
-    <h1>替历史人物,做一次选择</h1>
-    <p>每个故事都是一个真实的历史十字路口。<b>先弄懂当时的一切,再代入那个人</b>——换作是你,会怎么选?</p>
-  </div>
-
-  <div class="grid" id="grid"></div>
-
-  <div class="more">
-    <a class="card" href="./pattern.html" style="display:block;text-decoration:none;border-style:solid;border-color:var(--gold);background:linear-gradient(135deg,rgba(255,248,232,.7),rgba(255,232,200,.5))">
-      <div class="t" style="color:var(--ink)">🧩 走完几个抉择,来「找规律」</div>
-      <div class="s">把两段历史放一起看,你会发现藏在背后的<b style="color:var(--gold)">共同规律</b>——这才是真正"学到了"历史。<span style="color:var(--gold);font-weight:800">进入找规律 →</span></div>
-    </a>
-  </div>
-  <div class="more">
-    <div class="card">
-      <div class="t">⏳ 更多抉择,正在路上…</div>
-      <div class="s">哈特谢普苏特要不要称王、华盛顿要不要连任、林肯要不要签署解放宣言……一个个十字路口,会陆续加进来。</div>
+  <div class="wrap">
+    <div class="hero">
+      <div class="ic">🎯</div>
+      <h1>顺着一个「母题」,看历史</h1>
+      <p>历史上有些处境,<b>隔着几百年反复出现</b>。顺着同一条线一站站走下去,你就会发现藏在背后的规律——这,才是真正"学到了"历史。</p>
     </div>
+    <div id="motifs"></div>
+    <div class="tip">💡 这些故事,也散落在 <a href="./map.html">世界地图</a> 上——时间轴走到那个年代,对应的地点就会浮起一枚 🎯 抉择钉子。</div>
   </div>
-
-  <div class="tip">💡 这些故事,也散落在<a href="./map.html" style="color:var(--gold);font-weight:700;text-decoration:none">世界地图</a>上——当时间轴走到那个年代,对应的地点就会浮起一枚 🎯 抉择钉子。</div>
 </div>
 
+<script src="./track.js?v=1"></script>
 <script>
-// 抉择故事清单(与地图上的 DECISIONS 对应;新增抉择时在这里加一条即可)
-const STORIES=[
-  {id:'socrates', person:'苏格拉底', icon:'🏛️', era:'古典希腊 · 雅典 · 约公元前399',
-   theme:'良心 vs 法律', ask:'门开着——你逃走求生,还是留下赴死?',
-   ac:'#e2603f', ac2:'#b06aa0', url:'./decision-socrates.html', year:-399},
-  {id:'shangyang', person:'商鞅', icon:'⚖️', era:'战国 · 秦国 · 约公元前356',
-   theme:'家国权衡', ask:'太子犯了你亲手定的新法——罚,还是不罚?',
-   ac:'#e08a2c', ac2:'#e2603f', url:'./decision-shangyang.html', year:-356},
-  {id:'hanwudi', person:'汉武帝', icon:'👑', era:'西汉 · 长安 · 约公元前133',
-   theme:'家国权衡', ask:'打,还是不打匈奴?这一仗,要押上整个国家。',
-   ac:'#df8a2c', ac2:'#e2603f', url:'./decision-hanwudi.html', year:-133},
+// 抉择按"母题"组织成时间线动线;同一母题≥2站,走完即可"找规律"。
+const MOTIFS=[
+  {id:'gamble', tag:'举国的豪赌', title:'倾国之力,该不该?', ac:'#df8a2c',
+   sub:'倾尽国力去办一件大事——可能名垂千古,也可能把国家拖垮。成败的分水岭,常常是:能不能在悬崖前<b>刹住车</b>。',
+   stations:[
+     {person:'汉武帝', icon:'👑', year:-133, era:'公元前133 · 西汉', one:'打不打匈奴?用整个国家去赌。', url:'./decision-hanwudi.html'},
+     {person:'隋炀帝', icon:'👷', year:605, era:'公元605 · 隋', one:'要不要倾举国之力,开凿大运河?', url:'./decision-suiyangdi.html'},
+   ],
+   find:{
+     q:'这两位皇帝,都倾尽国力去办一件大事。走完这两站,你觉得它们藏着什么<b>共同的规律</b>?',
+     opts:[
+       {t:'倾尽国力办大事,常能留下千秋功业;但<b>能不能及时"刹车"</b>,才决定了国家的生死。', ok:true, fb:'✅ 你抓住了!这正是两条线最深的共同点。往下看揭晓——'},
+       {t:'凡是大兴土木、对外征战的皇帝,<b>最后都会亡国</b>。', ok:false, fb:'再想想:汉武帝可没亡国呀。"亡不亡"不是它们真正的共同点。'},
+       {t:'只要国库够厚,皇帝<b>怎么折腾都不会出事</b>。', ok:false, fb:'隋炀帝接手的国库厚得流油,照样几年就垮了——可见"刹不刹车"比"家底厚不厚"更关键。'},
+     ],
+     law:{ lt:'同样是倾国豪赌,<br>生死之差,就在两个字:<b>刹车</b>。',
+           le:'汉武帝晚年下「罪己诏」、<b>踩了刹车</b>,保住了汉朝;隋炀帝<b>不知收手</b>,把一个富庶王朝几年就葬送。功业可以相似,结局却天差地别——差别不在做不做,而在<b>知不知道停</b>。' },
+     move:'这条"<b>能不能刹车</b>"的规律,你还能在别处见到吗?(历史里,或今天的生活里)',
+     key:'find_gamble' },
+  },
+  {id:'reform', tag:'改革的代价', title:'要不要硬碰既得利益?', ac:'#e2603f',
+   sub:'想改变一个旧世界,就得硬碰<b>既得利益</b>——而既得利益,从不会乖乖让步。',
+   stations:[
+     {person:'商鞅', icon:'⚖️', year:-356, era:'公元前356 · 秦', one:'太子犯了你亲手定的新法,罚,还是不罚?', url:'./decision-shangyang.html'},
+   ], seed:'再凑一位改革家(如王安石),就能顺着这条线找规律了。'},
+  {id:'conscience', tag:'良心与法律', title:'良心撞上法律,听谁的?', ac:'#b06aa0',
+   sub:'当一个人的<b>良心</b>,撞上国家的<b>法律</b>,该听哪一个?',
+   stations:[
+     {person:'苏格拉底', icon:'🏛️', year:-399, era:'公元前399 · 雅典', one:'门开着,你逃走求生,还是留下赴死?', url:'./decision-socrates.html'},
+   ], seed:'再凑一个"良心与法律"的故事,这条线就能走通了。'},
 ];
 const esc=s=>String(s==null?'':s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
-document.getElementById('grid').innerHTML=STORIES.sort((a,b)=>a.year-b.year).map(s=>`
-  <a class="story" style="--ac:${s.ac};--ac2:${s.ac2}" href="${s.url}">
-    <div class="row"><div class="ic">${s.icon}</div>
-      <div class="who"><div class="nm">${esc(s.person)}</div><div class="era">${esc(s.era)}</div></div></div>
-    <span class="theme">${esc(s.theme)}</span>
-    <div class="ask">${esc(s.ask)}</div>
-    <span class="go">▶ 进入抉择</span>
-  </a>`).join('');
+function stationHtml(s){
+  return `<a class="station" href="${s.url}"><div class="scard">
+    <div class="sic">${s.icon}</div>
+    <div class="sbody"><div class="syr">${esc(s.era)}</div><div class="snm">${esc(s.person)}</div><div class="sone">${esc(s.one)}</div></div>
+    <div class="sgo">▶ 进入</div></div></a>`;
+}
+document.getElementById('motifs').innerHTML=MOTIFS.map(m=>{
+  const sts=m.stations.slice().sort((a,b)=>a.year-b.year);
+  let inner=`<div class="motif" style="--ac:${m.ac}">
+    <div class="mh"><span class="mtag">${esc(m.tag)}</span><span class="mt">${esc(m.title)}</span><span class="mcount">${sts.length} 站</span></div>
+    <div class="ms">${m.sub}</div>
+    <div class="line">${sts.map(stationHtml).join('')}`;
+  if(m.seed){ inner+=`<div class="seed"><div class="st">⏳ ${esc(m.seed)}</div></div>`; }
+  inner+=`</div>`;
+  if(m.find && sts.length>=2){
+    inner+=`<button class="findbtn" id="fb_${m.id}" onclick="openFind('${m.id}')">🧩 两站都走完了?来找它们的规律 →</button>
+      <div class="find hidden" id="find_${m.id}"></div>`;
+  }
+  inner+=`</div>`;
+  return inner;
+}).join('');
+
+const FINDMAP={}; MOTIFS.forEach(m=>{if(m.find)FINDMAP[m.id]=m.find;});
+function openFind(id){
+  const f=FINDMAP[id]; const box=document.getElementById('find_'+id);
+  document.getElementById('fb_'+id).classList.add('hidden');
+  box.classList.remove('hidden');
+  box.innerHTML=`<div class="fq">${f.q}</div>`+
+    f.opts.map((o,i)=>`<div class="opt" data-i="${i}" onclick="pickFind('${id}',${i})">${o.t}</div>`).join('')+
+    `<div class="fb" id="ffb_${id}"></div>
+     <div class="law hidden" id="law_${id}"><div class="lk">🔑 这条线的规律</div><div class="lt">${f.law.lt}</div><div class="le">${f.law.le}</div></div>
+     <div class="move hidden" id="move_${id}"><div class="mq">${f.move}</div><textarea id="mv_${id}" placeholder="写下你发现的规律,或你想到的另一个例子……"></textarea><button class="savebtn" onclick="saveFind('${id}',event)">💾 记下我的发现</button></div>`;
+  box.scrollIntoView({behavior:'smooth',block:'start'});
+  const mv=document.getElementById('mv_'+id); if(mv)mv.value=localStorage.getItem(f.key)||'';
+  if(window.Track) Track.log('找规律');
+}
+const answered={};
+function pickFind(id,i){
+  const f=FINDMAP[id];
+  document.querySelectorAll('#find_'+id+' .opt').forEach(el=>el.classList.toggle('picked',+el.dataset.i===i));
+  const fb=document.getElementById('ffb_'+id); fb.innerHTML=f.opts[i].fb; fb.classList.add('show');
+  const reveal=()=>{answered[id]=1;document.getElementById('law_'+id).classList.remove('hidden');document.getElementById('move_'+id).classList.remove('hidden');document.getElementById('law_'+id).scrollIntoView({behavior:'smooth',block:'center'});};
+  if(f.opts[i].ok && !answered[id]){ setTimeout(reveal,650); }
+  else if(!f.opts[i].ok && !document.getElementById('rev_'+id)){
+    const b=document.createElement('button'); b.id='rev_'+id; b.className='savebtn'; b.style.marginTop='8px'; b.style.background='var(--panel-bg)'; b.style.color='var(--gold)'; b.style.border='1px solid var(--panel-line)';
+    b.textContent='看看哪条才是最深的规律 →'; b.onclick=reveal; fb.after(b);
+  }
+}
+function saveFind(id,e){ const f=FINDMAP[id]; const mv=document.getElementById('mv_'+id); if(mv){localStorage.setItem(f.key,mv.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的发现',1500);} }
 </script>
 <script src="./ai_float.js?v=1"></script>
 </body>

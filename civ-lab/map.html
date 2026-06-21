@@ -236,6 +236,8 @@ const DECISIONS=[
    tip:'门开着,你逃,还是留下赴死?', url:'./decision-socrates.html'},
   {id:'hanwudi', person:'汉武帝', icon:'👑', lng:108.9, lat:34.3, year:-133, from:-140, to:-87,
    tip:'打,还是不打匈奴?用整个国家去赌。', url:'./decision-hanwudi.html'},
+  {id:'suiyangdi', person:'隋炀帝', icon:'👷', lng:112.4, lat:34.7, year:605, from:600, to:625,
+   tip:'要不要倾举国之力,开凿大运河?', url:'./decision-suiyangdi.html'},
 ];
 function activeDecisions(){ return DECISIONS.filter(d=> year>=d.from && year<=d.to ); }
 const dpinEls={};
