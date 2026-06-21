@@ -72,8 +72,8 @@ input{font-family:inherit}
   border:1px solid var(--border-lt);background:var(--paper-card);
   transition:transform .12s,box-shadow .12s,border-color .2s;
 }
-.day-cell:not(.locked):hover{transform:translateY(-1px);box-shadow:var(--sh-md);border-color:var(--border)}
-.day-cell.locked{background:var(--paper);border-color:transparent;cursor:not-allowed}
+.day-cell:hover{transform:translateY(-1px);box-shadow:var(--sh-md);border-color:var(--border)}
+.day-cell.future{background:var(--paper);border-color:var(--border-lt);opacity:.55}
 .day-cell.today{background:var(--gold-bg);border-color:var(--gold);border-width:1.5px}
 .day-cell.poem-day{background:var(--jade-bg);border-color:#9AC9A8}
 /* stamp: completed day */
@@ -95,11 +95,11 @@ input{font-family:inherit}
 .day-num{font-size:.8rem;font-weight:700;color:var(--ink-light);line-height:1;z-index:1;position:relative}
 .day-cell.today .day-num{color:var(--gold);font-weight:800}
 .day-cell.poem-day .day-num{color:var(--jade)}
-.day-cell.locked .day-num{color:var(--border)}
+.day-cell.future .day-num{color:var(--ink-light)}
 .day-icon{font-size:1rem;line-height:1;z-index:1;position:relative;margin-top:3px;font-family:var(--font-brush);color:var(--ink-light)}
 .day-cell.poem-day .day-icon{color:var(--jade)}
 .day-cell.today .day-icon{color:var(--gold)}
-.day-cell.locked .day-icon{color:var(--border-lt)}
+.day-cell.future .day-icon{color:var(--border)}
 
 /* ════ LESSON ════ */
 #lesson{background:var(--paper)}
@@ -494,7 +494,7 @@ input{font-family:inherit}
 }
 @media (min-width:1024px){
   .screen{max-width:1040px}
-  #home{
+  #home.active{
     display:grid;
     grid-template-columns:400px 1fr;
     grid-template-rows:auto auto 1fr;
@@ -1176,14 +1176,14 @@ function renderHome(){
     const done=progress[d]&&progress[d].done;
     const isPoemDay=!!sched.poemId;
     const isToday=d===today;
-    const isLocked=d>today;
+    const isFuture=d>today;
 
     if(done){
       cell.classList.add('done');
     } else if(isToday){
       cell.classList.add('today');
-    } else if(isLocked){
-      cell.classList.add('locked');
+    } else if(isFuture){
+      cell.classList.add('future');
     } else if(isPoemDay){
       cell.classList.add('poem-day');
     }
@@ -1195,9 +1195,8 @@ function renderHome(){
       ${stars>0?`<span class="day-star">${'⭐'.repeat(stars)}</span>`:''}
     `;
 
-    if(!isLocked){
-      cell.onclick=()=>openLesson(d);
-    }
+    // All days always clickable — free review navigation
+    cell.onclick=()=>openLesson(d);
     grid.appendChild(cell);
   }
 }
