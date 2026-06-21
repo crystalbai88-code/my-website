@@ -503,6 +503,21 @@ footer p{font-size:12px;color:var(--ink3);letter-spacing:0.08em}
 .proj-img-engineering{background:linear-gradient(150deg,rgba(46,124,184,0.13),rgba(90,168,216,0.07))}
 .proj-img-business{background:linear-gradient(150deg,rgba(112,96,176,0.13),rgba(150,130,210,0.07))}
 
+/* 4b · 作品卡 SVG 品类图标 + 弹性 hover（注入能量） */
+.proj-card-img svg{width:54px;height:54px;transition:transform 0.4s cubic-bezier(.34,1.56,.64,1)}
+.proj-img-humanities{color:var(--warm)}
+.proj-img-science{color:var(--moss)}
+.proj-img-engineering{color:var(--sky)}
+.proj-img-business{color:var(--lav)}
+.proj-card{transition:transform 0.4s cubic-bezier(.34,1.56,.64,1),box-shadow 0.35s ease,border-color 0.35s ease}
+.proj-card:hover{transform:translateY(-6px) scale(1.012);box-shadow:0 18px 44px rgba(232,114,12,0.18);border-color:var(--warm)}
+.proj-card:hover .proj-card-img svg{transform:scale(1.14) translateY(-3px)}
+@media(prefers-reduced-motion:reduce){
+  .proj-card,.proj-card-img svg{transition:none}
+  .proj-card:hover{transform:none}
+  .proj-card:hover .proj-card-img svg{transform:none}
+}
+
 /* 5 · Belief cards — richer depth on hover */
 .bcard:hover{transform:translateY(-5px);box-shadow:0 24px 56px rgba(43,29,14,0.13)}
 
@@ -968,7 +983,7 @@ footer p{color:rgba(255,249,240,0.28)}
       <p>我们不提前规定孩子要做什么。第一周的任务，只是帮助他找到自己真正在意的那件事。</p>
     </div>
     <div class="cohort-phases reveal">
-      <div class="phase"><div class="phase-num">Phase 01 · 第 1—2 周</div><h3>发现阶段<br>找到真正在意的事</h3><p>通过田野观察、对话访谈、头脑风暴，帮助孩子从模糊的兴趣中提炼出一个值得深入的真实问题。</p><ul class="phase-detail"><li>个人兴趣图谱绘制</li><li>真实场景观察与记录</li><li>问题定义工作坊</li><li>导师一对一面谈</li></ul></div>
+      <div class="phase"><div class="phase-num">Phase 01 · 第 1—2 周</div><h3>发现阶段<br>找到真正在意的事</h3><p>通过田野观察、对话访谈、头脑风暴，帮助孩子从模糊的兴趣中提炼出一个值得深入的真实问题。</p><ul class="phase-detail"><li>个人兴趣图谱绘制</li><li>真实场景观察与记录</li><li>问题定义工作坊</li><li>导师深度面谈</li></ul></div>
       <div class="phase"><div class="phase-num">Phase 02 · 第 3—6 周</div><h3>创造阶段<br>把想法变成真实作品</h3><p>根据问题方向，借助 AI 工具进行快速原型制作，在导师和同伴的反馈中持续迭代改进。</p><ul class="phase-detail"><li>原型设计与制作</li><li>用户测试与反馈收集</li><li>AI 工具综合运用</li><li>每周小组复盘</li></ul></div>
       <div class="phase"><div class="phase-num">Phase 03 · 第 7—8 周</div><h3>表达阶段<br>让作品被真实看见</h3><p>完成项目档案，准备公开展示。邀请家长、导师和俱乐部会员共同见证孩子的成果呈现。</p><ul class="phase-detail"><li>作品档案整理归纳</li><li>路演表达训练</li><li>结业公开展示</li><li>会员身份正式激活</li></ul></div>
     </div>
@@ -1311,13 +1326,19 @@ const projects=[
   {id:12,category:'humanities',title:'电影发展史 · 全球影史时间轴',author:'Crystal · 导师出品',level:'L4 负责人',house:'AI + 人文',summary:'一部可交互的世界电影简史：80 部 1903—2022 年的经典影片，用「时间轴胶片 / 3D 电影星球 / 星座关联」三种视角自由穿梭。点开任意一部，即可看到它的时代背景、为什么火、社会影响，以及它与其他作品之间的影响脉络。',emoji:'🎬',playUrl:'cinema.html',btnText:'🎬 进入时间轴',process:[{name:'内容梳理',desc:'从默片时代到数字流媒体时代，遴选 80 部真正改变电影语言的关键作品，标注年代、国家、导演与所属电影时代。'},{name:'三种视角',desc:'设计时间轴（胶片票根流）、3D 电影星球、星座关联三种浏览方式，让影史既能线性回顾，也能看见作品之间的相互影响。'},{name:'深度卡片',desc:'每部电影都有「时代背景 / 为什么火 / 社会影响」三段解读，并用连线呈现它如何启发了后来的作品。'},{name:'真实海报',desc:'内嵌 80 部影片的真实历史海报，从爱迪生公司的《火车大劫案》到苏联《战舰波将金号》原版，自成一座可收藏的影史画廊。'},{name:'AI 协作',desc:'全程通过 AI 协作完成数据整理、三维可视化与交互设计，是把一段庞杂历史变成可探索体验的「AI + 人文」范例。'}]}
 ];
 let currentFilter='all';
+const CATEGORY_ICONS={
+  humanities:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>',
+  science:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2"/><path d="M6.453 15h11.094"/><path d="M8.5 2h7"/></svg>',
+  engineering:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg>',
+  business:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 7h6v6"/><path d="m22 7-8.5 8.5-5-5L2 17"/></svg>'
+};
 function renderProjects(){
   const grid=document.getElementById('projGrid');
   if(!grid)return;
   const filtered=currentFilter==='all'?projects:projects.filter(p=>p.category===currentFilter);
   grid.innerHTML=filtered.map(p=>`
     <div class="proj-card" onclick="openModal(${p.id})">
-      <div class="proj-card-img proj-img-${p.category}">${p.emoji}</div>
+      <div class="proj-card-img proj-img-${p.category}">${CATEGORY_ICONS[p.category]||p.emoji}</div>
       <div class="proj-card-body">
         <div class="proj-house-tag">${p.house}</div>
         <h3>${p.title}</h3>
