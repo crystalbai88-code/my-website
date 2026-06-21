@@ -238,6 +238,8 @@ const DECISIONS=[
    tip:'打,还是不打匈奴?用整个国家去赌。', url:'./decision-hanwudi.html'},
   {id:'suiyangdi', person:'隋炀帝', icon:'👷', lng:112.4, lat:34.7, year:605, from:600, to:625,
    tip:'要不要倾举国之力,开凿大运河?', url:'./decision-suiyangdi.html'},
+  {id:'hanxin', person:'韩信', icon:'⚔️', lng:118.3, lat:36.8, year:-203, from:-210, to:-196,
+   tip:'三分天下自立,还是报恩忠于刘邦?', url:'./decision-hanxin.html'},
 ];
 function activeDecisions(){ return DECISIONS.filter(d=> year>=d.from && year<=d.to ); }
 const dpinEls={};
