@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>少年创造者俱乐部 · 为有想法的孩子</title>
+<title>智造少年 · 为有想法的孩子</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Noto+Serif+SC:wght@300;400;600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet"/>
@@ -556,7 +556,7 @@ footer p{color:rgba(255,249,240,0.28)}
 
 <!-- NAV -->
 <nav id="mainNav">
-  <a class="brand" href="#" onclick="showPage('home');return false">少年<em>创造者</em>俱乐部</a>
+  <a class="brand" href="#" onclick="showPage('home');return false">智造<em>少年</em></a>
   <div class="nav-links">
     <a href="#" onclick="showPage('home');return false" id="nav-home">首页</a>
     <a href="#" onclick="showPage('ceo');return false" id="nav-ceo">少年CEO</a>
@@ -979,6 +979,39 @@ footer p{color:rgba(255,249,240,0.28)}
       <span class="badge">结业转年度会员</span>
     </div>
   </section>
+  <section class="ceo-meaning reveal">
+    <style>
+      .ceo-meaning{background:var(--paper2);padding:92px 56px}
+      .cm-head{max-width:820px;margin:0 auto 60px;text-align:center}
+      .cm-head .cm-eyebrow{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--warm);margin-bottom:18px}
+      .cm-head h2{font-family:var(--display);font-weight:400;font-size:clamp(28px,4.4vw,48px);color:var(--ink);line-height:1.28}
+      .cm-head h2 em{font-style:normal;color:var(--warm)}
+      .cm-head h2 .strike{text-decoration:line-through;text-decoration-color:var(--coral);text-decoration-thickness:2px;color:var(--ink3)}
+      .cm-sub{color:var(--ink2);font-size:16px;margin-top:20px;line-height:1.75}
+      .cm-grid{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+      .cm-letter{background:var(--paper);border:1px solid var(--paper4);border-radius:18px;padding:38px 30px 32px;text-align:center;transition:transform .3s,box-shadow .3s}
+      .cm-letter:hover{transform:translateY(-5px);box-shadow:0 30px 60px -40px rgba(43,29,14,.45)}
+      .cm-letter .cm-big{font-family:var(--display);font-weight:400;font-size:clamp(76px,8vw,108px);line-height:1;color:var(--warm)}
+      .cm-letter .cm-role{font-family:var(--display);font-weight:500;font-size:23px;color:var(--ink);margin-top:4px}
+      .cm-letter .cm-cn{font-family:var(--serif);font-size:17px;color:var(--warm);font-weight:500;margin:6px 0 16px}
+      .cm-letter p{font-size:14.5px;color:var(--ink2);line-height:1.85;text-align:left}
+      .cm-foot{max-width:780px;margin:50px auto 0;text-align:center;font-size:15.5px;color:var(--ink2);line-height:2}
+      .cm-foot b{color:var(--warm)}
+      @media(max-width:820px){.cm-grid{grid-template-columns:1fr}.ceo-meaning{padding:56px 22px}}
+    </style>
+    <div class="cm-head">
+      <div class="cm-eyebrow">少年 CEO · 杭州</div>
+      <h2>CEO 不是<span class="strike">小老板</span>，<br>是 <em>Creator · Explorer · Owner</em>。</h2>
+      <p class="cm-sub">我们把 “CEO” 三个字母重新定义。它不指向一家公司，而指向一个孩子能成为的三种人——也是一条从探索，到创造，到拥有的成长主线。</p>
+    </div>
+    <div class="cm-grid">
+      <div class="cm-letter"><div class="cm-big">C</div><div class="cm-role">Creator</div><div class="cm-cn">创造者</div><p>把想法做成能被看见的真实作品，并为结果负责。用工具的人很多，造工具的人很少——我们要的是后者。</p></div>
+      <div class="cm-letter"><div class="cm-big">E</div><div class="cm-role">Explorer</div><div class="cm-cn">探索者</div><p>带着眼睛走进真实世界，在别人忽略的地方，找到一个真正属于自己的问题。好问题，比好答案更难得。</p></div>
+      <div class="cm-letter"><div class="cm-big">O</div><div class="cm-role">Owner</div><div class="cm-cn">自己人生的主人</div><p>结业不是终点——成为会员，长期拥有并经营自己的项目，而不是等别人来安排自己的人生。</p></div>
+    </div>
+    <p class="cm-foot">三个字母，也是一条主线：<b>探索</b>找到问题 → <b>创造</b>做出作品 → <b>拥有</b>长期经营。<br>少年CEO 探索班，正是带孩子走完这条路。</p>
+  </section>
+
   <section class="ceo-structure">
     <div class="structure-intro reveal">
       <div class="section-label">探索班结构</div>
@@ -1195,7 +1228,7 @@ footer p{color:rgba(255,249,240,0.28)}
     <div class="section-label reveal">和传统教育的区别</div>
     <h2 class="h-serif reveal">我们不是在做一种<br>更好的补习班。</h2>
     <table class="compare-table reveal">
-      <thead><tr><th>维度</th><th>传统课外教育</th><th>少年创造者俱乐部</th></tr></thead>
+      <thead><tr><th>维度</th><th>传统课外教育</th><th>智造少年</th></tr></thead>
       <tbody>
         <tr><td class="col-topic">起点</td><td class="col-them">课程大纲决定学什么</td><td class="col-us">孩子的真实问题决定学什么</td></tr>
         <tr><td class="col-topic">导师角色</td><td class="col-them">知识传授者</td><td class="col-us">问题陪伴者与方向引导者</td></tr>
@@ -1210,7 +1243,7 @@ footer p{color:rgba(255,249,240,0.28)}
 </div>
 
 <footer>
-  <p>© <span id="yr"></span> 少年创造者俱乐部 · ai00.tech</p>
+  <p>© <span id="yr"></span> 智造少年 · ai00.tech</p>
   <div class="footer-contact">
     <a href="tel:18966487100">微信 18966487100</a>
     <span>电话同号</span>
