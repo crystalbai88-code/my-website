@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>抉择时刻 · 阿周那的两难 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;display:flex;flex-direction:column;align-items:center}
+  .top{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:12px 16px;
+    background:linear-gradient(180deg,rgba(var(--scrim,0,0,0),.25),transparent);position:sticky;top:0;z-index:20}
+  .top a.back{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.1em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .top .brand{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink)}
+  .prog{display:flex;gap:5px;margin-left:auto}
+  .prog i{width:13px;height:4px;border-radius:3px;background:var(--panel-line)}
+  .prog i.on{background:var(--gold)}
+  .wrap{width:min(660px,92%);margin:8px auto 70px;flex:1}
+  .beat{animation:fin .5s cubic-bezier(.22,1,.36,1)}
+  @keyframes fin{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;font-weight:700;text-align:center;margin-top:18px}
+  .htitle{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);text-align:center;line-height:1.3;margin:6px 0 4px;text-shadow:var(--label-shadow)}
+  .hsub{font-family:var(--mono);font-size:12px;color:var(--ink3);text-align:center;letter-spacing:.08em;margin-bottom:18px}
+  .scene{font-family:var(--serif);font-size:clamp(15px,3.8vw,17.5px);color:var(--ink);line-height:1.95;
+    background:var(--panel-bg);border:1px solid var(--panel-line);border-left:4px solid var(--gold);border-radius:14px;
+    padding:18px 20px;backdrop-filter:blur(8px)}
+  .scene b{color:var(--gold)}
+  .dossier-intro{font-family:var(--sans);font-size:14.5px;color:var(--ink2);text-align:center;line-height:1.7;margin:4px 0 16px}
+  .dcount{font-family:var(--mono);font-size:12px;color:var(--gold);text-align:center;font-weight:700;margin-bottom:12px}
+  .dcard{background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:14px;margin-bottom:11px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+  .dcard.open{border-color:var(--gold)}
+  .dhead{display:flex;align-items:center;gap:11px;padding:15px 17px}
+  .dhead .di{font-size:21px}
+  .dhead .dt{font-family:var(--sans);font-weight:800;font-size:15.5px;color:var(--ink);flex:1}
+  .dhead .dchev{font-family:var(--mono);font-size:11px;color:var(--ink3);transition:transform .2s}
+  .dcard.open .dchev{transform:rotate(90deg);color:var(--gold)}
+  .dhead .ddot{width:8px;height:8px;border-radius:50%;background:var(--vermilion);flex:none}
+  .dcard.open .ddot{background:var(--cyan)}
+  .dbody{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .dbody-in{padding:0 17px 16px;font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.85}
+  .dbody-in b{color:var(--gold)}
+  .dbody-in ul{margin:8px 0 0;padding-left:2px;list-style:none}
+  .dbody-in li{margin:7px 0;padding-left:16px;position:relative}
+  .dbody-in li:before{content:'·';position:absolute;left:3px;color:var(--vermilion);font-weight:900}
+  .dbody-in li b{color:var(--vermilion)}
+  .ask{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);text-align:center;margin:22px 0 6px}
+  .asksub{font-family:var(--sans);font-size:13.5px;color:var(--ink2);text-align:center;margin-bottom:16px;line-height:1.6}
+  .choices{display:flex;flex-direction:column;gap:11px}
+  .choice{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink);background:var(--panel-bg);
+    border:1.5px solid var(--panel-line);border-radius:14px;padding:15px 17px;cursor:pointer;transition:all .15s;text-align:left;line-height:1.5}
+  .choice:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+  .choice .ckey{font-weight:900;color:var(--gold);margin-right:8px}
+  .choice.picked{border-color:var(--gold);background:rgba(224,138,44,.1)}
+  .reaction{margin-top:14px;font-size:14.5px;color:var(--ink);line-height:1.75;background:rgba(224,138,44,.1);
+    border-left:4px solid var(--gold);border-radius:8px;padding:13px 16px;display:none}
+  .reaction.show{display:block;animation:fin .4s}
+  .lines{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+  .line{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:12px;padding:13px 16px}
+  .line .lh{font-family:var(--serif);font-weight:900;font-size:14px;color:var(--gold);margin-bottom:4px}
+  .line .lt{font-size:14px;color:var(--ink);line-height:1.7}
+  .line .lt b{color:var(--vermilion)}
+  .voice{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:13px;padding:13px 16px;margin-bottom:10px}
+  .voice .vw{font-family:var(--sans);font-weight:800;font-size:14px;color:var(--ink);margin-bottom:5px}
+  .voice .va{font-size:14px;color:var(--ink2);line-height:1.7}
+  .note{font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:center;margin-top:12px}
+  .q{font-family:var(--serif);font-size:16.5px;color:var(--ink);line-height:1.75;margin:14px 0;padding-left:14px;border-left:3px solid var(--gold)}
+  .q b{color:var(--gold)}
+  textarea{width:100%;box-sizing:border-box;margin-top:10px;font-family:var(--sans);font-size:15px;color:var(--ink);
+    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:12px;padding:13px 15px;min-height:80px;outline:none;resize:vertical}
+  .btnrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
+  .nextbtn{font-family:var(--sans);font-weight:800;font-size:15px;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));
+    border:none;border-radius:999px;padding:13px 30px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.16)}
+  .nextbtn:active{transform:scale(.97)}
+  .nextbtn[disabled]{opacity:.4;cursor:not-allowed;box-shadow:none}
+  .ghost{font-family:var(--sans);font-weight:700;font-size:14px;color:var(--gold);background:var(--panel-bg);
+    border:1px solid var(--panel-line);border-radius:999px;padding:11px 20px;cursor:pointer;text-decoration:none;display:inline-block}
+  .gate{text-align:center;font-family:var(--sans);font-size:12.5px;color:var(--ink3);margin-top:6px}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="top">
+    <a class="back" href="./stories.html">⌂ 抉择</a>
+    <span class="brand">🎯 抉择时刻</span>
+    <div class="prog" id="prog"></div>
+  </div>
+  <div class="wrap"><div class="beat" id="beat"></div></div>
+</div>
+<script src="./track.js?v=1"></script>
+<script>
+window.__aiCtx='用户正在体验"抉择时刻·阿周那的两难"(母题:尽责还是不忍,出自印度史诗《摩诃婆罗多》及其中的《薄伽梵歌》)。背景:般度族与堂兄弟俱卢族为争夺王国,在俱卢之野决战。开战前,般度族第一勇士、神射手阿周那驾车冲到阵前,看清对面大军里全是自己的亲人——堂兄弟、恩师(教他射箭的德罗纳)、敬爱的祖父(毗湿摩)。他不忍亲手杀害亲族,浑身发抖、弓箭滑落、失去斗志,宁可不打。他的御者克里希纳(黑天,神的化身)劝导他:逃避是懦弱;作为刹帝利武士,为正义而战是他的天职(达摩);应尽自己的责任,但不执着于结果的得失。这段对话即《薄伽梵歌》,是印度教最重要的经典之一,影响印度三千年,也启发了甘地。阿周那最终重新拿起弓,般度族经十八天血战惨胜,但双方损失惨重。这是没有标准答案的两难:责任与不忍的冲突。注意《摩诃婆罗多》是传说史诗、成书跨越数百年,故事属传说时代。请用适合10-12岁孩子的语言陪他思考,多反问,不要替他下结论。';
+let pick=null;
+const DOSSIER=[
+  {i:'🏹',t:'你是谁',b:'你是<b>阿周那</b>,般度族五兄弟中最勇猛的<b>神射手</b>,箭术天下无双。(这是印度大史诗《摩诃婆罗多》里的英雄。)'},
+  {i:'⚔️',t:'这场战争',b:'你的堂兄弟<b>俱卢族</b>用诡计夺走了本属于你们般度族的王国,还百般羞辱你们。所有和平的努力都失败了,只剩最后一条路——在<b>俱卢之野</b>,两族决一死战。'},
+  {i:'💔',t:'对面是谁',b:'可当你驾着战车冲到阵前、看清对面的大军时,你愣住了——那里面全是你的<b>亲人</b>:你的堂兄弟、教你射箭的<b>恩师</b>、你从小敬爱的<b>祖父</b>……要打赢,你就得亲手射死他们。'},
+  {i:'😣',t:'你的崩溃',b:'你浑身发抖,弓从手里滑落。"为了一个王国,去杀死自己的亲人和恩师——这样的胜利,还有什么意义?<b>我宁可不打。</b>"你瘫坐在战车上。'},
+  {i:'🪷',t:'御者的劝导',b:'你的御者<b>克里希纳</b>(其实是神的化身)对你说了一番话:<ul><li>逃避不是慈悲,是<b>懦弱</b>;</li><li>你是武士,为<b>正义</b>而战是你的天职("达摩");</li><li>尽你该尽的责任,但<b>不要执着于结果</b>的成败得失。</li></ul>(这段对话,就是《薄伽梵歌》。)'},
+  {i:'⚡',t:'眼前的难题',b:'一边是"<b>不忍</b>"——不愿亲手杀害自己的亲人与恩师;一边是"<b>责任</b>"——为了正义、为了天职,必须打这一仗。<br>你,是放下弓,还是拉满弓?'},
+];
+let opened=new Set();
+const beats=[];
+beats.push(()=>`
+  <div class="kicker">传说时代 · 印度 · 俱卢之野</div>
+  <div class="htitle">对面是亲人,这一仗打不打?</div>
+  <div class="hsub">即将由你 —— 阿周那 —— 决定</div>
+  <div class="scene">你是印度史诗里的神射手<b>阿周那</b>。决战在即,你却发现:战场对面,全是你的亲人和恩师。<br><br>你即将做一个决定——它不只关乎一场战争的胜负,更是一个让人类想了三千年的难题:<b>当"责任"要你去做一件"不忍"做的事,你该怎么办?</b><br><br>但在你决定之前,<b>先别急。</b> 先把这件事,想清楚。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(1)">📂 先把这件事想清楚 →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第一步 · 了解</div>
+  <div class="htitle" style="font-size:23px">想清楚这件事</div>
+  <div class="dossier-intro">点开下面每一张卡片,弄懂这场战争、对面是谁、和御者对你说的话。<br>全部看完,你才有资格替阿周那做决定。</div>
+  <div class="dcount" id="dcount">已了解 0 / ${DOSSIER.length}</div>
+  <div id="dwrap">${DOSSIER.map((d,i)=>`
+    <div class="dcard" data-i="${i}" onclick="flip(${i})">
+      <div class="dhead"><span class="ddot"></span><span class="di">${d.i}</span><span class="dt">${d.t}</span><span class="dchev">▶</span></div>
+      <div class="dbody" id="db${i}"><div class="dbody-in">${d.b}</div></div>
+    </div>`).join('')}</div>
+  <div class="btnrow"><button class="nextbtn" id="toChoice" onclick="go(2)" disabled>换作是你,你会怎么做? →</button></div>
+  <div class="gate" id="gate">(看完全部 ${DOSSIER.length} 张卡片后解锁)</div>`);
+beats.push(()=>`
+  <div class="kicker">第二步 · 此刻,你就是阿周那</div>
+  <div class="ask">放下弓,还是拉满弓?</div>
+  <div class="asksub">你已经想清楚了——被夺的王国、对面的亲人、心里的不忍,还有克里希纳关于"责任"的劝导。<br>现在,这个决定由你来下。</div>
+  <div class="choices">
+    <div class="choice" data-k="A" onclick="choose('A')"><span class="ckey">A</span>履行天职、拿起武器——为了正义,尽武士的责任,哪怕对手是亲人。</div>
+    <div class="choice" data-k="B" onclick="choose('B')"><span class="ckey">B</span>放下弓、拒绝作战——我不忍杀害亲人与恩师,宁可舍弃王国。</div>
+    <div class="choice" data-k="C" onclick="choose('C')"><span class="ckey">C</span>出家修行、逃离一切——抛下战争与王国,去山林里寻求内心的解脱。</div>
+  </div>
+  <div class="reaction" id="reaction"></div>`);
+beats.push(()=>`
+  <div class="kicker">第三步 · 真实的他</div>
+  <div class="htitle" style="font-size:22px">阿周那,选了 A</div>
+  <div class="scene">听完克里希纳的话,阿周那擦干眼泪,<b>重新拉满了弓</b>。他明白了:逃避痛苦不是慈悲;身为武士,为正义而战是他无法推卸的天职——他要尽责,但把成败交给更高的天意。<br><br>俱卢之野的大战打了整整<b>十八天</b>,尸横遍野。般度族最终惨胜,夺回了王国——可代价,是几乎失去了所有的至亲。<br><br>胜利是苦涩的。但他没有逃避那个"明知该做、却不忍做"的责任。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(4)">那……后来呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第四步 · 一次拉弓,延伸出三条线</div>
+  <div class="lines">
+    <div class="line"><div class="lh">⚔️ 当时</div><div class="lt">大战十八天,般度族惨胜、夺回王国,但双方几乎同归于尽,阿周那也失去了许多至亲。</div></div>
+    <div class="line"><div class="lh">🪷 思想</div><div class="lt">克里希纳劝他的那番话被记下来,成了印度教最重要的经典《<b>薄伽梵歌</b>》——"尽责而不执着于结果"的思想,影响印度三千年,也深深启发了<b>甘地</b>的非暴力理念。</div></div>
+    <div class="line"><div class="lh">⚖️ 代价</div><div class="lt">"正义"的战争,一样要付血的代价。它逼每个人去想:有些事即使是对的,做起来也无比沉重。</div></div>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(5)">不同的人怎么说? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第五步 · 关于责任与不忍,不同的声音</div>
+  <div class="voice"><div class="vw">🪷 克里希纳(黑天)</div><div class="va">"做你该做的事,但把成败得失交给更高的天意——这,才是真正的自在。"</div></div>
+  <div class="voice"><div class="vw">😢 阿周那的不忍</div><div class="va">"就算赢了,失去了这么多亲人,我真的会快乐吗?"</div></div>
+  <div class="voice"><div class="vw">🕊️ 后世的甘地</div><div class="va">"我从《薄伽梵歌》里读到的,不是教人打仗,而是教人无私地尽责、不计较得失。"</div></div>
+  <div class="voice"><div class="vw">🤔 今天的人</div><div class="va">"当'责任'和'感情'撞在一起,你会听哪一个?"</div></div>
+  <div class="note">同一个两难,没有标准答案。 · 出处:《摩诃婆罗多·薄伽梵歌》</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(6)">它给世界留下了什么? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第六步 · 一场犹豫,开出一部千年哲学</div>
+  <div class="scene"><b>《摩诃婆罗多》</b>是世界上最长的史诗,是印度文明的"百科全书"。<br><br>而阿周那在战车上的那一刻犹豫,引出了克里希纳的教导——《<b>薄伽梵歌</b>》。它成了印度教的灵魂经典,讨论着"责任、行动与解脱",连<b>甘地、爱因斯坦、奥本海默</b>都深受它影响。<br><br>一个武士在战场上的一次动摇,竟开出了一部<b>影响三千年的哲学</b>。</div>
+  <div class="btnrow" style="margin-top:16px">
+    <a class="ghost" href="./timeline.html?c=india">📜 看印度文明时间轴</a>
+    <a class="ghost" href="./classical-network.html?all=1">🕸 看这个时代的人物关系网</a>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(7)">那……换作是你呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">最后 · 回到你</div>
+  <div class="htitle" style="font-size:22px">换作是你呢?</div>
+  <div class="q">当"<b>责任</b>"要你去做一件你"<b>不忍</b>"做的事——你会怎么选?</div>
+  <div class="q">阿周那的两难,你在生活里遇到过吗?(那种"明知该做、却很难下手"的事)</div>
+  <div class="q">你最开始选的是 <b id="myPick">?</b>,和阿周那(A)一样吗?走到这里,你的想法<b>变了</b>吗?</div>
+  <div style="font-family:var(--sans);font-weight:700;color:var(--ink);margin-top:18px">✍️ 写下你从阿周那的两难里,看懂的一句话:</div>
+  <textarea id="myNote" placeholder="比如:尽该尽的责任,但别被'结果'绑架……"></textarea>
+  <div class="btnrow"><button class="nextbtn" onclick="saveNote(event)">💾 记下我的收获</button></div>
+  <div class="btnrow" style="margin-top:14px">
+    <a class="nextbtn" href="./stories.html" style="text-decoration:none">🧩 回到抉择,顺着母题线找规律 →</a>
+  </div>
+  <div class="btnrow" style="margin-top:8px">
+    <button class="ghost" onclick="if(window.toggleAIFloat)toggleAIFloat()">🤖 和 AI 聊聊这个两难</button>
+    <button class="ghost" onclick="pick=null;opened=new Set();go(0)">↺ 重新走一遍</button>
+  </div>`);
+
+let cur=0;
+function render(){
+  document.getElementById('beat').innerHTML=beats[cur]();
+  document.getElementById('prog').innerHTML=beats.map((_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('');
+  if(cur===1){ refreshGate(); }
+  if(cur===7){ const m=document.getElementById('myPick'); if(m)m.textContent=pick||'?'; const n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('decision_arjuna')||''; }
+  window.scrollTo({top:0,behavior:'instant'});
+  if(window.Track) Track.log('抉择时刻');
+}
+function go(n){ cur=n; render(); }
+function flip(i){
+  const card=document.querySelector('.dcard[data-i="'+i+'"]');
+  const body=document.getElementById('db'+i);
+  const isOpen=card.classList.toggle('open');
+  body.style.maxHeight=isOpen?(body.scrollHeight+'px'):'0';
+  if(isOpen){ opened.add(i); refreshGate(); }
+}
+function refreshGate(){
+  const c=document.getElementById('dcount'); if(c)c.textContent='已了解 '+opened.size+' / '+DOSSIER.length;
+  const btn=document.getElementById('toChoice'); const gate=document.getElementById('gate');
+  if(opened.size>=DOSSIER.length){ if(btn)btn.disabled=false; if(gate)gate.textContent='✅ 你已想清楚,可以决定了'; }
+}
+function choose(k){
+  pick=k;
+  document.querySelectorAll('.choice').forEach(c=>{c.classList.toggle('picked',c.dataset.k===k);c.onclick=null;});
+  const react={A:'你扛起了责任。可亲手射向恩师与亲人,这份痛,你背得动吗?',
+    B:'重情。可放下弓,被夺走王国、被羞辱的族人怎么办?逃避,真的更轻松吗?',
+    C:'求解脱。但在最该担当的时刻转身离去——这是超脱,还是另一种逃避?'}[k];
+  const r=document.getElementById('reaction');
+  r.innerHTML=react+'<div class="btnrow" style="margin-top:14px"><button class="nextbtn" onclick="go(3)">👉 看真实的阿周那怎么选</button></div>';
+  r.classList.add('show');
+}
+function saveNote(e){ const n=document.getElementById('myNote'); if(n){localStorage.setItem('decision_arjuna',n.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的收获',1500);} }
+render();
+</script>
+<script src="./ai_float.js?v=1"></script>
+</body>
+</html>

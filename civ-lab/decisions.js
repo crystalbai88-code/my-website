@@ -30,6 +30,10 @@
      tip:'几万人拼四十万,要不要砸锅沉船断退路?', url:'./decision-julu.html'},
     {id:'gilgamesh', person:'吉尔伽美什', icon:'🦁', culture:'mesopotamia', lng:45.6, lat:31.3, year:-2700, from:-2800, to:-2500,
      tip:'挚友死了,你要去寻找永生吗?', url:'./decision-gilgamesh.html'},
+    {id:'qinshihuang', person:'秦始皇求仙', icon:'⚗️', culture:'china', lng:119.5, lat:35.6, year:-215, from:-219, to:-210,
+     tip:'拥有一切,要不要倾国之力追求长生不老?', url:'./decision-qinshihuang.html'},
+    {id:'arjuna', person:'阿周那的两难', icon:'🏹', culture:'india', lng:76.8, lat:29.9, year:-1000, from:-1100, to:-900,
+     tip:'对面是亲人,这一仗,打还是不打?', url:'./decision-arjuna.html'},
   ];
   if(typeof window!=='undefined') window.DECISIONS=DECISIONS;
 })();

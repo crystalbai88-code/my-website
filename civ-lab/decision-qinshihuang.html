@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>抉择时刻 · 秦始皇求仙 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;display:flex;flex-direction:column;align-items:center}
+  .top{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:12px 16px;
+    background:linear-gradient(180deg,rgba(var(--scrim,0,0,0),.25),transparent);position:sticky;top:0;z-index:20}
+  .top a.back{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.1em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .top .brand{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink)}
+  .prog{display:flex;gap:5px;margin-left:auto}
+  .prog i{width:13px;height:4px;border-radius:3px;background:var(--panel-line)}
+  .prog i.on{background:var(--gold)}
+  .wrap{width:min(660px,92%);margin:8px auto 70px;flex:1}
+  .beat{animation:fin .5s cubic-bezier(.22,1,.36,1)}
+  @keyframes fin{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;font-weight:700;text-align:center;margin-top:18px}
+  .htitle{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);text-align:center;line-height:1.3;margin:6px 0 4px;text-shadow:var(--label-shadow)}
+  .hsub{font-family:var(--mono);font-size:12px;color:var(--ink3);text-align:center;letter-spacing:.08em;margin-bottom:18px}
+  .scene{font-family:var(--serif);font-size:clamp(15px,3.8vw,17.5px);color:var(--ink);line-height:1.95;
+    background:var(--panel-bg);border:1px solid var(--panel-line);border-left:4px solid var(--gold);border-radius:14px;
+    padding:18px 20px;backdrop-filter:blur(8px)}
+  .scene b{color:var(--gold)}
+  .dossier-intro{font-family:var(--sans);font-size:14.5px;color:var(--ink2);text-align:center;line-height:1.7;margin:4px 0 16px}
+  .dcount{font-family:var(--mono);font-size:12px;color:var(--gold);text-align:center;font-weight:700;margin-bottom:12px}
+  .dcard{background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:14px;margin-bottom:11px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+  .dcard.open{border-color:var(--gold)}
+  .dhead{display:flex;align-items:center;gap:11px;padding:15px 17px}
+  .dhead .di{font-size:21px}
+  .dhead .dt{font-family:var(--sans);font-weight:800;font-size:15.5px;color:var(--ink);flex:1}
+  .dhead .dchev{font-family:var(--mono);font-size:11px;color:var(--ink3);transition:transform .2s}
+  .dcard.open .dchev{transform:rotate(90deg);color:var(--gold)}
+  .dhead .ddot{width:8px;height:8px;border-radius:50%;background:var(--vermilion);flex:none}
+  .dcard.open .ddot{background:var(--cyan)}
+  .dbody{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .dbody-in{padding:0 17px 16px;font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.85}
+  .dbody-in b{color:var(--gold)}
+  .dbody-in ul{margin:8px 0 0;padding-left:2px;list-style:none}
+  .dbody-in li{margin:7px 0;padding-left:16px;position:relative}
+  .dbody-in li:before{content:'·';position:absolute;left:3px;color:var(--vermilion);font-weight:900}
+  .dbody-in li b{color:var(--vermilion)}
+  .ask{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);text-align:center;margin:22px 0 6px}
+  .asksub{font-family:var(--sans);font-size:13.5px;color:var(--ink2);text-align:center;margin-bottom:16px;line-height:1.6}
+  .choices{display:flex;flex-direction:column;gap:11px}
+  .choice{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink);background:var(--panel-bg);
+    border:1.5px solid var(--panel-line);border-radius:14px;padding:15px 17px;cursor:pointer;transition:all .15s;text-align:left;line-height:1.5}
+  .choice:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+  .choice .ckey{font-weight:900;color:var(--gold);margin-right:8px}
+  .choice.picked{border-color:var(--gold);background:rgba(224,138,44,.1)}
+  .reaction{margin-top:14px;font-size:14.5px;color:var(--ink);line-height:1.75;background:rgba(224,138,44,.1);
+    border-left:4px solid var(--gold);border-radius:8px;padding:13px 16px;display:none}
+  .reaction.show{display:block;animation:fin .4s}
+  .lines{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+  .line{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:12px;padding:13px 16px}
+  .line .lh{font-family:var(--serif);font-weight:900;font-size:14px;color:var(--gold);margin-bottom:4px}
+  .line .lt{font-size:14px;color:var(--ink);line-height:1.7}
+  .line .lt b{color:var(--vermilion)}
+  .voice{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:13px;padding:13px 16px;margin-bottom:10px}
+  .voice .vw{font-family:var(--sans);font-weight:800;font-size:14px;color:var(--ink);margin-bottom:5px}
+  .voice .va{font-size:14px;color:var(--ink2);line-height:1.7}
+  .note{font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:center;margin-top:12px}
+  .q{font-family:var(--serif);font-size:16.5px;color:var(--ink);line-height:1.75;margin:14px 0;padding-left:14px;border-left:3px solid var(--gold)}
+  .q b{color:var(--gold)}
+  textarea{width:100%;box-sizing:border-box;margin-top:10px;font-family:var(--sans);font-size:15px;color:var(--ink);
+    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:12px;padding:13px 15px;min-height:80px;outline:none;resize:vertical}
+  .btnrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
+  .nextbtn{font-family:var(--sans);font-weight:800;font-size:15px;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));
+    border:none;border-radius:999px;padding:13px 30px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.16)}
+  .nextbtn:active{transform:scale(.97)}
+  .nextbtn[disabled]{opacity:.4;cursor:not-allowed;box-shadow:none}
+  .ghost{font-family:var(--sans);font-weight:700;font-size:14px;color:var(--gold);background:var(--panel-bg);
+    border:1px solid var(--panel-line);border-radius:999px;padding:11px 20px;cursor:pointer;text-decoration:none;display:inline-block}
+  .gate{text-align:center;font-family:var(--sans);font-size:12.5px;color:var(--ink3);margin-top:6px}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="top">
+    <a class="back" href="./stories.html">⌂ 抉择</a>
+    <span class="brand">🎯 抉择时刻</span>
+    <div class="prog" id="prog"></div>
+  </div>
+  <div class="wrap"><div class="beat" id="beat"></div></div>
+</div>
+<script src="./track.js?v=1"></script>
+<script>
+window.__aiCtx='用户正在体验"抉择时刻·秦始皇求仙"(母题:终有一死怎么活,与吉尔伽美什同一条找规律线)。史实据《史记·秦始皇本纪》:秦始皇统一六国后极度渴望长生不老,派方士徐福率童男童女数千人、耗费巨资东渡求蓬莱仙药(一去不回,传说漂到日本);又常年服食方士炼的"仙丹"(多含水银/汞,反而可能伤身);多次巡游天下登山求仙。因忌讳谈"死"、迟迟不立太子,公元前210年他在第五次巡游途中病死沙丘;赵高、李斯秘不发丧、用鲍鱼(咸鱼)掩盖尸臭,篡改遗诏立胡亥、逼死长子扶苏,三年后秦二世而亡。讽刺的是,他求而不得的"不朽",却以另一种方式实现——长城、统一文字与度量衡、皇帝制度、兵马俑让"秦"两千年后仍被铭记。与吉尔伽美什对照:都拼命求永生,吉尔伽美什失败后学会珍惜当下、放下;秦始皇至死不放手,反被恐惧绑架、丢了江山。请用适合10-12岁孩子的语言陪他思考死亡与生命,多反问,不要替他下结论。';
+let pick=null;
+const DOSSIER=[
+  {i:'👑',t:'你是谁',b:'你是<b>嬴政</b>,中国第一个皇帝。你横扫六国、一统天下,自称"<b>始皇帝</b>",立志让这江山传至二世、三世,直到万世。'},
+  {i:'🏔️',t:'你拥有的',b:'你几乎拥有了一切:天下、权力、宫殿、千军万马。可偏偏有一样东西,你怎么也抓不住——<b>时间</b>。你也会老,也会死。'},
+  {i:'😨',t:'对死亡的恐惧',b:'你太想长长久久地享有这一切了。"<b>死</b>"这个字,你听都不爱听;群臣看出你的忌讳,谁也不敢在你面前提它。'},
+  {i:'🌊',t:'方士的承诺',b:'方士们对你说:东海里有<b>蓬莱、方丈、瀛洲</b>三座仙山,住着神仙、藏着<b>长生不老的仙药</b>。术士徐福拍胸脯:只要给他人和船,他就能把仙药取回来。'},
+  {i:'⚗️',t:'你能做的',b:'你可以:<ul><li>派<b>徐福</b>带数千童男童女、耗费巨资<b>东渡求药</b>;</li><li>服食方士炼的"<b>仙丹</b>"(里头大多掺了水银);</li><li>一次次<b>巡游天下、登山求仙</b>。</li></ul>'},
+  {i:'⚡',t:'眼前的难题',b:'你已经站在了人间权力的顶峰。面对终将到来的死亡,你是<b>倾尽国力去追求长生不老</b>,还是<b>接受"人终有一死"</b>、把精力用来安顿好身后的江山与继承人?'},
+];
+let opened=new Set();
+const beats=[];
+beats.push(()=>`
+  <div class="kicker">约公元前 215 年 · 秦 · 东海之滨</div>
+  <div class="htitle">拥有了一切,却抓不住时间</div>
+  <div class="hsub">即将由你 —— 秦始皇 —— 决定</div>
+  <div class="scene">你是统一天下的<b>秦始皇</b>,几乎拥有了人间的一切。唯独"死亡",让你日夜恐惧。<br><br>方士说海外有长生不老的仙药。你即将做一个决定——它关乎你余生怎么过,也关乎你拼死打下的帝国,将走向何方。<br><br>但在你决定之前,<b>先别急。</b> 先把这件事,想清楚。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(1)">📂 先把这件事想清楚 →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第一步 · 了解</div>
+  <div class="htitle" style="font-size:23px">想清楚这件事</div>
+  <div class="dossier-intro">点开下面每一张卡片,弄懂你拥有什么、恐惧什么、方士许诺了什么。<br>全部看完,你才有资格替秦始皇做决定。</div>
+  <div class="dcount" id="dcount">已了解 0 / ${DOSSIER.length}</div>
+  <div id="dwrap">${DOSSIER.map((d,i)=>`
+    <div class="dcard" data-i="${i}" onclick="flip(${i})">
+      <div class="dhead"><span class="ddot"></span><span class="di">${d.i}</span><span class="dt">${d.t}</span><span class="dchev">▶</span></div>
+      <div class="dbody" id="db${i}"><div class="dbody-in">${d.b}</div></div>
+    </div>`).join('')}</div>
+  <div class="btnrow"><button class="nextbtn" id="toChoice" onclick="go(2)" disabled>换作是你,你会怎么做? →</button></div>
+  <div class="gate" id="gate">(看完全部 ${DOSSIER.length} 张卡片后解锁)</div>`);
+beats.push(()=>`
+  <div class="kicker">第二步 · 此刻,你就是秦始皇</div>
+  <div class="ask">追长生,还是安天下?</div>
+  <div class="asksub">你已经想清楚了——至高的权力、对死亡的恐惧、方士的承诺,还有那个你不愿面对的"死"字。<br>现在,这个决定由你来下。</div>
+  <div class="choices">
+    <div class="choice" data-k="A" onclick="choose('A')"><span class="ckey">A</span>求仙问药——派徐福东渡、服食仙丹、巡游求仙,一定要长生不老。</div>
+    <div class="choice" data-k="B" onclick="choose('B')"><span class="ckey">B</span>接受终有一死——立好太子(扶苏)、安排好身后事,让帝国稳稳传下去。</div>
+    <div class="choice" data-k="C" onclick="choose('C')"><span class="ckey">C</span>用功业与制度留名——肉身会死,就把长城、文字、制度做到极致,让"秦"千古留名。</div>
+  </div>
+  <div class="reaction" id="reaction"></div>`);
+beats.push(()=>`
+  <div class="kicker">第三步 · 真实的他</div>
+  <div class="htitle" style="font-size:22px">秦始皇,选了 A</div>
+  <div class="scene">他把全部心思都押在了"长生"上。徐福带着几千童男童女和巨额钱粮出海——<b>一去不回</b>(传说漂到了日本)。他又常年服食"仙丹",可那些丹药<b>大多掺着水银</b>,非但没让他长生,反而可能悄悄损害着他的身体。<br><br>他一次次巡游、登山、求仙,却始终忌讳谈"死",<b>迟迟不肯立太子</b>。死亡的脚步,并没有因为他的恐惧而放慢。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(4)">那……后来呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第四步 · 一场求仙,延伸出三条线</div>
+  <div class="lines">
+    <div class="line"><div class="lh">⚗️ 求而不得</div><div class="lt">徐福带着童男童女与巨资一去不返;他服的"仙丹"含汞,长生没求到,健康反受其害。</div></div>
+    <div class="line"><div class="lh">🥀 他自己</div><div class="lt">公元前210年,他在第五次巡游途中<b>病死沙丘</b>——还在求仙的路上。因忌讳谈死、不立继承人,他一死,赵高就篡改遗诏、逼死太子扶苏,立昏庸的胡亥;想传万世的帝国,<b>二世而亡</b>。</div></div>
+    <div class="line"><div class="lh">🧱 真正的不朽</div><div class="lt">讽刺的是,他没求到的"不朽",却以另一种方式实现了:<b>长城、统一的文字与度量衡、"皇帝"制度、地下的兵马俑</b>——让"秦"两千年后仍被全世界记得。</div></div>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(5)">别人怎么看这件事? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第五步 · 关于长生,不同的声音</div>
+  <div class="voice"><div class="vw">🌊 方士徐福</div><div class="va">"仙药就在海外,只是大鱼挡路、机缘未到……"(其实,海上根本没有仙山)</div></div>
+  <div class="voice"><div class="vw">📜 一个史官</div><div class="va">"他什么都有了,唯独想抓住'永远'。结果不但没长生,连辛苦打下的江山都没守住。"</div></div>
+  <div class="voice"><div class="vw">🦁 四千年前的吉尔伽美什</div><div class="va">"我也找过永生,失败后我学会了珍惜当下、好好活;而他,至死都没能放下。"</div></div>
+  <div class="voice"><div class="vw">🤔 今天的人</div><div class="va">"越想死死抓住'永远',反而越被对死亡的恐惧绑架了。"</div></div>
+  <div class="note">同一个追求,不同的结局。 · 史料:《史记·秦始皇本纪》</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(6)">它留下了什么? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第六步 · 求不到的永生,与守不住的江山</div>
+  <div class="scene">秦始皇对"长生"的执念,像一根绳索:<br><br>痴迷求仙、忌讳谈死 → <b>不立太子</b> → 病死沙丘后赵高篡权、逼死扶苏 → <b>秦二世而亡</b>。<br><br>一个皇帝对死亡的恐惧,竟<b>加速了一个帝国的崩塌</b>。<br><br>而他真正流传千古的,恰恰不是那虚无的仙药,而是<b>他做过的事</b>——这或许就是命运,对所有想"永远活着"的人,开的一个意味深长的玩笑。</div>
+  <div class="btnrow" style="margin-top:16px">
+    <a class="ghost" href="./map.html?civ=qin">🗺 去地图看 秦朝</a>
+    <a class="ghost" href="./decision-gilgamesh.html">🦁 去看吉尔伽美什求永生</a>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(7)">那……换作是你呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">最后 · 回到你</div>
+  <div class="htitle" style="font-size:22px">换作是你呢?</div>
+  <div class="q">吉尔伽美什和秦始皇,都拼命寻找长生。一个失败后学会"珍惜当下",一个至死还在追、丢了江山。为什么同样的追求,<b>结局差这么多</b>?</div>
+  <div class="q">真正能让一个人"<b>不朽</b>"的,是长生药,还是别的什么?</div>
+  <div class="q">你最开始选的是 <b id="myPick">?</b>,和秦始皇(A)一样吗?走到这里,你的想法<b>变了</b>吗?</div>
+  <div style="font-family:var(--sans);font-weight:700;color:var(--ink);margin-top:18px">✍️ 写下你从秦始皇求仙里,看懂的一句话:</div>
+  <textarea id="myNote" placeholder="比如:越想抓住永远,越容易失去眼前……"></textarea>
+  <div class="btnrow"><button class="nextbtn" onclick="saveNote(event)">💾 记下我的收获</button></div>
+  <div class="btnrow" style="margin-top:14px">
+    <a class="nextbtn" href="./stories.html" style="text-decoration:none">🧩 回到「终有一死」这条线:和吉尔伽美什找规律 →</a>
+  </div>
+  <div class="btnrow" style="margin-top:8px">
+    <button class="ghost" onclick="if(window.toggleAIFloat)toggleAIFloat()">🤖 和 AI 聊聊这个抉择</button>
+    <button class="ghost" onclick="pick=null;opened=new Set();go(0)">↺ 重新走一遍</button>
+  </div>`);
+
+let cur=0;
+function render(){
+  document.getElementById('beat').innerHTML=beats[cur]();
+  document.getElementById('prog').innerHTML=beats.map((_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('');
+  if(cur===1){ refreshGate(); }
+  if(cur===7){ const m=document.getElementById('myPick'); if(m)m.textContent=pick||'?'; const n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('decision_qinshihuang')||''; }
+  window.scrollTo({top:0,behavior:'instant'});
+  if(window.Track) Track.log('抉择时刻');
+}
+function go(n){ cur=n; render(); }
+function flip(i){
+  const card=document.querySelector('.dcard[data-i="'+i+'"]');
+  const body=document.getElementById('db'+i);
+  const isOpen=card.classList.toggle('open');
+  body.style.maxHeight=isOpen?(body.scrollHeight+'px'):'0';
+  if(isOpen){ opened.add(i); refreshGate(); }
+}
+function refreshGate(){
+  const c=document.getElementById('dcount'); if(c)c.textContent='已了解 '+opened.size+' / '+DOSSIER.length;
+  const btn=document.getElementById('toChoice'); const gate=document.getElementById('gate');
+  if(opened.size>=DOSSIER.length){ if(btn)btn.disabled=false; if(gate)gate.textContent='✅ 你已想清楚,可以决定了'; }
+}
+function choose(k){
+  pick=k;
+  document.querySelectorAll('.choice').forEach(c=>{c.classList.toggle('picked',c.dataset.k===k);c.onclick=null;});
+  const react={A:'求长生。可万一海外根本没有仙药、丹药还有毒呢?你把国事、继承人都耽误了,值吗?',
+    B:'清醒。但你正当壮年、又最怕死——真能坦然安排自己的"身后事"吗?',
+    C:'有远见。可你若一边修制度、一边还痴迷仙药、迟迟不立太子,根基照样会松动。'}[k];
+  const r=document.getElementById('reaction');
+  r.innerHTML=react+'<div class="btnrow" style="margin-top:14px"><button class="nextbtn" onclick="go(3)">👉 看真实的秦始皇怎么选</button></div>';
+  r.classList.add('show');
+}
+function saveNote(e){ const n=document.getElementById('myNote'); if(n){localStorage.setItem('decision_qinshihuang',n.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的收获',1500);} }
+render();
+</script>
+<script src="./ai_float.js?v=1"></script>
+</body>
+</html>
