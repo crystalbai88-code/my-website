@@ -172,6 +172,11 @@ const MOTIFS=[
      move:'如果有一天,规则要你做一件你觉得不对的事,你会怎么办?',
      key:'find_conscience' },
   },
+  {id:'mercy', tag:'该不该痛下杀手', title:'能除掉对手时,该不该下手?', ac:'#c0563a',
+   sub:'面对一个还没成气候、却<b>可能威胁你</b>的对手——是斩草除根,还是网开一面?一念之差,可能就是天壤之别。',
+   stations:[
+     {person:'项羽 · 鸿门宴', icon:'🍷', year:-206, era:'公元前206 · 鸿门', one:'席间杀机:杀掉刘邦,还是放他一马?', url:'./decision-hongmenyan.html'},
+   ], seed:'再配一个"该不该下手"的故事(比如李世民玄武门之变),这条线就能找规律了。'},
 ];
 const esc=s=>String(s==null?'':s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
 function stationHtml(s){

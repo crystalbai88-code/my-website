@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>抉择时刻 · 鸿门宴 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;display:flex;flex-direction:column;align-items:center}
+  .top{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:12px 16px;
+    background:linear-gradient(180deg,rgba(var(--scrim,0,0,0),.25),transparent);position:sticky;top:0;z-index:20}
+  .top a.back{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.1em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .top .brand{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink)}
+  .prog{display:flex;gap:5px;margin-left:auto}
+  .prog i{width:13px;height:4px;border-radius:3px;background:var(--panel-line)}
+  .prog i.on{background:var(--gold)}
+  .wrap{width:min(660px,92%);margin:8px auto 70px;flex:1}
+  .beat{animation:fin .5s cubic-bezier(.22,1,.36,1)}
+  @keyframes fin{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;font-weight:700;text-align:center;margin-top:18px}
+  .htitle{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);text-align:center;line-height:1.3;margin:6px 0 4px;text-shadow:var(--label-shadow)}
+  .hsub{font-family:var(--mono);font-size:12px;color:var(--ink3);text-align:center;letter-spacing:.08em;margin-bottom:18px}
+  .scene{font-family:var(--serif);font-size:clamp(15px,3.8vw,17.5px);color:var(--ink);line-height:1.95;
+    background:var(--panel-bg);border:1px solid var(--panel-line);border-left:4px solid var(--gold);border-radius:14px;
+    padding:18px 20px;backdrop-filter:blur(8px)}
+  .scene b{color:var(--gold)}
+  .dossier-intro{font-family:var(--sans);font-size:14.5px;color:var(--ink2);text-align:center;line-height:1.7;margin:4px 0 16px}
+  .dcount{font-family:var(--mono);font-size:12px;color:var(--gold);text-align:center;font-weight:700;margin-bottom:12px}
+  .dcard{background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:14px;margin-bottom:11px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+  .dcard.open{border-color:var(--gold)}
+  .dhead{display:flex;align-items:center;gap:11px;padding:15px 17px}
+  .dhead .di{font-size:21px}
+  .dhead .dt{font-family:var(--sans);font-weight:800;font-size:15.5px;color:var(--ink);flex:1}
+  .dhead .dchev{font-family:var(--mono);font-size:11px;color:var(--ink3);transition:transform .2s}
+  .dcard.open .dchev{transform:rotate(90deg);color:var(--gold)}
+  .dhead .ddot{width:8px;height:8px;border-radius:50%;background:var(--vermilion);flex:none}
+  .dcard.open .ddot{background:var(--cyan)}
+  .dbody{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .dbody-in{padding:0 17px 16px;font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.85}
+  .dbody-in b{color:var(--gold)}
+  .dbody-in ul{margin:8px 0 0;padding-left:2px;list-style:none}
+  .dbody-in li{margin:7px 0;padding-left:16px;position:relative}
+  .dbody-in li:before{content:'·';position:absolute;left:3px;color:var(--vermilion);font-weight:900}
+  .dbody-in li b{color:var(--vermilion)}
+  .ask{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);text-align:center;margin:22px 0 6px}
+  .asksub{font-family:var(--sans);font-size:13.5px;color:var(--ink2);text-align:center;margin-bottom:16px;line-height:1.6}
+  .choices{display:flex;flex-direction:column;gap:11px}
+  .choice{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink);background:var(--panel-bg);
+    border:1.5px solid var(--panel-line);border-radius:14px;padding:15px 17px;cursor:pointer;transition:all .15s;text-align:left;line-height:1.5}
+  .choice:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+  .choice .ckey{font-weight:900;color:var(--gold);margin-right:8px}
+  .choice.picked{border-color:var(--gold);background:rgba(224,138,44,.1)}
+  .reaction{margin-top:14px;font-size:14.5px;color:var(--ink);line-height:1.75;background:rgba(224,138,44,.1);
+    border-left:4px solid var(--gold);border-radius:8px;padding:13px 16px;display:none}
+  .reaction.show{display:block;animation:fin .4s}
+  .lines{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+  .line{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:12px;padding:13px 16px}
+  .line .lh{font-family:var(--serif);font-weight:900;font-size:14px;color:var(--gold);margin-bottom:4px}
+  .line .lt{font-size:14px;color:var(--ink);line-height:1.7}
+  .line .lt b{color:var(--vermilion)}
+  .voice{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:13px;padding:13px 16px;margin-bottom:10px}
+  .voice .vw{font-family:var(--sans);font-weight:800;font-size:14px;color:var(--ink);margin-bottom:5px}
+  .voice .va{font-size:14px;color:var(--ink2);line-height:1.7}
+  .note{font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:center;margin-top:12px}
+  .q{font-family:var(--serif);font-size:16.5px;color:var(--ink);line-height:1.75;margin:14px 0;padding-left:14px;border-left:3px solid var(--gold)}
+  .q b{color:var(--gold)}
+  textarea{width:100%;box-sizing:border-box;margin-top:10px;font-family:var(--sans);font-size:15px;color:var(--ink);
+    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:12px;padding:13px 15px;min-height:80px;outline:none;resize:vertical}
+  .btnrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
+  .nextbtn{font-family:var(--sans);font-weight:800;font-size:15px;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));
+    border:none;border-radius:999px;padding:13px 30px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.16)}
+  .nextbtn:active{transform:scale(.97)}
+  .nextbtn[disabled]{opacity:.4;cursor:not-allowed;box-shadow:none}
+  .ghost{font-family:var(--sans);font-weight:700;font-size:14px;color:var(--gold);background:var(--panel-bg);
+    border:1px solid var(--panel-line);border-radius:999px;padding:11px 20px;cursor:pointer;text-decoration:none;display:inline-block}
+  .gate{text-align:center;font-family:var(--sans);font-size:12.5px;color:var(--ink3);margin-top:6px}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="top">
+    <a class="back" href="./stories.html">⌂ 抉择</a>
+    <span class="brand">🎯 抉择时刻</span>
+    <div class="prog" id="prog"></div>
+  </div>
+  <div class="wrap"><div class="beat" id="beat"></div></div>
+</div>
+<script src="./track.js?v=1"></script>
+<script>
+window.__aiCtx='用户正在体验"抉择时刻·鸿门宴"(母题:该不该痛下杀手)。背景据《史记·项羽本纪》:公元前206年秦亡后,项羽率四十万大军入关,刘邦仅十万却抢先入咸阳、又派兵守函谷关想独占关中,项羽大怒。亚父范增看出刘邦"志不在小",力劝项羽在新丰鸿门的宴会上除掉刘邦。刘邦自知不敌,亲到鸿门低声谢罪、献关中。席间范增多次举玉玦示意动手,项羽沉默不应;范增令项庄舞剑欲刺刘邦,项羽叔父项伯起身以身翼蔽;刘邦部将樊哙闯帐怒视。最终项羽放过刘邦,刘邦借如厕脱身逃回军中,张良留下献礼,范增怒撞玉斗叹"竖子不足与谋,夺项王天下者必沛公也"。结果:项羽虽一时称霸、分封诸侯,四年后却在楚汉相争中败于刘邦,垓下被围、乌江自刎(31岁),刘邦建立汉朝。后世评价撕裂:项羽不杀,是"妇人之仁",还是英雄气度?这是没有标准答案的抉择。请用适合10-12岁孩子的语言陪他思考,多反问,不要替他下结论。';
+let pick=null;
+const DOSSIER=[
+  {i:'👑',t:'你是谁',b:'你是<b>项羽</b>,当世最强的统帅。巨鹿之战你<b>破釜沉舟</b>、以少胜多,击垮了秦军主力;诸侯将领见你,都跪着前行、不敢抬头。如今你手握<b>四十万大军</b>。'},
+  {i:'🐉',t:'刘邦做了什么',b:'你的对手<b>刘邦</b>只有十万兵,却<b>抢先一步</b>进了咸阳、灭了秦,还派兵把守函谷关,像是想<b>独占关中</b>(当初有约:谁先入关,谁就称王)。你听了,勃然大怒。'},
+  {i:'🔥',t:'范增的判断',b:'你的亚父<b>范增</b>看得很透:刘邦在家乡本是个贪财好色之徒,可一进咸阳竟<b>秋毫无犯、约法三章</b>——"<b>此其志不在小</b>"(他的野心绝不简单)!范增力劝你:趁这次宴会,<b>除掉他</b>。'},
+  {i:'🤝',t:'刘邦来谢罪',b:'刘邦自知打不过你,第二天<b>亲自带百余骑</b>来鸿门赔罪,低声下气:"我先入关,只是替将军打前站,哪敢有别的心思?"还把整个关中<b>拱手让给你</b>。'},
+  {i:'🎭',t:'宴席上的暗流',b:'酒席之间,杀机四伏:<ul><li>范增多次<b>举起玉玦</b>,示意你快动手——你却沉默不语。</li><li>范增让<b>项庄舞剑</b>,想趁机刺杀刘邦;你叔父<b>项伯</b>却起身,用身体护住刘邦。</li><li>刘邦的猛将<b>樊哙</b>闯进帐来,怒目圆睁、横眉而立。</li></ul>'},
+  {i:'⚡',t:'眼前的难题',b:'杀机,就在这一杯酒之间。<br>你可以<b>趁机杀掉</b>这个向你俯首、来谢罪的对手,一劳永逸;也可以<b>放他一条生路</b>,显出你的气度。<br>机会只有这一次,<b>你下不下手?</b>'},
+];
+let opened=new Set();
+const beats=[];
+beats.push(()=>`
+  <div class="kicker">公元前 206 年 · 新丰鸿门(今西安东)</div>
+  <div class="htitle">一杯酒的功夫,天下要换主人</div>
+  <div class="hsub">即将由你 —— 项羽 —— 决定</div>
+  <div class="scene">公元前206年,秦朝刚亡,你是天下最强的<b>项羽</b>。你的对手刘邦,此刻就坐在你的宴席上,向你低头赔罪。<br><br>范增一直在使眼色:动手。你即将做一个决定——它将决定这一杯酒之后,<b>天下姓项,还是姓刘</b>。<br><br>但在你决定之前,<b>先别急。</b> 先把这盘棋,看清楚。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(1)">📂 先弄懂这盘棋 →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第一步 · 了解</div>
+  <div class="htitle" style="font-size:23px">看清这盘棋</div>
+  <div class="dossier-intro">点开下面每一张情报卡,弄懂你的实力、对手的心思、和席间的暗流。<br>全部看完,你才有资格替项羽做决定。</div>
+  <div class="dcount" id="dcount">已了解 0 / ${DOSSIER.length}</div>
+  <div id="dwrap">${DOSSIER.map((d,i)=>`
+    <div class="dcard" data-i="${i}" onclick="flip(${i})">
+      <div class="dhead"><span class="ddot"></span><span class="di">${d.i}</span><span class="dt">${d.t}</span><span class="dchev">▶</span></div>
+      <div class="dbody" id="db${i}"><div class="dbody-in">${d.b}</div></div>
+    </div>`).join('')}</div>
+  <div class="btnrow"><button class="nextbtn" id="toChoice" onclick="go(2)" disabled>换作是你,你会怎么做? →</button></div>
+  <div class="gate" id="gate">(看完全部 ${DOSSIER.length} 张情报卡后解锁)</div>`);
+beats.push(()=>`
+  <div class="kicker">第二步 · 此刻,你就是项羽</div>
+  <div class="ask">杀,还是放?</div>
+  <div class="asksub">你已经看清了整盘棋——你的强大、刘邦的野心与谦卑、范增的催促、项伯的回护。<br>现在,这个决定由你来下。</div>
+  <div class="choices">
+    <div class="choice" data-k="A" onclick="choose('A')"><span class="ckey">A</span>杀掉刘邦——听范增的,趁此良机除掉唯一的对手,斩草除根。</div>
+    <div class="choice" data-k="B" onclick="choose('B')"><span class="ckey">B</span>放他一马——他亲来谢罪、向我低头,杀一个认错的客人不义,也显得我怕他。</div>
+    <div class="choice" data-k="C" onclick="choose('C')"><span class="ckey">C</span>不杀,但扣下他——把他软禁在身边,既不背"杀降"恶名,又除后患。</div>
+  </div>
+  <div class="reaction" id="reaction"></div>`);
+beats.push(()=>`
+  <div class="kicker">第三步 · 真实的他</div>
+  <div class="htitle" style="font-size:22px">项羽,选了 B</div>
+  <div class="scene">任凭范增一次次举起玉玦,项羽始终<b>默然不应</b>。在他看来,刘邦既已俯首谢罪,杀一个来认错的人,<b>不光彩、也跌份</b>。<br><br>刘邦趁着敬酒的间隙,借口"如厕",悄悄<b>溜出大营、逃回了军中</b>。张良留下,替他献上白璧。<br><br>范增气得拔剑<b>撞碎了那对玉斗</b>,长叹:"唉!<b>竖子不足与谋</b>——将来夺项王天下的,一定就是这个刘邦!"</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(4)">那……后来呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第四步 · 一念之差,延伸出三条线</div>
+  <div class="lines">
+    <div class="line"><div class="lh">⚡ 短期</div><div class="lt">项羽入咸阳、分封十八路诸侯,自立"西楚霸王",一时威震天下、风光无两。</div></div>
+    <div class="line"><div class="lh">🌅 长远</div><div class="lt">被打发到偏远汉中的刘邦,<b>暗度陈仓、养精蓄锐</b>;四年楚汉相争,垓下十面埋伏,项羽<b>一败涂地</b>。</div></div>
+    <div class="line"><div class="lh">🥀 他自己</div><div class="lt">乌江边,项羽不肯过江、<b>自刎而死</b>,年仅31岁——"无颜见江东父老"。当年那一杯酒里没下的手,最终要了他自己的命。</div></div>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(5)">别人怎么看这一念? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第五步 · 同一场宴席,不同的声音</div>
+  <div class="voice"><div class="vw">🔥 范增</div><div class="va">"竖子不足与谋!该下手时心慈手软,是要亡国的。我看错了你。"(愤而离去,不久病死)</div></div>
+  <div class="voice"><div class="vw">🐲 刘邦</div><div class="va">"好险!今日他不杀我——他日这天下,我必取之。"</div></div>
+  <div class="voice"><div class="vw">📜 后世(评价两极)</div><div class="va">有人惋惜"江东子弟多才俊,卷土重来未可知";李清照却赞他"生当作人杰,死亦为鬼雄,至今思项羽,不肯过江东"——这究竟是<b>妇人之仁</b>,还是<b>英雄气度</b>?</div></div>
+  <div class="voice"><div class="vw">🍷 一个在场的士兵</div><div class="va">"就那一杯酒的功夫……天下的主人,后来真的换了。"</div></div>
+  <div class="note">同一个抉择,没有标准答案。 · 史料:《史记·项羽本纪》</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(6)">它如何改写了中国? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第六步 · 一杯酒,改写了四百年</div>
+  <div class="scene">鸿门宴上的<b>一念之差</b>,放走了刘邦。<br><br>四年之后,刘邦击败项羽,建立了<b>汉朝</b>——一个延续四百年、奠定"<b>汉人</b>""汉字""汉文化"的伟大王朝。<br><br>一场宴席上的犹豫,改写了整个中国的走向。从此,"<b>鸿门宴</b>"成了一个成语:<b>表面热闹、暗藏杀机的局</b>。</div>
+  <div class="btnrow" style="margin-top:16px">
+    <a class="ghost" href="./map.html?civ=xihan">🗺 去地图看 西汉(刘邦建立的王朝)</a>
+    <a class="ghost" href="./classical-network.html?all=1">🕸 看楚汉的人物关系网</a>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(7)">那……换作是你呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">最后 · 回到你</div>
+  <div class="htitle" style="font-size:22px">换作是你呢?</div>
+  <div class="q">当你能除掉一个还没成气候、却<b>可能威胁你</b>的对手时——该斩草除根,还是网开一面?</div>
+  <div class="q">项羽的"心软",到底是<b>妇人之仁</b>,还是真英雄的<b>气度</b>?换作是你,这一杯酒,你下不下手?</div>
+  <div class="q">你最开始选的是 <b id="myPick">?</b>,和项羽(B)一样吗?走到这里,你的想法<b>变了</b>吗?</div>
+  <div style="font-family:var(--sans);font-weight:700;color:var(--ink);margin-top:18px">✍️ 写下你从鸿门宴里,看懂的一句话:</div>
+  <textarea id="myNote" placeholder="比如:该狠的时候心软,可能要付出整个天下……(或者:不愿背信弃义,也是一种高贵?)"></textarea>
+  <div class="btnrow"><button class="nextbtn" onclick="saveNote(event)">💾 记下我的收获</button></div>
+  <div class="btnrow" style="margin-top:14px">
+    <a class="nextbtn" href="./stories.html" style="text-decoration:none">🧩 回到抉择,顺着母题线找规律 →</a>
+  </div>
+  <div class="btnrow" style="margin-top:8px">
+    <button class="ghost" onclick="if(window.toggleAIFloat)toggleAIFloat()">🤖 和 AI 聊聊这个抉择</button>
+    <button class="ghost" onclick="pick=null;opened=new Set();go(0)">↺ 重新走一遍</button>
+  </div>`);
+
+let cur=0;
+function render(){
+  document.getElementById('beat').innerHTML=beats[cur]();
+  document.getElementById('prog').innerHTML=beats.map((_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('');
+  if(cur===1){ refreshGate(); }
+  if(cur===7){ const m=document.getElementById('myPick'); if(m)m.textContent=pick||'?'; const n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('decision_hongmenyan')||''; }
+  window.scrollTo({top:0,behavior:'instant'});
+  if(window.Track) Track.log('抉择时刻');
+}
+function go(n){ cur=n; render(); }
+function flip(i){
+  const card=document.querySelector('.dcard[data-i="'+i+'"]');
+  const body=document.getElementById('db'+i);
+  const isOpen=card.classList.toggle('open');
+  body.style.maxHeight=isOpen?(body.scrollHeight+'px'):'0';
+  if(isOpen){ opened.add(i); refreshGate(); }
+}
+function refreshGate(){
+  const c=document.getElementById('dcount'); if(c)c.textContent='已了解 '+opened.size+' / '+DOSSIER.length;
+  const btn=document.getElementById('toChoice'); const gate=document.getElementById('gate');
+  if(opened.size>=DOSSIER.length){ if(btn)btn.disabled=false; if(gate)gate.textContent='✅ 你已看清整盘棋,可以决定了'; }
+}
+function choose(k){
+  pick=k;
+  document.querySelectorAll('.choice').forEach(c=>{c.classList.toggle('picked',c.dataset.k===k);c.onclick=null;});
+  const react={A:'果断狠辣!可杀一个亲来谢罪、向你俯首的人,天下人会不会说你不义、说你怕他?',
+    B:'有气度。但范增会捶胸顿足地问你:放虎归山,你担得起将来的后果吗?',
+    C:'想两全。可你扣着一个曾与你约为兄弟、又当众认错的人,既留祸根,又落话柄——真的两全吗?'}[k];
+  const r=document.getElementById('reaction');
+  r.innerHTML=react+'<div class="btnrow" style="margin-top:14px"><button class="nextbtn" onclick="go(3)">👉 看真实的项羽怎么选</button></div>';
+  r.classList.add('show');
+}
+function saveNote(e){ const n=document.getElementById('myNote'); if(n){localStorage.setItem('decision_hongmenyan',n.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的收获',1500);} }
+render();
+</script>
+<script src="./ai_float.js?v=1"></script>
+</body>
+</html>
