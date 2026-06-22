@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>抉择时刻 · 托马斯·莫尔 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;display:flex;flex-direction:column;align-items:center}
+  .top{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:12px 16px;
+    background:linear-gradient(180deg,rgba(var(--scrim,0,0,0),.25),transparent);position:sticky;top:0;z-index:20}
+  .top a.back{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.1em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .top .brand{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink)}
+  .prog{display:flex;gap:5px;margin-left:auto}
+  .prog i{width:13px;height:4px;border-radius:3px;background:var(--panel-line)}
+  .prog i.on{background:var(--gold)}
+  .wrap{width:min(660px,92%);margin:8px auto 70px;flex:1}
+  .beat{animation:fin .5s cubic-bezier(.22,1,.36,1)}
+  @keyframes fin{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;font-weight:700;text-align:center;margin-top:18px}
+  .htitle{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);text-align:center;line-height:1.3;margin:6px 0 4px;text-shadow:var(--label-shadow)}
+  .hsub{font-family:var(--mono);font-size:12px;color:var(--ink3);text-align:center;letter-spacing:.08em;margin-bottom:18px}
+  .scene{font-family:var(--serif);font-size:clamp(15px,3.8vw,17.5px);color:var(--ink);line-height:1.95;
+    background:var(--panel-bg);border:1px solid var(--panel-line);border-left:4px solid var(--gold);border-radius:14px;
+    padding:18px 20px;backdrop-filter:blur(8px)}
+  .scene b{color:var(--gold)}
+  .dossier-intro{font-family:var(--sans);font-size:14.5px;color:var(--ink2);text-align:center;line-height:1.7;margin:4px 0 16px}
+  .dcount{font-family:var(--mono);font-size:12px;color:var(--gold);text-align:center;font-weight:700;margin-bottom:12px}
+  .dcard{background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:14px;margin-bottom:11px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+  .dcard.open{border-color:var(--gold)}
+  .dhead{display:flex;align-items:center;gap:11px;padding:15px 17px}
+  .dhead .di{font-size:21px}
+  .dhead .dt{font-family:var(--sans);font-weight:800;font-size:15.5px;color:var(--ink);flex:1}
+  .dhead .dchev{font-family:var(--mono);font-size:11px;color:var(--ink3);transition:transform .2s}
+  .dcard.open .dchev{transform:rotate(90deg);color:var(--gold)}
+  .dhead .ddot{width:8px;height:8px;border-radius:50%;background:var(--vermilion);flex:none}
+  .dcard.open .ddot{background:var(--cyan)}
+  .dbody{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .dbody-in{padding:0 17px 16px;font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.85}
+  .dbody-in b{color:var(--gold)}
+  .dbody-in ul{margin:8px 0 0;padding-left:2px;list-style:none}
+  .dbody-in li{margin:7px 0;padding-left:16px;position:relative}
+  .dbody-in li:before{content:'·';position:absolute;left:3px;color:var(--vermilion);font-weight:900}
+  .dbody-in li b{color:var(--vermilion)}
+  .ask{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);text-align:center;margin:22px 0 6px}
+  .asksub{font-family:var(--sans);font-size:13.5px;color:var(--ink2);text-align:center;margin-bottom:16px;line-height:1.6}
+  .choices{display:flex;flex-direction:column;gap:11px}
+  .choice{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink);background:var(--panel-bg);
+    border:1.5px solid var(--panel-line);border-radius:14px;padding:15px 17px;cursor:pointer;transition:all .15s;text-align:left;line-height:1.5}
+  .choice:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+  .choice .ckey{font-weight:900;color:var(--gold);margin-right:8px}
+  .choice.picked{border-color:var(--gold);background:rgba(224,138,44,.1)}
+  .reaction{margin-top:14px;font-size:14.5px;color:var(--ink);line-height:1.75;background:rgba(224,138,44,.1);
+    border-left:4px solid var(--gold);border-radius:8px;padding:13px 16px;display:none}
+  .reaction.show{display:block;animation:fin .4s}
+  .lines{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+  .line{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:12px;padding:13px 16px}
+  .line .lh{font-family:var(--serif);font-weight:900;font-size:14px;color:var(--gold);margin-bottom:4px}
+  .line .lt{font-size:14px;color:var(--ink);line-height:1.7}
+  .line .lt b{color:var(--vermilion)}
+  .voice{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:13px;padding:13px 16px;margin-bottom:10px}
+  .voice .vw{font-family:var(--sans);font-weight:800;font-size:14px;color:var(--ink);margin-bottom:5px}
+  .voice .va{font-size:14px;color:var(--ink2);line-height:1.7}
+  .note{font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:center;margin-top:12px}
+  .q{font-family:var(--serif);font-size:16.5px;color:var(--ink);line-height:1.75;margin:14px 0;padding-left:14px;border-left:3px solid var(--gold)}
+  .q b{color:var(--gold)}
+  textarea{width:100%;box-sizing:border-box;margin-top:10px;font-family:var(--sans);font-size:15px;color:var(--ink);
+    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:12px;padding:13px 15px;min-height:80px;outline:none;resize:vertical}
+  .btnrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
+  .nextbtn{font-family:var(--sans);font-weight:800;font-size:15px;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));
+    border:none;border-radius:999px;padding:13px 30px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.16)}
+  .nextbtn:active{transform:scale(.97)}
+  .nextbtn[disabled]{opacity:.4;cursor:not-allowed;box-shadow:none}
+  .ghost{font-family:var(--sans);font-weight:700;font-size:14px;color:var(--gold);background:var(--panel-bg);
+    border:1px solid var(--panel-line);border-radius:999px;padding:11px 20px;cursor:pointer;text-decoration:none;display:inline-block}
+  .gate{text-align:center;font-family:var(--sans);font-size:12.5px;color:var(--ink3);margin-top:6px}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="top">
+    <a class="back" href="./stories.html">⌂ 抉择</a>
+    <span class="brand">🎯 抉择时刻</span>
+    <div class="prog" id="prog"></div>
+  </div>
+  <div class="wrap"><div class="beat" id="beat"></div></div>
+</div>
+<script src="./track.js?v=1"></script>
+<script>
+window.__aiCtx='用户正在体验"抉择时刻·托马斯·莫尔"(母题:良心与法律,与苏格拉底同一条找规律线,且是相反的选择)。史实:英国大法官、《乌托邦》作者托马斯·莫尔(1478—1535)是虔诚的天主教徒。亨利八世为与王后离婚而与罗马教廷决裂,1534年议会通过《至尊法案》宣布国王为英国教会最高首领,要求全国宣誓承认。莫尔认为这违背自己的信仰与良心("我不能违背自己的良心"),拒绝宣誓——他起初以"保持沉默、不公开反对"来钻法律空子,但仍被以叛国罪起诉,囚于伦敦塔一年余,1535年7月6日被斩首,临刑留言"我是国王的好仆人,但首先是上帝的仆人"。与苏格拉底对照:苏格拉底面对不公的判决选择"服从法律"而死,莫尔面对不公的法律选择"服从良心"抗法而死——同一个"良心与法律冲突"的两难,做出了相反的选择,都付出了生命。这是没有标准答案的道德两难。请用适合10-12岁孩子的语言陪他思考,多反问,不要替他下结论。';
+let pick=null;
+const DOSSIER=[
+  {i:'📜',t:'你是谁',b:'你是<b>托马斯·莫尔</b>,英国的<b>大法官</b>(一人之下、万人之上),也是大学者,写过名著《乌托邦》。你为人正直、信仰虔诚,是全国敬重的人。'},
+  {i:'👑',t:'你的国王',b:'国王<b>亨利八世</b>想和王后离婚、另娶新人,可罗马教廷不准。于是他干脆<b>和罗马决裂</b>,自己创立英国国教,宣布:从此英国教会的首领,就是国王本人。'},
+  {i:'⚖️',t:'那道新法律',b:'议会通过了《<b>至尊法案</b>》:宣布国王是英国教会的<b>最高首领</b>,并规定——<b>全国臣民都必须宣誓承认</b>。不宣誓,就是叛国。'},
+  {i:'🙏',t:'你的良心',b:'可你是虔诚的天主教徒。在你心里,教会的首领只能是教皇,<b>绝不能是国王</b>。要你宣这个誓,等于逼你说违心的话、背叛自己的信仰。你说:"我已反复思量,但我<b>不能违背自己的良心</b>。"'},
+  {i:'👨‍👩‍👧',t:'你会失去什么',b:'你有家庭、有崇高的地位、有性命。拒绝宣誓,这一切都可能没了。朋友诺福克劝你:"在英国,<b>谁不服从国王,就没有好结果</b>。"'},
+  {i:'⚡',t:'眼前的难题',b:'一支笔就摆在你面前:<b>签了字</b>,保住一切;<b>拒绝签</b>,守住良心却可能掉脑袋;或者<b>什么都不说</b>、保持沉默,钻法律的空子,赌他们抓不到你的把柄。<br>你会怎么做?'},
+];
+let opened=new Set();
+const beats=[];
+beats.push(()=>`
+  <div class="kicker">公元 1534 年 · 英国 · 伦敦</div>
+  <div class="htitle">一支笔,还是一颗良心?</div>
+  <div class="hsub">即将由你 —— 托马斯·莫尔 —— 决定</div>
+  <div class="scene">1534年的英国,你是大法官<b>托马斯·莫尔</b>。国王要你签字宣誓,承认他是教会的首领——可这违背你的信仰与良心。<br><br>你即将做一个决定:它无关江山社稷,却会成为后世反复争论的一幕,也将决定<b>你自己的生死</b>。<br><br>但在你决定之前,<b>先别急。</b> 先把这件事,想清楚。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(1)">📂 先把这件事想清楚 →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第一步 · 了解</div>
+  <div class="htitle" style="font-size:23px">想清楚这件事</div>
+  <div class="dossier-intro">点开下面每一张卡片,弄懂你是谁、国王要什么、法律逼你什么、你的良心又说什么。<br>全部看完,你才有资格替莫尔做决定。</div>
+  <div class="dcount" id="dcount">已了解 0 / ${DOSSIER.length}</div>
+  <div id="dwrap">${DOSSIER.map((d,i)=>`
+    <div class="dcard" data-i="${i}" onclick="flip(${i})">
+      <div class="dhead"><span class="ddot"></span><span class="di">${d.i}</span><span class="dt">${d.t}</span><span class="dchev">▶</span></div>
+      <div class="dbody" id="db${i}"><div class="dbody-in">${d.b}</div></div>
+    </div>`).join('')}</div>
+  <div class="btnrow"><button class="nextbtn" id="toChoice" onclick="go(2)" disabled>换作是你,你会怎么做? →</button></div>
+  <div class="gate" id="gate">(看完全部 ${DOSSIER.length} 张卡片后解锁)</div>`);
+beats.push(()=>`
+  <div class="kicker">第二步 · 此刻,你就是莫尔</div>
+  <div class="ask">签,还是不签?</div>
+  <div class="asksub">你已经想清楚了——国王的法律、自己的信仰、家人的安危,还有那句"不能违背良心"。<br>现在,这个决定由你来下。</div>
+  <div class="choices">
+    <div class="choice" data-k="A" onclick="choose('A')"><span class="ckey">A</span>签字宣誓——保住性命、家庭和地位,违心的话,说了又何妨?</div>
+    <div class="choice" data-k="B" onclick="choose('B')"><span class="ckey">B</span>拒绝宣誓——我不能违背自己的良心,哪怕付出生命。</div>
+    <div class="choice" data-k="C" onclick="choose('C')"><span class="ckey">C</span>保持沉默——既不签、也不公开反对,钻法律的空子,赌他们定不了我的罪。</div>
+  </div>
+  <div class="reaction" id="reaction"></div>`);
+beats.push(()=>`
+  <div class="kicker">第三步 · 真实的他</div>
+  <div class="htitle" style="font-size:22px">莫尔,最终选了 B</div>
+  <div class="scene">他先试着走 <b>C</b>——<b>保持沉默</b>,一个字都不说,想用法律的空子保住性命。可国王容不下他的沉默。<br><br>当被逼到最后,他没有退让:他可以宣誓承认王位继承,<b>却始终拒绝承认国王是教会的首领</b>——因为那违背他的信仰。<br><br>他被关进伦敦塔一年多,始终不肯松口,最终以"叛国罪"被送上断头台。临刑前,他留下那句话:"我是<b>国王的好仆人,但首先是上帝的仆人</b>。"</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(4)">那……后来呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第四步 · 一个决定,延伸出三条线</div>
+  <div class="lines">
+    <div class="line"><div class="lh">⚖️ 当时</div><div class="lt">他被囚伦敦塔一年余,1535年以叛国罪斩首。他至死没有说一句违背良心的话。</div></div>
+    <div class="line"><div class="lh">🌅 长远</div><div class="lt">他的《<b>乌托邦</b>》成为后世"理想社会"想象的起点;而他"<b>为良心而死</b>",成了西方"个人良心高于王权"的标志。四百年后,他被教会封为圣人。</div></div>
+    <div class="line"><div class="lh">🕊️ 一个永恒的问题</div><div class="lt">他用死亡,把一个问题硬生生立在人类面前:<b>当国家的法律,要你做违背良心的事——你该听谁的?</b></div></div>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(5)">别人怎么看他的选择? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第五步 · 同一个选择,不同的声音</div>
+  <div class="voice"><div class="vw">👑 亨利八世 / 朝廷</div><div class="va">"国王的法律就是法律。不服从,就是叛国——死罪,无可争辩。"</div></div>
+  <div class="voice"><div class="vw">😢 诺福克(朋友)</div><div class="va">"何必呢?签个字就能活下来。你太固执了,为一句话搭上性命,值得吗?"</div></div>
+  <div class="voice"><div class="vw">⛪ 后世的信徒</div><div class="va">"他为信仰和良心而死,是真正的圣徒。守住良心,比守住性命更重要。"</div></div>
+  <div class="voice"><div class="vw">🤔 一个今天的人</div><div class="va">"如果法律要你说违心的话、做违心的事——你会照做,还是像他一样拒绝?"</div></div>
+  <div class="note">同一个抉择,没有标准答案。 · 史料:据托马斯·莫尔生平(1535)</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(6)">它和另一个人的故事像不像? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第六步 · 跨越一千九百年的回声</div>
+  <div class="scene">莫尔的难题,其实<b>一千九百年前就有人面对过</b>。<br><br>古希腊的<b>苏格拉底</b>,也被判了不公的死刑;他本可以越狱逃生,却选择<b>服从法律</b>、平静赴死。<br><br>同样是"良心撞上法律"——<br>苏格拉底,<b>服从了法律</b>而死;<br>莫尔,<b>服从了良心、违抗法律</b>而死。<br><br>两个相反的选择,都搭上了性命。这个两难,人类<b>至今没有标准答案</b>。</div>
+  <div class="btnrow" style="margin-top:16px">
+    <a class="ghost" href="./map.html?civ=britain">🗺 去地图看 英国</a>
+    <a class="ghost" href="./decision-socrates.html">🏛 去看苏格拉底的抉择</a>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(7)">那……换作是你呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">最后 · 回到你</div>
+  <div class="htitle" style="font-size:22px">换作是你呢?</div>
+  <div class="q">如果法律要你做一件<b>违背良心</b>的事,你会服从,还是反抗?</div>
+  <div class="q">苏格拉底<b>服从法律</b>而死,莫尔<b>违抗法律</b>而死——他们俩,都对吗?都错吗?换作是你,会怎么选?</div>
+  <div class="q">你最开始选的是 <b id="myPick">?</b>,和莫尔(B)一样吗?走到这里,你的想法<b>变了</b>吗?</div>
+  <div style="font-family:var(--sans);font-weight:700;color:var(--ink);margin-top:18px">✍️ 写下你从莫尔的抉择里,看懂的一句话:</div>
+  <textarea id="myNote" placeholder="比如:有些东西,比活着更重要……(或者:先活着,才有别的?)"></textarea>
+  <div class="btnrow"><button class="nextbtn" onclick="saveNote(event)">💾 记下我的收获</button></div>
+  <div class="btnrow" style="margin-top:14px">
+    <a class="nextbtn" href="./stories.html" style="text-decoration:none">🧩 回到「良心与法律」这条线:和苏格拉底放一起找规律 →</a>
+  </div>
+  <div class="btnrow" style="margin-top:8px">
+    <button class="ghost" onclick="if(window.toggleAIFloat)toggleAIFloat()">🤖 和 AI 聊聊这个抉择</button>
+    <button class="ghost" onclick="pick=null;opened=new Set();go(0)">↺ 重新走一遍</button>
+  </div>`);
+
+let cur=0;
+function render(){
+  document.getElementById('beat').innerHTML=beats[cur]();
+  document.getElementById('prog').innerHTML=beats.map((_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('');
+  if(cur===1){ refreshGate(); }
+  if(cur===7){ const m=document.getElementById('myPick'); if(m)m.textContent=pick||'?'; const n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('decision_more')||''; }
+  window.scrollTo({top:0,behavior:'instant'});
+  if(window.Track) Track.log('抉择时刻');
+}
+function go(n){ cur=n; render(); }
+function flip(i){
+  const card=document.querySelector('.dcard[data-i="'+i+'"]');
+  const body=document.getElementById('db'+i);
+  const isOpen=card.classList.toggle('open');
+  body.style.maxHeight=isOpen?(body.scrollHeight+'px'):'0';
+  if(isOpen){ opened.add(i); refreshGate(); }
+}
+function refreshGate(){
+  const c=document.getElementById('dcount'); if(c)c.textContent='已了解 '+opened.size+' / '+DOSSIER.length;
+  const btn=document.getElementById('toChoice'); const gate=document.getElementById('gate');
+  if(opened.size>=DOSSIER.length){ if(btn)btn.disabled=false; if(gate)gate.textContent='✅ 你已想清楚,可以决定了'; }
+}
+function choose(k){
+  pick=k;
+  document.querySelectorAll('.choice').forEach(c=>{c.classList.toggle('picked',c.dataset.k===k);c.onclick=null;});
+  const react={A:'保命要紧,人之常情。可对一个一生正直、虔诚的人来说,说一句违背信仰的话,他做得到吗?',
+    B:'你愿意为良心付出最重的代价。可朋友会哭着问:为了一句话,真的值得搭上性命吗?',
+    C:'聪明——想用沉默钻空子。可如果国王连你的沉默都不放过呢?你还退得了吗?'}[k];
+  const r=document.getElementById('reaction');
+  r.innerHTML=react+'<div class="btnrow" style="margin-top:14px"><button class="nextbtn" onclick="go(3)">👉 看真实的莫尔怎么选</button></div>';
+  r.classList.add('show');
+}
+function saveNote(e){ const n=document.getElementById('myNote'); if(n){localStorage.setItem('decision_more',n.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的收获',1500);} }
+render();
+</script>
+<script src="./ai_float.js?v=1"></script>
+</body>
+</html>

@@ -22,7 +22,8 @@ const CLASSICAL_PEOPLE=[
   {id:"tasman",n:"塔斯曼",e:"Abel Tasman",c:"dutch",r:"other",d:"1603—1659",b:"VOC航海家，发现新西兰、塔斯马尼亚，证明澳大利亚是独立大陆。",rel:[{i:"coen",t:"VOC同僚"}]},
   {id:"de_ruyter",n:"德鲁伊特",e:"M. de Ruyter",c:"dutch",r:"general",d:"1607—1676",b:"荷兰最伟大的海军将领，多次击败英法海军。",rel:[]},
   // ── 英国 (britain) ──
-  {id:"henry8",n:"亨利八世",e:"Henry VIII",c:"britain",r:"ruler",d:"1491—1547",b:"六次婚姻，1534年与罗马决裂、创立英国国教。",rel:[{i:"elizabeth1",t:"其女"}]},
+  {id:"henry8",n:"亨利八世",e:"Henry VIII",c:"britain",r:"ruler",d:"1491—1547",b:"六次婚姻，1534年与罗马决裂、创立英国国教。",rel:[{i:"elizabeth1",t:"其女"},{i:"thomas_more",t:"处死其大法官"}]},
+  {id:"thomas_more",n:"托马斯·莫尔",e:"Thomas More",c:"britain",r:"thinker",d:"1478—1535",b:"英国大法官、人文主义者，名著《乌托邦》的作者。亨利八世颁《至尊法案》自封教会首脑，要全国宣誓承认，莫尔'不能违背自己的良心'拒绝宣誓，被囚伦敦塔一年余后以叛国罪斩首，临刑留言'我是国王的好仆人，但首先是上帝的仆人'。",rel:[{i:"henry8",t:"抗其法被处死"}]},
   {id:"elizabeth1",n:"伊丽莎白一世",e:"Elizabeth I",c:"britain",r:"ruler",d:"1533—1603",b:"'童贞女王'，击败无敌舰队，开创英国文艺复兴黄金时代。",rel:[{i:"henry8",t:"其父"},{i:"drake",t:"重用"},{i:"philip2",t:"宿敌"}]},
   {id:"drake",n:"德雷克",e:"Francis Drake",c:"britain",r:"general",d:"1540—1596",b:"私掠船长，第二次环球航行，1588年助败无敌舰队。",rel:[{i:"elizabeth1",t:"效力"}]},
   {id:"raleigh",n:"罗利",e:"Walter Raleigh",c:"britain",r:"other",d:"1552—1618",b:"伊丽莎白宠臣，殖民北美、寻黄金城，后以叛国罪斩首。",rel:[{i:"elizabeth1",t:"宠臣"}]},

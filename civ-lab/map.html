@@ -242,6 +242,8 @@ const DECISIONS=[
    tip:'三分天下自立,还是报恩忠于刘邦?', url:'./decision-hanxin.html'},
   {id:'wuqi', person:'吴起', icon:'🗡️', lng:112.2, lat:30.3, year:-381, from:-388, to:-372,
    tip:'楚王把改革的刀交给你,要不要硬削贵族特权?', url:'./decision-wuqi.html'},
+  {id:'more', person:'托马斯·莫尔', icon:'📜', lng:-0.1, lat:51.5, year:1534, from:1529, to:1540,
+   tip:'国王要你签字违背良心,签,还是不签?', url:'./decision-more.html'},
 ];
 function activeDecisions(){ return DECISIONS.filter(d=> year>=d.from && year<=d.to ); }
 const dpinEls={};
