@@ -34,6 +34,8 @@
      tip:'拥有一切,要不要倾国之力追求长生不老?', url:'./decision-qinshihuang.html'},
     {id:'arjuna', person:'阿周那的两难', icon:'🏹', culture:'india', lng:76.8, lat:29.9, year:-1000, from:-1100, to:-900,
      tip:'对面是亲人,这一仗,打还是不打?', url:'./decision-arjuna.html'},
+    {id:'shique', person:'石碏大义灭亲', icon:'👴', culture:'china', lng:114.5, lat:35.7, year:-719, from:-722, to:-716,
+     tip:'亲儿子是弑君帮凶,你要不要大义灭亲?', url:'./decision-shique.html'},
   ];
   if(typeof window!=='undefined') window.DECISIONS=DECISIONS;
 })();
