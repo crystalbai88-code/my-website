@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>抉择时刻 · 项羽破釜沉舟 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;display:flex;flex-direction:column;align-items:center}
+  .top{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:12px 16px;
+    background:linear-gradient(180deg,rgba(var(--scrim,0,0,0),.25),transparent);position:sticky;top:0;z-index:20}
+  .top a.back{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.1em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .top .brand{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink)}
+  .prog{display:flex;gap:5px;margin-left:auto}
+  .prog i{width:13px;height:4px;border-radius:3px;background:var(--panel-line)}
+  .prog i.on{background:var(--gold)}
+  .wrap{width:min(660px,92%);margin:8px auto 70px;flex:1}
+  .beat{animation:fin .5s cubic-bezier(.22,1,.36,1)}
+  @keyframes fin{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;font-weight:700;text-align:center;margin-top:18px}
+  .htitle{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);text-align:center;line-height:1.3;margin:6px 0 4px;text-shadow:var(--label-shadow)}
+  .hsub{font-family:var(--mono);font-size:12px;color:var(--ink3);text-align:center;letter-spacing:.08em;margin-bottom:18px}
+  .scene{font-family:var(--serif);font-size:clamp(15px,3.8vw,17.5px);color:var(--ink);line-height:1.95;
+    background:var(--panel-bg);border:1px solid var(--panel-line);border-left:4px solid var(--gold);border-radius:14px;
+    padding:18px 20px;backdrop-filter:blur(8px)}
+  .scene b{color:var(--gold)}
+  .dossier-intro{font-family:var(--sans);font-size:14.5px;color:var(--ink2);text-align:center;line-height:1.7;margin:4px 0 16px}
+  .dcount{font-family:var(--mono);font-size:12px;color:var(--gold);text-align:center;font-weight:700;margin-bottom:12px}
+  .dcard{background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:14px;margin-bottom:11px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+  .dcard.open{border-color:var(--gold)}
+  .dhead{display:flex;align-items:center;gap:11px;padding:15px 17px}
+  .dhead .di{font-size:21px}
+  .dhead .dt{font-family:var(--sans);font-weight:800;font-size:15.5px;color:var(--ink);flex:1}
+  .dhead .dchev{font-family:var(--mono);font-size:11px;color:var(--ink3);transition:transform .2s}
+  .dcard.open .dchev{transform:rotate(90deg);color:var(--gold)}
+  .dhead .ddot{width:8px;height:8px;border-radius:50%;background:var(--vermilion);flex:none}
+  .dcard.open .ddot{background:var(--cyan)}
+  .dbody{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .dbody-in{padding:0 17px 16px;font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.85}
+  .dbody-in b{color:var(--gold)}
+  .dbody-in ul{margin:8px 0 0;padding-left:2px;list-style:none}
+  .dbody-in li{margin:7px 0;padding-left:16px;position:relative}
+  .dbody-in li:before{content:'·';position:absolute;left:3px;color:var(--vermilion);font-weight:900}
+  .dbody-in li b{color:var(--vermilion)}
+  .ask{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);text-align:center;margin:22px 0 6px}
+  .asksub{font-family:var(--sans);font-size:13.5px;color:var(--ink2);text-align:center;margin-bottom:16px;line-height:1.6}
+  .choices{display:flex;flex-direction:column;gap:11px}
+  .choice{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink);background:var(--panel-bg);
+    border:1.5px solid var(--panel-line);border-radius:14px;padding:15px 17px;cursor:pointer;transition:all .15s;text-align:left;line-height:1.5}
+  .choice:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+  .choice .ckey{font-weight:900;color:var(--gold);margin-right:8px}
+  .choice.picked{border-color:var(--gold);background:rgba(224,138,44,.1)}
+  .reaction{margin-top:14px;font-size:14.5px;color:var(--ink);line-height:1.75;background:rgba(224,138,44,.1);
+    border-left:4px solid var(--gold);border-radius:8px;padding:13px 16px;display:none}
+  .reaction.show{display:block;animation:fin .4s}
+  .lines{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+  .line{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:12px;padding:13px 16px}
+  .line .lh{font-family:var(--serif);font-weight:900;font-size:14px;color:var(--gold);margin-bottom:4px}
+  .line .lt{font-size:14px;color:var(--ink);line-height:1.7}
+  .line .lt b{color:var(--vermilion)}
+  .voice{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:13px;padding:13px 16px;margin-bottom:10px}
+  .voice .vw{font-family:var(--sans);font-weight:800;font-size:14px;color:var(--ink);margin-bottom:5px}
+  .voice .va{font-size:14px;color:var(--ink2);line-height:1.7}
+  .note{font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:center;margin-top:12px}
+  .q{font-family:var(--serif);font-size:16.5px;color:var(--ink);line-height:1.75;margin:14px 0;padding-left:14px;border-left:3px solid var(--gold)}
+  .q b{color:var(--gold)}
+  textarea{width:100%;box-sizing:border-box;margin-top:10px;font-family:var(--sans);font-size:15px;color:var(--ink);
+    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:12px;padding:13px 15px;min-height:80px;outline:none;resize:vertical}
+  .btnrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
+  .nextbtn{font-family:var(--sans);font-weight:800;font-size:15px;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));
+    border:none;border-radius:999px;padding:13px 30px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.16)}
+  .nextbtn:active{transform:scale(.97)}
+  .nextbtn[disabled]{opacity:.4;cursor:not-allowed;box-shadow:none}
+  .ghost{font-family:var(--sans);font-weight:700;font-size:14px;color:var(--gold);background:var(--panel-bg);
+    border:1px solid var(--panel-line);border-radius:999px;padding:11px 20px;cursor:pointer;text-decoration:none;display:inline-block}
+  .gate{text-align:center;font-family:var(--sans);font-size:12.5px;color:var(--ink3);margin-top:6px}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="top">
+    <a class="back" href="./stories.html">⌂ 抉择</a>
+    <span class="brand">🎯 抉择时刻</span>
+    <div class="prog" id="prog"></div>
+  </div>
+  <div class="wrap"><div class="beat" id="beat"></div></div>
+</div>
+<script src="./track.js?v=1"></script>
+<script>
+window.__aiCtx='用户正在体验"抉择时刻·项羽破釜沉舟"(母题:回不了头的一步,与凯撒过卢比孔同一条找规律线)。史实据《史记·项羽本纪》:公元前207年巨鹿之战,秦将章邯、王离率约四十万主力围攻赵国巨鹿。楚军主帅宋义按兵不动四十六天,项羽杀宋义夺取兵权,率数万楚军渡过漳水后下令"破釜沉舟"——凿沉船只、砸破饭锅、烧掉营帐、只带三日干粮,以示不胜则死、断绝一切退路。楚军以一当十,九战九捷,大破秦军、活捉王离,各路诸侯将领此前作壁上观、此后膝行而前莫敢仰视。此战基本消灭秦军主力,加速秦亡,项羽确立反秦盟主地位。"破釜沉舟""置之死地而后生"由此而来。与凯撒过卢比孔对照:都主动自断退路、孤注一掷,逼出全力一击,赢得惊天逆转——这是激发潜能的勇气,也是输不起的豪赌。请用适合10-12岁孩子的语言陪他思考,多反问,不要替他下结论。';
+let pick=null;
+const DOSSIER=[
+  {i:'⚔️',t:'你是谁',b:'你是<b>项羽</b>,楚国名将的后代,力能扛鼎、勇猛盖世。你随叔父项梁起兵反秦,可项梁刚刚战死,楚军士气低落,正是危难之时。'},
+  {i:'🆘',t:'巨鹿告急',b:'秦军主力——章邯、王离率领的<b>约四十万大军</b>,把赵国的巨鹿城团团围住。赵王危在旦夕,向各路诸侯拼命求救。你,是楚国援军的次将。'},
+  {i:'😤',t:'主帅按兵不动',b:'楚军主帅宋义带兵走到半路就停了下来,<b>整整四十六天</b>不肯进兵,想坐山观虎斗、等秦赵两败俱伤。再等下去,赵国就完了——你忍无可忍,<b>杀了宋义,夺过兵权</b>。'},
+  {i:'🪖',t:'你的劣势',b:'你手里只有<b>几万楚军</b>,对面是四十万身经百战的秦军主力(王离部还是镇守长城的精锐)。先到的各路诸侯,全都缩在营垒里<b>作壁上观</b>,不敢出战。'},
+  {i:'🔥',t:'你想做的事',b:'你决心率全军渡过漳水,跟秦军主力<b>决一死战</b>。可你的兵又少、又怕这必死之战——人心不齐,这仗根本没法打。'},
+  {i:'⚡',t:'眼前的难题',b:'大军刚渡过河。你可以<b>保留船只粮草和退路</b>,稳扎稳打、见势不妙能撤;也可以<b>凿沉船、砸破锅、烧掉营帐、只带三天干粮</b>——把所有退路一刀斩断,逼全军拼死。<b>这一仗,你怎么打?</b>'},
+];
+let opened=new Set();
+const beats=[];
+beats.push(()=>`
+  <div class="kicker">公元前 207 年 · 巨鹿(今河北邢台)</div>
+  <div class="htitle">几万人,要不要去拼四十万?</div>
+  <div class="hsub">即将由你 —— 项羽 —— 决定</div>
+  <div class="scene">公元前207年,你是楚军统帅<b>项羽</b>。你只有几万人,要去救被四十万秦军围住的巨鹿。诸侯们都在壁垒里观望,不敢出手。<br><br>你即将做一个决定——它会决定这几万人的生死,也会决定反秦大业的成败,更会让"项羽"这个名字,以怎样的方式被记住。<br><br>但在你决定之前,<b>先别急。</b> 先把这盘棋,看清楚。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(1)">📂 先弄懂这盘棋 →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第一步 · 了解</div>
+  <div class="htitle" style="font-size:23px">看清这盘棋</div>
+  <div class="dossier-intro">点开下面每一张情报卡,弄懂敌我的悬殊、诸侯的观望、和你想拼的这一仗。<br>全部看完,你才有资格替项羽做决定。</div>
+  <div class="dcount" id="dcount">已了解 0 / ${DOSSIER.length}</div>
+  <div id="dwrap">${DOSSIER.map((d,i)=>`
+    <div class="dcard" data-i="${i}" onclick="flip(${i})">
+      <div class="dhead"><span class="ddot"></span><span class="di">${d.i}</span><span class="dt">${d.t}</span><span class="dchev">▶</span></div>
+      <div class="dbody" id="db${i}"><div class="dbody-in">${d.b}</div></div>
+    </div>`).join('')}</div>
+  <div class="btnrow"><button class="nextbtn" id="toChoice" onclick="go(2)" disabled>换作是你,你会怎么做? →</button></div>
+  <div class="gate" id="gate">(看完全部 ${DOSSIER.length} 张情报卡后解锁)</div>`);
+beats.push(()=>`
+  <div class="kicker">第二步 · 此刻,你就是项羽</div>
+  <div class="ask">留退路,还是断退路?</div>
+  <div class="asksub">你已经看清了整盘棋——敌我悬殊、诸侯观望、军心不稳,还有你拼死一战的决心。<br>现在,这个决定由你来下。</div>
+  <div class="choices">
+    <div class="choice" data-k="A" onclick="choose('A')"><span class="ckey">A</span>破釜沉舟——凿沉船、砸破锅、只带三日粮,断绝退路,逼全军拼死一战。</div>
+    <div class="choice" data-k="B" onclick="choose('B')"><span class="ckey">B</span>稳扎稳打——保留船只粮草和退路,见势不妙能撤,慢慢耗。</div>
+    <div class="choice" data-k="C" onclick="choose('C')"><span class="ckey">C</span>等诸侯一起上——先按兵不动,等各路诸侯军一齐出手再打。</div>
+  </div>
+  <div class="reaction" id="reaction"></div>`);
+beats.push(()=>`
+  <div class="kicker">第三步 · 真实的他</div>
+  <div class="htitle" style="font-size:22px">项羽,选了 A</div>
+  <div class="scene">渡过漳水后,他下了一道惊世骇俗的命令:<b>把船全部凿沉,把饭锅全部砸破,把营帐全部烧光,每人只带三天干粮。</b><br><br>意思再清楚不过:<b>不胜,就死;没有退路,没有退路!</b><br><br>断了后路的楚军,人人以一当十、舍命冲杀,九次激战、九战九捷,大破秦军、活捉王离。那些一直缩在壁垒里观望的诸侯,这下全看呆了。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(4)">那……后来呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第四步 · 一把火,延伸出三条线</div>
+  <div class="lines">
+    <div class="line"><div class="lh">⚡ 短期</div><div class="lt">楚军势不可挡,九战九捷,全歼秦军主力、活捉王离;诸侯将领吓得<b>跪着进辕门、不敢抬头看他</b>。</div></div>
+    <div class="line"><div class="lh">🌅 长远</div><div class="lt">此战基本<b>消灭了秦的主力军</b>,秦朝灭亡进入倒计时;项羽一战封神,成为反秦诸侯的总盟主——<b>西楚霸王</b>。</div></div>
+    <div class="line"><div class="lh">🥀 他自己</div><div class="lt">"有我无敌"的豪气让他名震天下,可这种<b>孤注一掷、刚愎自负</b>的性格,也为日后鸿门宴的轻敌、垓下的败亡,埋下了伏笔。</div></div>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(5)">别人怎么看这一战? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第五步 · 同一场死战,不同的声音</div>
+  <div class="voice"><div class="vw">🪖 楚军士兵</div><div class="va">"退路都没了,只能往前冲!原来人被逼到绝境,能爆发出这么大的力量!"</div></div>
+  <div class="voice"><div class="vw">⚔️ 秦军</div><div class="va">"这帮人……不要命了。四十万大军,竟被几万个不怕死的人冲垮了。"</div></div>
+  <div class="voice"><div class="vw">👀 各路诸侯</div><div class="va">"我们躲在营垒里看,看得手脚发凉。这样的人,我们只能跪着服。"</div></div>
+  <div class="voice"><div class="vw">📜 后世兵家</div><div class="va">"'置之死地而后生'——断了退路,反而激出死战的勇气。可这是把双刃剑:赢了封神,输了就全完。"</div></div>
+  <div class="note">同一个抉择,没有标准答案。 · 史料:《史记·项羽本纪》</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(6)">它和另一个人像不像? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第六步 · 跨越六百年、东西呼应的一招</div>
+  <div class="scene">项羽"破釜沉舟"的两百多年后,在地球另一端的罗马,统帅<b>凯撒</b>带兵踏过卢比孔河、说出"骰子已掷下"——也是<b>主动断了自己的退路</b>,孤注一掷。<br><br>一个沉了船、砸了锅,一个过了那条不能回头的河——<b>两个相隔万里的统帅,用同一种心理,逼出了全军的死战</b>,都赢得了惊天逆转。<br><br>"<b>破釜沉舟</b>""<b>背水一战</b>",从此成了中国人形容"拼死一搏"的话。</div>
+  <div class="btnrow" style="margin-top:16px">
+    <a class="ghost" href="./map.html?civ=qin">🗺 去地图看 秦末</a>
+    <a class="ghost" href="./decision-caesar.html">🦅 去看凯撒过卢比孔</a>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(7)">那……换作是你呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">最后 · 回到你</div>
+  <div class="htitle" style="font-size:22px">换作是你呢?</div>
+  <div class="q">凯撒过河、项羽沉船——都主动<b>断了自己的退路</b>。把自己逼到绝境,是大智大勇,还是孤注一掷的豪赌?</div>
+  <div class="q">"置之死地而后生"能逼出最大的潜能,可一旦失败就<b>再无退路</b>。什么时候该破釜沉舟,什么时候又该<b>留一条后路</b>?</div>
+  <div class="q">你最开始选的是 <b id="myPick">?</b>,和项羽(A)一样吗?走到这里,你的想法<b>变了</b>吗?</div>
+  <div style="font-family:var(--sans);font-weight:700;color:var(--ink);margin-top:18px">✍️ 写下你从破釜沉舟里,看懂的一句话:</div>
+  <textarea id="myNote" placeholder="比如:把自己逼到没退路,有时反而能爆发出全部的力量……"></textarea>
+  <div class="btnrow"><button class="nextbtn" onclick="saveNote(event)">💾 记下我的收获</button></div>
+  <div class="btnrow" style="margin-top:14px">
+    <a class="nextbtn" href="./stories.html" style="text-decoration:none">🧩 回到「回不了头的一步」:和凯撒放一起找规律 →</a>
+  </div>
+  <div class="btnrow" style="margin-top:8px">
+    <button class="ghost" onclick="if(window.toggleAIFloat)toggleAIFloat()">🤖 和 AI 聊聊这个抉择</button>
+    <button class="ghost" onclick="pick=null;opened=new Set();go(0)">↺ 重新走一遍</button>
+  </div>`);
+
+let cur=0;
+function render(){
+  document.getElementById('beat').innerHTML=beats[cur]();
+  document.getElementById('prog').innerHTML=beats.map((_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('');
+  if(cur===1){ refreshGate(); }
+  if(cur===7){ const m=document.getElementById('myPick'); if(m)m.textContent=pick||'?'; const n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('decision_julu')||''; }
+  window.scrollTo({top:0,behavior:'instant'});
+  if(window.Track) Track.log('抉择时刻');
+}
+function go(n){ cur=n; render(); }
+function flip(i){
+  const card=document.querySelector('.dcard[data-i="'+i+'"]');
+  const body=document.getElementById('db'+i);
+  const isOpen=card.classList.toggle('open');
+  body.style.maxHeight=isOpen?(body.scrollHeight+'px'):'0';
+  if(isOpen){ opened.add(i); refreshGate(); }
+}
+function refreshGate(){
+  const c=document.getElementById('dcount'); if(c)c.textContent='已了解 '+opened.size+' / '+DOSSIER.length;
+  const btn=document.getElementById('toChoice'); const gate=document.getElementById('gate');
+  if(opened.size>=DOSSIER.length){ if(btn)btn.disabled=false; if(gate)gate.textContent='✅ 你已看清整盘棋,可以决定了'; }
+}
+function choose(k){
+  pick=k;
+  document.querySelectorAll('.choice').forEach(c=>{c.classList.toggle('picked',c.dataset.k===k);c.onclick=null;});
+  const react={A:'破釜沉舟!可万一没冲垮敌人,几万人连退都退不了——你敢把所有人的命押上吗?',
+    B:'稳妥。但留着退路,士兵就总想着逃,这必死的硬仗,靠"想撤"的心打得赢吗?',
+    C:'等人帮忙。可诸侯都在看你笑话、谁也不肯先动——再等,巨鹿就破了。'}[k];
+  const r=document.getElementById('reaction');
+  r.innerHTML=react+'<div class="btnrow" style="margin-top:14px"><button class="nextbtn" onclick="go(3)">👉 看真实的项羽怎么选</button></div>';
+  r.classList.add('show');
+}
+function saveNote(e){ const n=document.getElementById('myNote'); if(n){localStorage.setItem('decision_julu',n.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的收获',1500);} }
+render();
+</script>
+<script src="./ai_float.js?v=1"></script>
+</body>
+</html>

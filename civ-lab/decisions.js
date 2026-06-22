@@ -26,6 +26,10 @@
      tip:'兄弟要害你,先下手杀兄夺位,还是隐忍?', url:'./decision-lishimin.html'},
     {id:'caesar', person:'凯撒过卢比孔', icon:'🦅', culture:'rome', lng:12.4, lat:44.1, year:-49, from:-52, to:-44,
      tip:'过河就是内战,回头就是受审——你过不过?', url:'./decision-caesar.html'},
+    {id:'julu', person:'项羽破釜沉舟', icon:'🔥', culture:'china', lng:115.0, lat:37.2, year:-207, from:-208, to:-206,
+     tip:'几万人拼四十万,要不要砸锅沉船断退路?', url:'./decision-julu.html'},
+    {id:'gilgamesh', person:'吉尔伽美什', icon:'🦁', culture:'mesopotamia', lng:45.6, lat:31.3, year:-2700, from:-2800, to:-2500,
+     tip:'挚友死了,你要去寻找永生吗?', url:'./decision-gilgamesh.html'},
   ];
   if(typeof window!=='undefined') window.DECISIONS=DECISIONS;
 })();

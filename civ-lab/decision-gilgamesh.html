@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>抉择时刻 · 吉尔伽美什 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;display:flex;flex-direction:column;align-items:center}
+  .top{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:12px 16px;
+    background:linear-gradient(180deg,rgba(var(--scrim,0,0,0),.25),transparent);position:sticky;top:0;z-index:20}
+  .top a.back{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.1em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .top .brand{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink)}
+  .prog{display:flex;gap:5px;margin-left:auto}
+  .prog i{width:13px;height:4px;border-radius:3px;background:var(--panel-line)}
+  .prog i.on{background:var(--gold)}
+  .wrap{width:min(660px,92%);margin:8px auto 70px;flex:1}
+  .beat{animation:fin .5s cubic-bezier(.22,1,.36,1)}
+  @keyframes fin{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;font-weight:700;text-align:center;margin-top:18px}
+  .htitle{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);text-align:center;line-height:1.3;margin:6px 0 4px;text-shadow:var(--label-shadow)}
+  .hsub{font-family:var(--mono);font-size:12px;color:var(--ink3);text-align:center;letter-spacing:.08em;margin-bottom:18px}
+  .scene{font-family:var(--serif);font-size:clamp(15px,3.8vw,17.5px);color:var(--ink);line-height:1.95;
+    background:var(--panel-bg);border:1px solid var(--panel-line);border-left:4px solid var(--gold);border-radius:14px;
+    padding:18px 20px;backdrop-filter:blur(8px)}
+  .scene b{color:var(--gold)}
+  .dossier-intro{font-family:var(--sans);font-size:14.5px;color:var(--ink2);text-align:center;line-height:1.7;margin:4px 0 16px}
+  .dcount{font-family:var(--mono);font-size:12px;color:var(--gold);text-align:center;font-weight:700;margin-bottom:12px}
+  .dcard{background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:14px;margin-bottom:11px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+  .dcard.open{border-color:var(--gold)}
+  .dhead{display:flex;align-items:center;gap:11px;padding:15px 17px}
+  .dhead .di{font-size:21px}
+  .dhead .dt{font-family:var(--sans);font-weight:800;font-size:15.5px;color:var(--ink);flex:1}
+  .dhead .dchev{font-family:var(--mono);font-size:11px;color:var(--ink3);transition:transform .2s}
+  .dcard.open .dchev{transform:rotate(90deg);color:var(--gold)}
+  .dhead .ddot{width:8px;height:8px;border-radius:50%;background:var(--vermilion);flex:none}
+  .dcard.open .ddot{background:var(--cyan)}
+  .dbody{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .dbody-in{padding:0 17px 16px;font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.85}
+  .dbody-in b{color:var(--gold)}
+  .dbody-in ul{margin:8px 0 0;padding-left:2px;list-style:none}
+  .dbody-in li{margin:7px 0;padding-left:16px;position:relative}
+  .dbody-in li:before{content:'·';position:absolute;left:3px;color:var(--vermilion);font-weight:900}
+  .dbody-in li b{color:var(--vermilion)}
+  .ask{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);text-align:center;margin:22px 0 6px}
+  .asksub{font-family:var(--sans);font-size:13.5px;color:var(--ink2);text-align:center;margin-bottom:16px;line-height:1.6}
+  .choices{display:flex;flex-direction:column;gap:11px}
+  .choice{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink);background:var(--panel-bg);
+    border:1.5px solid var(--panel-line);border-radius:14px;padding:15px 17px;cursor:pointer;transition:all .15s;text-align:left;line-height:1.5}
+  .choice:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+  .choice .ckey{font-weight:900;color:var(--gold);margin-right:8px}
+  .choice.picked{border-color:var(--gold);background:rgba(224,138,44,.1)}
+  .reaction{margin-top:14px;font-size:14.5px;color:var(--ink);line-height:1.75;background:rgba(224,138,44,.1);
+    border-left:4px solid var(--gold);border-radius:8px;padding:13px 16px;display:none}
+  .reaction.show{display:block;animation:fin .4s}
+  .lines{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+  .line{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:12px;padding:13px 16px}
+  .line .lh{font-family:var(--serif);font-weight:900;font-size:14px;color:var(--gold);margin-bottom:4px}
+  .line .lt{font-size:14px;color:var(--ink);line-height:1.7}
+  .line .lt b{color:var(--vermilion)}
+  .voice{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:13px;padding:13px 16px;margin-bottom:10px}
+  .voice .vw{font-family:var(--sans);font-weight:800;font-size:14px;color:var(--ink);margin-bottom:5px}
+  .voice .va{font-size:14px;color:var(--ink2);line-height:1.7}
+  .note{font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:center;margin-top:12px}
+  .q{font-family:var(--serif);font-size:16.5px;color:var(--ink);line-height:1.75;margin:14px 0;padding-left:14px;border-left:3px solid var(--gold)}
+  .q b{color:var(--gold)}
+  textarea{width:100%;box-sizing:border-box;margin-top:10px;font-family:var(--sans);font-size:15px;color:var(--ink);
+    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:12px;padding:13px 15px;min-height:80px;outline:none;resize:vertical}
+  .btnrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
+  .nextbtn{font-family:var(--sans);font-weight:800;font-size:15px;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));
+    border:none;border-radius:999px;padding:13px 30px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.16)}
+  .nextbtn:active{transform:scale(.97)}
+  .nextbtn[disabled]{opacity:.4;cursor:not-allowed;box-shadow:none}
+  .ghost{font-family:var(--sans);font-weight:700;font-size:14px;color:var(--gold);background:var(--panel-bg);
+    border:1px solid var(--panel-line);border-radius:999px;padding:11px 20px;cursor:pointer;text-decoration:none;display:inline-block}
+  .gate{text-align:center;font-family:var(--sans);font-size:12.5px;color:var(--ink3);margin-top:6px}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="top">
+    <a class="back" href="./stories.html">⌂ 抉择</a>
+    <span class="brand">🎯 抉择时刻</span>
+    <div class="prog" id="prog"></div>
+  </div>
+  <div class="wrap"><div class="beat" id="beat"></div></div>
+</div>
+<script src="./track.js?v=1"></script>
+<script>
+window.__aiCtx='用户正在体验"抉择时刻·吉尔伽美什"(母题:终有一死,怎么活,出自人类最早的史诗《吉尔伽美什史诗》,两河流域/苏美尔)。史实/史诗内容:吉尔伽美什是乌鲁克半人半神的暴君;神造野人恩奇都与他相斗,不打不相识结为生死挚友;两人合力斩杀杉林怪兽胡姆巴巴、又杀死天牛。因此触怒众神,恩奇都被降罚病重而死。吉尔伽美什第一次被死亡的恐惧攫住,远行去寻找大洪水的幸存者、得到永生的乌特纳比西丁,渡过死亡之海、经受不眠试炼,终于得到海底的"永生草",却在归途中被一条蛇偷吃(蛇从此能蜕皮重生)。寻永生失败后,他回到乌鲁克,望着自己建造的高大城墙,领悟到:凡人终有一死,但人留下的功业、城市、爱与名,可以长久——这是人类文学里最早的"向死而生"。这部史诗也是《圣经》大洪水故事的更早原型。请用适合10-12岁孩子的语言陪他思考死亡与生命的意义,多反问,不要替他下结论。';
+let pick=null;
+const DOSSIER=[
+  {i:'👑',t:'你是谁',b:'你是<b>吉尔伽美什</b>,两河流域<b>乌鲁克</b>城的国王,三分之二是神、三分之一是人,力大无穷。可你年轻时残暴任性,百姓苦不堪言。'},
+  {i:'🤝',t:'你的挚友',b:'众神为了管住你,造出了野人<b>恩奇都</b>。你俩大战一场、不分胜负,从此<b>不打不相识、结为生死之交</b>。你们一起闯进杉树林斩杀怪兽胡姆巴巴,又联手杀死天牛,名震天下。'},
+  {i:'💔',t:'挚友之死',b:'因为杀了胡姆巴巴和天牛,众神降下惩罚——<b>恩奇都病重死去</b>。你抱着他冰冷的身体,七天不肯下葬。你第一次,被一个念头狠狠攫住:"<b>我,也会像他一样,变成尘土吗?</b>"'},
+  {i:'🌊',t:'永生的传说',b:'你听说:遥远的地方,有一个叫<b>乌特纳比西丁</b>的人,在那场淹没大地的<b>大洪水</b>之后,被众神赐予了<b>永生</b>。只要找到他,也许你也能逃过一死。'},
+  {i:'⚰️',t:'凡人的宿命',b:'可是所有人都对你说:诸神创造人类时,就<b>把死亡分给了人,把永生留给了自己</b>。你越想抓住"永远",死亡的影子,越是甩不掉。'},
+  {i:'⚡',t:'眼前的难题',b:'挚友的死,把你逼到一个十字路口:<br>是<b>抛下王国、远行天涯</b>,拼了命也要找到不死的秘密?是<b>接受"人终有一死"</b>,回去好好活、好好爱身边人?还是<b>建立不朽的功业</b>,让自己的名字永远留下?'},
+];
+let opened=new Set();
+const beats=[];
+beats.push(()=>`
+  <div class="kicker">约公元前 2700 年 · 两河流域 · 乌鲁克</div>
+  <div class="htitle">人,能不能不死?</div>
+  <div class="hsub">即将由你 —— 吉尔伽美什 —— 面对</div>
+  <div class="scene">四千多年前,你是乌鲁克的国王<b>吉尔伽美什</b>。你最好的朋友恩奇都死了,你第一次尝到死亡的恐惧。<br><br>你即将做一个决定——它不关乎江山战争,却是人类<b>第一次用文字</b>追问的问题:<b>人终有一死,那这一生,到底该怎么过?</b><br><br>但在你决定之前,<b>先别急。</b> 先把这件事,想清楚。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(1)">📂 先把这件事想清楚 →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第一步 · 了解</div>
+  <div class="htitle" style="font-size:23px">想清楚这件事</div>
+  <div class="dossier-intro">点开下面每一张卡片,弄懂你是谁、你失去了谁、和那个关于"永生"的传说。<br>全部看完,你才有资格替吉尔伽美什做决定。</div>
+  <div class="dcount" id="dcount">已了解 0 / ${DOSSIER.length}</div>
+  <div id="dwrap">${DOSSIER.map((d,i)=>`
+    <div class="dcard" data-i="${i}" onclick="flip(${i})">
+      <div class="dhead"><span class="ddot"></span><span class="di">${d.i}</span><span class="dt">${d.t}</span><span class="dchev">▶</span></div>
+      <div class="dbody" id="db${i}"><div class="dbody-in">${d.b}</div></div>
+    </div>`).join('')}</div>
+  <div class="btnrow"><button class="nextbtn" id="toChoice" onclick="go(2)" disabled>换作是你,你会怎么做? →</button></div>
+  <div class="gate" id="gate">(看完全部 ${DOSSIER.length} 张卡片后解锁)</div>`);
+beats.push(()=>`
+  <div class="kicker">第二步 · 此刻,你就是吉尔伽美什</div>
+  <div class="ask">面对死亡,你怎么活?</div>
+  <div class="asksub">你已经想清楚了——挚友的死、永生的传说、凡人的宿命,还有你心底那份恐惧。<br>现在,这个决定由你来下。</div>
+  <div class="choices">
+    <div class="choice" data-k="A" onclick="choose('A')"><span class="ckey">A</span>远行寻永生——抛下一切,跋涉天涯,一定要找到不死的秘密。</div>
+    <div class="choice" data-k="B" onclick="choose('B')"><span class="ckey">B</span>接受死亡、珍惜当下——既然终有一死,就回去好好活、好好爱身边人。</div>
+    <div class="choice" data-k="C" onclick="choose('C')"><span class="ckey">C</span>用功业留名——肉身会死,就建起不朽的城墙与功业,让名字永存。</div>
+  </div>
+  <div class="reaction" id="reaction"></div>`);
+beats.push(()=>`
+  <div class="kicker">第三步 · 真实的他</div>
+  <div class="htitle" style="font-size:22px">他先选了 A,却在尽头懂了别的</div>
+  <div class="scene">他抛下王国,踏上寻找永生的远路。他翻过群山、渡过<b>死亡之海</b>,终于见到了乌特纳比西丁,熬过六天七夜不睡觉的试炼,从海底摘到了那株<b>永生草</b>。<br><br>可就在归途,他下水洗澡时,一条<b>蛇悄悄把永生草吃掉了</b>——蛇从此能蜕皮重生,而永生,到手又溜走了。<br><br>他空着手回到乌鲁克。站在自己建起的<b>高大城墙</b>下,他忽然懂了:永生求不来,但人留下的东西,可以长久。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(4)">那……他懂了什么? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第四步 · 一场寻找,延伸出三条线</div>
+  <div class="lines">
+    <div class="line"><div class="lh">🌊 寻找</div><div class="lt">他历尽艰险拿到了永生草,却被一条蛇偷吃。<b>永生,到手又失去</b>——这是命运给所有凡人的回答。</div></div>
+    <div class="line"><div class="lh">🧱 领悟</div><div class="lt">回到乌鲁克,他望着自己建的城墙,第一次平静下来:<b>人终有一死,但人造的东西、做过的事、留下的爱与名,可以长久。</b>这是人类最早的"向死而生"。</div></div>
+    <div class="line"><div class="lh">📜 流传</div><div class="lt">四千年后,我们仍在读他的故事。《吉尔伽美什史诗》是人类<b>最早写下的史诗</b>,第一次用文字追问"人为什么会死、该怎么活"——他想要的"不朽",竟以这种方式实现了。</div></div>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(5)">不同的人怎么说? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第五步 · 关于生死,不同的声音</div>
+  <div class="voice"><div class="vw">🍺 酒馆女主人西杜丽</div><div class="va">"你永远找不到你寻找的永生。不如吃饱穿暖、珍惜身边的人——这,才是凡人的福分。"</div></div>
+  <div class="voice"><div class="vw">👻 恩奇都(亡魂)</div><div class="va">"朋友啊,别为我太悲伤。活着的人,要好好地活。"</div></div>
+  <div class="voice"><div class="vw">🧱 一个乌鲁克百姓</div><div class="va">"国王走的时候,是个被死亡吓坏的人;回来的时候,成了一个懂得珍惜的好王。"</div></div>
+  <div class="voice"><div class="vw">🤔 今天的我们</div><div class="va">"谁不怕死呢?可也许正因为生命有限,它才这么珍贵。"</div></div>
+  <div class="note">同一个追问,没有标准答案。 · 出处:《吉尔伽美什史诗》(人类最早的史诗)</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(6)">它给后世留下了什么? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第六步 · 人类第一次,把"死亡"写下来</div>
+  <div class="scene">四千多年前,两河流域的人,把这个故事一笔一画刻在泥板上——这是人类<b>已知最早的史诗</b>。<br><br>它第一次用文字,替全人类问出了那个最大的问题:<b>我们都会死,那活着的意义是什么?</b><br><br>故事里那场淹没大地、靠一艘大船幸存的<b>大洪水</b>,比《圣经》里的诺亚方舟早了一千多年——它就是后来许多洪水传说的源头。一个四千年前的国王的追问,至今还在叩问着每一个人。</div>
+  <div class="btnrow" style="margin-top:16px">
+    <a class="ghost" href="./map.html?civ=sumer">🗺 去地图看 苏美尔</a>
+    <a class="ghost" href="./timeline.html?c=mesopotamia">📜 看两河文明时间轴</a>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(7)">那……换作是你呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">最后 · 回到你</div>
+  <div class="htitle" style="font-size:22px">换作是你呢?</div>
+  <div class="q">如果你知道生命终有尽头,你会怎么过这一生?是拼命追求"<b>永远</b>",还是珍惜"<b>现在</b>"?</div>
+  <div class="q">吉尔伽美什找了一大圈,最后发现答案就在家里。你觉得,什么能让一个人"<b>不朽</b>"?</div>
+  <div class="q">你最开始选的是 <b id="myPick">?</b>。走到这里,你对"死亡"和"活着"的想法,<b>变了</b>吗?</div>
+  <div style="font-family:var(--sans);font-weight:700;color:var(--ink);margin-top:18px">✍️ 写下你从这个最古老的故事里,看懂的一句话:</div>
+  <textarea id="myNote" placeholder="比如:正因为会失去,当下才值得好好珍惜……"></textarea>
+  <div class="btnrow"><button class="nextbtn" onclick="saveNote(event)">💾 记下我的收获</button></div>
+  <div class="btnrow" style="margin-top:14px">
+    <a class="nextbtn" href="./stories.html" style="text-decoration:none">🧩 回到抉择,顺着母题线找规律 →</a>
+  </div>
+  <div class="btnrow" style="margin-top:8px">
+    <button class="ghost" onclick="if(window.toggleAIFloat)toggleAIFloat()">🤖 和 AI 聊聊生死这件事</button>
+    <button class="ghost" onclick="pick=null;opened=new Set();go(0)">↺ 重新走一遍</button>
+  </div>`);
+
+let cur=0;
+function render(){
+  document.getElementById('beat').innerHTML=beats[cur]();
+  document.getElementById('prog').innerHTML=beats.map((_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('');
+  if(cur===1){ refreshGate(); }
+  if(cur===7){ const m=document.getElementById('myPick'); if(m)m.textContent=pick||'?'; const n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('decision_gilgamesh')||''; }
+  window.scrollTo({top:0,behavior:'instant'});
+  if(window.Track) Track.log('抉择时刻');
+}
+function go(n){ cur=n; render(); }
+function flip(i){
+  const card=document.querySelector('.dcard[data-i="'+i+'"]');
+  const body=document.getElementById('db'+i);
+  const isOpen=card.classList.toggle('open');
+  body.style.maxHeight=isOpen?(body.scrollHeight+'px'):'0';
+  if(isOpen){ opened.add(i); refreshGate(); }
+}
+function refreshGate(){
+  const c=document.getElementById('dcount'); if(c)c.textContent='已了解 '+opened.size+' / '+DOSSIER.length;
+  const btn=document.getElementById('toChoice'); const gate=document.getElementById('gate');
+  if(opened.size>=DOSSIER.length){ if(btn)btn.disabled=false; if(gate)gate.textContent='✅ 你已想清楚,可以决定了'; }
+}
+function choose(k){
+  pick=k;
+  document.querySelectorAll('.choice').forEach(c=>{c.classList.toggle('picked',c.dataset.k===k);c.onclick=null;});
+  const react={A:'勇敢!可如果跑遍天涯,最后发现永生根本求不来呢?那这一趟,白走了吗?',
+    B:'通透。可挚友刚死、恐惧正浓,这么快就能放下、坦然接受死亡——做得到吗?',
+    C:'聪明——用不朽的功业对抗速朽的肉身。但只为'+"'留名'"+'而活,会不会忘了好好生活本身?'}[k];
+  const r=document.getElementById('reaction');
+  r.innerHTML=react+'<div class="btnrow" style="margin-top:14px"><button class="nextbtn" onclick="go(3)">👉 看真实的吉尔伽美什怎么做</button></div>';
+  r.classList.add('show');
+}
+function saveNote(e){ const n=document.getElementById('myNote'); if(n){localStorage.setItem('decision_gilgamesh',n.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的收获',1500);} }
+render();
+</script>
+<script src="./ai_float.js?v=1"></script>
+</body>
+</html>
