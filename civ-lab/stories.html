@@ -46,6 +46,10 @@
   .seed:before{content:'';position:absolute;left:-19px;top:11px;width:9px;height:9px;border-radius:50%;background:var(--panel-line)}
   .seed .st{font-family:var(--sans);font-size:12px;color:var(--ink3);padding:5px 0 0}
   /* 找规律(动线终点) */
+  .mnav{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin:14px auto 4px;max-width:660px}
+  .mnav a{font-family:var(--sans);font-size:12px;font-weight:700;color:var(--ink2);text-decoration:none;
+    background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:999px;padding:5px 12px}
+  .mnav a:hover{color:#fff;background:var(--gold);border-color:transparent}
   .findbtn{display:block;width:100%;box-sizing:border-box;margin-top:8px;font-family:var(--sans);font-weight:800;font-size:14px;color:#fff;
     background:linear-gradient(90deg,var(--ac,var(--gold)),var(--vermilion));border:none;border-radius:12px;padding:13px;cursor:pointer;box-shadow:0 5px 14px rgba(0,0,0,.14)}
   .findbtn:active{transform:scale(.99)}
@@ -91,6 +95,7 @@
       <h1>顺着一个「母题」,看历史</h1>
       <p>历史上有些处境,<b>隔着几百年反复出现</b>。顺着同一条线一站站走下去,你就会发现藏在背后的规律——这,才是真正"学到了"历史。</p>
     </div>
+    <div class="mnav" id="mnav"></div>
     <div id="motifs"></div>
     <div class="tip">💡 这些故事,也散落在 <a href="./map.html">世界地图</a> 上——时间轴走到那个年代,对应的地点就会浮起一枚 🎯 抉择钉子。</div>
   </div>
@@ -141,17 +146,18 @@ const MOTIFS=[
    stations:[
      {person:'吴起', icon:'🗡️', year:-381, era:'公元前381 · 楚', one:'楚王把改革的刀交给你,要不要硬削贵族特权?', url:'./decision-wuqi.html'},
      {person:'商鞅', icon:'⚖️', year:-356, era:'公元前356 · 秦', one:'太子犯了你亲手定的新法,罚,还是不罚?', url:'./decision-shangyang.html'},
+     {person:'王安石变法', icon:'📖', year:1069, era:'公元1069 · 北宋', one:'明知前人下场,要不要硬碰既得利益强推新法?', url:'./decision-wanganshi.html'},
    ],
    find:{
-     q:'吴起在楚、商鞅在秦,隔了几十年,都靠变法让国家强大,又都在君主一死后被旧贵族清算杀掉。你觉得藏着什么共同的规律?',
+     q:'吴起(楚)、商鞅(秦)、王安石(宋),跨越一千六百年,都靠变法让国家强大,又都在<b>君主一死后</b>被旧势力清算、变法被废。你觉得藏着什么共同的规律?',
      opts:[
-       {t:'改变旧世界,就要夺<b>既得利益者</b>的好处;一旦失去君主庇护,他们就会反扑——<b>变法者常常等不到新世界</b>。', ok:true, fb:'✅ 你抓住了!这正是两场变法最深的共同点。往下看揭晓——'},
+       {t:'改变旧世界,就要夺<b>既得利益者</b>的好处;一旦失去君主庇护,他们就会反扑——<b>变法者常常等不到新世界</b>。', ok:true, fb:'✅ 你抓住了!这正是三场变法最深的共同点。往下看揭晓——'},
        {t:'变法<b>一定会失败</b>,所以根本不该变。', ok:false, fb:'可秦国靠商鞅之法最终统一天下——变法没失败,失败的是变法者本人的安危。'},
        {t:'他们都是因为<b>太残忍</b>才被杀的。', ok:false, fb:'手段是一方面,但真正要他们命的,是被夺了世袭特权、恨之入骨的旧贵族。'},
      ],
      law:{ lt:'强国可成,变法者难全;<br>动既得利益的人,常常<b>拿命去填</b>。',
-           le:'吴起伏在楚王尸上被乱箭射死,商鞅被新王车裂——他们靠一位君主的支持推动变法,君主一死,失去特权的旧贵族立刻反扑。<b>改革成了,改革者却倒在了新世界的门口。</b>' },
-     move:'这条"<b>变法者难有好下场</b>"的规律,你还能在别处见到吗?(比如后来的王安石、张居正)',
+           le:'吴起被乱箭射死、商鞅被车裂、王安石郁郁而终——<b>跨越一千六百年,同一个剧本反复上演</b>:他们都靠一位君主的支持推动变法,君主一死,失去利益的旧势力立刻反扑、新法被废。改革成了,改革者却倒在了新世界的门口。' },
+     move:'这条"<b>变法者难有好下场</b>"的规律,你还能在别处见到吗?(比如后来的张居正、近代的维新)',
      key:'find_reform' },
   },
   {id:'conscience', tag:'良心与法律', title:'良心撞上法律,听谁的?', ac:'#b06aa0',
@@ -272,19 +278,21 @@ function stationHtml(s){
 }
 document.getElementById('motifs').innerHTML=MOTIFS.map(m=>{
   const sts=m.stations.slice().sort((a,b)=>a.year-b.year);
-  let inner=`<div class="motif" style="--ac:${m.ac}">
+  let inner=`<div class="motif" id="motif_${m.id}" style="--ac:${m.ac}">
     <div class="mh"><span class="mtag">${esc(m.tag)}</span><span class="mt">${esc(m.title)}</span><span class="mcount">${sts.length} 站</span></div>
     <div class="ms">${m.sub}</div>
     <div class="line">${sts.map(stationHtml).join('')}`;
   if(m.seed){ inner+=`<div class="seed"><div class="st">⏳ ${esc(m.seed)}</div></div>`; }
   inner+=`</div>`;
   if(m.find && sts.length>=2){
-    inner+=`<button class="findbtn" id="fb_${m.id}" onclick="openFind('${m.id}')">🧩 两站都走完了?来找它们的规律 →</button>
+    inner+=`<button class="findbtn" id="fb_${m.id}" onclick="openFind('${m.id}')">🧩 都走完了?来找它们藏的规律 →</button>
       <div class="find hidden" id="find_${m.id}"></div>`;
   }
   inner+=`</div>`;
   return inner;
 }).join('');
+// 母题快速导航
+document.getElementById('mnav').innerHTML=MOTIFS.map(m=>`<a href="#motif_${m.id}">${esc(m.tag)}</a>`).join('');
 
 const FINDMAP={}; MOTIFS.forEach(m=>{if(m.find)FINDMAP[m.id]=m.find;});
 function openFind(id){

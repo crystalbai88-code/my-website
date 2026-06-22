@@ -36,6 +36,8 @@
      tip:'对面是亲人,这一仗,打还是不打?', url:'./decision-arjuna.html'},
     {id:'shique', person:'石碏大义灭亲', icon:'👴', culture:'china', lng:114.5, lat:35.7, year:-719, from:-722, to:-716,
      tip:'亲儿子是弑君帮凶,你要不要大义灭亲?', url:'./decision-shique.html'},
+    {id:'wanganshi', person:'王安石变法', icon:'📖', culture:'china', lng:114.3, lat:34.8, year:1069, from:1067, to:1086,
+     tip:'明知前人下场,要不要硬碰既得利益强推新法?', url:'./decision-wanganshi.html'},
   ];
   if(typeof window!=='undefined') window.DECISIONS=DECISIONS;
 })();

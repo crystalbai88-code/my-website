@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>抉择时刻 · 王安石变法 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;display:flex;flex-direction:column;align-items:center}
+  .top{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:12px 16px;
+    background:linear-gradient(180deg,rgba(var(--scrim,0,0,0),.25),transparent);position:sticky;top:0;z-index:20}
+  .top a.back{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.1em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .top .brand{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink)}
+  .prog{display:flex;gap:5px;margin-left:auto}
+  .prog i{width:13px;height:4px;border-radius:3px;background:var(--panel-line)}
+  .prog i.on{background:var(--gold)}
+  .wrap{width:min(660px,92%);margin:8px auto 70px;flex:1}
+  .beat{animation:fin .5s cubic-bezier(.22,1,.36,1)}
+  @keyframes fin{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;font-weight:700;text-align:center;margin-top:18px}
+  .htitle{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);text-align:center;line-height:1.3;margin:6px 0 4px;text-shadow:var(--label-shadow)}
+  .hsub{font-family:var(--mono);font-size:12px;color:var(--ink3);text-align:center;letter-spacing:.08em;margin-bottom:18px}
+  .scene{font-family:var(--serif);font-size:clamp(15px,3.8vw,17.5px);color:var(--ink);line-height:1.95;
+    background:var(--panel-bg);border:1px solid var(--panel-line);border-left:4px solid var(--gold);border-radius:14px;
+    padding:18px 20px;backdrop-filter:blur(8px)}
+  .scene b{color:var(--gold)}
+  .dossier-intro{font-family:var(--sans);font-size:14.5px;color:var(--ink2);text-align:center;line-height:1.7;margin:4px 0 16px}
+  .dcount{font-family:var(--mono);font-size:12px;color:var(--gold);text-align:center;font-weight:700;margin-bottom:12px}
+  .dcard{background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:14px;margin-bottom:11px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+  .dcard.open{border-color:var(--gold)}
+  .dhead{display:flex;align-items:center;gap:11px;padding:15px 17px}
+  .dhead .di{font-size:21px}
+  .dhead .dt{font-family:var(--sans);font-weight:800;font-size:15.5px;color:var(--ink);flex:1}
+  .dhead .dchev{font-family:var(--mono);font-size:11px;color:var(--ink3);transition:transform .2s}
+  .dcard.open .dchev{transform:rotate(90deg);color:var(--gold)}
+  .dhead .ddot{width:8px;height:8px;border-radius:50%;background:var(--vermilion);flex:none}
+  .dcard.open .ddot{background:var(--cyan)}
+  .dbody{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .dbody-in{padding:0 17px 16px;font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.85}
+  .dbody-in b{color:var(--gold)}
+  .dbody-in ul{margin:8px 0 0;padding-left:2px;list-style:none}
+  .dbody-in li{margin:7px 0;padding-left:16px;position:relative}
+  .dbody-in li:before{content:'·';position:absolute;left:3px;color:var(--vermilion);font-weight:900}
+  .dbody-in li b{color:var(--vermilion)}
+  .ask{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);text-align:center;margin:22px 0 6px}
+  .asksub{font-family:var(--sans);font-size:13.5px;color:var(--ink2);text-align:center;margin-bottom:16px;line-height:1.6}
+  .choices{display:flex;flex-direction:column;gap:11px}
+  .choice{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink);background:var(--panel-bg);
+    border:1.5px solid var(--panel-line);border-radius:14px;padding:15px 17px;cursor:pointer;transition:all .15s;text-align:left;line-height:1.5}
+  .choice:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+  .choice .ckey{font-weight:900;color:var(--gold);margin-right:8px}
+  .choice.picked{border-color:var(--gold);background:rgba(224,138,44,.1)}
+  .reaction{margin-top:14px;font-size:14.5px;color:var(--ink);line-height:1.75;background:rgba(224,138,44,.1);
+    border-left:4px solid var(--gold);border-radius:8px;padding:13px 16px;display:none}
+  .reaction.show{display:block;animation:fin .4s}
+  .lines{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+  .line{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:12px;padding:13px 16px}
+  .line .lh{font-family:var(--serif);font-weight:900;font-size:14px;color:var(--gold);margin-bottom:4px}
+  .line .lt{font-size:14px;color:var(--ink);line-height:1.7}
+  .line .lt b{color:var(--vermilion)}
+  .voice{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:13px;padding:13px 16px;margin-bottom:10px}
+  .voice .vw{font-family:var(--sans);font-weight:800;font-size:14px;color:var(--ink);margin-bottom:5px}
+  .voice .va{font-size:14px;color:var(--ink2);line-height:1.7}
+  .note{font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:center;margin-top:12px}
+  .q{font-family:var(--serif);font-size:16.5px;color:var(--ink);line-height:1.75;margin:14px 0;padding-left:14px;border-left:3px solid var(--gold)}
+  .q b{color:var(--gold)}
+  textarea{width:100%;box-sizing:border-box;margin-top:10px;font-family:var(--sans);font-size:15px;color:var(--ink);
+    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:12px;padding:13px 15px;min-height:80px;outline:none;resize:vertical}
+  .btnrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
+  .nextbtn{font-family:var(--sans);font-weight:800;font-size:15px;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));
+    border:none;border-radius:999px;padding:13px 30px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.16)}
+  .nextbtn:active{transform:scale(.97)}
+  .nextbtn[disabled]{opacity:.4;cursor:not-allowed;box-shadow:none}
+  .ghost{font-family:var(--sans);font-weight:700;font-size:14px;color:var(--gold);background:var(--panel-bg);
+    border:1px solid var(--panel-line);border-radius:999px;padding:11px 20px;cursor:pointer;text-decoration:none;display:inline-block}
+  .gate{text-align:center;font-family:var(--sans);font-size:12.5px;color:var(--ink3);margin-top:6px}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="top">
+    <a class="back" href="./stories.html">⌂ 抉择</a>
+    <span class="brand">🎯 抉择时刻</span>
+    <div class="prog" id="prog"></div>
+  </div>
+  <div class="wrap"><div class="beat" id="beat"></div></div>
+</div>
+<script src="./track.js?v=1"></script>
+<script>
+window.__aiCtx='用户正在体验"抉择时刻·王安石变法"(母题:改革的代价,与吴起、商鞅同一条找规律线的第三站)。史实:北宋积贫积弱(冗官冗兵冗费、国库空虚、辽与西夏边患)。年轻的宋神宗一心富国强兵,熙宁二年(1069)任命王安石为参知政事(副宰相),全力支持其变法。王安石推行青苗法、募役法、保甲法、方田均税法、市易法等,确实充实了国库、增强了军力,但新法从大地主大官僚大商人手中夺利、执行中走样扰民,触动整个士大夫既得利益集团,以司马光为首的旧党激烈反对,朝廷分裂为新党旧党。王安石全部依靠是神宗一人之支持;1085年神宗病逝,高太后起用司马光主持"元祐更化",几乎尽废新法,王安石不久郁郁病死。新旧党争延续五十余年、反复内耗,加速北宋灭亡。这与吴起(楚悼王死后被旧贵族射杀)、商鞅(秦孝公死后被新王车裂)如出一辙——变法者靠君主支持图强,君主一死即遭旧势力反扑、变法被废、自己凄凉收场,跨越一千六百年反复上演。请用适合10-12岁孩子的语言陪他思考,多反问,不要替他下结论。';
+let pick=null;
+const DOSSIER=[
+  {i:'📖',t:'你是谁',b:'你是<b>王安石</b>,北宋名臣、大文学家(唐宋八大家之一),以清廉刚直、学问深厚闻名。你立志改变这个"积贫积弱"的国家。'},
+  {i:'🏯',t:'你的北宋',b:'北宋表面富庶,实则<b>积贫积弱</b>:官多得养不起、兵多却打不赢(冗官、冗兵、冗费),国库空虚,北方还有辽和西夏年年压境。危机藏在繁华之下。'},
+  {i:'👑',t:'皇帝的支持',b:'年轻的<b>宋神宗</b>一心想富国强兵,力排众议,任命你为<b>参知政事</b>(副宰相),把变法大权交到你手里。这是千载难逢的机会。'},
+  {i:'⚔️',t:'你要动谁的奶酪',b:'你的新法(青苗法、募役法、市易法…)要从<b>大地主、大官僚、大商人</b>手里夺利,去充实国库、扶助小民。这等于向<b>整个士大夫既得利益集团</b>开战。'},
+  {i:'⏳',t:'一个熟悉的隐患',b:'你全部的依靠,是<b>神宗一个人</b>的支持。以<b>司马光</b>为首的"旧党"(满朝重臣,不少还是你昔日的朋友)激烈反对。万一哪天神宗不在了……(两百多年前的商鞅、更早的吴起,都是这么倒下的。)'},
+  {i:'⚡',t:'眼前的难题',b:'你可以<b>顶住反对、强力推行</b>全套新法,富国强兵但树敌无数;可以<b>温和改良</b>,只推阻力小的几项、慢慢来;也可以<b>不变法</b>,维持现状、修修补补。<b>你怎么做?</b>'},
+];
+let opened=new Set();
+const beats=[];
+beats.push(()=>`
+  <div class="kicker">公元 1069 年 · 北宋 · 开封</div>
+  <div class="htitle">明知前人的下场,还要变法吗?</div>
+  <div class="hsub">即将由你 —— 王安石 —— 决定</div>
+  <div class="scene">公元1069年,你是北宋的副宰相<b>王安石</b>。皇帝把变法图强的大权交给你,可你要动的,是整个官僚集团的奶酪。<br><br>你即将做一个决定——它能让积弱的北宋强起来,也可能让你重蹈商鞅、吴起的覆辙。<br><br>但在你决定之前,<b>先别急。</b> 先把这盘棋,看清楚。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(1)">📂 先弄懂这盘棋 →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第一步 · 了解</div>
+  <div class="htitle" style="font-size:23px">看清这盘棋</div>
+  <div class="dossier-intro">点开下面每一张情报卡,弄懂北宋的危机、皇帝的支持、和你要硬碰的人。<br>全部看完,你才有资格替王安石做决定。</div>
+  <div class="dcount" id="dcount">已了解 0 / ${DOSSIER.length}</div>
+  <div id="dwrap">${DOSSIER.map((d,i)=>`
+    <div class="dcard" data-i="${i}" onclick="flip(${i})">
+      <div class="dhead"><span class="ddot"></span><span class="di">${d.i}</span><span class="dt">${d.t}</span><span class="dchev">▶</span></div>
+      <div class="dbody" id="db${i}"><div class="dbody-in">${d.b}</div></div>
+    </div>`).join('')}</div>
+  <div class="btnrow"><button class="nextbtn" id="toChoice" onclick="go(2)" disabled>换作是你,你会怎么做? →</button></div>
+  <div class="gate" id="gate">(看完全部 ${DOSSIER.length} 张情报卡后解锁)</div>`);
+beats.push(()=>`
+  <div class="kicker">第二步 · 此刻,你就是王安石</div>
+  <div class="ask">强推,还是缓行?</div>
+  <div class="asksub">你已经看清了整盘棋——北宋的积弊、神宗的支持、旧党的反对,还有商鞅、吴起的前车之鉴。<br>现在,这个决定由你来下。</div>
+  <div class="choices">
+    <div class="choice" data-k="A" onclick="choose('A')"><span class="ckey">A</span>强力推行——顶住反对,全面推行青苗、募役等新法,富国强兵。</div>
+    <div class="choice" data-k="B" onclick="choose('B')"><span class="ckey">B</span>温和改良——只推阻力小的几项,慢慢来,少树敌。</div>
+    <div class="choice" data-k="C" onclick="choose('C')"><span class="ckey">C</span>不变法——积弊虽深却牵一发动全身,不如维持现状、修修补补。</div>
+  </div>
+  <div class="reaction" id="reaction"></div>`);
+beats.push(()=>`
+  <div class="kicker">第三步 · 真实的他</div>
+  <div class="htitle" style="font-size:22px">王安石,选了 A</div>
+  <div class="scene">"<b>天变不足畏,祖宗不足法,人言不足恤。</b>"他顶着满朝骂声,把青苗法、募役法、保甲法、市易法……一项项全面铺开。<br><br>国库确实渐渐充盈,军力也有提升。可新法在执行中处处走样、扰了民,旧党骂声震天;朝廷彻底裂成"<b>新党</b>"与"<b>旧党</b>",水火不容。<br><br>而他心里清楚:他全部的依靠,只有神宗一个人。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(4)">那……后来呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第四步 · 一场变法,延伸出三条线</div>
+  <div class="lines">
+    <div class="line"><div class="lh">⚡ 短期</div><div class="lt">新法推行,国库充盈、军力提升;但执行走样扰民,朝廷分裂成新旧两党,势同水火。</div></div>
+    <div class="line"><div class="lh">🥀 他自己</div><div class="lt">1085年<b>神宗一死</b>,高太后起用司马光"元祐更化",几乎<b>尽废新法</b>;王安石听闻噩耗,不久<b>郁郁病逝</b>。"变法靠君主、君主一去就被清算"——和商鞅、吴起,一模一样。</div></div>
+    <div class="line"><div class="lh">🌊 长远</div><div class="lt">新旧党争此后反复折腾<b>五十余年</b>,严重内耗,大大<b>加速了北宋的衰亡</b>。</div></div>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(5)">别人怎么看这场变法? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第五步 · 同一场变法,不同的声音</div>
+  <div class="voice"><div class="vw">👑 宋神宗</div><div class="va">"国家积弊太深,不变,就是坐着等死。我支持你,放手去做。"</div></div>
+  <div class="voice"><div class="vw">📜 司马光(旧党·老友)</div><div class="va">"你的新法与民争利、操之过急。祖宗之法不可轻变!"(转身离朝,去写《资治通鉴》)</div></div>
+  <div class="voice"><div class="vw">🌾 一个农民</div><div class="va">"青苗法本想帮我们度荒,可到了贪官手里,反成了强迫摊派的高利贷。"</div></div>
+  <div class="voice"><div class="vw">📖 后世史家</div><div class="va">"一个理想主义者的失败——动机良善,却低估了既得利益的反扑,和执行中的走样。"</div></div>
+  <div class="note">同一场变法,没有标准答案。 · 史料:《宋史》等</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(6)">它和前人像不像? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第六步 · 跨越一千六百年的同一个剧本</div>
+  <div class="scene">站远一点看,你会发现一个惊人的循环:<br><br>🗡️ <b>吴起</b>(楚·前381):变法图强,楚王一死,被旧贵族乱箭射死。<br>⚖️ <b>商鞅</b>(秦·前356):变法图强,秦王一死,被新王车裂。<br>📖 <b>王安石</b>(宋·1069):变法图强,神宗一死,新法尽废、郁郁而终。<br><br>跨越<b>一千六百年</b>,三个变法者,靠君主推动、被旧势力反扑——<b>同一个剧本,反复上演</b>。</div>
+  <div class="btnrow" style="margin-top:16px">
+    <a class="ghost" href="./map.html?civ=song">🗺 去地图看 北宋</a>
+    <a class="ghost" href="./stories.html">🧩 看「改革的代价」整条线</a>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(7)">那……换作是你呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">最后 · 回到你</div>
+  <div class="htitle" style="font-size:22px">换作是你呢?</div>
+  <div class="q">吴起被射死、商鞅被车裂、王安石郁郁而终——隔了一千六百年,变法者的结局<b>为什么总是这么像</b>?</div>
+  <div class="q">明知很可能重蹈商鞅的覆辙,王安石还是变了。你觉得,这样的人<b>值不值</b>?如果是你,变,还是不变?</div>
+  <div class="q">你最开始选的是 <b id="myPick">?</b>,和王安石(A)一样吗?走到这里,你的想法<b>变了</b>吗?</div>
+  <div style="font-family:var(--sans);font-weight:700;color:var(--ink);margin-top:18px">✍️ 写下你从王安石变法里,看懂的一句话:</div>
+  <textarea id="myNote" placeholder="比如:改变旧世界的人,往往等不到新世界——可总得有人去做……"></textarea>
+  <div class="btnrow"><button class="nextbtn" onclick="saveNote(event)">💾 记下我的收获</button></div>
+  <div class="btnrow" style="margin-top:14px">
+    <a class="nextbtn" href="./stories.html" style="text-decoration:none">🧩 回到「改革的代价」:三位变法者放一起找规律 →</a>
+  </div>
+  <div class="btnrow" style="margin-top:8px">
+    <button class="ghost" onclick="if(window.toggleAIFloat)toggleAIFloat()">🤖 和 AI 聊聊这个抉择</button>
+    <button class="ghost" onclick="pick=null;opened=new Set();go(0)">↺ 重新走一遍</button>
+  </div>`);
+
+let cur=0;
+function render(){
+  document.getElementById('beat').innerHTML=beats[cur]();
+  document.getElementById('prog').innerHTML=beats.map((_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('');
+  if(cur===1){ refreshGate(); }
+  if(cur===7){ const m=document.getElementById('myPick'); if(m)m.textContent=pick||'?'; const n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('decision_wanganshi')||''; }
+  window.scrollTo({top:0,behavior:'instant'});
+  if(window.Track) Track.log('抉择时刻');
+}
+function go(n){ cur=n; render(); }
+function flip(i){
+  const card=document.querySelector('.dcard[data-i="'+i+'"]');
+  const body=document.getElementById('db'+i);
+  const isOpen=card.classList.toggle('open');
+  body.style.maxHeight=isOpen?(body.scrollHeight+'px'):'0';
+  if(isOpen){ opened.add(i); refreshGate(); }
+}
+function refreshGate(){
+  const c=document.getElementById('dcount'); if(c)c.textContent='已了解 '+opened.size+' / '+DOSSIER.length;
+  const btn=document.getElementById('toChoice'); const gate=document.getElementById('gate');
+  if(opened.size>=DOSSIER.length){ if(btn)btn.disabled=false; if(gate)gate.textContent='✅ 你已看清整盘棋,可以决定了'; }
+}
+function choose(k){
+  pick=k;
+  document.querySelectorAll('.choice').forEach(c=>{c.classList.toggle('picked',c.dataset.k===k);c.onclick=null;});
+  const react={A:'有魄力!可你只靠神宗一人撑腰,树敌满朝——他若不在了,你想过自己的下场吗?',
+    B:'稳妥。但温吞的改革常常半途而废,北宋的积弊,小修小补救得了吗?',
+    C:'不冒险。可眼看国库空、边患急,什么都不动,是不是在等着王朝慢慢烂掉?'}[k];
+  const r=document.getElementById('reaction');
+  r.innerHTML=react+'<div class="btnrow" style="margin-top:14px"><button class="nextbtn" onclick="go(3)">👉 看真实的王安石怎么选</button></div>';
+  r.classList.add('show');
+}
+function saveNote(e){ const n=document.getElementById('myNote'); if(n){localStorage.setItem('decision_wanganshi',n.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的收获',1500);} }
+render();
+</script>
+<script src="./ai_float.js?v=1"></script>
+</body>
+</html>
