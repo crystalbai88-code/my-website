@@ -38,6 +38,14 @@
      tip:'亲儿子是弑君帮凶,你要不要大义灭亲?', url:'./decision-shique.html'},
     {id:'wanganshi', person:'王安石变法', icon:'📖', culture:'china', lng:114.3, lat:34.8, year:1069, from:1067, to:1086,
      tip:'明知前人下场,要不要硬碰既得利益强推新法?', url:'./decision-wanganshi.html'},
+    {id:'nika', person:'查士丁尼 · 尼卡暴动', icon:'👑', culture:'byzantine', lng:28.98, lat:41.01, year:532, from:527, to:540,
+     tip:'暴民围城,登船逃命,还是留下死守?', url:'./decision-nika.html'},
+    {id:'david', person:'大卫放过扫罗', icon:'🎯', culture:'levant', lng:35.4, lat:31.5, year:-1010, from:-1030, to:-970,
+     tip:'仇敌就在刀下,这一刀,下不下?', url:'./decision-david.html'},
+    {id:'moctezuma', person:'蒙特祖马迎客', icon:'🦅', culture:'americas', lng:-99.13, lat:19.43, year:1519, from:1517, to:1521,
+     tip:'前所未见的来客,迎进城,还是挡出去?', url:'./decision-moctezuma.html'},
+    {id:'atahualpa', person:'阿塔瓦尔帕 · 卡哈马卡', icon:'🌄', culture:'americas', lng:-78.5, lat:-7.16, year:1532, from:1530, to:1533,
+     tip:'你有千军万马,要提防这一百多个异乡人吗?', url:'./decision-atahualpa.html'},
   ];
   if(typeof window!=='undefined') window.DECISIONS=DECISIONS;
 })();

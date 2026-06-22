@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>抉择时刻 · 大卫放过扫罗 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;display:flex;flex-direction:column;align-items:center}
+  .top{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:12px 16px;
+    background:linear-gradient(180deg,rgba(var(--scrim,0,0,0),.25),transparent);position:sticky;top:0;z-index:20}
+  .top a.back{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.1em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .top .brand{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink)}
+  .prog{display:flex;gap:5px;margin-left:auto}
+  .prog i{width:13px;height:4px;border-radius:3px;background:var(--panel-line)}
+  .prog i.on{background:var(--gold)}
+  .wrap{width:min(660px,92%);margin:8px auto 70px;flex:1}
+  .beat{animation:fin .5s cubic-bezier(.22,1,.36,1)}
+  @keyframes fin{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;font-weight:700;text-align:center;margin-top:18px}
+  .htitle{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);text-align:center;line-height:1.3;margin:6px 0 4px;text-shadow:var(--label-shadow)}
+  .hsub{font-family:var(--mono);font-size:12px;color:var(--ink3);text-align:center;letter-spacing:.08em;margin-bottom:18px}
+  .scene{font-family:var(--serif);font-size:clamp(15px,3.8vw,17.5px);color:var(--ink);line-height:1.95;
+    background:var(--panel-bg);border:1px solid var(--panel-line);border-left:4px solid var(--gold);border-radius:14px;
+    padding:18px 20px;backdrop-filter:blur(8px)}
+  .scene b{color:var(--gold)}
+  .dossier-intro{font-family:var(--sans);font-size:14.5px;color:var(--ink2);text-align:center;line-height:1.7;margin:4px 0 16px}
+  .dcount{font-family:var(--mono);font-size:12px;color:var(--gold);text-align:center;font-weight:700;margin-bottom:12px}
+  .dcard{background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:14px;margin-bottom:11px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+  .dcard.open{border-color:var(--gold)}
+  .dhead{display:flex;align-items:center;gap:11px;padding:15px 17px}
+  .dhead .di{font-size:21px}
+  .dhead .dt{font-family:var(--sans);font-weight:800;font-size:15.5px;color:var(--ink);flex:1}
+  .dhead .dchev{font-family:var(--mono);font-size:11px;color:var(--ink3);transition:transform .2s}
+  .dcard.open .dchev{transform:rotate(90deg);color:var(--gold)}
+  .dhead .ddot{width:8px;height:8px;border-radius:50%;background:var(--vermilion);flex:none}
+  .dcard.open .ddot{background:var(--cyan)}
+  .dbody{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .dbody-in{padding:0 17px 16px;font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.85}
+  .dbody-in b{color:var(--gold)}
+  .dbody-in ul{margin:8px 0 0;padding-left:2px;list-style:none}
+  .dbody-in li{margin:7px 0;padding-left:16px;position:relative}
+  .dbody-in li:before{content:'·';position:absolute;left:3px;color:var(--vermilion);font-weight:900}
+  .dbody-in li b{color:var(--vermilion)}
+  .ask{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);text-align:center;margin:22px 0 6px}
+  .asksub{font-family:var(--sans);font-size:13.5px;color:var(--ink2);text-align:center;margin-bottom:16px;line-height:1.6}
+  .choices{display:flex;flex-direction:column;gap:11px}
+  .choice{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink);background:var(--panel-bg);
+    border:1.5px solid var(--panel-line);border-radius:14px;padding:15px 17px;cursor:pointer;transition:all .15s;text-align:left;line-height:1.5}
+  .choice:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+  .choice .ckey{font-weight:900;color:var(--gold);margin-right:8px}
+  .choice.picked{border-color:var(--gold);background:rgba(224,138,44,.1)}
+  .reaction{margin-top:14px;font-size:14.5px;color:var(--ink);line-height:1.75;background:rgba(224,138,44,.1);
+    border-left:4px solid var(--gold);border-radius:8px;padding:13px 16px;display:none}
+  .reaction.show{display:block;animation:fin .4s}
+  .lines{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+  .line{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:12px;padding:13px 16px}
+  .line .lh{font-family:var(--serif);font-weight:900;font-size:14px;color:var(--gold);margin-bottom:4px}
+  .line .lt{font-size:14px;color:var(--ink);line-height:1.7}
+  .line .lt b{color:var(--vermilion)}
+  .voice{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:13px;padding:13px 16px;margin-bottom:10px}
+  .voice .vw{font-family:var(--sans);font-weight:800;font-size:14px;color:var(--ink);margin-bottom:5px}
+  .voice .va{font-size:14px;color:var(--ink2);line-height:1.7}
+  .note{font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:center;margin-top:12px}
+  .q{font-family:var(--serif);font-size:16.5px;color:var(--ink);line-height:1.75;margin:14px 0;padding-left:14px;border-left:3px solid var(--gold)}
+  .q b{color:var(--gold)}
+  textarea{width:100%;box-sizing:border-box;margin-top:10px;font-family:var(--sans);font-size:15px;color:var(--ink);
+    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:12px;padding:13px 15px;min-height:80px;outline:none;resize:vertical}
+  .btnrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
+  .nextbtn{font-family:var(--sans);font-weight:800;font-size:15px;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));
+    border:none;border-radius:999px;padding:13px 30px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.16)}
+  .nextbtn:active{transform:scale(.97)}
+  .nextbtn[disabled]{opacity:.4;cursor:not-allowed;box-shadow:none}
+  .ghost{font-family:var(--sans);font-weight:700;font-size:14px;color:var(--gold);background:var(--panel-bg);
+    border:1px solid var(--panel-line);border-radius:999px;padding:11px 20px;cursor:pointer;text-decoration:none;display:inline-block}
+  .gate{text-align:center;font-family:var(--sans);font-size:12.5px;color:var(--ink3);margin-top:6px}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="top">
+    <a class="back" href="./stories.html">⌂ 抉择</a>
+    <span class="brand">🎯 抉择时刻</span>
+    <div class="prog" id="prog"></div>
+  </div>
+  <div class="wrap"><div class="beat" id="beat"></div><div class="epigraph" style="margin:20px auto 4px;max-width:30em;text-align:center;font-family:'Noto Serif SC',serif;color:var(--ink2);font-size:15px;line-height:1.75;border-top:1px dashed var(--panel-line);padding-top:16px">「我决不向我的王伸手。」<div style="font-family:var(--mono);font-size:11px;color:var(--gold);margin-top:8px;letter-spacing:.04em">—— 大卫 · 隐基底山洞</div></div></div>
+</div>
+<script src="./track.js?v=1"></script>
+<script>
+window.__aiCtx='用户正在体验"抉择时刻·大卫放过扫罗"(母题:该不该痛下杀手/能除掉对手时该不该下手)。出处:希伯来圣经《撒母耳记上》第24章。背景:古以色列第一位国王扫罗,因嫉恨年轻英雄大卫(曾击杀巨人歌利亚、深得民心),多次想杀他。大卫被迫逃亡旷野。在隐基底(En Gedi)旷野,扫罗带着三千精兵追杀大卫;途中扫罗独自进了一个山洞方便,而大卫和部下恰好就藏在这个山洞深处。大卫的部下劝他:这是天赐良机,杀掉扫罗就能终结追杀、自己登上王位。但大卫没有杀扫罗,只悄悄割下了扫罗外袍的一角(衣襟);事后他甚至为割袍这件事都感到不安。等扫罗离开山洞走远,大卫从洞里出来,远远高举那块割下的衣襟,向扫罗喊话,证明"我本可以杀你,却没有动手;我决不向耶和华的受膏者(指扫罗,神所膏立的王)伸手"。扫罗深受触动,承认大卫比自己公义,说"你以善待我,我却以恶待你"。后来大卫果然成为以色列最伟大的国王。教学要点:这是一个"能除掉对手却选择不下手"的经典抉择,与项羽鸿门宴放刘邦、李世民玄武门杀兄属于同一母题(该不该痛下杀手)。大卫"放过"与项羽"放过"结局不同:大卫赢得人心、最终称王;项羽却因放过刘邦而败亡——可见"放过"是福是祸,要看更深的东西。请用适合10-12岁孩子的语言陪他思考,多反问,不要替他下结论。注意尊重这是宗教经典中的叙事,讲述时以"据《撒母耳记》记载"的口吻,客观转述,不传教、不评判信仰。';
+let pick=null;
+const DOSSIER=[
+  {i:'🎯',t:'你是谁',b:'你是<b>大卫</b>,以色列的少年英雄。你曾用一颗石子打倒巨人<b>歌利亚</b>,百姓为你欢呼,人人都说你了不起——可这份人望,也给你招来了大祸。'},
+  {i:'👑',t:'国王为何恨你',b:'以色列第一位国王<b>扫罗</b>,越来越嫉妒你的名声。他怕你抢走王位,几次三番想杀你。你不得不<b>逃进旷野</b>,东躲西藏。'},
+  {i:'🏹',t:'三千追兵',b:'这一次,扫罗亲自带着<b>三千精兵</b>,追进了隐基底的旷野,一心要除掉你。你和少数部下,正藏身在一处<b>山洞</b>的深处,大气都不敢出。'},
+  {i:'🕯️',t:'天赐良机',b:'万万没想到——<b>扫罗竟独自走进了你藏身的这个山洞</b>方便,毫无防备,背对着你。洞外是他的大军,洞里只有他一个人,而你,就在黑暗深处,近在咫尺。'},
+  {i:'🗣️',t:'部下的怂恿',b:'你的部下激动地低声说:"<b>机会来了!</b>这是上天把仇敌交到你手里!一刀下去,追杀就结束了,王位也是你的!"——他们都盯着你,等你动手。'},
+  {i:'⚖️',t:'你心里的那道坎',b:'可扫罗毕竟是<b>当今的王</b>。杀了他,你能立刻脱困、甚至称王;但你也会变成一个<b>弑君篡位</b>的人。<br><br>是<b>趁机除掉</b>这个要你命的对手,还是<b>放下刀</b>、守住心里那道坎?'},
+];
+let opened=new Set();
+const beats=[];
+beats.push(()=>`
+  <div class="kicker">约公元前 1010 年 · 隐基底旷野 · 山洞</div>
+  <div class="htitle">仇敌就在刀下,这一刀,下不下?</div>
+  <div class="hsub">即将由你 —— 大卫 —— 决定</div>
+  <div class="scene">据《撒母耳记》记载:你是少年英雄<b>大卫</b>。国王扫罗嫉恨你,带三千兵追杀你。<br><br>你躲在山洞深处,偏偏<b>扫罗独自走进了这个洞</b>,毫无防备,背对着你。部下催你:一刀下去,追杀就结束了!<br><br><b>杀,还是不杀?</b> 先别急——先把你的处境看清楚。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(1)">📂 先弄懂这个山洞 →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第一步 · 了解</div>
+  <div class="htitle" style="font-size:23px">看清这个山洞</div>
+  <div class="dossier-intro">点开每一张情报卡,弄懂你是谁、国王为何追杀你、这个机会有多诱人、又难在哪。<br>全部看完,你才有资格替大卫做决定。</div>
+  <div class="dcount" id="dcount">已了解 0 / ${DOSSIER.length}</div>
+  <div id="dwrap">${DOSSIER.map((d,i)=>`
+    <div class="dcard" data-i="${i}" onclick="flip(${i})">
+      <div class="dhead"><span class="ddot"></span><span class="di">${d.i}</span><span class="dt">${d.t}</span><span class="dchev">▶</span></div>
+      <div class="dbody" id="db${i}"><div class="dbody-in">${d.b}</div></div>
+    </div>`).join('')}</div>
+  <div class="btnrow"><button class="nextbtn" id="toChoice" onclick="go(2)" disabled>换作是你,你会怎么做? →</button></div>
+  <div class="gate" id="gate">(看完全部 ${DOSSIER.length} 张情报卡后解锁)</div>`);
+beats.push(()=>`
+  <div class="kicker">第二步 · 此刻,你就是大卫</div>
+  <div class="ask">这一刀,下不下?</div>
+  <div class="asksub">仇敌毫无防备,近在咫尺;部下在催你动手。机会,稍纵即逝。<br>现在,这个决定由你来下。</div>
+  <div class="choices">
+    <div class="choice" data-k="A" onclick="choose('A')"><span class="ckey">A</span>下手——趁机除掉扫罗,一了百了,结束追杀、夺取王位。</div>
+    <div class="choice" data-k="B" onclick="choose('B')"><span class="ckey">B</span>放下刀——不杀他,但悄悄留个记号,证明"我本可以杀你,却没有"。</div>
+    <div class="choice" data-k="C" onclick="choose('C')"><span class="ckey">C</span>什么都不做——既不杀也不留痕,趁他不备,带着部下悄悄溜走。</div>
+  </div>
+  <div class="reaction" id="reaction"></div>`);
+beats.push(()=>`
+  <div class="kicker">第三步 · 真实的他</div>
+  <div class="htitle" style="font-size:22px">大卫,选了 B</div>
+  <div class="scene">据记载,大卫<b>没有杀扫罗</b>。他悄悄上前,只<b>割下了扫罗外袍的一角</b>,就退回了黑暗里——据说,连为这一下"割袍"他心里都感到不安。<br><br>等扫罗离开山洞、走出老远,大卫才从洞里出来,远远<b>高举那块割下的衣襟</b>,向扫罗喊话:看哪,我本可以杀你,却没有动手——"<b>我决不向我的王伸手。</b>"<br><br>扫罗听了,流下泪来,承认:"<b>你比我公义。你以善待我,我却以恶待你。</b>"</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(4)">那……后来呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第四步 · 放下刀这一步,延伸出三条线</div>
+  <div class="lines">
+    <div class="line"><div class="lh">⚡ 短期</div><div class="lt">扫罗当场被打动,羞愧落泪,暂时<b>停止了追杀</b>。大卫用一块衣襟,证明了自己从没想造反。</div></div>
+    <div class="line"><div class="lh">🌅 长远</div><div class="lt">大卫"<b>不向王伸手</b>"的名声传遍以色列,人心越来越向着他。后来,他堂堂正正地成为以色列<b>最伟大的国王</b>。</div></div>
+    <div class="line"><div class="lh">🔁 一个对照</div><div class="lt">同样是"放过对手",项羽在鸿门宴放走刘邦,却换来自己的败亡。<b>"放过"是福是祸,从不只看放不放——还要看你为什么放、又赢得了谁的心。</b></div></div>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(5)">别人怎么看这一刀? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第五步 · 同一个山洞,不同的声音</div>
+  <div class="voice"><div class="vw">🗣️ 大卫的部下</div><div class="va">"千载难逢的机会啊!放他走,他出去还会接着追杀我们——这不是妇人之仁吗?"</div></div>
+  <div class="voice"><div class="vw">🎯 大卫</div><div class="va">"他今天毫无防备,我却没动手。我要让全以色列知道:我手里没有恶,我从没想过造反。"</div></div>
+  <div class="voice"><div class="vw">👑 扫罗</div><div class="va">"你比我公义。你以善待我,我却以恶待你……愿你将来得福。"</div></div>
+  <div class="voice"><div class="vw">📜 后世的人</div><div class="va">"他大可一刀了事,却选择了更难走的那条路——用克制赢得人心,而不是用刀。"</div></div>
+  <div class="note">同一个抉择,没有标准答案。 · 出处:据《撒母耳记上》第24章</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(6)">它改变了什么? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第六步 · 放下的那一刀,赢得了人心</div>
+  <div class="scene">大卫本可以一刀终结一切——结束追杀、立刻称王。可他放下了刀,只留下一块衣襟作证。<br><br>这一"放",不是软弱:他是想<b>用克制,而不是用刀,去赢得这个王位</b>。结果,他赢得的是整个以色列的人心。<br><br>把它和项羽鸿门宴、李世民玄武门摆在一起,你会看到同一个古老的难题:<b>能除掉对手时,该不该下手?</b> 大卫放过、得了天下;项羽放过、丢了天下;李世民下手、赢了天下却背上污名——同样的处境,答案竟如此不同。</div>
+  <div class="btnrow" style="margin-top:16px">
+    <a class="ghost" href="./map.html?civ=israel">🗺 去地图看 以色列·犹大</a>
+    <a class="ghost" href="./classical-network.html?all=1">🕸 看希伯来人物关系网</a>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(7)">那……换作是你呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">最后 · 回到你</div>
+  <div class="htitle" style="font-size:22px">换作是你呢?</div>
+  <div class="q">当一个伤害过你的人,毫无防备地落在你手里——你会趁机报复,还是<b>放下手</b>?</div>
+  <div class="q">大卫"放过"赢了天下,项羽"放过"却败亡。你觉得,<b>同样是放过,差别到底在哪里</b>?</div>
+  <div class="q">你最开始选的是 <b id="myPick">?</b>,和大卫(B)一样吗?走到这里,你的想法<b>变了</b>吗?</div>
+  <div style="font-family:var(--sans);font-weight:700;color:var(--ink);margin-top:18px">✍️ 写下你从这个山洞看懂的一句话:</div>
+  <textarea id="myNote" placeholder="比如:忍住不报复,有时比报复更需要勇气,也更能赢得人心……"></textarea>
+  <div class="btnrow"><button class="nextbtn" onclick="saveNote(event)">💾 记下我的收获</button></div>
+  <div class="btnrow" style="margin-top:14px">
+    <a class="nextbtn" href="./stories.html" style="text-decoration:none">🧩 回到抉择,顺着母题线找规律 →</a>
+  </div>
+  <div class="btnrow" style="margin-top:8px">
+    <button class="ghost" onclick="if(window.toggleAIFloat)toggleAIFloat()">🤖 和 AI 聊聊这个抉择</button>
+    <button class="ghost" onclick="pick=null;opened=new Set();go(0)">↺ 重新走一遍</button>
+  </div>`);
+
+let cur=0;
+function render(){
+  document.getElementById('beat').innerHTML=beats[cur]();
+  document.getElementById('prog').innerHTML=beats.map((_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('');
+  if(cur===1){ refreshGate(); }
+  if(cur===7){ const m=document.getElementById('myPick'); if(m)m.textContent=pick||'?'; const n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('decision_david')||''; }
+  window.scrollTo({top:0,behavior:'instant'});
+  if(window.Track) Track.log('抉择时刻');
+}
+function go(n){ cur=n; render(); }
+function flip(i){
+  const card=document.querySelector('.dcard[data-i="'+i+'"]');
+  const body=document.getElementById('db'+i);
+  const isOpen=card.classList.toggle('open');
+  body.style.maxHeight=isOpen?(body.scrollHeight+'px'):'0';
+  if(isOpen){ opened.add(i); refreshGate(); }
+}
+function refreshGate(){
+  const c=document.getElementById('dcount'); if(c)c.textContent='已了解 '+opened.size+' / '+DOSSIER.length;
+  const btn=document.getElementById('toChoice'); const gate=document.getElementById('gate');
+  if(opened.size>=DOSSIER.length){ if(btn)btn.disabled=false; if(gate)gate.textContent='✅ 你已看清整盘棋,可以决定了'; }
+}
+function choose(k){
+  pick=k;
+  document.querySelectorAll('.choice').forEach(c=>{c.classList.toggle('picked',c.dataset.k===k);c.onclick=null;});
+  const react={A:'一刀了事,确实最省事。可你也从此成了"弑君"的人——这个名声,你背得起吗?',
+    B:'放下刀,却留个记号证明清白——这需要比动手更大的定力。可他出去还会追杀你,你不怕吗?',
+    C:'悄悄溜走,稳妥。可你白白错过了一个证明自己"从未想造反"的机会——人心,会怎么看你?'}[k];
+  const r=document.getElementById('reaction');
+  r.innerHTML=react+'<div class="btnrow" style="margin-top:14px"><button class="nextbtn" onclick="go(3)">👉 看真实的大卫怎么选</button></div>';
+  r.classList.add('show');
+}
+function saveNote(e){ const n=document.getElementById('myNote'); if(n){localStorage.setItem('decision_david',n.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的收获',1500);} }
+render();
+</script>
+<script src="./ai_float.js?v=2"></script>
+</body>
+</html>

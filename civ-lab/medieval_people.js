@@ -63,7 +63,8 @@ const CLASSICAL_PEOPLE=[
 // ═══ 美洲 ═══
 {id:"pakal",n:"帕卡尔大帝",e:"K'inich Janaab' Pakal",c:"americas",r:"ruler",d:"603—683",b:"玛雅帕伦克城邦最伟大的国王，在位68年大兴土木，其铭文神庙与精雕石棺(著名的'宇航员'浮雕)是玛雅文明的瑰宝。",rel:[{i:"montezuma2",t:"同属美洲古文明"},{i:"pachacuti",t:"美洲文明"}]},
 {id:"montezuma2",n:"蒙特祖马二世",e:"Moctezuma II",c:"americas",r:"ruler",d:"约1466—1520",b:"阿兹特克帝国末代雄主，帝国鼎盛却在1519年迎来西班牙人科尔特斯，被俘身死，阿兹特克随之灭亡。",rel:[{i:"pachacuti",t:"同期美洲帝国"}]},
-{id:"pachacuti",n:"帕查库特克",e:"Pachacuti",c:"americas",r:"ruler",d:"约1418—1472",b:"印加帝国奠基者，把库斯科小国扩张为安第斯大帝国，重建库斯科、兴建马丘比丘，创立印加的行政与道路体系。",rel:[{i:"montezuma2",t:"同期美洲帝国"}]},
+{id:"pachacuti",n:"帕查库特克",e:"Pachacuti",c:"americas",r:"ruler",d:"约1418—1472",b:"印加帝国奠基者，把库斯科小国扩张为安第斯大帝国，重建库斯科、兴建马丘比丘，创立印加的行政与道路体系。",rel:[{i:"montezuma2",t:"同期美洲帝国"},{i:"atahualpa",t:"印加后裔"}]},
+{id:"atahualpa",n:"阿塔瓦尔帕",e:"Atahualpa",c:"americas",r:"ruler",d:"约1502—1533",b:"印加帝国末代皇帝。刚在内战中击败兄长统一帝国，1532年在卡哈马卡轻装会见仅180人的西班牙皮萨罗，遭伏击被俘；用一屋黄金两屋白银赎身仍于1533年被处死，印加随之崩溃。",rel:[{i:"pachacuti",t:"印加先祖"},{i:"montezuma2",t:"同遭欧洲征服"}]},
 // ═══ 跨文明 ═══
 {id:"marco_polo",n:"马可·波罗",e:"Marco Polo",c:"europe",r:"other",d:"1254—1324",b:"威尼斯商人，17年游历元朝中国，《马可·波罗游记》向欧洲展现东方的繁华，激发了后世的大航海与探索热情。",rel:[{i:"kublai",t:"觐见忽必烈"},{i:"ibn_battuta",t:"东西方旅行家"}]},
 // ═══ 补充 · 唐(500-1000) ═══
@@ -133,7 +134,7 @@ const CLASSICAL_ICON = {
   justinian:'⚖️',theodora:'👸',basil2:'🛡️',vladimir:'✝️',rurik:'⚓',leif_erikson:'⛵',
   charlemagne:'👑',urban2:'✝️',aquinas:'📚',dante:'📜',
   sundiata:'🦁',mansa_musa:'💰',
-  pakal:'🗿',montezuma2:'🦅',pachacuti:'🏔️',
+  pakal:'🗿',montezuma2:'🦅',pachacuti:'🏔️',atahualpa:'🌄',
   marco_polo:'🧭',
   // 补充 500-1000
   weizheng:'📜',lijing:'⚔️',direnjie:'⚖️',yangguifei:'👤',guoziyi:'⚔️',shisiming:'⚔️',baijuyi:'📜',wangwei:'🖼️',hanyu:'📜',liuzongyuan:'📜',jianzhen:'☸️',huangchao:'⚔️',zhuwen:'👑',

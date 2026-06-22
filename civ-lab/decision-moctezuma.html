@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>抉择时刻 · 蒙特祖马·迎客还是拒客 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;display:flex;flex-direction:column;align-items:center}
+  .top{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:12px 16px;
+    background:linear-gradient(180deg,rgba(var(--scrim,0,0,0),.25),transparent);position:sticky;top:0;z-index:20}
+  .top a.back{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.1em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .top .brand{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink)}
+  .prog{display:flex;gap:5px;margin-left:auto}
+  .prog i{width:13px;height:4px;border-radius:3px;background:var(--panel-line)}
+  .prog i.on{background:var(--gold)}
+  .wrap{width:min(660px,92%);margin:8px auto 70px;flex:1}
+  .beat{animation:fin .5s cubic-bezier(.22,1,.36,1)}
+  @keyframes fin{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;font-weight:700;text-align:center;margin-top:18px}
+  .htitle{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);text-align:center;line-height:1.3;margin:6px 0 4px;text-shadow:var(--label-shadow)}
+  .hsub{font-family:var(--mono);font-size:12px;color:var(--ink3);text-align:center;letter-spacing:.08em;margin-bottom:18px}
+  .scene{font-family:var(--serif);font-size:clamp(15px,3.8vw,17.5px);color:var(--ink);line-height:1.95;
+    background:var(--panel-bg);border:1px solid var(--panel-line);border-left:4px solid var(--gold);border-radius:14px;
+    padding:18px 20px;backdrop-filter:blur(8px)}
+  .scene b{color:var(--gold)}
+  .dossier-intro{font-family:var(--sans);font-size:14.5px;color:var(--ink2);text-align:center;line-height:1.7;margin:4px 0 16px}
+  .dcount{font-family:var(--mono);font-size:12px;color:var(--gold);text-align:center;font-weight:700;margin-bottom:12px}
+  .dcard{background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:14px;margin-bottom:11px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+  .dcard.open{border-color:var(--gold)}
+  .dhead{display:flex;align-items:center;gap:11px;padding:15px 17px}
+  .dhead .di{font-size:21px}
+  .dhead .dt{font-family:var(--sans);font-weight:800;font-size:15.5px;color:var(--ink);flex:1}
+  .dhead .dchev{font-family:var(--mono);font-size:11px;color:var(--ink3);transition:transform .2s}
+  .dcard.open .dchev{transform:rotate(90deg);color:var(--gold)}
+  .dhead .ddot{width:8px;height:8px;border-radius:50%;background:var(--vermilion);flex:none}
+  .dcard.open .ddot{background:var(--cyan)}
+  .dbody{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .dbody-in{padding:0 17px 16px;font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.85}
+  .dbody-in b{color:var(--gold)}
+  .dbody-in ul{margin:8px 0 0;padding-left:2px;list-style:none}
+  .dbody-in li{margin:7px 0;padding-left:16px;position:relative}
+  .dbody-in li:before{content:'·';position:absolute;left:3px;color:var(--vermilion);font-weight:900}
+  .dbody-in li b{color:var(--vermilion)}
+  .ask{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);text-align:center;margin:22px 0 6px}
+  .asksub{font-family:var(--sans);font-size:13.5px;color:var(--ink2);text-align:center;margin-bottom:16px;line-height:1.6}
+  .choices{display:flex;flex-direction:column;gap:11px}
+  .choice{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink);background:var(--panel-bg);
+    border:1.5px solid var(--panel-line);border-radius:14px;padding:15px 17px;cursor:pointer;transition:all .15s;text-align:left;line-height:1.5}
+  .choice:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+  .choice .ckey{font-weight:900;color:var(--gold);margin-right:8px}
+  .choice.picked{border-color:var(--gold);background:rgba(224,138,44,.1)}
+  .reaction{margin-top:14px;font-size:14.5px;color:var(--ink);line-height:1.75;background:rgba(224,138,44,.1);
+    border-left:4px solid var(--gold);border-radius:8px;padding:13px 16px;display:none}
+  .reaction.show{display:block;animation:fin .4s}
+  .lines{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+  .line{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:12px;padding:13px 16px}
+  .line .lh{font-family:var(--serif);font-weight:900;font-size:14px;color:var(--gold);margin-bottom:4px}
+  .line .lt{font-size:14px;color:var(--ink);line-height:1.7}
+  .line .lt b{color:var(--vermilion)}
+  .voice{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:13px;padding:13px 16px;margin-bottom:10px}
+  .voice .vw{font-family:var(--sans);font-weight:800;font-size:14px;color:var(--ink);margin-bottom:5px}
+  .voice .va{font-size:14px;color:var(--ink2);line-height:1.7}
+  .note{font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:center;margin-top:12px}
+  .q{font-family:var(--serif);font-size:16.5px;color:var(--ink);line-height:1.75;margin:14px 0;padding-left:14px;border-left:3px solid var(--gold)}
+  .q b{color:var(--gold)}
+  textarea{width:100%;box-sizing:border-box;margin-top:10px;font-family:var(--sans);font-size:15px;color:var(--ink);
+    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:12px;padding:13px 15px;min-height:80px;outline:none;resize:vertical}
+  .btnrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
+  .nextbtn{font-family:var(--sans);font-weight:800;font-size:15px;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));
+    border:none;border-radius:999px;padding:13px 30px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.16)}
+  .nextbtn:active{transform:scale(.97)}
+  .nextbtn[disabled]{opacity:.4;cursor:not-allowed;box-shadow:none}
+  .ghost{font-family:var(--sans);font-weight:700;font-size:14px;color:var(--gold);background:var(--panel-bg);
+    border:1px solid var(--panel-line);border-radius:999px;padding:11px 20px;cursor:pointer;text-decoration:none;display:inline-block}
+  .gate{text-align:center;font-family:var(--sans);font-size:12.5px;color:var(--ink3);margin-top:6px}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="top">
+    <a class="back" href="./stories.html">⌂ 抉择</a>
+    <span class="brand">🎯 抉择时刻</span>
+    <div class="prog" id="prog"></div>
+  </div>
+  <div class="wrap"><div class="beat" id="beat"></div><div class="epigraph" style="margin:20px auto 4px;max-width:30em;text-align:center;font-family:'Noto Serif SC',serif;color:var(--ink2);font-size:15px;line-height:1.75;border-top:1px dashed var(--panel-line);padding-top:16px">「从没见过的来客,究竟是神、是使者,还是敌人?」<div style="font-family:var(--mono);font-size:11px;color:var(--gold);margin-top:8px;letter-spacing:.04em">—— 阿兹特克 · 蒙特祖马二世</div></div></div>
+</div>
+<script src="./track.js?v=1"></script>
+<script>
+window.__aiCtx='用户正在体验"抉择时刻·蒙特祖马迎客"(母题:看不懂的来客/面对前所未见的强敌)。史实:1519年,阿兹特克帝国皇帝蒙特祖马二世(Moctezuma II)统治着以特诺奇蒂特兰(今墨西哥城)为中心的强大帝国。西班牙人埃尔南·科尔特斯(Cortés)带着约数百名士兵、十几匹马和火器从海岸登陆,一路向首都进发。这些"来客"前所未见:白皮肤、大胡子、骑着从未见过的"巨鹿"(马)、手持会喷火的铁管(火枪)。蒙特祖马反复派使者送黄金礼物、试图打探与安抚,内心摇摆。1519年11月8日,他选择在通往首都的长堤上亲自迎接科尔特斯,互赠礼物(阿兹特克历法金盘、金银圆盘),把西班牙人迎进了城。结果:不久科尔特斯扣押了蒙特祖马作为人质,1520年蒙特祖马在动乱中死去,1521年特诺奇蒂特兰陷落,阿兹特克帝国灭亡。重要史学提醒:流行说法称"阿兹特克人以为科尔特斯是返回的羽蛇神(Quetzalcoatl)所以不敢抵抗"——但许多现代历史学家认为这个"神话"很可能是征服之后才被编造、附会上去的,并非可靠史实。讲述时务必把它作为"一个被质疑的传说"而非事实,这正是教孩子分辨史料、追问"这是谁说的、怎么知道的"的好机会。请用适合10-12岁孩子的语言陪他思考,多反问,不要替他下结论。这个抉择和印加阿塔瓦尔帕在卡哈马卡的抉择属于同一母题:两个美洲帝国都因误判欧洲来客而覆灭。';
+let pick=null;
+const DOSSIER=[
+  {i:'🦅',t:'你是谁',b:'你是<b>蒙特祖马二世</b>,<b>阿兹特克帝国</b>的皇帝。你的都城特诺奇蒂特兰建在湖心岛上,人口几十万,神庙高耸——是当时美洲最强大、最辉煌的帝国之一。'},
+  {i:'⛵',t:'海边来了怪客',b:'有信使飞报:东边海岸来了一群从没见过的人。他们<b>皮肤白、留大胡子</b>,骑着像鹿一样的巨兽(<b>马</b>),手里的铁管能<b>喷火轰响</b>(<b>火枪</b>)。没人见过这样的来客。'},
+  {i:'🤔',t:'是神,还是人?',b:'宫里议论纷纷:有人说他们是天上来的<b>神或神的使者</b>;有人说不过是贪婪的<b>外族人</b>。<br><br><b>⚠️ 小提示:</b>后来流行一种说法,说你把他们当成了归来的羽蛇神——但<b>很多历史学家怀疑这是后人编出来的</b>,未必真实。真相,也许没那么神秘。'},
+  {i:'🎁',t:'你的试探',b:'你反复派使者,给他们送去<b>大量黄金礼物</b>,既想表示友好、又想打探虚实——可黄金,反而让这些来客<b>眼睛发亮、更想往里走</b>。'},
+  {i:'⚔️',t:'你手里的牌',b:'来客只有<b>几百人</b>,而你能召集<b>数以万计</b>的战士。论人数,你占绝对上风。可他们的马、火枪和铁甲,是你从未交过手的东西;而且他们一路上<b>联合了恨你的部族</b>。'},
+  {i:'🏝️',t:'眼前的难题',b:'他们已经走到首都门口的<b>长堤</b>上。<b>迎进城</b>——也许能摸清底细、化敌为友,也可能引狼入室;<b>挡在城外、甚至先下手</b>——也许能除掉隐患,也可能开罪"神明"、引来大战。'},
+];
+let opened=new Set();
+const beats=[];
+beats.push(()=>`
+  <div class="kicker">1519 年 · 特诺奇蒂特兰(今墨西哥城)· 长堤</div>
+  <div class="htitle">把陌生的来客,迎进城吗?</div>
+  <div class="hsub">即将由你 —— 蒙特祖马 —— 决定</div>
+  <div class="scene">1519年,你是<b>阿兹特克</b>皇帝蒙特祖马。海边来了一群从没见过的人:白皮肤、大胡子,骑"巨鹿"、持"火管"。<br><br>他们只有几百人,却一路逼近你的都城。如今,就站在你城门口的长堤上。<br><br><b>迎进来,还是挡出去?</b> 先别急——先弄懂这群来客到底是谁。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(1)">📂 先弄懂这群来客 →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第一步 · 了解</div>
+  <div class="htitle" style="font-size:23px">看清这群来客</div>
+  <div class="dossier-intro">点开每一张情报卡,弄懂这些人从哪来、是神是人、你手里有什么牌。<br>全部看完,你才有资格替蒙特祖马做决定。</div>
+  <div class="dcount" id="dcount">已了解 0 / ${DOSSIER.length}</div>
+  <div id="dwrap">${DOSSIER.map((d,i)=>`
+    <div class="dcard" data-i="${i}" onclick="flip(${i})">
+      <div class="dhead"><span class="ddot"></span><span class="di">${d.i}</span><span class="dt">${d.t}</span><span class="dchev">▶</span></div>
+      <div class="dbody" id="db${i}"><div class="dbody-in">${d.b}</div></div>
+    </div>`).join('')}</div>
+  <div class="btnrow"><button class="nextbtn" id="toChoice" onclick="go(2)" disabled>换作是你,你会怎么做? →</button></div>
+  <div class="gate" id="gate">(看完全部 ${DOSSIER.length} 张情报卡后解锁)</div>`);
+beats.push(()=>`
+  <div class="kicker">第二步 · 此刻,你就是蒙特祖马</div>
+  <div class="ask">迎进城,还是挡出去?</div>
+  <div class="asksub">来客只有几百人,你有千军万马;可他们身上,全是你看不懂的东西。<br>现在,这个决定由你来下。</div>
+  <div class="choices">
+    <div class="choice" data-k="A" onclick="choose('A')"><span class="ckey">A</span>盛情迎进城——以礼相待,把他们请进都城,慢慢摸清他们的来意。</div>
+    <div class="choice" data-k="B" onclick="choose('B')"><span class="ckey">B</span>挡在城外——客气地拒绝,坚决不让他们踏进首都半步。</div>
+    <div class="choice" data-k="C" onclick="choose('C')"><span class="ckey">C</span>趁人少先下手——他们才几百人,集结大军,在城外一举除掉这个隐患。</div>
+  </div>
+  <div class="reaction" id="reaction"></div>`);
+beats.push(()=>`
+  <div class="kicker">第三步 · 真实的他</div>
+  <div class="htitle" style="font-size:22px">蒙特祖马,选了 A</div>
+  <div class="scene">1519年11月8日,蒙特祖马<b>亲自走上长堤,迎接科尔特斯</b>。双方互赠礼物——他送上阿兹特克的金银圆盘,把这群陌生人<b>请进了都城</b>。<br><br>他大概是想:先看看你们到底是谁。可这一"迎",等于把对手放进了自己的心脏。<br><br>没过多久,科尔特斯就<b>扣押了蒙特祖马</b>,把他变成了人质。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(4)">那……后来呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第四步 · 迎进城这一步,延伸出三条线</div>
+  <div class="lines">
+    <div class="line"><div class="lh">⚡ 短期</div><div class="lt">科尔特斯进城后<b>挟持了蒙特祖马</b>,借他的名义号令全城。1520年,蒙特祖马在一场动乱中死去,死因众说纷纭。</div></div>
+    <div class="line"><div class="lh">🌅 长远</div><div class="lt">1521年,特诺奇蒂特兰陷落,<b>阿兹特克帝国灭亡</b>。一个庞大的文明,在几百个外来者和瘟疫面前,短短两年就崩塌了。</div></div>
+    <div class="line"><div class="lh">🌎 整个美洲</div><div class="lt">十几年后,远在南方的<b>印加帝国</b>几乎重演同样的悲剧。两个美洲大帝国,都<b>栽在了对陌生来客的误判</b>上。</div></div>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(5)">别人怎么看这件事? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第五步 · 同一群来客,不同的声音</div>
+  <div class="voice"><div class="vw">🦅 蒙特祖马</div><div class="va">"他们如此奇异……是先以礼相待、摸清虚实更稳妥,还是该趁早动手?我一直拿不定主意。"</div></div>
+  <div class="voice"><div class="vw">⚔️ 一位阿兹特克将领</div><div class="va">"他们才几百人!当初就该在城外把他们拦下,而不是请进我们的家门。"</div></div>
+  <div class="voice"><div class="vw">🛡️ 一个被阿兹特克欺压的部族</div><div class="va">"我们恨阿兹特克的统治,所以选择帮这些外来人——没想到引来的是所有人的灭顶之灾。"</div></div>
+  <div class="voice"><div class="vw">📜 后世史家</div><div class="va">"说他把科尔特斯当成神才不抵抗?这个'神话'很可能是后人编的。真相,也许只是一次代价惨重的<b>误判</b>。"</div></div>
+  <div class="note">同一个抉择,没有标准答案。 · 史料:阿兹特克与西班牙双方记载(需互相印证)</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(6)">它改变了什么? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第六步 · 一次误判,一个文明的落幕</div>
+  <div class="scene">面对一群<b>前所未见</b>的来客,蒙特祖马既看不透他们,也低估了危险。他选择把人请进门——结果引狼入室。<br><br>这不是"愚蠢"那么简单:换了任何人,面对从天而降、闻所未闻的对手,都很难判断该信任还是该开战。可历史无情:<b>第一次相遇的一个误判,可能就是一个文明的落幕。</b><br><br>十几年后,印加皇帝阿塔瓦尔帕,会在遥远的南方,面对几乎一模一样的难题——结局,惊人地相似。</div>
+  <div class="btnrow" style="margin-top:16px">
+    <a class="ghost" href="./map.html?civ=aztec">🗺 去地图看 阿兹特克</a>
+    <a class="ghost" href="./decision-atahualpa.html">🌄 看印加的同款抉择 →</a>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(7)">那……换作是你呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">最后 · 回到你</div>
+  <div class="htitle" style="font-size:22px">换作是你呢?</div>
+  <div class="q">面对一个<b>完全陌生、又强又怪</b>的来客,你会先以礼相待去了解,还是先提防、甚至先下手?</div>
+  <div class="q">蒙特祖马的"友好",成了致命的破绽。可如果他一上来就开战,会不会更好?<b>这真的有"正确答案"吗?</b></div>
+  <div class="q">你最开始选的是 <b id="myPick">?</b>,和蒙特祖马(A)一样吗?走到这里,你的想法<b>变了</b>吗?</div>
+  <div style="font-family:var(--sans);font-weight:700;color:var(--ink);margin-top:18px">✍️ 写下你从这次相遇看懂的一句话:</div>
+  <textarea id="myNote" placeholder="比如:面对完全看不懂的对手,既不能盲目信任,也不能盲目开战——最难的是先看清……"></textarea>
+  <div class="btnrow"><button class="nextbtn" onclick="saveNote(event)">💾 记下我的收获</button></div>
+  <div class="btnrow" style="margin-top:14px">
+    <a class="nextbtn" href="./stories.html" style="text-decoration:none">🧩 回到抉择,顺着母题线找规律 →</a>
+  </div>
+  <div class="btnrow" style="margin-top:8px">
+    <button class="ghost" onclick="if(window.toggleAIFloat)toggleAIFloat()">🤖 和 AI 聊聊这个抉择</button>
+    <button class="ghost" onclick="pick=null;opened=new Set();go(0)">↺ 重新走一遍</button>
+  </div>`);
+
+let cur=0;
+function render(){
+  document.getElementById('beat').innerHTML=beats[cur]();
+  document.getElementById('prog').innerHTML=beats.map((_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('');
+  if(cur===1){ refreshGate(); }
+  if(cur===7){ const m=document.getElementById('myPick'); if(m)m.textContent=pick||'?'; const n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('decision_moctezuma')||''; }
+  window.scrollTo({top:0,behavior:'instant'});
+  if(window.Track) Track.log('抉择时刻');
+}
+function go(n){ cur=n; render(); }
+function flip(i){
+  const card=document.querySelector('.dcard[data-i="'+i+'"]');
+  const body=document.getElementById('db'+i);
+  const isOpen=card.classList.toggle('open');
+  body.style.maxHeight=isOpen?(body.scrollHeight+'px'):'0';
+  if(isOpen){ opened.add(i); refreshGate(); }
+}
+function refreshGate(){
+  const c=document.getElementById('dcount'); if(c)c.textContent='已了解 '+opened.size+' / '+DOSSIER.length;
+  const btn=document.getElementById('toChoice'); const gate=document.getElementById('gate');
+  if(opened.size>=DOSSIER.length){ if(btn)btn.disabled=false; if(gate)gate.textContent='✅ 你已看清整盘棋,可以决定了'; }
+}
+function choose(k){
+  pick=k;
+  document.querySelectorAll('.choice').forEach(c=>{c.classList.toggle('picked',c.dataset.k===k);c.onclick=null;});
+  const react={A:'以礼相待,显出大国气度。可你把一群看不透的人请进了都城的心脏——万一他们图谋不轨呢?',
+    B:'谨慎拒客。可他们已经联合了你的敌人,挡在门外,真能挡得住吗?',
+    C:'先下手为强。可他们若真是"神使",或背后还有大军,这一击会不会捅了马蜂窝?'}[k];
+  const r=document.getElementById('reaction');
+  r.innerHTML=react+'<div class="btnrow" style="margin-top:14px"><button class="nextbtn" onclick="go(3)">👉 看真实的蒙特祖马怎么选</button></div>';
+  r.classList.add('show');
+}
+function saveNote(e){ const n=document.getElementById('myNote'); if(n){localStorage.setItem('decision_moctezuma',n.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的收获',1500);} }
+render();
+</script>
+<script src="./ai_float.js?v=2"></script>
+</body>
+</html>
