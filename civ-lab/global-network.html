@@ -338,8 +338,8 @@ function draw(){
     if(relFilter!=='all' && !inFilter){ ctx.globalAlpha=0.04; ctx.strokeStyle=_ca; ctx.lineWidth=0.5; }
     else if(selId && !isHighlighted){ ctx.globalAlpha=0.05; ctx.strokeStyle=_ca; ctx.lineWidth=0.5; }
     else if(isHighlighted){ ctx.globalAlpha=0.85; ctx.strokeStyle=(REL_CAT_COLOR[e.cat]||_ca); ctx.lineWidth=1.8; }
-    else { ctx.globalAlpha=0.16; ctx.strokeStyle=_ca; ctx.lineWidth=0.8; }
-    { var _dx=b.x-a.x,_dy=b.y-a.y,_len=Math.hypot(_dx,_dy)||1,_bow=Math.min(_len*0.12,24);
+    else { ctx.globalAlpha=0.1; ctx.strokeStyle=_ca; ctx.lineWidth=0.6; }
+    { var _dx=b.x-a.x,_dy=b.y-a.y,_len=Math.hypot(_dx,_dy)||1,_bow=Math.min(_len*0.2,36);
       var _cx=(a.x+b.x)/2-_dy/_len*_bow,_cy=(a.y+b.y)/2+_dx/_len*_bow;
       ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.quadraticCurveTo(_cx,_cy,b.x,b.y);ctx.stroke(); }
     ctx.restore();
@@ -365,7 +365,7 @@ function draw(){
     if(selId && focusSet && !focusSet.has(n.id)){ ctx.save();ctx.globalAlpha=0.2;ctx.beginPath();ctx.arc(n.x,n.y,9,0,Math.PI*2);ctx.fillStyle=roleColor(p.r);ctx.fill();ctx.restore(); return; }
     const col=roleColor(p.r);
     const isSel=n.id===selId,isHov=n.id===hovId;
-    const r=isSel?21:isHov?18:15;
+    let r=isSel?(21+Math.sin(Date.now()/280)*2.6):(isHov?18:15);
     const icon=(typeof personIconOf==='function')?personIconOf(p):'👤';
     ctx.save();
     // 强调外环(选中/悬浮)
