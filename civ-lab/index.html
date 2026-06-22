@@ -19,6 +19,10 @@
   .hero .tag{font-family:var(--serif);font-size:clamp(15px,4.2vw,19px);color:var(--ink2);line-height:1.7;margin:8px auto 0;max-width:20em}
   .hero .tag b{color:var(--gold)}
   .hero .lead{font-family:var(--sans);font-size:13.5px;color:var(--ink3);margin-top:14px;line-height:1.6}
+  .hstats{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:18px}
+  .hstat{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:13px;padding:9px 16px;min-width:74px;backdrop-filter:blur(8px)}
+  .hstat b{display:block;font-family:var(--serif);font-weight:900;font-size:23px;color:var(--gold);line-height:1}
+  .hstat span{font-family:var(--sans);font-size:11px;color:var(--ink2);margin-top:3px;display:block}
   /* 三大入口 */
   .doors{display:grid;grid-template-columns:repeat(auto-fit,minmax(248px,1fr));gap:16px;
     max-width:1000px;width:100%;margin:26px auto 0}
@@ -62,6 +66,12 @@
     <h1>AI 世界文明实验室</h1>
     <div class="tag">把五千年的世界历史,变成一个<b>你可以亲手探索的开放世界</b>。</div>
     <div class="lead">不用从头背年代——挑一个你喜欢的方式走进去就好 👇</div>
+    <div class="hstats">
+      <div class="hstat"><b>78</b><span>个文明</span></div>
+      <div class="hstat"><b>18</b><span>个历史抉择</span></div>
+      <div class="hstat"><b>9</b><span>条规律线</span></div>
+      <div class="hstat"><b>5000</b><span>年跨度</span></div>
+    </div>
   </div>
 
   <div class="doors">

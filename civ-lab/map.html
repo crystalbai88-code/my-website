@@ -131,6 +131,7 @@
     <a class="tbtn acc" href="./stories.html">🎯 抉择</a>
     <a class="tbtn acc" href="./networks.html">🕸 关系网</a>
     <a class="tbtn" href="./timelines.html">📜 时间轴</a>
+    <button class="tbtn acc" id="decToggle" title="显隐抉择钉子">🎯 抉择</button>
     <div class="ds-theme-switch" id="themeSwitch">
       <button data-t="deepblue"></button><button data-t="museum"></button><button data-t="textbook"></button><button data-t="parchment"></button><button data-t="aurora" title="极光"></button><button data-t="sunset" title="暮霞"></button><button data-t="nebula" title="星云"></button><button data-t="palace" title="故宫"></button>
     </div>
@@ -237,6 +238,7 @@ function activeDecisions(){ return DECISIONS.filter(d=> year>=d.from && year<=d.
 const dpinEls={};
 function syncDecisions(){
   const wrap=document.getElementById('dcards'); if(!wrap)return;
+  if(window.__showDec===false){ for(const id in dpinEls){ dpinEls[id].remove(); delete dpinEls[id]; } return; }
   const live=new Set();
   for(const d of activeDecisions()){
     const s=w2s(d.lng,d.lat);
@@ -335,7 +337,7 @@ function draw(){
     ctx.restore();
   });
   // 抉择时刻:金色脉冲光点(画在地图上,提示"这里有个十字路口")
-  activeDecisions().forEach(d=>{
+  if(window.__showDec!==false) activeDecisions().forEach(d=>{
     const s=w2s(d.lng,d.lat); if(!isFinite(s.x)||!isFinite(s.y))return;
     ctx.save();
     ctx.beginPath(); ctx.arc(s.x,s.y,17,0,7); ctx.fillStyle='rgba(226,96,63,.16)'; ctx.fill();
@@ -447,6 +449,8 @@ function play(){ playing=!playing; document.getElementById('playBtn').textConten
   if(playing){ hideHint(); if(year>=2025)setYear(-3500);
     playTimer=setInterval(()=>{ const step=(activeCivs().length<=1)?30:7; setYear(year+step); if(year>=2025){playing=false;document.getElementById('playBtn').textContent='▶';clearInterval(playTimer);} },72); } }
 document.getElementById('playBtn').onclick=play;
+window.__showDec=true;
+document.getElementById('decToggle').onclick=function(){ window.__showDec=!window.__showDec; this.style.opacity=window.__showDec?'1':'.45'; draw(); };
 let hintTimer=setTimeout(()=>hideHint(),6000);
 function hideHint(){document.getElementById('hint').classList.add('hide');clearTimeout(hintTimer);}
 
