@@ -208,6 +208,11 @@ const MOTIFS=[
      move:'在你心里,有没有什么东西,是你觉得比"安全""舒服"更重要的?',
      key:'find_sacrifice' },
   },
+  {id:'rubicon', tag:'回不了头的一步', title:'要不要迈出不可逆的那一步?', ac:'#c98a3a',
+   sub:'有些决定,一旦做了就<b>再也回不了头</b>——明知前路凶险、退路也已断绝,你迈不迈出那一步?',
+   stations:[
+     {person:'凯撒过卢比孔', icon:'🦅', year:-49, era:'公元前49 · 罗马', one:'过河就是内战,回头就是受审——你过不过?', url:'./decision-caesar.html'},
+   ], seed:'再配一个"自断退路、孤注一掷"的故事(如项羽破釜沉舟),这条线就能找规律了。'},
 ];
 const esc=s=>String(s==null?'':s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
 function stationHtml(s){

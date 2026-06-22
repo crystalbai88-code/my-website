@@ -24,6 +24,8 @@
      tip:'明知一去不还,你上路刺秦吗?', url:'./decision-jingke.html'},
     {id:'lishimin', person:'李世民 · 玄武门', icon:'🏯', culture:'china', lng:108.9, lat:34.3, year:626, from:622, to:635,
      tip:'兄弟要害你,先下手杀兄夺位,还是隐忍?', url:'./decision-lishimin.html'},
+    {id:'caesar', person:'凯撒过卢比孔', icon:'🦅', culture:'rome', lng:12.4, lat:44.1, year:-49, from:-52, to:-44,
+     tip:'过河就是内战,回头就是受审——你过不过?', url:'./decision-caesar.html'},
   ];
   if(typeof window!=='undefined') window.DECISIONS=DECISIONS;
 })();
