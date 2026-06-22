@@ -1416,5 +1416,16 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementB
 showPage('home');
 renderProjects();
 </script>
+<a id="backHomeBtn" href="#" onclick="showPage('home');window.scrollTo(0,0);return false" style="position:fixed;left:20px;bottom:22px;z-index:9000;display:none;align-items:center;gap:7px;height:44px;padding:0 20px;background:#fff;color:#e8720c;font:500 14px/1 'Noto Sans SC',system-ui,sans-serif;text-decoration:none;border:1px solid rgba(232,114,12,.28);border-radius:999px;box-shadow:0 6px 20px rgba(43,29,14,.15)">← 返回主页</a>
+<script>
+(function(){
+  var btn=document.getElementById('backHomeBtn');
+  function toggle(id){ btn.style.display=(id&&id!=='home')?'inline-flex':'none'; }
+  var _sp=window.showPage;
+  if(typeof _sp==='function'){ window.showPage=function(id){ _sp.apply(this,arguments); toggle(id); }; }
+  var act=document.querySelector('.page.active');
+  toggle(act?act.id.replace('page-',''):'home');
+})();
+</script>
 </body>
 </html>
