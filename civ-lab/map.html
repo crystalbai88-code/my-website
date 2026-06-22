@@ -246,6 +246,8 @@ const DECISIONS=[
    tip:'国王要你签字违背良心,签,还是不签?', url:'./decision-more.html'},
   {id:'hongmenyan', person:'鸿门宴', icon:'🍷', lng:109.2, lat:34.4, year:-206, from:-207, to:-202,
    tip:'席间杀机:杀掉刘邦,还是放他一马?', url:'./decision-hongmenyan.html'},
+  {id:'leonidas', person:'列奥尼达 · 温泉关', icon:'🛡️', lng:22.5, lat:38.8, year:-480, from:-485, to:-475,
+   tip:'三百人挡百万大军,死守,还是撤退?', url:'./decision-leonidas.html'},
 ];
 function activeDecisions(){ return DECISIONS.filter(d=> year>=d.from && year<=d.to ); }
 const dpinEls={};

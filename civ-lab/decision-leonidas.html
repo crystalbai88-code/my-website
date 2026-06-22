@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>抉择时刻 · 温泉关 · 列奥尼达 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;display:flex;flex-direction:column;align-items:center}
+  .top{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:12px 16px;
+    background:linear-gradient(180deg,rgba(var(--scrim,0,0,0),.25),transparent);position:sticky;top:0;z-index:20}
+  .top a.back{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.1em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .top .brand{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink)}
+  .prog{display:flex;gap:5px;margin-left:auto}
+  .prog i{width:13px;height:4px;border-radius:3px;background:var(--panel-line)}
+  .prog i.on{background:var(--gold)}
+  .wrap{width:min(660px,92%);margin:8px auto 70px;flex:1}
+  .beat{animation:fin .5s cubic-bezier(.22,1,.36,1)}
+  @keyframes fin{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;font-weight:700;text-align:center;margin-top:18px}
+  .htitle{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);text-align:center;line-height:1.3;margin:6px 0 4px;text-shadow:var(--label-shadow)}
+  .hsub{font-family:var(--mono);font-size:12px;color:var(--ink3);text-align:center;letter-spacing:.08em;margin-bottom:18px}
+  .scene{font-family:var(--serif);font-size:clamp(15px,3.8vw,17.5px);color:var(--ink);line-height:1.95;
+    background:var(--panel-bg);border:1px solid var(--panel-line);border-left:4px solid var(--gold);border-radius:14px;
+    padding:18px 20px;backdrop-filter:blur(8px)}
+  .scene b{color:var(--gold)}
+  .dossier-intro{font-family:var(--sans);font-size:14.5px;color:var(--ink2);text-align:center;line-height:1.7;margin:4px 0 16px}
+  .dcount{font-family:var(--mono);font-size:12px;color:var(--gold);text-align:center;font-weight:700;margin-bottom:12px}
+  .dcard{background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:14px;margin-bottom:11px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+  .dcard.open{border-color:var(--gold)}
+  .dhead{display:flex;align-items:center;gap:11px;padding:15px 17px}
+  .dhead .di{font-size:21px}
+  .dhead .dt{font-family:var(--sans);font-weight:800;font-size:15.5px;color:var(--ink);flex:1}
+  .dhead .dchev{font-family:var(--mono);font-size:11px;color:var(--ink3);transition:transform .2s}
+  .dcard.open .dchev{transform:rotate(90deg);color:var(--gold)}
+  .dhead .ddot{width:8px;height:8px;border-radius:50%;background:var(--vermilion);flex:none}
+  .dcard.open .ddot{background:var(--cyan)}
+  .dbody{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .dbody-in{padding:0 17px 16px;font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.85}
+  .dbody-in b{color:var(--gold)}
+  .dbody-in ul{margin:8px 0 0;padding-left:2px;list-style:none}
+  .dbody-in li{margin:7px 0;padding-left:16px;position:relative}
+  .dbody-in li:before{content:'·';position:absolute;left:3px;color:var(--vermilion);font-weight:900}
+  .dbody-in li b{color:var(--vermilion)}
+  .ask{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);text-align:center;margin:22px 0 6px}
+  .asksub{font-family:var(--sans);font-size:13.5px;color:var(--ink2);text-align:center;margin-bottom:16px;line-height:1.6}
+  .choices{display:flex;flex-direction:column;gap:11px}
+  .choice{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink);background:var(--panel-bg);
+    border:1.5px solid var(--panel-line);border-radius:14px;padding:15px 17px;cursor:pointer;transition:all .15s;text-align:left;line-height:1.5}
+  .choice:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+  .choice .ckey{font-weight:900;color:var(--gold);margin-right:8px}
+  .choice.picked{border-color:var(--gold);background:rgba(224,138,44,.1)}
+  .reaction{margin-top:14px;font-size:14.5px;color:var(--ink);line-height:1.75;background:rgba(224,138,44,.1);
+    border-left:4px solid var(--gold);border-radius:8px;padding:13px 16px;display:none}
+  .reaction.show{display:block;animation:fin .4s}
+  .lines{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+  .line{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:12px;padding:13px 16px}
+  .line .lh{font-family:var(--serif);font-weight:900;font-size:14px;color:var(--gold);margin-bottom:4px}
+  .line .lt{font-size:14px;color:var(--ink);line-height:1.7}
+  .line .lt b{color:var(--vermilion)}
+  .voice{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:13px;padding:13px 16px;margin-bottom:10px}
+  .voice .vw{font-family:var(--sans);font-weight:800;font-size:14px;color:var(--ink);margin-bottom:5px}
+  .voice .va{font-size:14px;color:var(--ink2);line-height:1.7}
+  .note{font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:center;margin-top:12px}
+  .q{font-family:var(--serif);font-size:16.5px;color:var(--ink);line-height:1.75;margin:14px 0;padding-left:14px;border-left:3px solid var(--gold)}
+  .q b{color:var(--gold)}
+  textarea{width:100%;box-sizing:border-box;margin-top:10px;font-family:var(--sans);font-size:15px;color:var(--ink);
+    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:12px;padding:13px 15px;min-height:80px;outline:none;resize:vertical}
+  .btnrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
+  .nextbtn{font-family:var(--sans);font-weight:800;font-size:15px;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));
+    border:none;border-radius:999px;padding:13px 30px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.16)}
+  .nextbtn:active{transform:scale(.97)}
+  .nextbtn[disabled]{opacity:.4;cursor:not-allowed;box-shadow:none}
+  .ghost{font-family:var(--sans);font-weight:700;font-size:14px;color:var(--gold);background:var(--panel-bg);
+    border:1px solid var(--panel-line);border-radius:999px;padding:11px 20px;cursor:pointer;text-decoration:none;display:inline-block}
+  .gate{text-align:center;font-family:var(--sans);font-size:12.5px;color:var(--ink3);margin-top:6px}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="top">
+    <a class="back" href="./stories.html">⌂ 抉择</a>
+    <span class="brand">🎯 抉择时刻</span>
+    <div class="prog" id="prog"></div>
+  </div>
+  <div class="wrap"><div class="beat" id="beat"></div></div>
+</div>
+<script src="./track.js?v=1"></script>
+<script>
+window.__aiCtx='用户正在体验"抉择时刻·温泉关·列奥尼达"(母题:向死的勇气/明知必死要不要去,出自希罗多德《历史》)。背景:公元前480年波希战争,波斯王薛西斯率大军西征要踏平希腊。斯巴达国王列奥尼达一世率约三百斯巴达精兵和部分希腊联军,扼守狭窄的温泉关隘口(波斯军南下的唯一通道),头两天死守让波斯死伤惨重、不得寸进。第三天,一个希腊农夫(埃菲亚特斯)为了赏钱,把一条绕到联军背后的山间小路告知波斯,联军面临被包抄。列奥尼达遣散了其他城邦的联军以保存希腊力量,自己留下三百斯巴达战士和少数自愿殿后的志愿军血战到底、全部阵亡、无一投降,列奥尼达被枭首。他们的死守为希腊海军赢得了宝贵时间,使希腊随后在萨拉米斯海战、普拉提亚之战反败为胜、击退波斯,保住了孕育民主与哲学的希腊文明。温泉关立碑:"过客啊,请告诉斯巴达人,我们遵照命令,长眠于此。"这是一个关于"为比生命更重要的东西赴死"的抉择,没有标准答案。请用适合10-12岁孩子的语言陪他思考,多反问,不要替他下结论。';
+let pick=null;
+const DOSSIER=[
+  {i:'🛡️',t:'你是谁',b:'你是<b>列奥尼达</b>,<b>斯巴达</b>的国王。斯巴达人从小接受最严酷的军事训练,以勇武和荣誉为生命。出征时母亲会对儿子说:"<b>要么带着盾牌回来,要么躺在盾牌上回来。</b>"'},
+  {i:'🌊',t:'来犯的敌人',b:'波斯王<b>薛西斯</b>率领号称百万的大军,跨海西征,要踏平整个希腊。各希腊城邦平时各自为政、互相争斗,面对这股洪流,人人自危。'},
+  {i:'🏔️',t:'温泉关',b:'<b>温泉关</b>是一条狭窄的山隘,是波斯大军南下希腊的<b>唯一通道</b>。在这里,地形让"人多"失去了意义——再多的兵,也只能一小队一小队地挤进来送死。'},
+  {i:'⚔️',t:'你手里的牌',b:'因为神谕和节日,斯巴达没能派出大军——你身边只有<b>三百名斯巴达精兵</b>和少量希腊联军。你要用这区区几千人,去挡住<b>几十万大军</b>。'},
+  {i:'🗡️',t:'头两天',b:'你们死死守住隘口。波斯人一波波冲上来,又一波波倒下,<b>整整两天寸步难进、死伤惨重</b>。薛西斯在山上看着,又惊又怒——他没想到,几百人能挡住他的千军万马。'},
+  {i:'⚡',t:'眼前的难题(第三天)',b:'变故来了:一个希腊农夫为了赏钱,把一条<b>绕到你们背后</b>的山间小路告诉了波斯人。大军就要从背后包抄过来,你们将腹背受敌。<br>你可以<b>趁机撤退保命</b>,也可以<b>死守到底</b>。'},
+];
+let opened=new Set();
+const beats=[];
+beats.push(()=>`
+  <div class="kicker">公元前 480 年 · 希腊 · 温泉关</div>
+  <div class="htitle">三百人,挡在百万大军前</div>
+  <div class="hsub">即将由你 —— 列奥尼达 —— 决定</div>
+  <div class="scene">公元前480年,你是斯巴达国王<b>列奥尼达</b>。你带着三百勇士,守在温泉关——挡住波斯王薛西斯踏平希腊的唯一通道。<br><br>守了两天,敌人寸步难进。可第三天,你们的背后被一条小路出卖了。你即将做一个决定——它将决定你的生死,也可能决定<b>整个希腊文明的存亡</b>。<br><br>但在你决定之前,<b>先别急。</b> 先把这盘棋,看清楚。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(1)">📂 先弄懂这盘棋 →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第一步 · 了解</div>
+  <div class="htitle" style="font-size:23px">看清这盘棋</div>
+  <div class="dossier-intro">点开下面每一张情报卡,弄懂你是谁、敌人多强、地形如何、和第三天的变故。<br>全部看完,你才有资格替列奥尼达做决定。</div>
+  <div class="dcount" id="dcount">已了解 0 / ${DOSSIER.length}</div>
+  <div id="dwrap">${DOSSIER.map((d,i)=>`
+    <div class="dcard" data-i="${i}" onclick="flip(${i})">
+      <div class="dhead"><span class="ddot"></span><span class="di">${d.i}</span><span class="dt">${d.t}</span><span class="dchev">▶</span></div>
+      <div class="dbody" id="db${i}"><div class="dbody-in">${d.b}</div></div>
+    </div>`).join('')}</div>
+  <div class="btnrow"><button class="nextbtn" id="toChoice" onclick="go(2)" disabled>换作是你,你会怎么做? →</button></div>
+  <div class="gate" id="gate">(看完全部 ${DOSSIER.length} 张情报卡后解锁)</div>`);
+beats.push(()=>`
+  <div class="kicker">第二步 · 此刻,你就是列奥尼达</div>
+  <div class="ask">死守,还是撤退?</div>
+  <div class="asksub">你已经看清了整盘棋——敌人百万、你只有三百、背后的小路已被出卖。<br>现在,这个决定由你来下。</div>
+  <div class="choices">
+    <div class="choice" data-k="A" onclick="choose('A')"><span class="ckey">A</span>死守到底——遵从斯巴达的律法,绝不后退,战至最后一人。</div>
+    <div class="choice" data-k="B" onclick="choose('B')"><span class="ckey">B</span>趁早撤退——留得青山在,何必白白送死,日后再战。</div>
+    <div class="choice" data-k="C" onclick="choose('C')"><span class="ckey">C</span>接受招降——薛西斯许你做全希腊的王,识时务者为俊杰。</div>
+  </div>
+  <div class="reaction" id="reaction"></div>`);
+beats.push(()=>`
+  <div class="kicker">第三步 · 真实的他</div>
+  <div class="htitle" style="font-size:22px">列奥尼达,选了 A</div>
+  <div class="scene">他做了一个两全的安排:把其他城邦的联军<b>遣散撤走</b>,为希腊保存有生力量;自己,留下<b>三百斯巴达战士</b>和少数自愿殿后的志愿军。<br><br>他们明知必死,却<b>死战到底</b>——盾牌断了用矛,矛断了用拳头和牙齿,直到<b>全部阵亡,无一人投降</b>。列奥尼达战死,被波斯人枭首示众。<br><br>对斯巴达人来说,这不是失败:他们带着盾牌、躺着回来了——这是<b>最高的荣誉</b>。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(4)">那……后来呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第四步 · 一场必败的死守,延伸出三条线</div>
+  <div class="lines">
+    <div class="line"><div class="lh">⚡ 短期</div><div class="lt">三百人全部战死,但他们重创了波斯军,更<b>点燃了全希腊同仇敌忾的斗志</b>——原来,巨人也能被挡住。</div></div>
+    <div class="line"><div class="lh">🌅 长远</div><div class="lt">他们用生命争取的时间,让希腊在随后的<b>萨拉米斯海战、普拉提亚之战</b>反败为胜、击退波斯,<b>保住了希腊文明</b>——民主、哲学、科学的摇篮。</div></div>
+    <div class="line"><div class="lh">🗿 他自己</div><div class="lt">列奥尼达战死沙场。温泉关立起一块石碑:"<b>过客啊,请告诉斯巴达人,我们遵照命令,长眠于此。</b>"他成了西方"为自由与责任赴死"的永恒象征。</div></div>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(5)">别人怎么看这场死守? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第五步 · 同一场死守,不同的声音</div>
+  <div class="voice"><div class="vw">🛡️ 斯巴达人</div><div class="va">"他没有辱没斯巴达。带着盾牌、躺着回来——这就是一个战士最高的荣誉。"</div></div>
+  <div class="voice"><div class="vw">👑 薛西斯</div><div class="va">"区区三百人,竟让我的大军付出如此代价?"(他下令枭首泄愤,却反而成全了列奥尼达的传奇)</div></div>
+  <div class="voice"><div class="vw">👩 一位斯巴达母亲</div><div class="va">"我送他出征时说:带着盾牌回来,或者躺在盾牌上回来。我的孩子,做到了。"</div></div>
+  <div class="voice"><div class="vw">🤔 一个今天的人</div><div class="va">"明知守不住、必死无疑,还要留下死守——这是愚蠢,还是人类最高的勇敢?"</div></div>
+  <div class="note">同一个抉择,没有标准答案。 · 史料:希罗多德《历史》</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(6)">它守住了什么? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第六步 · 三百人,守住了一整个文明</div>
+  <div class="scene">温泉关三百人的死,像一颗火种,点燃了希腊人"<b>宁死不做奴隶</b>"的斗志,最终把强大的波斯帝国挡在了门外。<br><br>而被守住的希腊,在随后的岁月里孕育了<b>民主、哲学、科学、奥林匹克</b>……成为整个西方文明的源头。<br><br>一场注定失败的死守,守住的,是<b>一整个文明的未来</b>。</div>
+  <div class="btnrow" style="margin-top:16px">
+    <a class="ghost" href="./map.html?civ=greece_classical">🗺 去地图看 古典希腊</a>
+    <a class="ghost" href="./classical-network.html?all=1">🕸 看古希腊的人物关系网</a>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(7)">那……换作是你呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">最后 · 回到你</div>
+  <div class="htitle" style="font-size:22px">换作是你呢?</div>
+  <div class="q">明知守不住、几乎必死,你会<b>留下死守</b>,还是<b>撤退保命</b>?换作是你,做得到吗?</div>
+  <div class="q">列奥尼达为自由和责任赴死,苏格拉底为信念和法律赴死……人,为什么会<b>为了比生命更重要的东西</b>去死?在你心里,有没有这样的东西?</div>
+  <div class="q">你最开始选的是 <b id="myPick">?</b>,和列奥尼达(A)一样吗?走到这里,你的想法<b>变了</b>吗?</div>
+  <div style="font-family:var(--sans);font-weight:700;color:var(--ink);margin-top:18px">✍️ 写下你从温泉关里,看懂的一句话:</div>
+  <textarea id="myNote" placeholder="比如:有些时候,守住的不是关口,而是一种精神……"></textarea>
+  <div class="btnrow"><button class="nextbtn" onclick="saveNote(event)">💾 记下我的收获</button></div>
+  <div class="btnrow" style="margin-top:14px">
+    <a class="nextbtn" href="./stories.html" style="text-decoration:none">🧩 回到抉择,顺着母题线找规律 →</a>
+  </div>
+  <div class="btnrow" style="margin-top:8px">
+    <button class="ghost" onclick="if(window.toggleAIFloat)toggleAIFloat()">🤖 和 AI 聊聊这个抉择</button>
+    <button class="ghost" onclick="pick=null;opened=new Set();go(0)">↺ 重新走一遍</button>
+  </div>`);
+
+let cur=0;
+function render(){
+  document.getElementById('beat').innerHTML=beats[cur]();
+  document.getElementById('prog').innerHTML=beats.map((_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('');
+  if(cur===1){ refreshGate(); }
+  if(cur===7){ const m=document.getElementById('myPick'); if(m)m.textContent=pick||'?'; const n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('decision_leonidas')||''; }
+  window.scrollTo({top:0,behavior:'instant'});
+  if(window.Track) Track.log('抉择时刻');
+}
+function go(n){ cur=n; render(); }
+function flip(i){
+  const card=document.querySelector('.dcard[data-i="'+i+'"]');
+  const body=document.getElementById('db'+i);
+  const isOpen=card.classList.toggle('open');
+  body.style.maxHeight=isOpen?(body.scrollHeight+'px'):'0';
+  if(isOpen){ opened.add(i); refreshGate(); }
+}
+function refreshGate(){
+  const c=document.getElementById('dcount'); if(c)c.textContent='已了解 '+opened.size+' / '+DOSSIER.length;
+  const btn=document.getElementById('toChoice'); const gate=document.getElementById('gate');
+  if(opened.size>=DOSSIER.length){ if(btn)btn.disabled=false; if(gate)gate.textContent='✅ 你已看清整盘棋,可以决定了'; }
+}
+function choose(k){
+  pick=k;
+  document.querySelectorAll('.choice').forEach(c=>{c.classList.toggle('picked',c.dataset.k===k);c.onclick=null;});
+  const react={A:'壮烈!可三百人对几十万,这一守就是必死。你愿意用全部的命,去换一点时间吗?',
+    B:'保命是人之常情。可你身为国王、身为斯巴达人,临阵后退——你迈得开这一步吗?',
+    C:'活下来,还能做全希腊的王。但对一个把荣誉看得比命重的斯巴达人来说,投降……比死更难受吧?'}[k];
+  const r=document.getElementById('reaction');
+  r.innerHTML=react+'<div class="btnrow" style="margin-top:14px"><button class="nextbtn" onclick="go(3)">👉 看真实的列奥尼达怎么选</button></div>';
+  r.classList.add('show');
+}
+function saveNote(e){ const n=document.getElementById('myNote'); if(n){localStorage.setItem('decision_leonidas',n.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的收获',1500);} }
+render();
+</script>
+<script src="./ai_float.js?v=1"></script>
+</body>
+</html>
