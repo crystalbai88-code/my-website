@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>文明时间轴 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;padding-bottom:60px}
+  .nav{display:flex;align-items:center;gap:9px;padding:13px 16px 2px;flex-wrap:wrap}
+  .nav a.pill{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.08em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .nav .title{font-family:var(--serif);font-weight:900;font-size:16px;color:var(--ink);margin-left:2px}
+  .wrap{width:min(680px,92%);margin:0 auto}
+  /* 文化切换 */
+  .cults{display:flex;gap:7px;overflow-x:auto;padding:12px 4px 6px;-webkit-overflow-scrolling:touch}
+  .cults::-webkit-scrollbar{display:none}
+  .cult{flex:none;font-family:var(--sans);font-size:13px;font-weight:700;color:var(--ink2);background:var(--panel-bg);
+    border:1.5px solid var(--panel-line);border-radius:999px;padding:7px 14px;cursor:pointer;text-decoration:none;white-space:nowrap}
+  .cult.on{color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));border-color:transparent}
+  /* hero */
+  .hero{text-align:center;margin:12px auto 6px}
+  .hero .ic{font-size:46px;line-height:1}
+  .hero h1{font-family:var(--serif);font-weight:900;font-size:clamp(24px,6vw,34px);color:var(--ink);margin:6px 0 3px}
+  .hero .span{font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:.04em}
+  .hero .lead{font-family:var(--sans);font-size:13px;color:var(--ink2);margin-top:8px;line-height:1.6}
+  /* 时间轴 */
+  .tl{position:relative;margin:22px auto 0;padding-left:30px}
+  .tl:before{content:'';position:absolute;left:9px;top:4px;bottom:8px;width:3px;
+    background:linear-gradient(180deg,var(--gold),var(--vermilion),var(--purple));border-radius:3px;opacity:.55}
+  /* 时代条 */
+  .era{position:relative;margin:20px 0 8px}
+  .era:before{content:'';position:absolute;left:-26px;top:8px;width:17px;height:17px;border-radius:50%;
+    background:var(--ac,var(--gold));border:3px solid var(--bg);box-shadow:0 0 0 2px var(--ac,var(--gold))}
+  .era a.band{display:flex;align-items:center;gap:11px;text-decoration:none;
+    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-left:5px solid var(--ac,var(--gold));
+    border-radius:13px;padding:12px 15px;transition:transform .14s,box-shadow .14s}
+  .era a.band:hover{transform:translateX(3px);box-shadow:0 6px 16px rgba(0,0,0,.14)}
+  .era .eic{font-size:26px;line-height:1}
+  .era .enm{font-family:var(--serif);font-weight:900;font-size:18px;color:var(--ink)}
+  .era .eyr{font-family:var(--mono);font-size:10.5px;color:var(--ac,var(--gold));font-weight:700;margin-top:2px}
+  .era .ego{margin-left:auto;font-family:var(--sans);font-size:11px;color:var(--ink3)}
+  /* 事件 */
+  .ev{position:relative;margin:8px 0 8px 4px;padding:2px 0}
+  .ev:before{content:'';position:absolute;left:-22px;top:7px;width:8px;height:8px;border-radius:50%;background:var(--cyan);border:2px solid var(--bg)}
+  .ev .ey{font-family:var(--mono);font-size:11px;color:var(--cyan);font-weight:700}
+  .ev .et{font-family:var(--serif);font-weight:700;font-size:14.5px;color:var(--ink);margin:1px 0 2px}
+  .ev .eo{font-family:var(--sans);font-size:12.5px;color:var(--ink2);line-height:1.6}
+  /* 抉择 */
+  .dec{position:relative;margin:12px 0 12px 2px}
+  .dec:before{content:'';position:absolute;left:-25px;top:10px;width:14px;height:14px;border-radius:50%;
+    background:radial-gradient(circle at 35% 35%,#ffe0a0,#e2603f);border:2px solid var(--bg);box-shadow:0 0 0 2px rgba(226,96,63,.4)}
+  .dec a{display:block;text-decoration:none;background:linear-gradient(135deg,rgba(255,248,232,.95),rgba(255,232,200,.92));
+    border:1.5px solid var(--gold);border-radius:13px;padding:11px 14px}
+  .dec .dk{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.1em;color:var(--vermilion)}
+  .dec .dn{font-family:var(--serif);font-weight:900;font-size:15.5px;color:var(--ink);margin:1px 0}
+  .dec .dt{font-family:var(--sans);font-size:12.5px;color:var(--ink2);line-height:1.5}
+  .dec .dgo{font-family:var(--sans);font-size:11.5px;font-weight:800;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));border-radius:999px;padding:3px 11px;margin-top:6px;display:inline-block}
+  .empty{text-align:center;color:var(--ink3);font-family:var(--sans);font-size:13px;padding:30px}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="nav">
+    <a class="pill" href="./index.html">⌂ 首页</a>
+    <a class="pill" href="./map.html">🗺 世界地图</a>
+    <a class="pill" href="./timelines.html">📜 所有时间轴</a>
+    <span class="title">文明时间轴</span>
+  </div>
+  <div class="wrap">
+    <div class="cults" id="cults"></div>
+    <div class="hero" id="hero"></div>
+    <div class="tl" id="tl"></div>
+  </div>
+</div>
+<script src="./track.js?v=1"></script>
+<script src="./map_data.js?v=3"></script>
+<script src="./decisions.js?v=1"></script>
+<script>
+const CULTURES=[
+  {key:'china', name:'中国', icon:'🐉', ac:'#e2603f', civs:['shang','xizhou','chunqiu','zhanguo','qin','xihan','donghan','tang','song','mongol','china']},
+  {key:'india', name:'印度', icon:'🕉️', ac:'#df8a2c', civs:['indus','magadha','maurya','gupta','chola','delhi_sultanate']},
+  {key:'mesopotamia', name:'两河·近东', icon:'📜', ac:'#b5642a', civs:['sumer','akkad','babylon','hittite','assyria','neobabylon','achaemenid','israel','phoenicia']},
+  {key:'egypt', name:'古埃及', icon:'🔺', ac:'#d4a72f', civs:['egypt_old','egypt_mid','egypt_new']},
+  {key:'greece', name:'古希腊', icon:'🏛️', ac:'#3a9ec8', civs:['minoan','mycenae','greece_archaic','greece_classical','macedon','hellenistic']},
+  {key:'rome', name:'罗马', icon:'🦅', ac:'#c0563a', civs:['roman_republic','roman_empire','christianity','byzantine']},
+  {key:'islam', name:'伊斯兰世界', icon:'☪️', ac:'#2f9e86', civs:['islam_rise','abbasid','ottoman']},
+  {key:'japan', name:'日本', icon:'🗾', ac:'#b06aa0', civs:['heian','shogunate','japan','meiji']},
+  {key:'europe', name:'欧洲', icon:'⚜️', ac:'#7a6cd0', civs:['franks','medieval_europe','vikings','kievan_rus','crusades','exploration','britain','spain','reform','science','dutch','france','industrial','french_rev','imperialism','unification']},
+  {key:'americas', name:'美洲', icon:'🌽', ac:'#4aa86a', civs:['maya','aztec','inca']},
+  {key:'africa', name:'非洲', icon:'🌍', ac:'#9c7a3a', civs:['great_zimbabwe','mali']},
+  {key:'sea', name:'东南亚', icon:'🛕', ac:'#4aa86a', civs:['srivijaya','khmer']},
+  {key:'global', name:'现代世界', icon:'🌐', ac:'#3a8ec0', civs:['ww1','ww2','un','coldwar','ai','space','climate','internet','globalization']},
+];
+const CIVS=(window.MAP_CIVS||[]), EV=(window.CIV_EVENTS||{}), DEC=(window.DECISIONS||[]);
+const byId={}; CIVS.forEach(c=>byId[c.id]=c);
+const civ2cult={}; CULTURES.forEach(cu=>cu.civs.forEach(id=>civ2cult[id]=cu.key));
+const esc=s=>String(s==null?'':s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
+const yl=y=>y<0?('公元前'+(-y)):('公元'+y);
+
+const params=new URLSearchParams(location.search);
+let cur=params.get('c');
+if(!cur){ const civ=params.get('civ'); if(civ&&civ2cult[civ]) cur=civ2cult[civ]; }
+if(!cur) cur='china';
+
+// 文化切换条
+document.getElementById('cults').innerHTML=CULTURES.map(cu=>
+  `<a class="cult${cu.key===cur?' on':''}" href="./timeline.html?c=${cu.key}">${cu.icon} ${cu.name}</a>`).join('');
+
+function render(){
+  const cu=CULTURES.find(x=>x.key===cur)||CULTURES[0];
+  const civs=cu.civs.map(id=>byId[id]).filter(Boolean).sort((a,b)=>a.s-b.s);
+  if(!civs.length){ document.getElementById('tl').innerHTML='<div class="empty">这个文明的时间轴还在筹备中…</div>'; return; }
+  const span=yl(Math.min(...civs.map(c=>c.s)))+' — '+yl(Math.max(...civs.map(c=>c.e)));
+  document.getElementById('hero').innerHTML=
+    `<div class="ic">${cu.icon}</div><h1>${esc(cu.name)} · 时间轴</h1><div class="span">${span} · 共 ${civs.length} 个时代</div>
+     <div class="lead">顺着这条线,看 ${esc(cu.name)} 从头到尾的脉络 · 🎯是可以代入的抉择时刻</div>`;
+  // 组装按年排序的条目流
+  const items=[];
+  civs.forEach(c=>{
+    items.push({y:c.s, k:0, type:'era', civ:c});
+    (EV[c.id]||[]).forEach(e=>items.push({y:e.year, k:1, type:'ev', e, civ:c}));
+  });
+  DEC.filter(d=>d.culture===cu.key).forEach(d=>items.push({y:d.year, k:2, type:'dec', d}));
+  items.sort((a,b)=>a.y-b.y || a.k-b.k);
+  let h='';
+  items.forEach(it=>{
+    if(it.type==='era'){ const c=it.civ;
+      h+=`<div class="era" style="--ac:${cu.ac}"><a class="band" href="./map.html?civ=${c.id}">
+        <span class="eic">${esc(c.icon||cu.icon)}</span>
+        <span><span class="enm">${esc(c.name)}</span><span class="eyr" style="display:block">${yl(c.s)} – ${yl(c.e)}</span></span>
+        <span class="ego">看档案 →</span></a></div>`;
+    }else if(it.type==='ev'){ const e=it.e;
+      h+=`<div class="ev"><div class="ey">${yl(e.year)}</div><div class="et">${esc(e.title)}</div><div class="eo">${esc(e.one||'')}</div></div>`;
+    }else if(it.type==='dec'){ const d=it.d;
+      h+=`<div class="dec"><a href="${d.url}"><div class="dk">🎯 抉择时刻 · ${yl(d.year)}</div><div class="dn">${esc(d.icon+' '+d.person)}</div><div class="dt">${esc(d.tip)}</div><span class="dgo">▶ 替他做个选择</span></a></div>`;
+    }
+  });
+  document.getElementById('tl').innerHTML=h;
+  document.title=cu.name+'时间轴 · CivLab';
+  if(window.Track) Track.log('文明时间轴');
+}
+render();
+</script>
+<script src="./ai_float.js?v=1"></script>
+</body>
+</html>

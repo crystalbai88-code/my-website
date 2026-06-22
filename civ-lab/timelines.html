@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>各文明时间轴 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;padding-bottom:60px}
+  .nav{display:flex;align-items:center;gap:9px;padding:13px 16px 2px;flex-wrap:wrap}
+  .nav a.pill{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.08em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .nav .title{font-family:var(--serif);font-weight:900;font-size:16px;color:var(--ink);margin-left:2px}
+  .hero{text-align:center;max-width:620px;margin:18px auto 4px;padding:0 20px}
+  .hero .ic{font-size:42px}
+  .hero h1{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);margin:6px 0 6px}
+  .hero p{font-family:var(--serif);font-size:14.5px;color:var(--ink2);line-height:1.7;margin:0 auto;max-width:24em}
+  .hero p b{color:var(--gold)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;max-width:980px;margin:22px auto 0;padding:0 20px}
+  .card{position:relative;display:flex;flex-direction:column;text-decoration:none;
+    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-top:5px solid var(--ac,var(--gold));
+    border-radius:16px;padding:17px 17px 15px;backdrop-filter:blur(10px);transition:transform .15s,box-shadow .15s,border-color .15s}
+  .card:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(0,0,0,.16);border-color:var(--ac,var(--gold))}
+  .card .ic{font-size:36px;line-height:1}
+  .card .nm{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);margin:8px 0 2px}
+  .card .span{font-family:var(--mono);font-size:10.5px;color:var(--ac,var(--gold));font-weight:700}
+  .card .meta{font-family:var(--sans);font-size:12px;color:var(--ink2);line-height:1.55;margin-top:8px}
+  .card .go{margin-top:11px;align-self:flex-start;font-family:var(--sans);font-weight:800;font-size:12.5px;color:#fff;
+    background:linear-gradient(90deg,var(--ac,var(--gold)),var(--vermilion));border-radius:999px;padding:7px 14px}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="nav">
+    <a class="pill" href="./index.html">⌂ 首页</a>
+    <a class="pill" href="./map.html">🗺 世界地图</a>
+    <span class="title">📜 各文明时间轴</span>
+  </div>
+  <div class="hero">
+    <div class="ic">📜</div>
+    <h1>每个文明,一条自己的时间轴</h1>
+    <p>世界地图看的是<b>同一时间、各地都在发生什么</b>;这里,你可以钻进<b>一个文明</b>,顺着它从头到尾走一遍。</p>
+  </div>
+  <div class="grid" id="grid"></div>
+</div>
+<script src="./map_data.js?v=3"></script>
+<script>
+const CULTURES=[
+  {key:'china', name:'中国', icon:'🐉', ac:'#e2603f', civs:['shang','xizhou','chunqiu','zhanguo','qin','xihan','donghan','tang','song','mongol','china']},
+  {key:'india', name:'印度', icon:'🕉️', ac:'#df8a2c', civs:['indus','magadha','maurya','gupta','chola','delhi_sultanate']},
+  {key:'mesopotamia', name:'两河·近东', icon:'📜', ac:'#b5642a', civs:['sumer','akkad','babylon','hittite','assyria','neobabylon','achaemenid','israel','phoenicia']},
+  {key:'egypt', name:'古埃及', icon:'🔺', ac:'#d4a72f', civs:['egypt_old','egypt_mid','egypt_new']},
+  {key:'greece', name:'古希腊', icon:'🏛️', ac:'#3a9ec8', civs:['minoan','mycenae','greece_archaic','greece_classical','macedon','hellenistic']},
+  {key:'rome', name:'罗马', icon:'🦅', ac:'#c0563a', civs:['roman_republic','roman_empire','christianity','byzantine']},
+  {key:'islam', name:'伊斯兰世界', icon:'☪️', ac:'#2f9e86', civs:['islam_rise','abbasid','ottoman']},
+  {key:'japan', name:'日本', icon:'🗾', ac:'#b06aa0', civs:['heian','shogunate','japan','meiji']},
+  {key:'europe', name:'欧洲', icon:'⚜️', ac:'#7a6cd0', civs:['franks','medieval_europe','vikings','kievan_rus','crusades','exploration','britain','spain','reform','science','dutch','france','industrial','french_rev','imperialism','unification']},
+  {key:'americas', name:'美洲', icon:'🌽', ac:'#4aa86a', civs:['maya','aztec','inca']},
+  {key:'africa', name:'非洲', icon:'🌍', ac:'#9c7a3a', civs:['great_zimbabwe','mali']},
+  {key:'sea', name:'东南亚', icon:'🛕', ac:'#4aa86a', civs:['srivijaya','khmer']},
+  {key:'global', name:'现代世界', icon:'🌐', ac:'#3a8ec0', civs:['ww1','ww2','un','coldwar','ai','space','climate','internet','globalization']},
+];
+const CIVS=(window.MAP_CIVS||[]); const byId={}; CIVS.forEach(c=>byId[c.id]=c);
+const esc=s=>String(s==null?'':s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
+const yl=y=>y<0?('前'+(-y)):(''+y);
+document.getElementById('grid').innerHTML=CULTURES.map(cu=>{
+  const civs=cu.civs.map(id=>byId[id]).filter(Boolean).sort((a,b)=>a.s-b.s);
+  if(!civs.length) return '';
+  const span=yl(Math.min(...civs.map(c=>c.s)))+' – '+yl(Math.max(...civs.map(c=>c.e)));
+  const sample=civs.slice(0,4).map(c=>c.name).join(' · ')+(civs.length>4?'…':'');
+  return `<a class="card" style="--ac:${cu.ac}" href="./timeline.html?c=${cu.key}">
+    <div class="ic">${cu.icon}</div>
+    <div class="nm">${esc(cu.name)}</div>
+    <div class="span">${span}</div>
+    <div class="meta">${civs.length}个时代:${esc(sample)}</div>
+    <span class="go">看时间轴 →</span></a>`;
+}).join('');
+</script>
+<script src="./ai_float.js?v=1"></script>
+</body>
+</html>
