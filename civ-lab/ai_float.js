@@ -112,8 +112,13 @@
     const sug=document.getElementById('aiSug');
     const ctx=(typeof window.__aiCtx==='function'?window.__aiCtx():window.__aiCtx)||'';
     let qs=['这个文明为什么会衰落?','给我讲个有意思的故事','它对今天有什么影响?'];
-    const m=/(?:文明|人物)[:：]\s*([^,，。(（]+)/.exec(ctx);
-    if(m){ const n=m[1].trim(); qs=[`${n}最重要的事是什么?`,`${n}为什么重要?`,`讲个${n}的小故事`]; }
+    if(/抉择时刻|换作是你|代入|母题|找规律/.test(ctx)){
+      // 抉择页:引导孩子思考,而不是直接给答案
+      qs=['他为什么会这么选?','如果换个选择,会怎样?','换作是我,该怎么选?','这件事和今天有什么关系?'];
+    } else {
+      const m=/(?:文明|人物)[:：]\s*([^,，。(（]+)/.exec(ctx);
+      if(m){ const n=m[1].trim(); qs=[`${n}最重要的事是什么?`,`${n}为什么重要?`,`讲个${n}的小故事`]; }
+    }
     sug.innerHTML=qs.map(q=>`<button>${esc(q)}</button>`).join('');
     sug.querySelectorAll('button').forEach(b=>b.onclick=()=>{document.getElementById('aiInput').value=b.textContent;send();});
   }

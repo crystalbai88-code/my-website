@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>这是什么 · AI世界文明实验室 · 给家长和老师</title>
+<meta name="description" content="AI世界文明实验室:把五千年世界历史变成孩子能亲手探索的开放世界。不背年代,而是看大局、找规律、代入历史人物做抉择。">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;padding-bottom:60px}
+  .nav{display:flex;align-items:center;gap:9px;padding:13px 16px 2px;flex-wrap:wrap}
+  .nav a.pill{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.08em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .wrap{width:min(680px,92%);margin:0 auto}
+  .hero{text-align:center;margin:24px auto 8px}
+  .hero .globe{font-size:50px;animation:spin 22s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .hero h1{font-family:var(--serif);font-weight:900;font-size:clamp(24px,6.5vw,38px);color:var(--ink);margin:10px 0 6px;text-shadow:var(--label-shadow)}
+  .hero .tag{font-family:var(--serif);font-size:clamp(15px,4.2vw,19px);color:var(--ink2);line-height:1.75;max-width:22em;margin:0 auto}
+  .hero .tag b{color:var(--gold)}
+  .stats{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:20px 0 4px}
+  .stat{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:13px;padding:9px 16px;min-width:74px;backdrop-filter:blur(8px)}
+  .stat b{display:block;font-family:var(--serif);font-weight:900;font-size:22px;color:var(--gold);line-height:1}
+  .stat span{font-family:var(--sans);font-size:11px;color:var(--ink2);margin-top:3px;display:block}
+  .sec{margin:30px auto 0;background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:18px;padding:22px 22px 20px;backdrop-filter:blur(10px)}
+  .sec .k{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--gold);text-transform:uppercase;font-weight:700}
+  .sec h2{font-family:var(--serif);font-weight:900;font-size:21px;color:var(--ink);margin:6px 0 12px}
+  .sec p{font-family:var(--serif);font-size:15px;color:var(--ink);line-height:1.85;margin:0 0 12px}
+  .sec p b{color:var(--gold)}
+  .vs{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
+  .vcol{flex:1 1 220px;border:1px solid var(--panel-line);border-radius:13px;padding:13px 15px}
+  .vcol.no{background:rgba(226,96,63,.06)}
+  .vcol.yes{background:rgba(47,158,134,.08)}
+  .vcol .vh{font-family:var(--sans);font-weight:800;font-size:13px;margin-bottom:7px}
+  .vcol.no .vh{color:var(--vermilion)} .vcol.yes .vh{color:var(--cyan)}
+  .vcol ul{margin:0;padding-left:18px} .vcol li{font-family:var(--sans);font-size:13px;color:var(--ink2);line-height:1.7;margin:3px 0}
+  .boards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:6px}
+  .board{border:1px solid var(--panel-line);border-radius:13px;padding:14px 15px;border-top:4px solid var(--ac,var(--gold))}
+  .board .bic{font-size:28px}
+  .board .bt{font-family:var(--serif);font-weight:900;font-size:16px;color:var(--ink);margin:6px 0 3px}
+  .board .bd{font-family:var(--sans);font-size:12.5px;color:var(--ink2);line-height:1.6}
+  .dims{margin-top:6px}
+  .dim{display:flex;gap:11px;align-items:flex-start;padding:9px 0;border-bottom:1px dashed var(--panel-line)}
+  .dim:last-child{border-bottom:none}
+  .dim .di{font-size:20px;flex:none;width:26px;text-align:center}
+  .dim .dx{font-family:var(--sans);font-size:13.5px;color:var(--ink);line-height:1.6}
+  .dim .dx b{color:var(--gold)}
+  .cta{text-align:center;margin:30px auto 0}
+  .cta a{display:inline-block;font-family:var(--sans);font-weight:800;font-size:16px;color:#fff;text-decoration:none;
+    background:linear-gradient(90deg,var(--gold),var(--vermilion));border-radius:999px;padding:14px 34px;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+  .foot{text-align:center;font-family:var(--sans);font-size:12px;color:var(--ink3);margin-top:26px;line-height:1.8}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="nav"><a class="pill" href="./index.html">⌂ 进入实验室</a></div>
+  <div class="wrap">
+    <div class="hero">
+      <div class="globe">🌍</div>
+      <h1>AI 世界文明实验室</h1>
+      <div class="tag">把五千年的世界历史,变成一个<b>孩子愿意亲手探索的开放世界</b>。</div>
+      <div class="stats">
+        <div class="stat"><b>78</b><span>个文明</span></div>
+        <div class="stat"><b>18</b><span>个历史抉择</span></div>
+        <div class="stat"><b>9</b><span>条规律线</span></div>
+        <div class="stat"><b>5000</b><span>年跨度</span></div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="k">为什么做它</div>
+      <h2>历史,不该是背年代</h2>
+      <p>很多孩子怕历史,因为它被讲成了一堆要背的年份和名字。可历史真正动人的,是<b>人在关键时刻的选择</b>、是<b>不同文明此消彼长的大局</b>、是<b>反复上演的规律</b>。</p>
+      <div class="vs">
+        <div class="vcol no"><div class="vh">✗ 传统的历史</div><ul><li>背年代、背人名</li><li>一个朝代一个朝代孤立地记</li><li>标准答案、对错分明</li><li>"学完就忘"</li></ul></div>
+        <div class="vcol yes"><div class="vh">✓ 这里的历史</div><ul><li>在地图与时间轴上自由探索</li><li>看见文明之间、人物之间的<b>连接</b></li><li>代入历史人物,自己<b>做抉择</b></li><li>把规律<b>迁移</b>到新情境和今天</li></ul></div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="k">怎么玩 · 三个入口</div>
+      <h2>三种方式,走进同一段历史</h2>
+      <div class="boards">
+        <div class="board" style="--ac:#e08a2c"><div class="bic">🗺️</div><div class="bt">世界地图 · 时间轴</div><div class="bd">拖动时间,看文明在地图上诞生、强盛、消失;点任意国家看它的完整历史。每个文明还有一条自己的时间轴。</div></div>
+        <div class="board" style="--ac:#2f9e86"><div class="bic">🕸️</div><div class="bt">人物关系网</div><div class="bd">星图般的"朋友圈":孔子、苏格拉底、凯撒……谁是谁的老师、对手、知己,一点就连成星座。</div></div>
+        <div class="board" style="--ac:#b06aa0"><div class="bic">🎯</div><div class="bt">抉择时刻</div><div class="bd">先弄懂当时的一切,再代入历史人物做一次艰难的选择;走完几个相似的抉择,自己提炼出"规律"。</div></div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="k">孩子能学到什么</div>
+      <h2>五个维度,一种能"用"的历史</h2>
+      <div class="dims">
+        <div class="dim"><span class="di">🗺️</span><span class="dx"><b>大局观</b>——这件事发生时,世界别处在发生什么?</span></div>
+        <div class="dim"><span class="di">🔗</span><span class="dx"><b>因果</b>——会追问"为什么"和"然后呢",而不只记住结论。</span></div>
+        <div class="dim"><span class="di">🧩</span><span class="dx"><b>规律</b>——能说"这个像那个",把一条规律搬到新案例。</span></div>
+        <div class="dim"><span class="di">❤️</span><span class="dx"><b>人性</b>——会说"如果是我会…",并能讲出对方的难处。</span></div>
+        <div class="dim"><span class="di">🔍</span><span class="dx"><b>证据</b>——会问"这是谁说的、怎么知道的"。</span></div>
+      </div>
+      <p style="margin-top:14px">当孩子能把"商鞅、吴起、王安石都因变法而死"提炼成一条规律、再迁移到今天——<b>那一刻,他才真正"学到了"历史。</b></p>
+    </div>
+
+    <div class="sec">
+      <div class="k">关于 AI 与史实</div>
+      <h2>AI 陪着问,而不是替孩子想</h2>
+      <p>每个页面右下角都有一位 AI 小助手,它了解当前的内容,会<b>多反问、引导思考,而不直接给标准答案</b>(比如"他为什么这么选?""换作是你呢?")。所有史实都经过逐条核对,取自《史记》《左传》、希罗多德《历史》等权威记载;讲法适合 10–12 岁,残酷处点到为止。</p>
+    </div>
+
+    <div class="cta"><a href="./index.html">▶ 带孩子进去看看</a></div>
+    <div class="foot">适合 10–12 岁 · 可在手机/平板/电脑上使用<br>由白白的 AI 教育实验室打造</div>
+  </div>
+</div>
+<script src="./ai_float.js?v=2"></script>
+</body>
+</html>

@@ -206,6 +206,6 @@ function pickOpt(i){
 function saveNote(e){ const n=document.getElementById('myNote'); if(n){localStorage.setItem('pattern_cost',n.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的发现',1500);} }
 window.addEventListener('DOMContentLoaded',()=>{const n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('pattern_cost')||'';});
 </script>
-<script src="./ai_float.js?v=1"></script>
+<script src="./ai_float.js?v=2"></script>
 </body>
 </html>

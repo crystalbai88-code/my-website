@@ -322,6 +322,6 @@ function pickFind(id,i){
 }
 function saveFind(id,e){ const f=FINDMAP[id]; const mv=document.getElementById('mv_'+id); if(mv){localStorage.setItem(f.key,mv.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的发现',1500);} }
 </script>
-<script src="./ai_float.js?v=1"></script>
+<script src="./ai_float.js?v=2"></script>
 </body>
 </html>
