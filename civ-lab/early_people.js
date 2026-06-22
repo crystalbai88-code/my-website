@@ -35,6 +35,12 @@ const CLASSICAL_PEOPLE=[
   {id:"agamemnon",n:"阿伽门农",e:"Agamemnon",c:"aegean",r:"ruler",d:"传说(约前1250)",b:"迈锡尼王、特洛伊战争希腊联军统帅;'阿伽门农黄金面具'闻名。",rel:[{i:"nestor",t:"麾下谋臣"}]},
   {id:"nestor",n:"涅斯托尔",e:"Nestor",c:"aegean",r:"other",d:"传说",b:"皮洛斯老王,特洛伊战争中的智慧顾问;皮洛斯宫殿出土大量线形文字B。",rel:[{i:"agamemnon",t:"同盟"}]},
   // ── 华夏 (china) ──
+  // 史记批次4 · 上古五帝(《史记·五帝本纪》)
+  {id:"huangdi",n:"黄帝",e:"Yellow Emperor",c:"china",r:"ruler",d:"约前2700(传说)",b:"传说中的华夏人文初祖。阪泉之战收服炎帝、涿鹿之战擒杀蚩尤,统一华夏诸部;后世华人自称'炎黄子孙'。",rel:[{i:"yandi",t:"阪泉之战"},{i:"chiyou",t:"涿鹿擒之"}]},
+  {id:"yandi",n:"炎帝",e:"Yan Emperor",c:"china",r:"ruler",d:"约前2700(传说)",b:"即神农氏,传说尝百草、教民耕种。与黄帝阪泉之战后融合,合称'炎黄'。",rel:[{i:"huangdi",t:"阪泉而后合"}]},
+  {id:"chiyou",n:"蚩尤",e:"Chiyou",c:"china",r:"general",d:"上古(传说)",b:"九黎部落首领,骁勇善战、传说能呼风唤雨;涿鹿之战败于黄帝,后世尊为'战神'。",rel:[{i:"huangdi",t:"涿鹿败亡"}]},
+  {id:"yao",n:"尧",e:"Yao",c:"china",r:"ruler",d:"约前2300(传说)",b:"五帝之一,定历法、敬授民时,以仁德治天下;不传子而'禅让'于舜,'尧天舜日'是太平象征。",rel:[{i:"shun",t:"禅让于舜"}]},
+  {id:"shun",n:"舜",e:"Shun",c:"china",r:"ruler",d:"约前2200(传说)",b:"五帝之一,以孝感动天下,受尧禅让;任用大禹治水,又禅位于禹——'禅让'传统的典范。",rel:[{i:"yao",t:"受尧禅让"},{i:"dayu",t:"禅让于禹"}]},
   {id:"dayu",n:"大禹",e:"Yu the Great",c:"china",r:"ruler",d:"约前2070",b:"治水英雄,三过家门而不入;其子启开创世袭王朝(夏)。",rel:[{i:"qi",t:"其子"}]},
   {id:"qi",n:"启",e:"Qi",c:"china",r:"ruler",d:"约前2070",b:"禹之子,继位打破禅让、开创'家天下'的夏王朝。",rel:[{i:"dayu",t:"其父"}]},
   {id:"jie",n:"夏桀",e:"Jie",c:"china",r:"ruler",d:"夏末",b:"夏朝末代暴君,荒淫无道,被商汤推翻。",rel:[{i:"tang",t:"被其推翻"}]},

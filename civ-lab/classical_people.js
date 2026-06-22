@@ -88,6 +88,18 @@ const CLASSICAL_PEOPLE=[
 {id:"fankuai",n:"樊哙",e:"Fan Kuai",c:"china",r:"general",d:"？—前189",b:"出身屠狗，刘邦麾下猛将。鸿门宴上闯帐持盾、怒斥项羽，护刘邦脱险，是忠勇的代表；又是吕后的妹夫。",rel:[{i:"liubang",t:"护卫"},{i:"xiangyu",t:"鸿门宴抗之"},{i:"lvhou",t:"连襟"}]},
 {id:"zhoubo",n:"周勃",e:"Zhou Bo",c:"china",r:"general",d:"？—前169",b:"汉初开国功臣，木讷少文却忠厚刚毅。刘邦预言'安刘氏者必勃也'；吕后死后他与陈平一举铲除诸吕、迎立汉文帝，挽救刘汉江山。",rel:[{i:"liubang",t:"效力"},{i:"chenping",t:"共诛诸吕"},{i:"lvhou",t:"平其诸吕"}]},
 {id:"jiayi",n:"贾谊",e:"Jia Yi",c:"china",r:"thinker",d:"前200—前168",b:"西汉第一才子，少年成名。作《过秦论》总结秦亡教训、《治安策》献策削藩；遭排挤贬长沙，途经汨罗作《吊屈原赋》，英年早逝——'屈贾谊于长沙'。",rel:[{i:"quyuan",t:"凭吊"}]},
+{id:"wuqi",n:"吴起",e:"Wu Qi",c:"china",r:"general",d:"约前440—前381",b:"军事家、改革家。在魏国练就精锐'魏武卒'，在楚国主持变法、削夺贵族特权使楚国强盛；楚悼王一死，旧贵族作乱，他伏在王尸上被乱箭射死——与商鞅同为'变法图强却遭旧势力反扑'的悲剧。",rel:[{i:"shangyang",t:"同为变法者"},{i:"sunbin",t:"兵家并称"}]},
+// ═══ 史记批次3 · 西汉朝臣 ═══
+{id:"chaocuo",n:"晁错",e:"Chao Cuo",c:"china",r:"thinker",d:"前200—前154",b:"汉景帝智囊，力主'削藩'加强中央；引发吴楚七国之乱，景帝为平息叛乱将他腰斩于市——'清君侧'的牺牲品。",rel:[{i:"zhouyafu",t:"乱由其平"},{i:"jiayi",t:"同主削藩"}]},
+{id:"zhouyafu",n:"周亚夫",e:"Zhou Yafu",c:"china",r:"general",d:"？—前143",b:"周勃之子，治军严明，'细柳营'令汉文帝叹服；三个月平定七国之乱，功盖一时，却因刚直得罪权贵，蒙冤下狱、绝食而亡。",rel:[{i:"zhoubo",t:"父"},{i:"chaocuo",t:"平其乱"}]},
+{id:"zhufuyan",n:"主父偃",e:"Zhufu Yan",c:"china",r:"thinker",d:"？—前126",b:"为汉武帝献'推恩令'，兵不血刃瓦解诸侯；权倾一时却自言'生不五鼎食，死即五鼎烹'，终因横行被族诛。",rel:[{i:"wudi_han",t:"献推恩令"}]},
+{id:"jian",n:"汲黯",e:"Ji An",c:"china",r:"other",d:"？—前112",b:"汉武帝朝著名直臣，敢当面顶撞皇帝、批其'内多欲而外施仁义'；武帝虽不快却敬畏，称他为'社稷之臣'。",rel:[{i:"wudi_han",t:"直谏"}]},
+{id:"dongfangshuo",n:"东方朔",e:"Dongfang Shuo",c:"china",r:"other",d:"前154—前93",b:"汉武帝身边的智慧弄臣，诙谐机辩、寓庄于谐，常以玩笑进谏；后世奉为'大隐隐于朝'的代表。",rel:[{i:"wudi_han",t:"近臣"}]},
+{id:"sima_xiangru",n:"司马相如",e:"Sima Xiangru",c:"china",r:"thinker",d:"约前179—前118",b:"汉赋第一大家，《子虚赋》《上林赋》气象恢宏；与卓文君'凤求凰'私奔、当垆卖酒的爱情故事千古流传。",rel:[{i:"wudi_han",t:"以赋得宠"}]},
+{id:"weizifu",n:"卫子夫",e:"Wei Zifu",c:"china",r:"ruler",d:"？—前91",b:"出身歌女，得汉武帝宠爱立为皇后，执掌后宫数十年；弟卫青、外甥霍去病皆因她显贵。晚年遭'巫蛊之祸'牵连，自尽。",rel:[{i:"wudi_han",t:"皇后"},{i:"weiqing",t:"姊弟"},{i:"huoqubing",t:"姨母"}]},
+{id:"huoguang",n:"霍光",e:"Huo Guang",c:"china",r:"other",d:"？—前68",b:"霍去病异母弟，汉武帝临终托孤大臣。辅佐幼帝、废立昏君、迎立汉宣帝，执掌朝政二十年，'霍光辅政'是权臣辅国的典型。",rel:[{i:"huoqubing",t:"异母弟"},{i:"wudi_han",t:"受托孤"}]},
+{id:"sanghongyang",n:"桑弘羊",e:"Sang Hongyang",c:"china",r:"other",d:"前152—前80",b:"汉武帝的理财大臣，推行盐铁专卖、平准均输，为连年征战充实国库；'与民争利'之争，留下著名的《盐铁论》。",rel:[{i:"wudi_han",t:"理财"}]},
+{id:"dou_taihou",n:"窦太后",e:"Empress Dowager Dou",c:"china",r:"ruler",d:"？—前135",b:"汉文帝皇后，历文、景、武三朝，笃信黄老之学、主张无为而治，曾压制儒生，是汉初政坛举足轻重的女性。",rel:[{i:"wudi_han",t:"祖母"},{i:"dongzhongshu",t:"抑其儒术"}]},
 
 // ═══ 希腊 ═══
 {id:"thales",n:"泰利斯",e:"Thales",c:"greece",r:"thinker",d:"约前624—前546",b:"第一位哲学家，预测前585年日食，'万物本质是水'，从神话到理性解释的第一人。",rel:[{i:"anaximander",t:"学生"}]},

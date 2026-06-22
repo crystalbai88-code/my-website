@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>抉择时刻 · 吴起变法 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;display:flex;flex-direction:column;align-items:center}
+  .top{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:12px 16px;
+    background:linear-gradient(180deg,rgba(var(--scrim,0,0,0),.25),transparent);position:sticky;top:0;z-index:20}
+  .top a.back{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.1em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .top .brand{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink)}
+  .prog{display:flex;gap:5px;margin-left:auto}
+  .prog i{width:13px;height:4px;border-radius:3px;background:var(--panel-line)}
+  .prog i.on{background:var(--gold)}
+  .wrap{width:min(660px,92%);margin:8px auto 70px;flex:1}
+  .beat{animation:fin .5s cubic-bezier(.22,1,.36,1)}
+  @keyframes fin{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;font-weight:700;text-align:center;margin-top:18px}
+  .htitle{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);text-align:center;line-height:1.3;margin:6px 0 4px;text-shadow:var(--label-shadow)}
+  .hsub{font-family:var(--mono);font-size:12px;color:var(--ink3);text-align:center;letter-spacing:.08em;margin-bottom:18px}
+  .scene{font-family:var(--serif);font-size:clamp(15px,3.8vw,17.5px);color:var(--ink);line-height:1.95;
+    background:var(--panel-bg);border:1px solid var(--panel-line);border-left:4px solid var(--gold);border-radius:14px;
+    padding:18px 20px;backdrop-filter:blur(8px)}
+  .scene b{color:var(--gold)}
+  .dossier-intro{font-family:var(--sans);font-size:14.5px;color:var(--ink2);text-align:center;line-height:1.7;margin:4px 0 16px}
+  .dcount{font-family:var(--mono);font-size:12px;color:var(--gold);text-align:center;font-weight:700;margin-bottom:12px}
+  .dcard{background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:14px;margin-bottom:11px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+  .dcard.open{border-color:var(--gold)}
+  .dhead{display:flex;align-items:center;gap:11px;padding:15px 17px}
+  .dhead .di{font-size:21px}
+  .dhead .dt{font-family:var(--sans);font-weight:800;font-size:15.5px;color:var(--ink);flex:1}
+  .dhead .dchev{font-family:var(--mono);font-size:11px;color:var(--ink3);transition:transform .2s}
+  .dcard.open .dchev{transform:rotate(90deg);color:var(--gold)}
+  .dhead .ddot{width:8px;height:8px;border-radius:50%;background:var(--vermilion);flex:none}
+  .dcard.open .ddot{background:var(--cyan)}
+  .dbody{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .dbody-in{padding:0 17px 16px;font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.85}
+  .dbody-in b{color:var(--gold)}
+  .dbody-in ul{margin:8px 0 0;padding-left:2px;list-style:none}
+  .dbody-in li{margin:7px 0;padding-left:16px;position:relative}
+  .dbody-in li:before{content:'·';position:absolute;left:3px;color:var(--vermilion);font-weight:900}
+  .dbody-in li b{color:var(--vermilion)}
+  .ask{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);text-align:center;margin:22px 0 6px}
+  .asksub{font-family:var(--sans);font-size:13.5px;color:var(--ink2);text-align:center;margin-bottom:16px;line-height:1.6}
+  .choices{display:flex;flex-direction:column;gap:11px}
+  .choice{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink);background:var(--panel-bg);
+    border:1.5px solid var(--panel-line);border-radius:14px;padding:15px 17px;cursor:pointer;transition:all .15s;text-align:left;line-height:1.5}
+  .choice:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+  .choice .ckey{font-weight:900;color:var(--gold);margin-right:8px}
+  .choice.picked{border-color:var(--gold);background:rgba(224,138,44,.1)}
+  .reaction{margin-top:14px;font-size:14.5px;color:var(--ink);line-height:1.75;background:rgba(224,138,44,.1);
+    border-left:4px solid var(--gold);border-radius:8px;padding:13px 16px;display:none}
+  .reaction.show{display:block;animation:fin .4s}
+  .lines{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+  .line{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:12px;padding:13px 16px}
+  .line .lh{font-family:var(--serif);font-weight:900;font-size:14px;color:var(--gold);margin-bottom:4px}
+  .line .lt{font-size:14px;color:var(--ink);line-height:1.7}
+  .line .lt b{color:var(--vermilion)}
+  .voice{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:13px;padding:13px 16px;margin-bottom:10px}
+  .voice .vw{font-family:var(--sans);font-weight:800;font-size:14px;color:var(--ink);margin-bottom:5px}
+  .voice .va{font-size:14px;color:var(--ink2);line-height:1.7}
+  .note{font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:center;margin-top:12px}
+  .q{font-family:var(--serif);font-size:16.5px;color:var(--ink);line-height:1.75;margin:14px 0;padding-left:14px;border-left:3px solid var(--gold)}
+  .q b{color:var(--gold)}
+  textarea{width:100%;box-sizing:border-box;margin-top:10px;font-family:var(--sans);font-size:15px;color:var(--ink);
+    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:12px;padding:13px 15px;min-height:80px;outline:none;resize:vertical}
+  .btnrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
+  .nextbtn{font-family:var(--sans);font-weight:800;font-size:15px;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));
+    border:none;border-radius:999px;padding:13px 30px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.16)}
+  .nextbtn:active{transform:scale(.97)}
+  .nextbtn[disabled]{opacity:.4;cursor:not-allowed;box-shadow:none}
+  .ghost{font-family:var(--sans);font-weight:700;font-size:14px;color:var(--gold);background:var(--panel-bg);
+    border:1px solid var(--panel-line);border-radius:999px;padding:11px 20px;cursor:pointer;text-decoration:none;display:inline-block}
+  .gate{text-align:center;font-family:var(--sans);font-size:12.5px;color:var(--ink3);margin-top:6px}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="top">
+    <a class="back" href="./stories.html">⌂ 抉择</a>
+    <span class="brand">🎯 抉择时刻</span>
+    <div class="prog" id="prog"></div>
+  </div>
+  <div class="wrap"><div class="beat" id="beat"></div></div>
+</div>
+<script src="./track.js?v=1"></script>
+<script>
+window.__aiCtx='用户正在体验"抉择时刻·吴起变法"(母题:改革的代价,与商鞅同一条找规律线)。背景据《史记·孙子吴起列传》:战国前期,吴起在楚悼王支持下任令尹主持变法——明法审令、削夺疏远贵族的世袭爵禄、裁撤冗官、把省下的钱粮用来强兵,使楚国南平百越、北却三晋、诸侯畏惧;但严重触犯旧贵族利益。公元前381年楚悼王一死,宗室大臣立刻作乱攻杀吴起,吴起逃到楚悼王停灵处、伏在王尸上,贵族放箭射死吴起、也射中了悼王的尸体;新君楚肃王即位后,以"在先王尸体前动兵(丽兵于王尸)"为大罪,族灭了射吴起并中王尸的七十余家贵族——吴起以自己的死拉了仇敌陪葬。这与商鞅"变法图强、君主一死即被旧势力清算"的结局如出一辙,二人同属"改革的代价"母题。请用适合10-12岁孩子的语言陪他思考,多反问,不要替他下结论。';
+let pick=null;
+const DOSSIER=[
+  {i:'🗡️',t:'你是谁',b:'你是<b>吴起</b>,战国前期最能打的军事家之一。你带兵和士兵同吃同住,甚至亲口为伤兵<b>吮出脓血</b>,将士都愿为你死战;你在魏国练出了精锐的"<b>魏武卒</b>"。'},
+  {i:'🏯',t:'你的楚国',b:'你辗转来到<b>楚国</b>。楚国地大人多,却<b>积弱不振</b>:大量爵位、俸禄被疏远的旧贵族世代白白占着,真正打仗、做事的人反而没有出头之日。'},
+  {i:'🤝',t:'你的机会',b:'楚王(<b>楚悼王</b>)久闻你的大名,一上来就拜你为<b>令尹</b>(楚国最高官职),把整个国家的改革大权交给你。这是你一展抱负的舞台。'},
+  {i:'⚔️',t:'要动谁的奶酪',b:'要让楚国强起来,你看得很清楚,必须:<ul><li><b>废掉</b>疏远贵族世袭的爵位俸禄</li><li>裁掉只拿钱不办事的冗官</li><li>把省下的钱粮,全用来<b>养精兵</b></li></ul>——而这每一刀,都砍在<b>旧贵族</b>的身上。'},
+  {i:'⏳',t:'一个隐患',b:'你的全部权力,都来自<b>楚悼王一个人</b>的支持。可楚王能撑多久,没有人知道。一旦他不在了,那些被你夺走特权、恨你入骨的旧贵族……会怎么对你?'},
+  {i:'⚡',t:'眼前的难题',b:'楚王把刀交到你手里。你可以<b>大刀阔斧</b>地削贵族、强楚国,代价是与整个旧势力为敌;也可以<b>温和一点</b>、留点余地,换自己平安。<br><b>你会下多重的手?</b>'},
+];
+let opened=new Set();
+const beats=[];
+beats.push(()=>`
+  <div class="kicker">公元前 4 世纪 · 楚国</div>
+  <div class="htitle">楚王把改革的刀,交到了你手里</div>
+  <div class="hsub">即将由你 —— 吴起 —— 决定</div>
+  <div class="scene">战国前期,你是名将<b>吴起</b>。楚悼王把整个国家的改革大权交给你,要你让积弱的楚国强起来。<br><br>你即将做一个决定——它能让楚国脱胎换骨,也可能在将来的某一天,要了你的命。<br><br>但是——<b>在你决定之前,先别急。</b> 先把这盘棋,看清楚。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(1)">📂 先弄懂这盘棋 →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第一步 · 了解</div>
+  <div class="htitle" style="font-size:23px">看清这盘棋</div>
+  <div class="dossier-intro">点开下面每一张情报卡,弄懂你的处境、你要动谁、和那个隐患。<br>全部看完,你才有资格替吴起做决定。</div>
+  <div class="dcount" id="dcount">已了解 0 / ${DOSSIER.length}</div>
+  <div id="dwrap">${DOSSIER.map((d,i)=>`
+    <div class="dcard" data-i="${i}" onclick="flip(${i})">
+      <div class="dhead"><span class="ddot"></span><span class="di">${d.i}</span><span class="dt">${d.t}</span><span class="dchev">▶</span></div>
+      <div class="dbody" id="db${i}"><div class="dbody-in">${d.b}</div></div>
+    </div>`).join('')}</div>
+  <div class="btnrow"><button class="nextbtn" id="toChoice" onclick="go(2)" disabled>换作是你,你会怎么做? →</button></div>
+  <div class="gate" id="gate">(看完全部 ${DOSSIER.length} 张情报卡后解锁)</div>`);
+beats.push(()=>`
+  <div class="kicker">第二步 · 此刻,你就是吴起</div>
+  <div class="ask">下多重的手?</div>
+  <div class="asksub">你已经看清了整盘棋——楚王的支持、旧贵族的特权、还有那个"靠山一倒就危险"的隐患。<br>现在,这个决定由你来下。</div>
+  <div class="choices">
+    <div class="choice" data-k="A" onclick="choose('A')"><span class="ckey">A</span>大刀阔斧——彻底废掉贵族世袭特权,把钱粮全用来强兵,哪怕与整个旧势力为敌。</div>
+    <div class="choice" data-k="B" onclick="choose('B')"><span class="ckey">B</span>温和改良——只改一部分,给贵族留点体面,免得树敌太狠。</div>
+    <div class="choice" data-k="C" onclick="choose('C')"><span class="ckey">C</span>不碰贵族——只练兵、不动既得利益,先保住自己的安全。</div>
+  </div>
+  <div class="reaction" id="reaction"></div>`);
+beats.push(()=>`
+  <div class="kicker">第三步 · 真实的他</div>
+  <div class="htitle" style="font-size:22px">吴起,选了 A</div>
+  <div class="scene">他没有留情。<b>明法审令</b>,废掉疏远贵族世袭的爵禄,裁撤冗官,把省下的钱粮全部投到军队上。<br><br>楚国很快脱胎换骨——<b>南平百越、北却三晋、西伐强秦</b>,诸侯都开始害怕楚国。<br><br>可与此同时,被夺走特权的旧贵族,对他<b>恨之入骨</b>。而吴起心里清楚:他全部的靠山,只有楚王一个人。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(4)">那……后来呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第四步 · 一个决定,延伸出三条线</div>
+  <div class="lines">
+    <div class="line"><div class="lh">⚡ 短期</div><div class="lt">楚国国力大涨,军威赫赫,一时成为诸侯最忌惮的强国。</div></div>
+    <div class="line"><div class="lh">🌅 长远</div><div class="lt">变法虽因他的死而中断,但"变法图强"的火种留了下来——几十年后,<b>商鞅在秦国把同样的事做到了底</b>。</div></div>
+    <div class="line"><div class="lh">🥀 他自己</div><div class="lt"><b>楚悼王一死,旧贵族当场作乱</b>。吴起逃到楚王停灵处、伏在王尸上,仍被乱箭射死——可箭也射中了王的尸体。新王依"在先王尸前动兵"的重罪,<b>族灭了七十多家贵族</b>。吴起,用自己的死拉了仇敌陪葬。</div></div>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(5)">别人怎么看这场变法? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第五步 · 同一场变法,不同的声音</div>
+  <div class="voice"><div class="vw">⚖️ 后来的法家(商鞅、韩非)</div><div class="va">"他证明了:变法能让国家强大,但变法的人,必须做好<b>被旧势力反扑</b>的准备。"</div></div>
+  <div class="voice"><div class="vw">👑 楚国旧贵族</div><div class="va">"他夺走了我们世世代代的特权和俸禄。不杀他,难平我们心头之恨!"</div></div>
+  <div class="voice"><div class="vw">🪖 一个楚国士兵</div><div class="va">"吴起将军和我们同吃同住,还亲口为伤兵吸脓。为这样的将军,我们愿意拼命。"</div></div>
+  <div class="voice"><div class="vw">📜 史家</div><div class="va">"他才能盖世,却'刻暴少恩',不得善终。变法者的宿命,他和后来的商鞅,几乎一模一样。"</div></div>
+  <div class="note">同一场变法,没有标准答案。 · 史料:《史记·孙子吴起列传》</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(6)">它和后来的历史有什么关系? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第六步 · 火种,传了下去</div>
+  <div class="scene">吴起的变法,人一死就被废掉,像一场<b>夭折的改革</b>。<br><br>但"<b>变法图强</b>"这把火没有熄灭——几十年后,<b>商鞅</b>在秦国把同样的事做到了底,秦国因此一步步走向统一。<br><br>吴起在楚、商鞅在秦,一前一后,共同写下了一条冰冷的规律:<br><b>动了既得利益的人,往往要拿自己的命去填。</b></div>
+  <div class="btnrow" style="margin-top:16px">
+    <a class="ghost" href="./map.html?civ=qin">🗺 去地图看 秦(把变法做到底的国家)</a>
+    <a class="ghost" href="./classical-network.html?all=1">🕸 看这个时代的人物关系网</a>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(7)">那……换作是你呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">最后 · 回到你</div>
+  <div class="htitle" style="font-size:22px">换作是你呢?</div>
+  <div class="q">明知道靠山一倒、自己就会被反扑,变法者还<b>该不该硬干</b>到底?</div>
+  <div class="q">吴起(楚)和商鞅(秦),隔了几十年,<b>变法、强国、被旧贵族清算</b>——结局几乎一模一样。这是巧合,还是藏着同一条<b>规律</b>?</div>
+  <div class="q">你最开始选的是 <b id="myPick">?</b>,和吴起(A)一样吗?走到这里,你的想法<b>变了</b>吗?</div>
+  <div style="font-family:var(--sans);font-weight:700;color:var(--ink);margin-top:18px">✍️ 写下你从吴起的抉择里,看懂的一句话:</div>
+  <textarea id="myNote" placeholder="比如:改变旧世界的人,常常等不到新世界……"></textarea>
+  <div class="btnrow"><button class="nextbtn" onclick="saveNote(event)">💾 记下我的收获</button></div>
+  <div class="btnrow" style="margin-top:14px">
+    <a class="nextbtn" href="./stories.html" style="text-decoration:none">🧩 回到「改革的代价」这条线:和商鞅放一起找规律 →</a>
+  </div>
+  <div class="btnrow" style="margin-top:8px">
+    <button class="ghost" onclick="if(window.toggleAIFloat)toggleAIFloat()">🤖 和 AI 聊聊这个抉择</button>
+    <button class="ghost" onclick="pick=null;opened=new Set();go(0)">↺ 重新走一遍</button>
+  </div>`);
+
+let cur=0;
+function render(){
+  document.getElementById('beat').innerHTML=beats[cur]();
+  document.getElementById('prog').innerHTML=beats.map((_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('');
+  if(cur===1){ refreshGate(); }
+  if(cur===7){ const m=document.getElementById('myPick'); if(m)m.textContent=pick||'?'; const n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('decision_wuqi')||''; }
+  window.scrollTo({top:0,behavior:'instant'});
+  if(window.Track) Track.log('抉择时刻');
+}
+function go(n){ cur=n; render(); }
+function flip(i){
+  const card=document.querySelector('.dcard[data-i="'+i+'"]');
+  const body=document.getElementById('db'+i);
+  const isOpen=card.classList.toggle('open');
+  body.style.maxHeight=isOpen?(body.scrollHeight+'px'):'0';
+  if(isOpen){ opened.add(i); refreshGate(); }
+}
+function refreshGate(){
+  const c=document.getElementById('dcount'); if(c)c.textContent='已了解 '+opened.size+' / '+DOSSIER.length;
+  const btn=document.getElementById('toChoice'); const gate=document.getElementById('gate');
+  if(opened.size>=DOSSIER.length){ if(btn)btn.disabled=false; if(gate)gate.textContent='✅ 你已看清整盘棋,可以决定了'; }
+}
+function choose(k){
+  pick=k;
+  document.querySelectorAll('.choice').forEach(c=>{c.classList.toggle('picked',c.dataset.k===k);c.onclick=null;});
+  const react={A:'雷厉风行!可你把整个旧贵族都得罪光了——靠山楚王若有一天不在,你怎么办?',
+    B:'想留余地。但改革一旦留情,既得利益就会反扑回来,楚国还强得起来吗?',
+    C:'最安全。可楚王把改革大权交给你,你却什么都不敢动——这舞台,你白上了。'}[k];
+  const r=document.getElementById('reaction');
+  r.innerHTML=react+'<div class="btnrow" style="margin-top:14px"><button class="nextbtn" onclick="go(3)">👉 看真实的吴起怎么选</button></div>';
+  r.classList.add('show');
+}
+function saveNote(e){ const n=document.getElementById('myNote'); if(n){localStorage.setItem('decision_wuqi',n.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的收获',1500);} }
+render();
+</script>
+<script src="./ai_float.js?v=1"></script>
+</body>
+</html>
