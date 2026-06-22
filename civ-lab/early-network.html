@@ -265,11 +265,15 @@ function draw(){
     const inFilter = relFilter==='all' || e.cat===relFilter;
     const isHighlighted=(selId&&(a.id===selId||b.id===selId)) || (relFilter!=='all'&&inFilter);
     ctx.save();
-    if(relFilter!=='all' && !inFilter){ ctx.globalAlpha=0.05; ctx.strokeStyle=TH.edge; ctx.lineWidth=0.5; }
-    else { ctx.globalAlpha=isHighlighted?0.9:0.32; ctx.strokeStyle=isHighlighted?(REL_CAT_COLOR[e.cat]||roleColor(a.data.r)):TH.edge; ctx.lineWidth=isHighlighted?1.8:0.7; }
-    if(selId && !isHighlighted) ctx.globalAlpha=0.07;
-    if(!isHighlighted)ctx.setLineDash([3,4]);
-    ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+    ctx.globalCompositeOperation='lighter'; ctx.lineCap='round';
+    var _ca=roleColor(a.data.r);
+    if(relFilter!=='all' && !inFilter){ ctx.globalAlpha=0.04; ctx.strokeStyle=_ca; ctx.lineWidth=0.5; }
+    else if(selId && !isHighlighted){ ctx.globalAlpha=0.05; ctx.strokeStyle=_ca; ctx.lineWidth=0.5; }
+    else if(isHighlighted){ ctx.globalAlpha=0.85; ctx.strokeStyle=(REL_CAT_COLOR[e.cat]||_ca); ctx.lineWidth=1.8; }
+    else { ctx.globalAlpha=0.16; ctx.strokeStyle=_ca; ctx.lineWidth=0.8; }
+    { var _dx=b.x-a.x,_dy=b.y-a.y,_len=Math.hypot(_dx,_dy)||1,_bow=Math.min(_len*0.12,24);
+      var _cx=(a.x+b.x)/2-_dy/_len*_bow,_cy=(a.y+b.y)/2+_dx/_len*_bow;
+      ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.quadraticCurveTo(_cx,_cy,b.x,b.y);ctx.stroke(); }
     ctx.restore();
     // 选中节点时，在连线中点标出"两人之间是什么关系"
     const showLabel = e.t && selId && (a.id===selId||b.id===selId);
@@ -301,9 +305,12 @@ function draw(){
       ctx.beginPath();ctx.arc(n.x,n.y,r+4,0,Math.PI*2);
       ctx.strokeStyle=col;ctx.lineWidth=2.5;ctx.globalAlpha=isSel?0.95:0.5;ctx.stroke();
     }
-    // 星辰辉光(星空)
-    ctx.save();ctx.globalAlpha=isSel?0.6:isHov?0.45:0.32;ctx.shadowColor=col;ctx.shadowBlur=isSel?30:isHov?22:15;
-    ctx.beginPath();ctx.arc(n.x,n.y,r*0.9,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();ctx.restore();
+    // 星辰 bloom(叠加发光)
+    ctx.save();ctx.globalCompositeOperation='lighter';
+    var _bg=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,r*2.7);
+    _bg.addColorStop(0,col);_bg.addColorStop(0.4,col);_bg.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.globalAlpha=isSel?0.92:isHov?0.64:0.44;ctx.fillStyle=_bg;
+    ctx.beginPath();ctx.arc(n.x,n.y,r*2.7,0,Math.PI*2);ctx.fill();ctx.restore();
     // 角色色圆底(头像底座)
     ctx.beginPath();ctx.arc(n.x,n.y,r,0,Math.PI*2);
     ctx.fillStyle=col;ctx.globalAlpha=isSel||isHov?1:0.9;ctx.fill();ctx.globalAlpha=1;
