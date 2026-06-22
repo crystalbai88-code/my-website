@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>抉择时刻 · 玄武门之变 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;display:flex;flex-direction:column;align-items:center}
+  .top{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:12px 16px;
+    background:linear-gradient(180deg,rgba(var(--scrim,0,0,0),.25),transparent);position:sticky;top:0;z-index:20}
+  .top a.back{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.1em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .top .brand{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink)}
+  .prog{display:flex;gap:5px;margin-left:auto}
+  .prog i{width:13px;height:4px;border-radius:3px;background:var(--panel-line)}
+  .prog i.on{background:var(--gold)}
+  .wrap{width:min(660px,92%);margin:8px auto 70px;flex:1}
+  .beat{animation:fin .5s cubic-bezier(.22,1,.36,1)}
+  @keyframes fin{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;font-weight:700;text-align:center;margin-top:18px}
+  .htitle{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);text-align:center;line-height:1.3;margin:6px 0 4px;text-shadow:var(--label-shadow)}
+  .hsub{font-family:var(--mono);font-size:12px;color:var(--ink3);text-align:center;letter-spacing:.08em;margin-bottom:18px}
+  .scene{font-family:var(--serif);font-size:clamp(15px,3.8vw,17.5px);color:var(--ink);line-height:1.95;
+    background:var(--panel-bg);border:1px solid var(--panel-line);border-left:4px solid var(--gold);border-radius:14px;
+    padding:18px 20px;backdrop-filter:blur(8px)}
+  .scene b{color:var(--gold)}
+  .dossier-intro{font-family:var(--sans);font-size:14.5px;color:var(--ink2);text-align:center;line-height:1.7;margin:4px 0 16px}
+  .dcount{font-family:var(--mono);font-size:12px;color:var(--gold);text-align:center;font-weight:700;margin-bottom:12px}
+  .dcard{background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:14px;margin-bottom:11px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+  .dcard.open{border-color:var(--gold)}
+  .dhead{display:flex;align-items:center;gap:11px;padding:15px 17px}
+  .dhead .di{font-size:21px}
+  .dhead .dt{font-family:var(--sans);font-weight:800;font-size:15.5px;color:var(--ink);flex:1}
+  .dhead .dchev{font-family:var(--mono);font-size:11px;color:var(--ink3);transition:transform .2s}
+  .dcard.open .dchev{transform:rotate(90deg);color:var(--gold)}
+  .dhead .ddot{width:8px;height:8px;border-radius:50%;background:var(--vermilion);flex:none}
+  .dcard.open .ddot{background:var(--cyan)}
+  .dbody{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .dbody-in{padding:0 17px 16px;font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.85}
+  .dbody-in b{color:var(--gold)}
+  .dbody-in ul{margin:8px 0 0;padding-left:2px;list-style:none}
+  .dbody-in li{margin:7px 0;padding-left:16px;position:relative}
+  .dbody-in li:before{content:'·';position:absolute;left:3px;color:var(--vermilion);font-weight:900}
+  .dbody-in li b{color:var(--vermilion)}
+  .ask{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);text-align:center;margin:22px 0 6px}
+  .asksub{font-family:var(--sans);font-size:13.5px;color:var(--ink2);text-align:center;margin-bottom:16px;line-height:1.6}
+  .choices{display:flex;flex-direction:column;gap:11px}
+  .choice{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink);background:var(--panel-bg);
+    border:1.5px solid var(--panel-line);border-radius:14px;padding:15px 17px;cursor:pointer;transition:all .15s;text-align:left;line-height:1.5}
+  .choice:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+  .choice .ckey{font-weight:900;color:var(--gold);margin-right:8px}
+  .choice.picked{border-color:var(--gold);background:rgba(224,138,44,.1)}
+  .reaction{margin-top:14px;font-size:14.5px;color:var(--ink);line-height:1.75;background:rgba(224,138,44,.1);
+    border-left:4px solid var(--gold);border-radius:8px;padding:13px 16px;display:none}
+  .reaction.show{display:block;animation:fin .4s}
+  .lines{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+  .line{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:12px;padding:13px 16px}
+  .line .lh{font-family:var(--serif);font-weight:900;font-size:14px;color:var(--gold);margin-bottom:4px}
+  .line .lt{font-size:14px;color:var(--ink);line-height:1.7}
+  .line .lt b{color:var(--vermilion)}
+  .voice{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:13px;padding:13px 16px;margin-bottom:10px}
+  .voice .vw{font-family:var(--sans);font-weight:800;font-size:14px;color:var(--ink);margin-bottom:5px}
+  .voice .va{font-size:14px;color:var(--ink2);line-height:1.7}
+  .note{font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:center;margin-top:12px}
+  .q{font-family:var(--serif);font-size:16.5px;color:var(--ink);line-height:1.75;margin:14px 0;padding-left:14px;border-left:3px solid var(--gold)}
+  .q b{color:var(--gold)}
+  textarea{width:100%;box-sizing:border-box;margin-top:10px;font-family:var(--sans);font-size:15px;color:var(--ink);
+    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:12px;padding:13px 15px;min-height:80px;outline:none;resize:vertical}
+  .btnrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
+  .nextbtn{font-family:var(--sans);font-weight:800;font-size:15px;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));
+    border:none;border-radius:999px;padding:13px 30px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.16)}
+  .nextbtn:active{transform:scale(.97)}
+  .nextbtn[disabled]{opacity:.4;cursor:not-allowed;box-shadow:none}
+  .ghost{font-family:var(--sans);font-weight:700;font-size:14px;color:var(--gold);background:var(--panel-bg);
+    border:1px solid var(--panel-line);border-radius:999px;padding:11px 20px;cursor:pointer;text-decoration:none;display:inline-block}
+  .gate{text-align:center;font-family:var(--sans);font-size:12.5px;color:var(--ink3);margin-top:6px}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="top">
+    <a class="back" href="./stories.html">⌂ 抉择</a>
+    <span class="brand">🎯 抉择时刻</span>
+    <div class="prog" id="prog"></div>
+  </div>
+  <div class="wrap"><div class="beat" id="beat"></div></div>
+</div>
+<script src="./track.js?v=1"></script>
+<script>
+window.__aiCtx='用户正在体验"抉择时刻·玄武门之变"(母题:该不该痛下杀手,与鸿门宴·项羽同一条找规律线,且是相反的选择)。史实据《资治通鉴》《旧唐书》:唐初,秦王李世民为大唐打下大半江山、功高震主,与长兄太子李建成、四弟齐王李元吉势同水火;太子集团多次加害他(下毒、夺其部将)。公元626年,李世民在长安宫城北门玄武门设伏,亲手射杀太子李建成,部将尉迟恭射杀齐王李元吉,又杀二人诸子,逼迫父亲唐高祖李渊立自己为太子、不久退位,李世民即位为唐太宗,随后虚心纳谏(重用原太子谋士魏征)、轻徭薄赋,开创"贞观之治",成为大唐盛世的奠基者;但也背上了"杀兄逼父"的道德污点,一生在意史书如何评价他。与项羽鸿门宴对照:项羽能杀刘邦却"心软"放走,终致败亡;李世民在权力顶峰"狠心"除掉兄弟,赢得天下却背负良心与名声的代价。这是没有标准答案的抉择。请用适合10-12岁孩子的语言陪他思考,多反问,不要替他下结论。';
+let pick=null;
+const DOSSIER=[
+  {i:'👑',t:'你是谁',b:'你是<b>李世民</b>,唐高祖李渊的次子、<b>秦王</b>。大唐的江山,大半是你打下来的——你战功赫赫、威望极高,身边聚集了尉迟恭、长孙无忌等一批死忠的能臣猛将。'},
+  {i:'👬',t:'你的兄弟',b:'你的长兄<b>李建成</b>是太子(储君),四弟<b>李元吉</b>和他联手。你功劳太大,盖过了太子,他们对你又忌又怕。朝堂分成两派,势同水火。'},
+  {i:'⚔️',t:'杀机已现',b:'太子一方已经几次想除掉你:在你的酒里下毒(你当场吐血)、设法调走你的猛将、削你的兵权……局势越来越凶险——已经到了<b>不是你死、就是我亡</b>的地步。'},
+  {i:'🏯',t:'你的处境',b:'父亲李渊按"立长为储"的规矩,偏向太子。你若<b>不动手</b>,一旦太子顺利登基,你和你这一帮部下,几乎一定会被<b>清算</b>。'},
+  {i:'⚖️',t:'道义的重量',b:'可是——他们是你的<b>亲哥哥、亲弟弟</b>。杀兄、弑弟、逼父退位,这会是一辈子洗不掉的<b>污点</b>。史书会怎么写你?后人会怎么骂你?'},
+  {i:'⚡',t:'眼前的难题',b:'谋士们一再劝你:先下手为强。<br>你可以<b>抢先动手</b>,在玄武门设伏除掉兄弟;可以<b>继续隐忍</b>,赌太子不会赶尽杀绝;也可以<b>主动退让</b>,交出兵权保命。<br><b>这一刀,下还是不下?</b>'},
+];
+let opened=new Set();
+const beats=[];
+beats.push(()=>`
+  <div class="kicker">公元 626 年 · 唐 · 长安 · 玄武门</div>
+  <div class="htitle">兄弟,还是皇位?</div>
+  <div class="hsub">即将由你 —— 李世民 —— 决定</div>
+  <div class="scene">公元626年,你是大唐的<b>秦王李世民</b>。你为这个王朝打下大半江山,如今却和你的亲兄弟,走到了你死我亡的绝境。<br><br>你即将做一个决定——它将决定你的生死,也将决定大唐的走向,还会成为史书上一笔<b>永远擦不掉的记录</b>。<br><br>但在你决定之前,<b>先别急。</b> 先把这盘棋,看清楚。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(1)">📂 先弄懂这盘棋 →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第一步 · 了解</div>
+  <div class="htitle" style="font-size:23px">看清这盘棋</div>
+  <div class="dossier-intro">点开下面每一张情报卡,弄懂你的功劳、兄弟的杀机、和那道道义的坎。<br>全部看完,你才有资格替李世民做决定。</div>
+  <div class="dcount" id="dcount">已了解 0 / ${DOSSIER.length}</div>
+  <div id="dwrap">${DOSSIER.map((d,i)=>`
+    <div class="dcard" data-i="${i}" onclick="flip(${i})">
+      <div class="dhead"><span class="ddot"></span><span class="di">${d.i}</span><span class="dt">${d.t}</span><span class="dchev">▶</span></div>
+      <div class="dbody" id="db${i}"><div class="dbody-in">${d.b}</div></div>
+    </div>`).join('')}</div>
+  <div class="btnrow"><button class="nextbtn" id="toChoice" onclick="go(2)" disabled>换作是你,你会怎么做? →</button></div>
+  <div class="gate" id="gate">(看完全部 ${DOSSIER.length} 张情报卡后解锁)</div>`);
+beats.push(()=>`
+  <div class="kicker">第二步 · 此刻,你就是李世民</div>
+  <div class="ask">下手,还是隐忍?</div>
+  <div class="asksub">你已经看清了整盘棋——你的战功、兄弟的杀机、父亲的偏袒,还有那"杀兄"二字的千钧重量。<br>现在,这个决定由你来下。</div>
+  <div class="choices">
+    <div class="choice" data-k="A" onclick="choose('A')"><span class="ckey">A</span>先下手为强——在玄武门设伏,除掉太子和齐王,夺取皇位。</div>
+    <div class="choice" data-k="B" onclick="choose('B')"><span class="ckey">B</span>继续隐忍——他们毕竟是我兄弟,我不愿背杀兄之名,赌他们不赶尽杀绝。</div>
+    <div class="choice" data-k="C" onclick="choose('C')"><span class="ckey">C</span>主动退让——交出兵权、离开长安,保住性命,把皇位让给太子。</div>
+  </div>
+  <div class="reaction" id="reaction"></div>`);
+beats.push(()=>`
+  <div class="kicker">第三步 · 真实的他</div>
+  <div class="htitle" style="font-size:22px">李世民,选了 A</div>
+  <div class="scene">他决定<b>抢先动手</b>。公元626年的清晨,他率亲信在<b>玄武门</b>设下埋伏。<br><br>当太子李建成、齐王李元吉骑马入宫,察觉不对想回头时,李世民<b>亲手一箭射死了长兄</b>;部将尉迟恭赶到,射杀了四弟。两人的儿子也被一并诛杀。<br><br>随后,他逼父亲李渊立自己为太子;两个月后,李渊退位,李世民登上皇位——<b>是为唐太宗</b>。他赢了,却也亲手沾上了兄弟的血。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(4)">那……后来呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第四步 · 一刀下去,延伸出三条线</div>
+  <div class="lines">
+    <div class="line"><div class="lh">⚡ 短期</div><div class="lt">太子、齐王及其诸子被杀,李世民掌握大权;两月后李渊退位,他即位为唐太宗。</div></div>
+    <div class="line"><div class="lh">🌅 长远</div><div class="lt">他虚心纳谏——甚至<b>重用原本是太子谋士的魏征</b>,容他直言顶撞;轻徭薄赋、励精图治,开创<b>"贞观之治"</b>,被尊为"天可汗",奠定大唐盛世。</div></div>
+    <div class="line"><div class="lh">🥀 他自己</div><div class="lt">他背上了"<b>杀兄逼父</b>"的道德污点,一生都在意史书如何写他——这成了他心里永远拔不掉的一根刺。</div></div>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(5)">别人怎么看这一刀? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第五步 · 同一场政变,不同的声音</div>
+  <div class="voice"><div class="vw">⚔️ 谋士(长孙无忌、尉迟恭)</div><div class="va">"这是你死我活!不是你先动手,就是我们全家被清算。先发制人,是唯一的活路。"</div></div>
+  <div class="voice"><div class="vw">📜 儒家史官</div><div class="va">"杀兄、弑弟、逼父退位——纵有天大的功业,这一笔,也永远洗不干净。"</div></div>
+  <div class="voice"><div class="vw">📿 魏征(原太子谋士)</div><div class="va">"他没有杀我,反而重用我、容我直谏。这样的胸襟,也许真配得上一个盛世。"</div></div>
+  <div class="voice"><div class="vw">🌾 一个百姓</div><div class="va">"谁当皇帝我管不着。我只知道贞观年间,路不拾遗、天下太平,日子是真的好过。"</div></div>
+  <div class="note">同一个抉择,没有标准答案。 · 史料:《资治通鉴》《旧唐书》</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(6)">它换来了什么? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第六步 · 一场骨肉相残,换来一个黄金时代</div>
+  <div class="scene">玄武门的血,换来了<b>贞观之治</b>和盛唐气象——中国历史上最强盛、最开放的时代之一,万国来朝。<br><br>一场兄弟相残的悲剧,竟开出了一个<b>黄金时代</b>。<br><br>于是后人不断争论一个难题:<b>用骨肉的鲜血换来的太平盛世,我们究竟该怎么评价?</b>功业能不能抵消罪过?</div>
+  <div class="btnrow" style="margin-top:16px">
+    <a class="ghost" href="./map.html?civ=tang">🗺 去地图看 唐朝</a>
+    <a class="ghost" href="./decision-hongmenyan.html">🍷 去看鸿门宴(项羽的"心软")</a>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(7)">那……换作是你呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">最后 · 回到你</div>
+  <div class="htitle" style="font-size:22px">换作是你呢?</div>
+  <div class="q">项羽在鸿门宴<b>心软</b>放走刘邦,丢了天下;李世民在玄武门<b>狠心</b>杀掉兄弟,赢了天下却背了污名。同样在权力的顶峰——这一刀,到底该不该下?</div>
+  <div class="q">如果"心软"会害死自己,"狠心"会留下一辈子的污点——这世上,真的有<b>两全</b>的选择吗?</div>
+  <div class="q">你最开始选的是 <b id="myPick">?</b>,和李世民(A)一样吗?走到这里,你的想法<b>变了</b>吗?</div>
+  <div style="font-family:var(--sans);font-weight:700;color:var(--ink);margin-top:18px">✍️ 写下你从玄武门里,看懂的一句话:</div>
+  <textarea id="myNote" placeholder="比如:有些胜利,是要用一辈子的良心去偿还的……"></textarea>
+  <div class="btnrow"><button class="nextbtn" onclick="saveNote(event)">💾 记下我的收获</button></div>
+  <div class="btnrow" style="margin-top:14px">
+    <a class="nextbtn" href="./stories.html" style="text-decoration:none">🧩 回到「该不该痛下杀手」这条线:和鸿门宴放一起找规律 →</a>
+  </div>
+  <div class="btnrow" style="margin-top:8px">
+    <button class="ghost" onclick="if(window.toggleAIFloat)toggleAIFloat()">🤖 和 AI 聊聊这个抉择</button>
+    <button class="ghost" onclick="pick=null;opened=new Set();go(0)">↺ 重新走一遍</button>
+  </div>`);
+
+let cur=0;
+function render(){
+  document.getElementById('beat').innerHTML=beats[cur]();
+  document.getElementById('prog').innerHTML=beats.map((_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('');
+  if(cur===1){ refreshGate(); }
+  if(cur===7){ const m=document.getElementById('myPick'); if(m)m.textContent=pick||'?'; const n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('decision_lishimin')||''; }
+  window.scrollTo({top:0,behavior:'instant'});
+  if(window.Track) Track.log('抉择时刻');
+}
+function go(n){ cur=n; render(); }
+function flip(i){
+  const card=document.querySelector('.dcard[data-i="'+i+'"]');
+  const body=document.getElementById('db'+i);
+  const isOpen=card.classList.toggle('open');
+  body.style.maxHeight=isOpen?(body.scrollHeight+'px'):'0';
+  if(isOpen){ opened.add(i); refreshGate(); }
+}
+function refreshGate(){
+  const c=document.getElementById('dcount'); if(c)c.textContent='已了解 '+opened.size+' / '+DOSSIER.length;
+  const btn=document.getElementById('toChoice'); const gate=document.getElementById('gate');
+  if(opened.size>=DOSSIER.length){ if(btn)btn.disabled=false; if(gate)gate.textContent='✅ 你已看清整盘棋,可以决定了'; }
+}
+function choose(k){
+  pick=k;
+  document.querySelectorAll('.choice').forEach(c=>{c.classList.toggle('picked',c.dataset.k===k);c.onclick=null;});
+  const react={A:'决绝!可亲手杀掉兄弟、逼父退位——这血换来的皇位,你睡得安稳吗?',
+    B:'重情。但隐忍若换不来对方收手,等太子登基,你和部下的命还保得住吗?',
+    C:'退让最干净。可你交出去的不只是兵权,还有跟着你出生入死的一帮人的身家性命——你舍得吗?'}[k];
+  const r=document.getElementById('reaction');
+  r.innerHTML=react+'<div class="btnrow" style="margin-top:14px"><button class="nextbtn" onclick="go(3)">👉 看真实的李世民怎么选</button></div>';
+  r.classList.add('show');
+}
+function saveNote(e){ const n=document.getElementById('myNote'); if(n){localStorage.setItem('decision_lishimin',n.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的收获',1500);} }
+render();
+</script>
+<script src="./ai_float.js?v=1"></script>
+</body>
+</html>

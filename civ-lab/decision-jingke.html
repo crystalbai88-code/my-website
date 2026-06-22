@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>抉择时刻 · 荆轲刺秦 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;display:flex;flex-direction:column;align-items:center}
+  .top{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:12px 16px;
+    background:linear-gradient(180deg,rgba(var(--scrim,0,0,0),.25),transparent);position:sticky;top:0;z-index:20}
+  .top a.back{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.1em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .top .brand{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink)}
+  .prog{display:flex;gap:5px;margin-left:auto}
+  .prog i{width:13px;height:4px;border-radius:3px;background:var(--panel-line)}
+  .prog i.on{background:var(--gold)}
+  .wrap{width:min(660px,92%);margin:8px auto 70px;flex:1}
+  .beat{animation:fin .5s cubic-bezier(.22,1,.36,1)}
+  @keyframes fin{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;font-weight:700;text-align:center;margin-top:18px}
+  .htitle{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);text-align:center;line-height:1.3;margin:6px 0 4px;text-shadow:var(--label-shadow)}
+  .hsub{font-family:var(--mono);font-size:12px;color:var(--ink3);text-align:center;letter-spacing:.08em;margin-bottom:18px}
+  .scene{font-family:var(--serif);font-size:clamp(15px,3.8vw,17.5px);color:var(--ink);line-height:1.95;
+    background:var(--panel-bg);border:1px solid var(--panel-line);border-left:4px solid var(--gold);border-radius:14px;
+    padding:18px 20px;backdrop-filter:blur(8px)}
+  .scene b{color:var(--gold)}
+  .dossier-intro{font-family:var(--sans);font-size:14.5px;color:var(--ink2);text-align:center;line-height:1.7;margin:4px 0 16px}
+  .dcount{font-family:var(--mono);font-size:12px;color:var(--gold);text-align:center;font-weight:700;margin-bottom:12px}
+  .dcard{background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:14px;margin-bottom:11px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+  .dcard.open{border-color:var(--gold)}
+  .dhead{display:flex;align-items:center;gap:11px;padding:15px 17px}
+  .dhead .di{font-size:21px}
+  .dhead .dt{font-family:var(--sans);font-weight:800;font-size:15.5px;color:var(--ink);flex:1}
+  .dhead .dchev{font-family:var(--mono);font-size:11px;color:var(--ink3);transition:transform .2s}
+  .dcard.open .dchev{transform:rotate(90deg);color:var(--gold)}
+  .dhead .ddot{width:8px;height:8px;border-radius:50%;background:var(--vermilion);flex:none}
+  .dcard.open .ddot{background:var(--cyan)}
+  .dbody{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .dbody-in{padding:0 17px 16px;font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.85}
+  .dbody-in b{color:var(--gold)}
+  .dbody-in ul{margin:8px 0 0;padding-left:2px;list-style:none}
+  .dbody-in li{margin:7px 0;padding-left:16px;position:relative}
+  .dbody-in li:before{content:'·';position:absolute;left:3px;color:var(--vermilion);font-weight:900}
+  .dbody-in li b{color:var(--vermilion)}
+  .ask{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);text-align:center;margin:22px 0 6px}
+  .asksub{font-family:var(--sans);font-size:13.5px;color:var(--ink2);text-align:center;margin-bottom:16px;line-height:1.6}
+  .choices{display:flex;flex-direction:column;gap:11px}
+  .choice{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink);background:var(--panel-bg);
+    border:1.5px solid var(--panel-line);border-radius:14px;padding:15px 17px;cursor:pointer;transition:all .15s;text-align:left;line-height:1.5}
+  .choice:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+  .choice .ckey{font-weight:900;color:var(--gold);margin-right:8px}
+  .choice.picked{border-color:var(--gold);background:rgba(224,138,44,.1)}
+  .reaction{margin-top:14px;font-size:14.5px;color:var(--ink);line-height:1.75;background:rgba(224,138,44,.1);
+    border-left:4px solid var(--gold);border-radius:8px;padding:13px 16px;display:none}
+  .reaction.show{display:block;animation:fin .4s}
+  .lines{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+  .line{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:12px;padding:13px 16px}
+  .line .lh{font-family:var(--serif);font-weight:900;font-size:14px;color:var(--gold);margin-bottom:4px}
+  .line .lt{font-size:14px;color:var(--ink);line-height:1.7}
+  .line .lt b{color:var(--vermilion)}
+  .voice{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:13px;padding:13px 16px;margin-bottom:10px}
+  .voice .vw{font-family:var(--sans);font-weight:800;font-size:14px;color:var(--ink);margin-bottom:5px}
+  .voice .va{font-size:14px;color:var(--ink2);line-height:1.7}
+  .note{font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:center;margin-top:12px}
+  .q{font-family:var(--serif);font-size:16.5px;color:var(--ink);line-height:1.75;margin:14px 0;padding-left:14px;border-left:3px solid var(--gold)}
+  .q b{color:var(--gold)}
+  textarea{width:100%;box-sizing:border-box;margin-top:10px;font-family:var(--sans);font-size:15px;color:var(--ink);
+    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:12px;padding:13px 15px;min-height:80px;outline:none;resize:vertical}
+  .btnrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
+  .nextbtn{font-family:var(--sans);font-weight:800;font-size:15px;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));
+    border:none;border-radius:999px;padding:13px 30px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.16)}
+  .nextbtn:active{transform:scale(.97)}
+  .nextbtn[disabled]{opacity:.4;cursor:not-allowed;box-shadow:none}
+  .ghost{font-family:var(--sans);font-weight:700;font-size:14px;color:var(--gold);background:var(--panel-bg);
+    border:1px solid var(--panel-line);border-radius:999px;padding:11px 20px;cursor:pointer;text-decoration:none;display:inline-block}
+  .gate{text-align:center;font-family:var(--sans);font-size:12.5px;color:var(--ink3);margin-top:6px}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="top">
+    <a class="back" href="./stories.html">⌂ 抉择</a>
+    <span class="brand">🎯 抉择时刻</span>
+    <div class="prog" id="prog"></div>
+  </div>
+  <div class="wrap"><div class="beat" id="beat"></div></div>
+</div>
+<script src="./track.js?v=1"></script>
+<script>
+window.__aiCtx='用户正在体验"抉择时刻·荆轲刺秦"(母题:向死的勇气/明知必死也要去,与温泉关·列奥尼达同一条找规律线)。史实据《史记·刺客列传》:战国末年,秦已灭韩、破赵,大军压到燕国边境的易水,燕国朝不保夕。燕太子丹尊侠士荆轲为上卿,托他去刺杀秦王嬴政(后来的秦始皇),想逼秦退还土地或令秦大乱。为接近秦王,荆轲带上秦国叛将樊於期的首级(樊於期为此自刎相赠)和燕国督亢地图(地图卷里藏着淬毒匕首),以少年秦舞阳为副手。明知几乎必死,荆轲仍义无反顾;易水送行,众人白衣,高渐离击筑,荆轲高歌"风萧萧兮易水寒,壮士一去兮不复还"。行刺时"图穷匕见",刺秦王未中,绕柱追逐,被秦王拔剑击断左股,荆轲掷匕不中,身中八创,倚柱笑骂而死。此举激怒秦王,秦随即发兵灭燕。荆轲虽败,其"明知不可为而为之"的勇气与信义被千古传颂。与温泉关·列奥尼达对照:都明知必死也要前行,为了比生命更重要的东西(列奥尼达:责任与自由;荆轲:知遇之恩与道义)。请用适合10-12岁孩子的语言陪他思考,多反问,不要替他下结论。';
+let pick=null;
+const DOSSIER=[
+  {i:'🗡️',t:'你是谁',b:'你是<b>荆轲</b>,卫国人,爱读书、好击剑,沉稳而重情义的侠士。你漂泊到燕国,常和好友<b>高渐离</b>(善击筑)饮酒高歌、旁若无人。燕太子丹敬重你,尊你为上卿,待你极厚。'},
+  {i:'🐉',t:'天下的形势',b:'秦国已经<b>灭了韩、破了赵</b>,大军压到燕国边境的<b>易水</b>。秦统一天下的大势已成,弱小的燕国,危在旦夕。'},
+  {i:'🙇',t:'太子丹的托付',b:'走投无路的<b>燕太子丹</b>,想出一个孤注一掷的办法:派一个刺客去劫持或刺杀秦王嬴政,逼他退还诸侯的土地,或者干脆杀了他、让秦国大乱。<br>他选中的人,是<b>你</b>。'},
+  {i:'🎁',t:'行刺的代价',b:'要靠近戒备森严的秦王,你需要两样他最想要的东西:秦国叛将<b>樊於期的首级</b>(樊於期为此<b>自刎相赠</b>)、和燕国<b>督亢的地图</b>——地图卷的最里面,藏着一把淬了毒、见血即死的匕首。副手,是个叫秦舞阳的少年。'},
+  {i:'⚰️',t:'几乎必死',b:'秦宫层层戒备,就算行刺成功,你也几乎<b>不可能活着回来</b>。易水边送行那天,人人穿着白衣,高渐离击筑,你和着拍子高声唱:"<b>风萧萧兮易水寒,壮士一去兮不复还。</b>"'},
+  {i:'⚡',t:'眼前的难题',b:'你可以为了这份<b>知遇之恩和道义</b>,明知必死也去;可以<b>婉言推辞</b>,保住性命;也可以<b>再等一等</b>,寻一个更有把握的时机。<br>但太子丹在催,秦军在逼。<b>你去,还是不去?</b>'},
+];
+let opened=new Set();
+const beats=[];
+beats.push(()=>`
+  <div class="kicker">公元前 227 年 · 燕 · 易水</div>
+  <div class="htitle">明知一去不还,你上路吗?</div>
+  <div class="hsub">即将由你 —— 荆轲 —— 决定</div>
+  <div class="scene">公元前227年,你是燕国的侠士<b>荆轲</b>。太子丹把整个燕国的命运,押在了你一个人身上——去刺杀那个即将吞并天下的秦王。<br><br>这几乎是一条有去无回的路。你即将做一个决定——它关乎你的生死,也关乎一个"明知不可为"的信义,将如何被后人记住。<br><br>但在你决定之前,<b>先别急。</b> 先把这件事,想清楚。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(1)">📂 先把这件事想清楚 →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第一步 · 了解</div>
+  <div class="htitle" style="font-size:23px">想清楚这件事</div>
+  <div class="dossier-intro">点开下面每一张卡片,弄懂你是谁、形势多危、这件事的分量与代价。<br>全部看完,你才有资格替荆轲做决定。</div>
+  <div class="dcount" id="dcount">已了解 0 / ${DOSSIER.length}</div>
+  <div id="dwrap">${DOSSIER.map((d,i)=>`
+    <div class="dcard" data-i="${i}" onclick="flip(${i})">
+      <div class="dhead"><span class="ddot"></span><span class="di">${d.i}</span><span class="dt">${d.t}</span><span class="dchev">▶</span></div>
+      <div class="dbody" id="db${i}"><div class="dbody-in">${d.b}</div></div>
+    </div>`).join('')}</div>
+  <div class="btnrow"><button class="nextbtn" id="toChoice" onclick="go(2)" disabled>换作是你,你会怎么做? →</button></div>
+  <div class="gate" id="gate">(看完全部 ${DOSSIER.length} 张卡片后解锁)</div>`);
+beats.push(()=>`
+  <div class="kicker">第二步 · 此刻,你就是荆轲</div>
+  <div class="ask">去,还是不去?</div>
+  <div class="asksub">你已经想清楚了——燕国的危亡、太子的重托、樊於期的人头、还有那几乎注定的死亡。<br>现在,这个决定由你来下。</div>
+  <div class="choices">
+    <div class="choice" data-k="A" onclick="choose('A')"><span class="ckey">A</span>慨然赴死——为知遇之恩、为道义,明知九死一生也要去刺秦。</div>
+    <div class="choice" data-k="B" onclick="choose('B')"><span class="ckey">B</span>婉言推辞——这几乎是去送死,我没有把握,不如保命另谋出路。</div>
+    <div class="choice" data-k="C" onclick="choose('C')"><span class="ckey">C</span>拖延等待——再等一个更有把握的时机和帮手,别这么仓促上路。</div>
+  </div>
+  <div class="reaction" id="reaction"></div>`);
+beats.push(()=>`
+  <div class="kicker">第三步 · 真实的他</div>
+  <div class="htitle" style="font-size:22px">荆轲,选了 A</div>
+  <div class="scene">他上路了。带着樊於期的人头和那卷藏着匕首的地图,走进了秦国的宫殿。<br><br>献图时,地图<b>一寸寸展开,到尽头,匕首露了出来</b>——"<b>图穷匕见</b>"。他一把抓起匕首刺向秦王,却没刺中;秦王绕着柱子奔逃,他在后面紧追……最终秦王拔剑砍断了他的左腿。<br><br>身受八处重伤、再也站不起来的荆轲,<b>倚着柱子放声大笑、痛骂秦王</b>,从容赴死。他失败了,却把一份气概,永远留在了易水边。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(4)">那……后来呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第四步 · 一次失败的行刺,延伸出三条线</div>
+  <div class="lines">
+    <div class="line"><div class="lh">⚡ 短期</div><div class="lt">行刺失败,荆轲身中八创被杀,临死仍笑骂不止。"图穷匕见"成了千古成语。</div></div>
+    <div class="line"><div class="lh">🥀 长远(它招来的)</div><div class="lt">此举彻底激怒秦王,秦随即发大军<b>猛攻并灭掉了燕国</b>——刺杀,反而加速了燕的灭亡。</div></div>
+    <div class="line"><div class="lh">🌟 不灭的回响</div><div class="lt">但荆轲"<b>明知不可为而为之</b>"的勇气与信义,被《史记》郑重记下,千古传颂。"风萧萧兮易水寒",成了中国人心中最悲壮的一幕。</div></div>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(5)">别人怎么看他的赴死? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第五步 · 同一次赴死,不同的声音</div>
+  <div class="voice"><div class="vw">🙇 太子丹</div><div class="va">"是我把他推上了绝路……可除此之外,弱小的燕国,还有别的活路吗?"</div></div>
+  <div class="voice"><div class="vw">🎵 高渐离(挚友)</div><div class="va">"我送他到易水,那首歌我一辈子忘不了。后来,我也想替他,再去刺一次秦王。"</div></div>
+  <div class="voice"><div class="vw">📜 后世(陶渊明)</div><div class="va">"其人虽已没,千载有余情。"——他虽然失败了,那份气概,千年之后依然动人。</div></div>
+  <div class="voice"><div class="vw">🤔 一个务实的人</div><div class="va">"用一个刺客,想挡住整个秦国的统一?这从一开始,就注定是徒劳吧。"</div></div>
+  <div class="note">同一个抉择,没有标准答案。 · 史料:《史记·刺客列传》</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(6)">他留下了什么? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第六步 · 失败,却留下比成功更长的回响</div>
+  <div class="scene">荆轲刺秦失败了,反而加速了燕国的灭亡、秦的统一。从"<b>成败</b>"看,他输得彻底。<br><br>可是——"<b>风萧萧兮易水寒</b>"和"<b>图穷匕见</b>",成了中国文化里关于<b>勇气、信义与悲壮</b>的永恒符号,传诵了两千多年。<br><br>一次失败的刺杀,留下了<b>比成功更长久的回响</b>。原来,有些事,衡量它的不是成败,而是那一份"明知不可为而为之"的<b>气概</b>。</div>
+  <div class="btnrow" style="margin-top:16px">
+    <a class="ghost" href="./map.html?civ=zhanguo">🗺 去地图看 战国</a>
+    <a class="ghost" href="./decision-leonidas.html">🛡 去看温泉关(列奥尼达的死守)</a>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(7)">那……换作是你呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">最后 · 回到你</div>
+  <div class="htitle" style="font-size:22px">换作是你呢?</div>
+  <div class="q">列奥尼达明知守不住,死守温泉关;荆轲明知刺不成,也踏上易水。都<b>明知必死也要去</b>——人,为什么会为了某种东西,连命都不要?</div>
+  <div class="q">在你心里,有没有什么东西,是你觉得<b>比"安全""舒服"更重要</b>的?换作是你,你会上易水这条路吗?</div>
+  <div class="q">你最开始选的是 <b id="myPick">?</b>,和荆轲(A)一样吗?走到这里,你的想法<b>变了</b>吗?</div>
+  <div style="font-family:var(--sans);font-weight:700;color:var(--ink);margin-top:18px">✍️ 写下你从荆轲的抉择里,看懂的一句话:</div>
+  <textarea id="myNote" placeholder="比如:有些事,衡量它的不是成败,而是敢不敢去……"></textarea>
+  <div class="btnrow"><button class="nextbtn" onclick="saveNote(event)">💾 记下我的收获</button></div>
+  <div class="btnrow" style="margin-top:14px">
+    <a class="nextbtn" href="./stories.html" style="text-decoration:none">🧩 回到「向死的勇气」这条线:和温泉关放一起找规律 →</a>
+  </div>
+  <div class="btnrow" style="margin-top:8px">
+    <button class="ghost" onclick="if(window.toggleAIFloat)toggleAIFloat()">🤖 和 AI 聊聊这个抉择</button>
+    <button class="ghost" onclick="pick=null;opened=new Set();go(0)">↺ 重新走一遍</button>
+  </div>`);
+
+let cur=0;
+function render(){
+  document.getElementById('beat').innerHTML=beats[cur]();
+  document.getElementById('prog').innerHTML=beats.map((_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('');
+  if(cur===1){ refreshGate(); }
+  if(cur===7){ const m=document.getElementById('myPick'); if(m)m.textContent=pick||'?'; const n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('decision_jingke')||''; }
+  window.scrollTo({top:0,behavior:'instant'});
+  if(window.Track) Track.log('抉择时刻');
+}
+function go(n){ cur=n; render(); }
+function flip(i){
+  const card=document.querySelector('.dcard[data-i="'+i+'"]');
+  const body=document.getElementById('db'+i);
+  const isOpen=card.classList.toggle('open');
+  body.style.maxHeight=isOpen?(body.scrollHeight+'px'):'0';
+  if(isOpen){ opened.add(i); refreshGate(); }
+}
+function refreshGate(){
+  const c=document.getElementById('dcount'); if(c)c.textContent='已了解 '+opened.size+' / '+DOSSIER.length;
+  const btn=document.getElementById('toChoice'); const gate=document.getElementById('gate');
+  if(opened.size>=DOSSIER.length){ if(btn)btn.disabled=false; if(gate)gate.textContent='✅ 你已想清楚,可以决定了'; }
+}
+function choose(k){
+  pick=k;
+  document.querySelectorAll('.choice').forEach(c=>{c.classList.toggle('picked',c.dataset.k===k);c.onclick=null;});
+  const react={A:'壮烈!可这一去几乎必死,你真的甘心用自己的命,去赌一个渺茫的机会吗?',
+    B:'保命是本能。可樊於期已经为这件事献出了人头,太子丹待你恩重——你推得开吗?',
+    C:'谨慎。但秦军已压到易水,燕国等不起;再拖,机会可能就没有了。'}[k];
+  const r=document.getElementById('reaction');
+  r.innerHTML=react+'<div class="btnrow" style="margin-top:14px"><button class="nextbtn" onclick="go(3)">👉 看真实的荆轲怎么选</button></div>';
+  r.classList.add('show');
+}
+function saveNote(e){ const n=document.getElementById('myNote'); if(n){localStorage.setItem('decision_jingke',n.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的收获',1500);} }
+render();
+</script>
+<script src="./ai_float.js?v=1"></script>
+</body>
+</html>

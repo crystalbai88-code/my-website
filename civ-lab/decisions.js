@@ -20,6 +20,10 @@
      tip:'席间杀机:杀掉刘邦,还是放他一马?', url:'./decision-hongmenyan.html'},
     {id:'leonidas', person:'列奥尼达 · 温泉关', icon:'🛡️', culture:'greece', lng:22.5, lat:38.8, year:-480, from:-485, to:-475,
      tip:'三百人挡百万大军,死守,还是撤退?', url:'./decision-leonidas.html'},
+    {id:'jingke', person:'荆轲刺秦', icon:'🗡️', culture:'china', lng:115.5, lat:39.3, year:-227, from:-230, to:-222,
+     tip:'明知一去不还,你上路刺秦吗?', url:'./decision-jingke.html'},
+    {id:'lishimin', person:'李世民 · 玄武门', icon:'🏯', culture:'china', lng:108.9, lat:34.3, year:626, from:622, to:635,
+     tip:'兄弟要害你,先下手杀兄夺位,还是隐忍?', url:'./decision-lishimin.html'},
   ];
   if(typeof window!=='undefined') window.DECISIONS=DECISIONS;
 })();
