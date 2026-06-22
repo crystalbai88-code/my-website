@@ -45,7 +45,7 @@
   @media(max-width:768px){ #panel{width:calc(100vw - 28px)} .legend{display:none} }
 </style>
 </head>
-<body data-theme="warm">
+<body data-theme="nebula">
 <div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
 <div id="app">
   <div class="nav">
@@ -330,6 +330,9 @@ function draw(){
       ctx.beginPath();ctx.arc(n.x,n.y,r+4,0,Math.PI*2);
       ctx.strokeStyle=col;ctx.lineWidth=2.5;ctx.globalAlpha=isSel?0.95:0.5;ctx.stroke();
     }
+    // 星辰辉光(星空)
+    ctx.save();ctx.globalAlpha=isSel?0.6:isHov?0.45:0.32;ctx.shadowColor=col;ctx.shadowBlur=isSel?30:isHov?22:15;
+    ctx.beginPath();ctx.arc(n.x,n.y,r*0.9,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();ctx.restore();
     // 角色色圆底(头像底座)
     ctx.beginPath();ctx.arc(n.x,n.y,r,0,Math.PI*2);
     ctx.fillStyle=col;ctx.globalAlpha=isSel||isHov?1:0.9;ctx.fill();ctx.globalAlpha=1;
@@ -533,7 +536,7 @@ document.getElementById('themeSwitch').addEventListener('click',e=>{const b=e.ta
 window.addEventListener('resize',()=>{resize();});
 
 resize();
-applyTheme('warm');
+applyTheme('nebula');
 buildGraph();
 draw();
 (function(){if(new URLSearchParams(location.search).get("all")){var b=document.querySelector(".civ-pill[data-civ='all']");if(b)b.click();}})();
