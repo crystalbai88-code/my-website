@@ -513,6 +513,23 @@ input{font-family:inherit}
   .progress-bar-wrap{grid-column:2;grid-row:2;padding:4px 40px 16px}
   .calendar-grid{grid-column:2;grid-row:3;padding:0 28px 56px;gap:7px}
 }
+/* ── Chat Step (文先生) ── */
+.chat-wrap{display:flex;flex-direction:column;gap:14px;padding:4px 0 16px}
+.chat-teacher{display:flex;align-items:flex-start;gap:12px}
+.chat-avatar{width:44px;height:44px;border-radius:50%;background:var(--cinnabar);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;box-shadow:0 2px 8px rgba(199,56,38,.25)}
+.chat-meta{display:flex;flex-direction:column;gap:6px;flex:1;min-width:0}
+.chat-name{font-family:var(--font-brush);font-size:.85rem;color:var(--cinnabar);letter-spacing:.1em}
+.chat-bubble{background:#FFF8F0;border:1.5px solid rgba(199,56,38,.18);border-radius:0 14px 14px 14px;padding:14px 16px;font-family:var(--font-serif);font-size:.98rem;color:var(--ink);line-height:1.8}
+.chat-user-msg{align-self:flex-end;background:var(--jade);color:#fff;border-radius:14px 14px 0 14px;padding:10px 14px;font-family:var(--font-serif);font-size:.95rem;line-height:1.6;max-width:85%}
+.chat-input-area{display:flex;flex-direction:column;gap:10px;margin-top:2px}
+.chat-textarea{width:100%;box-sizing:border-box;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-family:var(--font-serif);font-size:.97rem;color:var(--ink);background:#FEFAF6;resize:none;min-height:76px;outline:none;transition:border-color .2s}
+.chat-textarea:focus{border-color:rgba(199,56,38,.4)}
+.chat-send-btn{background:var(--cinnabar);color:#fff;border:none;border-radius:10px;padding:13px;font-family:var(--font-brush);font-size:1rem;cursor:pointer;letter-spacing:.06em;transition:opacity .15s}
+.chat-send-btn:active{opacity:.8}
+.chat-skip-btn{background:none;border:none;color:var(--ink-light);font-family:var(--font-serif);font-size:.84rem;cursor:pointer;padding:4px;text-decoration:underline;text-underline-offset:3px;align-self:center}
+.chat-reply{display:flex;align-items:flex-start;gap:12px;animation:chat-in .35s ease}
+@keyframes chat-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.chat-continue-btn{background:var(--jade);color:#fff;border:none;border-radius:10px;padding:13px;font-family:var(--font-brush);font-size:1rem;cursor:pointer;width:100%;margin-top:6px;letter-spacing:.06em;animation:chat-in .35s ease .2s both}
 /* ── Discovery Step ── */
 .discovery-wrap{display:flex;flex-direction:column;align-items:center;gap:20px;padding:8px 0 20px}
 .discovery-lantern{font-size:2.6rem;line-height:1;animation:lantern-glow 2s ease-in-out infinite alternate}
@@ -1109,6 +1126,58 @@ const SCHEDULE = [
 ];
 
 // ══════════════════════════════════════════
+// 文先生开场问题 — 36天，每天一个开放性问题
+// ══════════════════════════════════════════
+const AFFIRMATIONS = [
+  '嗯，你说的让我想了一下呢。',
+  '哇，你这样想真的很有意思！',
+  '谢谢你愿意告诉我这些。',
+  '你这样想，很棒！',
+  '你观察得真仔细！',
+  '我很高兴你愿意和我聊这个。',
+  '你说得很好。',
+];
+
+const OPEN_QUESTIONS = [
+  /* 1  绝句       */ {q:'今天开始暑假复习了！先聊一聊——你觉得春天最美的时候是什么样子？可以是一个画面、一个声音、一个味道，随便说。', bridge:'诗人杜甫也在观察春天——他用四个画面描述了初春，我们去看看他注意到了什么。'},
+  /* 2  燕子       */ {q:'你见过燕子吗？它飞起来是什么感觉？如果没见过，你想象中的燕子是什么样子？', bridge:'作者也特别喜欢燕子——他用文字把燕子的样子和飞翔描述得很生动，我们一起看看。'},
+  /* 3  惠崇春江晚景*/ {q:'你有没有看过一幅画，然后觉得好像能感受到画里面的温度或者声音？随便哪幅都行，或者想象一个。', bridge:'诗人苏轼看着一幅春江的画，感受到了水的温度——他把这个感觉写成了诗，我们去读一读。'},
+  /* 4  荷花       */ {q:'你有没有特别喜欢的花？你喜欢它的什么——颜色、形状、香味、还是别的？', bridge:'作者也非常喜欢荷花——他在荷花旁边站着站着，忽然有了一个神奇的想法，我们去看看是什么。'},
+  /* 5  三衢道中   */ {q:'你有没有出去走路，然后注意到路边一个让你开心的小细节？可以是任何东西。', bridge:'诗人曾几回家路上心情也很好——有趣的是，他没直接说"我开心"，而是写了别的东西，我们去看。'},
+  /* 6  火烧云     */ {q:'你有没有抬头看过天空，觉得云彩的形状特别像什么？', bridge:'作者萧红小时候特别爱看火烧云——她把天空描绘得像一出大戏，我们去看看。'},
+  /* 7  忆江南     */ {q:'你去过哪个地方，回来之后还会时不时想起那里的某个画面？', bridge:'白居易离开江南之后，一直忘不了那里——他写了一首词，就是为了留住那个美丽的地方。'},
+  /* 8  燕子·复习  */ {q:'如果你能飞，你最想飞去哪里？飞去那里你想做什么？', bridge:'燕子每年都要飞很远——今天我们重读《燕子》，看看你有没有新的发现。'},
+  /* 9  滁州西涧   */ {q:'你有没有听过流水声？闭上眼睛，想象一条小溪，你脑子里会出现什么样的画面？', bridge:'诗人韦应物在一条小溪旁写下了这首诗——他看到的和你想象的，也许有相同的地方。'},
+  /* 10 荷花·复习  */ {q:'如果你能变成一朵花，你最想成为哪种花？为什么？', bridge:'作者站在荷花旁边，也有过"变成荷花"的想象——今天我们重读《荷花》，把它背出来。'},
+  /* 11 元日       */ {q:'过新年的时候，你最喜欢哪个感觉或者哪个瞬间？', bridge:'诗人王安石写新年，选了爆竹声、屠苏酒、桃符——三个画面就写出了过年的热闹，我们去感受一下。'},
+  /* 12 火烧云·复习 */ {q:'你见过傍晚天空变颜色吗？你记得是什么颜色？', bridge:'萧红写的火烧云颜色多到说不完——今天我们重读，试着把这些颜色记在脑子里。'},
+  /* 13 清明       */ {q:'雨天你会有什么样的心情？有点低落，还是很舒服，还是别的什么？', bridge:'诗人杜牧在清明那天淋着小雨，心里有些茫然——他把那个感觉写进了这首诗。'},
+  /* 14 燕子·熟背  */ {q:'你有没有仔细观察过一种动物很久？它做了什么让你印象深刻？', bridge:'作者观察燕子，把它的每一个细节都记了下来——今天我们试着把《燕子》第1-2段背出来。'},
+  /* 15 九月九日   */ {q:'你有没有离开家一段时间，特别想念某个人或者某件事的时候？', bridge:'诗人王维年轻时一个人在外地，重阳节那天特别想家——这首诗就是那时候写的。'},
+  /* 16 荷花·熟背  */ {q:'你有没有在一个地方待着，周围很美，然后慢慢忘了时间的感觉？', bridge:'作者站在荷花旁边，就有过这种感觉——今天我们试着把《荷花》第2-3段背出来。'},
+  /* 17 大林寺桃花  */ {q:'你有没有去找一个东西找了很久，然后突然在意想不到的地方找到了？那种感觉是什么样的？', bridge:'诗人白居易在山上找春天，也是这个感觉——他把那一刻写进了这首诗。'},
+  /* 18 火烧云·熟背 */ {q:'如果让你给今天的天空写一句话，你会怎么写？不用好——就写出来。', bridge:'萧红写天空写得非常生动——今天我们试着把《火烧云》第3-6段背出来，学她的写法。'},
+  /* 19 守株待兔   */ {q:'你有没有遇过一件好运气的事？碰到之后，你有没有觉得下次还会这样？', bridge:'故事里的农夫就是这么想的——他等了又等，结果发生了什么，我们去看看。'},
+  /* 20 燕子·巩固  */ {q:'你觉得燕子和其他你见过的鸟有什么不一样？随便说。', bridge:'作者写燕子，专门选了它最有特点的地方——今天我们再读一遍，看看你能不能背出来。'},
+  /* 21 绝句·复习  */ {q:'你最近有没有遇到一个让你心里想说"今天真好"的时刻？', bridge:'杜甫写《绝句》的时候，心情也是这样——今天我们重读这首诗，试着背出来。'},
+  /* 22 荷花·巩固  */ {q:'如果你要画一幅荷花，你最想画哪种样子——全开的、半开的、还是花骨朵儿？', bridge:'作者写了三种荷花的姿态——今天我们再读《荷花》，看看你背得怎么样了。'},
+  /* 23 九月九日·复习*/ {q:'你觉得一个人在一个陌生的地方，最让你想家的是什么？是某种食物，某个声音，还是别的？', bridge:'王维一个人在长安，重阳节那天特别想家——我们今天复习这首诗。'},
+  /* 24 火烧云·巩固 */ {q:'你觉得"火烧云"这个名字是谁起的？为什么叫"火烧"？', bridge:'萧红说傍晚的云"从西边一直烧到东边"——今天我们再读《火烧云》，把颜色和形状都记住。'},
+  /* 25 惠崇·复习   */ {q:'你见过鸭子吗？你觉得鸭子在水里是什么感觉？', bridge:'苏轼觉得鸭子最先知道春天江水变暖——今天复习《惠崇春江晚景》，试着背出来。'},
+  /* 26 燕子·精背   */ {q:'你有没有试过用很多词描述一件东西？描述得越详细越好——今天我们来比一比。', bridge:'作者用不到一百个字，把燕子写得让人眼前一亮——今天我们争取把《燕子》背得流利。'},
+  /* 27 大林寺桃花·复习*/ {q:'你觉得春天一般在几月结束？如果山上还有花，山下却没了，你会觉得意外吗？', bridge:'诗人白居易就遇到了这件事——今天我们复习《大林寺桃花》，感受那种惊喜。'},
+  /* 28 荷花·精背   */ {q:'你有没有在一朵花旁边站很久，什么也不做？你站那里的时候心里在想什么？', bridge:'作者就是这样——他站在荷花旁边，忽然有了一个美丽的想象。今天把《荷花》背得更流利。'},
+  /* 29 三衢道中·复习*/ {q:'你最近有没有走过一段路，走路的时候注意到了什么让你觉得不错的东西？', bridge:'曾几走路的时候，注意到了很多别人不一定注意的细节——今天复习《三衢道中》。'},
+  /* 30 火烧云·精背  */ {q:'如果让你描述一朵云的形状变化，你会怎么说？它慢慢变成了什么？', bridge:'萧红描述火烧云的变化写得非常生动——今天争取把《火烧云》背得非常流利。'},
+  /* 31 守株待兔·复习 */ {q:'你觉得"等运气"和"靠努力"，哪个更值得做？为什么？', bridge:'这个寓言故事就是在说这件事——今天复习《守株待兔》，把它背出来。'},
+  /* 32 燕子·冲刺   */ {q:'你现在能记起《燕子》里的哪些句子？先在心里默背一下，随便说几个字。', bridge:'很好！今天冲刺——我们争取把《燕子》背得一字不差，非常流利！'},
+  /* 33 元日·复习   */ {q:'你觉得过年最有意思的地方是什么？最让你期待的是什么？', bridge:'王安石把过年最热闹的三个画面都写进去了——今天复习《元日》，把它背出来。'},
+  /* 34 荷花·冲刺   */ {q:'你还记得《荷花》里的哪一句话吗？随便说一句，说不出来也没关系。', bridge:'很好！今天冲刺——我们要把《荷花》背得流畅，为结业做准备。'},
+  /* 35 清明·冲刺   */ {q:'《清明》这首诗你现在能背出来吗？在心里默一遍，告诉我你记得哪些字。', bridge:'今天冲刺《清明》！这首诗只有28个字，每个字都有画面感——我们把它背得非常流利。'},
+  /* 36 火烧云·结业  */ {q:'今天是第36天，最后一天了！这个暑假，你印象最深的是哪一首诗或哪一篇课文？为什么？', bridge:'很高兴你愿意告诉我。我们最后来一次《火烧云》——背好它，整个暑期复习就完成了！🌅'},
+];
+
+// ══════════════════════════════════════════
 // STATE & PERSISTENCE
 // ══════════════════════════════════════════
 function getStartDate(){
@@ -1240,8 +1309,10 @@ function openLesson(dayNum){
   document.getElementById('lesson-title').textContent=sched.title;
   document.getElementById('lesson-day-badge').textContent='第'+dayNum+'天';
 
-  // Every day: vocab → discovery → poem/prose → harvest
+  // Every day: chat → vocab → discovery → poem/prose → harvest
   currentSteps=[];
+
+  currentSteps.push({type:'chat', dayNum});
 
   if(sched.vocabKey && VOCAB_SETS[sched.vocabKey]){
     currentSteps.push({type:'vocab', vocabKey:sched.vocabKey});
@@ -1295,7 +1366,8 @@ function renderStep(idx){
   nextBtn.onclick=nextStep;
   prevBtn.onclick=prevStep;
 
-  if(step.type==='intro') renderIntroStep(body,step.sched);
+  if(step.type==='chat') renderChatStep(body,step.dayNum);
+  else if(step.type==='intro') renderIntroStep(body,step.sched);
   else if(step.type==='vocab') renderVocabStep(body,step.vocabKey,'词语闯关');
   else if(step.type==='discovery') renderDiscoveryStep(body,step.text,step.title);
   else if(step.type==='sentence') renderSentenceStep(body,step.sentKey);
@@ -2382,6 +2454,75 @@ function renderWritingPromptStep(body,key,promptType){
 }
 
 // ── HARVEST STEP ──
+function renderChatStep(body, dayNum){
+  const oq = OPEN_QUESTIONS[dayNum-1];
+  if(!oq){ nextStep(); return; }
+  document.getElementById('btn-next').style.display='none';
+  document.getElementById('btn-prev').style.display='none';
+
+  body.innerHTML=`
+    <div class="chat-wrap" id="chat-wrap">
+      <div class="chat-teacher">
+        <div class="chat-avatar">📖</div>
+        <div class="chat-meta">
+          <div class="chat-name">文先生</div>
+          <div class="chat-bubble">${oq.q}</div>
+        </div>
+      </div>
+      <div class="chat-input-area" id="chat-input-area">
+        <textarea class="chat-textarea" id="chat-input" placeholder="写下你的想法……"></textarea>
+        <button class="chat-send-btn" id="chat-send-btn">告诉先生 →</button>
+        <button class="chat-skip-btn" id="chat-skip-btn">今天先学习，下次再聊</button>
+      </div>
+    </div>
+  `;
+
+  scheduleSpeak('文先生问：' + oq.q, 0.83);
+
+  function submitReply(skipped){
+    stopAutoSpeak();
+    const input=document.getElementById('chat-input');
+    const userText=skipped?'':(input?input.value.trim():'');
+    document.getElementById('chat-input-area').style.display='none';
+
+    const wrap=document.getElementById('chat-wrap');
+    if(!skipped && userText){
+      const um=document.createElement('div');
+      um.className='chat-user-msg';
+      um.textContent=userText;
+      wrap.appendChild(um);
+    }
+
+    const affirmation=skipped
+      ?'没关系，我们边学边想。'
+      :AFFIRMATIONS[Math.floor(Math.random()*AFFIRMATIONS.length)];
+    const replyText=affirmation+' '+oq.bridge;
+
+    const replyEl=document.createElement('div');
+    replyEl.className='chat-reply';
+    replyEl.innerHTML=`
+      <div class="chat-avatar">📖</div>
+      <div class="chat-meta">
+        <div class="chat-name">文先生</div>
+        <div class="chat-bubble">${replyText}</div>
+      </div>
+    `;
+    wrap.appendChild(replyEl);
+
+    const continueBtn=document.createElement('button');
+    continueBtn.className='chat-continue-btn';
+    continueBtn.textContent='好，开始今天的学习 →';
+    continueBtn.addEventListener('click',()=>{ stopAutoSpeak(); nextStep(); });
+    wrap.appendChild(continueBtn);
+
+    scheduleSpeak(replyText, 0.83, 300);
+    body.scrollTop=body.scrollHeight;
+  }
+
+  document.getElementById('chat-send-btn').addEventListener('click',()=>submitReply(false));
+  document.getElementById('chat-skip-btn').addEventListener('click',()=>submitReply(true));
+}
+
 function renderDiscoveryStep(body,text,title){
   body.innerHTML=`
     <div class="discovery-wrap">
@@ -2450,6 +2591,7 @@ function scheduleSpeak(text, rate=0.83, delay=800){
 
 function autoSpeakStep(step){
   if(!step) return;
+  if(step.type==='chat') return; // handled inside renderChatStep
   if(step.type==='discovery'){
     scheduleSpeak(step.text, 0.82);
   } else if(step.type==='harvest'){
@@ -2772,6 +2914,5 @@ function resetProgress(){
 // ══════════════════════════════════════════
 renderHome();
 </script>
-<a href="/" class="site-home-btn" style="position:fixed;top:14px;left:14px;z-index:2147483647;display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 16px;background:rgba(20,16,10,.62);color:#fff;font:500 14px/1 system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;text-decoration:none;border-radius:999px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 2px 12px rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.2)">← 返回首页</a>
 </body>
 </html>
