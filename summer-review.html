@@ -49,13 +49,16 @@ input{font-family:inherit}
 }
 .home-hero p{color:var(--ink-light);font-size:.88rem;margin-top:8px;line-height:1.6;font-family:var(--font-serif)}
 
-.stats-row{display:flex;gap:8px;padding:14px 16px 10px;justify-content:center;flex-wrap:wrap}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:12px 14px 8px}
 .stat-chip{
   background:var(--paper-card);border:1px solid var(--border);border-radius:var(--r);
-  padding:7px 16px;font-size:.9rem;display:flex;align-items:center;gap:5px;
+  padding:10px 6px 9px;display:flex;flex-direction:column;align-items:center;gap:3px;
   color:var(--ink-mid);box-shadow:var(--sh-sm);
 }
-.stat-chip b{color:var(--cinnabar)}
+.chip-val{display:flex;align-items:baseline;gap:1px;line-height:1}
+.chip-val b{font-size:1.4rem;color:var(--cinnabar);font-weight:800;font-family:var(--font-sans)}
+.chip-denom{font-size:.72rem;color:var(--ink-light);font-weight:400}
+.chip-label{font-size:.68rem;color:var(--ink-light);font-family:var(--font-serif);letter-spacing:.05em;white-space:nowrap}
 
 .progress-bar-wrap{padding:4px 16px 16px}
 .prog-bar{height:4px;background:var(--border-lt);position:relative;overflow:hidden;border-radius:2px}
@@ -126,7 +129,7 @@ input{font-family:inherit}
 .step-dot.done{background:var(--jade)}
 .step-dot.active{background:var(--cinnabar);width:38px}
 
-.lesson-body{flex:1;overflow-y:auto;padding:16px}
+.lesson-body{flex:1;overflow-y:auto;padding:14px 14px 8px}
 
 /* step labels */
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
@@ -146,9 +149,9 @@ input{font-family:inherit}
 .btn-blue{background:var(--azure);color:#fff;box-shadow:0 2px 8px rgba(44,95,138,.22)}
 .btn-purple{background:var(--purple);color:#fff;box-shadow:0 2px 8px rgba(124,77,184,.22)}
 .btn-red{background:var(--cinnabar);color:#fff;box-shadow:0 2px 8px rgba(192,59,44,.28)}
-.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--ink-light)}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--ink-light);white-space:nowrap;flex-shrink:0}
 .btn-full{width:100%;justify-content:center;margin-top:12px}
-.lesson-nav{padding:10px 16px 22px;display:flex;gap:10px}
+.lesson-nav{padding:10px 16px 22px;display:flex;gap:10px;align-items:stretch}
 
 /* vocab cards */
 .vocab-list{display:flex;flex-direction:column;gap:9px;margin-bottom:16px}
@@ -509,7 +512,10 @@ input{font-family:inherit}
     display:flex;flex-direction:column;justify-content:center;
   }
   .home-hero::after{width:3px;height:56px;bottom:auto;top:50%;left:-1px;transform:translateY(-50%)}
-  .stats-row{grid-column:2;grid-row:1;padding:32px 40px 12px;flex-direction:row;flex-wrap:wrap;justify-content:flex-start;gap:12px}
+  .stats-row{grid-column:2;grid-row:1;padding:32px 40px 12px;display:flex;flex-wrap:wrap;justify-content:flex-start;gap:12px}
+  .stat-chip{padding:12px 20px;flex-direction:row;gap:8px;align-items:center;flex:none}
+  .chip-val b{font-size:1.6rem}
+  .chip-label{font-size:.78rem}
   .progress-bar-wrap{grid-column:2;grid-row:2;padding:4px 40px 16px}
   .calendar-grid{grid-column:2;grid-row:3;padding:0 28px 56px;gap:7px}
 }
@@ -577,9 +583,18 @@ input{font-family:inherit}
     <button class="home-settings-btn" onclick="showSettings()">⚙ 设置开始日期</button>
   </div>
   <div class="stats-row">
-    <div class="stat-chip">已完成 <b id="stat-days">0</b>/36 天</div>
-    <div class="stat-chip">获得 <b id="stat-stars">0</b> 颗星</div>
-    <div class="stat-chip">已背 <b id="stat-poems">0</b>/13 首文</div>
+    <div class="stat-chip">
+      <div class="chip-val"><b id="stat-days">0</b><span class="chip-denom">/36</span></div>
+      <div class="chip-label">天 完成</div>
+    </div>
+    <div class="stat-chip">
+      <div class="chip-val"><b id="stat-stars">0</b></div>
+      <div class="chip-label">颗 星</div>
+    </div>
+    <div class="stat-chip">
+      <div class="chip-val"><b id="stat-poems">0</b><span class="chip-denom">/13</span></div>
+      <div class="chip-label">首 背诵</div>
+    </div>
   </div>
   <div class="progress-bar-wrap">
     <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
@@ -1362,6 +1377,7 @@ function renderStep(idx){
   const prevBtn=document.getElementById('btn-prev');
   const nextBtn=document.getElementById('btn-next');
   prevBtn.style.display=idx>0?'inline-flex':'none';
+  nextBtn.style.display='inline-flex';
   // reset handlers (poem/prose steps override them, restore here)
   nextBtn.onclick=nextStep;
   prevBtn.onclick=prevStep;
