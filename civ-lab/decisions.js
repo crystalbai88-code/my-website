@@ -62,6 +62,8 @@
      tip:'明知是死神的圈套,下不下冥界?', url:'./decision-popolvuh.html'},
     {id:'zhenghe', person:'郑和之后 · 停航还是远航', icon:'⛵', culture:'china', lng:118.8, lat:32.0, year:1433, from:1405, to:1450,
      tip:'世界最大的船队,停,还是继续开?', url:'./decision-zhenghe.html'},
+    {id:'edwin', person:'爱德温与那只麻雀', icon:'🐦', culture:'medieval_europe', lng:-1.08, lat:53.96, year:627, from:616, to:633,
+     tip:'背弃祖先的神,接受一个外来的新信仰?', url:'./decision-edwin.html'},
   ];
   if(typeof window!=='undefined') window.DECISIONS=DECISIONS;
 })();
