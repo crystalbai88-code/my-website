@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>抉择时刻 · 成吉思汗的复仇 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;display:flex;flex-direction:column;align-items:center}
+  .top{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:12px 16px;
+    background:linear-gradient(180deg,rgba(var(--scrim,0,0,0),.25),transparent);position:sticky;top:0;z-index:20}
+  .top a.back{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.1em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .top .brand{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink)}
+  .prog{display:flex;gap:5px;margin-left:auto}
+  .prog i{width:13px;height:4px;border-radius:3px;background:var(--panel-line)}
+  .prog i.on{background:var(--gold)}
+  .wrap{width:min(660px,92%);margin:8px auto 70px;flex:1}
+  .beat{animation:fin .5s cubic-bezier(.22,1,.36,1)}
+  @keyframes fin{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;font-weight:700;text-align:center;margin-top:18px}
+  .htitle{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);text-align:center;line-height:1.3;margin:6px 0 4px;text-shadow:var(--label-shadow)}
+  .hsub{font-family:var(--mono);font-size:12px;color:var(--ink3);text-align:center;letter-spacing:.08em;margin-bottom:18px}
+  .scene{font-family:var(--serif);font-size:clamp(15px,3.8vw,17.5px);color:var(--ink);line-height:1.95;
+    background:var(--panel-bg);border:1px solid var(--panel-line);border-left:4px solid var(--gold);border-radius:14px;
+    padding:18px 20px;backdrop-filter:blur(8px)}
+  .scene b{color:var(--gold)}
+  .dossier-intro{font-family:var(--sans);font-size:14.5px;color:var(--ink2);text-align:center;line-height:1.7;margin:4px 0 16px}
+  .dcount{font-family:var(--mono);font-size:12px;color:var(--gold);text-align:center;font-weight:700;margin-bottom:12px}
+  .dcard{background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:14px;margin-bottom:11px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+  .dcard.open{border-color:var(--gold)}
+  .dhead{display:flex;align-items:center;gap:11px;padding:15px 17px}
+  .dhead .di{font-size:21px}
+  .dhead .dt{font-family:var(--sans);font-weight:800;font-size:15.5px;color:var(--ink);flex:1}
+  .dhead .dchev{font-family:var(--mono);font-size:11px;color:var(--ink3);transition:transform .2s}
+  .dcard.open .dchev{transform:rotate(90deg);color:var(--gold)}
+  .dhead .ddot{width:8px;height:8px;border-radius:50%;background:var(--vermilion);flex:none}
+  .dcard.open .ddot{background:var(--cyan)}
+  .dbody{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .dbody-in{padding:0 17px 16px;font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.85}
+  .dbody-in b{color:var(--gold)}
+  .dbody-in ul{margin:8px 0 0;padding-left:2px;list-style:none}
+  .dbody-in li{margin:7px 0;padding-left:16px;position:relative}
+  .dbody-in li:before{content:'·';position:absolute;left:3px;color:var(--vermilion);font-weight:900}
+  .dbody-in li b{color:var(--vermilion)}
+  .ask{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);text-align:center;margin:22px 0 6px}
+  .asksub{font-family:var(--sans);font-size:13.5px;color:var(--ink2);text-align:center;margin-bottom:16px;line-height:1.6}
+  .choices{display:flex;flex-direction:column;gap:11px}
+  .choice{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink);background:var(--panel-bg);
+    border:1.5px solid var(--panel-line);border-radius:14px;padding:15px 17px;cursor:pointer;transition:all .15s;text-align:left;line-height:1.5}
+  .choice:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+  .choice .ckey{font-weight:900;color:var(--gold);margin-right:8px}
+  .choice.picked{border-color:var(--gold);background:rgba(224,138,44,.1)}
+  .reaction{margin-top:14px;font-size:14.5px;color:var(--ink);line-height:1.75;background:rgba(224,138,44,.1);
+    border-left:4px solid var(--gold);border-radius:8px;padding:13px 16px;display:none}
+  .reaction.show{display:block;animation:fin .4s}
+  .lines{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+  .line{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:12px;padding:13px 16px}
+  .line .lh{font-family:var(--serif);font-weight:900;font-size:14px;color:var(--gold);margin-bottom:4px}
+  .line .lt{font-size:14px;color:var(--ink);line-height:1.7}
+  .line .lt b{color:var(--vermilion)}
+  .voice{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:13px;padding:13px 16px;margin-bottom:10px}
+  .voice .vw{font-family:var(--sans);font-weight:800;font-size:14px;color:var(--ink);margin-bottom:5px}
+  .voice .va{font-size:14px;color:var(--ink2);line-height:1.7}
+  .note{font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:center;margin-top:12px}
+  .q{font-family:var(--serif);font-size:16.5px;color:var(--ink);line-height:1.75;margin:14px 0;padding-left:14px;border-left:3px solid var(--gold)}
+  .q b{color:var(--gold)}
+  textarea{width:100%;box-sizing:border-box;margin-top:10px;font-family:var(--sans);font-size:15px;color:var(--ink);
+    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:12px;padding:13px 15px;min-height:80px;outline:none;resize:vertical}
+  .btnrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
+  .nextbtn{font-family:var(--sans);font-weight:800;font-size:15px;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));
+    border:none;border-radius:999px;padding:13px 30px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.16)}
+  .nextbtn:active{transform:scale(.97)}
+  .nextbtn[disabled]{opacity:.4;cursor:not-allowed;box-shadow:none}
+  .ghost{font-family:var(--sans);font-weight:700;font-size:14px;color:var(--gold);background:var(--panel-bg);
+    border:1px solid var(--panel-line);border-radius:999px;padding:11px 20px;cursor:pointer;text-decoration:none;display:inline-block}
+  .gate{text-align:center;font-family:var(--sans);font-size:12.5px;color:var(--ink3);margin-top:6px}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="top">
+    <a class="back" href="./stories.html">⌂ 抉择</a>
+    <span class="brand">🎯 抉择时刻</span>
+    <div class="prog" id="prog"></div>
+  </div>
+  <div class="wrap"><div class="beat" id="beat"></div><div class="epigraph" style="margin:20px auto 4px;max-width:30em;text-align:center;font-family:'Noto Serif SC',serif;color:var(--ink2);font-size:15px;line-height:1.75;border-top:1px dashed var(--panel-line);padding-top:16px">「使者神圣不可侵犯——这是草原的铁律。」<div style="font-family:var(--mono);font-size:11px;color:var(--gold);margin-top:8px;letter-spacing:.04em">—— 成吉思汗(其心境)</div></div></div>
+</div>
+<script src="./track.js?v=1"></script>
+<script>
+window.__aiCtx='用户正在体验"抉择时刻·成吉思汗的复仇"(母题:倾国的豪赌)。史实:1218—1219年,已统一蒙古草原的成吉思汗,起初并不想与西边富庶强大的花剌子模帝国(Khwarezmia,在今中亚)开战,而是希望通商。他派出一支庞大的商队(约数百人)前往花剌子模通商;但花剌子模边境城市讹答剌(Otrar)的总督(伊纳勒术克)诬称他们是奸细,扣押商队、屠杀商人、夺走货物。成吉思汗强忍怒火,又派出三名使者去见花剌子模国王(沙阿)讨公道,要求交出那个总督。沙阿不但拒绝,还杀了为首的使者、剃掉另外两名使者的胡须加以羞辱后赶回。在蒙古文化中,使者神圣不可侵犯,这是奇耻大辱。成吉思汗于是决定倾全国之兵西征花剌子模(1219—1221),最终灭亡花剌子模、处死那个总督,蒙古铁骑震动整个西方。代价是战争极其惨烈,多座城市遭屠戮。更深远的是:这场西征打开了蒙古向西扩张的大门,此后蒙古帝国成为人类历史上版图最大的陆地帝国,但无止境的征服也埋下了过度扩张、难以长久统治的隐患。教学要点:这是"倾国之力办一件大事"的豪赌,与汉武帝伐匈奴、隋炀帝开运河属于同一母题(倾国的豪赌);共同的关键是"有没有边界、知不知道停"——成吉思汗为维护尊严而复仇,赌赢了,但征服的车一旦发动就再难停下。讲述战争残酷处点到为止。请用适合10-12岁孩子的语言陪他思考,多反问,不要替他下结论。';
+let pick=null;
+const DOSSIER=[
+  {i:'🐎',t:'你是谁',b:'你是<b>成吉思汗</b>,刚刚统一了蒙古草原上所有的部落。你的骑兵纪律严明、来去如风,是当时最可怕的军队之一。'},
+  {i:'🤝',t:'本想做生意',b:'你<b>本来不想打仗</b>。西边的花剌子模帝国又大又富,你派出一支几百人的<b>商队</b>带着货物过去,只想<b>通商互市</b>、和平做生意。'},
+  {i:'💀',t:'商队被屠',b:'谁知花剌子模边境一座城的<b>总督</b>,诬陷你的商人是奸细,<b>把整支商队扣下、杀光,抢走了所有货物</b>。你强忍着怒火,决定先讲道理。'},
+  {i:'🧔',t:'使者被辱',b:'你派出<b>三名使者</b>去见花剌子模国王,要求交出凶手、给个说法。国王不但不给,反而<b>杀了为首的使者</b>,把另外两人的<b>胡须剃光</b>,羞辱一番后赶了回来。'},
+  {i:'⚡',t:'踩到了铁律',b:'在草原上,<b>使者神圣不可侵犯</b>——这是所有人都认的铁律。杀使者、辱使者,是对你、对整个蒙古的奇耻大辱。这口气,草原上没人能咽下。'},
+  {i:'⚖️',t:'眼前的难题',b:'花剌子模<b>又大又富、兵马众多</b>,远征它要<b>倾全国之兵、劳师远行</b>。<b>复仇</b>——能维护尊严、立威,却要拿整个蒙古去赌;<b>忍下</b>——能保存实力,可你的威信和草原的铁律,从此还立得住吗?'},
+];
+let opened=new Set();
+const beats=[];
+beats.push(()=>`
+  <div class="kicker">1219 年 · 蒙古草原</div>
+  <div class="htitle">奇耻大辱,要倾全国去复仇吗?</div>
+  <div class="hsub">即将由你 —— 成吉思汗 —— 决定</div>
+  <div class="scene">1219年,你是刚统一草原的<b>成吉思汗</b>。你本想和西边富庶的花剌子模通商,派去的商队却被对方总督<b>屠杀</b>,讨公道的<b>使者也被杀、被羞辱</b>。<br><br>在草原,使者神圣不可侵犯——这是奇耻大辱。可花剌子模又大又富,远征要倾全国之兵。<br><br><b>复仇,还是忍下?</b> 先别急,先把这件事看清楚。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(1)">📂 先弄懂这件事 →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第一步 · 了解</div>
+  <div class="htitle" style="font-size:23px">看清这桩血仇</div>
+  <div class="dossier-intro">点开每一张情报卡,弄懂你本想做什么、对方做了什么、又踩了什么铁律。<br>全部看完,你才有资格替成吉思汗做决定。</div>
+  <div class="dcount" id="dcount">已了解 0 / ${DOSSIER.length}</div>
+  <div id="dwrap">${DOSSIER.map((d,i)=>`
+    <div class="dcard" data-i="${i}" onclick="flip(${i})">
+      <div class="dhead"><span class="ddot"></span><span class="di">${d.i}</span><span class="dt">${d.t}</span><span class="dchev">▶</span></div>
+      <div class="dbody" id="db${i}"><div class="dbody-in">${d.b}</div></div>
+    </div>`).join('')}</div>
+  <div class="btnrow"><button class="nextbtn" id="toChoice" onclick="go(2)" disabled>换作是你,你会怎么做? →</button></div>
+  <div class="gate" id="gate">(看完全部 ${DOSSIER.length} 张情报卡后解锁)</div>`);
+beats.push(()=>`
+  <div class="kicker">第二步 · 此刻,你就是成吉思汗</div>
+  <div class="ask">复仇,还是忍下?</div>
+  <div class="asksub">复仇要倾全国去赌一场远征;忍下能保存实力,却伤了威信和铁律。<br>现在,这个决定由你来下。</div>
+  <div class="choices">
+    <div class="choice" data-k="A" onclick="choose('A')"><span class="ckey">A</span>倾国西征——召集全军,远征花剌子模,为被杀的商队和使者复仇、立威。</div>
+    <div class="choice" data-k="B" onclick="choose('B')"><span class="ckey">B</span>忍下息事——接受赔偿、不开战,保存实力,把精力放在巩固草原上。</div>
+    <div class="choice" data-k="C" onclick="choose('C')"><span class="ckey">C</span>小规模惩戒——只派一支偏师骚扰边境,既出口气,又不全面开战。</div>
+  </div>
+  <div class="reaction" id="reaction"></div>`);
+beats.push(()=>`
+  <div class="kicker">第三步 · 真实的他</div>
+  <div class="htitle" style="font-size:22px">成吉思汗,选了 A</div>
+  <div class="scene">他决定<b>倾全国之兵西征</b>。1219年,蒙古铁骑越过大漠,扑向花剌子模。这个又大又富的帝国,在蒙古军凌厉的攻势下接连失守——边城讹答剌被攻破,那个屠杀商队的<b>总督被处死</b>;撒马尔罕等名城相继陷落。<br><br>短短两三年,花剌子模<b>灭亡了</b>。蒙古的威名,第一次震动了整个西方世界。<br><br>但战争极其惨烈,多座城市付出了惨重的代价。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(4)">那……它带来了什么? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第四步 · 一场复仇,延伸出三条线</div>
+  <div class="lines">
+    <div class="line"><div class="lh">⚡ 短期</div><div class="lt">花剌子模灭亡,凶手伏诛,蒙古的尊严和"使者不可犯"的铁律,用最强硬的方式立了起来,威震四方。</div></div>
+    <div class="line"><div class="lh">🩸 代价</div><div class="lt">战争<b>极其惨烈</b>,许多城市遭到屠戮。一场为尊严而起的复仇,演变成席卷中亚的腥风血雨。</div></div>
+    <div class="line"><div class="lh">🌍 长远</div><div class="lt">这一战打开了蒙古<b>向西扩张的大门</b>。此后蒙古成为史上<b>版图最大的陆地帝国</b>;可"停不下来"的征服,也埋下了过度扩张、难以长久统治的隐患。</div></div>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(5)">别人怎么看这场西征? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第五步 · 同一场复仇,不同的声音</div>
+  <div class="voice"><div class="vw">🐎 成吉思汗</div><div class="va">"是他们先杀我商队、辱我使者。若忍下这口气,草原的铁律和我的威信,都将荡然无存。"</div></div>
+  <div class="voice"><div class="vw">🏹 一个蒙古战士</div><div class="va">"使者被剃须斩首,这是天大的侮辱!跟着大汗,我们打到天边也要讨回公道!"</div></div>
+  <div class="voice"><div class="vw">🏙️ 一个花剌子模百姓</div><div class="va">"明明是总督闯的祸、国王的傲慢,为什么要我们全城的人,用性命来偿还?"</div></div>
+  <div class="voice"><div class="vw">📜 后世史家</div><div class="va">"为尊严而战的复仇,他赌赢了。但征服的车一旦发动,就再也停不下来——这是福,也是祸。"</div></div>
+  <div class="note">同一个抉择,没有标准答案。 · 史料:据《蒙古秘史》及波斯、阿拉伯史家记载</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(6)">它藏着什么规律? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第六步 · 倾国豪赌,赢了也要懂得边界</div>
+  <div class="scene">成吉思汗为了尊严,把整个蒙古压上了赌桌——他赌赢了:灭了花剌子模,威震天下。可这一仗也像推开了一道闸门,蒙古的征服从此<b>停不下来</b>,一路向西、向南打了几十年,版图大到难以统治。<br><br>把它和<b>汉武帝</b>倾国伐匈奴、<b>隋炀帝</b>倾国开运河放在一起,你会看到同一个母题:<b>倾国之力办一件大事,关键不在做不做,而在有没有"边界"、知不知道在哪儿"刹车"。</b><br><br>汉武帝晚年踩了刹车,保住了汉朝;隋炀帝不知收手,几年葬送王朝;成吉思汗赌赢了复仇,却把"停不下来"留给了子孙。</div>
+  <div class="btnrow" style="margin-top:16px">
+    <a class="ghost" href="./map.html?civ=mongol">🗺 去地图看 蒙古帝国</a>
+    <a class="ghost" href="./decision-hanwudi.html">👑 看汉武帝的同款豪赌 →</a>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(7)">那……换作是你呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">最后 · 回到你</div>
+  <div class="htitle" style="font-size:22px">换作是你呢?</div>
+  <div class="q">受到莫大的侮辱时,你会不顾一切地<b>讨回公道</b>,还是先掂量"代价值不值"?尊严和代价,怎么权衡?</div>
+  <div class="q">成吉思汗赌赢了复仇,可征服却"<b>停不下来</b>"。你觉得,一个人(或一个国家)最难的,是不是"知道什么时候<b>该停</b>"?</div>
+  <div class="q">你最开始选的是 <b id="myPick">?</b>,和成吉思汗(A)一样吗?走到这里,你的想法<b>变了</b>吗?</div>
+  <div style="font-family:var(--sans);font-weight:700;color:var(--ink);margin-top:18px">✍️ 写下你看懂的一句话:</div>
+  <textarea id="myNote" placeholder="比如:倾尽全力去赢一件事并不难,难的是知道在哪里停下来……"></textarea>
+  <div class="btnrow"><button class="nextbtn" onclick="saveNote(event)">💾 记下我的收获</button></div>
+  <div class="btnrow" style="margin-top:14px">
+    <a class="nextbtn" href="./stories.html" style="text-decoration:none">🧩 回到抉择,顺着母题线找规律 →</a>
+  </div>
+  <div class="btnrow" style="margin-top:8px">
+    <button class="ghost" onclick="if(window.toggleAIFloat)toggleAIFloat()">🤖 和 AI 聊聊这个抉择</button>
+    <button class="ghost" onclick="pick=null;opened=new Set();go(0)">↺ 重新走一遍</button>
+  </div>`);
+
+let cur=0;
+function render(){
+  document.getElementById('beat').innerHTML=beats[cur]();
+  document.getElementById('prog').innerHTML=beats.map((_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('');
+  if(cur===1){ refreshGate(); }
+  if(cur===7){ const m=document.getElementById('myPick'); if(m)m.textContent=pick||'?'; const n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('decision_genghis')||''; }
+  window.scrollTo({top:0,behavior:'instant'});
+  if(window.Track) Track.log('抉择时刻');
+}
+function go(n){ cur=n; render(); }
+function flip(i){
+  const card=document.querySelector('.dcard[data-i="'+i+'"]');
+  const body=document.getElementById('db'+i);
+  const isOpen=card.classList.toggle('open');
+  body.style.maxHeight=isOpen?(body.scrollHeight+'px'):'0';
+  if(isOpen){ opened.add(i); refreshGate(); }
+}
+function refreshGate(){
+  const c=document.getElementById('dcount'); if(c)c.textContent='已了解 '+opened.size+' / '+DOSSIER.length;
+  const btn=document.getElementById('toChoice'); const gate=document.getElementById('gate');
+  if(opened.size>=DOSSIER.length){ if(btn)btn.disabled=false; if(gate)gate.textContent='✅ 你已看清整盘棋,可以决定了'; }
+}
+function choose(k){
+  pick=k;
+  document.querySelectorAll('.choice').forEach(c=>{c.classList.toggle('picked',c.dataset.k===k);c.onclick=null;});
+  const react={A:'维护尊严、震慑四方!可你押上了整个蒙古去远征——而且这架战争机器,你确定停得下来吗?',
+    B:'保存实力,理智。可使者被杀被辱却忍气吞声,你的威信和草原的铁律,还立得住吗?',
+    C:'小打小闹出口气?可对方既然敢杀你的使者,半吊子的惩戒只会让他更轻视你。'}[k];
+  const r=document.getElementById('reaction');
+  r.innerHTML=react+'<div class="btnrow" style="margin-top:14px"><button class="nextbtn" onclick="go(3)">👉 看真实的成吉思汗怎么选</button></div>';
+  r.classList.add('show');
+}
+function saveNote(e){ const n=document.getElementById('myNote'); if(n){localStorage.setItem('decision_genghis',n.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的收获',1500);} }
+render();
+</script>
+<script src="./ai_float.js?v=2"></script>
+</body>
+</html>

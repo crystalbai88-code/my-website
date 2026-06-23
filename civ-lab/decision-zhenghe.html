@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>抉择时刻 · 郑和之后,停航还是远航 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;display:flex;flex-direction:column;align-items:center}
+  .top{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:12px 16px;
+    background:linear-gradient(180deg,rgba(var(--scrim,0,0,0),.25),transparent);position:sticky;top:0;z-index:20}
+  .top a.back{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.1em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .top .brand{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink)}
+  .prog{display:flex;gap:5px;margin-left:auto}
+  .prog i{width:13px;height:4px;border-radius:3px;background:var(--panel-line)}
+  .prog i.on{background:var(--gold)}
+  .wrap{width:min(660px,92%);margin:8px auto 70px;flex:1}
+  .beat{animation:fin .5s cubic-bezier(.22,1,.36,1)}
+  @keyframes fin{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;font-weight:700;text-align:center;margin-top:18px}
+  .htitle{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);text-align:center;line-height:1.3;margin:6px 0 4px;text-shadow:var(--label-shadow)}
+  .hsub{font-family:var(--mono);font-size:12px;color:var(--ink3);text-align:center;letter-spacing:.08em;margin-bottom:18px}
+  .scene{font-family:var(--serif);font-size:clamp(15px,3.8vw,17.5px);color:var(--ink);line-height:1.95;
+    background:var(--panel-bg);border:1px solid var(--panel-line);border-left:4px solid var(--gold);border-radius:14px;
+    padding:18px 20px;backdrop-filter:blur(8px)}
+  .scene b{color:var(--gold)}
+  .dossier-intro{font-family:var(--sans);font-size:14.5px;color:var(--ink2);text-align:center;line-height:1.7;margin:4px 0 16px}
+  .dcount{font-family:var(--mono);font-size:12px;color:var(--gold);text-align:center;font-weight:700;margin-bottom:12px}
+  .dcard{background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:14px;margin-bottom:11px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+  .dcard.open{border-color:var(--gold)}
+  .dhead{display:flex;align-items:center;gap:11px;padding:15px 17px}
+  .dhead .di{font-size:21px}
+  .dhead .dt{font-family:var(--sans);font-weight:800;font-size:15.5px;color:var(--ink);flex:1}
+  .dhead .dchev{font-family:var(--mono);font-size:11px;color:var(--ink3);transition:transform .2s}
+  .dcard.open .dchev{transform:rotate(90deg);color:var(--gold)}
+  .dhead .ddot{width:8px;height:8px;border-radius:50%;background:var(--vermilion);flex:none}
+  .dcard.open .ddot{background:var(--cyan)}
+  .dbody{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .dbody-in{padding:0 17px 16px;font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.85}
+  .dbody-in b{color:var(--gold)}
+  .dbody-in ul{margin:8px 0 0;padding-left:2px;list-style:none}
+  .dbody-in li{margin:7px 0;padding-left:16px;position:relative}
+  .dbody-in li:before{content:'·';position:absolute;left:3px;color:var(--vermilion);font-weight:900}
+  .dbody-in li b{color:var(--vermilion)}
+  .ask{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);text-align:center;margin:22px 0 6px}
+  .asksub{font-family:var(--sans);font-size:13.5px;color:var(--ink2);text-align:center;margin-bottom:16px;line-height:1.6}
+  .choices{display:flex;flex-direction:column;gap:11px}
+  .choice{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink);background:var(--panel-bg);
+    border:1.5px solid var(--panel-line);border-radius:14px;padding:15px 17px;cursor:pointer;transition:all .15s;text-align:left;line-height:1.5}
+  .choice:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+  .choice .ckey{font-weight:900;color:var(--gold);margin-right:8px}
+  .choice.picked{border-color:var(--gold);background:rgba(224,138,44,.1)}
+  .reaction{margin-top:14px;font-size:14.5px;color:var(--ink);line-height:1.75;background:rgba(224,138,44,.1);
+    border-left:4px solid var(--gold);border-radius:8px;padding:13px 16px;display:none}
+  .reaction.show{display:block;animation:fin .4s}
+  .lines{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+  .line{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:12px;padding:13px 16px}
+  .line .lh{font-family:var(--serif);font-weight:900;font-size:14px;color:var(--gold);margin-bottom:4px}
+  .line .lt{font-size:14px;color:var(--ink);line-height:1.7}
+  .line .lt b{color:var(--vermilion)}
+  .voice{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:13px;padding:13px 16px;margin-bottom:10px}
+  .voice .vw{font-family:var(--sans);font-weight:800;font-size:14px;color:var(--ink);margin-bottom:5px}
+  .voice .va{font-size:14px;color:var(--ink2);line-height:1.7}
+  .note{font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:center;margin-top:12px}
+  .q{font-family:var(--serif);font-size:16.5px;color:var(--ink);line-height:1.75;margin:14px 0;padding-left:14px;border-left:3px solid var(--gold)}
+  .q b{color:var(--gold)}
+  textarea{width:100%;box-sizing:border-box;margin-top:10px;font-family:var(--sans);font-size:15px;color:var(--ink);
+    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:12px;padding:13px 15px;min-height:80px;outline:none;resize:vertical}
+  .btnrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
+  .nextbtn{font-family:var(--sans);font-weight:800;font-size:15px;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));
+    border:none;border-radius:999px;padding:13px 30px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.16)}
+  .nextbtn:active{transform:scale(.97)}
+  .nextbtn[disabled]{opacity:.4;cursor:not-allowed;box-shadow:none}
+  .ghost{font-family:var(--sans);font-weight:700;font-size:14px;color:var(--gold);background:var(--panel-bg);
+    border:1px solid var(--panel-line);border-radius:999px;padding:11px 20px;cursor:pointer;text-decoration:none;display:inline-block}
+  .gate{text-align:center;font-family:var(--sans);font-size:12.5px;color:var(--ink3);margin-top:6px}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="top">
+    <a class="back" href="./stories.html">⌂ 抉择</a>
+    <span class="brand">🎯 抉择时刻</span>
+    <div class="prog" id="prog"></div>
+  </div>
+  <div class="wrap"><div class="beat" id="beat"></div><div class="epigraph" style="margin:20px auto 4px;max-width:30em;text-align:center;font-family:'Noto Serif SC',serif;color:var(--ink2);font-size:15px;line-height:1.75;border-top:1px dashed var(--panel-line);padding-top:16px">「最大的船队就在港口——是扬帆,还是封存?」<div style="font-family:var(--mono);font-size:11px;color:var(--gold);margin-top:8px;letter-spacing:.04em">—— 郑和之后的明朝朝廷</div></div></div>
+</div>
+<script src="./track.js?v=1"></script>
+<script>
+window.__aiCtx='用户正在体验"抉择时刻·郑和之后,停航还是远航"(母题:面对外面的世界,开门还是关门)。史实:明朝初年,郑和(三宝太监,回族航海家)奉永乐皇帝之命,率领当时世界上规模最大的舰队"七下西洋"(1405—1433),宝船巨大、船员上万,航迹远达东南亚、印度、阿拉伯,直至东非海岸,宣扬国威、开展朝贡贸易。这是人类航海史上的壮举,比欧洲的大航海早了几十年。但永乐帝1424年去世后,朝廷内部对远航争议很大:以儒家士大夫为主的官员强烈反对,认为远航劳民伤财、是宦官(郑和是宦官)好大喜功之举;他们也反对皇帝重用宦官。1433年最后一次航行后,远航停止,明朝转向内向，朝廷把资源更多投向北方边防(包括修筑、扩建长城,防御蒙古)。后来明朝长期实行"海禁"。关于"远航是否真的太烧钱拖垮国库",现代史学界有争论(有学者认为耗费被夸大、甚至有利可图),但无论如何,朝廷确实选择了停航、转向内向。讽刺的是:就在中国从海洋退场的几十年后,欧洲人(达伽马、哥伦布等)扬帆出海,开启了大航海时代,世界的中心从此逐渐转移。教学要点:这是"面对外面的世界,开门还是关门"的抉择,与圣德太子主动开门学习中国形成鲜明对照(同一母题的两个相反答案)。请用适合10-12岁孩子的语言陪他思考,多反问,不要替他下结论;注意"太烧钱"是有争议的说法,要客观呈现各方观点。';
+let pick=null;
+const DOSSIER=[
+  {i:'⛵',t:'你是谁',b:'你是明朝的<b>当家人</b>(朝廷)。几十年来,航海家<b>郑和</b>奉命率领当时世界上最庞大的舰队"<b>七下西洋</b>"——巨大的宝船、上万的船员,一直开到了印度、阿拉伯,远至<b>东非海岸</b>。'},
+  {i:'🚢',t:'空前的壮举',b:'这是人类航海史上的奇迹:它<b>比欧洲的大航海还早几十年</b>。船队带回奇珍异兽(连长颈鹿都运了回来),把大明的威名,传到了万里之外。'},
+  {i:'💰',t:'巨大的争议',b:'可这件事<b>耗费巨大</b>。朝中的儒家大臣强烈反对,说这是<b>劳民伤财、好大喜功</b>(郑和是宦官,他们也不满皇帝重用宦官)。<br><br><b>⚠️ 小提示:</b>"到底烧不烧钱"其实<b>后世史家有争论</b>——有人说耗费被夸大了,甚至远航还能带来贸易收益。'},
+  {i:'🐎',t:'北方的威胁',b:'与此同时,北方的<b>蒙古势力</b>仍是心腹大患。支持收手的人说:与其把钱花在远洋上,不如<b>用来加固北方边防、修筑长城</b>,守好自家门口。'},
+  {i:'⚓',t:'掌舵人老去',b:'力主远航的永乐皇帝已经去世,郑和也<b>年事渐高</b>。这项庞大的事业,正走到一个十字路口:是<b>接着干下去</b>,还是<b>就此收手</b>?'},
+  {i:'⚖️',t:'眼前的难题',b:'<b>继续远航</b>——保持海上的力量与对外联系,把"开门看世界"的路走下去,但要持续投入;<b>停航内向</b>——省下钱粮守好门口,却可能从此<b>关上通往海洋的大门</b>。'},
+];
+let opened=new Set();
+const beats=[];
+beats.push(()=>`
+  <div class="kicker">约 1433 年 · 明朝</div>
+  <div class="htitle">世界最大的船队,停,还是继续开?</div>
+  <div class="hsub">即将由你 —— 明朝朝廷 —— 决定</div>
+  <div class="scene">明朝初年,<b>郑和</b>率领世界上最庞大的舰队七下西洋,远达东非,比欧洲大航海早了几十年。<br><br>可永乐皇帝已逝、郑和渐老,朝中大臣痛斥远航劳民伤财,北方蒙古又虎视眈眈。<br><br><b>继续远航,还是收起船队、转向内陆?</b> 先别急,先把这道难题看清楚。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(1)">📂 先弄懂这道难题 →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第一步 · 了解</div>
+  <div class="htitle" style="font-size:23px">看清这道难题</div>
+  <div class="dossier-intro">点开每一张情报卡,弄懂这支船队的分量、它的争议、和北方的威胁。<br>全部看完,你才有资格替明朝做决定。</div>
+  <div class="dcount" id="dcount">已了解 0 / ${DOSSIER.length}</div>
+  <div id="dwrap">${DOSSIER.map((d,i)=>`
+    <div class="dcard" data-i="${i}" onclick="flip(${i})">
+      <div class="dhead"><span class="ddot"></span><span class="di">${d.i}</span><span class="dt">${d.t}</span><span class="dchev">▶</span></div>
+      <div class="dbody" id="db${i}"><div class="dbody-in">${d.b}</div></div>
+    </div>`).join('')}</div>
+  <div class="btnrow"><button class="nextbtn" id="toChoice" onclick="go(2)" disabled>换作是你,你会怎么做? →</button></div>
+  <div class="gate" id="gate">(看完全部 ${DOSSIER.length} 张情报卡后解锁)</div>`);
+beats.push(()=>`
+  <div class="kicker">第二步 · 此刻,你就是明朝朝廷</div>
+  <div class="ask">停航,还是继续远航?</div>
+  <div class="asksub">远航耗费巨大、争议不断;停航能省钱守边,却可能关上海洋之门。<br>现在,这个决定由你来下。</div>
+  <div class="choices">
+    <div class="choice" data-k="A" onclick="choose('A')"><span class="ckey">A</span>停航、转向内向——收起船队、把钱粮投向北方边防,守好自家门口。</div>
+    <div class="choice" data-k="B" onclick="choose('B')"><span class="ckey">B</span>继续远航——保持世界最强的海上力量与对外联系,把"看世界"的路走下去。</div>
+    <div class="choice" data-k="C" onclick="choose('C')"><span class="ckey">C</span>缩减但保留——大幅削减规模,留一支小船队,既省钱又不彻底关门。</div>
+  </div>
+  <div class="reaction" id="reaction"></div>`);
+beats.push(()=>`
+  <div class="kicker">第三步 · 真实的历史</div>
+  <div class="htitle" style="font-size:22px">明朝,选了 A</div>
+  <div class="scene">1433年最后一次远航之后,明朝<b>停止了下西洋</b>。庞大的宝船渐渐封存、朽坏,朝廷把更多的钱粮,投向了<b>北方的边防与长城</b>。<br><br>反对远航的声音占了上风:它太烧钱、是宦官的好大喜功。从此,大明<b>转过身,背向海洋,面朝内陆</b>,后来还长期实行"海禁"。<br><br>世界上最强的船队,就这样停在了港口里。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(4)">那……后来呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第四步 · 停航这一步,延伸出三条线</div>
+  <div class="lines">
+    <div class="line"><div class="lh">⚡ 短期</div><div class="lt">朝廷省下了远航的巨大开销,把资源投向北方边防,守住了陆上的家门。一时之间,似乎是务实之举。</div></div>
+    <div class="line"><div class="lh">🌅 长远</div><div class="lt">中国从海洋上<b>退场</b>了。讽刺的是,就在几十年后,欧洲人(达伽马、哥伦布)<b>扬帆出海</b>,开启了大航海时代——世界的中心,从此慢慢转移。</div></div>
+    <div class="line"><div class="lh">⚖️ 一桩公案</div><div class="lt">"远航到底烧不烧钱",<b>后世仍有争论</b>。但无论如何,在那个十字路口,大明选择了<b>关门内向</b>,而不是走向海洋。</div></div>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(5)">别人怎么看这件事? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第五步 · 同一个决定,不同的声音</div>
+  <div class="voice"><div class="vw">📜 反对远航的大臣</div><div class="va">"宝船虽壮,却劳民伤财、徒费国库!守好北方边防、安顿百姓,才是正经。"</div></div>
+  <div class="voice"><div class="vw">⛵ 一个老船员</div><div class="va">"我们的船队远达非洲,世上无人能及。就这么封存朽坏……实在可惜啊。"</div></div>
+  <div class="voice"><div class="vw">🌍 几十年后的欧洲水手</div><div class="va">"东方那支无敌舰队居然停了?那……通往世界的大海,就让我们来闯吧。"</div></div>
+  <div class="voice"><div class="vw">📚 后世史家</div><div class="va">"它是否真的太费钱,至今有争论;但中国背向海洋的这一步,恰恰发生在世界即将'大航海'的前夜。"</div></div>
+  <div class="note">同一个抉择,没有标准答案。 · 史料:据《明史》等;远航耗费尚有学术争议</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(6)">它藏着什么规律? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第六步 · 面对外面的世界:开门,还是关门</div>
+  <div class="scene">明朝在自己最领先的时候,亲手收起了世界最强的船队,转身面向内陆、关上了海洋之门。这未必是一时的糊涂——它有省钱守边的现实理由;可放在更长的历史里看,这一步的代价格外沉重:<b>就在中国退场的前夜,欧洲扬帆而起,世界的中心慢慢移走了。</b><br><br>把它和八百多年前的<b>圣德太子</b>放在一起,你会看到同一个母题的两个相反答案:日本在弱小时,大大方方<b>开门</b>去学外面的世界;中国在强盛时,却<b>关上</b>了那扇门。<br><br>同样面对"外面的世界",<b>开门还是关门,长远的命运,可能就此天差地别。</b></div>
+  <div class="btnrow" style="margin-top:16px">
+    <a class="ghost" href="./map.html?civ=china">🗺 去地图看 明朝</a>
+    <a class="ghost" href="./decision-shotoku.html">🎌 看日本"开门"的相反选择 →</a>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(7)">那……换作是你呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">最后 · 回到你</div>
+  <div class="htitle" style="font-size:22px">换作是你呢?</div>
+  <div class="q">当你已经<b>遥遥领先</b>,你会继续往外闯、看更大的世界,还是觉得"够好了"、关起门来守着?</div>
+  <div class="q">明朝的停航,有省钱守边的<b>现实理由</b>,长远却可能错过了整个时代。你觉得,该怎么权衡"<b>眼前的实惠</b>"和"<b>长远的方向</b>"?</div>
+  <div class="q">你最开始选的是 <b id="myPick">?</b>,和真实的明朝(A)一样吗?走到这里,你的想法<b>变了</b>吗?</div>
+  <div style="font-family:var(--sans);font-weight:700;color:var(--ink);margin-top:18px">✍️ 写下你看懂的一句话:</div>
+  <textarea id="myNote" placeholder="比如:越是领先的时候,越不能关上看世界的门——眼前省下的,可能让你错过整个时代……"></textarea>
+  <div class="btnrow"><button class="nextbtn" onclick="saveNote(event)">💾 记下我的收获</button></div>
+  <div class="btnrow" style="margin-top:14px">
+    <a class="nextbtn" href="./stories.html" style="text-decoration:none">🧩 回到抉择,顺着母题线找规律 →</a>
+  </div>
+  <div class="btnrow" style="margin-top:8px">
+    <button class="ghost" onclick="if(window.toggleAIFloat)toggleAIFloat()">🤖 和 AI 聊聊这个抉择</button>
+    <button class="ghost" onclick="pick=null;opened=new Set();go(0)">↺ 重新走一遍</button>
+  </div>`);
+
+let cur=0;
+function render(){
+  document.getElementById('beat').innerHTML=beats[cur]();
+  document.getElementById('prog').innerHTML=beats.map((_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('');
+  if(cur===1){ refreshGate(); }
+  if(cur===7){ const m=document.getElementById('myPick'); if(m)m.textContent=pick||'?'; const n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('decision_zhenghe')||''; }
+  window.scrollTo({top:0,behavior:'instant'});
+  if(window.Track) Track.log('抉择时刻');
+}
+function go(n){ cur=n; render(); }
+function flip(i){
+  const card=document.querySelector('.dcard[data-i="'+i+'"]');
+  const body=document.getElementById('db'+i);
+  const isOpen=card.classList.toggle('open');
+  body.style.maxHeight=isOpen?(body.scrollHeight+'px'):'0';
+  if(isOpen){ opened.add(i); refreshGate(); }
+}
+function refreshGate(){
+  const c=document.getElementById('dcount'); if(c)c.textContent='已了解 '+opened.size+' / '+DOSSIER.length;
+  const btn=document.getElementById('toChoice'); const gate=document.getElementById('gate');
+  if(opened.size>=DOSSIER.length){ if(btn)btn.disabled=false; if(gate)gate.textContent='✅ 你已看清整盘棋,可以决定了'; }
+}
+function choose(k){
+  pick=k;
+  document.querySelectorAll('.choice').forEach(c=>{c.classList.toggle('picked',c.dataset.k===k);c.onclick=null;});
+  const react={A:'省钱守边,看似务实。可你也亲手收起了世界最强的船队、关上了海洋之门——几十年后,你会后悔吗?',
+    B:'保住领先、继续看世界,有魄力!可远航确实耗费不小,朝中骂声一片——这笔投入,值不值?',
+    C:'缩减保留,想两头兼顾?可一旦船队散了、人才走了,"留个火种"往往说着容易、做着难。'}[k];
+  const r=document.getElementById('reaction');
+  r.innerHTML=react+'<div class="btnrow" style="margin-top:14px"><button class="nextbtn" onclick="go(3)">👉 看真实的明朝怎么选</button></div>';
+  r.classList.add('show');
+}
+function saveNote(e){ const n=document.getElementById('myNote'); if(n){localStorage.setItem('decision_zhenghe',n.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的收获',1500);} }
+render();
+</script>
+<script src="./ai_float.js?v=2"></script>
+</body>
+</html>

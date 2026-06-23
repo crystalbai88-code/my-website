@@ -28,6 +28,9 @@ const CLASSICAL_PEOPLE=[
 {id:"genghis",n:"成吉思汗",e:"Genghis Khan",c:"steppe",r:"ruler",d:"约1162—1227",b:"铁木真，统一蒙古各部，建立人类历史上最大的连续陆地帝国。军事天才与组织家，颁《大札撒》、建驿站，征服横跨欧亚，深刻改变世界格局。",rel:[{i:"ogedei",t:"子"},{i:"kublai",t:"孙"}]},
 {id:"ogedei",n:"窝阔台",e:"Ögedei Khan",c:"steppe",r:"ruler",d:"约1186—1241",b:"成吉思汗三子、第二代大汗。灭金、西征欧洲(拔都)直抵匈牙利，建哈拉和林为都，其暴卒使蒙古止步于欧洲。",rel:[{i:"genghis",t:"父"}]},
 {id:"kublai",n:"忽必烈",e:"Kublai Khan",c:"steppe",r:"ruler",d:"1215—1294",b:"成吉思汗之孙，灭南宋、1271年建元朝、定都大都(北京),成为中国皇帝。接见马可·波罗，两征日本失败，融合草原与中原统治。",rel:[{i:"genghis",t:"祖父"},{i:"marco_polo",t:"接见"},{i:"hojo",t:"征日受阻"}]},
+{id:"saladin",n:"萨拉丁",e:"Saladin",c:"islam",r:"ruler",d:"1137/38—1193",b:"埃及与叙利亚的苏丹,阿尤布王朝创立者。哈丁战役大败十字军后,1187年收复耶路撒冷,却宽待战败居民、不行屠城,以仁慈与骑士风度被敌我双方共同传颂。",rel:[]},
+{id:"shotoku",n:"圣德太子",e:"Prince Shōtoku",c:"japan",r:"ruler",d:"574—622",b:"日本推古朝摄政。主动向中国(隋)学习:推行冠位十二阶、颁十七条宪法、弘扬佛教,607年遣小野妹子使隋,国书自称'日出处天子',开启日本千年'善学强者'的传统。",rel:[]},
+{id:"zhenghe",n:"郑和",e:"Zheng He",c:"china",r:"other",d:"1371—1433/35",b:"明代航海家、宦官。奉永乐帝命七下西洋(1405—1433),率当时世界最大舰队远抵东南亚、印度、阿拉伯乃至东非,比欧洲大航海早数十年;其后明朝停航转向内向。",rel:[]},
 // ═══ 伊斯兰世界 ═══
 {id:"muhammad",n:"穆罕默德",e:"Muhammad",c:"islam",r:"religious",d:"约570—632",b:"伊斯兰教先知。610年得'启示'传播一神信仰，622年'希吉拉'迁麦地那(伊斯兰纪元元年),统一阿拉伯半岛，《古兰经》与其言行(圣训)成为伊斯兰文明的根基。",rel:[{i:"abu_bakr",t:"继承者"},{i:"ali",t:"女婿/堂弟"},{i:"umar",t:"继任哈里发"}]},
 {id:"abu_bakr",n:"阿布·伯克尔",e:"Abu Bakr",c:"islam",r:"ruler",d:"约573—634",b:"第一任正统哈里发，穆罕默德挚友与岳父。平定叛乱、统一阿拉伯、开始向外扩张，下令汇集《古兰经》。",rel:[{i:"muhammad",t:"继承"},{i:"umar",t:"继任者"}]},
@@ -127,7 +130,7 @@ const CLASSICAL_ICON = {
   taizong:'👑',wuzetian:'👑',xuanzong:'👑',libai:'🍷',dufu:'📜',xuanzang:'🧎',anlushan:'⚔️',
   zhao_kuangyin:'👑',wang_anshi:'📜',sima_guang:'📖',sushi:'🖌️',yuefei:'🗡️',zhuxi:'📜',shen_kuo:'🧭',
   murasaki:'📕',yoritomo:'🏹',hojo:'🌀',ashikaga:'🏯',
-  genghis:'🏹',ogedei:'👑',kublai:'👑',
+  genghis:'🏹',ogedei:'👑',kublai:'👑',saladin:'🕌',shotoku:'🎌',zhenghe:'⛵',
   muhammad:'☪️',abu_bakr:'📗',umar:'⚔️',ali:'🗡️',harun:'🏛️',al_khwarizmi:'🔢',avicenna:'⚕️',averroes:'📚',ibn_battuta:'🧭',
   harsha:'👑',rajaraja:'🛕',ramanuja:'🪷',
   suryavarman2:'🛕',jayavarman7:'🗿',

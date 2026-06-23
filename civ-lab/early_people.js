@@ -19,7 +19,7 @@ const CLASSICAL_PEOPLE=[
   {id:"khafre",n:"哈夫拉",e:"Khafre",c:"egypt",r:"ruler",d:"约前2558—前2532",b:"建吉萨第二金字塔与狮身人面像(面据信即其本人)。",rel:[{i:"khufu",t:"其父"}]},
   {id:"hatshepsut",n:"哈特谢普苏特",e:"Hatshepsut",c:"egypt",r:"ruler",d:"约前1473—前1458",b:"埃及女法老,戴假胡须、重商不重战,远征蓬特。",rel:[{i:"thutmose3",t:"继子"}]},
   {id:"thutmose3",n:"图特摩斯三世",e:"Thutmose III",c:"egypt",r:"general",d:"约前1479—前1425",b:"'古代的拿破仑',17次远征建立埃及最大版图;米吉多之战。",rel:[{i:"hatshepsut",t:"继母/摄政"}]},
-  {id:"akhenaten",n:"阿肯纳顿",e:"Akhenaten",c:"egypt",r:"ruler",d:"约前1351—前1334",b:"独尊太阳神阿顿、迁都阿马尔纳——人类最早的一神论实验。",rel:[{i:"nefertiti",t:"王后"},{i:"tutankhamun",t:"其子"}]},
+  {id:"akhenaten",n:"阿肯那顿",e:"Akhenaten",c:"egypt",r:"ruler",d:"约前1353—前1336在位",b:"原名阿蒙霍特普四世。发动埃及第一次'一神教'革命:废众神、独尊太阳神阿顿,迁都阿玛尔纳,削夺阿蒙祭司之权。死后改革被全面推翻、新都废弃,他的名字更被后世从王表中抹去。",rel:[{i:"nefertiti",t:"王后"},{i:"tutankhamun",t:"其子"}]},
   {id:"nefertiti",n:"奈费尔提提",e:"Nefertiti",c:"egypt",r:"other",d:"约前1340",b:"阿肯纳顿王后,美艳半身像闻名,或有很大政治影响力。",rel:[{i:"akhenaten",t:"其夫"}]},
   {id:"tutankhamun",n:"图坦卡蒙",e:"Tutankhamun",c:"egypt",r:"ruler",d:"约前1332—前1323",b:"少年法老,恢复多神教;1922年其黄金陵墓完好出土。",rel:[{i:"akhenaten",t:"其父"}]},
   {id:"ramesses2",n:"拉美西斯二世",e:"Ramesses II",c:"egypt",r:"ruler",d:"约前1279—前1213",b:"'大帝',在位约66年,卡叠什之战后签人类最早国际和约,建阿布辛贝。",rel:[{i:"muwatalli2",t:"卡叠什之战对手"},{i:"hattusili3",t:"签订和约"}]},

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>抉择时刻 · 居鲁士的宽容 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;display:flex;flex-direction:column;align-items:center}
+  .top{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:12px 16px;
+    background:linear-gradient(180deg,rgba(var(--scrim,0,0,0),.25),transparent);position:sticky;top:0;z-index:20}
+  .top a.back{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.1em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .top .brand{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink)}
+  .prog{display:flex;gap:5px;margin-left:auto}
+  .prog i{width:13px;height:4px;border-radius:3px;background:var(--panel-line)}
+  .prog i.on{background:var(--gold)}
+  .wrap{width:min(660px,92%);margin:8px auto 70px;flex:1}
+  .beat{animation:fin .5s cubic-bezier(.22,1,.36,1)}
+  @keyframes fin{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;font-weight:700;text-align:center;margin-top:18px}
+  .htitle{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);text-align:center;line-height:1.3;margin:6px 0 4px;text-shadow:var(--label-shadow)}
+  .hsub{font-family:var(--mono);font-size:12px;color:var(--ink3);text-align:center;letter-spacing:.08em;margin-bottom:18px}
+  .scene{font-family:var(--serif);font-size:clamp(15px,3.8vw,17.5px);color:var(--ink);line-height:1.95;
+    background:var(--panel-bg);border:1px solid var(--panel-line);border-left:4px solid var(--gold);border-radius:14px;
+    padding:18px 20px;backdrop-filter:blur(8px)}
+  .scene b{color:var(--gold)}
+  .dossier-intro{font-family:var(--sans);font-size:14.5px;color:var(--ink2);text-align:center;line-height:1.7;margin:4px 0 16px}
+  .dcount{font-family:var(--mono);font-size:12px;color:var(--gold);text-align:center;font-weight:700;margin-bottom:12px}
+  .dcard{background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:14px;margin-bottom:11px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+  .dcard.open{border-color:var(--gold)}
+  .dhead{display:flex;align-items:center;gap:11px;padding:15px 17px}
+  .dhead .di{font-size:21px}
+  .dhead .dt{font-family:var(--sans);font-weight:800;font-size:15.5px;color:var(--ink);flex:1}
+  .dhead .dchev{font-family:var(--mono);font-size:11px;color:var(--ink3);transition:transform .2s}
+  .dcard.open .dchev{transform:rotate(90deg);color:var(--gold)}
+  .dhead .ddot{width:8px;height:8px;border-radius:50%;background:var(--vermilion);flex:none}
+  .dcard.open .ddot{background:var(--cyan)}
+  .dbody{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .dbody-in{padding:0 17px 16px;font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.85}
+  .dbody-in b{color:var(--gold)}
+  .dbody-in ul{margin:8px 0 0;padding-left:2px;list-style:none}
+  .dbody-in li{margin:7px 0;padding-left:16px;position:relative}
+  .dbody-in li:before{content:'·';position:absolute;left:3px;color:var(--vermilion);font-weight:900}
+  .dbody-in li b{color:var(--vermilion)}
+  .ask{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);text-align:center;margin:22px 0 6px}
+  .asksub{font-family:var(--sans);font-size:13.5px;color:var(--ink2);text-align:center;margin-bottom:16px;line-height:1.6}
+  .choices{display:flex;flex-direction:column;gap:11px}
+  .choice{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink);background:var(--panel-bg);
+    border:1.5px solid var(--panel-line);border-radius:14px;padding:15px 17px;cursor:pointer;transition:all .15s;text-align:left;line-height:1.5}
+  .choice:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+  .choice .ckey{font-weight:900;color:var(--gold);margin-right:8px}
+  .choice.picked{border-color:var(--gold);background:rgba(224,138,44,.1)}
+  .reaction{margin-top:14px;font-size:14.5px;color:var(--ink);line-height:1.75;background:rgba(224,138,44,.1);
+    border-left:4px solid var(--gold);border-radius:8px;padding:13px 16px;display:none}
+  .reaction.show{display:block;animation:fin .4s}
+  .lines{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+  .line{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:12px;padding:13px 16px}
+  .line .lh{font-family:var(--serif);font-weight:900;font-size:14px;color:var(--gold);margin-bottom:4px}
+  .line .lt{font-size:14px;color:var(--ink);line-height:1.7}
+  .line .lt b{color:var(--vermilion)}
+  .voice{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:13px;padding:13px 16px;margin-bottom:10px}
+  .voice .vw{font-family:var(--sans);font-weight:800;font-size:14px;color:var(--ink);margin-bottom:5px}
+  .voice .va{font-size:14px;color:var(--ink2);line-height:1.7}
+  .note{font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:center;margin-top:12px}
+  .q{font-family:var(--serif);font-size:16.5px;color:var(--ink);line-height:1.75;margin:14px 0;padding-left:14px;border-left:3px solid var(--gold)}
+  .q b{color:var(--gold)}
+  textarea{width:100%;box-sizing:border-box;margin-top:10px;font-family:var(--sans);font-size:15px;color:var(--ink);
+    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:12px;padding:13px 15px;min-height:80px;outline:none;resize:vertical}
+  .btnrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
+  .nextbtn{font-family:var(--sans);font-weight:800;font-size:15px;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));
+    border:none;border-radius:999px;padding:13px 30px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.16)}
+  .nextbtn:active{transform:scale(.97)}
+  .nextbtn[disabled]{opacity:.4;cursor:not-allowed;box-shadow:none}
+  .ghost{font-family:var(--sans);font-weight:700;font-size:14px;color:var(--gold);background:var(--panel-bg);
+    border:1px solid var(--panel-line);border-radius:999px;padding:11px 20px;cursor:pointer;text-decoration:none;display:inline-block}
+  .gate{text-align:center;font-family:var(--sans);font-size:12.5px;color:var(--ink3);margin-top:6px}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="top">
+    <a class="back" href="./stories.html">⌂ 抉择</a>
+    <span class="brand">🎯 抉择时刻</span>
+    <div class="prog" id="prog"></div>
+  </div>
+  <div class="wrap"><div class="beat" id="beat"></div><div class="epigraph" style="margin:20px auto 4px;max-width:30em;text-align:center;font-family:'Noto Serif SC',serif;color:var(--ink2);font-size:15px;line-height:1.75;border-top:1px dashed var(--panel-line);padding-top:16px">「我让被掳的人回家,让各族拜自己的神。」<div style="font-family:var(--mono);font-size:11px;color:var(--gold);margin-top:8px;letter-spacing:.04em">—— 居鲁士圆柱(大意)</div></div></div>
+</div>
+<script src="./track.js?v=1"></script>
+<script>
+window.__aiCtx='用户正在体验"抉择时刻·居鲁士的宽容"(母题:胜利者的宽容/赢了之后怎么对待败者)。史实:公元前539年,波斯国王居鲁士大帝(Cyrus the Great)征服了强大的巴比伦。据记载,巴比伦几乎不流血就陷落——许多巴比伦人厌恶旧王那波尼德,把居鲁士当作解放者欢迎。当时各帝国征服后的惯例,是掠夺、奴役战败者,把被征服民族强行迁走、毁掉他们的神庙、强加征服者的神。居鲁士却反其道而行:他善待巴比伦人,尊重当地信仰;并下令释放此前被巴比伦掳来的各族人，让他们返回家乡、重建被毁的神庙、归还被掳走的神像。其中包括被掳的犹太人——据《圣经·以斯拉记》,约有数万犹太人因此得以返回犹大故土、重建耶路撒冷圣殿。这一政策记录在著名的"居鲁士圆柱"(Cyrus Cylinder,1879年出土于巴比伦,现藏大英博物馆)上,该圆柱常被誉为最早的"人权宣言"之一(注意:这种称呼有现代美化的成分,需谨慎，但其宽容遣返政策是史实)。结果:波斯靠这种宽容与尊重,成功统合了众多民族,成为当时世界上最大的帝国。教学要点:这是"胜利者如何对待战败者"的经典抉择——靠宽容而非屠戮来统治,与几百年后萨拉丁在耶路撒冷的宽待属于同一母题。讲犹太人返乡涉及宗教经典时保持客观,只叙史实。请用适合10-12岁孩子的语言陪他思考,多反问,不要替他下结论。';
+let pick=null;
+const DOSSIER=[
+  {i:'👑',t:'你是谁',b:'你是<b>居鲁士大帝</b>,波斯的国王。你用惊人的速度,把一个个王国并入版图。如今,你拿下了当时最古老、最繁华的大城——<b>巴比伦</b>。'},
+  {i:'🏙️',t:'几乎不流血的胜利',b:'巴比伦城里,很多人早就厌恶了旧国王的统治。当你的军队进城时,不少巴比伦人竟把你当作<b>解放者</b>来欢迎。这座大城,几乎<b>没怎么流血</b>就到了你手里。'},
+  {i:'⛓️',t:'城里的"外乡人"',b:'巴比伦曾四处征伐,把许多被征服民族<b>掳来这里</b>,拆了他们的神庙、抢走他们的神像。其中,就有一大批被掳来的<b>犹太人</b>,远离家乡、思乡几十年。'},
+  {i:'🗡️',t:'当时的"规矩"',b:'按那个时代征服者的惯例:打下一座城,就该<b>掠夺财富、奴役人民</b>,把不听话的民族强行迁走,毁掉他们的神、逼他们拜你的神。<b>这,才叫"立威"。</b>'},
+  {i:'🕊️',t:'一个不一样的念头',b:'可你想:与其用恐惧压住他们,不如<b>反过来</b>——释放被掳的人,让他们<b>回家</b>;归还神像,让各族<b>拜自己的神</b>;尊重他们的风俗。也许,人心能比刀剑捆得更牢。'},
+  {i:'⚖️',t:'眼前的难题',b:'<b>宽容</b>——可能赢得万民归心,但也可能被人当成软弱、被旧贵族钻空子;<b>照老规矩立威</b>——能立刻让人害怕你,却也会埋下无数仇恨的种子。'},
+];
+let opened=new Set();
+const beats=[];
+beats.push(()=>`
+  <div class="kicker">公元前 539 年 · 巴比伦</div>
+  <div class="htitle">赢了之后,怎么对待战败的人?</div>
+  <div class="hsub">即将由你 —— 居鲁士 —— 决定</div>
+  <div class="scene">公元前539年,你是波斯王<b>居鲁士</b>。你几乎兵不血刃地拿下了最古老的大城巴比伦。<br><br>城里关着被掳来的各族人(包括思乡几十年的犹太人)。按当时的规矩,征服者该掠夺、奴役、毁掉他们的神。<br><br><b>照老规矩立威,还是反过来宽待他们?</b> 先别急,先把这座城看清楚。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(1)">📂 先弄懂这座城 →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第一步 · 了解</div>
+  <div class="htitle" style="font-size:23px">看清这座刚到手的城</div>
+  <div class="dossier-intro">点开每一张情报卡,弄懂你怎么赢的、城里关着谁、当时的规矩是什么。<br>全部看完,你才有资格替居鲁士做决定。</div>
+  <div class="dcount" id="dcount">已了解 0 / ${DOSSIER.length}</div>
+  <div id="dwrap">${DOSSIER.map((d,i)=>`
+    <div class="dcard" data-i="${i}" onclick="flip(${i})">
+      <div class="dhead"><span class="ddot"></span><span class="di">${d.i}</span><span class="dt">${d.t}</span><span class="dchev">▶</span></div>
+      <div class="dbody" id="db${i}"><div class="dbody-in">${d.b}</div></div>
+    </div>`).join('')}</div>
+  <div class="btnrow"><button class="nextbtn" id="toChoice" onclick="go(2)" disabled>换作是你,你会怎么做? →</button></div>
+  <div class="gate" id="gate">(看完全部 ${DOSSIER.length} 张情报卡后解锁)</div>`);
+beats.push(()=>`
+  <div class="kicker">第二步 · 此刻,你就是居鲁士</div>
+  <div class="ask">立威,还是宽容?</div>
+  <div class="asksub">老规矩能让人立刻怕你;宽容也许能赢得人心,却可能被当成软弱。<br>现在,这个决定由你来下。</div>
+  <div class="choices">
+    <div class="choice" data-k="A" onclick="choose('A')"><span class="ckey">A</span>宽容——释放被掳的人让他们回家,归还神像,尊重各族信仰。</div>
+    <div class="choice" data-k="B" onclick="choose('B')"><span class="ckey">B</span>照老规矩立威——掠夺财富、奴役人民,强推波斯的神,让人人都怕你。</div>
+    <div class="choice" data-k="C" onclick="choose('C')"><span class="ckey">C</span>表面宽松、暗里控制——嘴上说尊重,实则扣下人质、处处设防。</div>
+  </div>
+  <div class="reaction" id="reaction"></div>`);
+beats.push(()=>`
+  <div class="kicker">第三步 · 真实的他</div>
+  <div class="htitle" style="font-size:22px">居鲁士,选了 A</div>
+  <div class="scene">他选择了<b>宽容</b>。他善待巴比伦人、尊重当地的神;还下令<b>释放</b>那些被掳来的各族人,让他们<b>回家乡、重建神庙、把神像请回去</b>。<br><br>那批思乡几十年的<b>犹太人</b>,因此得以返回故土、重建耶路撒冷的圣殿。<br><br>这些事,被刻在著名的"<b>居鲁士圆柱</b>"上——一段两千五百年前的泥土文字,至今还被人传颂。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(4)">那……它带来了什么? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第四步 · 一次宽容,延伸出三条线</div>
+  <div class="lines">
+    <div class="line"><div class="lh">⚡ 短期</div><div class="lt">被征服的人不再只有恐惧,反而把他当作<b>解放者</b>来拥戴。新到手的土地,人心很快就稳了下来。</div></div>
+    <div class="line"><div class="lh">🌅 长远</div><div class="lt">波斯靠这种<b>宽容与尊重</b>,把几十个不同民族、信仰各异的人统合在一起,成为当时世界上<b>最大的帝国</b>。</div></div>
+    <div class="line"><div class="lh">📜 一段不朽的文字</div><div class="lt">"居鲁士圆柱"流传至今,常被人称作最早的"<b>宽容与尊重</b>"宣言之一。几百年后,萨拉丁在耶路撒冷,也做了同样的选择。</div></div>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(5)">别人怎么看这件事? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第五步 · 同一次胜利,不同的声音</div>
+  <div class="voice"><div class="vw">🕊️ 一个返乡的犹太人</div><div class="va">"被掳了几十年,我们以为再也回不去了。是他,让我们能回家、重建圣殿。"</div></div>
+  <div class="voice"><div class="vw">🏙️ 一个巴比伦人</div><div class="va">"他没有烧杀抢掠,还尊重我们的神。这样的征服者,我们认。"</div></div>
+  <div class="voice"><div class="vw">🗡️ 一个老派将领</div><div class="va">"对败者这么客气?会不会被当成软弱?我担心镇不住他们。"</div></div>
+  <div class="voice"><div class="vw">📜 后世史家</div><div class="va">"他证明了:真正的强大,不必靠灭绝来显示。用尊重换人心,比用刀剑更长久。"</div></div>
+  <div class="note">同一个抉择,没有标准答案。 · 史料:据居鲁士圆柱、希罗多德《历史》、《以斯拉记》</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(6)">它藏着什么规律? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第六步 · 真正的强大,不必靠灭绝</div>
+  <div class="scene">手握生杀大权时,居鲁士没有选择掠夺与奴役,而是放人回家、还人神像、尊重信仰。结果,他用<b>宽容</b>赢得的人心,比用刀剑捆得更牢——成就了当时世界上最大的帝国。<br><br>两千多年里,一代又一代征服者都面对同一个考验:<b>赢了之后,怎么对待败者?</b> 几百年后,萨拉丁攻下耶路撒冷,本可血腥报复,却选择了和居鲁士一样的路——宽待战败的人。<br><br>这两位伟大的胜利者,隔着千年、隔着信仰,却告诉后人同一句话:<b>真正的强大,不必靠灭绝来证明。</b></div>
+  <div class="btnrow" style="margin-top:16px">
+    <a class="ghost" href="./map.html?civ=achaemenid">🗺 去地图看 波斯帝国</a>
+    <a class="ghost" href="./decision-saladin.html">🕌 看萨拉丁的同款宽容 →</a>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(7)">那……换作是你呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">最后 · 回到你</div>
+  <div class="htitle" style="font-size:22px">换作是你呢?</div>
+  <div class="q">当你<b>赢了</b>、对方再也威胁不到你时,你会选择羞辱、报复,还是<b>宽待</b>?哪一种,更需要力量?</div>
+  <div class="q">居鲁士用宽容统合了最大的帝国。你觉得,"<b>让人怕你</b>"和"<b>让人服你</b>",哪一个更牢靠?为什么?</div>
+  <div class="q">你最开始选的是 <b id="myPick">?</b>,和居鲁士(A)一样吗?走到这里,你的想法<b>变了</b>吗?</div>
+  <div style="font-family:var(--sans);font-weight:700;color:var(--ink);margin-top:18px">✍️ 写下你看懂的一句话:</div>
+  <textarea id="myNote" placeholder="比如:赢了之后还能善待对方,才是真正的强大——人心,比刀剑捆得更牢……"></textarea>
+  <div class="btnrow"><button class="nextbtn" onclick="saveNote(event)">💾 记下我的收获</button></div>
+  <div class="btnrow" style="margin-top:14px">
+    <a class="nextbtn" href="./stories.html" style="text-decoration:none">🧩 回到抉择,顺着母题线找规律 →</a>
+  </div>
+  <div class="btnrow" style="margin-top:8px">
+    <button class="ghost" onclick="if(window.toggleAIFloat)toggleAIFloat()">🤖 和 AI 聊聊这个抉择</button>
+    <button class="ghost" onclick="pick=null;opened=new Set();go(0)">↺ 重新走一遍</button>
+  </div>`);
+
+let cur=0;
+function render(){
+  document.getElementById('beat').innerHTML=beats[cur]();
+  document.getElementById('prog').innerHTML=beats.map((_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('');
+  if(cur===1){ refreshGate(); }
+  if(cur===7){ const m=document.getElementById('myPick'); if(m)m.textContent=pick||'?'; const n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('decision_cyrus')||''; }
+  window.scrollTo({top:0,behavior:'instant'});
+  if(window.Track) Track.log('抉择时刻');
+}
+function go(n){ cur=n; render(); }
+function flip(i){
+  const card=document.querySelector('.dcard[data-i="'+i+'"]');
+  const body=document.getElementById('db'+i);
+  const isOpen=card.classList.toggle('open');
+  body.style.maxHeight=isOpen?(body.scrollHeight+'px'):'0';
+  if(isOpen){ opened.add(i); refreshGate(); }
+}
+function refreshGate(){
+  const c=document.getElementById('dcount'); if(c)c.textContent='已了解 '+opened.size+' / '+DOSSIER.length;
+  const btn=document.getElementById('toChoice'); const gate=document.getElementById('gate');
+  if(opened.size>=DOSSIER.length){ if(btn)btn.disabled=false; if(gate)gate.textContent='✅ 你已看清整盘棋,可以决定了'; }
+}
+function choose(k){
+  pick=k;
+  document.querySelectorAll('.choice').forEach(c=>{c.classList.toggle('picked',c.dataset.k===k);c.onclick=null;});
+  const react={A:'用尊重换人心,气度非凡!可也有人会把宽容当软弱——你镇得住那些蠢蠢欲动的人吗?',
+    B:'立刻让人害怕,确实最快。可恐惧底下埋的全是仇恨——这样的帝国,能稳多久?',
+    C:'又想要人心、又不肯真放手?这种"假宽容"最容易被看穿,反而两头不讨好。'}[k];
+  const r=document.getElementById('reaction');
+  r.innerHTML=react+'<div class="btnrow" style="margin-top:14px"><button class="nextbtn" onclick="go(3)">👉 看真实的居鲁士怎么选</button></div>';
+  r.classList.add('show');
+}
+function saveNote(e){ const n=document.getElementById('myNote'); if(n){localStorage.setItem('decision_cyrus',n.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的收获',1500);} }
+render();
+</script>
+<script src="./ai_float.js?v=2"></script>
+</body>
+</html>

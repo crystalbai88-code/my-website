@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>抉择时刻 · 波波尔·乌·双子闯冥界 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;display:flex;flex-direction:column;align-items:center}
+  .top{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:12px 16px;
+    background:linear-gradient(180deg,rgba(var(--scrim,0,0,0),.25),transparent);position:sticky;top:0;z-index:20}
+  .top a.back{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.1em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .top .brand{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink)}
+  .prog{display:flex;gap:5px;margin-left:auto}
+  .prog i{width:13px;height:4px;border-radius:3px;background:var(--panel-line)}
+  .prog i.on{background:var(--gold)}
+  .wrap{width:min(660px,92%);margin:8px auto 70px;flex:1}
+  .beat{animation:fin .5s cubic-bezier(.22,1,.36,1)}
+  @keyframes fin{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;font-weight:700;text-align:center;margin-top:18px}
+  .htitle{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);text-align:center;line-height:1.3;margin:6px 0 4px;text-shadow:var(--label-shadow)}
+  .hsub{font-family:var(--mono);font-size:12px;color:var(--ink3);text-align:center;letter-spacing:.08em;margin-bottom:18px}
+  .scene{font-family:var(--serif);font-size:clamp(15px,3.8vw,17.5px);color:var(--ink);line-height:1.95;
+    background:var(--panel-bg);border:1px solid var(--panel-line);border-left:4px solid var(--gold);border-radius:14px;
+    padding:18px 20px;backdrop-filter:blur(8px)}
+  .scene b{color:var(--gold)}
+  .dossier-intro{font-family:var(--sans);font-size:14.5px;color:var(--ink2);text-align:center;line-height:1.7;margin:4px 0 16px}
+  .dcount{font-family:var(--mono);font-size:12px;color:var(--gold);text-align:center;font-weight:700;margin-bottom:12px}
+  .dcard{background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:14px;margin-bottom:11px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+  .dcard.open{border-color:var(--gold)}
+  .dhead{display:flex;align-items:center;gap:11px;padding:15px 17px}
+  .dhead .di{font-size:21px}
+  .dhead .dt{font-family:var(--sans);font-weight:800;font-size:15.5px;color:var(--ink);flex:1}
+  .dhead .dchev{font-family:var(--mono);font-size:11px;color:var(--ink3);transition:transform .2s}
+  .dcard.open .dchev{transform:rotate(90deg);color:var(--gold)}
+  .dhead .ddot{width:8px;height:8px;border-radius:50%;background:var(--vermilion);flex:none}
+  .dcard.open .ddot{background:var(--cyan)}
+  .dbody{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .dbody-in{padding:0 17px 16px;font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.85}
+  .dbody-in b{color:var(--gold)}
+  .dbody-in ul{margin:8px 0 0;padding-left:2px;list-style:none}
+  .dbody-in li{margin:7px 0;padding-left:16px;position:relative}
+  .dbody-in li:before{content:'·';position:absolute;left:3px;color:var(--vermilion);font-weight:900}
+  .dbody-in li b{color:var(--vermilion)}
+  .ask{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);text-align:center;margin:22px 0 6px}
+  .asksub{font-family:var(--sans);font-size:13.5px;color:var(--ink2);text-align:center;margin-bottom:16px;line-height:1.6}
+  .choices{display:flex;flex-direction:column;gap:11px}
+  .choice{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink);background:var(--panel-bg);
+    border:1.5px solid var(--panel-line);border-radius:14px;padding:15px 17px;cursor:pointer;transition:all .15s;text-align:left;line-height:1.5}
+  .choice:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+  .choice .ckey{font-weight:900;color:var(--gold);margin-right:8px}
+  .choice.picked{border-color:var(--gold);background:rgba(224,138,44,.1)}
+  .reaction{margin-top:14px;font-size:14.5px;color:var(--ink);line-height:1.75;background:rgba(224,138,44,.1);
+    border-left:4px solid var(--gold);border-radius:8px;padding:13px 16px;display:none}
+  .reaction.show{display:block;animation:fin .4s}
+  .lines{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+  .line{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:12px;padding:13px 16px}
+  .line .lh{font-family:var(--serif);font-weight:900;font-size:14px;color:var(--gold);margin-bottom:4px}
+  .line .lt{font-size:14px;color:var(--ink);line-height:1.7}
+  .line .lt b{color:var(--vermilion)}
+  .voice{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:13px;padding:13px 16px;margin-bottom:10px}
+  .voice .vw{font-family:var(--sans);font-weight:800;font-size:14px;color:var(--ink);margin-bottom:5px}
+  .voice .va{font-size:14px;color:var(--ink2);line-height:1.7}
+  .note{font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:center;margin-top:12px}
+  .q{font-family:var(--serif);font-size:16.5px;color:var(--ink);line-height:1.75;margin:14px 0;padding-left:14px;border-left:3px solid var(--gold)}
+  .q b{color:var(--gold)}
+  textarea{width:100%;box-sizing:border-box;margin-top:10px;font-family:var(--sans);font-size:15px;color:var(--ink);
+    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:12px;padding:13px 15px;min-height:80px;outline:none;resize:vertical}
+  .btnrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
+  .nextbtn{font-family:var(--sans);font-weight:800;font-size:15px;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));
+    border:none;border-radius:999px;padding:13px 30px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.16)}
+  .nextbtn:active{transform:scale(.97)}
+  .nextbtn[disabled]{opacity:.4;cursor:not-allowed;box-shadow:none}
+  .ghost{font-family:var(--sans);font-weight:700;font-size:14px;color:var(--gold);background:var(--panel-bg);
+    border:1px solid var(--panel-line);border-radius:999px;padding:11px 20px;cursor:pointer;text-decoration:none;display:inline-block}
+  .gate{text-align:center;font-family:var(--sans);font-size:12.5px;color:var(--ink3);margin-top:6px}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="top">
+    <a class="back" href="./stories.html">⌂ 抉择</a>
+    <span class="brand">🎯 抉择时刻</span>
+    <div class="prog" id="prog"></div>
+  </div>
+  <div class="wrap"><div class="beat" id="beat"></div><div class="epigraph" style="margin:20px auto 4px;max-width:30em;text-align:center;font-family:'Noto Serif SC',serif;color:var(--ink2);font-size:15px;line-height:1.75;border-top:1px dashed var(--panel-line);padding-top:16px">「我们不靠蛮力,我们靠智慧,走进死神的家。」<div style="font-family:var(--mono);font-size:11px;color:var(--gold);margin-top:8px;letter-spacing:.04em">—— 玛雅双子英雄 · 《波波尔·乌》</div></div></div>
+</div>
+<script src="./track.js?v=1"></script>
+<script>
+window.__aiCtx='用户正在体验"抉择时刻·波波尔·乌·双子闯冥界"(母题:终有一死,怎么活)。出处:这是中美洲玛雅人(基切玛雅)的创世史诗《波波尔·乌》(Popol Vuh)中的核心神话故事,属神话/史诗,与《吉尔伽美什史诗》一样是该文明的"扛旗经典"。故事:一对孪生英雄——乌纳普(Hunahpu)与希巴兰克(Xbalanque),他们的父亲与叔父此前被冥界"希巴尔巴"(Xibalba,意为"恐惧之地")的死亡之神(以"一死"和"七死"为首)用诡计害死。后来,这对双子也被死亡之神召唤到冥界比赛蹴球。冥界布满致命的考验:刀屋、寒屋、美洲豹屋、火屋、蝙蝠屋……稍有不慎就会丧命(蝙蝠屋里,乌纳普的头一度被蝙蝠神砍下)。但双子明知凶险,仍然选择下到冥界应战。他们不靠蛮力,而是靠智慧、勇气与巧计,一关关闯过死亡的考验,在球赛中击败了死亡之神,为父亲与叔父复仇。最后,他们经历"死而复生",升上天空,化为太阳与月亮——以另一种方式获得了"永生"。教学要点:这是玛雅文明对"如何面对死亡"的回答——不是去求长生不老的仙药,而是以勇气和智慧直面死亡、战胜对死亡的恐惧,从而把生命升华为不朽。这与两河的吉尔伽美什(求永生失败、学会珍惜当下)、中国的秦始皇(求仙至死、终成空)属于同一母题(终有一死,怎么活),是第三个文明给出的答案。注意提醒孩子:这是神话史诗(像《吉尔伽美什》),据《波波尔·乌》。请用适合10-12岁孩子的语言陪他思考,多反问,不要替他下结论。';
+let pick=null;
+const DOSSIER=[
+  {i:'👯',t:'你们是谁',b:'你们是一对<b>孪生英雄</b>——乌纳普与希巴兰克。你们机敏、勇敢,还是了不起的蹴球高手。这是玛雅人最古老的史诗《<b>波波尔·乌</b>》里的故事。'},
+  {i:'💀',t:'父亲的血仇',b:'你们的<b>父亲和叔父</b>,从前也被召到冥界比赛,却中了死亡之神的诡计,<b>被害死了</b>。这笔血仇,一直压在你们心头。'},
+  {i:'🦇',t:'恐惧之地',b:'冥界叫"<b>希巴尔巴</b>",意思是"<b>恐惧之地</b>"。那里由"一死""七死"等死亡之神统治,布满致命的房间:<b>刀屋、寒屋、美洲豹屋、火屋、蝙蝠屋</b>……进去的人,几乎没有活着出来的。'},
+  {i:'📜',t:'死神的召唤',b:'有一天,死亡之神也<b>召唤你们</b>下冥界比赛蹴球。明眼人都看得出:这是<b>当年害死你们父亲的同一个圈套</b>,九死一生。'},
+  {i:'🧠',t:'你们的本钱',b:'你们打不过死亡之神的蛮力,但你们有<b>过人的机智和巧计</b>。也许,对付死神靠的不是力气,而是<b>智慧和勇气</b>——是敢不敢直面那份恐惧。'},
+  {i:'⚖️',t:'眼前的难题',b:'<b>下冥界应战</b>——为父复仇、直面死神,但很可能有去无回;<b>不去</b>——留在人间、远离死亡,保住性命,可父仇未报,你们也将一辈子活在死神的阴影下。'},
+];
+let opened=new Set();
+const beats=[];
+beats.push(()=>`
+  <div class="kicker">玛雅神话 · 据《波波尔·乌》</div>
+  <div class="htitle">明知是死神的圈套,下不下冥界?</div>
+  <div class="hsub">即将由你们 —— 双子英雄 —— 决定</div>
+  <div class="scene">这是玛雅最古老的史诗《<b>波波尔·乌</b>》里的故事。你们是一对孪生英雄,父亲被冥界的死亡之神用诡计害死。<br><br>如今,死神也<b>召你们下冥界</b>比赛——那是布满刀屋、蝙蝠屋的"恐惧之地",分明是同一个圈套。<br><br><b>去,还是不去?</b> 先别急,先把这场生死之约看清楚。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(1)">📂 先弄懂这场约战 →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第一步 · 了解</div>
+  <div class="htitle" style="font-size:23px">看清这场生死之约</div>
+  <div class="dossier-intro">点开每一张情报卡,弄懂你们的血仇、冥界的凶险、和你们手里的本钱。<br>全部看完,你才有资格替双子英雄做决定。</div>
+  <div class="dcount" id="dcount">已了解 0 / ${DOSSIER.length}</div>
+  <div id="dwrap">${DOSSIER.map((d,i)=>`
+    <div class="dcard" data-i="${i}" onclick="flip(${i})">
+      <div class="dhead"><span class="ddot"></span><span class="di">${d.i}</span><span class="dt">${d.t}</span><span class="dchev">▶</span></div>
+      <div class="dbody" id="db${i}"><div class="dbody-in">${d.b}</div></div>
+    </div>`).join('')}</div>
+  <div class="btnrow"><button class="nextbtn" id="toChoice" onclick="go(2)" disabled>换作是你,你会怎么做? →</button></div>
+  <div class="gate" id="gate">(看完全部 ${DOSSIER.length} 张情报卡后解锁)</div>`);
+beats.push(()=>`
+  <div class="kicker">第二步 · 此刻,你们就是双子英雄</div>
+  <div class="ask">下冥界,还是留在人间?</div>
+  <div class="asksub">去,可能有去无回;不去,父仇未报、永远活在死神的阴影下。<br>现在,这个决定由你来下。</div>
+  <div class="choices">
+    <div class="choice" data-k="A" onclick="choose('A')"><span class="ckey">A</span>下冥界应战——明知凶险,也要直面死神、为父复仇,用智慧闯过死亡的考验。</div>
+    <div class="choice" data-k="B" onclick="choose('B')"><span class="ckey">B</span>不去——留在人间,远离死亡,保住性命,把血仇埋在心底。</div>
+    <div class="choice" data-k="C" onclick="choose('C')"><span class="ckey">C</span>去,但只求自保——下去虚应一下,不挑战死神,设法逃回人间。</div>
+  </div>
+  <div class="reaction" id="reaction"></div>`);
+beats.push(()=>`
+  <div class="kicker">第三步 · 真实的传说</div>
+  <div class="htitle" style="font-size:22px">双子,选了 A</div>
+  <div class="scene">他们<b>下到了冥界</b>。面对一个个致命的房间,他们没有靠蛮力硬拼,而是<b>用智慧和巧计</b>:在蝙蝠屋里历经险境(乌纳普的头一度被砍下),又用计夺回;在球赛里一次次识破死神的诡计。<br><br>一关又一关,他们闯了过来,最终在球赛中<b>击败了"一死"和"七死"</b>——为父亲与叔父报了血仇。<br><br>而他们自己,也在"<b>死而复生</b>"之后,升上了天空。</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(4)">那……他们的结局呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第四步 · 直面死神这一步,延伸出三条线</div>
+  <div class="lines">
+    <div class="line"><div class="lh">⚡ 一路过关</div><div class="lt">在刀屋、寒屋、蝙蝠屋等致命考验里,他们靠<b>机智与勇气</b>(而非蛮力)一次次化险为夷。</div></div>
+    <div class="line"><div class="lh">🏆 战胜死神</div><div class="lt">他们在蹴球场上<b>击败了死亡之神</b>,为父亲和叔父报了仇——证明了:对死亡的恐惧,是可以被勇气战胜的。</div></div>
+    <div class="line"><div class="lh">🌞 化为日月</div><div class="lt">最后,双子"<b>死而复生</b>",升上天空,化为<b>太阳与月亮</b>。他们没有去求长生药,却以另一种方式,获得了真正的不朽。</div></div>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(5)">别人怎么看这个故事? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第五步 · 同一个传说,不同的声音</div>
+  <div class="voice"><div class="vw">👯 双子英雄</div><div class="va">"我们怕,可我们更不愿一辈子躲在死神的阴影里。与其逃,不如走进它的家,堂堂正正赢回来。"</div></div>
+  <div class="voice"><div class="vw">💀 死亡之神</div><div class="va">"竟没有一个陷阱困得住他们?他们靠的不是力气,是我从没料到的——智慧。"</div></div>
+  <div class="voice"><div class="vw">🌽 一个玛雅讲故事的人</div><div class="va">"我们把这个故事一代代讲下去,是想告诉孩子:死亡可怕,但勇气和智慧,能让人活成日月。"</div></div>
+  <div class="voice"><div class="vw">📜 后世学者</div><div class="va">"这是玛雅人面对死亡的答案——不求长生,而是直面它、超越它。和别的文明遥相呼应。"</div></div>
+  <div class="note">这是神话史诗(像《吉尔伽美什》)。 · 出处:据玛雅《波波尔·乌》</div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(6)">它藏着什么规律? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">第六步 · 三个文明,同一个关于死亡的答案</div>
+  <div class="scene">面对"人终有一死"这个最古老的难题,玛雅人在《波波尔·乌》里给出的答案是:<b>不去逃避,也不去求长生药,而是用勇气和智慧直面死亡、超越恐惧</b>——双子最终化为日月,成了另一种意义上的"不朽"。<br><br>把它和别的文明放在一起,你会惊讶地发现一条共同的线:<b>两河</b>的吉尔伽美什,苦寻长生不得,最后学会珍惜当下、留下功业;<b>中国</b>的秦始皇,求仙至死、终成一场空;<b>玛雅</b>的双子,直面死神、化为日月。<br><br>三个相隔万里、素不相识的文明,却指向同一个答案:<b>真正的不朽,从来不在长生药里——而在你如何面对死亡、又留下了什么。</b></div>
+  <div class="btnrow" style="margin-top:16px">
+    <a class="ghost" href="./map.html?civ=maya">🗺 去地图看 玛雅</a>
+    <a class="ghost" href="./decision-gilgamesh.html">🦁 看吉尔伽美什的同款追问 →</a>
+  </div>
+  <div class="btnrow"><button class="nextbtn" onclick="go(7)">那……换作是你呢? →</button></div>`);
+beats.push(()=>`
+  <div class="kicker">最后 · 回到你</div>
+  <div class="htitle" style="font-size:22px">换作是你呢?</div>
+  <div class="q">面对一件你<b>害怕得要命、却躲不开</b>的事,你会一直逃避,还是像双子那样,鼓起勇气<b>走进去面对</b>?</div>
+  <div class="q">双子不靠蛮力,而靠<b>智慧</b>战胜死神。你觉得,面对最可怕的对手,"<b>勇气</b>"和"<b>聪明</b>",哪个更重要?还是缺一不可?</div>
+  <div class="q">你最开始选的是 <b id="myPick">?</b>,和双子(A)一样吗?走到这里,你的想法<b>变了</b>吗?</div>
+  <div style="font-family:var(--sans);font-weight:700;color:var(--ink);margin-top:18px">✍️ 写下你看懂的一句话:</div>
+  <textarea id="myNote" placeholder="比如:越害怕的事越躲不掉,鼓起勇气去面对、再用脑子想办法,反而能赢……"></textarea>
+  <div class="btnrow"><button class="nextbtn" onclick="saveNote(event)">💾 记下我的收获</button></div>
+  <div class="btnrow" style="margin-top:14px">
+    <a class="nextbtn" href="./stories.html" style="text-decoration:none">🧩 回到抉择,顺着母题线找规律 →</a>
+  </div>
+  <div class="btnrow" style="margin-top:8px">
+    <button class="ghost" onclick="if(window.toggleAIFloat)toggleAIFloat()">🤖 和 AI 聊聊这个抉择</button>
+    <button class="ghost" onclick="pick=null;opened=new Set();go(0)">↺ 重新走一遍</button>
+  </div>`);
+
+let cur=0;
+function render(){
+  document.getElementById('beat').innerHTML=beats[cur]();
+  document.getElementById('prog').innerHTML=beats.map((_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('');
+  if(cur===1){ refreshGate(); }
+  if(cur===7){ const m=document.getElementById('myPick'); if(m)m.textContent=pick||'?'; const n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('decision_popolvuh')||''; }
+  window.scrollTo({top:0,behavior:'instant'});
+  if(window.Track) Track.log('抉择时刻');
+}
+function go(n){ cur=n; render(); }
+function flip(i){
+  const card=document.querySelector('.dcard[data-i="'+i+'"]');
+  const body=document.getElementById('db'+i);
+  const isOpen=card.classList.toggle('open');
+  body.style.maxHeight=isOpen?(body.scrollHeight+'px'):'0';
+  if(isOpen){ opened.add(i); refreshGate(); }
+}
+function refreshGate(){
+  const c=document.getElementById('dcount'); if(c)c.textContent='已了解 '+opened.size+' / '+DOSSIER.length;
+  const btn=document.getElementById('toChoice'); const gate=document.getElementById('gate');
+  if(opened.size>=DOSSIER.length){ if(btn)btn.disabled=false; if(gate)gate.textContent='✅ 你已看清整盘棋,可以决定了'; }
+}
+function choose(k){
+  pick=k;
+  document.querySelectorAll('.choice').forEach(c=>{c.classList.toggle('picked',c.dataset.k===k);c.onclick=null;});
+  const react={A:'明知是圈套也敢走进去,这是真正的勇气!可对手是死神——光有胆量,你靠什么活着出来?',
+    B:'保住了命,却要一辈子活在死神的阴影和未报的血仇里。这样的"安全",你甘心吗?',
+    C:'想去又想躲,虚应一下就跑?对死神耍滑头,只怕还没等你逃,就先栽在第一道陷阱里。'}[k];
+  const r=document.getElementById('reaction');
+  r.innerHTML=react+'<div class="btnrow" style="margin-top:14px"><button class="nextbtn" onclick="go(3)">👉 看传说里的双子怎么选</button></div>';
+  r.classList.add('show');
+}
+function saveNote(e){ const n=document.getElementById('myNote'); if(n){localStorage.setItem('decision_popolvuh',n.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的收获',1500);} }
+render();
+</script>
+<script src="./ai_float.js?v=2"></script>
+</body>
+</html>

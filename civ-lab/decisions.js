@@ -46,6 +46,22 @@
      tip:'前所未见的来客,迎进城,还是挡出去?', url:'./decision-moctezuma.html'},
     {id:'atahualpa', person:'阿塔瓦尔帕 · 卡哈马卡', icon:'🌄', culture:'americas', lng:-78.5, lat:-7.16, year:1532, from:1530, to:1533,
      tip:'你有千军万马,要提防这一百多个异乡人吗?', url:'./decision-atahualpa.html'},
+    {id:'hammurabi', person:'汉谟拉比立法', icon:'📜', culture:'babylon', lng:44.4, lat:32.5, year:-1754, from:-1800, to:-1700,
+     tip:'把法律刻成石碑公示,连贵族也受约束?', url:'./decision-hammurabi.html'},
+    {id:'akhenaten', person:'阿肯那顿的宗教革命', icon:'☀️', culture:'egypt', lng:30.9, lat:27.6, year:-1350, from:-1360, to:-1330,
+     tip:'推翻千年众神,只拜一个太阳神?', url:'./decision-akhenaten.html'},
+    {id:'cyrus', person:'居鲁士的宽容', icon:'👑', culture:'persia', lng:53.0, lat:30.2, year:-539, from:-545, to:-530,
+     tip:'赢了之后,屠戮立威还是宽待败者?', url:'./decision-cyrus.html'},
+    {id:'saladin', person:'萨拉丁的宽待', icon:'🕌', culture:'islam', lng:35.2, lat:31.78, year:1187, from:1185, to:1193,
+     tip:'攻下圣城,要为先辈屠城复仇吗?', url:'./decision-saladin.html'},
+    {id:'shotoku', person:'圣德太子学中国', icon:'🎌', culture:'japan', lng:135.8, lat:34.5, year:607, from:593, to:622,
+     tip:'放下身段,去学海那边的强国吗?', url:'./decision-shotoku.html'},
+    {id:'genghis', person:'成吉思汗的复仇', icon:'🐎', culture:'mongol', lng:106.9, lat:47.9, year:1219, from:1215, to:1227,
+     tip:'奇耻大辱,要倾全国去复仇吗?', url:'./decision-genghis.html'},
+    {id:'popolvuh', person:'双子闯冥界', icon:'👯', culture:'maya', lng:-89.6, lat:17.2, year:250, from:100, to:900,
+     tip:'明知是死神的圈套,下不下冥界?', url:'./decision-popolvuh.html'},
+    {id:'zhenghe', person:'郑和之后 · 停航还是远航', icon:'⛵', culture:'china', lng:118.8, lat:32.0, year:1433, from:1405, to:1450,
+     tip:'世界最大的船队,停,还是继续开?', url:'./decision-zhenghe.html'},
   ];
   if(typeof window!=='undefined') window.DECISIONS=DECISIONS;
 })();
