@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>走进一座城 · 敦煌 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;display:flex;flex-direction:column}
+  .nav{display:flex;align-items:center;gap:9px;padding:12px 16px 4px;flex-wrap:wrap}
+  .nav a.pill,.nav .pill{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.08em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .nav .city{font-family:var(--serif);font-weight:900;font-size:17px;color:var(--ink);margin-left:2px;text-shadow:var(--label-shadow)}
+  .wrap{width:min(680px,92%);margin:0 auto;flex:1;padding-bottom:90px}
+  /* 封面 */
+  .cover{text-align:center;margin:14px auto 6px}
+  .cover .big{font-family:var(--serif);font-weight:900;font-size:clamp(34px,9vw,56px);color:var(--ink);letter-spacing:.06em;text-shadow:var(--label-shadow);line-height:1}
+  .cover .tag{font-family:var(--serif);font-size:clamp(14px,3.8vw,17px);color:var(--gold);margin-top:8px}
+  .cover .aka{font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:.1em;margin-top:5px}
+  .cover .intro{font-family:var(--serif);font-size:13.5px;color:var(--ink2);line-height:1.8;max-width:30em;margin:12px auto 0}
+  /* 时间轨 */
+  .rail{position:relative;margin:20px 0 4px;padding:2px 2px 10px;overflow-x:auto;scrollbar-width:none}
+  .rail::-webkit-scrollbar{display:none}
+  .railline{display:flex;gap:0;align-items:stretch;min-width:max-content;position:relative}
+  .railline:before{content:'';position:absolute;left:10px;right:10px;top:13px;height:2px;background:var(--panel-line)}
+  .rstop{position:relative;flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:5px;padding:0 12px;cursor:pointer;background:none;border:none}
+  .rstop .dot{width:13px;height:13px;border-radius:50%;background:var(--panel-line);border:2px solid var(--bg);z-index:1;transition:all .2s}
+  .rstop .rl{font-family:var(--sans);font-size:11px;font-weight:700;color:var(--ink3);white-space:nowrap;transition:color .2s}
+  .rstop.on .dot{background:var(--gold);box-shadow:0 0 0 4px rgba(212,168,88,.25)}
+  .rstop.on .rl{color:var(--gold)}
+  .rstop.past .dot{background:var(--ink3)}
+  /* 时代卡 */
+  .era{animation:fin .45s cubic-bezier(.22,1,.36,1)}
+  @keyframes fin{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  .ehead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .ehead .en{font-family:var(--serif);font-weight:900;font-size:clamp(21px,5.5vw,28px);color:var(--ink);text-shadow:var(--label-shadow)}
+  .ehead .ey{font-family:var(--mono);font-size:12px;color:var(--gold);letter-spacing:.04em}
+  .ehead .etag{margin-left:auto;font-family:var(--sans);font-size:11px;font-weight:800;color:#fff;background:var(--ac,var(--gold));border-radius:999px;padding:3px 11px}
+  .eone{font-family:var(--serif);font-size:clamp(15px,4vw,18px);color:var(--gold);line-height:1.6;margin:10px 0 0;font-weight:700}
+  .escene{font-family:var(--serif);font-size:15px;color:var(--ink);line-height:1.95;background:var(--panel-bg);border:1px solid var(--panel-line);
+    border-left:4px solid var(--gold);border-radius:13px;padding:15px 18px;margin-top:12px;backdrop-filter:blur(8px)}
+  .change{display:flex;gap:9px;align-items:flex-start;margin-top:12px;font-family:var(--sans);font-size:13.5px;color:var(--ink);line-height:1.7;
+    background:rgba(224,138,44,.08);border-radius:11px;padding:11px 14px}
+  .change b{color:var(--vermilion)}
+  .change .ci{flex:none}
+  /* 故事卡 */
+  .storyk{margin-top:18px;background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:18px;padding:18px 18px 20px;backdrop-filter:blur(10px)}
+  .storyk .sk{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--gold);text-transform:uppercase;font-weight:700}
+  .storyk .shook{font-family:var(--serif);font-weight:900;font-size:clamp(17px,4.6vw,21px);color:var(--ink);line-height:1.5;margin:8px 0 12px}
+  .storyk .stale{font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.95}
+  .storyk .sturn{font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.95;margin-top:11px;padding:12px 15px;
+    background:rgba(47,158,134,.08);border-left:3px solid var(--cyan,#2f9e86);border-radius:9px}
+  .storyk .sturn b{color:var(--cyan,#2f9e86)}
+  .vtoggle{margin-top:14px;width:100%;box-sizing:border-box;font-family:var(--sans);font-weight:800;font-size:13.5px;color:var(--gold);
+    background:rgba(200,160,60,.1);border:1px solid var(--panel-line);border-radius:11px;padding:11px;cursor:pointer}
+  .voices{display:none;margin-top:10px}
+  .voices.show{display:block;animation:fin .35s}
+  .voice{background:var(--bg2,rgba(255,255,255,.04));border:1px solid var(--panel-line);border-radius:11px;padding:11px 14px;margin-bottom:8px}
+  .voice .vw{font-family:var(--sans);font-weight:800;font-size:13px;color:var(--gold);margin-bottom:3px}
+  .voice .va{font-family:var(--serif);font-size:13.5px;color:var(--ink2);line-height:1.7}
+  .squestion{font-family:var(--serif);font-size:15.5px;color:var(--ink);line-height:1.75;margin-top:14px;padding-left:13px;border-left:3px solid var(--gold);font-weight:700}
+  .squestion b{color:var(--gold)}
+  /* 图层:人/物/抉择 */
+  .layers{margin-top:16px}
+  .lyr{margin-bottom:12px}
+  .lyr .lh{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--ink3);text-transform:uppercase;margin-bottom:7px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{font-family:var(--sans);font-size:12.5px;color:var(--ink);background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:10px;padding:7px 11px;line-height:1.4}
+  .chip b{color:var(--gold);font-weight:700}
+  .chip .ct{color:var(--ink3);font-size:11px}
+  a.chip.dec{color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));border:none;text-decoration:none;font-weight:800}
+  .why{margin-top:14px;font-family:var(--serif);font-size:13.5px;color:var(--ink2);line-height:1.75;background:var(--panel-bg);border:1px dashed var(--panel-line);border-radius:11px;padding:11px 14px}
+  .why b{color:var(--gold)}
+  .why .wk{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;display:block;margin-bottom:4px}
+  /* 底部翻页 */
+  .pager{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;gap:10px;justify-content:center;align-items:center;
+    padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(0deg,rgba(var(--scrim,0,0,0),.5),transparent)}
+  .pbtn{font-family:var(--sans);font-weight:800;font-size:14px;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));
+    border:none;border-radius:999px;padding:11px 22px;cursor:pointer;box-shadow:0 5px 16px rgba(0,0,0,.18)}
+  .pbtn.ghost{color:var(--gold);background:var(--panel-bg);border:1px solid var(--panel-line);box-shadow:none}
+  .pbtn[disabled]{opacity:.35;cursor:not-allowed;box-shadow:none}
+  .pginfo{font-family:var(--mono);font-size:11px;color:var(--ink2);min-width:54px;text-align:center}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="nav">
+    <a class="pill" href="./index.html">⌂ 首页</a>
+    <a class="pill" href="./map.html">🗺 世界地图</a>
+    <span class="city" id="cityName">🏙️ 敦煌</span>
+  </div>
+  <div class="wrap">
+    <div class="cover" id="cover"></div>
+    <div class="rail"><div class="railline" id="rail"></div></div>
+    <div id="eraBox"></div>
+  </div>
+  <div class="pager">
+    <button class="pbtn ghost" id="prev" onclick="step(-1)">← 上一时代</button>
+    <span class="pginfo" id="pginfo"></span>
+    <button class="pbtn" id="next" onclick="step(1)">下一时代 →</button>
+  </div>
+</div>
+<script src="./track.js?v=1"></script>
+<script src="./city_dunhuang.js?v=1"></script>
+<script>
+const C = window.CITY||{eras:[]};
+const AC = ['#c86820','#b8731f','#c0563a','#5a6fb0','#e2603f','#8a6cd0','#7a6a58','#2f9e86'];
+let cur = 0;
+window.__aiCtx = '用户正在"走进一座城·敦煌":以城市为基底看历史,主轴是时间(若干时代横切面),每个时代挂一张"故事卡"。当前城市:敦煌。引导孩子顺着故事感受这座城的兴衰变迁,多问"它为什么会变成这样"。';
+
+function esc(s){return String(s==null?'':s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));}
+
+function renderCover(){
+  document.getElementById('cityName').textContent = '🏙️ '+C.name;
+  document.getElementById('cover').innerHTML =
+    `<div class="big">${esc(C.name)}</div>
+     <div class="tag">${esc(C.tagline)}</div>
+     <div class="aka">${esc(C.aka)}</div>
+     <div class="intro">${esc(C.intro)}</div>`;
+}
+function renderRail(){
+  document.getElementById('rail').innerHTML = C.eras.map((e,i)=>
+    `<button class="rstop ${i===cur?'on':(i<cur?'past':'')}" onclick="jump(${i})">
+       <span class="dot"></span><span class="rl">${esc(e.name)}</span>
+     </button>`).join('');
+  const on=document.querySelector('.rstop.on'); if(on&&on.scrollIntoView) on.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});
+}
+function renderEra(){
+  const e = C.eras[cur]; const ac = AC[cur%AC.length];
+  const st = e.story||{};
+  const voices = (st.voices||[]).map(v=>`<div class="voice"><div class="vw">${esc(v.who)}</div><div class="va">${esc(v.say)}</div></div>`).join('');
+  const people = (e.people||[]).map(p=>`<span class="chip">👤 <b>${esc(p.n)}</b> <span class="ct">${esc(p.r)}</span></span>`).join('');
+  const objects = (e.objects||[]).map(o=>`<span class="chip">📿 <b>${esc(o.n)}</b> <span class="ct">${esc(o.t)}·${esc(o.note)}</span></span>`).join('');
+  const decChip = e.decisionRef?`<a class="chip dec" href="${e.decisionRef}">🎯 相关抉择 →</a>`:'';
+  document.getElementById('eraBox').innerHTML = `
+    <div class="era" style="--ac:${ac}">
+      <div class="ehead"><span class="en">${esc(e.name)}</span><span class="ey">${esc(e.years)}</span><span class="etag">${esc(e.tag||'')}</span></div>
+      <div class="eone">${esc(e.oneline)}</div>
+      <div class="escene">${esc(e.scene)}</div>
+      <div class="change"><span class="ci">🔄</span><span><b>这一时代,变了什么:</b>${esc(e.change)}</span></div>
+      <div class="storyk">
+        <div class="sk">· 这个时代的故事 ·</div>
+        <div class="shook">${esc(st.hook||'')}</div>
+        <div class="stale">${st.tale||''}</div>
+        ${st.turn?`<div class="sturn"><b>转折 ▸ </b>${st.turn}</div>`:''}
+        ${voices?`<button class="vtoggle" onclick="this.nextElementSibling.classList.toggle('show');this.textContent=this.nextElementSibling.classList.contains('show')?'▲ 收起众声':'🗣️ 听听不同的声音(争议在这里)'">🗣️ 听听不同的声音(争议在这里)</button><div class="voices">${voices}</div>`:''}
+        ${st.question?`<div class="squestion">❓ ${esc(st.question)}</div>`:''}
+      </div>
+      <div class="layers">
+        ${people?`<div class="lyr"><div class="lh">过客与主人</div><div class="chips">${people}</div></div>`:''}
+        ${(objects||decChip)?`<div class="lyr"><div class="lh">一物一世界 / 抉择</div><div class="chips">${objects}${decChip}</div></div>`:''}
+      </div>
+      <div class="why"><span class="wk">它为什么会变成这样</span>${esc(e.whyChange)}</div>
+    </div>`;
+  document.getElementById('pginfo').textContent = (cur+1)+' / '+C.eras.length;
+  document.getElementById('prev').disabled = cur===0;
+  document.getElementById('next').disabled = cur===C.eras.length-1;
+}
+function render(){ renderRail(); renderEra(); window.scrollTo({top:0,behavior:'instant'}); if(window.Track) Track.log('走进一座城·'+C.name); }
+function jump(i){ cur=Math.max(0,Math.min(C.eras.length-1,i)); render(); }
+function step(d){ jump(cur+d); }
+renderCover(); render();
+</script>
+<script src="./ai_float.js?v=2"></script>
+</body>
+</html>
