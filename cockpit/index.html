@@ -301,11 +301,11 @@ const ENV=[
 const PHASES=['前期规划 · 想清楚做什么','开发执行 · 把它做出来','运营维护 · 算得过、守得住'];
 const CROSS=[['性能','前端、后端、基建每层都能拖慢体验'],['可访问性','从设计层就开始,不是前端补丁'],['安全与隐私','鉴权、越权、密钥、数据合规'],['数据与度量','让每个决定回到真实行为上验证'],['沟通与对齐','与人、与 AI 都要先复述目标'],['时间与优先级','永远资源有限,先做最锋利的']];
 const STAGES=[
- {n:'立项',role:'Explorer',goal:'找到一个「小而真」的需求,定下要为谁解决什么。',x:[1,6],e:[1,2],j:[4,5]},
+ {n:'立项',role:'Explorer',goal:'找到一个「小而真」的需求,定下要为谁解决什么。',x:[1],e:[1,2],j:[4,5]},
  {n:'原型',role:'Explorer',goal:'做出第一个「能点的」可交互原型。',x:[2],e:[4,5],j:[10,2]},
- {n:'开发',role:'Creator',goal:'把作品一块块做出来,让它真正「能用」。',x:[3],e:[6,7,5],j:[7,13,12,6]},
- {n:'打磨',role:'Owner',goal:'测试、上线,让真实的人用一用,再改。',x:[4,5],e:[8,9,10],j:[11,3]},
- {n:'路演',role:'Owner',goal:'为自己的作品站台——讲清它、答辩、交付。',x:[3],e:[1,11],j:[5,1]},
+ {n:'开发',role:'Creator',goal:'把作品一块块做出来,让它真正「能用」。',x:[3,4],e:[6,7,5],j:[7,13,12,6]},
+ {n:'打磨',role:'Owner',goal:'测试、上线,让真实的人用一用,再改。',x:[5],e:[8,9,10],j:[11,3]},
+ {n:'路演',role:'Owner',goal:'为自己的作品站台——讲清它、答辩、交付。',x:[],e:[1,11],j:[5,1]},
 ];
 const STUCK=[
  {t:'AI 没听懂我想要什么',jq:[5,6,7],pr:'我想做的是:[谁] 在 [什么情况下],想要 [做什么]。\n现在的问题是 [具体哪里不对]。\n请你 [具体改什么]。我截图给你看:[贴图]'},
@@ -409,7 +409,9 @@ function envCard(ev){
 function renderFollow(){
  const s=STAGES[st.stage];
  let h=`<div class="goal"><div class="gl">第 ${st.stage+1} 步 · ${s.n} · ${s.role}</div><div class="gt">${s.goal}</div></div>`;
- h+=`<div class="lbl">⭐ 这一阶段最该记住的心法</div>`+s.x.map(i=>xinfaCard(XINFA[i-1])).join('');
+ if(s.x.length){h+=`<div class="lbl">⭐ 这一阶段最该记住的心法</div>`+s.x.map(i=>xinfaCard(XINFA[i-1])).join('');}
+ else{h+=`<div class="lbl">⭐ 这一阶段</div><div class="note">路演主要靠「表达」——把作品讲清楚(看下面的技巧);也回到 <b>心法1</b>:讲清你最初想为谁解决什么。</div>`;}
+ h+=`<div class="lbl">🔁 这条心法,每节课都要做(贯穿全程)</div>`+xinfaCard(XINFA[5]);
  h+=`<div class="lbl">🧩 这一阶段会碰到的专业环节(点开看全部概念)</div>`+s.e.map(i=>envCard(ENV[i-1])).join('');
  h+=`<div class="lbl">💬 这一阶段好用的协作技巧</div>`+s.j.map(i=>jqCard(JQ[i-1])).join('');
  $('p-follow').innerHTML=h;
