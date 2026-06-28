@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>秦汉 · 闯关 · AI 学历史强化课</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root{--ink:#2b2420;--ink2:#6b5d50;--ink3:#a89a8a;--gold:#c0782a;--green:#2f9e86;--red:#d4583a;--line:#e7ddcf;--panel:#fffaf2;--bg1:#fbf4e8;--bg2:#f4ead8;}
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:linear-gradient(160deg,var(--bg1),var(--bg2));-webkit-tap-highlight-color:transparent}
+  body{font-family:'Noto Sans SC',sans-serif;color:var(--ink);padding-bottom:40px}
+  .wrap{width:min(640px,93%);margin:0 auto}
+  .top{display:flex;align-items:center;gap:10px;padding:14px 0 6px}
+  .top a{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);text-decoration:none;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 12px}
+  .top .ttl{font-family:'Noto Serif SC',serif;font-weight:900;font-size:16px}
+  .bar{height:8px;background:#fff;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin:6px 0 4px}
+  .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--red));width:0;transition:width .3s}
+  .meta{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink2);margin-bottom:12px}
+  .meta b{color:var(--gold)}
+  .qtype{display:inline-block;font-size:11px;font-weight:800;color:#fff;background:var(--gold);border-radius:999px;padding:3px 11px;margin-bottom:10px}
+  .q{font-family:'Noto Serif SC',serif;font-weight:700;font-size:18px;line-height:1.65;margin-bottom:16px}
+  .opts{display:flex;flex-direction:column;gap:11px}
+  .opt{font-size:15px;color:var(--ink);background:var(--panel);border:1.5px solid var(--line);border-radius:13px;padding:14px 16px;cursor:pointer;text-align:left;line-height:1.55;transition:all .14s;display:flex;gap:10px}
+  .opt:hover{border-color:var(--gold)}
+  .opt .lt{font-weight:900;color:var(--gold);flex:none}
+  .opt.right{border-color:var(--green);background:rgba(47,158,134,.12)}.opt.right .lt{color:var(--green)}
+  .opt.wrong{border-color:var(--red);background:rgba(212,88,58,.1)}.opt.wrong .lt{color:var(--red)}
+  .opt.dim{opacity:.55;pointer-events:none}
+  .exp{margin-top:14px;font-size:14px;line-height:1.75;background:#fff;border:1px solid var(--line);border-left:4px solid var(--green);border-radius:10px;padding:13px 15px;display:none}
+  .exp.show{display:block;animation:fin .3s}@keyframes fin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .exp .eh{font-weight:800;color:var(--green);font-size:13px;margin-bottom:4px}
+  .next{margin-top:16px;width:100%;font-weight:800;font-size:16px;color:#fff;border:none;border-radius:999px;padding:14px;cursor:pointer;background:linear-gradient(90deg,var(--gold),var(--red));box-shadow:0 5px 16px rgba(0,0,0,.12)}
+  /* 结算 */
+  .end{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px 20px;text-align:center}
+  .end .ee{font-size:44px}
+  .end h2{font-family:'Noto Serif SC',serif;font-weight:900;font-size:24px;margin:6px 0 2px}
+  .end .big{font-family:'Noto Serif SC',serif;font-weight:900;font-size:34px;color:var(--gold)}
+  .end .sub{font-size:13px;color:var(--ink2);margin-bottom:6px}
+  .review{text-align:left;margin-top:16px}
+  .review h3{font-size:14px;color:var(--red);margin:0 0 8px}
+  .rv{border-left:3px solid var(--red);padding:6px 0 6px 12px;margin:10px 0;font-size:13.5px;line-height:1.7}
+  .rv .rq{font-weight:700}.rv .ra{color:var(--green)}
+  .btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+  .btn{font-weight:800;font-size:14px;border:none;border-radius:999px;padding:12px 24px;cursor:pointer;color:#fff;background:linear-gradient(90deg,var(--gold),var(--red))}
+  .btn.ghost{color:var(--gold);background:#fff;border:1px solid var(--line)}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top"><a href="./index.html">⌂ 地图</a><span class="ttl">🐉 秦汉 · 闯关</span></div>
+    <div class="bar"><i id="bar"></i></div>
+    <div class="meta"><span>第 <b id="qn">1</b> / <b id="qt">10</b> 题</span><span>答对 <b id="score">0</b></span></div>
+    <div id="game"></div>
+  </div>
+<script src="./kb_qinhan.js"></script>
+<script src="./qtype.js"></script>
+<script>
+function esc(s){return String(s==null?'':s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));}
+const LK='ABCD';
+const cards=(window.KB_QINHAN&&window.KB_QINHAN.cards)||[];
+const TOTAL=10;
+let qs=[], idx=0, score=0, wrong=[], locked=false;
+
+function startQuiz(){
+  qs=window.QTYPE.session(cards,TOTAL); idx=0; score=0; wrong=[];
+  document.getElementById('qt').textContent=qs.length;
+  render();
+}
+function render(){
+  locked=false;
+  const q=qs[idx];
+  document.getElementById('qn').textContent=idx+1;
+  document.getElementById('score').textContent=score;
+  document.getElementById('bar').style.width=(idx/qs.length*100)+'%';
+  document.getElementById('game').innerHTML=`
+    <div class="qtype">${esc(q.type)}</div>
+    <div class="q">${q.q}</div>
+    <div class="opts">${q.options.map((o,i)=>`<button class="opt" data-o="${esc(o)}"><span class="lt">${LK[i]}</span><span>${esc(o)}</span></button>`).join('')}</div>
+    <div class="exp" id="exp"></div>`;
+  document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>choose(b,q));
+}
+function choose(btn,q){
+  if(locked) return; locked=true;
+  const chosen=btn.dataset.o, correct=q.correct;
+  document.querySelectorAll('.opt').forEach(b=>{
+    if(b.dataset.o===correct) b.classList.add('right');
+    else if(b===btn) b.classList.add('wrong');
+    else b.classList.add('dim');
+    b.onclick=null;
+  });
+  const right=chosen===correct;
+  if(right) score++; else wrong.push(q);
+  document.getElementById('score').textContent=score;
+  const exp=document.getElementById('exp');
+  exp.innerHTML=`<div class="eh">${right?'✅ 答对了':'❌ 答案:'+esc(correct)}</div>${esc(q.explain||'')}
+    <button class="next" onclick="next()">${idx+1<qs.length?'下一题 →':'看成绩 →'}</button>`;
+  exp.classList.add('show');
+}
+function next(){ idx++; if(idx>=qs.length) end(); else render(); }
+function end(){
+  document.getElementById('bar').style.width='100%';
+  const best=Math.max(score, +(localStorage.getItem('hc_qinhan_best')||0));
+  localStorage.setItem('hc_qinhan_best',best);
+  const rate=Math.round(score/qs.length*100);
+  const lv = rate>=90?'🏆 秦汉满级!' : rate>=70?'🌟 掌握不错!' : rate>=50?'📖 再巩固一下' : '🌱 多刷几遍会更稳';
+  let html=`<div class="end"><div class="ee">${rate>=70?'🎉':'📚'}</div><h2>${lv}</h2>
+    <div class="big">${score} / ${qs.length}</div>
+    <div class="sub">正确率 ${rate}% · 最好成绩 ${best}/${qs.length}</div>`;
+  if(wrong.length){
+    html+=`<div class="review"><h3>❌ 错题回顾(${wrong.length}题)</h3>`;
+    wrong.forEach(q=>html+=`<div class="rv"><div class="rq">${q.q.replace(/<br>/g,' ')}</div><div class="ra">✓ ${esc(q.correct)}</div><div>${esc(q.explain||'')}</div></div>`);
+    html+=`</div>`;
+  } else html+=`<div class="sub" style="margin-top:10px">全对!这个单元你拿下了 💪</div>`;
+  html+=`<div class="btns"><button class="btn" onclick="startQuiz()">↺ 再来一组</button><a class="btn ghost" href="./index.html" style="text-decoration:none">⌂ 回地图</a></div></div>`;
+  document.getElementById('game').innerHTML=html;
+}
+if(cards.length) startQuiz();
+else document.getElementById('game').innerHTML='<p style="text-align:center;color:#a89a8a">题库未加载,请刷新。</p>';
+</script>
+</body>
+</html>

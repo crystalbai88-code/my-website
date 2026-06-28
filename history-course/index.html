@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>AI 学历史 · 学习强化课 · 中考历史</title>
+<meta name="description" content="按中考题型设计的初中历史强化课:把三年知识点装进一张'中考知识地图',按阶段×专题整体学,游戏化刷题、AI材料题陪练。">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root{--ink:#2b2420;--ink2:#6b5d50;--ink3:#a89a8a;--gold:#c0782a;--green:#2f9e86;--red:#d4583a;--line:#e7ddcf;--panel:#fffaf2;--bg1:#fbf4e8;--bg2:#f4ead8;}
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:linear-gradient(160deg,var(--bg1),var(--bg2));-webkit-tap-highlight-color:transparent}
+  body{font-family:'Noto Sans SC',sans-serif;color:var(--ink);padding-bottom:50px}
+  .wrap{width:min(720px,92%);margin:0 auto}
+  .hero{text-align:center;padding:26px 0 6px}
+  .hero .badge{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;color:var(--gold);background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 13px}
+  .hero h1{font-family:'Noto Serif SC',serif;font-weight:900;font-size:clamp(26px,7vw,40px);margin:12px 0 6px;letter-spacing:.02em}
+  .hero p{font-size:14px;color:var(--ink2);line-height:1.7;max-width:24em;margin:0 auto}
+  .hero p b{color:var(--gold)}
+  .stats{display:flex;justify-content:center;gap:10px;margin:16px 0 4px;flex-wrap:wrap}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 15px;min-width:80px}
+  .stat b{display:block;font-family:'Noto Serif SC',serif;font-weight:900;font-size:20px;color:var(--gold)}
+  .stat span{font-size:11px;color:var(--ink2)}
+  /* 专题横轴 */
+  .axis{margin:26px 0 6px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+  .axis .k{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;color:var(--gold);text-transform:uppercase}
+  .axis h2{font-family:'Noto Serif SC',serif;font-size:17px;margin:5px 0 10px}
+  .topics{display:flex;flex-wrap:wrap;gap:8px}
+  .topic{font-size:12.5px;font-weight:700;color:var(--ink);background:var(--bg2);border:1px solid var(--line);border-radius:9px;padding:6px 11px}
+  .topic i{font-style:normal;color:var(--gold);margin-right:4px}
+  .note{font-size:12px;color:var(--ink3);margin-top:10px;line-height:1.6}
+  /* 阶段纵轴(地图) */
+  .map{margin-top:22px}
+  .grp{font-family:'Noto Serif SC',serif;font-weight:900;font-size:15px;color:var(--ink2);margin:18px 0 8px;display:flex;align-items:center;gap:8px}
+  .grp:before{content:'';width:5px;height:18px;background:var(--gold);border-radius:3px}
+  .stage{display:flex;align-items:center;gap:13px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px 15px;margin-bottom:10px;text-decoration:none;color:inherit;transition:transform .12s,box-shadow .12s,border-color .12s}
+  .stage.on{cursor:pointer;border-color:var(--gold)}
+  .stage.on:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.08)}
+  .stage.lock{opacity:.6}
+  .stage .ic{font-size:24px;flex:none}
+  .stage .body{flex:1;min-width:0}
+  .stage .sn{font-family:'Noto Serif SC',serif;font-weight:900;font-size:16px}
+  .stage .sd{font-size:12px;color:var(--ink2);margin-top:2px}
+  .stage .meta{font-size:11px;color:var(--gold);margin-top:3px;font-weight:700}
+  .stage .go{flex:none;font-size:13px;font-weight:800}
+  .stage.on .go{color:#fff;background:linear-gradient(90deg,var(--gold),var(--red));border-radius:999px;padding:8px 15px}
+  .stage.lock .go{color:var(--ink3)}
+  .foot{text-align:center;font-size:12px;color:var(--ink3);margin-top:30px;line-height:1.8}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <span class="badge">中考历史 · 按题型强化</span>
+      <h1>AI 学历史 · 学习强化课</h1>
+      <p>把初中三年历史,装进<b>一张知识地图</b>——按<b>阶段 × 专题</b>整体学,不再东一块西一块。</p>
+      <div class="stats">
+        <div class="stat"><b>阶段</b><span>纵轴 · 中外双线</span></div>
+        <div class="stat"><b>专题</b><span>横轴 · 6 条线索</span></div>
+        <div class="stat"><b>题型</b><span>对照真题设计</span></div>
+      </div>
+    </div>
+
+    <div class="axis">
+      <div class="k">横轴 · 6 条常考线索(专题)</div>
+      <h2>任何知识点,都能归到"哪个阶段 × 哪条线索"</h2>
+      <div class="topics">
+        <span class="topic"><i>①</i>国家治理与制度</span>
+        <span class="topic"><i>②</i>经济与科技</span>
+        <span class="topic"><i>③</i>思想与文化</span>
+        <span class="topic"><i>④</i>民族交融与统一</span>
+        <span class="topic"><i>⑤</i>对外交往</span>
+        <span class="topic"><i>⑥</i>侵略·抗争 / 世界格局</span>
+      </div>
+      <div class="note">💡 顺<b>阶段</b>纵着走 = 看一个时代的方方面面(阶段特征);顺<b>专题</b>横着走 = 一条线索贯穿千年(专题复习)。这正是中考要的"整体感"。</div>
+    </div>
+
+    <div class="map">
+      <div class="grp">中国古代史</div>
+      <div class="stage lock"><span class="ic">🏯</span><div class="body"><div class="sn">先秦</div><div class="sd">史前 · 夏商周 · 春秋战国(诸子百家)</div></div><span class="go">敬请期待</span></div>
+      <a class="stage on" href="./quiz.html?unit=qinhan"><span class="ic">🐉</span><div class="body"><div class="sn">秦汉</div><div class="sd">大一统的建立与巩固 · 丝绸之路</div><div class="meta" id="qinhanMeta">14 个知识点 · 6 种题型 · 可玩</div></div><span class="go">开始闯关 →</span></a>
+      <div class="stage lock"><span class="ic">⚔️</span><div class="body"><div class="sn">三国两晋南北朝 / 隋唐 / 宋元 / 明清</div><div class="sd">繁荣开放 · 统一多民族国家的发展</div></div><span class="go">敬请期待</span></div>
+      <div class="grp">中国近现代史</div>
+      <div class="stage lock"><span class="ic">🌊</span><div class="body"><div class="sn">中国近代史</div><div class="sd">1840—1949 · 列强侵华与救亡图存</div></div><span class="go">敬请期待</span></div>
+      <div class="stage lock"><span class="ic">🚩</span><div class="body"><div class="sn">中国现代史</div><div class="sd">1949—今 · 新中国的建设与发展</div></div><span class="go">敬请期待</span></div>
+      <div class="grp">世界史</div>
+      <div class="stage lock"><span class="ic">🌍</span><div class="body"><div class="sn">世界古代·近代史</div><div class="sd">文明古国 · 文艺复兴 · 大航海 · 工业革命(可接"世界文明实验室")</div></div><span class="go">敬请期待</span></div>
+      <div class="stage lock"><span class="ic">⚙️</span><div class="body"><div class="sn">世界现代史</div><div class="sd">两次世界大战 · 冷战 · 全球化</div></div><span class="go">敬请期待</span></div>
+    </div>
+
+    <div class="foot">每解锁一个阶段,地图就亮一格——始终是在<b>一张整图</b>上长,不会散。<br>由白白的 AI 教育实验室打造 · 与「AI 世界文明实验室」并行</div>
+  </div>
+<script src="./kb_qinhan.js"></script>
+<script>
+  (function(){ try{ const n=(window.KB_QINHAN&&window.KB_QINHAN.cards.length)||14;
+    const best=localStorage.getItem('hc_qinhan_best');
+    document.getElementById('qinhanMeta').textContent = n+' 个知识点 · 6 种题型'+(best?' · 最好 '+best+'/10':' · 可玩'); }catch(e){} })();
+</script>
+</body>
+</html>
