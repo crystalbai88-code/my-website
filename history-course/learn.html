@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>秦汉 · 速记 · AI 学历史强化课</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root{--ink:#2b2420;--ink2:#6b5d50;--ink3:#a89a8a;--gold:#c0782a;--green:#2f9e86;--red:#d4583a;--line:#e7ddcf;--panel:#fffaf2;--bg1:#fbf4e8;--bg2:#f4ead8;}
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:linear-gradient(160deg,var(--bg1),var(--bg2));-webkit-tap-highlight-color:transparent}
+  body{font-family:'Noto Sans SC',sans-serif;color:var(--ink);padding-bottom:90px}
+  .wrap{width:min(680px,93%);margin:0 auto}
+  .top{display:flex;align-items:center;gap:10px;padding:14px 0 6px}
+  .top a{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);text-decoration:none;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 12px}
+  .top .ttl{font-family:'Noto Serif SC',serif;font-weight:900;font-size:16px}
+  .lead{font-size:13px;color:var(--ink2);line-height:1.7;margin:4px 2px 10px}
+  .lead b{color:var(--gold)}
+  /* 主线 */
+  .spine{display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:6px}
+  .spine .n{font-family:'Noto Serif SC',serif;font-weight:900;font-size:16px;color:var(--ink);background:var(--bg2);border-radius:10px;padding:8px 14px;text-align:center;line-height:1.4}
+  .spine .n small{display:block;font-size:11px;color:var(--gold);font-weight:700}
+  .spine .ar{color:var(--gold);font-weight:900;font-size:18px}
+  /* 进度 */
+  .prog{display:flex;align-items:center;gap:10px;margin:14px 2px 4px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink2)}
+  .prog .pb{flex:1;height:8px;background:#fff;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+  .prog .pb i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--gold));transition:width .3s}
+  .prog b{color:var(--green)}
+  /* 分支 */
+  .branch{margin-top:18px}
+  .bh{font-family:'Noto Serif SC',serif;font-weight:900;font-size:15px;color:var(--ink);display:flex;align-items:center;gap:8px;margin-bottom:9px}
+  .bh:before{content:'';width:5px;height:18px;background:var(--gold);border-radius:3px}
+  .card{display:flex;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px 15px;margin-bottom:10px;transition:border-color .15s}
+  .card.done{border-color:var(--green);background:rgba(47,158,134,.06)}
+  .chk{flex:none;width:26px;height:26px;border-radius:8px;border:2px solid var(--line);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;color:transparent;transition:all .15s;margin-top:2px}
+  .card.done .chk{background:var(--green);border-color:var(--green);color:#fff}
+  .body{flex:1;min-width:0}
+  .nm{font-family:'Noto Serif SC',serif;font-weight:900;font-size:16px}
+  .hook{font-size:14px;color:var(--ink);line-height:1.7;margin-top:5px;background:#fffdf6;border:1px dashed var(--gold);border-radius:9px;padding:8px 11px}
+  .hook b{color:var(--gold)}
+  .why{font-size:12.5px;color:var(--ink3);line-height:1.6;margin-top:6px}
+  /* 底部去闯关 */
+  .gobar{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(0deg,var(--bg2),rgba(244,234,216,.85));backdrop-filter:blur(6px);border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom))}
+  .gobar .inner{width:min(680px,93%);margin:0 auto;display:flex;gap:10px}
+  .gobar a{flex:1;text-align:center;text-decoration:none;font-weight:800;font-size:14px;border-radius:999px;padding:13px}
+  .gobar .test{color:#fff;background:linear-gradient(90deg,var(--gold),var(--red))}
+  .gobar .all{color:var(--gold);background:#fff;border:1px solid var(--line);flex:0 0 auto;padding:13px 18px}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top"><a href="./index.html">⌂ 地图</a><span class="ttl">🐉 秦汉 · 速记</span></div>
+    <div class="lead">先<b>看懂结构、记住钩子</b>,再去闯关检验——别一上来就埋头做题。点左边 ☐ 标记"我会了"。</div>
+
+    <div class="spine">
+      <div class="n">秦<small>建立大一统</small></div>
+      <div class="ar">→</div>
+      <div class="n">汉<small>巩固大一统</small></div>
+    </div>
+    <div class="prog"><span>已掌握 <b id="done">0</b> / <span id="tot">14</span></span><div class="pb"><i id="pb"></i></div></div>
+
+    <div id="tree"></div>
+  </div>
+  <div class="gobar"><div class="inner">
+    <a class="test" href="./quiz.html?unit=qinhan&focus=weak" id="testBtn">🎮 去闯关检验(只考没标会的)</a>
+    <a class="all" href="./quiz.html?unit=qinhan">全考</a>
+  </div></div>
+<script src="./kb_qinhan.js"></script>
+<script>
+function esc(s){return String(s==null?'':s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));}
+const KB=window.KB_QINHAN||{cards:[],branches:[]};
+const cards=KB.cards;
+const MK='hc_qinhan_mastered';
+let mastered=new Set(JSON.parse(localStorage.getItem(MK)||'[]'));
+
+function save(){localStorage.setItem(MK,JSON.stringify([...mastered]));updateProg();}
+function updateProg(){
+  document.getElementById('done').textContent=mastered.size;
+  document.getElementById('tot').textContent=cards.length;
+  document.getElementById('pb').style.width=(mastered.size/cards.length*100)+'%';
+  const t=document.getElementById('testBtn');
+  const weak=cards.length-mastered.size;
+  t.textContent = weak>0?`🎮 去闯关检验(只考没标会的 ${weak} 个)`:'🎮 全标会了!去闯关检验一下';
+}
+function toggle(id,el){ if(mastered.has(id))mastered.delete(id); else mastered.add(id); el.classList.toggle('done',mastered.has(id)); el.querySelector('.chk').textContent=mastered.has(id)?'✓':''; save(); }
+
+function render(){
+  const tree=document.getElementById('tree');
+  (KB.branches||[...new Set(cards.map(c=>c.br))]).forEach(br=>{
+    const list=cards.filter(c=>c.br===br); if(!list.length) return;
+    const sec=document.createElement('div'); sec.className='branch';
+    sec.innerHTML=`<div class="bh">${esc(br)}</div>`+list.map(c=>`
+      <div class="card ${mastered.has(c.id)?'done':''}" data-id="${c.id}">
+        <div class="chk">${mastered.has(c.id)?'✓':''}</div>
+        <div class="body">
+          <div class="nm">${esc(c.n)}</div>
+          <div class="hook">💡 ${esc(c.hook||'')}</div>
+          <div class="why">${esc(c.why||c.what||'')}</div>
+        </div>
+      </div>`).join('');
+    tree.appendChild(sec);
+  });
+  document.querySelectorAll('.card').forEach(el=>{ el.querySelector('.chk').onclick=()=>toggle(el.dataset.id,el); });
+  updateProg();
+}
+if(cards.length) render();
+else document.getElementById('tree').innerHTML='<p style="text-align:center;color:#a89a8a">题库未加载,请刷新。</p>';
+</script>
+</body>
+</html>

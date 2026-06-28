@@ -33,12 +33,13 @@
     if(!cand.length) return null;
     return cand[Math.floor(Math.random()*cand.length)];
   }
-  // 一组题:尽量题型多样、卡片不重复
-  function session(all, n){
-    const cards=shuffle(all); const out=[]; let i=0, guard=0;
-    while(out.length<n && guard<n*5){
+  // 一组题:targets=出题卡片,pool=干扰项来源(默认同 targets)。focus复习时 targets=薄弱卡、pool=全部卡。
+  function session(targets, n, pool){
+    pool = pool || targets;
+    const cards=shuffle(targets); const out=[]; let i=0, guard=0;
+    while(out.length<n && guard<n*6){
       const c=cards[i%cards.length]; i++; guard++;
-      const q=gen(c,all);
+      const q=gen(c,pool);
       if(q){ q.card=c.id; out.push(q); }
     }
     return out;

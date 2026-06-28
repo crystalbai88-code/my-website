@@ -63,7 +63,11 @@ const TOTAL=10;
 let qs=[], idx=0, score=0, wrong=[], locked=false;
 
 function startQuiz(){
-  qs=window.QTYPE.session(cards,TOTAL); idx=0; score=0; wrong=[];
+  const focus=new URLSearchParams(location.search).get('focus')==='weak';
+  let targets=cards;
+  if(focus){ const mastered=new Set(JSON.parse(localStorage.getItem('hc_qinhan_mastered')||'[]'));
+    const weak=cards.filter(c=>!mastered.has(c.id)); if(weak.length) targets=weak; }
+  qs=window.QTYPE.session(targets,TOTAL,cards); idx=0; score=0; wrong=[];
   document.getElementById('qt').textContent=qs.length;
   render();
 }

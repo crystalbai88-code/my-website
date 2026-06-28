@@ -78,7 +78,7 @@
     <div class="map">
       <div class="grp">中国古代史</div>
       <div class="stage lock"><span class="ic">🏯</span><div class="body"><div class="sn">先秦</div><div class="sd">史前 · 夏商周 · 春秋战国(诸子百家)</div></div><span class="go">敬请期待</span></div>
-      <a class="stage on" href="./quiz.html?unit=qinhan"><span class="ic">🐉</span><div class="body"><div class="sn">秦汉</div><div class="sd">大一统的建立与巩固 · 丝绸之路</div><div class="meta" id="qinhanMeta">14 个知识点 · 6 种题型 · 可玩</div></div><span class="go">开始闯关 →</span></a>
+      <a class="stage on" href="./learn.html?unit=qinhan"><span class="ic">🐉</span><div class="body"><div class="sn">秦汉</div><div class="sd">大一统的建立与巩固 · 丝绸之路</div><div class="meta" id="qinhanMeta">速记知识树 + 记忆钩子 · 看懂再检验</div></div><span class="go">开始学 →</span></a>
       <div class="stage lock"><span class="ic">⚔️</span><div class="body"><div class="sn">三国两晋南北朝 / 隋唐 / 宋元 / 明清</div><div class="sd">繁荣开放 · 统一多民族国家的发展</div></div><span class="go">敬请期待</span></div>
       <div class="grp">中国近现代史</div>
       <div class="stage lock"><span class="ic">🌊</span><div class="body"><div class="sn">中国近代史</div><div class="sd">1840—1949 · 列强侵华与救亡图存</div></div><span class="go">敬请期待</span></div>
@@ -93,8 +93,9 @@
 <script src="./kb_qinhan.js"></script>
 <script>
   (function(){ try{ const n=(window.KB_QINHAN&&window.KB_QINHAN.cards.length)||14;
+    const m=JSON.parse(localStorage.getItem('hc_qinhan_mastered')||'[]').length;
     const best=localStorage.getItem('hc_qinhan_best');
-    document.getElementById('qinhanMeta').textContent = n+' 个知识点 · 6 种题型'+(best?' · 最好 '+best+'/10':' · 可玩'); }catch(e){} })();
+    document.getElementById('qinhanMeta').textContent = `${n} 个知识点 · 已掌握 ${m}/${n}`+(best?` · 闯关最好 ${best}/10`:''); }catch(e){} })();
 </script>
 </body>
 </html>
