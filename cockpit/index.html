@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>少年 CEO · 创造者驾驶舱</title>
+<style>
+  :root{--green:#2F5D50;--orange:#D98A3D;--bg:#FBF8F2;--ink:#33312c;--mut:#8a857c;--line:#e7e0d2;--card:#fff;--soft:#f3efe6;}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{background:var(--bg);color:var(--ink);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.6}
+  .wrap{max-width:960px;margin:0 auto;padding:18px 16px 70px}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .brand{font-size:13px;letter-spacing:2px;color:var(--orange);font-weight:700}
+  .brand b{font-family:"Songti SC",serif;font-size:22px;color:var(--green);display:block;letter-spacing:0;margin-top:2px}
+  .ceo{font-size:11px;color:var(--mut);letter-spacing:1px}
+  .right{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+  .proj{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
+  .proj label{font-size:12px;color:var(--mut)}
+  .proj input{border:none;background:transparent;font-size:15px;font-weight:700;color:var(--green);width:150px;outline:none}
+  .awbar{font-size:12px;color:var(--mut);background:#fdf3e6;border:1px solid var(--orange);border-radius:999px;padding:5px 13px}
+  .awbar b{color:#8a5410}
+  .journey{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:14px}
+  .jhead{font-size:12px;color:var(--mut);margin-bottom:10px;text-align:center;letter-spacing:1px}
+  .jhead b{color:var(--orange)}
+  .stages{display:flex;gap:6px}
+  .stage{flex:1;text-align:center;cursor:pointer;border-radius:12px;padding:9px 3px;border:1.5px solid var(--line);background:var(--soft);transition:.15s}
+  .stage.active{background:var(--green);border-color:var(--green)}
+  .stage .sn{font-size:10.5px;color:var(--mut)}.stage.active .sn{color:#bcd3c9}
+  .stage .st{font-size:14px;font-weight:700;margin-top:2px}.stage.active .st{color:#fff}
+  .stage .role{font-size:9.5px;color:var(--orange);margin-top:2px;font-weight:700}.stage.active .role{color:#f3c98c}
+  .tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+  .tab{flex:1;min-width:110px;text-align:center;padding:11px 6px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);cursor:pointer;font-size:14px;font-weight:700;color:var(--mut)}
+  .tab.on{background:var(--orange);border-color:var(--orange);color:#fff}
+  .panel{display:none}.panel.on{display:block}
+  .goal{background:linear-gradient(120deg,var(--green),#26483d);color:#fff;border-radius:14px;padding:15px 18px;margin-bottom:16px}
+  .goal .gl{font-size:12px;color:#a9c6bb;letter-spacing:1px}.goal .gt{font-size:17px;font-weight:700;margin-top:5px}
+  .lbl{font-size:12.5px;color:var(--mut);letter-spacing:1px;margin:18px 0 8px;font-weight:700}
+  .lbl:first-child{margin-top:4px}
+  .phase{font-size:13px;font-weight:700;color:var(--orange);margin:18px 0 8px;letter-spacing:1px}
+  .formula{text-align:center;background:#fdf3e6;border:1px solid var(--orange);border-radius:12px;padding:13px;margin:4px 0 8px;font-size:15px;color:#8a5410;font-weight:700}
+  /* accordion */
+  .acc{background:var(--card);border:1px solid var(--line);border-radius:13px;margin-bottom:9px;overflow:hidden}
+  .acc-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 15px;cursor:pointer}
+  .acc-t{font-size:15px;font-weight:700;color:var(--green)}
+  .acc-t .no{color:var(--orange);margin-right:6px}
+  .acc-t small{display:block;font-size:11px;color:var(--mut);font-weight:400;margin-top:2px}
+  .acc-b{display:none;padding:0 15px 15px;border-top:1px dashed var(--line)}
+  .acc.open .acc-b{display:block}
+  .acc.open .acc-h{background:var(--soft)}
+  .fn{font-size:13.5px;color:var(--ink);margin:12px 0 4px}
+  .fn b{color:var(--green)}
+  .good{font-size:13px;color:#6b5a2a;background:#fbf6ea;border-radius:9px;padding:9px 12px;margin-top:10px;line-height:1.55}
+  .good b{color:var(--orange)}
+  .desc{font-size:14px;color:var(--ink);margin-top:12px;line-height:1.7}
+  .ex{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
+  .ex div{flex:1;min-width:200px;border-radius:9px;padding:9px 11px;font-size:13px;line-height:1.5}
+  .ex .gd{background:#eef5f0;color:#2c5042;border:1px solid #cfe0d6}
+  .ex .bd{background:#f6efe9;color:#9a6a44;border:1px solid #ead9cc}
+  .ex .tag{font-size:11px;font-weight:700;display:block;margin-bottom:3px;opacity:.8}
+  /* terms */
+  .termtip{font-size:12px;color:var(--mut);margin:10px 0 4px}
+  .trow{border:1px solid var(--line);border-radius:9px;padding:9px 12px;margin-bottom:6px;cursor:pointer;transition:.12s}
+  .trow:hover{border-color:var(--orange)}
+  .trow .tt{font-size:14px;font-weight:600;color:var(--green)}
+  .trow .tt::after{content:"  点开看概念 ›";font-size:11px;color:var(--mut);font-weight:400}
+  .trow.open .tt::after{content:""}
+  .trow .td{display:none;font-size:13px;color:var(--ink);margin-top:5px;line-height:1.5}
+  .trow.open .td{display:block}
+  .trow.open{background:var(--soft);border-color:var(--orange)}
+  /* awareness btn */
+  .aw{flex:none;font-size:12px;font-weight:700;border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:5px 12px;color:var(--mut);cursor:pointer;white-space:nowrap}
+  .aw.on{background:var(--green);border-color:var(--green);color:#fff}
+  /* stuck */
+  .sit{display:flex;flex-direction:column;gap:8px;margin-bottom:8px}
+  .sitbtn{text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:13px 15px;cursor:pointer;font-size:15px;font-weight:700;color:var(--ink)}
+  .sitbtn.on{background:#fdf3e6;border-color:var(--orange);color:#8a5410}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:9px}
+  .mini{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:11px 13px}
+  .mini .mt{font-size:14px;font-weight:700;color:var(--green)}.mini .md{font-size:12.5px;color:var(--mut);margin-top:4px;line-height:1.5}
+  .prompt{background:#1f2a26;border-radius:12px;padding:14px 16px;margin-top:12px;position:relative}
+  .prompt .pl{font-size:11px;color:#8fb3a6;letter-spacing:1px}.prompt .pt{font-size:14px;color:#eaf2ee;line-height:1.7;margin-top:6px;white-space:pre-wrap}
+  .copy{position:absolute;top:12px;right:12px;background:var(--orange);color:#fff;border:none;border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer;font-weight:700}
+  /* journal */
+  .form label{display:block;font-size:14px;font-weight:700;color:var(--green);margin:12px 0 5px}
+  .form label small{color:var(--mut);font-weight:400}
+  .form textarea{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:11px 13px;font-size:14px;font-family:inherit;resize:vertical;min-height:56px;outline:none;background:var(--card)}
+  .form textarea:focus{border-color:var(--orange)}
+  .btnrow{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+  .btn{background:var(--green);color:#fff;border:none;border-radius:12px;padding:11px 20px;font-size:14px;font-weight:700;cursor:pointer}
+  .btn.ghost{background:var(--card);color:var(--green);border:1.5px solid var(--line)}
+  .logitem{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:10px}
+  .logitem .ld{font-size:12px;color:var(--orange);font-weight:700;margin-bottom:6px}
+  .logitem p{font-size:13px;margin:3px 0}.logitem p b{color:var(--green)}
+  .empty{font-size:13px;color:var(--mut);text-align:center;padding:24px}
+  .sesspick{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:8px}
+  .sbtn{padding:9px 15px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);cursor:pointer;font-size:14px;font-weight:700;color:var(--mut)}
+  .sbtn.has{color:var(--green);border-color:#cfe0d6;background:#f4f8f5}
+  .sbtn.on{background:var(--green);border-color:var(--green);color:#fff}
+  .reclbl{font-family:"Songti SC",serif;font-size:16px;font-weight:700;color:var(--green);margin-bottom:8px}
+  .note{font-size:12.5px;color:var(--mut);background:var(--soft);border-radius:10px;padding:10px 13px;margin-bottom:12px;line-height:1.6}
+  .albhead{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:8px}
+  .albtop{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+  .albbig{font-size:30px;font-weight:800;color:var(--green);font-family:"Songti SC",serif}
+  .albbig small{font-size:16px;color:var(--mut);font-weight:400}
+  .albrank{font-size:14px;font-weight:700;color:var(--orange)}
+  .prog{height:14px;background:var(--soft);border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+  .prog>i{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--orange));transition:width .35s}
+  .albtip{font-size:12px;color:var(--mut);margin-top:9px;line-height:1.5}
+  .tilegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(116px,1fr));gap:8px}
+  .tile{border:1.5px solid var(--line);border-radius:12px;padding:11px 9px;text-align:center;cursor:pointer;background:var(--soft);opacity:.5;transition:.15s}
+  .tile.on{opacity:1;background:#fff;border-color:var(--orange);box-shadow:0 3px 10px rgba(217,138,61,.16)}
+  .tile .ti{font-size:11px;color:var(--mut);font-weight:700}.tile.on .ti{color:var(--orange)}
+  .tile .tn{font-size:13px;font-weight:700;color:var(--mut);margin-top:4px;line-height:1.3}.tile.on .tn{color:var(--green)}
+  .tile .chk{font-size:10.5px;margin-top:4px;color:var(--orange);font-weight:700}
+  .cert-btn{margin-top:12px;width:100%;background:linear-gradient(90deg,#caa23f,var(--orange));color:#fff;border:none;border-radius:10px;padding:11px;font-size:14px;font-weight:700;cursor:pointer}
+  .modal{display:none;position:fixed;inset:0;background:rgba(20,16,10,.55);z-index:99;align-items:center;justify-content:center;padding:20px;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+  .modal.on{display:flex}
+  .cert{width:380px;max-width:100%;background:linear-gradient(180deg,#fffdf8,#FBF8F2);border:2px solid var(--orange);border-radius:18px;padding:30px 28px;text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.4);position:relative}
+  .cert::before{content:"";position:absolute;inset:8px;border:1px solid #e7c98f;border-radius:12px;pointer-events:none}
+  .cert-seal{font-size:50px;line-height:1}
+  .cert-k{font-size:11px;letter-spacing:4px;color:var(--orange);font-weight:700;margin-top:8px}
+  .cert-h{font-family:"Songti SC",serif;font-size:29px;color:var(--green);font-weight:700;margin:6px 0}
+  .cert-sub{font-size:12px;color:var(--mut);letter-spacing:3px;margin-top:10px}
+  .cert-name{font-family:"Songti SC",serif;font-size:22px;color:var(--green);font-weight:700;margin:5px auto 12px;border-bottom:2px solid #e7c98f;padding:0 16px 5px;display:inline-block}
+  .cert-body{font-size:14px;color:var(--ink);line-height:1.95}.cert-body b{color:var(--orange)}
+  .cert-foot{display:flex;justify-content:space-between;font-size:11.5px;color:var(--mut);margin-top:18px;padding-top:12px;border-top:1px dashed #d9cdb3}
+  .cert-ceo{font-size:11px;letter-spacing:2px;color:var(--orange);margin-top:7px;font-weight:700}
+  .cert-close{margin-top:18px;width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer}
+  .foot{text-align:center;font-size:11.5px;color:var(--mut);margin-top:26px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">CREATOR COCKPIT<b>创造者驾驶舱</b><span class="ceo">少年 CEO · Creator · Explorer · Owner</span></div>
+    <div class="right">
+      <div class="proj"><label>我是</label><input id="user" placeholder="你的名字…" style="width:108px"></div>
+      <div class="proj"><label>我的项目</label><input id="proj" placeholder="给项目起个名…"></div>
+      <div class="awbar">🪞 我已觉察 <b id="awCount">0 / 33</b> 个概念</div>
+    </div>
+  </div>
+
+  <div class="journey">
+    <div class="jhead">我的创造旅程 · <b id="roleNow">Explorer</b></div>
+    <div class="stages" id="stages"></div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab on" data-p="follow">🎯 跟着做</div>
+    <div class="tab" data-p="all">🗺 全部概念</div>
+    <div class="tab" data-p="stuck">🆘 我卡住了</div>
+    <div class="tab" data-p="log">🌱 成长记录</div>
+    <div class="tab" data-p="album">🏅 我的图鉴</div>
+  </div>
+
+  <div class="panel on" id="p-follow"></div>
+  <div class="panel" id="p-all"></div>
+  <div class="panel" id="p-album"></div>
+
+  <div class="panel" id="p-stuck">
+    <div class="note">不是你不行,是没说对话。选一个最像你的情况,马上给你招数 + 能直接复制的话术。</div>
+    <div class="sit" id="sitList"></div>
+    <div id="stuckAns"></div>
+  </div>
+
+  <div class="panel" id="p-log">
+    <div class="note">这是你的成长记录。每节课上课前/后,选今天是<b>第几节课</b>,把你「觉察到的东西」写进去——不限次数,随时可以来写。</div>
+    <div class="lbl" style="margin-top:4px">📅 选一节课(我们的课程共 4–8 节)</div>
+    <div class="sesspick" id="sessPick"></div>
+    <div class="form" id="recForm">
+      <div class="reclbl" id="recHead">📅 第 1 节课 · 今天的成长记录</div>
+      <label>🪞 我今天「觉察」到了什么?<small>（任何发现、感受、想通的事——自由写）</small></label>
+      <textarea id="rJue" placeholder="比如:我发现做减法以后,作品反而更清楚了…" style="min-height:74px"></textarea>
+      <label>① 我做出了什么?</label><textarea id="rQ1"></textarea>
+      <label>② 我卡在哪?<small>（怎么解决的 / 还没解决）</small></label><textarea id="rQ2"></textarea>
+      <label>③ 我学会了哪个新概念?用在哪?</label><textarea id="rQ3"></textarea>
+      <div class="btnrow"><button class="btn" onclick="saveRec()">保存这节课的记录</button><button class="btn ghost" onclick="exportRecs()">导出我的成长记录</button></div>
+    </div>
+    <div class="lbl">🌱 我的成长足迹</div>
+    <div id="recList"></div>
+  </div>
+
+  <div class="foot">少年 CEO · 创造者驾驶舱 · 内容源自「数字产品 13 环节(战略·决策)」+「Vibe Coding 6 心法 / 14 技巧」</div>
+
+  <div class="modal" id="certModal" onclick="if(event.target===this)closeCert()">
+    <div class="cert" id="certCard">
+      <div class="cert-seal">🏆</div>
+      <div class="cert-k">CREATOR MASTER</div>
+      <div class="cert-h">创造大师 认证</div>
+      <div class="cert-sub">兹 证 明</div>
+      <div class="cert-name" id="certName">一位少年创造者</div>
+      <div class="cert-body">已亲手集齐 <b>全部 33 个</b> 数字产品专业概念，<br>从「有想法」真正成长为一名 <b>创造者</b>。<br>特授予最高称号 —— <b>创造大师</b>。</div>
+      <div class="cert-foot"><span id="certDate"></span><span>少年 CEO · 创造者驾驶舱</span></div>
+      <div class="cert-ceo">Creator · Explorer · Owner</div>
+      <button class="cert-close" onclick="closeCert()">📸 截图保存这张证书 · 关闭</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const XINFA=[
+ {n:1,t:'从一个「痒」开始',d:'先有真实的需求、想解决的问题——代码只是后面的工具。别为了做而做。'},
+ {n:2,t:'做「能点的」东西',d:'把想法变成一个可交互的页面原型,才能真正验证它行不行,而不是停在空想。'},
+ {n:3,t:'品味就是超能力',d:'AI 负责执行,你要有判断力和挑剔的眼光——能清晰地说出「问题在哪」。'},
+ {n:4,t:'做减法,回原点',d:'优先把一个小功能做到极致,而不是堆一堆半成品。'},
+ {n:5,t:'诚实:分清「以为/验证」',d:'保持警觉,去验证 AI 的输出是不是真的对,不盲目相信。'},
+ {n:6,t:'留一条日志',d:'记录每一个完成的工作,定期回顾,才看得见自己的成长。'},
+];
+const JQ=[
+ {n:1,g:1,t:'说感觉词',d:'用「感觉词」描述你想要的气质,而不是含糊地说「好看点」。',gd:'太幼稚了,我要更高级、更安静的感觉',bd:'帮我做好看一点'},
+ {n:2,g:1,t:'要方案',d:'让 AI 一次给几个版本,你来对比着挑。',gd:'做 3 版给我对比着选',bd:'帮我做一个'},
+ {n:3,g:1,t:'勤追问',d:'多问一句,确认 AI 是真的对、还是在猜。',gd:'你确定吗?为什么?这是你验证过的还是猜的',bd:'好的,谢谢'},
+ {n:4,g:1,t:'退一步',d:'卡住时别急着加东西,先回到「到底给谁、解决什么」。',gd:'退一步——这东西到底给谁、解决什么',bd:'再加个功能'},
+ {n:5,g:1,t:'讲场景',d:'把「谁、在什么情况下、要做什么」讲清楚。',gd:'假设我是用户,第一眼看到什么、会卡在哪',bd:'这个行不行'},
+ {n:6,g:1,t:'指清楚',d:'具体说出问题在哪、为什么、你想要的是什么。',gd:'问题在哪、因为什么、我想要的是……',bd:'不对,重做'},
+ {n:7,g:2,t:'看(截图)',d:'用截图圈出问题,比纯文字描述高效得多。',gd:'把画面截给 AI,圈出「这里不对」',bd:'只用文字反复描述'},
+ {n:8,g:2,t:'划(规划)',d:'先把步骤列出来,再一步步动手。',gd:'先列出 1-2-3 步,再开始做',bd:'想到哪做到哪'},
+ {n:9,g:2,t:'规(定规则)',d:'一开始就把「红线」约束讲清楚。',gd:'规则:只用中文、不要改其它地方',bd:'(什么都不说,任 AI 发挥)'},
+ {n:10,g:2,t:'小(从小开始)',d:'先做一个最小可行的 demo,验证了再扩展。',gd:'先做一个最小能跑的版本',bd:'一口气把所有功能都要上'},
+ {n:11,g:2,t:'检(自检)',d:'让 AI 自己检查,并列出还缺什么。',gd:'你自己检查一遍,列出缺失清单',bd:'(默认它都做对了)'},
+ {n:12,g:2,t:'参(参照)',d:'给 AI 一个你喜欢的例子/竞品做参考。',gd:'参考这个网站的风格(贴例子)',bd:'凭空让它「做好看」'},
+ {n:13,g:2,t:'一(一次一件事)',d:'一次只改一处,方便对比和追踪。',gd:'这次只改导航栏,别动其它',bd:'一次改十个地方'},
+ {n:14,g:2,t:'夸(肯定)',d:'先肯定做对的,再给方向,维持协作动力。',gd:'这个配色很好,保留;接下来…',bd:'(只挑错,不说哪里对)'},
+];
+const ENV=[
+ {n:1,p:0,name:'战略与决策',en:'Strategy',fn:'方向对不对、先做什么、资源往哪押',
+  terms:[['商业模式画布','一张纸看清:产品怎么创造价值、怎么赚钱'],['价值主张 Value Prop','你给用户的核心好处,一句话说清'],['市场定位与细分','你主打哪类人、站在什么位置'],['竞争分析差异化','别人怎么做、你凭什么不一样'],['OKR / 目标管理','定目标(O)和衡量它的关键结果(KR)'],['北极星指标','最能代表成功的那一个核心数字'],['优先级与取舍','先做什么、放弃什么'],['产品路线图 Roadmap','接下来一段时间要做什么的计划图'],['关键假设验证','把「我以为」拿去验证是不是真的']],
+  good:'一句话说清「给谁·解决什么·凭什么是你」;有一条想清楚的主路径和几个被验证的关键假设。'},
+ {n:2,p:0,name:'用户研究与体验洞察',en:'UX Research',fn:'为谁做、他怎么想、卡在哪',
+  terms:[['用户访谈','一对一聊,听用户真实的想法'],['问卷调研','用问卷收集很多人的看法'],['可用性测试','看真人用你的产品卡在哪'],['用户画像 Persona','把目标用户具体成一个「典型的人」'],['客户旅程地图 Journey Map','用户从开始到结束每一步的体验'],['服务蓝图 Service Blueprint','旅程背后,台前幕后怎么配合'],['用户目标 JTBD','用户「雇」你的产品来完成什么任务'],['心智模型','用户脑子里以为它该怎么用'],['痛点与触点','哪里难受 / 哪里和产品接触'],['同理心地图','站在用户角度想他看/听/想/做什么'],['尼尔森十大可用性原则','十条「好用」的通用规则']],
+  good:'画得出一条客户旅程,每个触点的情绪与卡点被看见;改的是关键摩擦,而不是凭空堆功能。'},
+ {n:3,p:0,name:'市场与增长运营',en:'Growth & Ops',fn:'怎么让人知道、来、留下、愿意付',
+  terms:[['增长模型 AARRR','拉新→激活→留存→变现→推荐'],['获客渠道','用户从哪来(搜索/内容/社媒/投放)'],['转化漏斗','从看到到行动,一层层筛下来'],['留存与复购','用户愿不愿意再回来'],['用户运营与社区','维护用户、建立社群'],['品牌与传播','让人记住你、愿意说起你'],['内容营销','用有用的内容吸引用户'],['私域 / 用户分层','把用户分类、长期经营'],['定价与变现','卖多少钱、怎么赚钱'],['活动运营','用活动拉动参与']],
+  good:'有清晰的获客→转化→留存路径,每一环都有可看的数字,知道钱和人从哪来、为什么留。'},
+ {n:4,p:1,name:'产品与交互设计',en:'Product / IxD',fn:'做什么、信息怎么组织、怎么流转',
+  terms:[['产品定义','这个产品到底是什么'],['需求优先级 RICE / MoSCoW','用方法排「先做哪个需求」'],['PRD','产品需求文档,写清要做什么'],['信息架构 IA','内容怎么分类、放在哪'],['导航与分类','用户怎么找到想要的'],['用户流程 User Flow','用户完成一件事的步骤路线'],['交互设计','点一下会怎样、怎么反馈'],['反馈与微交互','小动效让操作有回应'],['状态设计','空/错/加载/没权限各长什么样'],['线框与原型','先用草图/能点的版本去试']],
+  good:'信息架构清晰、关键路径短;每一个状态都被设计过——包括空状态、错误态、边界 case。'},
+ {n:5,p:1,name:'视觉与设计系统',en:'Visual / UI',fn:'长什么样、第一眼的层级与气质',
+  terms:[['版式与网格','用网格把元素摆整齐'],['字体排印 Typography','选字体、排文字'],['色彩与对比','配色 + 看得清'],['间距与节奏','留白和疏密'],['视觉层级','让重要的更显眼'],['设计系统(Token/组件/规范)','颜色/组件/规范有统一来源'],['品牌 VI','品牌的视觉形象(logo/色)'],['动效','动起来的效果'],['图标与插画','小图标和配图'],['UX 文案','界面上的文字怎么写']],
+  good:'克制、统一、有清晰层级;背后有一套设计系统当「单一事实源」,颜色间距组件都从一处取。'},
+ {n:6,p:1,name:'前端工程',en:'Frontend',fn:'怎么变成浏览器里能用的界面',
+  terms:[['HTML 语义','用对标签,结构清晰'],['CSS 布局(Flex/Grid)','用 CSS 把元素排好'],['响应式与断点','手机电脑都好看'],['JavaScript','让网页「动起来」的语言'],['框架 React / Vue','帮你更快搭界面的工具'],['组件化','把界面拆成可复用的积木'],['状态管理','管理界面里会变的数据'],['路由','不同页面怎么切换'],['构建与打包','把代码打包成能上线的样子'],['前端性能','让页面更快'],['可访问性 a11y','让残障用户也能用'],['跨端适配','不同设备都能用']],
+  good:'响应式不塌、首屏快、语义清晰、可访问;状态可预期——点了有反馈、加载有提示、出错不白屏。'},
+ {n:7,p:1,name:'后端工程',en:'Backend',fn:'数据怎么存、逻辑在哪算、谁能访问',
+  terms:[['系统架构','整个系统怎么搭起来'],['API 设计 REST / GraphQL','前后端怎么对话的接口'],['数据建模','数据怎么组织'],['数据库(关系型/NoSQL)','存数据的地方'],['鉴权与权限','你是谁、能不能访问'],['业务逻辑','背后的规则怎么算'],['缓存','把常用的先存着,更快'],['消息队列','任务排队慢慢处理'],['第三方集成','接入别人的服务'],['错误处理与日志','出错了怎么记、怎么查']],
+  good:'数据模型清晰、接口契约稳定、鉴权严谨、出错可观测;改一处不会牵连一片。'},
+ {n:8,p:1,name:'测试与质量',en:'Test / QA',fn:'怎么保证它真的对、改一处不塌一片',
+  terms:[['测试计划','打算怎么测'],['单元测试','测最小的一块对不对'],['集成测试','测几块拼一起对不对'],['端到端 E2E','当用户从头走一遍'],['回归测试','改了之后旧功能没坏'],['边界与异常用例','极端情况也要测'],['性能 / 压力测试','人多了扛不扛得住'],['兼容性测试','不同环境都能用'],['验收标准','怎样算「做好了」'],['缺陷管理','记录和跟踪 bug'],['灰度 / 回退','先放一部分人 / 出问题能退回']],
+  good:'关键路径有自动化覆盖;异常与边界被显式测过;发布有灰度、能回退。'},
+ {n:9,p:1,name:'运维与基础设施',en:'Infra / DevOps',fn:'怎么上线、怎么不挂、出问题怎么查',
+  terms:[['部署与托管','把产品放到服务器上'],['域名与 DNS','网址怎么指向你的服务'],['HTTPS / 证书','让连接安全(浏览器的小锁)'],['Nginx / 反向代理','帮忙转发请求'],['进程与服务 systemd','让程序一直运行'],['容器化','把程序打包成「集装箱」'],['CI / CD','自动测试和上线'],['监控与告警','出问题自动报警'],['日志','记录运行情况'],['备份与容灾','数据有备份、灾难能恢复'],['扩容','人多了加机器'],['密钥管理','安全地保管密码/密钥']],
+  good:'稳定可访问、出问题能定位、有备份与回退;上线是数据闭环的起点,不是终点。'},
+ {n:10,p:2,name:'数据与分析',en:'Data & Analytics',fn:'怎么知道用户真实在干什么',
+  terms:[['埋点与事件设计','记录用户做了什么'],['指标体系','一套衡量好坏的数字'],['北极星指标','最关键的那个数字'],['漏斗分析','看每一步流失了多少'],['留存分析','看用户回不回来'],['用户行为分析','看用户怎么用'],['A / B 实验','两版对比,哪版更好'],['数据看板 / BI','把数据做成图表看'],['数据仓库','集中存数据的地方'],['数据质量','数据准不准'],['数据驱动决策','用数据做判断,不靠感觉']],
+  good:'关键行为可量化、有看板、能用数据回答「改了到底有没有用」,而不是停在感觉。'},
+ {n:11,p:2,name:'财务与商业化',en:'Finance',fn:'算不算得过账、可不可持续',
+  terms:[['预算与成本','花多少、花在哪'],['定价与毛利','卖多少、赚多少'],['现金流','钱进出的流水'],['单位经济模型 LTV / CAC','一个用户能赚的(LTV)和获取成本(CAC)'],['收入模型','钱从哪来'],['账务与对账','记账、核对'],['发票与税务','开票、交税'],['成本核算','算清每一项成本'],['财务合规','守财务规矩']],
+  good:'知道每个用户/订单的单位经济账赚不赚钱、跑得久不久;钱账清楚,不糊涂。'},
+ {n:12,p:2,name:'法务与风控',en:'Legal & Risk',fn:'守不守得住边界、会不会踩雷',
+  terms:[['用户协议与隐私政策','和用户的约定、怎么用数据'],['数据合规(个保法/GDPR)','守个人信息保护的法律'],['知识产权与版权','别用别人的、保护自己的'],['内容授权','用别人的东西要得到许可'],['合同','白纸黑字的约定'],['内容风控与审核','把不良内容拦住'],['安全合规','守安全规矩'],['风险评估','提前想哪里会出事'],['责任边界','谁负责什么']],
+  good:'用户数据合规、版权清晰、关键风险被识别并有预案;不把雷留给上线后的自己。'},
+ {n:13,p:2,name:'人力·协作·项目管理',en:'People & PM',fn:'一个人怎么把事推进、不丢球',
+  terms:[['项目管理','把事情有序地推进'],['任务拆解与排期','拆成小任务、排时间'],['优先级管理','先做重要的'],['外包与协作','和别人/AI 合作'],['角色分工','谁做什么'],['沟通对齐','让大家理解一致'],['知识沉淀与文档','把经验写下来'],['自我管理','管好自己的节奏'],['复盘','做完回头看哪里能更好'],['产品日志','记录产品怎么一步步做的']],
+  good:'事情有节奏地推进、判断被记录、经验沉淀成可复用资产——下一个项目起点更高。'},
+];
+const PHASES=['前期规划 · 想清楚做什么','开发执行 · 把它做出来','运营维护 · 算得过、守得住'];
+const CROSS=[['性能','前端、后端、基建每层都能拖慢体验'],['可访问性','从设计层就开始,不是前端补丁'],['安全与隐私','鉴权、越权、密钥、数据合规'],['数据与度量','让每个决定回到真实行为上验证'],['沟通与对齐','与人、与 AI 都要先复述目标'],['时间与优先级','永远资源有限,先做最锋利的']];
+const STAGES=[
+ {n:'立项',role:'Explorer',goal:'找到一个「小而真」的需求,定下要为谁解决什么。',x:[1,6],e:[1,2],j:[4,5]},
+ {n:'原型',role:'Explorer',goal:'做出第一个「能点的」可交互原型。',x:[2],e:[3,4],j:[10,2]},
+ {n:'开发',role:'Creator',goal:'把作品一块块做出来,让它真正「能用」。',x:[3],e:[5,6,4],j:[7,13,12,6]},
+ {n:'打磨',role:'Owner',goal:'测试、上线,让真实的人用一用,再改。',x:[4,5],e:[7,8,10],j:[11,3]},
+ {n:'路演',role:'Owner',goal:'为自己的作品站台——讲清它、答辩、交付。',x:[3],e:[1,11],j:[5,1]},
+];
+const STUCK=[
+ {t:'AI 没听懂我想要什么',jq:[5,6,7],pr:'我想做的是:[谁] 在 [什么情况下],想要 [做什么]。\n现在的问题是 [具体哪里不对]。\n请你 [具体改什么]。我截图给你看:[贴图]'},
+ {t:'做出来不好看',jq:[2,12,1],pr:'请给我 3 个不同风格的版本让我挑。\n我喜欢的参考是 [贴一个例子/截图]。\n重点把 [配色 / 字体 / 留白] 做得更 [更简洁 / 更暖 / 更高级]。'},
+ {t:'越改越乱 / 改坏了',jq:[13,10,9],pr:'我们一次只改一件事。\n现在只做这一件:[一句话]。\n规则:不要动其它已经好的地方。\n做完这件、我确认 OK 了,我们再做下一件。'},
+ {t:'不知道下一步做什么',jq:[4,8,1],pr:'先退一步:我这个产品最核心的是帮 [谁] 解决 [什么]。\n请帮我把接下来要做的,按重要程度列成 3 步。\n我们从最重要的第 1 步开始。'},
+ {t:'我以为做好了,但不确定',jq:[11,5],pr:'(这一条要去找真人)\n请一个同学/家长用一下你的作品,别提示他。\n看他卡在哪、哪里不会用——那就是你下一步要改的。'},
+];
+
+const KEY='cockpit_v2';
+let st=JSON.parse(localStorage.getItem(KEY)||'{}');
+if(st.stage==null)st.stage=0; st.proj=st.proj||''; st.aware=st.aware||[]; st.user=st.user||''; st.records=st.records||{}; if(!st.sess)st.sess=1;
+function save(){localStorage.setItem(KEY,JSON.stringify(st));}
+const $=id=>document.getElementById(id);
+
+$('proj').value=st.proj;
+$('proj').addEventListener('input',()=>{st.proj=$('proj').value;save();});
+$('user').value=st.user;
+$('user').addEventListener('input',()=>{st.user=$('user').value;save();});
+
+function awHas(k){return st.aware.includes(k);}
+function awBtn(k){return `<span class="aw${awHas(k)?' on':''}" onclick="aware(event,'${k}',this)">${awHas(k)?'✓ 已觉察':'○ 觉察'}</span>`;}
+function aware(e,k,btn){e.stopPropagation();const i=st.aware.indexOf(k);if(i<0)st.aware.push(k);else st.aware.splice(i,1);save();const on=awHas(k);btn.textContent=on?'✓ 已觉察':'○ 觉察';btn.classList.toggle('on',on);updCount();checkComplete();}
+function updCount(){$('awCount').textContent=st.aware.length+' / 33';}
+function tog(h){h.parentNode.classList.toggle('open');}
+
+// builders
+function xinfaCard(x){return `<div class="acc"><div class="acc-h" onclick="tog(this)"><span class="acc-t">心法 ${x.n} · ${x.t}</span>${awBtn('x'+x.n)}</div><div class="acc-b"><p class="desc">${x.d}</p></div></div>`;}
+function jqCard(j){return `<div class="acc"><div class="acc-h" onclick="tog(this)"><span class="acc-t">${j.t}</span>${awBtn('j'+j.n)}</div><div class="acc-b"><p class="desc">${j.d}</p><div class="ex"><div class="gd"><span class="tag">✓ 这样说</span>「${j.gd}」</div><div class="bd"><span class="tag">✗ 别这样</span>「${j.bd}」</div></div></div></div>`;}
+function envCard(ev){
+ const terms=ev.terms.map(t=>`<div class="trow" onclick="this.classList.toggle('open')"><div class="tt">${t[0]}</div><div class="td">${t[1]}</div></div>`).join('');
+ return `<div class="acc"><div class="acc-h" onclick="tog(this)"><span class="acc-t"><span class="no">${ev.n}</span>${ev.name}<small>${ev.en} · ${ev.fn}</small></span>${awBtn('e'+ev.n)}</div>
+  <div class="acc-b"><p class="termtip">👇 点开每个术语,看它是什么</p>${terms}<p class="good"><b>「好」的标准:</b>${ev.good}</p></div></div>`;
+}
+
+function renderFollow(){
+ const s=STAGES[st.stage];
+ let h=`<div class="goal"><div class="gl">第 ${st.stage+1} 步 · ${s.n} · ${s.role}</div><div class="gt">${s.goal}</div></div>`;
+ h+=`<div class="lbl">⭐ 这一阶段最该记住的心法</div>`+s.x.map(i=>xinfaCard(XINFA[i-1])).join('');
+ h+=`<div class="lbl">🧩 这一阶段会碰到的专业环节(点开看全部概念)</div>`+s.e.map(i=>envCard(ENV[i-1])).join('');
+ h+=`<div class="lbl">💬 这一阶段好用的协作技巧</div>`+s.j.map(i=>jqCard(JQ[i-1])).join('');
+ $('p-follow').innerHTML=h;
+}
+function renderAll(){
+ let h=`<div class="formula">创造力 × 专业性 = 既敢做,又做得住</div>`;
+ h+=`<div class="lbl">⭐ 6 个心法</div>`+XINFA.map(xinfaCard).join('');
+ h+=`<div class="lbl">🧩 13 个专业环节(做产品像开一家餐厅,点开看每个概念)</div>`;
+ [0,1,2].forEach(p=>{h+=`<div class="phase">${PHASES[p]}</div>`+ENV.filter(e=>e.p===p).map(envCard).join('');});
+ h+=`<div class="lbl">💬 14 个实战技巧 · 6 个沟通策略</div>`+JQ.filter(j=>j.g===1).map(jqCard).join('');
+ h+=`<div class="lbl">🤝 14 个实战技巧 · 8 个协作动作</div>`+JQ.filter(j=>j.g===2).map(jqCard).join('');
+ h+=`<div class="lbl">🧵 横切关注(贯穿全程)</div><div class="grid">`+CROSS.map(c=>`<div class="mini"><div class="mt">${c[0]}</div><div class="md">${c[1]}</div></div>`).join('')+`</div>`;
+ h+=`<div class="good" style="margin-top:14px"><b>核心规律:</b>上台阶的往往不是「派活」,而是「定框架」——一句好的约束,比一百个细节指令更有方向。(案例:aha 美术馆 139 页 / 0 行手写代码 / 1 个上线产品)</div>`;
+ $('p-all').innerHTML=h;
+}
+
+function renderStages(){
+ const el=$('stages');el.innerHTML='';
+ STAGES.forEach((s,i)=>{const d=document.createElement('div');d.className='stage'+(i===st.stage?' active':'');
+  d.innerHTML=`<div class="sn">第 ${i+1} 步</div><div class="st">${s.n}</div><div class="role">${s.role}</div>`;
+  d.onclick=()=>{st.stage=i;save();renderStages();renderFollow();};el.appendChild(d);});
+ $('roleNow').textContent=STAGES[st.stage].role;
+}
+
+function renderStuck(){const el=$('sitList');el.innerHTML='';STUCK.forEach((s,i)=>{const b=document.createElement('div');b.className='sitbtn';b.textContent=s.t;b.onclick=()=>{document.querySelectorAll('.sitbtn').forEach(x=>x.classList.remove('on'));b.classList.add('on');showStuck(i);};el.appendChild(b);});}
+function showStuck(i){const s=STUCK[i];const cards=JQ.filter(j=>s.jq.includes(j.n)).map(j=>`<div class="mini"><div class="mt">💡 ${j.t}</div><div class="md">${j.d}</div></div>`).join('');
+ $('stuckAns').innerHTML=`<div class="lbl">试试这几招</div><div class="grid">${cards}</div><div class="prompt"><button class="copy" onclick="copyP(this)">复制</button><div class="pl">可以这样跟 AI 说 ↓</div><div class="pt">${s.pr}</div></div>`;}
+function copyP(b){const t=b.parentNode.querySelector('.pt').textContent;navigator.clipboard&&navigator.clipboard.writeText(t);b.textContent='已复制✓';setTimeout(()=>b.textContent='复制',1200);}
+
+const TOTAL_SESS=8;
+function selectSess(n){st.sess=n;save();renderSessPick();loadRec();}
+function renderSessPick(){const el=$('sessPick');el.innerHTML='';for(let i=1;i<=TOTAL_SESS;i++){const b=document.createElement('div');b.className='sbtn'+(i===st.sess?' on':'')+(st.records[i]?' has':'');b.textContent='第 '+i+' 节'+(st.records[i]?' ✓':'');b.onclick=()=>selectSess(i);el.appendChild(b);}$('recHead').textContent='📅 第 '+st.sess+' 节课 · 今天的成长记录';}
+function loadRec(){const r=st.records[st.sess]||{};$('rJue').value=r.jue||'';$('rQ1').value=r.q1||'';$('rQ2').value=r.q2||'';$('rQ3').value=r.q3||'';}
+function saveRec(){const jue=$('rJue').value.trim(),q1=$('rQ1').value.trim(),q2=$('rQ2').value.trim(),q3=$('rQ3').value.trim();if(!jue&&!q1&&!q2&&!q3){alert('先写一点点再保存吧～');return;}const d=new Date();st.records[st.sess]={jue,q1,q2,q3,at:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};save();renderSessPick();renderTimeline();alert('第 '+st.sess+' 节课的记录已保存 ✓');}
+function renderTimeline(){const el=$('recList');const keys=Object.keys(st.records).map(Number).sort((a,b)=>a-b);if(!keys.length){el.innerHTML='<div class="empty">还没有记录。选一节课,写下你今天觉察到的东西吧。</div>';return;}
+ el.innerHTML=keys.map(k=>{const r=st.records[k];return `<div class="logitem"><div class="ld">第 ${k} 节课 · ${r.at}</div>${r.jue?`<p><b>🪞 觉察到:</b>${esc(r.jue)}</p>`:''}${r.q1?`<p><b>做出了:</b>${esc(r.q1)}</p>`:''}${r.q2?`<p><b>卡在:</b>${esc(r.q2)}</p>`:''}${r.q3?`<p><b>学到:</b>${esc(r.q3)}</p>`:''}</div>`;}).join('');}
+function renderRecTab(){renderSessPick();loadRec();renderTimeline();}
+function exportRecs(){const data={用户名:st.user||'',项目:st.proj||'',觉察概念数:st.aware.length+' / 33',已点亮概念:st.aware,成长记录:st.records,导出时间:new Date().toISOString()};
+ const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`成长记录_${st.user||'学生'}_${st.proj||'项目'}.json`;a.click();}
+function esc(s){return s.replace(/</g,'&lt;').replace(/\n/g,'<br>');}
+
+document.querySelectorAll('.tab').forEach(t=>{t.onclick=()=>{
+ document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');
+ document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));$('p-'+t.dataset.p).classList.add('on');
+ if(t.dataset.p==='follow')renderFollow();if(t.dataset.p==='all')renderAll();if(t.dataset.p==='album')renderAlbum();if(t.dataset.p==='log')renderRecTab();
+};});
+
+function tileTog(k){const i=st.aware.indexOf(k);if(i<0)st.aware.push(k);else st.aware.splice(i,1);save();updCount();renderAlbum();checkComplete();}
+function checkComplete(){if(st.aware.length>=33){if(!window._cp){window._cp=true;showCert();}}else{window._cp=false;}}
+function showCert(){$('certName').textContent=st.user?st.user:(st.proj?(st.proj+' 的创造者'):'一位少年创造者');const d=new Date();$('certDate').textContent=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('certModal').classList.add('on');}
+function closeCert(){$('certModal').classList.remove('on');}
+function renderAlbum(){
+ const n=st.aware.length,pct=Math.round(n/33*100);let rank,ric;
+ if(n>=33){rank='全图鉴 · 创造大师';ric='🏆';}else if(n>=23){rank='主理人 Owner';ric='👑';}else if(n>=12){rank='创造者 Creator';ric='🛠';}else if(n>=1){rank='探索者 Explorer';ric='🧭';}else{rank='准备出发';ric='🌱';}
+ const tile=(k,top,name)=>`<div class="tile${awHas(k)?' on':''}" onclick="tileTog('${k}')"><div class="ti">${top}</div><div class="tn">${name}</div>${awHas(k)?'<div class="chk">✓ 已点亮</div>':''}</div>`;
+ let h=`<div class="albhead"><div class="albtop"><span class="albbig">${ric} ${n}<small> / 33</small></span><span class="albrank">当前称号:${rank}</span></div><div class="prog"><i style="width:${pct}%"></i></div><div class="albtip">每觉察(点亮)一个概念,图鉴就亮一格。点亮全部 33 个,成为创造大师。点格子可直接点亮 / 取消。</div>${n>=33?'<button class="cert-btn" onclick="showCert()">🏆 查看我的「创造大师」证书</button>':''}</div>`;
+ h+=`<div class="lbl">⭐ 心法 (6)</div><div class="tilegrid">`+XINFA.map(x=>tile('x'+x.n,'心法 '+x.n,x.t)).join('')+`</div>`;
+ h+=`<div class="lbl">🧩 专业环节 (13)</div><div class="tilegrid">`+ENV.map(e=>tile('e'+e.n,'环节 '+e.n,e.name)).join('')+`</div>`;
+ h+=`<div class="lbl">💬 实战技巧 (14)</div><div class="tilegrid">`+JQ.map(j=>tile('j'+j.n,(j.g===1?'沟通':'协作'),j.t)).join('')+`</div>`;
+ $('p-album').innerHTML=h;
+}
+renderStages();renderFollow();renderStuck();renderRecTab();updCount();
+</script>
+</body>
+</html>
