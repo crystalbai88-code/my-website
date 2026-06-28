@@ -85,6 +85,7 @@
       </div>
       <div id="aiMsgs"></div>
       <div class="aisug" id="aiSug"></div>
+      <div style="padding:0 14px 5px;font-size:10.5px;line-height:1.5;color:var(--ink3,#9aa)">🔒 聊天会直接发给你连接的 AI,别写真实姓名、住址、电话哦</div>
       <div id="aiInputRow"><textarea id="aiInput" rows="1" placeholder="问任何历史问题…"></textarea><button id="aiSend">发送</button></div>`;
     document.body.appendChild(panel);
     document.getElementById('aiSend').onclick=send;
@@ -161,6 +162,7 @@
 - 回答控制在 120–220 字,简洁、准确、不啰嗦,紧扣孩子问的问题。
 - 只讲真实可靠的历史;不确定就说"我不太确定",绝不编造。
 - 可以联系孩子正在看的内容来回答。
+- 【安全红线】绝不向孩子索要真实姓名、住址、学校、电话等任何个人信息;只聊历史。如果孩子主动透露了这类信息,温和提醒他"这些不要在网上告诉别人哦",然后把话题拉回历史。
 
 【孩子正在看的内容】
 ${ctx}`;
