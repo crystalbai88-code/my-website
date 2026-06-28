@@ -10,34 +10,39 @@
   *{box-sizing:border-box}
   html,body{margin:0;min-height:100%;background:linear-gradient(160deg,var(--bg1),var(--bg2));-webkit-tap-highlight-color:transparent}
   body{font-family:'Noto Sans SC',sans-serif;color:var(--ink);padding-bottom:30px}
-  .wrap{width:min(560px,95%);margin:0 auto}
+  .wrap{width:min(580px,96%);margin:0 auto}
   .top{display:flex;align-items:center;gap:10px;padding:14px 0 4px}
   .top a{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);text-decoration:none;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 12px}
   .top .ttl{font-family:'Noto Serif SC',serif;font-weight:900;font-size:16px}
-  .lead{font-size:13px;color:var(--ink2);line-height:1.6;margin:2px 2px 8px}
-  .lead b{color:var(--gold)}
-  .hud{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink2);margin:4px 2px 10px}
+  /* 本单元进度 */
+  .uprog{display:flex;align-items:center;gap:10px;margin:8px 2px 6px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink2)}
+  .uprog .pb{flex:1;height:9px;background:#fff;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+  .uprog .pb i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--gold));transition:width .4s}
+  .uprog b{color:var(--green)}
+  .lead{font-size:12.5px;color:var(--ink3);line-height:1.6;margin:0 2px 8px}
+  .hud{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink2);margin:2px 2px 10px}
   .hud b{color:var(--gold)}
-  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
   .card{position:relative;aspect-ratio:3/4;cursor:pointer;perspective:600px}
   .inner{position:absolute;inset:0;transition:transform .4s;transform-style:preserve-3d}
   .card.up .inner,.card.matched .inner{transform:rotateY(180deg)}
-  .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:8px;text-align:center;border:1.5px solid var(--line)}
-  .back{background:linear-gradient(135deg,#cf9a4e,#b06a24);color:#fff8e8;font-size:26px}
+  .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:11px;display:flex;align-items:center;justify-content:center;padding:6px;text-align:center;border:1.5px solid var(--line)}
+  .back{background:linear-gradient(135deg,#cf9a4e,#b06a24);color:#fff8e8;font-size:22px}
   .front{background:var(--panel);transform:rotateY(180deg)}
-  .front .nm{font-family:'Noto Serif SC',serif;font-weight:900;font-size:15px;line-height:1.3;color:var(--ink)}
-  .front .tg{font-size:13px;line-height:1.45;color:var(--gold);font-weight:700}
+  .front .nm{font-family:'Noto Serif SC',serif;font-weight:900;font-size:13.5px;line-height:1.25;color:var(--ink)}
+  .front .tg{font-size:11.5px;line-height:1.35;color:var(--gold);font-weight:700}
   .card.matched .front{background:rgba(47,158,134,.14);border-color:var(--green)}
   .card.matched{cursor:default}
-  /* 配对提示 */
-  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--green);color:#fff;font-weight:700;font-size:14px;
-    padding:11px 18px;border-radius:999px;box-shadow:0 6px 20px rgba(0,0,0,.2);opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;max-width:90%;text-align:center}
+  .card.glow .front{animation:glow .5s}
+  @keyframes glow{0%{box-shadow:0 0 0 0 rgba(47,158,134,.5)}100%{box-shadow:0 0 0 12px rgba(47,158,134,0)}}
+  .combo{position:fixed;left:50%;top:30%;transform:translateX(-50%) scale(.6);opacity:0;font-family:'Noto Serif SC',serif;font-weight:900;font-size:34px;color:var(--red);text-shadow:0 2px 8px rgba(0,0,0,.15);pointer-events:none;transition:transform .25s,opacity .25s}
+  .combo.show{opacity:1;transform:translateX(-50%) scale(1)}
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--green);color:#fff;font-weight:700;font-size:13.5px;padding:10px 16px;border-radius:999px;box-shadow:0 6px 20px rgba(0,0,0,.2);opacity:0;transition:all .25s;pointer-events:none;max-width:92%;text-align:center}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
-  /* 通关 */
-  .win{margin-top:18px;background:var(--panel);border:1.5px solid var(--green);border-radius:18px;padding:22px;text-align:center;animation:pop .4s cubic-bezier(.22,1.5,.4,1)}
+  .win{margin-top:16px;background:var(--panel);border:1.5px solid var(--green);border-radius:18px;padding:22px;text-align:center;animation:pop .4s cubic-bezier(.22,1.5,.4,1)}
   @keyframes pop{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
   .win .ee{font-size:42px}.win h2{font-family:'Noto Serif SC',serif;font-weight:900;font-size:22px;margin:6px 0 2px}
-  .win p{font-size:13.5px;color:var(--ink2);margin:2px 0}
+  .win p{font-size:13.5px;color:var(--ink2);margin:2px 0}.win p b{color:var(--gold)}
   .btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
   .btn{font-weight:800;font-size:14px;border:none;border-radius:999px;padding:12px 22px;cursor:pointer;color:#fff;background:linear-gradient(90deg,var(--gold),var(--red))}
   .btn.ghost{color:var(--gold);background:#fff;border:1px solid var(--line)}
@@ -46,17 +51,18 @@
 <body>
   <div class="wrap">
     <div class="top"><a href="./learn.html?unit=qinhan">⌂ 秦汉</a><span class="ttl">🃏 翻翻乐 · 玩着记</span></div>
-    <div class="lead">翻开两张牌,把<b>人物/事件</b>和它的<b>标志</b>配成一对——翻着翻着就记住了,不用背。</div>
-    <div class="hud"><span>配对 <b id="done">0</b> / <b id="tot">6</b></span><span>翻了 <b id="moves">0</b> 次</span></div>
+    <div class="uprog"><span>本单元已记 <b id="urec">0</b>/<span id="utot">14</span></span><div class="pb"><i id="upb"></i></div></div>
+    <div class="lead">翻牌把<b style="color:var(--gold)">人物/事件</b>和它的<b style="color:var(--gold)">标志</b>配对——优先出你还没记住的,连对有连击。全记住=单元通关 🏆</div>
+    <div class="hud"><span>第 <b id="lvl">1</b> 关 · 配对 <b id="done">0</b>/<b id="tot">6</b></span><span>翻了 <b id="moves">0</b> 次</span></div>
     <div class="grid" id="grid"></div>
     <div id="win"></div>
   </div>
+  <div class="combo" id="combo"></div>
   <div class="toast" id="toast"></div>
 <script src="./kb_qinhan.js"></script>
 <script>
 function esc(s){return String(s==null?'':s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));}
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-// 每个知识点的超短"标志"(翻牌上用)
 const TAG={
   shangyang:'变法四板斧·秦变强', unify:'前221·灭六国', qin_system:'皇帝→三公→郡县',
   qin_unite3:'书同文·车同轨', fenshu:'烧书坑儒·控思想', chenshe:'大泽乡·第一次农民起义',
@@ -65,29 +71,39 @@ const TAG={
   shiji:'司马迁·纪传体通史', yixue:'医圣·麻沸散五禽戏'
 };
 const cards=(window.KB_QINHAN&&window.KB_QINHAN.cards)||[];
-const PAIRS=6;
-let deck=[], up=[], matched=0, moves=0, lock=false;
+const MK='hc_qinhan_matched';
+let recalled=new Set(JSON.parse(localStorage.getItem(MK)||'[]'));
+let level=1, deck=[], up=[], matched=0, moves=0, lock=false, combo=0, pairsThis=6;
 
+function pairsForLevel(l){ return Math.min(8, 5+l); }   // 第1关6对,逐级到8对
+function updateUnit(){
+  document.getElementById('urec').textContent=recalled.size;
+  document.getElementById('utot').textContent=cards.length;
+  document.getElementById('upb').style.width=(recalled.size/cards.length*100)+'%';
+}
 function build(){
-  matched=0; moves=0; up=[]; lock=false;
+  matched=0; moves=0; up=[]; lock=false; combo=0;
   document.getElementById('win').innerHTML='';
-  const chosen=shuffle(cards).slice(0,PAIRS);
+  pairsThis=Math.min(pairsForLevel(level), cards.length);
+  // 优先出还没记住的卡
+  const un=shuffle(cards.filter(c=>!recalled.has(c.id)));
+  let chosen=un.slice(0,pairsThis);
+  if(chosen.length<pairsThis) chosen=chosen.concat(shuffle(cards.filter(c=>recalled.has(c.id))).slice(0,pairsThis-chosen.length));
+  document.getElementById('lvl').textContent=level;
   document.getElementById('tot').textContent=chosen.length;
   document.getElementById('done').textContent=0;
   document.getElementById('moves').textContent=0;
   deck=shuffle(chosen.flatMap(c=>[
-    {pid:c.id, kind:'name', text:c.n},
-    {pid:c.id, kind:'tag',  text:TAG[c.id]||c.hook||c.why}
+    {pid:c.id,kind:'name',text:c.n},
+    {pid:c.id,kind:'tag',text:TAG[c.id]||c.hook||c.why}
   ]));
-  const g=document.getElementById('grid');
-  g.innerHTML=deck.map((d,i)=>`
-    <div class="card" data-i="${i}" data-pid="${d.pid}">
-      <div class="inner">
-        <div class="face back">?</div>
-        <div class="face front"><div class="${d.kind==='name'?'nm':'tg'}">${esc(d.text)}</div></div>
-      </div>
+  document.getElementById('grid').innerHTML=deck.map((d,i)=>`
+    <div class="card" data-i="${i}" data-pid="${d.pid}"><div class="inner">
+      <div class="face back">?</div>
+      <div class="face front"><div class="${d.kind==='name'?'nm':'tg'}">${esc(d.text)}</div></div>
     </div>`).join('');
-  g.querySelectorAll('.card').forEach(el=>el.onclick=()=>flip(el));
+  document.querySelectorAll('.card').forEach(el=>el.onclick=()=>flip(el));
+  updateUnit();
 }
 function flip(el){
   if(lock||el.classList.contains('up')||el.classList.contains('matched'))return;
@@ -97,30 +113,35 @@ function flip(el){
     const [a,b]=up;
     if(a.dataset.pid===b.dataset.pid){
       lock=true;
-      setTimeout(()=>{ a.classList.add('matched'); b.classList.add('matched'); a.classList.remove('up'); b.classList.remove('up');
+      setTimeout(()=>{
+        a.classList.add('matched','glow'); b.classList.add('matched','glow'); a.classList.remove('up'); b.classList.remove('up');
         up=[]; matched++; document.getElementById('done').textContent=matched;
+        recalled.add(a.dataset.pid); localStorage.setItem(MK,JSON.stringify([...recalled])); updateUnit();
+        combo++; if(combo>=2) showCombo(combo);
         const c=cards.find(x=>x.id===a.dataset.pid); toast('✅ '+c.n+' = '+(TAG[c.id]||''));
-        lock=false; if(matched>=PAIRS_now()) win();
-      },260);
+        lock=false; if(matched>=pairsThis) win();
+      },240);
     } else {
-      lock=true;
+      lock=true; combo=0;
       setTimeout(()=>{ a.classList.remove('up'); b.classList.remove('up'); up=[]; lock=false; },720);
     }
   }
 }
-function PAIRS_now(){ return Math.min(PAIRS,cards.length); }
-let toastT;
-function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),1500); }
+function showCombo(n){ const c=document.getElementById('combo'); c.textContent='连击 ×'+n+' 🔥'; c.classList.add('show'); setTimeout(()=>c.classList.remove('show'),700); }
+let tT; function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(tT); tT=setTimeout(()=>t.classList.remove('show'),1400); }
 function win(){
-  const best=Math.min(moves, +(localStorage.getItem('hc_qinhan_match_best')||999));
-  localStorage.setItem('hc_qinhan_match_best',best);
-  const perfect=moves===PAIRS_now();
-  document.getElementById('win').innerHTML=`<div class="win"><div class="ee">${perfect?'🏆':'🎉'}</div>
-    <h2>${perfect?'一遍就全配上!记忆力满分!':'全配对啦!'}</h2>
-    <p>翻了 ${moves} 次配齐 ${PAIRS_now()} 对 · 最少 ${best} 次</p>
-    <p style="color:var(--gold)">再玩几局,这些就刻在脑子里了 💪</p>
-    <div class="btns"><button class="btn" onclick="build()">↺ 换一批再来</button>
-      <a class="btn ghost" href="./quiz.html?unit=qinhan&focus=weak" style="text-decoration:none">🎮 试试闯关</a></div></div>`;
+  const perfect=moves===pairsThis;
+  const allDone=recalled.size>=cards.length;
+  level++;
+  let html=`<div class="win"><div class="ee">${allDone?'🏆':(perfect?'⭐':'🎉')}</div>
+    <h2>${allDone?'秦汉 · 整单元记住啦!':(perfect?'一遍全对!':'这关过了!')}</h2>
+    <p>翻了 <b>${moves}</b> 次配齐 <b>${pairsThis}</b> 对${perfect?' · 零失误!':''}</p>
+    <p>本单元已记牢 <b>${recalled.size}/${cards.length}</b> 个知识点</p>`;
+  if(allDone) html+=`<p style="color:var(--gold)">14 个点全刻进脑子了,去闯关检验一下吧 💪</p>`;
+  else html+=`<p style="color:var(--gold)">下一关更大,继续把没记的翻出来!</p>`;
+  html+=`<div class="btns"><button class="btn" onclick="build()">${allDone?'↺ 再玩一轮':'下一关 →'}</button>
+    <a class="btn ghost" href="./quiz.html?unit=qinhan&focus=weak" style="text-decoration:none">🎮 闯关检验</a></div></div>`;
+  document.getElementById('win').innerHTML=html;
 }
 if(cards.length) build();
 else document.getElementById('grid').innerHTML='<p style="grid-column:1/-1;text-align:center;color:#a89a8a">题库未加载,请刷新。</p>';
