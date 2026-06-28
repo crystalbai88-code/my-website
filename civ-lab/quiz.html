@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>猜猜这是谁 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;padding-bottom:40px}
+  .nav{display:flex;align-items:center;gap:9px;padding:13px 16px 2px;flex-wrap:wrap}
+  .nav a.pill{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.08em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .wrap{width:min(620px,94%);margin:0 auto}
+  .hero{text-align:center;margin:14px auto 2px}
+  .hero h1{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,28px);color:var(--ink);margin:4px 0 4px;text-shadow:var(--label-shadow)}
+  .hero p{font-family:var(--sans);font-size:12.5px;color:var(--ink2);line-height:1.6;margin:0 auto;max-width:26em}
+  .hero p b{color:var(--gold)}
+  .bar{display:flex;align-items:center;justify-content:space-between;margin:12px 2px 8px;font-family:var(--mono);font-size:12px;color:var(--ink2)}
+  .bar b{color:var(--gold)}
+  /* 线索 */
+  .clues{margin-top:4px;display:flex;flex-direction:column;gap:9px}
+  .clue{font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.7;background:var(--panel-bg);border:1px solid var(--panel-line);
+    border-left:4px solid var(--gold);border-radius:12px;padding:12px 15px;backdrop-filter:blur(8px);animation:fin .4s cubic-bezier(.22,1,.36,1)}
+  @keyframes fin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .clue b{color:var(--gold)}
+  .pot{text-align:center;font-family:var(--sans);font-size:13px;color:var(--ink2);margin:14px 0 8px}
+  .pot .st{color:var(--gold);font-size:16px;letter-spacing:2px}
+  .opts{display:flex;flex-direction:column;gap:10px}
+  .opt{font-family:var(--serif);font-weight:900;font-size:16px;color:var(--ink);background:var(--panel-bg);border:1.5px solid var(--panel-line);
+    border-radius:13px;padding:13px 16px;cursor:pointer;text-align:left;transition:transform .12s,border-color .15s,background .15s}
+  .opt:active{transform:scale(.98)}
+  .opt:hover{border-color:var(--gold)}
+  .opt.right{border-color:var(--cyan,#2f9e86);background:rgba(47,158,134,.14)}
+  .opt.gone{opacity:.4;text-decoration:line-through;cursor:default;pointer-events:none}
+  .reveal{display:block;width:100%;box-sizing:border-box;margin-top:12px;font-family:var(--sans);font-weight:800;font-size:13.5px;color:var(--gold);
+    background:rgba(200,160,60,.1);border:1px solid var(--panel-line);border-radius:11px;padding:11px;cursor:pointer}
+  .fb{margin-top:12px;font-family:var(--sans);font-size:14px;color:var(--ink);line-height:1.7;background:rgba(47,158,134,.1);
+    border-left:4px solid var(--cyan,#2f9e86);border-radius:9px;padding:13px 15px;display:none}
+  .fb.show{display:block;animation:fin .35s}
+  .fb a{color:var(--gold);font-weight:800;text-decoration:none}
+  .next{margin-top:12px;width:100%;font-family:var(--sans);font-weight:800;font-size:15px;color:#fff;border:none;border-radius:999px;
+    padding:13px;cursor:pointer;background:linear-gradient(90deg,var(--gold),var(--vermilion));box-shadow:0 5px 16px rgba(0,0,0,.16)}
+  /* 结算 */
+  .end{text-align:center;margin:20px auto 0;background:var(--panel-bg);border:1.5px solid var(--gold);border-radius:18px;padding:24px 20px;backdrop-filter:blur(10px);animation:pop .45s cubic-bezier(.22,1.5,.4,1)}
+  @keyframes pop{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
+  .end .ee{font-size:44px}
+  .end h2{font-family:var(--serif);font-weight:900;font-size:23px;color:var(--ink);margin:8px 0 4px}
+  .end .big{font-family:var(--serif);font-weight:900;font-size:30px;color:var(--gold);letter-spacing:2px;margin:6px 0}
+  .end p{font-family:var(--sans);font-size:13.5px;color:var(--ink2);line-height:1.7;margin:0}
+  .btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+  .btn{font-family:var(--sans);font-weight:800;font-size:14px;border:none;border-radius:999px;padding:12px 24px;cursor:pointer;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion))}
+  .btn.ghost{color:var(--gold);background:var(--panel-bg);border:1px solid var(--panel-line)}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="nav"><a class="pill" href="./index.html">⌂ 首页</a><a class="pill" href="./game.html">🔗 连一连</a><a class="pill" href="./passport.html">🎒 足迹</a></div>
+  <div class="wrap">
+    <div class="hero"><h1>🕵️ 猜猜这是谁</h1><p id="src"></p></div>
+    <div class="bar"><span>第 <b id="rn">1</b> / <b id="rt">5</b> 位</span><span>已得 <b id="score">0</b> ★</span></div>
+    <div id="game"></div>
+  </div>
+</div>
+<script src="./decisions.js?v=6"></script>
+<script>
+function esc(s){return String(s==null?'':s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function addTrail(t,id,l){try{var K='civlab_trail_v1',a=JSON.parse(localStorage.getItem(K)||'[]'),k=t+':'+id;if(a.some(x=>x.t+':'+x.id===k))return;a.push({t:t,id:id,l:l,ts:Date.now()});if(a.length>120)a=a.slice(-120);localStorage.setItem(K,JSON.stringify(a));}catch(e){}}
+function readTrail(){try{return JSON.parse(localStorage.getItem('civlab_trail_v1'))||[];}catch(e){return[];}}
+const CULT={china:'中国',greece:'古希腊',rome:'古罗马',india:'古印度',mesopotamia:'两河流域',europe:'欧洲',byzantine:'拜占庭',levant:'古以色列(希伯来)',americas:'美洲',babylon:'古巴比伦',egypt:'古埃及',persia:'波斯',islam:'伊斯兰世界',japan:'日本',mongol:'蒙古',maya:'玛雅'};
+function fmtYear(y){ if(y==null) return '很久以前'; return y<0?('公元前'+(-y)+'年'):('公元'+y+'年'); }
+const ALL=(window.DECISIONS||[]).filter(d=>d.person&&d.tip);
+const ROUNDS=5;
+let queue=[], idx=0, score=0, cur=null, potential=3, cluesShown=1, solved=false;
+
+function buildQueue(){
+  const doneIds=new Set(readTrail().filter(x=>x.t==='decision').map(x=>x.id));
+  const mine=ALL.filter(d=>doneIds.has(d.id));
+  if(mine.length>=ROUNDS){ document.getElementById('src').innerHTML='从线索里,认出<b>你走过的</b>历史人物。'; return shuffle(mine).slice(0,ROUNDS); }
+  document.getElementById('src').innerHTML='先随便考考你——<b>走过更多抉择</b>,出的就全是你认识的人。';
+  return shuffle(ALL).slice(0,ROUNDS);
+}
+function cluesOf(d){ return [
+  `🕰 <b>时代</b>:${fmtYear(d.year)} · 🗺 <b>地区</b>:${esc(CULT[d.culture]||d.culture)}`,
+  `🤔 <b>他面对的难题</b>:「${esc(d.tip)}」`
+]; }
+
+function start(){
+  if(ALL.length<4){ document.getElementById('game').innerHTML='<p style="text-align:center;color:var(--ink3)">题库没加载,请刷新。</p>'; return; }
+  queue=buildQueue(); idx=0; score=0;
+  document.getElementById('rt').textContent=queue.length;
+  document.getElementById('score').textContent=0;
+  round();
+}
+function round(){
+  cur=queue[idx]; potential=3; cluesShown=1; solved=false;
+  document.getElementById('rn').textContent=idx+1;
+  // 选项 = 正确 + 3 个干扰
+  const distract=shuffle(ALL.filter(d=>d.id!==cur.id)).slice(0,3);
+  cur._opts=shuffle([cur,...distract]);
+  renderRound('');
+}
+function renderRound(fb){
+  const clues=cluesOf(cur);
+  const stars='★★★'.slice(0,potential)+'☆☆☆'.slice(0,3-potential);
+  document.getElementById('game').innerHTML=`
+    <div class="clues">${clues.slice(0,cluesShown).map(c=>`<div class="clue">${c}</div>`).join('')}</div>
+    <div class="pot">猜对得 <span class="st">${stars}</span></div>
+    <div class="opts">${cur._opts.map(o=>`<button class="opt" data-id="${o.id}">${esc(o.person)}</button>`).join('')}</div>
+    ${cluesShown<clues.length?`<button class="reveal" onclick="moreClue()">🔍 太难了?再给一条线索(少一颗★)</button>`:''}
+    <div class="fb" id="fb">${fb}</div>`;
+  document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>guess(b));
+}
+function moreClue(){ if(cluesShown<2){ cluesShown++; potential=Math.max(1,potential-1); renderRound(''); } }
+function guess(btn){
+  if(solved) return;
+  const id=btn.dataset.id;
+  if(id===cur.id){
+    solved=true; score+=potential; document.getElementById('score').textContent=score;
+    document.querySelectorAll('.opt').forEach(b=>{b.onclick=null;b.classList.add('gone');});
+    btn.classList.remove('gone'); btn.classList.add('right');
+    const fb=document.getElementById('fb');
+    fb.innerHTML=`✅ 答对啦,得 <b>${potential}</b> ★!<br><a href="${cur.url}">▶ 去走一遍 ${esc(cur.person)} 的故事</a>
+      <button class="next" onclick="nextRound()">${idx+1<queue.length?'下一位 →':'看结果 →'}</button>`;
+    fb.classList.add('show');
+  } else {
+    btn.classList.add('gone'); btn.onclick=null;
+    potential=Math.max(1,potential-1);
+    if(cluesShown<2) cluesShown++;
+    const stars='★★★'.slice(0,potential)+'☆☆☆'.slice(0,3-potential);
+    // 重画线索与星数,但保留已划掉的错误项
+    const gone=[...document.querySelectorAll('.opt.gone')].map(b=>b.dataset.id);
+    const clues=cluesOf(cur);
+    document.getElementById('game').innerHTML=`
+      <div class="clues">${clues.slice(0,cluesShown).map(c=>`<div class="clue">${c}</div>`).join('')}</div>
+      <div class="pot">再想想~ 猜对得 <span class="st">${stars}</span></div>
+      <div class="opts">${cur._opts.map(o=>`<button class="opt ${gone.includes(o.id)?'gone':''}" data-id="${o.id}">${esc(o.person)}</button>`).join('')}</div>
+      <div class="fb show" id="fb">不是哦,再看看线索 🤏</div>`;
+    document.querySelectorAll('.opt:not(.gone)').forEach(b=>b.onclick=()=>guess(b));
+  }
+}
+function nextRound(){ idx++; if(idx>=queue.length) end(); else round(); }
+function end(){
+  addTrail('game','quiz','猜猜这是谁·通关');
+  const max=queue.length*3;
+  const lv = score>=max?'🏆 火眼金睛!' : score>=max*0.6?'🌟 很懂历史嘛!' : '🌱 再玩几局会更准!';
+  document.getElementById('game').innerHTML=`
+    <div class="end"><div class="ee">🕵️</div><h2>${lv}</h2>
+      <div class="big">${score} / ${max} ★</div>
+      <p>认出了 ${queue.length} 位历史人物。已在「我的足迹」盖下一枚 🔗 游戏章。</p>
+      <div class="btns"><button class="btn" onclick="start()">↺ 再来一局</button>
+        <a class="btn ghost" href="./passport.html" style="text-decoration:none">🎒 看我的足迹</a></div></div>`;
+}
+start();
+</script>
+</body>
+</html>

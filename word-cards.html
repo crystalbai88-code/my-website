@@ -1,0 +1,1937 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>WordCards Pro · 单词学习</title>
+
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<!-- Excel 解析（SheetJS） -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<!-- PDF 解析（PDF.js） -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+  tailwind.config = {
+    theme: { extend: {
+      colors: {
+        brand:  { 50:'#eef2ff',100:'#e0e7ff',200:'#c7d2fe',500:'#6366f1',600:'#4f46e5',700:'#4338ca' },
+        accent: { 500:'#ec4899',600:'#db2777' },
+      },
+      fontFamily: { serif: ['"Playfair Display"', 'Georgia', 'serif'] },
+      boxShadow: { soft:'0 4px 20px rgba(0,0,0,0.06)', glow:'0 10px 40px rgba(99,102,241,0.18)' },
+      animation: {
+        'fade-in':'fadeIn 0.3s ease-out', 'slide-in':'slideIn 0.3s ease-out',
+        'pop':'pop 0.3s ease-out', 'shake':'shake 0.4s ease-in-out',
+      },
+      keyframes: {
+        fadeIn: { '0%':{opacity:0,transform:'translateY(6px)'}, '100%':{opacity:1,transform:'translateY(0)'} },
+        slideIn:{ '0%':{opacity:0,transform:'translateX(-8px)'}, '100%':{opacity:1,transform:'translateX(0)'} },
+        pop:    { '0%':{transform:'scale(0.85)',opacity:0}, '50%':{transform:'scale(1.05)'}, '100%':{transform:'scale(1)',opacity:1} },
+        shake:  { '0%,100%':{transform:'translateX(0)'}, '25%':{transform:'translateX(-6px)'}, '75%':{transform:'translateX(6px)'} },
+      },
+    } },
+  };
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+<style>
+  .perspective     { perspective: 1200px; }
+  .preserve-3d     { transform-style: preserve-3d; }
+  .backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+  .rotate-y-180    { transform: rotateY(180deg); }
+  html,body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; -webkit-tap-highlight-color: transparent; }
+  body { background: linear-gradient(135deg,#f5f7ff 0%,#fdf2f8 100%); min-height:100vh; }
+  .text-gradient { background: linear-gradient(135deg,#6366f1,#ec4899); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .nice-scroll::-webkit-scrollbar { width:6px; }
+  .nice-scroll::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:3px; }
+  .btn-press { transition: transform .12s ease, box-shadow .2s ease, background-color .2s ease; }
+  .btn-press:active { transform: scale(.96); }
+  .spinner { border:2px solid rgba(99,102,241,.2); border-top-color:#6366f1; width:18px;height:18px;border-radius:50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .dots::after { content:'…'; animation: dots 1.2s steps(4,end) infinite; }
+  @keyframes dots { 0%{content:'.'} 33%{content:'..'} 66%{content:'...'} }
+  .star { font-size: 0.95rem; } .star-on { color:#f59e0b; } .star-off { color:#e2e8f0; }
+  .screen { animation: fadeIn 0.3s ease-out; }
+  .match-card { transition: transform .2s, box-shadow .2s, opacity .35s, background .2s; user-select: none; cursor: pointer; }
+  .match-card.selected { transform: scale(1.04); box-shadow: 0 8px 18px rgba(99,102,241,.25); }
+  .match-card.matched  { opacity:0; pointer-events: none; transform: scale(0.6); }
+  .match-card.wrong    { animation: shake 0.4s ease-in-out; background:#fee2e2 !important; }
+  .heat-cell { width:14px; height:14px; border-radius:3px; }
+  .heat-0 { background:#f1f5f9; } .heat-1 { background:#c7d2fe; } .heat-2 { background:#818cf8; }
+  .heat-3 { background:#6366f1; } .heat-4 { background:#4338ca; }
+  .heat-today { outline: 2px solid #ec4899; outline-offset: 1px; }
+  .stat-num { font-variant-numeric: tabular-nums; }
+  .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .show-poster { aspect-ratio: 2 / 3; object-fit: cover; transition: transform .4s ease; }
+  .show-card:hover .show-poster { transform: scale(1.04); }
+  .library-bg { background: radial-gradient(ellipse at top, #fef3c7 0%, transparent 60%), linear-gradient(180deg, #fff8e7 0%, #fef3c7 100%); }
+  .library-title { font-family: 'Playfair Display', Georgia, serif; }
+  .wood-shelf { background: linear-gradient(180deg, #92400e 0%, #78350f 40%, #5c2c0a 70%, #78350f 100%); box-shadow: 0 6px 18px rgba(120,53,15,.35); border-radius: 4px; height: 14px; }
+  .book-card { transition: transform .3s ease; }
+  .book-card:hover { transform: translateY(-4px); }
+  .book-cover { aspect-ratio: 2 / 3; object-fit: cover; background: #fef3c7; box-shadow: 4px 4px 0 rgba(120,53,15,.15), 0 6px 18px rgba(120,53,15,.2); transition: transform .3s ease; }
+  .book-card:hover .book-cover { transform: rotate(-1deg) scale(1.02); }
+  /* 文件上传区 */
+  .file-drop {
+    border: 2px dashed #c7d2fe;
+    background: #f8fafc;
+    transition: all .2s ease;
+  }
+  .file-drop:hover, .file-drop.drag-over {
+    border-color: #6366f1; background: #eef2ff;
+  }
+</style>
+</head>
+
+<body class="text-slate-800">
+<div id="app" class="max-w-6xl mx-auto px-4 py-6 md:py-10">
+
+<!-- 主菜单 -->
+<section id="screen-home" class="screen">
+  <header class="text-center mb-6 md:mb-8 mt-4">
+    <h1 class="text-4xl md:text-5xl font-bold text-gradient">WordCards Pro</h1>
+    <p class="text-slate-500 mt-2 text-sm">单词 · 查词 · 词集 · 打卡 · 美剧 · 图书馆</p>
+  </header>
+
+  <div class="max-w-3xl mx-auto mb-6 bg-white rounded-2xl shadow-soft p-4 md:p-5 flex items-center gap-4">
+    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-2xl shrink-0">🔥</div>
+    <div class="flex-1 min-w-0">
+      <div class="flex items-baseline gap-2 flex-wrap">
+        <span class="text-sm text-slate-500">连续</span>
+        <span id="homeStreak" class="text-2xl font-bold text-orange-600 stat-num">0</span>
+        <span class="text-sm text-slate-500">天 · 今日</span>
+        <span id="homeTodayCount" class="text-lg font-bold text-brand-600 stat-num">0</span>
+        <span class="text-sm text-slate-500">词</span>
+      </div>
+      <div id="homeStreakHint" class="text-xs text-slate-400 mt-0.5"></div>
+    </div>
+    <button id="homeCheckIn" class="btn-press px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl text-sm font-semibold shadow-soft whitespace-nowrap">打卡</button>
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 max-w-5xl mx-auto">
+    <button data-nav="study" class="btn-press group bg-white rounded-3xl shadow-soft hover:shadow-glow p-4 md:p-5 text-left transition border-2 border-transparent hover:border-brand-200">
+      <div class="w-11 h-11 md:w-12 md:h-12 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-600 flex items-center justify-center mb-3 group-hover:scale-110 transition">
+        <svg class="w-5 h-5 md:w-6 md:h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+      </div>
+      <h2 class="text-base md:text-lg font-bold text-slate-800 mb-1">背单词</h2>
+      <p class="text-xs text-slate-500">5 种学习模式</p>
+    </button>
+    <button data-nav="lookup" class="btn-press group bg-white rounded-3xl shadow-soft hover:shadow-glow p-4 md:p-5 text-left transition border-2 border-transparent hover:border-accent-500/30">
+      <div class="w-11 h-11 md:w-12 md:h-12 rounded-2xl bg-gradient-to-br from-accent-500 to-accent-600 flex items-center justify-center mb-3 group-hover:scale-110 transition">
+        <svg class="w-5 h-5 md:w-6 md:h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      </div>
+      <h2 class="text-base md:text-lg font-bold text-slate-800 mb-1">查词</h2>
+      <p class="text-xs text-slate-500">在线词典</p>
+    </button>
+    <button data-nav="mydecks" class="btn-press group bg-white rounded-3xl shadow-soft hover:shadow-glow p-4 md:p-5 text-left transition border-2 border-transparent hover:border-emerald-300">
+      <div class="w-11 h-11 md:w-12 md:h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center mb-3 group-hover:scale-110 transition">
+        <svg class="w-5 h-5 md:w-6 md:h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+      </div>
+      <h2 class="text-base md:text-lg font-bold text-slate-800 mb-1">我的词集</h2>
+      <p class="text-xs text-slate-500">自由创建 · 文件导入</p>
+    </button>
+    <button data-nav="stats" class="btn-press group bg-white rounded-3xl shadow-soft hover:shadow-glow p-4 md:p-5 text-left transition border-2 border-transparent hover:border-orange-300">
+      <div class="w-11 h-11 md:w-12 md:h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center mb-3 group-hover:scale-110 transition">
+        <svg class="w-5 h-5 md:w-6 md:h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>
+      </div>
+      <h2 class="text-base md:text-lg font-bold text-slate-800 mb-1">学习统计</h2>
+      <p class="text-xs text-slate-500">打卡 · 数据</p>
+    </button>
+    <button data-nav="shows" class="btn-press group bg-white rounded-3xl shadow-soft hover:shadow-glow p-4 md:p-5 text-left transition border-2 border-transparent hover:border-purple-300">
+      <div class="w-11 h-11 md:w-12 md:h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-fuchsia-600 flex items-center justify-center mb-3 group-hover:scale-110 transition">
+        <svg class="w-5 h-5 md:w-6 md:h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M12 12l4 2-4 2v-4z"/></svg>
+      </div>
+      <h2 class="text-base md:text-lg font-bold text-slate-800 mb-1">美剧资源</h2>
+      <p class="text-xs text-slate-500">美剧推荐</p>
+    </button>
+    <button data-nav="library" class="btn-press group bg-white rounded-3xl shadow-soft hover:shadow-glow p-4 md:p-5 text-left transition border-2 border-transparent hover:border-amber-300">
+      <div class="w-11 h-11 md:w-12 md:h-12 rounded-2xl bg-gradient-to-br from-amber-700 to-orange-800 flex items-center justify-center mb-3 group-hover:scale-110 transition">
+        <svg class="w-5 h-5 md:w-6 md:h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+      </div>
+      <h2 class="text-base md:text-lg font-bold text-slate-800 mb-1">英文图书馆</h2>
+      <p class="text-xs text-slate-500">原著书架</p>
+    </button>
+  </div>
+</section>
+
+<template id="tpl-topbar">
+  <div class="flex items-center justify-between mb-5">
+    <button data-nav="home" class="btn-press flex items-center gap-1.5 px-3 py-2 bg-white rounded-xl text-sm text-slate-600 shadow-soft hover:bg-slate-50">
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg><span>主菜单</span>
+    </button>
+    <div class="title text-base font-semibold text-slate-700"></div>
+    <div class="w-20"></div>
+  </div>
+</template>
+
+<!-- 我的词集 -->
+<section id="screen-mydecks" class="screen hidden">
+  <div id="md-topbar"></div>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+    <section class="lg:col-span-1 bg-white rounded-2xl shadow-soft p-5">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-semibold text-slate-700">所有词集</h2>
+        <span id="mdDeckCount" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700">0 个</span>
+      </div>
+      <div class="bg-slate-50 rounded-xl p-3 mb-4 space-y-2">
+        <input id="mdNewName" type="text" placeholder="词集名称" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-brand-500" />
+        <input id="mdNewDesc" type="text" placeholder="简介（可选）" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-brand-500" />
+        <button id="mdBtnCreate" class="btn-press w-full py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-lg text-sm font-semibold">+ 新建</button>
+      </div>
+      <div id="mdDeckList" class="space-y-2 max-h-[28rem] overflow-y-auto nice-scroll pr-1"></div>
+    </section>
+    <section class="lg:col-span-2 bg-white rounded-2xl shadow-soft p-5 md:p-6">
+      <div id="mdEmpty" class="text-center py-16 text-slate-400"><p class="text-sm">从左侧选择一个词集</p></div>
+      <div id="mdEditor" class="hidden space-y-5">
+        <div class="flex items-start justify-between gap-3 flex-wrap">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <h3 id="mdDeckName" class="text-xl font-bold text-slate-800"></h3>
+              <span id="mdDeckBuiltin" class="hidden text-xs bg-slate-200 text-slate-600 px-2 py-0.5 rounded-md">只读</span>
+            </div>
+            <div id="mdDeckDesc" class="text-xs text-slate-500"></div>
+            <div class="mt-1 text-xs text-slate-500"><span id="mdDeckCountInline">0</span> 个词条</div>
+          </div>
+          <div class="flex gap-2">
+            <button id="mdBtnRename" class="btn-press px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg text-xs font-medium">重命名</button>
+            <button id="mdBtnStudy" class="btn-press px-3 py-1.5 bg-brand-500 text-white rounded-lg text-xs font-medium">用此学习</button>
+            <button id="mdBtnDeleteDeck" class="btn-press px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-xs font-medium disabled:opacity-40">删除</button>
+          </div>
+        </div>
+
+        <!-- 4 个标签页：单条 / 粘贴 / 文件 / 列表 -->
+        <div class="flex gap-1 border-b border-slate-200 overflow-x-auto">
+          <button data-tab="single" class="md-tab whitespace-nowrap px-4 py-2 text-sm font-medium border-b-2 border-brand-500 text-brand-700">单条添加</button>
+          <button data-tab="bulk" class="md-tab whitespace-nowrap px-4 py-2 text-sm font-medium border-b-2 border-transparent text-slate-500">粘贴导入</button>
+          <button data-tab="file" class="md-tab whitespace-nowrap px-4 py-2 text-sm font-medium border-b-2 border-transparent text-slate-500">
+            📂 文件导入
+          </button>
+        </div>
+
+        <!-- 单条添加 -->
+        <div id="mdTabSingle">
+          <form id="mdAddForm" class="grid grid-cols-1 md:grid-cols-5 gap-2">
+            <input id="mdAddTerm" type="text" required placeholder="词条" class="md:col-span-2 px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm" />
+            <input id="mdAddDef" type="text" required placeholder="释义" class="md:col-span-2 px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm" />
+            <button type="submit" class="btn-press px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl text-sm font-semibold">+ 添加</button>
+          </form>
+        </div>
+
+        <!-- 粘贴导入 -->
+        <div id="mdTabBulk" class="hidden space-y-2">
+          <p class="text-xs text-slate-500">每行一条 · 分隔符：<code class="px-1 bg-slate-100 rounded">|</code> <code class="px-1 bg-slate-100 rounded">—</code> <code class="px-1 bg-slate-100 rounded">：</code> <code class="px-1 bg-slate-100 rounded">,</code></p>
+          <textarea id="mdBulkInput" rows="6" placeholder="bonjour | 你好&#10;DNA: 脱氧核糖核酸" class="w-full px-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono"></textarea>
+          <div class="flex gap-2">
+            <button id="mdBtnBulkPreview" class="btn-press px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-sm font-medium">预览</button>
+            <button id="mdBtnBulkImport" class="btn-press px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl text-sm font-semibold">导入</button>
+          </div>
+          <div id="mdBulkPreview" class="hidden text-xs text-slate-600 bg-slate-50 rounded-lg p-3 max-h-40 overflow-y-auto nice-scroll"></div>
+        </div>
+
+        <!-- 文件导入 -->
+        <div id="mdTabFile" class="hidden space-y-3">
+          <div id="mdFileDrop" class="file-drop rounded-xl p-6 md:p-8 text-center cursor-pointer">
+            <svg class="w-10 h-10 mx-auto mb-2 text-brand-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+            </svg>
+            <p class="text-sm font-semibold text-slate-700 mb-1">点击或拖入文件</p>
+            <p class="text-xs text-slate-500">支持 <span class="font-semibold text-brand-600">.txt</span> · <span class="font-semibold text-emerald-600">.xlsx / .xls</span> · <span class="font-semibold text-rose-600">.pdf</span> · <span class="font-semibold text-amber-600">.csv</span></p>
+            <input id="mdFileInput" type="file" accept=".txt,.csv,.xlsx,.xls,.pdf" class="hidden" />
+          </div>
+
+          <div class="bg-slate-50 rounded-xl p-3 text-xs text-slate-600 space-y-1.5">
+            <div class="font-semibold text-slate-700 mb-1">📌 格式说明</div>
+            <div><span class="font-semibold text-brand-600">TXT / CSV</span>：每行一条，与"粘贴导入"分隔符一致</div>
+            <div><span class="font-semibold text-emerald-600">Excel</span>：A 列词条，B 列释义；自动读取第一个工作表</div>
+            <div><span class="font-semibold text-rose-600">PDF</span>：自动提取文本，按行解析为词条/释义</div>
+          </div>
+
+          <div id="mdFileStatus" class="hidden items-center gap-3 p-3 bg-brand-50 border border-brand-200 rounded-xl text-sm">
+            <div class="spinner"></div>
+            <span class="text-brand-700" id="mdFileStatusText">解析中…</span>
+          </div>
+
+          <div id="mdFilePreview" class="hidden">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm font-semibold text-slate-700">📊 解析结果：识别 <span id="mdFileCount" class="text-emerald-600">0</span> 条</span>
+              <button id="mdFileClear" class="text-xs text-slate-500 hover:text-rose-600">清除</button>
+            </div>
+            <div id="mdFilePreviewList" class="text-xs text-slate-600 bg-slate-50 rounded-lg p-3 max-h-40 overflow-y-auto nice-scroll"></div>
+            <button id="mdBtnFileImport" class="btn-press w-full mt-3 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl text-sm font-semibold">✓ 导入到当前词集</button>
+          </div>
+
+          <div id="mdFileError" class="hidden p-3 bg-rose-50 border border-rose-200 rounded-xl text-sm text-rose-700"></div>
+        </div>
+
+        <!-- 词条列表 -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="font-semibold text-slate-700 text-sm">词条列表</h4>
+            <input id="mdSearch" type="text" placeholder="搜索…" class="px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg" />
+          </div>
+          <div id="mdEntries" class="space-y-1.5 max-h-[28rem] overflow-y-auto nice-scroll pr-1"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</section>
+
+<!-- 英文图书馆 -->
+<section id="screen-library" class="screen hidden">
+  <div id="lb-topbar"></div>
+  <section class="rounded-2xl shadow-glow p-5 md:p-7 mb-5 text-white relative overflow-hidden" style="background: linear-gradient(135deg, #92400e 0%, #b45309 50%, #d97706 100%);">
+    <div class="flex items-start gap-4 relative z-10">
+      <div class="text-5xl shrink-0">📚</div>
+      <div class="flex-1">
+        <h2 class="text-2xl md:text-3xl font-bold library-title mb-1">English Library</h2>
+        <p class="text-sm opacity-90">精选英文经典，按水平分级</p>
+      </div>
+    </div>
+  </section>
+  <section class="bg-white rounded-2xl shadow-soft p-4 mb-5">
+    <div class="flex items-center gap-2 flex-wrap">
+      <span class="text-sm font-medium text-slate-600 mr-1">水平：</span>
+      <button data-lblevel="all" class="lb-btn btn-press px-3 py-1.5 rounded-full text-xs font-medium bg-amber-700 text-white">全部</button>
+      <button data-lblevel="小学" class="lb-btn btn-press px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">小学</button>
+      <button data-lblevel="初中" class="lb-btn btn-press px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">初中</button>
+      <button data-lblevel="高中" class="lb-btn btn-press px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">高中</button>
+      <button data-lblevel="大学" class="lb-btn btn-press px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">大学</button>
+      <button data-lblevel="雅思" class="lb-btn btn-press px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">雅思</button>
+      <span class="ml-auto text-xs text-slate-400">共 <span id="lbCount">0</span> 本</span>
+    </div>
+  </section>
+  <div id="lbShelves" class="library-bg rounded-2xl p-4 md:p-6 space-y-6"></div>
+</section>
+
+<!-- 美剧 -->
+<section id="screen-shows" class="screen hidden">
+  <div id="sh-topbar"></div>
+  <section class="bg-gradient-to-br from-purple-500 to-fuchsia-600 rounded-2xl shadow-glow p-5 md:p-7 mb-5 text-white">
+    <div class="flex items-start gap-4">
+      <div class="text-4xl shrink-0">🎬</div>
+      <div><h2 class="text-xl md:text-2xl font-bold mb-1">看美剧学英语</h2><p class="text-sm opacity-90">按水平分级</p></div>
+    </div>
+  </section>
+  <section class="bg-white rounded-2xl shadow-soft p-4 mb-5">
+    <div class="flex items-center gap-2 flex-wrap">
+      <span class="text-sm font-medium text-slate-600 mr-1">水平：</span>
+      <button data-level="all" class="lv-btn btn-press px-3 py-1.5 rounded-full text-xs font-medium bg-brand-500 text-white">全部</button>
+      <button data-level="初中" class="lv-btn btn-press px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">初中</button>
+      <button data-level="高中" class="lv-btn btn-press px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">高中</button>
+      <button data-level="四六级" class="lv-btn btn-press px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">四六级</button>
+      <button data-level="雅思" class="lv-btn btn-press px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">雅思</button>
+      <span class="ml-auto text-xs text-slate-400">共 <span id="shCount">0</span> 部</span>
+    </div>
+  </section>
+  <div id="shGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5"></div>
+</section>
+
+<!-- 学习统计 -->
+<section id="screen-stats" class="screen hidden">
+  <div id="st-topbar"></div>
+  <section class="bg-gradient-to-br from-brand-500 to-accent-500 rounded-2xl shadow-glow p-5 md:p-7 mb-5 text-white">
+    <div class="flex items-start justify-between flex-wrap gap-4">
+      <div>
+        <div class="text-sm opacity-90 mb-1">今天 · <span id="stTodayDate"></span></div>
+        <div class="flex items-baseline gap-2 mb-2"><span id="stTodayCount" class="text-5xl font-bold stat-num">0</span><span class="text-sm opacity-90">词条</span></div>
+        <div class="text-sm opacity-90 flex items-center gap-3 flex-wrap">
+          <span>⏱ <span id="stTodayTime" class="font-semibold">0 分</span></span>
+          <span>·</span>
+          <span>🎯 <span id="stTodaySessions" class="font-semibold">0</span> 轮</span>
+        </div>
+      </div>
+      <button id="stCheckIn" class="btn-press px-6 py-3 bg-white text-orange-600 rounded-xl text-sm font-bold shadow-soft">今日打卡</button>
+    </div>
+  </section>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+    <div class="bg-white rounded-2xl shadow-soft p-5">
+      <div class="text-xs text-slate-500 mb-1">🔥 连续打卡</div>
+      <div class="flex items-baseline gap-1"><span id="stCurStreak" class="text-3xl font-bold text-orange-600 stat-num">0</span><span class="text-sm text-slate-500">天</span></div>
+      <div class="text-xs text-slate-400 mt-1">最长 <span id="stMaxStreak" class="font-semibold">0</span></div>
+    </div>
+    <div class="bg-white rounded-2xl shadow-soft p-5">
+      <div class="text-xs text-slate-500 mb-1">📚 累计词汇</div>
+      <div class="flex items-baseline gap-1"><span id="stTotalWords" class="text-3xl font-bold text-emerald-600 stat-num">0</span><span class="text-sm text-slate-500">个</span></div>
+    </div>
+    <div class="bg-white rounded-2xl shadow-soft p-5">
+      <div class="text-xs text-slate-500 mb-1">⏱ 累计学习</div>
+      <div class="flex items-baseline gap-1"><span id="stTotalTime" class="text-3xl font-bold text-brand-600 stat-num">0</span><span class="text-sm text-slate-500">分</span></div>
+      <div class="text-xs text-slate-400 mt-1"><span id="stTotalDays" class="font-semibold">0</span> 天 · <span id="stTotalStudied" class="font-semibold">0</span> 次</div>
+    </div>
+  </div>
+  <section class="bg-white rounded-2xl shadow-soft p-5 md:p-6 mb-5">
+    <h3 class="font-semibold text-slate-700 mb-4">最近 7 天</h3>
+    <div id="stBarChart" class="flex items-end justify-between gap-2 h-32"></div>
+  </section>
+  <section class="bg-white rounded-2xl shadow-soft p-5 md:p-6 mb-5">
+    <h3 class="font-semibold text-slate-700 mb-4">学习热力图</h3>
+    <div class="overflow-x-auto"><div id="stHeatmap" class="inline-grid grid-flow-col gap-1" style="grid-template-rows: repeat(7, auto);"></div></div>
+  </section>
+  <section class="bg-white rounded-2xl shadow-soft p-5 md:p-6">
+    <h3 class="font-semibold text-slate-700 mb-4">成就徽章</h3>
+    <div id="stAchievements" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
+  </section>
+</section>
+
+<!-- 查词 -->
+<section id="screen-lookup" class="screen hidden">
+  <div id="lookup-topbar"></div>
+  <section class="bg-white rounded-2xl shadow-soft p-4 mb-5">
+    <div class="flex flex-col md:flex-row md:items-center gap-3">
+      <label class="text-sm font-medium text-slate-600">当前词集</label>
+      <select id="deckSelect" class="flex-1 px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm cursor-pointer"></select>
+    </div>
+  </section>
+  <section class="bg-white rounded-2xl shadow-soft p-5 md:p-7">
+    <div class="flex items-center gap-2 mb-4"><span class="w-1 h-5 bg-gradient-to-b from-brand-500 to-accent-500 rounded"></span><h2 class="font-semibold text-slate-700">在线查词</h2></div>
+    <div class="flex gap-2 mb-4">
+      <input id="lookupInput" type="text" placeholder="输入英文单词" class="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm" />
+      <button id="btnLookup" class="btn-press px-6 py-3 bg-gradient-to-r from-brand-500 to-brand-600 text-white rounded-xl text-sm font-semibold whitespace-nowrap">查询</button>
+    </div>
+    <div id="lookupHint" class="text-center py-10 text-slate-400 text-sm">请输入要查询的英文单词</div>
+    <div id="lookupLoading" class="hidden items-center justify-center gap-3 py-10 text-slate-500 text-sm"><div class="spinner"></div><span>查询中…</span></div>
+    <div id="lookupResult" class="hidden animate-fade-in space-y-4">
+      <div class="flex items-start justify-between flex-wrap gap-3 pb-4 border-b border-slate-100">
+        <div class="flex-1 min-w-0">
+          <div class="flex items-baseline gap-3 flex-wrap mb-2">
+            <span id="lookupWord" class="text-3xl font-bold text-slate-800"></span>
+            <span id="lookupPosBadges" class="flex gap-1.5 flex-wrap"></span>
+            <button id="btnSpeakLookup" class="btn-press text-brand-500"><svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg></button>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap text-sm">
+            <span class="text-xs text-slate-500">重要程度</span>
+            <span id="lookupStars" class="flex gap-0.5"></span>
+            <span id="lookupCefr" class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold"></span>
+            <span id="lookupLevelLabel" class="text-xs text-slate-500"></span>
+          </div>
+        </div>
+        <button id="btnAddLookup" class="btn-press px-4 py-2 bg-gradient-to-r from-brand-500 to-accent-500 text-white rounded-lg text-sm font-medium">+ 加入</button>
+      </div>
+      <div class="bg-brand-50/60 border border-brand-100 rounded-xl p-4">
+        <div class="text-xs font-semibold text-brand-700 mb-1.5">中文释义</div>
+        <div id="lookupMeaning" class="text-slate-800 text-base"></div>
+        <div id="lookupSource" class="text-xs text-slate-400 mt-1.5"></div>
+      </div>
+      <div id="lookupMeanings" class="space-y-4"></div>
+    </div>
+  </section>
+</section>
+
+<!-- 背单词 -->
+<section id="screen-study" class="screen hidden">
+  <div id="study-topbar"></div>
+  <section class="bg-white rounded-2xl shadow-soft p-4 mb-5">
+    <div class="flex flex-col md:flex-row md:items-center gap-3">
+      <label class="text-sm font-medium text-slate-600">词集</label>
+      <select id="studyDeckSelect" class="flex-1 px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm cursor-pointer"></select>
+      <span id="studyDeckInfo" class="text-xs text-slate-500"></span>
+    </div>
+  </section>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <button data-mode="flashcards" class="study-mode btn-press bg-white rounded-2xl shadow-soft hover:shadow-glow p-6 text-left group">
+      <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center mb-4 group-hover:scale-110 transition"><svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/></svg></div>
+      <h3 class="text-lg font-bold text-slate-800">卡片模式</h3>
+      <p class="text-xs text-slate-500">翻转卡片</p>
+    </button>
+    <button data-mode="learn" class="study-mode btn-press bg-white rounded-2xl shadow-soft hover:shadow-glow p-6 text-left group">
+      <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center mb-4 group-hover:scale-110 transition"><svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/></svg></div>
+      <h3 class="text-lg font-bold text-slate-800">学习模式</h3>
+      <p class="text-xs text-slate-500">智能出题</p>
+    </button>
+    <button data-mode="spell" class="study-mode btn-press bg-white rounded-2xl shadow-soft hover:shadow-glow p-6 text-left group">
+      <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center mb-4 group-hover:scale-110 transition"><svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0118 0v6"/></svg></div>
+      <h3 class="text-lg font-bold text-slate-800">拼写模式</h3>
+      <p class="text-xs text-slate-500">听音拼写</p>
+    </button>
+    <button data-mode="match" class="study-mode btn-press bg-white rounded-2xl shadow-soft hover:shadow-glow p-6 text-left group">
+      <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-400 to-rose-600 flex items-center justify-center mb-4 group-hover:scale-110 transition"><svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
+      <h3 class="text-lg font-bold text-slate-800">配对游戏</h3>
+      <p class="text-xs text-slate-500">限时连线</p>
+    </button>
+    <button data-mode="test" class="study-mode btn-press bg-white rounded-2xl shadow-soft hover:shadow-glow p-6 text-left group">
+      <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center mb-4 group-hover:scale-110 transition"><svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8"/></svg></div>
+      <h3 class="text-lg font-bold text-slate-800">测试模式</h3>
+      <p class="text-xs text-slate-500">自动出卷</p>
+    </button>
+  </div>
+</section>
+
+<!-- 卡片 -->
+<section id="screen-flashcards" class="screen hidden">
+  <div id="fc-topbar"></div>
+  <section class="bg-white rounded-2xl shadow-soft p-5 md:p-6">
+    <div id="fcEmpty" class="text-center py-12 text-slate-400 text-sm">空</div>
+    <div id="fcMain" class="hidden">
+      <div class="flex items-center justify-center gap-3 mb-4 text-sm text-slate-500">
+        <span id="fcProgressText" class="font-medium">0 / 0</span>
+        <div class="flex-1 max-w-xs h-1.5 bg-slate-200 rounded-full overflow-hidden"><div id="fcProgressFill" class="h-full bg-gradient-to-r from-brand-500 to-accent-500 transition-all duration-500" style="width:0%"></div></div>
+        <button id="btnShuffle" class="btn-press text-slate-500"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg></button>
+      </div>
+      <div class="mx-auto perspective" style="max-width:480px; aspect-ratio:5/3;">
+        <div id="fcCard" class="relative w-full h-full preserve-3d cursor-pointer transition-transform duration-700">
+          <div class="absolute inset-0 backface-hidden rounded-3xl flex flex-col items-center justify-center p-6 bg-gradient-to-br from-white to-brand-50 border-2 border-brand-100 shadow-glow">
+            <div id="fcWord" class="font-bold text-slate-800 text-center break-words" style="font-size: clamp(1.4rem, 4.5vw, 2.4rem);"></div>
+            <button id="btnSpeakFc" class="mt-3 btn-press text-brand-500"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg></button>
+            <div class="absolute bottom-4 text-xs text-slate-400">点击查看</div>
+          </div>
+          <div class="absolute inset-0 backface-hidden rotate-y-180 rounded-3xl flex flex-col items-center justify-center p-6 bg-gradient-to-br from-brand-500 to-accent-500 text-white shadow-glow">
+            <div id="fcMeaning" class="font-semibold text-center break-words" style="font-size: clamp(1.1rem, 3.6vw, 1.8rem);"></div>
+            <div class="absolute bottom-4 text-xs text-white/70">点击翻回</div>
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-center items-center gap-2 mt-6 flex-wrap">
+        <button id="fcPrev" class="btn-press px-5 py-2.5 bg-brand-50 text-brand-700 rounded-xl text-sm font-medium disabled:opacity-40">← 上一个</button>
+        <button id="fcFlip" class="btn-press px-6 py-2.5 bg-gradient-to-r from-brand-500 to-brand-600 text-white rounded-xl text-sm font-semibold">翻转</button>
+        <button id="fcNext" class="btn-press px-5 py-2.5 bg-brand-50 text-brand-700 rounded-xl text-sm font-medium disabled:opacity-40">下一个 →</button>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section id="screen-learn" class="screen hidden">
+  <div id="ln-topbar"></div>
+  <section class="bg-white rounded-2xl shadow-soft p-5 md:p-7">
+    <div id="lnEmpty" class="text-center py-12 text-slate-400 text-sm">至少 4 条</div>
+    <div id="lnMain" class="hidden">
+      <div class="flex items-center justify-between mb-5 text-sm">
+        <span id="lnProgress" class="font-medium text-slate-600">0 / 0</span>
+        <div class="flex gap-3 text-xs"><span class="text-emerald-600">✓ <span id="lnRight">0</span></span><span class="text-rose-600">✗ <span id="lnWrong">0</span></span></div>
+      </div>
+      <div class="h-1.5 bg-slate-200 rounded-full overflow-hidden mb-6"><div id="lnProgressFill" class="h-full bg-gradient-to-r from-brand-500 to-accent-500 transition-all duration-500" style="width:0%"></div></div>
+      <div id="lnQuestion" class="text-center mb-6 animate-fade-in">
+        <div id="lnQType" class="text-xs font-semibold text-brand-600 uppercase tracking-wider mb-2"></div>
+        <div id="lnQPrompt" class="text-2xl md:text-3xl font-bold text-slate-800 mb-1 break-words"></div>
+        <div id="lnQHint" class="text-sm text-slate-500"></div>
+      </div>
+      <div id="lnChoices" class="hidden grid grid-cols-1 md:grid-cols-2 gap-2"></div>
+      <div id="lnTyping" class="hidden">
+        <div class="flex gap-2">
+          <input id="lnInput" type="text" placeholder="输入答案" class="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-base" />
+          <button id="lnSubmit" class="btn-press px-5 py-3 bg-brand-500 text-white rounded-xl text-sm font-semibold">提交</button>
+        </div>
+      </div>
+      <div id="lnFeedback" class="hidden mt-5 p-4 rounded-xl animate-fade-in">
+        <div id="lnFbTitle" class="font-semibold mb-1"></div>
+        <div id="lnFbDetail" class="text-sm"></div>
+        <button id="lnNext" class="btn-press mt-3 px-4 py-2 bg-brand-500 text-white rounded-lg text-sm font-medium">下一题</button>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section id="screen-spell" class="screen hidden">
+  <div id="sp-topbar"></div>
+  <section class="bg-white rounded-2xl shadow-soft p-5 md:p-7">
+    <div id="spEmpty" class="text-center py-12 text-slate-400 text-sm">空</div>
+    <div id="spMain" class="hidden">
+      <div class="flex items-center justify-between mb-5 text-sm">
+        <span id="spProgress" class="font-medium text-slate-600">0 / 0</span>
+        <div class="flex gap-3 text-xs"><span class="text-emerald-600">✓ <span id="spRight">0</span></span><span class="text-rose-600">✗ <span id="spWrong">0</span></span></div>
+      </div>
+      <div class="h-1.5 bg-slate-200 rounded-full overflow-hidden mb-8"><div id="spProgressFill" class="h-full bg-gradient-to-r from-brand-500 to-accent-500 transition-all duration-500" style="width:0%"></div></div>
+      <div class="text-center mb-6">
+        <button id="spPlay" class="btn-press w-20 h-20 mx-auto mb-3 rounded-full bg-gradient-to-br from-brand-500 to-brand-600 text-white shadow-glow flex items-center justify-center"><svg class="w-9 h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg></button>
+        <div class="text-xs text-slate-400">点击播放</div>
+        <div class="text-base text-slate-600 mt-3">提示：<span id="spHintText" class="font-semibold text-slate-800"></span></div>
+      </div>
+      <div class="max-w-md mx-auto">
+        <div class="flex gap-2">
+          <input id="spInput" type="text" placeholder="输入词条" class="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-base" />
+          <button id="spSubmit" class="btn-press px-5 py-3 bg-brand-500 text-white rounded-xl text-sm font-semibold">提交</button>
+        </div>
+        <div id="spFeedback" class="hidden mt-4 p-3 rounded-xl text-sm text-center animate-fade-in"></div>
+        <button id="spNext" class="hidden btn-press mt-3 w-full py-2.5 bg-brand-500 text-white rounded-xl text-sm font-medium">下一个</button>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section id="screen-match" class="screen hidden">
+  <div id="mt-topbar"></div>
+  <section class="bg-white rounded-2xl shadow-soft p-5 md:p-7">
+    <div id="mtEmpty" class="text-center py-12 text-slate-400 text-sm">至少 6 条</div>
+    <div id="mtMain" class="hidden">
+      <div class="flex items-center justify-between mb-5 text-sm">
+        <span class="text-slate-600">时间：<span id="mtTimer" class="font-mono font-semibold text-brand-600">0.0s</span></span>
+        <span class="text-slate-600">已配对：<span id="mtMatched" class="font-semibold text-emerald-600">0</span> / <span id="mtTotal">0</span></span>
+      </div>
+      <div id="mtGrid" class="grid grid-cols-3 md:grid-cols-4 gap-2"></div>
+      <div class="text-center mt-5"><button id="mtRestart" class="btn-press px-5 py-2.5 bg-brand-50 text-brand-700 rounded-xl text-sm font-medium">重新开始</button></div>
+    </div>
+  </section>
+</section>
+
+<section id="screen-test" class="screen hidden">
+  <div id="ts-topbar"></div>
+  <section class="bg-white rounded-2xl shadow-soft p-5 md:p-7">
+    <div id="tsEmpty" class="text-center py-12 text-slate-400 text-sm">至少 4 条</div>
+    <div id="tsSetup" class="hidden">
+      <div class="text-center mb-6"><h3 class="text-xl font-bold text-slate-800">生成测试卷</h3></div>
+      <div class="max-w-sm mx-auto space-y-4">
+        <select id="tsCount" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm">
+          <option value="5">5 题</option><option value="10" selected>10 题</option><option value="15">15 题</option><option value="20">20 题</option>
+        </select>
+        <button id="tsStart" class="btn-press w-full py-3 bg-gradient-to-r from-brand-500 to-accent-500 text-white rounded-xl text-sm font-semibold">开始</button>
+      </div>
+    </div>
+    <div id="tsExam" class="hidden">
+      <div id="tsQuestions" class="space-y-5"></div>
+      <button id="tsSubmit" class="btn-press mt-6 w-full py-3 bg-gradient-to-r from-brand-500 to-accent-500 text-white rounded-xl text-sm font-semibold">提交</button>
+    </div>
+    <div id="tsResult" class="hidden">
+      <div class="text-center mb-6">
+        <div id="tsScore" class="text-5xl font-bold text-gradient mb-2">0</div>
+        <div class="text-sm text-slate-500">正确 <span id="tsCorrectN" class="text-emerald-600 font-semibold">0</span> · 错误 <span id="tsWrongN" class="text-rose-600 font-semibold">0</span></div>
+      </div>
+      <div id="tsReview" class="space-y-4 mb-6"></div>
+      <div class="flex gap-2">
+        <button id="tsRetry" class="btn-press flex-1 py-2.5 bg-brand-50 text-brand-700 rounded-xl text-sm font-medium">重新</button>
+        <button id="tsBackHub" class="btn-press flex-1 py-2.5 bg-brand-500 text-white rounded-xl text-sm font-medium">返回</button>
+      </div>
+    </div>
+  </section>
+</section>
+
+<div id="endModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
+  <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center animate-pop">
+    <div class="text-5xl mb-3">🎉</div>
+    <h3 class="text-2xl font-bold text-slate-800 mb-2">完成！</h3>
+    <div id="endSummary" class="text-sm text-slate-600 mb-6"></div>
+    <div class="flex gap-2">
+      <button id="endRetry" class="btn-press flex-1 py-2.5 bg-brand-50 text-brand-700 rounded-xl text-sm font-medium">再来一轮</button>
+      <button id="endHub" class="btn-press flex-1 py-2.5 bg-brand-500 text-white rounded-xl text-sm font-medium">返回</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div id="toast" class="fixed left-1/2 bottom-8 -translate-x-1/2 translate-y-20 opacity-0 pointer-events-none bg-slate-800 text-white text-sm px-5 py-3 rounded-xl shadow-2xl transition-all duration-300 z-50"></div>
+
+<button id="fabHome" data-nav="home" class="hidden fixed bottom-5 right-5 z-50 btn-press flex items-center gap-1.5 px-4 py-3 bg-brand-500 text-white rounded-full shadow-glow text-sm font-semibold" aria-label="返回主页">
+  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10"/></svg>
+  <span>主页</span>
+</button>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ============= 工具 ============= */
+  const $ = id => document.getElementById(id);
+  const qs = (sel, root=document) => root.querySelector(sel);
+  const qsa = (sel, root=document) => [...root.querySelectorAll(sel)];
+  function shuffle(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+  function rand(n){return Math.floor(Math.random()*n);}
+  function escapeHtml(s){return (s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function speak(text, opts={}) {
+    if (!('speechSynthesis' in window)) return;
+    try { speechSynthesis.cancel(); } catch(e){}
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = opts.lang || 'en-US'; u.rate = opts.rate ?? 0.85;
+    speechSynthesis.speak(u);
+  }
+  const toastEl = $('toast'); let toastTimer = null;
+  function toast(msg, type='info') {
+    toastEl.textContent = msg;
+    toastEl.classList.remove('bg-slate-800','bg-red-500','bg-emerald-500');
+    toastEl.classList.add(type==='error'?'bg-red-500':type==='ok'?'bg-emerald-500':'bg-slate-800');
+    toastEl.classList.remove('opacity-0','translate-y-20');
+    toastEl.classList.add('opacity-100','translate-y-0');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=>{toastEl.classList.add('opacity-0','translate-y-20'); toastEl.classList.remove('opacity-100','translate-y-0');},1800);
+  }
+  function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+  function daysBetween(a,b){return Math.round((new Date(b)-new Date(a))/86400000);}
+  function fmtTime(s){if(s<60)return s+' 秒';const m=Math.floor(s/60);if(m<60)return m+' 分';return Math.floor(m/60)+' 时 '+(m%60)+' 分';}
+
+  /* ============= 美剧 / 图书馆数据 ============= */
+  const SHOWS = [
+    {id:'friends',name:'Friends',cn:'老友记',year:'1994-2004',rating:9.8,
+      poster:'https://image.tmdb.org/t/p/w500/f496cm9enuEsZkSPzCwnTESEK5s.jpg',
+      plot:'六个住在纽约的好友的日常生活与友情故事。',
+      levels:['初中','高中','四六级'],bilibili:'https://search.bilibili.com/all?keyword='+encodeURIComponent('老友记')},
+    {id:'modern',name:'Modern Family',cn:'摩登家庭',year:'2009-2020',rating:9.5,
+      poster:'https://image.tmdb.org/t/p/w500/klzQDqDuKjUKWymTFdSpJikfYrf.jpg',
+      plot:'三个家庭的伪纪录片喜剧，语速适中、用词地道。',
+      levels:['高中','四六级'],bilibili:'https://search.bilibili.com/all?keyword='+encodeURIComponent('摩登家庭')},
+    {id:'bigbang',name:'The Big Bang Theory',cn:'生活大爆炸',year:'2007-2019',rating:9.3,
+      poster:'https://image.tmdb.org/t/p/w500/ooBGRQBdbGzBxAVfExiO8r7kloA.jpg',
+      plot:'四位科学怪咖与邻居美女的日常喜剧。',
+      levels:['四六级','雅思'],bilibili:'https://search.bilibili.com/all?keyword='+encodeURIComponent('生活大爆炸')},
+    {id:'sherlock',name:'Sherlock',cn:'神探夏洛克',year:'2010-2017',rating:9.3,
+      poster:'https://image.tmdb.org/t/p/w500/7WTsnHkbA0FaG6R9twfFde0I9hl.jpg',
+      plot:'现代版福尔摩斯。台词密度高、英式发音地道。',
+      levels:['雅思'],bilibili:'https://search.bilibili.com/all?keyword='+encodeURIComponent('神探夏洛克')},
+  ];
+
+  const BOOKS = [
+    { id:'charlotte', title:"Charlotte's Web", cn:'夏洛特的网', author:'E. B. White', year:1952,
+      levels:['小学','初中'], isbn:'9780064400558',
+      summary:'蜘蛛夏洛特如何用爱与智慧拯救小猪威尔伯的友情童话。',
+      read:'https://openlibrary.org/works/OL81613W/Charlotte_s_Web' },
+    { id:'little-prince', title:'The Little Prince', cn:'小王子', author:'Antoine de Saint-Exupéry', year:1943,
+      levels:['小学','初中'], isbn:'9780156012195',
+      summary:'小王子游历各星球的哲思童话，温柔治愈。',
+      read:'https://openlibrary.org/works/OL14903W/The_Little_Prince' },
+    { id:'alice', title:'Alice in Wonderland', cn:'爱丽丝梦游仙境', author:'Lewis Carroll', year:1865,
+      levels:['小学','初中'], isbn:'9780486275437',
+      summary:'爱丽丝掉入兔子洞展开的奇幻冒险。',
+      read:'https://www.gutenberg.org/ebooks/11' },
+    { id:'harry-potter-1', title:"Harry Potter and the Sorcerer's Stone", cn:'哈利·波特与魔法石', author:'J. K. Rowling', year:1997,
+      levels:['初中','高中'], isbn:'9780747532699',
+      summary:'孤儿哈利发现自己是巫师，进入霍格沃茨开启魔法之旅。',
+      read:'https://openlibrary.org/works/OL82586W' },
+    { id:'old-man-sea', title:'The Old Man and the Sea', cn:'老人与海', author:'Ernest Hemingway', year:1952,
+      levels:['高中','大学'], isbn:'9780684801223',
+      summary:'老渔夫与大马林鱼的孤独搏斗。海明威极简文风。',
+      read:'https://openlibrary.org/works/OL34902W' },
+    { id:'gatsby', title:'The Great Gatsby', cn:'了不起的盖茨比', author:'F. Scott Fitzgerald', year:1925,
+      levels:['高中','大学'], isbn:'9780743273565',
+      summary:'神秘富豪盖茨比对昔日爱人的痴情，照见美国梦的幻灭。',
+      read:'https://www.gutenberg.org/ebooks/64317' },
+    { id:'1984', title:'1984', cn:'一九八四', author:'George Orwell', year:1949,
+      levels:['大学','雅思'], isbn:'9780451524935',
+      summary:'反乌托邦经典，描绘极权社会下个体的挣扎。',
+      read:'https://openlibrary.org/works/OL1168083W' },
+    { id:'pride', title:'Pride and Prejudice', cn:'傲慢与偏见', author:'Jane Austen', year:1813,
+      levels:['大学','雅思'], isbn:'9780141439518',
+      summary:'伊丽莎白与达西先生的爱情故事，雅思高阶阅读经典。',
+      read:'https://www.gutenberg.org/ebooks/1342' },
+    { id:'sherlock-book', title:'The Adventures of Sherlock Holmes', cn:'福尔摩斯探案集', author:'Arthur Conan Doyle', year:1892,
+      levels:['高中','大学'], isbn:'9780141034355',
+      summary:'神探福尔摩斯的十二个短篇探案。',
+      read:'https://www.gutenberg.org/ebooks/1661' },
+  ];
+
+  /* ============= 雅思核心词（精简到 200 个） ============= */
+  const IELTS_CORE = [
+    ['abandon','放弃'],['ability','能力'],['absolute','绝对的'],['absorb','吸收'],['abstract','抽象的'],
+    ['academic','学术的'],['accept','接受'],['access','进入'],['accident','事故'],['accommodate','容纳'],
+    ['accompany','陪伴'],['accomplish','完成'],['accumulate','积累'],['accurate','准确的'],['achieve','达到'],
+    ['acknowledge','承认'],['acquire','获得'],['adapt','适应'],['adequate','足够的'],['adjust','调整'],
+    ['admire','钦佩'],['adopt','采纳'],['advance','前进'],['advantage','优势'],['advocate','提倡'],
+    ['affect','影响'],['afford','负担得起'],['agriculture','农业'],['alleviate','减轻'],['allocate','分配'],
+    ['alter','改变'],['alternative','替代的'],['ambition','雄心'],['analyze','分析'],['ancient','古代的'],
+    ['announce','宣布'],['annual','每年的'],['anticipate','预期'],['anxiety','焦虑'],['apparent','明显的'],
+    ['appeal','呼吁'],['appreciate','欣赏'],['approach','方法'],['appropriate','合适的'],['approve','批准'],
+    ['argue','争论'],['arrange','安排'],['artificial','人造的'],['aspect','方面'],['assess','评估'],
+    ['asset','资产'],['assist','帮助'],['associate','联系'],['assume','假定'],['atmosphere','气氛'],
+    ['attain','达到'],['attempt','尝试'],['attend','出席'],['attitude','态度'],['attract','吸引'],
+    ['authority','权威'],['available','可获得的'],['average','平均'],['avoid','避免'],['aware','意识到的'],
+    ['behave','行为'],['belief','信念'],['benefit','好处'],['boost','促进'],['brief','简短的'],
+    ['brilliant','杰出的'],['budget','预算'],['burden','负担'],['calculate','计算'],['campaign','运动'],
+    ['capable','有能力的'],['capacity','容量'],['capture','捕获'],['career','职业'],['category','类别'],
+    ['challenge','挑战'],['characteristic','特征'],['claim','声称'],['client','客户'],['climate','气候'],
+    ['collaborate','合作'],['colleague','同事'],['combine','结合'],['comment','评论'],['commercial','商业的'],
+    ['commit','承诺'],['communicate','交流'],['community','社区'],['compare','比较'],['compete','竞争'],
+    ['complete','完成'],['complex','复杂的'],['comprehend','理解'],['compromise','妥协'],['concept','概念'],
+    ['concern','关心'],['conclude','得出结论'],['concrete','具体的'],['condition','条件'],['conduct','进行'],
+    ['confirm','确认'],['conflict','冲突'],['confront','面对'],['conscious','意识到的'],['consequence','结果'],
+    ['conserve','保护'],['consider','考虑'],['construct','建造'],['consume','消耗'],['contact','联系'],
+    ['contain','包含'],['contemporary','当代的'],['content','内容'],['context','背景'],['contract','合同'],
+    ['contradict','反驳'],['contrast','对比'],['contribute','贡献'],['controversy','争议'],['convenient','方便的'],
+    ['convey','传达'],['convince','使确信'],['cope','应付'],['create','创造'],['critical','关键的'],
+    ['crucial','至关重要的'],['cultivate','培养'],['curiosity','好奇心'],['debate','辩论'],['decade','十年'],
+    ['decline','下降'],['dedicate','奉献'],['defeat','击败'],['defend','保卫'],['define','定义'],
+    ['demand','要求'],['demonstrate','证明'],['deny','否认'],['depend','依靠'],['describe','描述'],
+    ['design','设计'],['desire','渴望'],['destroy','破坏'],['detail','细节'],['detect','察觉'],
+    ['determine','决定'],['develop','发展'],['device','装置'],['devote','致力于'],['diligent','勤奋的'],
+    ['discover','发现'],['discuss','讨论'],['display','展示'],['distinct','不同的'],['distinguish','区别'],
+    ['distribute','分配'],['diverse','多样的'],['domain','领域'],['domestic','国内的'],['dominate','支配'],
+    ['donate','捐赠'],['doubt','怀疑'],['durable','耐用的'],['economy','经济'],['educate','教育'],
+    ['efficient','高效的'],['effort','努力'],['elaborate','详细的'],['eliminate','消除'],['emerge','出现'],
+    ['emotion','情感'],['emphasize','强调'],['employ','雇佣'],['encounter','遭遇'],['encourage','鼓励'],
+    ['endure','忍受'],['engage','参与'],['enhance','增强'],['enormous','巨大的'],['ensure','确保'],
+    ['enthusiasm','热情'],['environment','环境'],['equal','平等的'],['equivalent','相等的'],['essential','必要的'],
+    ['establish','建立'],['estimate','估计'],['evaluate','评价'],['eventually','最终'],['evidence','证据'],
+    ['evolve','进化'],['examine','检查'],['exceed','超过'],['exchange','交换'],['exhibit','展览'],
+    ['expand','扩展'],['expect','期望'],['experience','经验'],['expert','专家'],['explore','探索'],
+    ['expose','暴露'],['express','表达'],['extend','延伸'],['external','外部的'],['extreme','极端的'],
+  ].map(([en,zh])=>({en,zh,createdAt:0}));
+
+  const LEVEL_MAP={};
+  'a the i you he she it we they me my your is are be have can will not no good day time year week go come see know want need like love look make take give get put water food house home book'
+    .split(/\s+/).forEach(w=>LEVEL_MAP[w]='A1');
+  'about after animal answer ask back beautiful before begin big body car cat city color country dance dog door drink eat enjoy face family fast feel find food great green hand happy hard hear help high hot hour idea important large last late learn life listen live long new next nice night old open paper park people place play question quick read ready right say school sea sell short show sing sit sleep small song speak start stop story student study sun talk teacher think today together tree try use very walk warm way week white window word work world write young'
+    .split(/\s+/).forEach(w=>{if(!LEVEL_MAP[w])LEVEL_MAP[w]='A2';});
+  IELTS_CORE.forEach(w=>{const k=w.en.toLowerCase();if(!LEVEL_MAP[k])LEVEL_MAP[k]='B2';});
+  const CEFR_INFO={
+    A1:{stars:5,label:'入门高频',cls:'bg-emerald-100 text-emerald-700'},
+    A2:{stars:5,label:'日常高频',cls:'bg-emerald-100 text-emerald-700'},
+    B1:{stars:4,label:'常用进阶',cls:'bg-blue-100 text-blue-700'},
+    B2:{stars:4,label:'雅思核心',cls:'bg-amber-100 text-amber-700'},
+    C1:{stars:3,label:'学术高阶',cls:'bg-rose-100 text-rose-700'},
+    C2:{stars:2,label:'罕见高阶',cls:'bg-violet-100 text-violet-700'},
+  };
+  function getImportance(word){
+    const lw=word.toLowerCase();
+    let c=LEVEL_MAP[lw];
+    if(!c){if(lw.length<=4)c='A2';else if(lw.length<=6)c='B1';else if(lw.length<=9)c='B2';else if(lw.length<=12)c='C1';else c='C2';}
+    return {cefr:c,...CEFR_INFO[c]};
+  }
+  const POS_MAP = {
+    'n.':{label:'名词',cls:'bg-blue-100 text-blue-700',bd:'border-blue-200',bg:'bg-blue-50/50'},
+    'v.':{label:'动词',cls:'bg-rose-100 text-rose-700',bd:'border-rose-200',bg:'bg-rose-50/50'},
+    'adj.':{label:'形容词',cls:'bg-emerald-100 text-emerald-700',bd:'border-emerald-200',bg:'bg-emerald-50/50'},
+    'adv.':{label:'副词',cls:'bg-violet-100 text-violet-700',bd:'border-violet-200',bg:'bg-violet-50/50'},
+  };
+  function posInfo(p){return POS_MAP[p]||{label:p,cls:'bg-slate-100 text-slate-700',bd:'border-slate-200',bg:'bg-slate-50/50'};}
+  function posBadge(p){const m=posInfo(p);return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold ${m.cls}"><span class="opacity-70">${p}</span><span>${m.label}</span></span>`;}
+  function normalizePos(p){const m={noun:'n.',verb:'v.',adjective:'adj.',adverb:'adv.'};return m[(p||'').toLowerCase()]||p||'';}
+  function guessPosByMorph(w){const lw=w.toLowerCase();if(/(tion|sion|ment|ness|ity|ence|ance|ist|ism|age)$/.test(lw))return 'n.';if(/(ize|ise|ate|ify)$/.test(lw))return 'v.';if(/(able|ible|al|ful|less|ous|ive|ic|ent|ant)$/.test(lw))return 'adj.';if(/ly$/.test(lw))return 'adv.';return null;}
+  const TEMPLATES={
+    'n.':[{en:w=>`The ${w} played an important role.`,zh:w=>`这个 ${w}（%CN%）起到了重要作用。`}],
+    'v.':[{en:w=>`They decided to ${w} the plan.`,zh:w=>`他们决定 ${w}（%CN%）计划。`}],
+    'adj.':[{en:w=>`The result was truly ${w}.`,zh:w=>`结果非常 ${w}（%CN%）。`}],
+    default:[{en:w=>`"${w}" appears often in writing.`,zh:w=>`"${w}"（%CN%）常出现在写作中。`}],
+  };
+  function generateExamples(w,p,zh,n=2){const tpls=TEMPLATES[p]||TEMPLATES.default;const cn=(zh||'').split(/[；;,，]/)[0].trim()||'该词';return shuffle(tpls).slice(0,Math.min(n,tpls.length)).map(t=>({en:t.en(w),zh:t.zh(w).replace('%CN%',cn)}));}
+  function generateEnglishDefs(w,p,zh){return [`The term "${w}" (${zh||'?'})`];}
+  const SYN_FAMILY={big:['large','huge'],good:['great'],bad:['poor'],important:['significant']};
+  const ANT_PAIR={big:['small'],good:['bad'],happy:['sad'],new:['old']};
+  function generateSynAnt(w){const lw=w.toLowerCase();return {syn:SYN_FAMILY[lw]||[],ant:ANT_PAIR[lw]||[]};}
+
+  /* ============= 存储 ============= */
+  const STORAGE_KEYS = { decks:'wc_decks_v12', current:'wc_current_v12', learn:'wc_lp_v12', stats:'wc_stats_v12' };
+  const BUILTIN_DECK_ID = 'builtin_ielts2000';
+  const storage = {
+    loadDecks(){try{const r=localStorage.getItem(STORAGE_KEYS.decks);return r?JSON.parse(r):null;}catch{return null;}},
+    saveDecks(d){localStorage.setItem(STORAGE_KEYS.decks,JSON.stringify(d));},
+    loadCurrentId(){return localStorage.getItem(STORAGE_KEYS.current);},
+    saveCurrentId(id){localStorage.setItem(STORAGE_KEYS.current,id);},
+    loadLearn(){try{const r=localStorage.getItem(STORAGE_KEYS.learn);return r?JSON.parse(r):{};}catch{return {};}},
+    saveLearn(p){localStorage.setItem(STORAGE_KEYS.learn,JSON.stringify(p));},
+    loadStats(){try{const r=localStorage.getItem(STORAGE_KEYS.stats);return r?JSON.parse(r):null;}catch{return null;}},
+    saveStats(s){localStorage.setItem(STORAGE_KEYS.stats,JSON.stringify(s));},
+  };
+
+  /* ============= 统计 ============= */
+  function defaultStats(){return {daily:{},totals:{firstDate:null,lastStudyDate:null,curStreak:0,maxStreak:0,totalStudied:0,totalTime:0,totalDays:0}};}
+  const stats = storage.loadStats() || defaultStats();
+  function todayBucket(){const t=todayStr();if(!stats.daily[t])stats.daily[t]={studied:0,time:0,sessions:0,checkedIn:false};return stats.daily[t];}
+  function persistStats(){storage.saveStats(stats);}
+  function bumpStreak(){
+    const t=todayStr(), last=stats.totals.lastStudyDate;
+    if(last===t)return;
+    if(!stats.totals.firstDate)stats.totals.firstDate=t;
+    if(last&&daysBetween(last,t)===1)stats.totals.curStreak+=1;
+    else if(!last||daysBetween(last,t)>1)stats.totals.curStreak=1;
+    if(stats.totals.curStreak>stats.totals.maxStreak)stats.totals.maxStreak=stats.totals.curStreak;
+    stats.totals.lastStudyDate=t;
+    stats.totals.totalDays=Object.keys(stats.daily).filter(d=>stats.daily[d].studied>0||stats.daily[d].checkedIn).length;
+  }
+  function recordStudied(n=1){if(n<=0)return;const b=todayBucket();b.studied+=n;stats.totals.totalStudied+=n;bumpStreak();persistStats();updateHomeStreak();}
+  let sessionStart=0;
+  function startSession(){sessionStart=Date.now();}
+  function endSession(){if(!sessionStart)return;const sec=Math.round((Date.now()-sessionStart)/1000);sessionStart=0;if(sec<3)return;const b=todayBucket();b.time+=sec;b.sessions+=1;stats.totals.totalTime+=sec;bumpStreak();persistStats();updateHomeStreak();}
+  function manualCheckIn(){const b=todayBucket();if(b.checkedIn){toast('今日已打卡 🎉','ok');return;}b.checkedIn=true;bumpStreak();persistStats();toast(`打卡成功！连续 ${stats.totals.curStreak} 天 🔥`,'ok');updateHomeStreak();if(state.screen==='stats')renderStats();}
+
+  /* ============= 状态 ============= */
+  const state = {
+    decks:[], currentDeckId:null, screen:'home',
+    selectedMdDeckId:null,
+    cardIndex:0, fcOrder:null,
+    lookupCache:{}, lookupCurrent:null,
+    learnProgress: storage.loadLearn(),
+    showsFilter:'all', libraryFilter:'all',
+    importPending: null, // 文件导入暂存数据
+  };
+  const getDeck = () => state.decks.find(d=>d.id===state.currentDeckId) || state.decks[0];
+  function initState(){
+    let decks=storage.loadDecks();
+    const builtin = { id:BUILTIN_DECK_ID, name:'雅思2000核心词', desc:'内置词集', isBuiltIn:true, words:IELTS_CORE.slice() };
+    if(!decks||!Array.isArray(decks)||decks.length===0) decks=[builtin];
+    else if(!decks.some(d=>d.id===BUILTIN_DECK_ID)) decks.unshift(builtin);
+    else { const idx=decks.findIndex(d=>d.id===BUILTIN_DECK_ID); decks[idx]={...decks[idx], ...builtin}; }
+    state.decks=decks;
+    const saved=storage.loadCurrentId();
+    state.currentDeckId=(saved&&decks.some(d=>d.id===saved))?saved:decks[0].id;
+    storage.saveDecks(state.decks); storage.saveCurrentId(state.currentDeckId);
+  }
+  function persist(){storage.saveDecks(state.decks);storage.saveCurrentId(state.currentDeckId);}
+
+  /* ============= 导航 ============= */
+  const LEARNING_SCREENS = new Set(['flashcards','learn','spell','match','test']);
+  function injectTopbar(holderId, title, backTarget='home') {
+    const tpl = $('tpl-topbar');
+    const node = tpl.content.firstElementChild.cloneNode(true);
+    node.querySelector('.title').textContent = title;
+    const btn = node.querySelector('[data-nav="home"]');
+    btn.addEventListener('click', ()=>goToScreen(backTarget));
+    if (backTarget !== 'home') {
+      // 二级学习页：左侧“返回”回上一级，右侧再放一个“主页”直达键
+      btn.querySelector('span').textContent = '返回';
+      const spacer = node.querySelector('.w-20');
+      if (spacer) {
+        spacer.className = 'flex justify-end';
+        const homeBtn = document.createElement('button');
+        homeBtn.type = 'button';
+        homeBtn.className = 'btn-press flex items-center gap-1.5 px-3 py-2 bg-white rounded-xl text-sm text-slate-600 shadow-soft hover:bg-slate-50';
+        homeBtn.innerHTML = '<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10"/></svg><span>主页</span>';
+        homeBtn.addEventListener('click', ()=>goToScreen('home'));
+        spacer.appendChild(homeBtn);
+      }
+    }
+    $(holderId).innerHTML = '';
+    $(holderId).appendChild(node);
+  }
+  function goToScreen(name) {
+    if (LEARNING_SCREENS.has(state.screen) && !LEARNING_SCREENS.has(name)) endSession();
+    qsa('#app > .screen').forEach(s => s.classList.add('hidden'));
+    $('screen-' + name).classList.remove('hidden');
+    state.screen = name;
+    const _fab = document.getElementById('fabHome');
+    if (_fab) _fab.classList.toggle('hidden', name === 'home');
+    if (LEARNING_SCREENS.has(name)) startSession();
+    if (name === 'home')        updateHomeStreak();
+    if (name === 'lookup')      renderDeckSelect();
+    if (name === 'mydecks')     renderMyDecks();
+    if (name === 'study')       renderStudyDeckSelect();
+    if (name === 'stats')       renderStats();
+    if (name === 'shows')       renderShows();
+    if (name === 'library')     renderLibrary();
+    if (name === 'flashcards')  initFlashcards();
+    if (name === 'learn')       initLearn();
+    if (name === 'spell')       initSpell();
+    if (name === 'match')       initMatch();
+    if (name === 'test')        initTest();
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }
+  window.addEventListener('beforeunload', () => { endSession(); });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && LEARNING_SCREENS.has(state.screen)) endSession();
+    else if (!document.hidden && LEARNING_SCREENS.has(state.screen)) startSession();
+  });
+
+  function updateHomeStreak() {
+    const t = todayStr();
+    const today = stats.daily[t] || { studied:0, time:0, sessions:0, checkedIn:false };
+    $('homeStreak').textContent = stats.totals.curStreak;
+    $('homeTodayCount').textContent = today.studied;
+    $('homeStreakHint').textContent = (today.checkedIn||today.studied>0) ? `累计 ${stats.totals.totalDays} 天 · 最长 ${stats.totals.maxStreak} 天` : `今日还没打卡`;
+    const btn = $('homeCheckIn');
+    if (today.checkedIn) { btn.textContent='✓ 已打卡'; btn.disabled=true; btn.classList.remove('bg-gradient-to-r','from-amber-500','to-orange-500'); btn.classList.add('bg-emerald-500'); }
+    else { btn.textContent='打卡'; btn.disabled=false; btn.classList.add('bg-gradient-to-r','from-amber-500','to-orange-500'); btn.classList.remove('bg-emerald-500'); }
+  }
+
+  /* ============= 通用解析 ============= */
+  // 文本 → 词条数组
+  function parseBulk(text) {
+    const lines = text.split(/\r?\n/);
+    const seps = [/\t/, /\s+\|\s+/, /\s+—\s+/, /\s+-\s+/, /[:：]\s*/, /[，,]/];
+    const out = [];
+    for (const raw of lines) {
+      const line = raw.trim(); if (!line) continue;
+      let parts = null;
+      for (const re of seps) { const m = line.split(re); if (m.length >= 2) { parts = m; break; } }
+      if (!parts) continue;
+      const term = parts[0].trim(); const def = parts.slice(1).join(' ').trim();
+      if (term && def) out.push({ en: term, zh: def });
+    }
+    return out;
+  }
+
+  /* ===================================================================
+     文件导入：支持 TXT / CSV / Excel / PDF
+     —— 解析函数返回 [{en, zh}, ...] 数组
+     ================================================================== */
+  async function parseTextFile(file) {
+    const text = await file.text();
+    return parseBulk(text);
+  }
+  async function parseExcelFile(file) {
+    if (!window.XLSX) throw new Error('Excel 库未加载（请检查网络连接）');
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, { type: 'array' });
+    const sheet = wb.Sheets[wb.SheetNames[0]];
+    if (!sheet) throw new Error('Excel 文件中找不到工作表');
+    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+    const out = [];
+    rows.forEach(r => {
+      if (!Array.isArray(r) || r.length < 2) return;
+      const term = String(r[0] ?? '').trim();
+      const def = String(r[1] ?? '').trim();
+      if (term && def && !/^(word|term|english|英文|英语|单词|词条)$/i.test(term)) {
+        // 自动跳过表头
+        out.push({ en: term, zh: def });
+      }
+    });
+    return out;
+  }
+  async function parsePdfFile(file) {
+    if (!window.pdfjsLib) throw new Error('PDF 库未加载（请检查网络连接）');
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    const buf = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+    let allText = '';
+    for (let p = 1; p <= pdf.numPages; p++) {
+      const page = await pdf.getPage(p);
+      const tc = await page.getTextContent();
+      // 按 y 坐标分行：PDF.js 不会自动按视觉行分组，需要根据 transform[5] 判断
+      const items = tc.items.map(it => ({ str: it.str, x: it.transform[4], y: it.transform[5] }));
+      items.sort((a, b) => b.y - a.y || a.x - b.x);
+      let lastY = null, lineBuf = '';
+      const lines = [];
+      items.forEach(it => {
+        if (lastY === null || Math.abs(it.y - lastY) < 3) {
+          lineBuf += (lineBuf ? ' ' : '') + it.str;
+        } else {
+          if (lineBuf.trim()) lines.push(lineBuf.trim());
+          lineBuf = it.str;
+        }
+        lastY = it.y;
+      });
+      if (lineBuf.trim()) lines.push(lineBuf.trim());
+      allText += lines.join('\n') + '\n';
+    }
+    return parseBulk(allText);
+  }
+  async function parseFile(file) {
+    const name = file.name.toLowerCase();
+    if (name.endsWith('.txt') || name.endsWith('.csv')) return parseTextFile(file);
+    if (name.endsWith('.xlsx') || name.endsWith('.xls')) return parseExcelFile(file);
+    if (name.endsWith('.pdf')) return parsePdfFile(file);
+    throw new Error('不支持的格式：仅支持 .txt / .csv / .xlsx / .xls / .pdf');
+  }
+
+  // 文件导入主流程
+  async function handleFile(file) {
+    if (!file) return;
+    const deck = getSelectedMdDeck();
+    if (deck.isBuiltIn) { toast('内置词集只读，请先切换或新建词集','error'); return; }
+
+    // 显示加载状态
+    $('mdFileError').classList.add('hidden');
+    $('mdFilePreview').classList.add('hidden');
+    $('mdFileStatus').classList.remove('hidden');
+    $('mdFileStatus').classList.add('flex');
+    $('mdFileStatusText').textContent = `正在解析 ${file.name} …`;
+
+    try {
+      const items = await parseFile(file);
+      $('mdFileStatus').classList.add('hidden');
+      $('mdFileStatus').classList.remove('flex');
+
+      if (items.length === 0) {
+        $('mdFileError').classList.remove('hidden');
+        $('mdFileError').textContent = '⚠️ 文件中未识别到有效词条，请检查格式';
+        return;
+      }
+
+      // 暂存数据 + 展示预览
+      state.importPending = items;
+      $('mdFileCount').textContent = items.length;
+      const list = $('mdFilePreviewList');
+      list.innerHTML = items.slice(0, 50).map((it,i)=>`<div>${i+1}. <span class="font-semibold">${escapeHtml(it.en)}</span> — ${escapeHtml(it.zh)}</div>`).join('') + (items.length>50?`<div class="text-slate-400 mt-1">…还有 ${items.length-50} 条</div>`:'');
+      $('mdFilePreview').classList.remove('hidden');
+    } catch (err) {
+      $('mdFileStatus').classList.add('hidden');
+      $('mdFileStatus').classList.remove('flex');
+      $('mdFileError').classList.remove('hidden');
+      $('mdFileError').textContent = '❌ ' + (err.message || '解析失败');
+    }
+  }
+
+  function importPendingFile() {
+    const deck = getSelectedMdDeck();
+    if (deck.isBuiltIn) { toast('内置词集只读','error'); return; }
+    if (!state.importPending || state.importPending.length === 0) { toast('没有可导入的数据','error'); return; }
+    const existing = new Set(deck.words.map(w => w.en.toLowerCase()));
+    let added = 0, skipped = 0;
+    state.importPending.forEach(it => {
+      if (existing.has(it.en.toLowerCase())) { skipped++; return; }
+      deck.words.push({ ...it, createdAt: Date.now() });
+      existing.add(it.en.toLowerCase());
+      added++;
+    });
+    persist();
+    state.importPending = null;
+    $('mdFilePreview').classList.add('hidden');
+    $('mdFileInput').value = '';
+    renderMyDecks(); renderMdEntries();
+    toast(`✓ 导入 ${added} 条${skipped?`，跳过 ${skipped} 条重复`:''}`, 'ok');
+  }
+
+  function clearFileImport() {
+    state.importPending = null;
+    $('mdFilePreview').classList.add('hidden');
+    $('mdFileError').classList.add('hidden');
+    $('mdFileInput').value = '';
+  }
+
+  /* ============= 美剧 / 图书馆渲染 ============= */
+  const LEVEL_COLORS = {'初中':'bg-emerald-100 text-emerald-700','高中':'bg-blue-100 text-blue-700','四六级':'bg-amber-100 text-amber-700','雅思':'bg-rose-100 text-rose-700'};
+  function renderShows() {
+    const f = state.showsFilter;
+    const list = (f === 'all') ? SHOWS : SHOWS.filter(s => s.levels.includes(f));
+    $('shCount').textContent = list.length;
+    qsa('.lv-btn').forEach(b => {
+      const active = b.dataset.level === f;
+      b.classList.toggle('bg-brand-500', active);
+      b.classList.toggle('text-white', active);
+      b.classList.toggle('bg-slate-100', !active);
+      b.classList.toggle('text-slate-600', !active);
+    });
+    const grid = $('shGrid'); grid.innerHTML = '';
+    list.forEach(s => {
+      const fallback = `https://placehold.co/300x450/6366f1/ffffff/png?text=${encodeURIComponent(s.name)}`;
+      const card = document.createElement('div');
+      card.className = 'show-card bg-white rounded-2xl shadow-soft hover:shadow-glow overflow-hidden transition group animate-fade-in';
+      card.innerHTML = `
+        <div class="relative overflow-hidden bg-slate-100">
+          <img class="show-poster w-full" loading="lazy" src="${s.poster}" onerror="this.onerror=null;this.src='${fallback}';" />
+          <div class="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-black/60 text-white text-xs font-semibold">★ ${s.rating}</div>
+          <div class="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-white/85 text-slate-700 text-xs font-medium">${s.year}</div>
+        </div>
+        <div class="p-4 space-y-3">
+          <div><h3 class="font-bold text-lg text-slate-800">${escapeHtml(s.cn)}</h3><p class="text-xs text-slate-500">${escapeHtml(s.name)}</p></div>
+          <div class="flex flex-wrap gap-1.5">${s.levels.map(l => `<span class="px-2 py-0.5 rounded-md text-xs font-semibold ${LEVEL_COLORS[l]||'bg-slate-100 text-slate-700'}">${l}</span>`).join('')}</div>
+          <p class="text-sm text-slate-600 line-clamp-3">${escapeHtml(s.plot)}</p>
+          <a href="${s.bilibili}" target="_blank" rel="noopener noreferrer" class="btn-press flex items-center justify-center gap-2 w-full py-2.5 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl text-sm font-semibold">去 B 站观看</a>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  const BOOK_LEVEL_COLORS = {
+    '小学':'bg-emerald-100 text-emerald-700 border-emerald-200',
+    '初中':'bg-sky-100 text-sky-700 border-sky-200',
+    '高中':'bg-blue-100 text-blue-700 border-blue-200',
+    '大学':'bg-amber-100 text-amber-700 border-amber-200',
+    '雅思':'bg-rose-100 text-rose-700 border-rose-200',
+  };
+  window.bookCovers = {};
+  window.bookCoverFallback = function(imgEl, bookId) {
+    const rec = window.bookCovers[bookId];
+    if (!rec) return;
+    rec.idx++;
+    if (rec.idx < rec.chain.length) imgEl.src = rec.chain[rec.idx];
+  };
+  window.bookCoverCheckSize = function(imgEl, bookId) {
+    if (imgEl.naturalWidth > 0 && imgEl.naturalWidth < 50) window.bookCoverFallback(imgEl, bookId);
+  };
+  function buildCoverChain(b) {
+    return [
+      `https://covers.openlibrary.org/b/isbn/${b.isbn}-L.jpg?default=false`,
+      `https://books.google.com/books/content?id=${b.isbn}&printsec=frontcover&img=1&zoom=1`,
+      `https://placehold.co/300x450/92400e/ffffff/png?text=${encodeURIComponent(b.title)}&font=playfair-display`,
+    ];
+  }
+  function renderLibrary() {
+    const f = state.libraryFilter;
+    const list = (f === 'all') ? BOOKS : BOOKS.filter(b => b.levels.includes(f));
+    $('lbCount').textContent = list.length;
+    qsa('.lb-btn').forEach(b => {
+      const active = b.dataset.lblevel === f;
+      b.classList.toggle('bg-amber-700', active);
+      b.classList.toggle('text-white', active);
+      b.classList.toggle('bg-slate-100', !active);
+      b.classList.toggle('text-slate-600', !active);
+    });
+    const shelvesEl = $('lbShelves'); shelvesEl.innerHTML = '';
+    if (list.length === 0) { shelvesEl.innerHTML = '<div class="text-center py-12 text-slate-500">书架空空～</div>'; return; }
+    const shelf = document.createElement('div');
+    shelf.innerHTML = `<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mb-2"></div><div class="wood-shelf"></div>`;
+    const grid = shelf.querySelector('.grid');
+    list.forEach(b => {
+      const chain = buildCoverChain(b);
+      window.bookCovers[b.id] = { chain, idx: 0 };
+      const card = document.createElement('div');
+      card.className = 'book-card animate-fade-in';
+      card.innerHTML = `
+        <div><img class="book-cover w-full rounded-md" loading="lazy" src="${chain[0]}"
+             onerror="window.bookCoverFallback(this, '${b.id}')"
+             onload="window.bookCoverCheckSize(this, '${b.id}')" /></div>
+        <div class="mt-3 space-y-2">
+          <div>
+            <h3 class="library-title font-bold text-base text-slate-800 leading-tight line-clamp-3">${escapeHtml(b.title)}</h3>
+            <p class="text-xs text-slate-500 mt-0.5 truncate">${escapeHtml(b.cn)}</p>
+          </div>
+          <p class="text-xs text-slate-500"><span class="font-medium text-slate-600">${escapeHtml(b.author)}</span> · ${b.year}</p>
+          <div class="flex flex-wrap gap-1">${b.levels.map(l => `<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold border ${BOOK_LEVEL_COLORS[l]||'bg-slate-100'}">${l}</span>`).join('')}</div>
+          <p class="text-xs text-slate-600 line-clamp-3">${escapeHtml(b.summary)}</p>
+          <a href="${b.read}" target="_blank" rel="noopener noreferrer" class="btn-press inline-flex items-center justify-center gap-1.5 w-full py-2 bg-gradient-to-r from-amber-700 to-orange-800 text-white rounded-lg text-xs font-semibold">📖 开始阅读</a>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+    shelvesEl.appendChild(shelf);
+  }
+
+  /* ============= 统计屏 ============= */
+  function totalWordCount(){return state.decks.reduce((s,d)=>s+d.words.length,0);}
+  function renderStats() {
+    const t = todayStr();
+    const today = stats.daily[t] || { studied:0, time:0, sessions:0, checkedIn:false };
+    $('stTodayDate').textContent = t;
+    $('stTodayCount').textContent = today.studied;
+    $('stTodayTime').textContent = fmtTime(today.time);
+    $('stTodaySessions').textContent = today.sessions;
+    const cb = $('stCheckIn');
+    if (today.checkedIn) { cb.textContent='✓ 已打卡'; cb.disabled=true; cb.classList.remove('text-orange-600'); cb.classList.add('text-emerald-600'); }
+    else { cb.textContent='今日打卡'; cb.disabled=false; cb.classList.add('text-orange-600'); cb.classList.remove('text-emerald-600'); }
+    $('stCurStreak').textContent = stats.totals.curStreak;
+    $('stMaxStreak').textContent = stats.totals.maxStreak;
+    $('stTotalWords').textContent = totalWordCount();
+    $('stTotalTime').textContent = Math.round(stats.totals.totalTime / 60);
+    $('stTotalDays').textContent = stats.totals.totalDays;
+    $('stTotalStudied').textContent = stats.totals.totalStudied;
+    renderBarChart(); renderHeatmap(); renderAchievements();
+  }
+  function renderBarChart() {
+    const box = $('stBarChart'); box.innerHTML = '';
+    const days = [], now = new Date();
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now); d.setDate(now.getDate() - i);
+      const key = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+      const rec = stats.daily[key];
+      days.push({label: ['日','一','二','三','四','五','六'][d.getDay()], value: rec?rec.studied:0, isToday: i===0});
+    }
+    const max = Math.max(1, ...days.map(d=>d.value));
+    days.forEach(d => {
+      const h = Math.max(2, Math.round(d.value/max*110));
+      const wrap = document.createElement('div');
+      wrap.className = 'flex-1 flex flex-col items-center gap-1';
+      wrap.innerHTML = `<div class="text-xs font-semibold ${d.isToday?'text-accent-500':'text-slate-500'}">${d.value}</div><div class="w-full rounded-t ${d.isToday?'bg-gradient-to-t from-accent-500 to-pink-300':'bg-gradient-to-t from-brand-500 to-brand-200'}" style="height:${h}px;"></div><div class="text-xs ${d.isToday?'text-accent-500 font-semibold':'text-slate-400'}">${d.label}</div>`;
+      box.appendChild(wrap);
+    });
+  }
+  function renderHeatmap() {
+    const box = $('stHeatmap'); box.innerHTML = '';
+    const total = 56, today = new Date();
+    for (let i = total - 1; i >= 0; i--) {
+      const d = new Date(today); d.setDate(today.getDate() - i);
+      const key = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+      const rec = stats.daily[key]; const v = rec ? rec.studied : 0;
+      let lv = 0;
+      if (v >= 50) lv = 4; else if (v >= 20) lv = 3; else if (v >= 10) lv = 2; else if (v > 0) lv = 1;
+      const el = document.createElement('div');
+      el.className = `heat-cell heat-${lv}${i===0?' heat-today':''}`;
+      el.title = `${key} · ${v}`;
+      box.appendChild(el);
+    }
+  }
+  const ACHIEVEMENTS = [
+    { name:'初次打卡', icon:'🌱', check: s => s.totals.totalDays >= 1, desc:'第一次' },
+    { name:'三日不辍', icon:'🔥', check: s => s.totals.maxStreak >= 3, desc:'3 天' },
+    { name:'坚持一周', icon:'⭐', check: s => s.totals.maxStreak >= 7, desc:'7 天' },
+    { name:'月度精英', icon:'🏆', check: s => s.totals.maxStreak >= 30, desc:'30 天' },
+    { name:'词条破百', icon:'📚', check: s => s.totals.totalStudied >= 50, desc:'50 个' },
+    { name:'词汇大师', icon:'🎓', check: s => s.totals.totalStudied >= 200, desc:'200 个' },
+    { name:'专注 60 分', icon:'⏱️', check: s => s.totals.totalTime >= 3600, desc:'1 小时' },
+    { name:'十小时学者', icon:'🌟', check: s => s.totals.totalTime >= 36000, desc:'10 小时' },
+  ];
+  function renderAchievements() {
+    const box = $('stAchievements'); box.innerHTML = '';
+    ACHIEVEMENTS.forEach(a => {
+      const got = a.check(stats);
+      const el = document.createElement('div');
+      el.className = `rounded-xl p-3 text-center transition ${got?'bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200':'bg-slate-50 border-2 border-transparent opacity-60'}`;
+      el.innerHTML = `<div class="text-3xl mb-1 ${got?'':'grayscale'}">${a.icon}</div><div class="text-xs font-bold ${got?'text-amber-700':'text-slate-500'}">${a.name}</div><div class="text-xs text-slate-500 mt-0.5">${a.desc}</div>`;
+      box.appendChild(el);
+    });
+  }
+
+  /* ============= 词集选择 / 我的词集 ============= */
+  function renderDeckSelect() {
+    const el = $('deckSelect'); el.innerHTML = '';
+    state.decks.forEach(d => {
+      const o = document.createElement('option'); o.value = d.id;
+      o.textContent = d.name + (d.isBuiltIn?' 🔒':'') + ` (${d.words.length})`;
+      if (d.id === state.currentDeckId) o.selected = true;
+      el.appendChild(o);
+    });
+  }
+  function renderStudyDeckSelect() {
+    const sel=$('studyDeckSelect'); sel.innerHTML='';
+    state.decks.forEach(d=>{
+      const o=document.createElement('option'); o.value=d.id;
+      o.textContent=d.name+(d.isBuiltIn?' 🔒':'')+` (${d.words.length})`;
+      if(d.id===state.currentDeckId) o.selected=true;
+      sel.appendChild(o);
+    });
+    $('studyDeckInfo').textContent=`共 ${getDeck().words.length} 个`;
+  }
+  function switchDeck(id) {
+    if (!state.decks.some(d=>d.id===id)) return;
+    state.currentDeckId = id; persist();
+    if (state.screen === 'lookup') renderDeckSelect();
+    if (state.screen === 'study') renderStudyDeckSelect();
+  }
+  function renderMyDecks() {
+    const list = $('mdDeckList'); list.innerHTML = '';
+    $('mdDeckCount').textContent = state.decks.length + ' 个';
+    state.decks.forEach(d => {
+      const selected = d.id === state.selectedMdDeckId;
+      const item = document.createElement('button');
+      item.className = `w-full text-left p-3 rounded-xl border transition btn-press animate-slide-in ${selected?'bg-brand-50 border-brand-300':'bg-slate-50 border-transparent hover:bg-white hover:border-brand-100'}`;
+      item.innerHTML = `
+        <div class="flex items-start justify-between gap-2">
+          <div class="flex-1 min-w-0">
+            <div class="font-semibold text-slate-800 text-sm truncate flex items-center gap-1.5"><span class="deck-name"></span>${d.isBuiltIn?'<span class="text-xs">🔒</span>':''}</div>
+            <div class="text-xs text-slate-500 truncate deck-desc"></div>
+          </div>
+          <span class="shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full ${selected?'bg-brand-100 text-brand-700':'bg-white text-slate-500'}">${d.words.length}</span>
+        </div>`;
+      item.querySelector('.deck-name').textContent = d.name;
+      item.querySelector('.deck-desc').textContent = d.desc || (d.isBuiltIn?'只读':'自定义');
+      item.addEventListener('click', () => { state.selectedMdDeckId = d.id; clearFileImport(); renderMyDecks(); });
+      list.appendChild(item);
+    });
+    if (!state.selectedMdDeckId) state.selectedMdDeckId = state.decks[0].id;
+    renderMdEditor();
+  }
+  function getSelectedMdDeck() { return state.decks.find(d => d.id === state.selectedMdDeckId); }
+  function renderMdEditor() {
+    const deck = getSelectedMdDeck();
+    if (!deck) return;
+    $('mdEmpty').classList.add('hidden'); $('mdEditor').classList.remove('hidden');
+    $('mdDeckName').textContent = deck.name;
+    $('mdDeckDesc').textContent = deck.desc || '';
+    $('mdDeckBuiltin').classList.toggle('hidden', !deck.isBuiltIn);
+    $('mdDeckCountInline').textContent = deck.words.length;
+    const ro = !!deck.isBuiltIn;
+    $('mdBtnDeleteDeck').disabled = ro; $('mdBtnRename').disabled = ro;
+    $('mdAddTerm').disabled = ro; $('mdAddDef').disabled = ro;
+    qs('#mdAddForm button[type="submit"]').disabled = ro;
+    $('mdBulkInput').disabled = ro; $('mdBtnBulkPreview').disabled = ro; $('mdBtnBulkImport').disabled = ro;
+    setMdTab('single'); renderMdEntries();
+  }
+  function setMdTab(tab) {
+    qsa('.md-tab').forEach(b => {
+      const active = b.dataset.tab === tab;
+      b.classList.toggle('border-brand-500', active);
+      b.classList.toggle('text-brand-700', active);
+      b.classList.toggle('border-transparent', !active);
+      b.classList.toggle('text-slate-500', !active);
+    });
+    $('mdTabSingle').classList.toggle('hidden', tab !== 'single');
+    $('mdTabBulk').classList.toggle('hidden', tab !== 'bulk');
+    $('mdTabFile').classList.toggle('hidden', tab !== 'file');
+  }
+  function renderMdEntries() {
+    const deck = getSelectedMdDeck();
+    const box = $('mdEntries'); box.innerHTML = '';
+    const q = ($('mdSearch').value || '').trim().toLowerCase();
+    const list = q ? deck.words.filter(w => w.en.toLowerCase().includes(q) || w.zh.toLowerCase().includes(q)) : deck.words;
+    if (list.length === 0) { box.innerHTML = '<div class="text-center py-8 text-slate-400 text-sm">空</div>'; return; }
+    const ro = !!deck.isBuiltIn;
+    list.forEach(w => {
+      const idx = deck.words.indexOf(w);
+      const item = document.createElement('div');
+      item.className = 'flex items-center gap-2 p-2.5 bg-slate-50 hover:bg-white border border-transparent hover:border-brand-100 rounded-lg transition animate-slide-in';
+      item.innerHTML = `
+        <div class="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-2 gap-1 md:gap-3">
+          <div class="font-semibold text-slate-800 text-sm truncate term"></div>
+          <div class="text-slate-600 text-sm truncate def"></div>
+        </div>
+        ${ro?'':`<button class="btn-press shrink-0 w-7 h-7 flex items-center justify-center text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-md edit-btn">✎</button><button class="btn-press shrink-0 w-7 h-7 flex items-center justify-center text-red-500 hover:bg-red-50 rounded-md del-btn">✕</button>`}
+      `;
+      item.querySelector('.term').textContent = w.en;
+      item.querySelector('.def').textContent = w.zh;
+      if (!ro) {
+        item.querySelector('.edit-btn').addEventListener('click', () => editEntry(idx));
+        item.querySelector('.del-btn').addEventListener('click', () => deleteEntry(idx));
+      }
+      box.appendChild(item);
+    });
+  }
+  function editEntry(idx) {
+    const deck = getSelectedMdDeck(); const w = deck.words[idx];
+    const term = prompt('词条', w.en); if (term === null) return;
+    const def = prompt('释义', w.zh); if (def === null) return;
+    const t = term.trim(), d = def.trim();
+    if (!t || !d) { toast('不能为空','error'); return; }
+    if (deck.words.some((x,i)=>i!==idx && x.en.toLowerCase()===t.toLowerCase())) { toast('已存在','error'); return; }
+    deck.words[idx] = { ...w, en: t, zh: d };
+    persist(); renderMdEntries(); renderMyDecks(); toast('已更新','ok');
+  }
+  function deleteEntry(idx) {
+    const deck = getSelectedMdDeck(); const w = deck.words[idx];
+    if (!confirm(`删除「${w.en}」？`)) return;
+    deck.words.splice(idx, 1);
+    persist(); renderMdEntries(); renderMyDecks(); toast('已删除');
+  }
+  function createDeck() {
+    const name = $('mdNewName').value.trim(), desc = $('mdNewDesc').value.trim();
+    if (!name) { toast('请输入','error'); return; }
+    if (state.decks.some(d=>d.name===name)) { toast('已存在','error'); return; }
+    const id = 'deck_'+Date.now();
+    state.decks.push({ id, name, desc, isBuiltIn:false, words:[] });
+    state.selectedMdDeckId = id; state.currentDeckId = id;
+    persist(); renderMyDecks();
+    $('mdNewName').value = ''; $('mdNewDesc').value = '';
+    toast('已创建','ok');
+  }
+  function renameDeck() {
+    const deck = getSelectedMdDeck();
+    if (deck.isBuiltIn) return;
+    const name = prompt('新名称', deck.name); if (name === null) return;
+    const n = name.trim(); if (!n) return;
+    if (state.decks.some(d=>d.id!==deck.id && d.name===n)) { toast('已存在','error'); return; }
+    deck.name = n; persist(); renderMyDecks(); toast('已更新','ok');
+  }
+  function deleteSelectedDeck() {
+    const deck = getSelectedMdDeck();
+    if (deck.isBuiltIn) return;
+    if (!confirm(`删除「${deck.name}」？`)) return;
+    state.decks = state.decks.filter(d => d.id !== deck.id);
+    if (state.currentDeckId === deck.id) state.currentDeckId = state.decks[0].id;
+    state.selectedMdDeckId = state.decks[0].id;
+    persist(); renderMyDecks(); toast('已删除','ok');
+  }
+  function addSingleEntry(e) {
+    if (e) e.preventDefault();
+    const deck = getSelectedMdDeck();
+    if (deck.isBuiltIn) return;
+    const t = $('mdAddTerm').value.trim(), d = $('mdAddDef').value.trim();
+    if (!t || !d) { toast('请输入','error'); return; }
+    if (deck.words.some(w => w.en.toLowerCase() === t.toLowerCase())) { toast('已存在','error'); return; }
+    deck.words.push({ en:t, zh:d, createdAt: Date.now() });
+    persist(); renderMyDecks(); renderMdEntries();
+    $('mdAddTerm').value = ''; $('mdAddDef').value = ''; $('mdAddTerm').focus();
+    toast('已添加','ok');
+  }
+  function previewBulk() {
+    const items = parseBulk($('mdBulkInput').value);
+    const box = $('mdBulkPreview'); box.classList.remove('hidden');
+    if (items.length === 0) { box.innerHTML = '<div class="text-rose-600">未识别</div>'; return; }
+    box.innerHTML = `<div class="mb-2 font-semibold">识别 ${items.length} 条：</div>` + items.slice(0,30).map((it,i)=>`<div>${i+1}. <span class="font-semibold">${escapeHtml(it.en)}</span> — ${escapeHtml(it.zh)}</div>`).join('');
+  }
+  function importBulk() {
+    const deck = getSelectedMdDeck();
+    if (deck.isBuiltIn) return;
+    const items = parseBulk($('mdBulkInput').value);
+    if (items.length === 0) { toast('未识别','error'); return; }
+    const existing = new Set(deck.words.map(w=>w.en.toLowerCase()));
+    let added=0, skipped=0;
+    items.forEach(it => {
+      if (existing.has(it.en.toLowerCase())) { skipped++; return; }
+      deck.words.push({ ...it, createdAt: Date.now() });
+      existing.add(it.en.toLowerCase()); added++;
+    });
+    persist(); renderMyDecks(); renderMdEntries();
+    $('mdBulkInput').value = ''; $('mdBulkPreview').classList.add('hidden');
+    toast(`导入 ${added} 条${skipped?`，跳过 ${skipped}`:''}`,'ok');
+  }
+  function studySelectedDeck() {
+    const deck = getSelectedMdDeck();
+    state.currentDeckId = deck.id; persist();
+    goToScreen('study');
+  }
+
+  /* ============= 查词 ============= */
+  const lookupInputEl = $('lookupInput');
+  const lookupHintEl = $('lookupHint'), lookupLoadEl = $('lookupLoading'), lookupResultEl = $('lookupResult');
+  const lookupWordEl = $('lookupWord'), lookupPosEl = $('lookupPosBadges');
+  const lookupStarsEl = $('lookupStars'), lookupCefrEl = $('lookupCefr'), lookupLevelEl = $('lookupLevelLabel');
+  const lookupMeanEl = $('lookupMeaning'), lookupSrcEl = $('lookupSource');
+  const lookupMeaningsEl = $('lookupMeanings');
+  function setLookupState(name) {
+    lookupHintEl.classList.toggle('hidden', name!=='hint');
+    lookupLoadEl.classList.toggle('hidden', name!=='loading');
+    lookupLoadEl.classList.toggle('flex', name==='loading');
+    lookupResultEl.classList.toggle('hidden', name!=='result');
+  }
+  function showHint(msg){lookupHintEl.textContent=msg;setLookupState('hint');}
+  function renderLookupResult(data){
+    lookupWordEl.textContent = data.en;
+    lookupPosEl.innerHTML = '';
+    [...new Set(data.meanings.map(m=>m.pos).filter(Boolean))].forEach(p=>lookupPosEl.insertAdjacentHTML('beforeend',posBadge(p)));
+    const lv=data.level;
+    lookupStarsEl.innerHTML='';
+    for(let i=1;i<=5;i++){const s=document.createElement('span');s.className='star '+(i<=lv.stars?'star-on':'star-off');s.textContent='★';lookupStarsEl.appendChild(s);}
+    lookupCefrEl.textContent=lv.cefr;
+    lookupCefrEl.className='inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold '+lv.cls;
+    lookupLevelEl.textContent=lv.label;
+    lookupMeanEl.textContent=data.zh||data.meanings.map(m=>`${m.pos} ${m.zh}`).join('  ');
+    lookupSrcEl.textContent=data.source||'';
+    lookupMeaningsEl.innerHTML='';
+    data.meanings.forEach((m)=>{
+      const info=posInfo(m.pos);
+      const card=document.createElement('div');
+      card.className=`border ${info.bd} ${info.bg} rounded-xl p-4 space-y-3`;
+      card.innerHTML=`
+        <div class="flex items-center gap-2 flex-wrap">${posBadge(m.pos)}<span class="text-slate-800 font-semibold text-base zh-meaning"></span></div>
+        <div class="bg-white/70 border border-white rounded-lg p-3">
+          <div class="text-xs font-semibold text-slate-500 mb-1.5">英英释义</div>
+          <ul class="text-sm text-slate-700 space-y-1 list-disc list-inside defs-list"></ul>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="bg-emerald-50/60 border border-emerald-100 rounded-lg p-3"><div class="text-xs font-semibold text-emerald-700 mb-2">近义词</div><div class="syn-list flex flex-wrap gap-1.5"></div></div>
+          <div class="bg-rose-50/60 border border-rose-100 rounded-lg p-3"><div class="text-xs font-semibold text-rose-700 mb-2">反义词</div><div class="ant-list flex flex-wrap gap-1.5"></div></div>
+        </div>
+        <div class="bg-amber-50/50 border border-amber-100 rounded-lg p-3"><div class="text-xs font-semibold text-amber-700 mb-2">例句</div><div class="ex-list space-y-2"></div></div>
+      `;
+      card.querySelector('.zh-meaning').textContent=m.zh||'';
+      const dl=card.querySelector('.defs-list');
+      (m.defs&&m.defs.length?m.defs.slice(0,3):['(暂无)']).forEach(d=>{const li=document.createElement('li');li.textContent=d;dl.appendChild(li);});
+      const chips=(el,arr,scheme)=>{
+        if(!arr||arr.length===0){el.innerHTML='<span class="text-xs text-slate-400">（无）</span>';return;}
+        arr.slice(0,10).forEach(w=>{const c=document.createElement('span');c.className=`inline-block px-2 py-0.5 text-xs rounded-full ${scheme} cursor-pointer hover:opacity-80`;c.textContent=w;c.addEventListener('click',()=>{lookupInputEl.value=w;lookupWord();});el.appendChild(c);});
+      };
+      chips(card.querySelector('.syn-list'),m.syn,'bg-white border border-emerald-200 text-emerald-700');
+      chips(card.querySelector('.ant-list'),m.ant,'bg-white border border-rose-200 text-rose-700');
+      const exL=card.querySelector('.ex-list');
+      if(!m.examples||m.examples.length===0) exL.innerHTML='<div class="text-xs text-slate-400">（无）</div>';
+      else m.examples.slice(0,3).forEach((ex,ei)=>{
+        const d=document.createElement('div');
+        d.className='bg-white border border-amber-100 rounded-md p-2.5';
+        d.innerHTML=`<div class="flex items-start gap-2"><span class="shrink-0 w-5 h-5 rounded-full bg-amber-100 text-amber-700 text-xs flex items-center justify-center font-semibold mt-0.5">${ei+1}</span><div class="flex-1"><div class="text-slate-800 text-sm">${escapeHtml(ex.en)}</div><div class="text-slate-500 text-xs mt-1">${escapeHtml(ex.zh||'')}</div></div></div>`;
+        exL.appendChild(d);
+      });
+      lookupMeaningsEl.appendChild(card);
+    });
+    state.lookupCurrent={en:data.en,zh:data.zh};
+    setLookupState('result');
+  }
+  function localDeckLookup(word){const lw=word.toLowerCase();for(const d of state.decks){const hit=d.words.find(w=>w.en.toLowerCase()===lw);if(hit)return {zh:hit.zh,src:`来自「${d.name}」`};}return null;}
+  async function fetchDictionaryApi(word){
+    const resp=await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/'+encodeURIComponent(word));
+    if(!resp.ok)throw new Error('not_found');
+    const data=await resp.json();
+    if(!Array.isArray(data)||!data[0]||!data[0].meanings)throw new Error('empty');
+    return data[0].meanings.map(m=>{
+      const posAbbr=normalizePos(m.partOfSpeech);
+      const syn=new Set(m.synonyms||[]),ant=new Set(m.antonyms||[]);
+      const defs=[],examples=[];
+      (m.definitions||[]).forEach(d=>{
+        if(d.definition)defs.push(d.definition);
+        (d.synonyms||[]).forEach(s=>syn.add(s));
+        (d.antonyms||[]).forEach(s=>ant.add(s));
+        if(d.example)examples.push({en:d.example,zh:''});
+      });
+      return {pos:posAbbr,zh:'',defs:defs.slice(0,3),syn:[...syn],ant:[...ant],examples:examples.slice(0,2)};
+    });
+  }
+  async function translateEnToZh(text){
+    const resp=await fetch('https://api.mymemory.translated.net/get?q='+encodeURIComponent(text)+'&langpair=en|zh-CN');
+    if(!resp.ok)throw new Error('fail');
+    const data=await resp.json();
+    const zh=data&&data.responseData&&data.responseData.translatedText;
+    if(!zh)throw new Error('empty');
+    return zh;
+  }
+  function fillGaps(word,m,zhHint){
+    if(!m.syn||m.syn.length<3||!m.ant||m.ant.length<2){
+      const gen=generateSynAnt(word);
+      m.syn=m.syn||[]; m.ant=m.ant||[];
+      const ss=new Set(m.syn.map(s=>s.toLowerCase())),as=new Set(m.ant.map(s=>s.toLowerCase()));
+      gen.syn.forEach(s=>{if(!ss.has(s.toLowerCase()))m.syn.push(s);});
+      gen.ant.forEach(s=>{if(!as.has(s.toLowerCase()))m.ant.push(s);});
+    }
+    if(!m.examples||m.examples.length<2){
+      m.examples=(m.examples||[]).concat(generateExamples(word,m.pos,m.zh||zhHint,2));
+    }
+    if(!m.defs||m.defs.length===0) m.defs=generateEnglishDefs(word,m.pos,m.zh||zhHint);
+  }
+  async function lookupWord(){
+    const word=(lookupInputEl.value||'').trim();
+    if(!word){showHint('请输入');return;}
+    if(!/^[a-zA-Z][a-zA-Z\s'-]*$/.test(word)){toast('请输入合法英文','error');return;}
+    const cacheKey=word.toLowerCase();
+    if(state.lookupCache[cacheKey]){renderLookupResult(state.lookupCache[cacheKey]);return;}
+    setLookupState('loading');
+    const btnL=$('btnLookup'); btnL.disabled=true; btnL.textContent='查询中…';
+    const [apiR,trR]=await Promise.allSettled([fetchDictionaryApi(word),translateEnToZh(word)]);
+    const sources=[]; let meanings=[];
+    if(apiR.status==='fulfilled'){meanings=apiR.value;sources.push('Dictionary API');}
+    let zhMain=trR.status==='fulfilled'?trR.value:'';
+    if(trR.status==='fulfilled')sources.push('MyMemory');
+    if(!zhMain){const fb=localDeckLookup(word);if(fb){zhMain=fb.zh;sources.push(fb.src);}}
+    if(meanings.length===0){meanings=[{pos:guessPosByMorph(word)||'n.',zh:zhMain||'',defs:[],syn:[],ant:[],examples:[]}];sources.push('词性推断');}
+    meanings.forEach(m=>{if(!m.zh)m.zh=zhMain||'';fillGaps(word,m,zhMain);});
+    const data={en:word,zh:zhMain||meanings.map(m=>`${m.pos} ${m.zh}`).join('  '),level:getImportance(word),meanings,source:sources.length?'数据来源：'+sources.join(' · '):''};
+    state.lookupCache[cacheKey]=data;
+    renderLookupResult(data);
+    btnL.disabled=false; btnL.textContent='查询';
+  }
+
+  /* ============= 5 种学习模式 ============= */
+  function getStudyWords(){const d=getDeck();if(state.fcOrder&&state.fcOrder.length===d.words.length)return state.fcOrder.map(i=>d.words[i]);return d.words;}
+  function initFlashcards(){
+    const d=getDeck();
+    if(d.words.length===0){$('fcEmpty').classList.remove('hidden');$('fcMain').classList.add('hidden');return;}
+    $('fcEmpty').classList.add('hidden');$('fcMain').classList.remove('hidden');
+    state.cardIndex=0; state.fcOrder=null; renderFcCard();
+  }
+  function renderFcCard(){
+    const ws=getStudyWords();
+    if(state.cardIndex>=ws.length)state.cardIndex=ws.length-1;
+    if(state.cardIndex<0)state.cardIndex=0;
+    const w=ws[state.cardIndex];
+    $('fcCard').classList.remove('rotate-y-180');
+    setTimeout(()=>{$('fcWord').textContent=w.en;$('fcMeaning').textContent=w.zh;},60);
+    $('fcProgressText').textContent=(state.cardIndex+1)+' / '+ws.length;
+    $('fcProgressFill').style.width=((state.cardIndex+1)/ws.length*100)+'%';
+    $('fcPrev').disabled=state.cardIndex===0;
+    $('fcNext').disabled=state.cardIndex===ws.length-1;
+  }
+  function fcFlip(){if(getDeck().words.length===0)return;$('fcCard').classList.toggle('rotate-y-180');}
+  function fcPrev(){if(state.cardIndex>0){state.cardIndex--;renderFcCard();}}
+  function fcNext(){if(state.cardIndex<getStudyWords().length-1){state.cardIndex++;renderFcCard();recordStudied(1);}}
+  function fcShuffle(){state.fcOrder=shuffle(getDeck().words.map((_,i)=>i));state.cardIndex=0;renderFcCard();toast('已打乱','ok');}
+
+  const ln = { queue:[], currentIdx:-1, word:null, question:null, right:0, wrong:0, total:0, asked:0, progress:{} };
+  function initLearn(){
+    const d=getDeck();
+    if(d.words.length<4){$('lnEmpty').classList.remove('hidden');$('lnMain').classList.add('hidden');return;}
+    $('lnEmpty').classList.add('hidden');$('lnMain').classList.remove('hidden');
+    ln.progress=state.learnProgress[state.currentDeckId]||{};
+    const items=d.words.map((w,i)=>({i,p:ln.progress[w.en]||{seen:0,wrong:0}}));
+    items.sort((a,b)=>(b.p.wrong-a.p.wrong)||(a.p.seen-b.p.seen));
+    ln.queue=items.map(x=>x.i);
+    ln.currentIdx=-1; ln.right=0; ln.wrong=0; ln.asked=0; ln.total=ln.queue.length;
+    nextLearnQ();
+  }
+  function nextLearnQ(){
+    ln.currentIdx++;
+    if(ln.currentIdx>=ln.queue.length){showEnd('学习完成',`回答 ${ln.asked} 题 · ✓ ${ln.right} · ✗ ${ln.wrong}`,initLearn,()=>goToScreen('study'));return;}
+    const d=getDeck(); const w=d.words[ln.queue[ln.currentIdx]]; ln.word=w;
+    const t=['mc-en2zh','mc-zh2en','spell'][rand(3)];
+    let q;
+    if(t==='spell')q={type:'spell',prompt:w.zh,hint:`首字母 ${w.en[0].toUpperCase()} · ${w.en.length} 字母`,answer:w.en};
+    else q=makeChoiceQ(d,w,t==='mc-en2zh'?'en2zh':'zh2en');
+    ln.question=q;
+    renderLnQ();
+  }
+  function makeChoiceQ(d,w,dir){
+    const distractors=shuffle(d.words.filter(x=>x.en!==w.en)).slice(0,3);
+    if(dir==='en2zh'){const choices=shuffle([w,...distractors]).map(x=>x.zh);return {type:'choice',prompt:w.en,hint:'选择释义',choices,answer:w.zh};}
+    const choices=shuffle([w,...distractors]).map(x=>x.en);
+    return {type:'choice',prompt:w.zh,hint:'选择词条',choices,answer:w.en};
+  }
+  function renderLnQ(){
+    const q=ln.question;
+    $('lnQType').textContent=q.type==='choice'?'选择题':'拼写题';
+    $('lnQPrompt').textContent=q.prompt;
+    $('lnQHint').textContent=q.hint||'';
+    $('lnFeedback').classList.add('hidden');
+    $('lnNext').onclick=nextLearnQ;
+    $('lnProgress').textContent=`${ln.currentIdx+1} / ${ln.total}`;
+    $('lnProgressFill').style.width=((ln.currentIdx+1)/ln.total*100)+'%';
+    $('lnRight').textContent=ln.right; $('lnWrong').textContent=ln.wrong;
+    if(q.type==='choice'){
+      $('lnChoices').classList.remove('hidden'); $('lnTyping').classList.add('hidden');
+      const box=$('lnChoices'); box.innerHTML='';
+      q.choices.forEach(c=>{
+        const b=document.createElement('button');
+        b.className='btn-press text-left px-4 py-3 bg-slate-50 hover:bg-brand-50 border-2 border-slate-200 rounded-xl text-sm transition';
+        b.textContent=c;
+        b.addEventListener('click',()=>submitChoice(c,b));
+        box.appendChild(b);
+      });
+    }else{
+      $('lnChoices').classList.add('hidden'); $('lnTyping').classList.remove('hidden');
+      $('lnInput').value=''; $('lnInput').focus();
+    }
+  }
+  function submitChoice(c,btn){
+    const q=ln.question, right=(c===q.answer);
+    qsa('#lnChoices button').forEach(b=>{b.disabled=true;});
+    if(right) btn.classList.add('bg-emerald-100','border-emerald-400','text-emerald-800');
+    else { btn.classList.add('bg-rose-100','border-rose-400','text-rose-800'); qsa('#lnChoices button').forEach(b=>{if(b.textContent===q.answer)b.classList.add('bg-emerald-100','border-emerald-400','text-emerald-800');}); }
+    finishLn(right);
+  }
+  function submitTyping(){const q=ln.question, right=$('lnInput').value.trim().toLowerCase()===q.answer.toLowerCase(); finishLn(right);}
+  function finishLn(right){
+    ln.asked++; if(right)ln.right++; else ln.wrong++;
+    const p=ln.progress[ln.word.en]||{seen:0,wrong:0};
+    p.seen++; if(!right)p.wrong++;
+    ln.progress[ln.word.en]=p;
+    state.learnProgress[state.currentDeckId]=ln.progress;
+    storage.saveLearn(state.learnProgress);
+    recordStudied(1);
+    if(!right){const at=Math.min(ln.queue.length,ln.currentIdx+5+rand(5));ln.queue.splice(at,0,ln.queue[ln.currentIdx]);ln.total=ln.queue.length;}
+    const fb=$('lnFeedback'); fb.classList.remove('hidden');
+    fb.className='mt-5 p-4 rounded-xl animate-fade-in '+(right?'bg-emerald-50 border border-emerald-200 text-emerald-800':'bg-rose-50 border border-rose-200 text-rose-800');
+    $('lnFbTitle').textContent=right?'✓ 正确':'✗ 错误';
+    $('lnFbDetail').innerHTML=`<span class="font-semibold">${escapeHtml(ln.word.en)}</span> — ${escapeHtml(ln.word.zh)}`;
+    $('lnRight').textContent=ln.right; $('lnWrong').textContent=ln.wrong;
+  }
+
+  const sp = { order:[], idx:0, right:0, wrong:0, answered:false };
+  function initSpell(){
+    const d=getDeck();
+    if(d.words.length===0){$('spEmpty').classList.remove('hidden');$('spMain').classList.add('hidden');return;}
+    $('spEmpty').classList.add('hidden');$('spMain').classList.remove('hidden');
+    sp.order=shuffle(d.words.map((_,i)=>i));
+    sp.idx=0; sp.right=0; sp.wrong=0; sp.answered=false;
+    renderSp();
+    setTimeout(()=>speak(getDeck().words[sp.order[0]].en),300);
+  }
+  function renderSp(){
+    const w=getDeck().words[sp.order[sp.idx]];
+    $('spHintText').textContent=w.zh;
+    $('spProgress').textContent=`${sp.idx+1} / ${sp.order.length}`;
+    $('spProgressFill').style.width=((sp.idx+1)/sp.order.length*100)+'%';
+    $('spRight').textContent=sp.right; $('spWrong').textContent=sp.wrong;
+    $('spInput').value=''; $('spInput').disabled=false;
+    $('spFeedback').classList.add('hidden'); $('spNext').classList.add('hidden');
+    sp.answered=false; $('spInput').focus();
+  }
+  function submitSp(){
+    if(sp.answered)return;
+    const w=getDeck().words[sp.order[sp.idx]];
+    const ans=$('spInput').value.trim().toLowerCase();
+    if(!ans){toast('请输入','error');return;}
+    sp.answered=true; $('spInput').disabled=true;
+    const right=(ans===w.en.toLowerCase());
+    if(right)sp.right++; else sp.wrong++;
+    recordStudied(1);
+    $('spRight').textContent=sp.right; $('spWrong').textContent=sp.wrong;
+    const fb=$('spFeedback');
+    fb.classList.remove('hidden');
+    fb.className='mt-4 p-3 rounded-xl text-sm text-center animate-fade-in '+(right?'bg-emerald-50 border border-emerald-200 text-emerald-800':'bg-rose-50 border border-rose-200 text-rose-800');
+    fb.innerHTML=right?`✓ 正确！<span class="font-semibold">${escapeHtml(w.en)}</span>`:`✗ 答案：<span class="font-semibold">${escapeHtml(w.en)}</span>`;
+    $('spNext').classList.remove('hidden');
+  }
+  function nextSp(){
+    sp.idx++;
+    if(sp.idx>=sp.order.length){showEnd('拼写完成',`✓ ${sp.right} · ✗ ${sp.wrong}`,initSpell,()=>goToScreen('study'));return;}
+    renderSp();
+    setTimeout(()=>speak(getDeck().words[sp.order[sp.idx]].en),300);
+  }
+
+  const mt = { pairs:[], cards:[], selected:[], matched:0, total:0, startTime:0, timerId:null };
+  function initMatch(){
+    const d=getDeck();
+    if(d.words.length<6){$('mtEmpty').classList.remove('hidden');$('mtMain').classList.add('hidden');return;}
+    $('mtEmpty').classList.add('hidden');$('mtMain').classList.remove('hidden');
+    startMatch();
+  }
+  function startMatch(){
+    const d=getDeck();
+    mt.pairs=shuffle(d.words.slice()).slice(0,6);
+    mt.cards=[];
+    mt.pairs.forEach((w,i)=>{mt.cards.push({id:'en'+i,pair:i,kind:'en',text:w.en});mt.cards.push({id:'zh'+i,pair:i,kind:'zh',text:w.zh});});
+    mt.cards=shuffle(mt.cards);
+    mt.selected=[]; mt.matched=0; mt.total=mt.pairs.length;
+    $('mtMatched').textContent='0'; $('mtTotal').textContent=mt.total;
+    mt.startTime=Date.now();
+    if(mt.timerId)clearInterval(mt.timerId);
+    mt.timerId=setInterval(()=>{$('mtTimer').textContent=((Date.now()-mt.startTime)/1000).toFixed(1)+'s';},100);
+    renderMtGrid();
+  }
+  function renderMtGrid(){
+    const g=$('mtGrid'); g.innerHTML='';
+    mt.cards.forEach(c=>{
+      const el=document.createElement('button');
+      el.className=`match-card aspect-square p-2 flex items-center justify-center text-center rounded-xl border-2 text-sm font-medium ${c.kind==='en'?'bg-brand-50 text-brand-700 border-brand-200':'bg-accent-500/10 text-accent-600 border-accent-500/20'}`;
+      el.textContent=c.text;
+      el.addEventListener('click',()=>onMtClick(c,el));
+      g.appendChild(el);
+    });
+  }
+  function onMtClick(c,el){
+    if(el.classList.contains('matched')||el.classList.contains('selected'))return;
+    if(mt.selected.length>=2)return;
+    el.classList.add('selected');
+    mt.selected.push({c,el});
+    if(mt.selected.length===2){
+      const [a,b]=mt.selected;
+      if(a.c.pair===b.c.pair&&a.c.kind!==b.c.kind){
+        setTimeout(()=>{
+          a.el.classList.remove('selected');a.el.classList.add('matched');
+          b.el.classList.remove('selected');b.el.classList.add('matched');
+          mt.matched++; $('mtMatched').textContent=mt.matched;
+          recordStudied(1);
+          mt.selected=[];
+          if(mt.matched===mt.total){
+            clearInterval(mt.timerId);
+            const time=((Date.now()-mt.startTime)/1000).toFixed(1);
+            showEnd('配对完成！',`用时 ${time} 秒`,startMatch,()=>goToScreen('study'));
+          }
+        },200);
+      }else{
+        a.el.classList.add('wrong');b.el.classList.add('wrong');
+        setTimeout(()=>{a.el.classList.remove('selected','wrong');b.el.classList.remove('selected','wrong');mt.selected=[];},600);
+      }
+    }
+  }
+
+  const ts = { questions:[], answers:[] };
+  function initTest(){
+    const d=getDeck();
+    if(d.words.length<4){$('tsEmpty').classList.remove('hidden');$('tsSetup').classList.add('hidden');$('tsExam').classList.add('hidden');$('tsResult').classList.add('hidden');return;}
+    $('tsEmpty').classList.add('hidden');
+    $('tsSetup').classList.remove('hidden');
+    $('tsExam').classList.add('hidden'); $('tsResult').classList.add('hidden');
+  }
+  function startTest(){
+    const c=parseInt($('tsCount').value);
+    const d=getDeck();
+    const ws=shuffle(d.words).slice(0,Math.min(c,d.words.length));
+    ts.questions=ws.map((w,i)=>{
+      const t=['mc-en2zh','mc-zh2en','fill'][i%3];
+      if(t==='fill')return {type:'fill',word:w,prompt:`释义：${w.zh}`,answer:w.en};
+      const distractors=shuffle(d.words.filter(x=>x.en!==w.en)).slice(0,3);
+      if(t==='mc-en2zh'){const choices=shuffle([w,...distractors]).map(x=>x.zh);return {type:'mc',word:w,prompt:`选择 "${w.en}" 的中文`,choices,answer:w.zh};}
+      const choices=shuffle([w,...distractors]).map(x=>x.en);
+      return {type:'mc',word:w,prompt:`选择 "${w.zh}" 对应的词条`,choices,answer:w.en};
+    });
+    ts.answers=new Array(ts.questions.length).fill('');
+    $('tsSetup').classList.add('hidden'); $('tsExam').classList.remove('hidden');
+    renderTsQs();
+  }
+  function renderTsQs(){
+    const box=$('tsQuestions'); box.innerHTML='';
+    ts.questions.forEach((q,i)=>{
+      const wrap=document.createElement('div');
+      wrap.className='border border-slate-200 rounded-xl p-4';
+      wrap.innerHTML=`
+        <div class="flex items-start gap-2 mb-3"><span class="shrink-0 w-6 h-6 rounded-full bg-brand-100 text-brand-700 text-xs flex items-center justify-center font-bold">${i+1}</span><div class="flex-1 text-sm font-medium text-slate-700 prompt"></div></div>
+        <div class="ans-area pl-8"></div>
+      `;
+      wrap.querySelector('.prompt').textContent=q.prompt;
+      const area=wrap.querySelector('.ans-area');
+      if(q.type==='mc'){
+        q.choices.forEach(c=>{
+          const lbl=document.createElement('label');
+          lbl.className='flex items-center gap-2 px-3 py-2 mb-1.5 bg-slate-50 hover:bg-brand-50 rounded-lg text-sm cursor-pointer transition';
+          lbl.innerHTML=`<input type="radio" name="q${i}" class="text-brand-500"><span></span>`;
+          lbl.querySelector('input').value=c;
+          lbl.querySelector('input').addEventListener('change',e=>{ts.answers[i]=e.target.value;});
+          lbl.querySelector('span').textContent=c;
+          area.appendChild(lbl);
+        });
+      }else{
+        const inp=document.createElement('input');
+        inp.type='text'; inp.placeholder='输入词条';
+        inp.className='w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm';
+        inp.addEventListener('input',e=>{ts.answers[i]=e.target.value;});
+        area.appendChild(inp);
+      }
+      box.appendChild(wrap);
+    });
+  }
+  function submitTest(){
+    const total=ts.questions.length; let correct=0;
+    const review=ts.questions.map((q,i)=>{
+      const ans=(ts.answers[i]||'').trim();
+      const right=ans.toLowerCase()===q.answer.toLowerCase();
+      if(right)correct++;
+      return {q,ans,right};
+    });
+    recordStudied(total);
+    $('tsExam').classList.add('hidden'); $('tsResult').classList.remove('hidden');
+    $('tsScore').textContent=Math.round(correct/total*100);
+    $('tsCorrectN').textContent=correct; $('tsWrongN').textContent=total-correct;
+    const rv=$('tsReview'); rv.innerHTML='';
+    review.forEach((r,i)=>{
+      const div=document.createElement('div');
+      div.className=`border rounded-xl p-3 ${r.right?'border-emerald-200 bg-emerald-50/40':'border-rose-200 bg-rose-50/40'}`;
+      div.innerHTML=`<div class="flex items-start gap-2"><span class="shrink-0 w-5 h-5 rounded-full ${r.right?'bg-emerald-500':'bg-rose-500'} text-white text-xs flex items-center justify-center font-bold">${i+1}</span><div class="flex-1 text-sm"><div class="font-medium text-slate-700 mb-1">${escapeHtml(r.q.prompt)}</div><div class="text-xs">你的答案：<span class="${r.right?'text-emerald-700':'text-rose-700'} font-semibold">${escapeHtml(r.ans)||'(未作答)'}</span></div>${r.right?'':`<div class="text-xs text-slate-600">正确：<span class="font-semibold">${escapeHtml(r.q.answer)}</span></div>`}</div></div>`;
+      rv.appendChild(div);
+    });
+  }
+  function showEnd(title,summary,onRetry,onHub){
+    $('endModal').classList.remove('hidden');
+    qs('#endModal h3').textContent=title;
+    $('endSummary').textContent=summary;
+    $('endRetry').onclick=()=>{$('endModal').classList.add('hidden');onRetry();};
+    $('endHub').onclick=()=>{$('endModal').classList.add('hidden');onHub();};
+  }
+
+  /* ============= 事件绑定 ============= */
+  qsa('[data-nav]').forEach(el => el.addEventListener('click', e => goToScreen(e.currentTarget.dataset.nav)));
+  injectTopbar('lookup-topbar','查词');
+  injectTopbar('md-topbar','我的词集');
+  injectTopbar('study-topbar','背单词');
+  injectTopbar('st-topbar','学习统计');
+  injectTopbar('sh-topbar','美剧资源');
+  injectTopbar('lb-topbar','英文图书馆');
+  injectTopbar('fc-topbar','卡片模式','study');
+  injectTopbar('ln-topbar','学习模式','study');
+  injectTopbar('sp-topbar','拼写模式','study');
+  injectTopbar('mt-topbar','配对游戏','study');
+  injectTopbar('ts-topbar','测试模式','study');
+
+  $('homeCheckIn').addEventListener('click', manualCheckIn);
+  $('stCheckIn').addEventListener('click', manualCheckIn);
+  qsa('.lv-btn').forEach(b => b.addEventListener('click', e => { state.showsFilter = e.currentTarget.dataset.level; renderShows(); }));
+  qsa('.lb-btn').forEach(b => b.addEventListener('click', e => { state.libraryFilter = e.currentTarget.dataset.lblevel; renderLibrary(); }));
+
+  $('deckSelect').addEventListener('change', e => switchDeck(e.target.value));
+  $('btnLookup').addEventListener('click', lookupWord);
+  lookupInputEl.addEventListener('keydown', e => { if(e.key==='Enter'){e.preventDefault(); lookupWord();} });
+  $('btnAddLookup').addEventListener('click', () => {
+    if (!state.lookupCurrent) return;
+    const d=getDeck();
+    if (d.isBuiltIn) { toast('内置只读','error'); return; }
+    if (d.words.some(w=>w.en.toLowerCase()===state.lookupCurrent.en.toLowerCase())) { toast('已存在','error'); return; }
+    d.words.push({ en: state.lookupCurrent.en, zh: state.lookupCurrent.zh, createdAt: Date.now() });
+    persist(); renderDeckSelect(); toast('已添加','ok');
+  });
+  $('btnSpeakLookup').addEventListener('click', () => { if (state.lookupCurrent) speak(state.lookupCurrent.en); });
+
+  $('mdBtnCreate').addEventListener('click', createDeck);
+  $('mdBtnRename').addEventListener('click', renameDeck);
+  $('mdBtnDeleteDeck').addEventListener('click', deleteSelectedDeck);
+  $('mdBtnStudy').addEventListener('click', studySelectedDeck);
+  $('mdAddForm').addEventListener('submit', addSingleEntry);
+  $('mdBtnBulkPreview').addEventListener('click', previewBulk);
+  $('mdBtnBulkImport').addEventListener('click', importBulk);
+  $('mdSearch').addEventListener('input', renderMdEntries);
+  qsa('.md-tab').forEach(b => b.addEventListener('click', () => setMdTab(b.dataset.tab)));
+
+  // 文件导入相关
+  const fileDrop = $('mdFileDrop');
+  const fileInput = $('mdFileInput');
+  fileDrop.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+  // 拖拽支持
+  ['dragenter','dragover'].forEach(ev => fileDrop.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); fileDrop.classList.add('drag-over'); }));
+  ['dragleave','drop'].forEach(ev => fileDrop.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); fileDrop.classList.remove('drag-over'); }));
+  fileDrop.addEventListener('drop', e => {
+    e.preventDefault();
+    const f = e.dataTransfer.files[0];
+    if (f) handleFile(f);
+  });
+  $('mdBtnFileImport').addEventListener('click', importPendingFile);
+  $('mdFileClear').addEventListener('click', clearFileImport);
+
+  $('studyDeckSelect').addEventListener('change', e => switchDeck(e.target.value));
+  qsa('.study-mode').forEach(b => b.addEventListener('click', e => goToScreen(e.currentTarget.dataset.mode)));
+
+  $('fcCard').addEventListener('click', fcFlip);
+  $('fcFlip').addEventListener('click', fcFlip);
+  $('fcPrev').addEventListener('click', fcPrev);
+  $('fcNext').addEventListener('click', fcNext);
+  $('btnShuffle').addEventListener('click', fcShuffle);
+  $('btnSpeakFc').addEventListener('click', e => { e.stopPropagation(); const ws=getStudyWords(); if(ws.length)speak(ws[state.cardIndex].en); });
+
+  $('lnSubmit').addEventListener('click', submitTyping);
+  $('lnInput').addEventListener('keydown', e => { if(e.key==='Enter'){e.preventDefault(); submitTyping();} });
+
+  $('spPlay').addEventListener('click', () => speak(getDeck().words[sp.order[sp.idx]].en));
+  $('spSubmit').addEventListener('click', submitSp);
+  $('spInput').addEventListener('keydown', e => { if(e.key==='Enter'){e.preventDefault(); submitSp();} });
+  $('spNext').addEventListener('click', nextSp);
+
+  $('mtRestart').addEventListener('click', startMatch);
+  $('tsStart').addEventListener('click', startTest);
+  $('tsSubmit').addEventListener('click', submitTest);
+  $('tsRetry').addEventListener('click', () => { initTest(); });
+  $('tsBackHub').addEventListener('click', () => goToScreen('study'));
+
+  document.addEventListener('keydown', e => {
+    const tag=document.activeElement&&document.activeElement.tagName;
+    if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT')return;
+    if(state.screen!=='flashcards')return;
+    if(e.key==='ArrowLeft')fcPrev();
+    else if(e.key==='ArrowRight')fcNext();
+    else if(e.key===' '||e.key==='Enter'){e.preventDefault();fcFlip();}
+  });
+
+  initState();
+  goToScreen('home');
+})();
+</script>
+</body>
+</html>
