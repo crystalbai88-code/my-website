@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>我的历史足迹 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;padding-bottom:70px}
+  .nav{display:flex;align-items:center;gap:9px;padding:13px 16px 2px;flex-wrap:wrap}
+  .nav a.pill{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.08em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .wrap{width:min(620px,92%);margin:0 auto}
+  .hero{text-align:center;margin:18px auto 4px}
+  .hero .ic{font-size:44px}
+  .hero h1{font-family:var(--serif);font-weight:900;font-size:clamp(23px,6vw,32px);color:var(--ink);margin:7px 0 5px;text-shadow:var(--label-shadow)}
+  .hero .enc{font-family:var(--serif);font-size:15px;color:var(--gold);font-weight:700;margin-top:4px}
+  .hero .sub{font-family:var(--sans);font-size:12.5px;color:var(--ink3);margin-top:4px}
+  /* 计数 */
+  .counts{display:flex;gap:10px;justify-content:center;margin:18px 0 6px;flex-wrap:wrap}
+  .cc{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:14px;padding:11px 16px;min-width:84px;text-align:center;backdrop-filter:blur(8px)}
+  .cc b{display:block;font-family:var(--serif);font-weight:900;font-size:26px;color:var(--gold);line-height:1}
+  .cc span{font-family:var(--sans);font-size:11px;color:var(--ink2);display:block;margin-top:4px}
+  /* 足迹小路 */
+  .trail{position:relative;margin:22px auto 0;padding-left:8px}
+  .trail:before{content:'';position:absolute;left:33px;top:14px;bottom:14px;width:3px;border-radius:3px;
+    background:repeating-linear-gradient(var(--panel-line) 0 7px,transparent 7px 14px)}
+  .stamp{position:relative;display:flex;align-items:center;gap:14px;margin:0 0 16px;
+    animation:stampin .5s cubic-bezier(.22,1.5,.4,1) backwards}
+  @keyframes stampin{from{opacity:0;transform:scale(.55) rotate(-9deg)}to{opacity:1;transform:none}}
+  .seal{flex:none;width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:22px;position:relative;z-index:1;background:var(--panel-bg);border:2.5px solid var(--ac,var(--gold));
+    box-shadow:0 0 0 4px var(--bg),0 4px 12px rgba(0,0,0,.14)}
+  .seal.dec{border-color:var(--vermilion);color:var(--vermilion)}
+  .seal.law{border-color:var(--gold);color:var(--gold)}
+  .seal.city{border-color:var(--cyan,#2f9e86);color:var(--cyan,#2f9e86)}
+  .scard{flex:1;min-width:0;background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:13px;padding:11px 15px;backdrop-filter:blur(8px)}
+  .scard .sk{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3)}
+  .scard .sl{font-family:var(--serif);font-weight:900;font-size:16px;color:var(--ink);margin:2px 0 0;line-height:1.4}
+  .scard .sd{font-family:var(--mono);font-size:11px;color:var(--ink3);margin-top:3px}
+  /* 空状态 */
+  .empty{text-align:center;margin:30px auto 0;background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:16px;padding:26px 20px;backdrop-filter:blur(10px)}
+  .empty .ee{font-size:38px}
+  .empty p{font-family:var(--serif);font-size:15px;color:var(--ink);line-height:1.85;margin:12px 0 16px}
+  .empty .go{display:inline-flex;gap:10px;flex-wrap:wrap;justify-content:center}
+  .empty a{font-family:var(--sans);font-weight:800;font-size:14px;color:#fff;text-decoration:none;background:linear-gradient(90deg,var(--gold),var(--vermilion));border-radius:999px;padding:11px 20px}
+  .cta{text-align:center;margin:26px auto 0}
+  .cta a{font-family:var(--sans);font-weight:800;font-size:14px;color:var(--gold);text-decoration:none;background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:999px;padding:11px 22px}
+  .foot{text-align:center;font-family:var(--sans);font-size:11px;color:var(--ink3);margin-top:20px;line-height:1.8}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="nav"><a class="pill" href="./index.html">⌂ 首页</a><a class="pill" href="./stories.html">🎯 抉择</a><a class="pill" href="./city.html">🏙️ 敦煌</a></div>
+  <div class="wrap">
+    <div class="hero">
+      <div class="ic">🎒</div>
+      <h1>我的历史足迹</h1>
+      <div class="enc" id="enc"></div>
+      <div class="sub">每走完一段历史,就盖下一枚章。只存在这台设备上。</div>
+    </div>
+    <div id="board"></div>
+  </div>
+</div>
+<script>
+function esc(s){return String(s==null?'':s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));}
+function fmt(ts){if(!ts)return'';const d=new Date(ts);return `${d.getMonth()+1}月${d.getDate()}日`;}
+function readTrail(){try{return JSON.parse(localStorage.getItem('civlab_trail_v1'))||[];}catch(e){return[];}}
+const TYPE={
+  decision:{cls:'dec',ic:'🎯',k:'走完抉择'},
+  law:{cls:'law',ic:'🧩',k:'找到规律'},
+  city:{cls:'city',ic:'🏙️',k:'走进城市'}
+};
+function enc(n){
+  if(n===0) return '';
+  if(n<3) return '🌱 你已经迈出了第一步!';
+  if(n<6) return '🔥 小小探索者,渐入佳境!';
+  if(n<10) return '⭐ 历史的老朋友了!';
+  return '🏆 了不起的历史旅行家!';
+}
+function render(){
+  const tr=readTrail().slice().sort((a,b)=>a.ts-b.ts);
+  const nDec=tr.filter(x=>x.t==='decision').length;
+  const nLaw=tr.filter(x=>x.t==='law').length;
+  const nCity=tr.filter(x=>x.t==='city').length;
+  document.getElementById('enc').textContent=enc(tr.length);
+  if(!tr.length){
+    document.getElementById('board').innerHTML=`<div class="empty"><div class="ee">👣</div>
+      <p>这里还空空的——<br>去走一个<b>抉择</b>、走进一座<b>城</b>,<br>就会盖下你的<b>第一枚章</b>!</p>
+      <div class="go"><a href="./stories.html">🎯 选一个抉择</a><a href="./city.html">🏙️ 走进敦煌</a></div></div>`;
+    return;
+  }
+  let html=`<div class="counts">
+    <div class="cc"><b>${nDec}</b><span>走完的抉择</span></div>
+    <div class="cc"><b>${nLaw}</b><span>找到的规律</span></div>
+    <div class="cc"><b>${nCity}</b><span>走过的城</span></div>
+  </div><div class="trail">`;
+  tr.forEach((x,i)=>{
+    const T=TYPE[x.t]||{cls:'',ic:'•',k:''};
+    const label = x.t==='city' ? esc(x.l) : `${T.k==='走完抉择'?'《':'「'}${esc(x.l)}${T.k==='走完抉择'?'》':'」'}`;
+    html+=`<div class="stamp" style="animation-delay:${Math.min(i,12)*70}ms">
+      <div class="seal ${T.cls}">${T.ic}</div>
+      <div class="scard"><div class="sk">${esc(T.k)}</div><div class="sl">${label}</div><div class="sd">🗓 ${fmt(x.ts)}</div></div>
+    </div>`;
+  });
+  html+=`</div><div class="cta"><a href="./index.html">继续探索,再盖几枚章 →</a></div>
+    <div class="foot">足迹只存在这台设备上,清除浏览器缓存就会消失。</div>`;
+  document.getElementById('board').innerHTML=html;
+}
+render();
+</script>
+</body>
+</html>

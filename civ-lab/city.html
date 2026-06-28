@@ -164,6 +164,9 @@ function renderEra(){
 function render(){ renderRail(); renderEra(); window.scrollTo({top:0,behavior:'instant'}); if(window.Track) Track.log('走进一座城·'+C.name); }
 function jump(i){ cur=Math.max(0,Math.min(C.eras.length-1,i)); render(); }
 function step(d){ jump(cur+d); }
+// 历史足迹:走进一座城,盖一枚章
+function addTrail(t,id,l){try{var K='civlab_trail_v1',a=JSON.parse(localStorage.getItem(K)||'[]'),k=t+':'+id;if(a.some(x=>x.t+':'+x.id===k))return;a.push({t:t,id:id,l:l,ts:Date.now()});if(a.length>120)a=a.slice(-120);localStorage.setItem(K,JSON.stringify(a));}catch(e){}}
+addTrail('city', C.id, '走进'+C.name);
 // 返回时落回对应时代
 (function(){ const e=new URLSearchParams(location.search).get('era'); if(e){ const i=C.eras.findIndex(x=>x.id===e); if(i>=0) cur=i; } })();
 renderCover(); render();

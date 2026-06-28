@@ -387,11 +387,14 @@ function openFind(id){
   if(window.Track) Track.log('找规律');
 }
 const answered={};
+function addTrail(t,id,l){try{var K='civlab_trail_v1',a=JSON.parse(localStorage.getItem(K)||'[]'),k=t+':'+id;if(a.some(x=>x.t+':'+x.id===k))return;a.push({t:t,id:id,l:l,ts:Date.now()});if(a.length>120)a=a.slice(-120);localStorage.setItem(K,JSON.stringify(a));}catch(e){}}
 function pickFind(id,i){
   const f=FINDMAP[id];
   document.querySelectorAll('#find_'+id+' .opt').forEach(el=>el.classList.toggle('picked',+el.dataset.i===i));
   const fb=document.getElementById('ffb_'+id); fb.innerHTML=f.opts[i].fb; fb.classList.add('show');
-  const reveal=()=>{answered[id]=1;document.getElementById('law_'+id).classList.remove('hidden');document.getElementById('move_'+id).classList.remove('hidden');document.getElementById('law_'+id).scrollIntoView({behavior:'smooth',block:'center'});};
+  const reveal=()=>{answered[id]=1;document.getElementById('law_'+id).classList.remove('hidden');document.getElementById('move_'+id).classList.remove('hidden');document.getElementById('law_'+id).scrollIntoView({behavior:'smooth',block:'center'});
+    try{ if(!localStorage.getItem(f.key)) localStorage.setItem(f.key,'(已找到)'); addTrail('law',id,(MOTIFS.find(m=>m.id===id)||{}).tag||id); }catch(e){}
+  };
   if(f.opts[i].ok && !answered[id]){ setTimeout(reveal,650); }
   else if(!f.opts[i].ok && !document.getElementById('rev_'+id)){
     const b=document.createElement('button'); b.id='rev_'+id; b.className='savebtn'; b.style.marginTop='8px'; b.style.background='var(--panel-bg)'; b.style.color='var(--gold)'; b.style.border='1px solid var(--panel-line)';

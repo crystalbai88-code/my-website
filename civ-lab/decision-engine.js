@@ -7,6 +7,16 @@
 
   function D(){ return window.DECISION||{beats:[],DOSSIER:[],reactions:{}}; }
 
+  // 历史足迹:把一个里程碑记进本地(去重、capped)
+  function addTrail(t,id,l){
+    try{
+      var K='civlab_trail_v1', a=JSON.parse(localStorage.getItem(K)||'[]'), key=t+':'+id;
+      if(a.some(function(x){return x.t+':'+x.id===key;})) return;
+      a.push({t:t,id:id,l:l,ts:Date.now()}); if(a.length>120) a=a.slice(-120);
+      localStorage.setItem(K,JSON.stringify(a));
+    }catch(e){}
+  }
+
   function render(){
     var d=D();
     document.getElementById('beat').innerHTML=d.beats[cur]();
@@ -15,6 +25,9 @@
     if(cur===7){
       var m=document.getElementById('myPick'); if(m)m.textContent=pick||'?';
       var n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('decision_'+d.key)||'';
+      // 走到最后一拍 = 走完这个抉择,盖一枚章
+      var t=(document.title||'').split('·'); var label=(t[1]||d.key).trim();
+      addTrail('decision', d.key, label);
     }
     window.scrollTo({top:0,behavior:'instant'});
     if(window.Track) Track.log('抉择时刻');
