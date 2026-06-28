@@ -57,7 +57,7 @@ const ALL=(window.DECISIONS||[]).filter(d=>d.person&&d.tip);
 const ALLCULT=[...new Set(ALL.map(d=>CULT[d.culture]).filter(Boolean))];
 
 const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
-let W=0,H=0, ship, enemies=[], bullets=[], parts=[], score=0, lives=3, alive=true, last=0, ESPD=0.018, best=+(localStorage.getItem('civlab_fly_best')||0);
+let W=0,H=0, ship, enemies=[], bullets=[], parts=[], score=0, lives=3, alive=true, last=0, ESPD=0.0038, best=+(localStorage.getItem('civlab_fly_best')||0);
 function pool(){const done=new Set(readTrail().filter(x=>x.t==='decision').map(x=>x.id));const mine=ALL.filter(d=>done.has(d.id));document.getElementById('srctip').innerHTML=mine.length>=4?'出的都是你<b>走过的人物</b>。瞄准、开火,打掉正确答案!':'先随便打打——走过更多抉择,题目就全是你认识的人。';return mine.length>=4?mine:ALL;}
 
 function resize(){const w=cv.clientWidth,h=cv.clientHeight,dpr=window.devicePixelRatio||1;cv.width=w*dpr;cv.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);W=w;H=h;if(ship)ship.y=H-34;draw();}
@@ -80,7 +80,7 @@ function newWave(){
   const slots=shuffle([0,1,2,3]);
   enemies=labels.map((lab,i)=>({x:(slots[i]+0.5)*(W/4), y:-30-Math.random()*60, vy:H*ESPD*(0.85+Math.random()*0.3), label:lab, correct:lab===correctLabel, alive:true}));
 }
-function start(){score=0;lives=3;alive=true;ESPD=0.013;bullets=[];parts=[];ship={x:W/2,y:H-34,tx:W/2};newWave();updateHUD();document.getElementById('over').classList.remove('show');last=performance.now();requestAnimationFrame(loop);}
+function start(){score=0;lives=3;alive=true;ESPD=0.0038;bullets=[];parts=[];ship={x:W/2,y:H-34,tx:W/2};newWave();updateHUD();document.getElementById('over').classList.remove('show');last=performance.now();requestAnimationFrame(loop);}
 function updateHUD(){document.getElementById('score').textContent=score;document.getElementById('lives').textContent='❤️'.repeat(Math.max(0,lives))+'🖤'.repeat(3-Math.max(0,lives));}
 
 function fire(){
@@ -92,7 +92,7 @@ function fire(){
 function boom(x,y,col){for(let i=0;i<14;i++){const a=Math.random()*6.28,s=1+Math.random()*3;parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:18+Math.random()*12,c:col});}}
 function hit(e){
   e.alive=false;
-  if(e.correct){ boom(e.x,e.y,'#2f9e86'); score++; if(score>best){best=score;localStorage.setItem('civlab_fly_best',best);} if(score===5||score===10||score===20)addTrail('game','fly','飞机大战·得分'+score); ESPD=Math.min(0.03,ESPD+0.001); newWave(); updateHUD(); }
+  if(e.correct){ boom(e.x,e.y,'#2f9e86'); score++; if(score>best){best=score;localStorage.setItem('civlab_fly_best',best);} if(score===5||score===10||score===20)addTrail('game','fly','飞机大战·得分'+score); ESPD=Math.min(0.0085,ESPD+0.0004); newWave(); updateHUD(); }
   else { boom(e.x,e.y,'#e2603f'); lives--; updateHUD(); if(lives<=0){gameOver();} }
 }
 function loop(t){ if(!alive)return; const dt=Math.min(40,t-last); last=t; update(dt); draw(); requestAnimationFrame(loop); }
