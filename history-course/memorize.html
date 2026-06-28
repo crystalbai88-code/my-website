@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>秦汉 · 翻翻乐 · AI 学历史强化课</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root{--ink:#2b2420;--ink2:#6b5d50;--ink3:#a89a8a;--gold:#c0782a;--green:#2f9e86;--red:#d4583a;--line:#e7ddcf;--panel:#fffaf2;--bg1:#fbf4e8;--bg2:#f4ead8;}
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:linear-gradient(160deg,var(--bg1),var(--bg2));-webkit-tap-highlight-color:transparent}
+  body{font-family:'Noto Sans SC',sans-serif;color:var(--ink);padding-bottom:30px}
+  .wrap{width:min(560px,95%);margin:0 auto}
+  .top{display:flex;align-items:center;gap:10px;padding:14px 0 4px}
+  .top a{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);text-decoration:none;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 12px}
+  .top .ttl{font-family:'Noto Serif SC',serif;font-weight:900;font-size:16px}
+  .lead{font-size:13px;color:var(--ink2);line-height:1.6;margin:2px 2px 8px}
+  .lead b{color:var(--gold)}
+  .hud{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink2);margin:4px 2px 10px}
+  .hud b{color:var(--gold)}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+  .card{position:relative;aspect-ratio:3/4;cursor:pointer;perspective:600px}
+  .inner{position:absolute;inset:0;transition:transform .4s;transform-style:preserve-3d}
+  .card.up .inner,.card.matched .inner{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:8px;text-align:center;border:1.5px solid var(--line)}
+  .back{background:linear-gradient(135deg,#cf9a4e,#b06a24);color:#fff8e8;font-size:26px}
+  .front{background:var(--panel);transform:rotateY(180deg)}
+  .front .nm{font-family:'Noto Serif SC',serif;font-weight:900;font-size:15px;line-height:1.3;color:var(--ink)}
+  .front .tg{font-size:13px;line-height:1.45;color:var(--gold);font-weight:700}
+  .card.matched .front{background:rgba(47,158,134,.14);border-color:var(--green)}
+  .card.matched{cursor:default}
+  /* 配对提示 */
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--green);color:#fff;font-weight:700;font-size:14px;
+    padding:11px 18px;border-radius:999px;box-shadow:0 6px 20px rgba(0,0,0,.2);opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;max-width:90%;text-align:center}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+  /* 通关 */
+  .win{margin-top:18px;background:var(--panel);border:1.5px solid var(--green);border-radius:18px;padding:22px;text-align:center;animation:pop .4s cubic-bezier(.22,1.5,.4,1)}
+  @keyframes pop{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
+  .win .ee{font-size:42px}.win h2{font-family:'Noto Serif SC',serif;font-weight:900;font-size:22px;margin:6px 0 2px}
+  .win p{font-size:13.5px;color:var(--ink2);margin:2px 0}
+  .btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+  .btn{font-weight:800;font-size:14px;border:none;border-radius:999px;padding:12px 22px;cursor:pointer;color:#fff;background:linear-gradient(90deg,var(--gold),var(--red))}
+  .btn.ghost{color:var(--gold);background:#fff;border:1px solid var(--line)}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top"><a href="./learn.html?unit=qinhan">⌂ 秦汉</a><span class="ttl">🃏 翻翻乐 · 玩着记</span></div>
+    <div class="lead">翻开两张牌,把<b>人物/事件</b>和它的<b>标志</b>配成一对——翻着翻着就记住了,不用背。</div>
+    <div class="hud"><span>配对 <b id="done">0</b> / <b id="tot">6</b></span><span>翻了 <b id="moves">0</b> 次</span></div>
+    <div class="grid" id="grid"></div>
+    <div id="win"></div>
+  </div>
+  <div class="toast" id="toast"></div>
+<script src="./kb_qinhan.js"></script>
+<script>
+function esc(s){return String(s==null?'':s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+// 每个知识点的超短"标志"(翻牌上用)
+const TAG={
+  shangyang:'变法四板斧·秦变强', unify:'前221·灭六国', qin_system:'皇帝→三公→郡县',
+  qin_unite3:'书同文·车同轨', fenshu:'烧书坑儒·控思想', chenshe:'大泽乡·第一次农民起义',
+  wenjing:'刘邦建汉·休养生息', tuien:'切蛋糕·削藩', duzun:'董提武用·儒家正统',
+  zhangqian:'凿空西域·丝绸之路', duhu:'前60·管西域(新疆)', cailun:'改进造纸·东汉105',
+  shiji:'司马迁·纪传体通史', yixue:'医圣·麻沸散五禽戏'
+};
+const cards=(window.KB_QINHAN&&window.KB_QINHAN.cards)||[];
+const PAIRS=6;
+let deck=[], up=[], matched=0, moves=0, lock=false;
+
+function build(){
+  matched=0; moves=0; up=[]; lock=false;
+  document.getElementById('win').innerHTML='';
+  const chosen=shuffle(cards).slice(0,PAIRS);
+  document.getElementById('tot').textContent=chosen.length;
+  document.getElementById('done').textContent=0;
+  document.getElementById('moves').textContent=0;
+  deck=shuffle(chosen.flatMap(c=>[
+    {pid:c.id, kind:'name', text:c.n},
+    {pid:c.id, kind:'tag',  text:TAG[c.id]||c.hook||c.why}
+  ]));
+  const g=document.getElementById('grid');
+  g.innerHTML=deck.map((d,i)=>`
+    <div class="card" data-i="${i}" data-pid="${d.pid}">
+      <div class="inner">
+        <div class="face back">?</div>
+        <div class="face front"><div class="${d.kind==='name'?'nm':'tg'}">${esc(d.text)}</div></div>
+      </div>
+    </div>`).join('');
+  g.querySelectorAll('.card').forEach(el=>el.onclick=()=>flip(el));
+}
+function flip(el){
+  if(lock||el.classList.contains('up')||el.classList.contains('matched'))return;
+  el.classList.add('up'); up.push(el);
+  if(up.length===2){
+    moves++; document.getElementById('moves').textContent=moves;
+    const [a,b]=up;
+    if(a.dataset.pid===b.dataset.pid){
+      lock=true;
+      setTimeout(()=>{ a.classList.add('matched'); b.classList.add('matched'); a.classList.remove('up'); b.classList.remove('up');
+        up=[]; matched++; document.getElementById('done').textContent=matched;
+        const c=cards.find(x=>x.id===a.dataset.pid); toast('✅ '+c.n+' = '+(TAG[c.id]||''));
+        lock=false; if(matched>=PAIRS_now()) win();
+      },260);
+    } else {
+      lock=true;
+      setTimeout(()=>{ a.classList.remove('up'); b.classList.remove('up'); up=[]; lock=false; },720);
+    }
+  }
+}
+function PAIRS_now(){ return Math.min(PAIRS,cards.length); }
+let toastT;
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),1500); }
+function win(){
+  const best=Math.min(moves, +(localStorage.getItem('hc_qinhan_match_best')||999));
+  localStorage.setItem('hc_qinhan_match_best',best);
+  const perfect=moves===PAIRS_now();
+  document.getElementById('win').innerHTML=`<div class="win"><div class="ee">${perfect?'🏆':'🎉'}</div>
+    <h2>${perfect?'一遍就全配上!记忆力满分!':'全配对啦!'}</h2>
+    <p>翻了 ${moves} 次配齐 ${PAIRS_now()} 对 · 最少 ${best} 次</p>
+    <p style="color:var(--gold)">再玩几局,这些就刻在脑子里了 💪</p>
+    <div class="btns"><button class="btn" onclick="build()">↺ 换一批再来</button>
+      <a class="btn ghost" href="./quiz.html?unit=qinhan&focus=weak" style="text-decoration:none">🎮 试试闯关</a></div></div>`;
+}
+if(cards.length) build();
+else document.getElementById('grid').innerHTML='<p style="grid-column:1/-1;text-align:center;color:#a89a8a">题库未加载,请刷新。</p>';
+</script>
+</body>
+</html>
