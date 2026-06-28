@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>历史连一连 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;padding-bottom:40px}
+  .nav{display:flex;align-items:center;gap:9px;padding:13px 16px 2px;flex-wrap:wrap}
+  .nav a.pill{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.08em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .wrap{width:min(640px,94%);margin:0 auto}
+  .hero{text-align:center;margin:14px auto 2px}
+  .hero h1{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,28px);color:var(--ink);margin:4px 0 4px;text-shadow:var(--label-shadow)}
+  .hero p{font-family:var(--sans);font-size:12.5px;color:var(--ink2);line-height:1.6;margin:0 auto;max-width:26em}
+  .hero p b{color:var(--gold)}
+  .bar{display:flex;align-items:center;justify-content:center;gap:14px;margin:12px 0 6px;font-family:var(--mono);font-size:12px;color:var(--ink2)}
+  .bar b{color:var(--gold)}
+  /* 棋盘:两列 */
+  .board{display:grid;grid-template-columns:38% 1fr;gap:10px;margin-top:8px}
+  .col{display:flex;flex-direction:column;gap:9px}
+  .colh{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;text-align:center;margin-bottom:1px}
+  .card{font-family:var(--sans);color:var(--ink);background:var(--panel-bg);border:1.5px solid var(--panel-line);
+    border-radius:13px;padding:12px 13px;cursor:pointer;transition:transform .12s,border-color .15s,background .15s,box-shadow .15s;line-height:1.45;text-align:left}
+  .card.person{font-family:var(--serif);font-weight:900;font-size:15.5px;display:flex;align-items:center;gap:8px;min-height:24px}
+  .card.tip{font-size:13px;color:var(--ink)}
+  .card:active{transform:scale(.98)}
+  .card.sel{border-color:var(--gold);background:rgba(224,138,44,.12);box-shadow:0 4px 14px rgba(0,0,0,.12)}
+  .card.matched{border-color:var(--cyan,#2f9e86);background:rgba(47,158,134,.12);color:var(--ink3);cursor:default;opacity:.75}
+  .card.matched .pi{filter:grayscale(.2)}
+  .card.wrong{animation:shake .35s; border-color:var(--vermilion);background:rgba(226,96,63,.12)}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+  .card .pi{font-size:18px;flex:none}
+  .card .ok{margin-left:auto;color:var(--cyan,#2f9e86);font-weight:900}
+  /* 通关 */
+  .win{text-align:center;margin:20px auto 0;background:var(--panel-bg);border:1.5px solid var(--gold);border-radius:18px;padding:24px 20px;backdrop-filter:blur(10px);animation:pop .45s cubic-bezier(.22,1.5,.4,1)}
+  @keyframes pop{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
+  .win .we{font-size:46px}
+  .win h2{font-family:var(--serif);font-weight:900;font-size:24px;color:var(--ink);margin:8px 0 4px}
+  .win p{font-family:var(--sans);font-size:13.5px;color:var(--ink2);line-height:1.7;margin:0 0 4px}
+  .win p b{color:var(--gold)}
+  .btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+  .btn{font-family:var(--sans);font-weight:800;font-size:14px;border:none;border-radius:999px;padding:12px 24px;cursor:pointer;
+    color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));box-shadow:0 5px 16px rgba(0,0,0,.16)}
+  .btn.ghost{color:var(--gold);background:var(--panel-bg);border:1px solid var(--panel-line);box-shadow:none}
+  .hint{font-family:var(--sans);font-size:12px;color:var(--ink3);text-align:center;margin-top:16px;line-height:1.7}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="nav"><a class="pill" href="./index.html">⌂ 首页</a><a class="pill" href="./passport.html">🎒 我的足迹</a><a class="pill" href="./stories.html">🎯 抉择</a></div>
+  <div class="wrap">
+    <div class="hero">
+      <h1>🔗 历史连一连</h1>
+      <p id="src"></p>
+    </div>
+    <div class="bar"><span>已连对 <b id="done">0</b> / <b id="total">0</b></span><span>·</span><span>用了 <b id="moves">0</b> 步</span></div>
+    <div id="game"></div>
+  </div>
+</div>
+<script src="./decisions.js?v=6"></script>
+<script>
+function esc(s){return String(s==null?'':s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function addTrail(t,id,l){try{var K='civlab_trail_v1',a=JSON.parse(localStorage.getItem(K)||'[]'),k=t+':'+id;if(a.some(x=>x.t+':'+x.id===k))return;a.push({t:t,id:id,l:l,ts:Date.now()});if(a.length>120)a=a.slice(-120);localStorage.setItem(K,JSON.stringify(a));}catch(e){}}
+function readTrail(){try{return JSON.parse(localStorage.getItem('civlab_trail_v1'))||[];}catch(e){return[];}}
+
+const ICON={};(window.DECISIONS||[]).forEach(d=>ICON[d.id]=d.icon||'🎯');
+const N=5;
+let sel=null, done=0, moves=0, total=0, locking=false;
+
+function buildPool(){
+  const ALL=(window.DECISIONS||[]).filter(d=>d.person&&d.tip);
+  const doneIds=new Set(readTrail().filter(x=>x.t==='decision').map(x=>x.id));
+  const mine=ALL.filter(d=>doneIds.has(d.id));
+  if(mine.length>=N){ document.getElementById('src').innerHTML='把<b>你走过的人物</b>,和他当年面对的<b>难题</b>连起来。'; return mine; }
+  document.getElementById('src').innerHTML='先随机出几道——<b>走过更多抉择</b>,这里就全是你认识的人啦。';
+  // 不够就用走过的 + 随机补足
+  const rest=shuffle(ALL.filter(d=>!doneIds.has(d.id)));
+  return shuffle([...mine, ...rest]).slice(0, Math.max(N, mine.length));
+}
+
+function newRound(){
+  sel=null; done=0; moves=0; locking=false;
+  const pairs=shuffle(buildPool()).slice(0,N);
+  total=pairs.length;
+  document.getElementById('total').textContent=total;
+  document.getElementById('done').textContent=0;
+  document.getElementById('moves').textContent=0;
+  const left=shuffle(pairs), right=shuffle(pairs);
+  document.getElementById('game').innerHTML=`
+    <div class="board">
+      <div class="col"><div class="colh">人物</div>${left.map(d=>`<button class="card person" data-side="L" data-pid="${d.id}"><span class="pi">${ICON[d.id]||'🎯'}</span><span>${esc(d.person)}</span></button>`).join('')}</div>
+      <div class="col"><div class="colh">他面对的难题</div>${right.map(d=>`<button class="card tip" data-side="R" data-pid="${d.id}">${esc(d.tip)}</button>`).join('')}</div>
+    </div>`;
+  document.querySelectorAll('.card').forEach(c=>c.onclick=()=>tap(c));
+}
+
+function tap(c){
+  if(locking || c.classList.contains('matched')) return;
+  if(!sel){ sel=c; c.classList.add('sel'); return; }
+  if(sel===c){ sel=null; c.classList.remove('sel'); return; }        // 取消
+  if(sel.dataset.side===c.dataset.side){ sel.classList.remove('sel'); sel=c; c.classList.add('sel'); return; } // 同列改选
+  // 两列各一张 → 判定
+  moves++; document.getElementById('moves').textContent=moves;
+  const a=sel; sel=null;
+  if(a.dataset.pid===c.dataset.pid){
+    [a,c].forEach(x=>{x.classList.remove('sel');x.classList.add('matched');x.onclick=null;});
+    a.insertAdjacentHTML('beforeend','<span class="ok">✓</span>');
+    done++; document.getElementById('done').textContent=done;
+    if(done>=total) setTimeout(win,450);
+  } else {
+    locking=true;
+    [a,c].forEach(x=>{x.classList.remove('sel');x.classList.add('wrong');});
+    setTimeout(()=>{[a,c].forEach(x=>x.classList.remove('wrong'));locking=false;},420);
+  }
+}
+
+function win(){
+  addTrail('game','match','连一连·通关');
+  const perfect = moves===total;
+  document.getElementById('game').innerHTML=`
+    <div class="win">
+      <div class="we">${perfect?'🏆':'🎉'}</div>
+      <h2>${perfect?'完美通关!':'全部连对!'}</h2>
+      <p>你用了 <b>${moves}</b> 步连对 <b>${total}</b> 组${perfect?'——一步没错,太厉害了!':'。'}</p>
+      <p>已在「我的足迹」盖下一枚 🔗 <b>游戏章</b>。</p>
+      <div class="btns">
+        <button class="btn" onclick="newRound()">↺ 再来一局</button>
+        <a class="btn ghost" href="./passport.html" style="text-decoration:none">🎒 看我的足迹</a>
+      </div>
+    </div>`;
+}
+
+if((window.DECISIONS||[]).length>=2){ newRound(); }
+else { document.getElementById('game').innerHTML='<div class="hint">题库没加载出来,请刷新重试。</div>'; }
+</script>
+</body>
+</html>
