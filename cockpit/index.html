@@ -126,6 +126,24 @@
   .cert-foot{display:flex;justify-content:space-between;font-size:11.5px;color:var(--mut);margin-top:18px;padding-top:12px;border-top:1px dashed #d9cdb3}
   .cert-ceo{font-size:11px;letter-spacing:2px;color:var(--orange);margin-top:7px;font-weight:700}
   .cert-close{margin-top:18px;width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer}
+  .relbtn{display:inline-block;margin:0 7px 7px 0;background:#fdf3e6;border:1.5px solid var(--orange);color:#8a5410;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer}
+  .morebtn{margin-top:11px;background:var(--green);color:#fff;border:none;border-radius:9px;padding:9px 15px;font-size:13px;font-weight:700;cursor:pointer}
+  .route{font-size:14px;color:var(--green);font-weight:700;margin:8px 0 9px;line-height:1.5}
+  .stxt{flex:1;border:1.5px solid var(--line);border-radius:10px;padding:10px 13px;font-size:14px;font-family:inherit;outline:none;background:var(--card)}
+  .stxt:focus{border-color:var(--orange)}
+  .cdetail{width:430px;max-width:100%;max-height:86vh;overflow:auto;background:var(--bg);border-radius:18px;padding:24px;box-shadow:0 24px 70px rgba(0,0,0,.45)}
+  .cd-type{font-size:12px;letter-spacing:1px;color:var(--orange);font-weight:700}
+  .cd-name{font-family:"Songti SC",serif;font-size:24px;color:var(--green);font-weight:700;margin:4px 0 9px}
+  .cd-line{font-size:15px;color:var(--ink);line-height:1.7;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:11px 13px}
+  .cd-eg{background:#fbf6ea;border:1px solid #e7c98f;border-radius:11px;padding:13px 15px;margin-top:12px}
+  .cd-eglbl{font-size:13px;font-weight:700;color:#8a5410;display:block;margin-bottom:5px}
+  .cd-eg>div{font-size:14.5px;color:var(--ink);line-height:1.8}
+  .cd-when{margin-top:12px}
+  .cd-when>span{font-size:13px;font-weight:700;color:var(--green);display:block;margin-bottom:4px}
+  .cd-when>div{font-size:14px;color:var(--mut);line-height:1.6}
+  .cd-rellbl{font-size:13px;font-weight:700;color:var(--mut);margin:16px 0 9px}
+  .cd-close{margin-top:16px;width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;padding:11px;font-size:14px;font-weight:700;cursor:pointer}
+  .foot2{display:none}
   .foot{text-align:center;font-size:11.5px;color:var(--mut);margin-top:26px}
 </style>
 </head>
@@ -158,7 +176,11 @@
   <div class="panel" id="p-album"></div>
 
   <div class="panel" id="p-stuck">
-    <div class="note">不是你不行,是没说对话。选一个最像你的情况,马上给你招数 + 能直接复制的话术。</div>
+    <div class="note">卡住不是你不行,是还没找到对的概念。把你的问题写下来,我帮你认出你卡在哪个概念,点过去就能学(有例子)。</div>
+    <div class="lbl" style="margin-top:4px">✍️ 用一句话说说你现在卡在哪</div>
+    <div style="display:flex;gap:8px;margin-bottom:6px"><input id="stuckText" class="stxt" placeholder="比如:AI 做的颜色好丑 / 我不知道下一步做什么…" oninput="findStuckText()"><button class="btn" onclick="findStuckText()">帮我找找</button></div>
+    <div id="stuckTextAns"></div>
+    <div class="lbl">或者,选一个最像你的情况</div>
     <div class="sit" id="sitList"></div>
     <div id="stuckAns"></div>
   </div>
@@ -193,6 +215,19 @@
       <div class="cert-foot"><span id="certDate"></span><span>少年 CEO · 创造者驾驶舱</span></div>
       <div class="cert-ceo">Creator · Explorer · Owner</div>
       <button class="cert-close" onclick="closeCert()">📸 截图保存这张证书 · 关闭</button>
+    </div>
+  </div>
+
+  <div class="modal" id="cModal" onclick="if(event.target===this)closeConcept()">
+    <div class="cdetail">
+      <div class="cd-type" id="cdType"></div>
+      <div class="cd-name" id="cdName"></div>
+      <div class="cd-line" id="cdLine"></div>
+      <div class="cd-eg"><span class="cd-eglbl">🌰 举个例子</span><div id="cdEg"></div></div>
+      <div class="cd-when"><span>🤔 什么时候会用到它</span><div id="cdWhen"></div></div>
+      <div id="cdExtra"></div>
+      <div class="cd-rel" id="cdRel"></div>
+      <button class="cd-close" onclick="closeConcept()">关闭</button>
     </div>
   </div>
 </div>
@@ -267,9 +302,9 @@ const PHASES=['前期规划 · 想清楚做什么','开发执行 · 把它做出
 const CROSS=[['性能','前端、后端、基建每层都能拖慢体验'],['可访问性','从设计层就开始,不是前端补丁'],['安全与隐私','鉴权、越权、密钥、数据合规'],['数据与度量','让每个决定回到真实行为上验证'],['沟通与对齐','与人、与 AI 都要先复述目标'],['时间与优先级','永远资源有限,先做最锋利的']];
 const STAGES=[
  {n:'立项',role:'Explorer',goal:'找到一个「小而真」的需求,定下要为谁解决什么。',x:[1,6],e:[1,2],j:[4,5]},
- {n:'原型',role:'Explorer',goal:'做出第一个「能点的」可交互原型。',x:[2],e:[3,4],j:[10,2]},
- {n:'开发',role:'Creator',goal:'把作品一块块做出来,让它真正「能用」。',x:[3],e:[5,6,4],j:[7,13,12,6]},
- {n:'打磨',role:'Owner',goal:'测试、上线,让真实的人用一用,再改。',x:[4,5],e:[7,8,10],j:[11,3]},
+ {n:'原型',role:'Explorer',goal:'做出第一个「能点的」可交互原型。',x:[2],e:[4,5],j:[10,2]},
+ {n:'开发',role:'Creator',goal:'把作品一块块做出来,让它真正「能用」。',x:[3],e:[6,7,5],j:[7,13,12,6]},
+ {n:'打磨',role:'Owner',goal:'测试、上线,让真实的人用一用,再改。',x:[4,5],e:[8,9,10],j:[11,3]},
  {n:'路演',role:'Owner',goal:'为自己的作品站台——讲清它、答辩、交付。',x:[3],e:[1,11],j:[5,1]},
 ];
 const STUCK=[
@@ -280,6 +315,71 @@ const STUCK=[
  {t:'我以为做好了,但不确定',jq:[11,5],pr:'(这一条要去找真人)\n请一个同学/家长用一下你的作品,别提示他。\n看他卡在哪、哪里不会用——那就是你下一步要改的。'},
 ];
 
+const RICH={
+ x1:{eg:'就像你觉得「书包里总找不到东西」很烦,于是想做个「书包整理小帮手」——先有那个让你难受的「痒」,再去做。',when:'刚开始定项目、不知道做什么的时候。',rel:['e1','e2','j4']},
+ x2:{eg:'别先在脑子里想一个完美的游戏。先让 AI 做出一个「能点一下、会动」的小页面,哪怕很简陋——你一点,就知道好不好玩了。',when:'想法太多、迟迟不敢动手的时候。',rel:['e4','j10']},
+ x3:{eg:'就像你能一眼看出「这张画好看、那张乱」。AI 做得好不好,要你来判断、来挑刺;你说得出「哪里不对」,AI 才改得对。',when:'AI 做出来你觉得「怪怪的」却说不清时。',rel:['e5','j1','j6']},
+ x4:{eg:'做菜时,与其十样配料都放一点搞得乱七八糟,不如把一个「番茄炒蛋」炒到最好吃。功能也一样——先把一个做到极致。',when:'功能越加越多、越做越乱时。',rel:['j10','e13']},
+ x5:{eg:'你以为同学都喜欢你的游戏?真让一个同学玩一下,他可能第一步就不会用。「我以为」要拿去「试一下」才算数。',when:'觉得「应该没问题」但没真验证过时。',rel:['e8','e2','j11']},
+ x6:{eg:'像写日记。今天做了什么、卡在哪、学会了什么,写一句。一周后回头看,你会发现自己进步好多。',when:'每节课结束、想记录成长时。',rel:[]},
+ j1:{eg:'不要只说「做好看点」。要说「我想要安静、高级的感觉,像图书馆,不要像游乐场」——把「感觉」说出来,AI 才懂。',when:'AI 做的不合心意、你却只会说「不好看」时。',rel:['x3','e5','j12']},
+ j2:{eg:'像点菜时让服务员「推荐 3 道招牌菜」,你再挑。让 AI「做 3 个不同版本」,你对比着选,比直接要一个强。',when:'不确定想要哪种、AI 一次只给一个时。',rel:['j12','x3']},
+ j3:{eg:'AI 说「做好了」,你可以问:「你确定吗?是你试过的,还是猜的?」多问一句,常能发现它在瞎编。',when:'AI 答得太快、你不太信的时候。',rel:['x5','j11']},
+ j4:{eg:'拼乐高卡住了,别硬怼。退一步看说明书:「我到底要拼的是什么?」做产品也一样——卡住先回到「我要给谁解决什么」。',when:'越做越乱、不知道下一步时。',rel:['x1','e1','j8']},
+ j5:{eg:'别问「这个行不行」。要讲故事:「假设我是一年级小朋友,第一次打开,会先看到什么、会不会不知道点哪」——把场景讲出来。',when:'想让 AI 帮你想「用户会怎么用」时。',rel:['e2','e4','j6']},
+ j6:{eg:'不要只说「不对,重做」。要说「这个按钮太小,手指点不到,请放大一倍」——问题在哪、为什么、要怎样,讲清楚。',when:'反复改还是不对、AI 不懂你哪里不满意时。',rel:['j1','j7']},
+ j7:{eg:'与其打一大段字描述哪里不对,不如直接截个图,圈出「这里」给 AI 看。一张图胜过一百个字。',when:'画面有问题、文字怎么说都说不清时。',rel:['j6','j12']},
+ j8:{eg:'像出门前先列清单:钥匙、水杯、作业。做之前先让 AI 帮你列「1-2-3 步」,再一步步做,就不容易乱。',when:'事情有点多、不知从哪下手时。',rel:['e13','j10','j13']},
+ j9:{eg:'借同学橡皮先说好「用完还我、别弄脏」。和 AI 也一样,一开始就说清「只用中文、别动我已做好的地方」。',when:'AI 老是改坏别的地方、不按你要求时。',rel:['j13','j6']},
+ j10:{eg:'学骑车先装辅助轮,不是一上来就放手。先做一个「最小能跑」的版本,跑通了再加东西。',when:'想一口气做很大、结果做不出来时。',rel:['x2','x4']},
+ j11:{eg:'交作业前自己先检查一遍。让 AI「自己检查一遍,列出还缺什么」,常能在你发现前就补上漏洞。',when:'觉得做完了、但怕有没注意到的问题时。',rel:['e8','x5']},
+ j12:{eg:'想让 AI 懂你要的风格,给它看一个你喜欢的例子:「做成这个网站这样的感觉」——有参照,AI 就不乱猜了。',when:'你心里有个样子、但说不清楚时。',rel:['j1','x3']},
+ j13:{eg:'整理房间别同时翻五个抽屉。和 AI 也一样:这次只改导航栏,改好确认了,再改下一处。一次一件,才不会乱。',when:'一次提一堆要求、结果越改越乱时。',rel:['j9','j8']},
+ j14:{eg:'同学帮了你,你会说「谢谢,这个真好」。对 AI 也先肯定:「这个配色很好,保留」,再说下一步,它会更稳。',when:'AI 做对了一部分、你想保住它别被改掉时。',rel:['j6']},
+ e1:{eg:'开店前先想「开什么店、卖给谁」——开奶茶店还是文具店?给小学生还是上班族?先把方向定下来。',when:'项目刚开始、定「做什么、给谁」时。',rel:['x1','e2','e4']},
+ e2:{eg:'开奶茶店前先去问同学「你们爱喝什么、嫌什么贵」。先搞清楚客人想要什么,别自己瞎猜。',when:'想知道「我做给谁、他要什么」时。',rel:['j5','e1']},
+ e3:{eg:'怎么让更多人知道你的奶茶店、愿意来、还带朋友来。让你的产品被更多人用起来。',when:'想让更多人知道、来用你的作品时。',rel:['e2','e1']},
+ e4:{eg:'设计「菜单和怎么点单」:客人怎么一步步选到想要的、点哪个会怎样——把流程画顺。',when:'想清楚「人怎么一步步用我的产品」时。',rel:['e5','x2','e6']},
+ e5:{eg:'店面装修——招牌好不好看、颜色搭不搭、字大不大。第一眼让人觉得「这家店挺舒服」。',when:'觉得「做出来不好看」时。',rel:['x3','j1','j12']},
+ e6:{eg:'餐厅的「前厅」——客人看到、摸到、点到的桌椅和菜单。就是用户在屏幕上看到和点的那一层。',when:'在做「用户看得到、点得到」的界面时。',rel:['e4','e7']},
+ e7:{eg:'餐厅的「后厨」——客人看不见,但负责把菜做出来。就是背后算数据、存信息、管登录的那一层。',when:'涉及「存数据、登录、算逻辑」时。',rel:['e6','e8']},
+ e8:{eg:'菜上桌前厨师先尝一口,别让客人吃到没熟的。产品上线前自己先当用户挑毛病、修 bug。',when:'做完了、准备给别人用之前。',rel:['j11','e9','x5']},
+ e9:{eg:'正式「开门营业」,还要保证它每天都能正常开门、不突然关掉。把产品发布出去,并让它一直能用。',when:'想让别人能真正打开、用到你的作品时。',rel:['e8','e10']},
+ e10:{eg:'看「哪道菜卖得最好、客人都点什么」。看你的产品里哪些功能被用得多,用数据说话。',when:'上线后想知道「大家到底在用什么」时。',rel:['e9','x5']},
+ e11:{eg:'算账——一杯奶茶成本多少、卖多少、能不能赚钱、撑不撑得下去。',when:'路演要讲「它怎么持续、怎么赚钱」时。',rel:['e1','e3']},
+ e12:{eg:'守规矩——别用别人的图片不标出处、别乱收集同学的隐私。把风险提前挡住。',when:'用到别人的素材、或收集了别人信息时。',rel:['e7']},
+ e13:{eg:'像小组做手抄报——谁画、谁写、什么时候完成,排好。一个人做项目,也要把任务拆开、排好顺序。',when:'事情多、要安排「先做什么后做什么」时。',rel:['j8','x4']},
+};
+function nameOf(k){const n=+k.slice(1);if(k[0]==='x')return '心法'+n+'·'+XINFA[n-1].t;if(k[0]==='j')return JQ[n-1].t;if(k[0]==='e')return ENV[n-1].n+'.'+ENV[n-1].name;return k;}
+function findConcept(k){const n=+k.slice(1);
+ if(k[0]==='x'){const c=XINFA[n-1];return{type:'💡 心法',name:'心法 '+n+' · '+c.t,line:c.d,extra:''};}
+ if(k[0]==='j'){const c=JQ[n-1];return{type:c.g===1?'💬 沟通技巧':'🤝 协作技巧',name:c.t,line:c.d,extra:`<div class="ex" style="margin-top:12px"><div class="gd"><span class="tag">✓ 这样说</span>「${c.gd}」</div><div class="bd"><span class="tag">✗ 别这样</span>「${c.bd}」</div></div>`};}
+ const c=ENV[n-1];const terms=c.terms.map(t=>`<div class="trow" onclick="this.classList.toggle('open')"><div class="tt">${t[0]}</div><div class="td">${t[1]}</div></div>`).join('');
+ return{type:'🧩 专业环节',name:c.n+'. '+c.name,line:c.fn,extra:`<p class="termtip" style="margin-top:14px">👇 这个环节里的小概念</p>${terms}<p class="good"><b>「好」的标准:</b>${c.good}</p>`};}
+function openConcept(k){const c=findConcept(k),r=RICH[k]||{};
+ $('cdType').textContent=c.type;$('cdName').textContent=c.name;$('cdLine').textContent=c.line;
+ $('cdEg').innerHTML=r.eg||'';$('cdWhen').innerHTML=r.when||'';$('cdExtra').innerHTML=c.extra||'';
+ const rel=r.rel||[];
+ $('cdRel').innerHTML=rel.length?`<div class="cd-rellbl">🔗 接着学这些(它们是连在一起的)</div>`+rel.map(x=>`<button class="relbtn" onclick="openConcept('${x}')">${nameOf(x)} →</button>`).join(''):'';
+ $('cModal').classList.add('on');const d=document.querySelector('#cModal .cdetail');if(d)d.scrollTop=0;}
+function closeConcept(){$('cModal').classList.remove('on');}
+const KEYMAP=[
+ [['丑','不好看','难看','颜色','样子','配色','好看','字小','字大'],['e5','j1','j12']],
+ [['没听懂','听不懂','不懂我','不明白','听不明白','理解'],['j5','j6','j7']],
+ [['乱','坏了','改坏','搞乱','越改越','全乱'],['j13','j10','j9']],
+ [['下一步','不知道做什么','卡住','没思路','不知道','发懵'],['j4','j8','x1']],
+ [['登录','数据','保存','存不了','账号','后台'],['e7']],
+ [['bug','报错','错误','测试','出错','闪退','白屏'],['e8','j11']],
+ [['上线','发布','打不开','别人用不了','网址','分享'],['e9']],
+ [['用户','给谁','谁用','需求','为谁'],['e2','j5','e1']],
+ [['乱改','不听','不按','乱动','改别的'],['j9','j6','j13']],
+ [['太多','减不掉','功能多','复杂','贪多'],['x4','j10']],
+];
+function findStuckText(){const t=($('stuckText').value||'').toLowerCase();const out=$('stuckTextAns');
+ if(!t.trim()){out.innerHTML='';return;}
+ let hit=null;for(const[kw,ks]of KEYMAP){if(kw.some(w=>t.includes(w.toLowerCase()))){hit=ks;break;}}
+ if(!hit){out.innerHTML=`<div class="route">🤔 没太认出你卡在哪~ 换个说法,或选下面五个常见情况。</div>`;return;}
+ out.innerHTML=`<div class="route">💡 看起来你可能卡在了这些概念上,点过去学一下(有例子)👇</div>`+hit.map(k=>`<button class="relbtn" onclick="openConcept('${k}')">${nameOf(k)} →</button>`).join('');}
 const KEY='cockpit_v2';
 let st=JSON.parse(localStorage.getItem(KEY)||'{}');
 if(st.stage==null)st.stage=0; st.proj=st.proj||''; st.aware=st.aware||[]; st.user=st.user||''; st.records=st.records||{}; if(!st.sess)st.sess=1;
@@ -298,12 +398,12 @@ function updCount(){$('awCount').textContent=st.aware.length+' / 33';}
 function tog(h){h.parentNode.classList.toggle('open');}
 
 // builders
-function xinfaCard(x){return `<div class="acc"><div class="acc-h" onclick="tog(this)"><span class="acc-t">心法 ${x.n} · ${x.t}</span>${awBtn('x'+x.n)}</div><div class="acc-b"><p class="desc">${x.d}</p></div></div>`;}
-function jqCard(j){return `<div class="acc"><div class="acc-h" onclick="tog(this)"><span class="acc-t">${j.t}</span>${awBtn('j'+j.n)}</div><div class="acc-b"><p class="desc">${j.d}</p><div class="ex"><div class="gd"><span class="tag">✓ 这样说</span>「${j.gd}」</div><div class="bd"><span class="tag">✗ 别这样</span>「${j.bd}」</div></div></div></div>`;}
+function xinfaCard(x){return `<div class="acc"><div class="acc-h" onclick="tog(this)"><span class="acc-t">心法 ${x.n} · ${x.t}</span>${awBtn('x'+x.n)}</div><div class="acc-b"><p class="desc">${x.d}</p><button class="morebtn" onclick="openConcept('x${x.n}')">📖 看例子 · 什么时候用 · 连着学什么 →</button></div></div>`;}
+function jqCard(j){return `<div class="acc"><div class="acc-h" onclick="tog(this)"><span class="acc-t">${j.t}</span>${awBtn('j'+j.n)}</div><div class="acc-b"><p class="desc">${j.d}</p><div class="ex"><div class="gd"><span class="tag">✓ 这样说</span>「${j.gd}」</div><div class="bd"><span class="tag">✗ 别这样</span>「${j.bd}」</div></div><button class="morebtn" onclick="openConcept('j${j.n}')">📖 看例子 · 什么时候用 · 连着学什么 →</button></div></div>`;}
 function envCard(ev){
  const terms=ev.terms.map(t=>`<div class="trow" onclick="this.classList.toggle('open')"><div class="tt">${t[0]}</div><div class="td">${t[1]}</div></div>`).join('');
  return `<div class="acc"><div class="acc-h" onclick="tog(this)"><span class="acc-t"><span class="no">${ev.n}</span>${ev.name}<small>${ev.en} · ${ev.fn}</small></span>${awBtn('e'+ev.n)}</div>
-  <div class="acc-b"><p class="termtip">👇 点开每个术语,看它是什么</p>${terms}<p class="good"><b>「好」的标准:</b>${ev.good}</p></div></div>`;
+  <div class="acc-b"><button class="morebtn" style="margin-top:12px;margin-bottom:4px" onclick="openConcept('e${ev.n}')">📖 看例子 · 什么时候用 · 连着学什么 →</button><p class="termtip">👇 点开每个术语,看它是什么</p>${terms}<p class="good"><b>「好」的标准:</b>${ev.good}</p></div></div>`;
 }
 
 function renderFollow(){
@@ -336,7 +436,8 @@ function renderStages(){
 
 function renderStuck(){const el=$('sitList');el.innerHTML='';STUCK.forEach((s,i)=>{const b=document.createElement('div');b.className='sitbtn';b.textContent=s.t;b.onclick=()=>{document.querySelectorAll('.sitbtn').forEach(x=>x.classList.remove('on'));b.classList.add('on');showStuck(i);};el.appendChild(b);});}
 function showStuck(i){const s=STUCK[i];const cards=JQ.filter(j=>s.jq.includes(j.n)).map(j=>`<div class="mini"><div class="mt">💡 ${j.t}</div><div class="md">${j.d}</div></div>`).join('');
- $('stuckAns').innerHTML=`<div class="lbl">试试这几招</div><div class="grid">${cards}</div><div class="prompt"><button class="copy" onclick="copyP(this)">复制</button><div class="pl">可以这样跟 AI 说 ↓</div><div class="pt">${s.pr}</div></div>`;}
+ const routes=s.jq.map(nn=>`<button class="relbtn" onclick="openConcept('j${nn}')">${JQ[nn-1].t} →</button>`).join('');
+ $('stuckAns').innerHTML=`<div class="lbl">试试这几招</div><div class="grid">${cards}</div><div class="route">📖 点过去看例子 + 怎么学:</div>${routes}<div class="prompt"><button class="copy" onclick="copyP(this)">复制</button><div class="pl">也可以这样跟 AI 说 ↓</div><div class="pt">${s.pr}</div></div>`;}
 function copyP(b){const t=b.parentNode.querySelector('.pt').textContent;navigator.clipboard&&navigator.clipboard.writeText(t);b.textContent='已复制✓';setTimeout(()=>b.textContent='复制',1200);}
 
 const TOTAL_SESS=8;
