@@ -6,78 +6,7 @@
 <title>抉择时刻 · 爱德温与那只麻雀 · CivLab</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
-<style>
-  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
-  #app{position:relative;z-index:10;min-height:100dvh;display:flex;flex-direction:column;align-items:center}
-  .top{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:12px 16px;
-    background:linear-gradient(180deg,rgba(var(--scrim,0,0,0),.25),transparent);position:sticky;top:0;z-index:20}
-  .top a.back{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.1em;
-    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
-  .top .brand{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink)}
-  .prog{display:flex;gap:5px;margin-left:auto}
-  .prog i{width:13px;height:4px;border-radius:3px;background:var(--panel-line)}
-  .prog i.on{background:var(--gold)}
-  .wrap{width:min(660px,92%);margin:8px auto 70px;flex:1}
-  .beat{animation:fin .5s cubic-bezier(.22,1,.36,1)}
-  @keyframes fin{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
-  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;font-weight:700;text-align:center;margin-top:18px}
-  .htitle{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);text-align:center;line-height:1.3;margin:6px 0 4px;text-shadow:var(--label-shadow)}
-  .hsub{font-family:var(--mono);font-size:12px;color:var(--ink3);text-align:center;letter-spacing:.08em;margin-bottom:18px}
-  .scene{font-family:var(--serif);font-size:clamp(15px,3.8vw,17.5px);color:var(--ink);line-height:1.95;
-    background:var(--panel-bg);border:1px solid var(--panel-line);border-left:4px solid var(--gold);border-radius:14px;
-    padding:18px 20px;backdrop-filter:blur(8px)}
-  .scene b{color:var(--gold)}
-  .dossier-intro{font-family:var(--sans);font-size:14.5px;color:var(--ink2);text-align:center;line-height:1.7;margin:4px 0 16px}
-  .dcount{font-family:var(--mono);font-size:12px;color:var(--gold);text-align:center;font-weight:700;margin-bottom:12px}
-  .dcard{background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:14px;margin-bottom:11px;overflow:hidden;cursor:pointer;transition:border-color .2s}
-  .dcard.open{border-color:var(--gold)}
-  .dhead{display:flex;align-items:center;gap:11px;padding:15px 17px}
-  .dhead .di{font-size:21px}
-  .dhead .dt{font-family:var(--sans);font-weight:800;font-size:15.5px;color:var(--ink);flex:1}
-  .dhead .dchev{font-family:var(--mono);font-size:11px;color:var(--ink3);transition:transform .2s}
-  .dcard.open .dchev{transform:rotate(90deg);color:var(--gold)}
-  .dhead .ddot{width:8px;height:8px;border-radius:50%;background:var(--vermilion);flex:none}
-  .dcard.open .ddot{background:var(--cyan)}
-  .dbody{max-height:0;overflow:hidden;transition:max-height .35s ease}
-  .dbody-in{padding:0 17px 16px;font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.85}
-  .dbody-in b{color:var(--gold)}
-  .dbody-in ul{margin:8px 0 0;padding-left:2px;list-style:none}
-  .dbody-in li{margin:7px 0;padding-left:16px;position:relative}
-  .dbody-in li:before{content:'·';position:absolute;left:3px;color:var(--vermilion);font-weight:900}
-  .dbody-in li b{color:var(--vermilion)}
-  .ask{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);text-align:center;margin:22px 0 6px}
-  .asksub{font-family:var(--sans);font-size:13.5px;color:var(--ink2);text-align:center;margin-bottom:16px;line-height:1.6}
-  .choices{display:flex;flex-direction:column;gap:11px}
-  .choice{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink);background:var(--panel-bg);
-    border:1.5px solid var(--panel-line);border-radius:14px;padding:15px 17px;cursor:pointer;transition:all .15s;text-align:left;line-height:1.5}
-  .choice:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
-  .choice .ckey{font-weight:900;color:var(--gold);margin-right:8px}
-  .choice.picked{border-color:var(--gold);background:rgba(224,138,44,.1)}
-  .reaction{margin-top:14px;font-size:14.5px;color:var(--ink);line-height:1.75;background:rgba(224,138,44,.1);
-    border-left:4px solid var(--gold);border-radius:8px;padding:13px 16px;display:none}
-  .reaction.show{display:block;animation:fin .4s}
-  .lines{display:flex;flex-direction:column;gap:10px;margin-top:6px}
-  .line{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:12px;padding:13px 16px}
-  .line .lh{font-family:var(--serif);font-weight:900;font-size:14px;color:var(--gold);margin-bottom:4px}
-  .line .lt{font-size:14px;color:var(--ink);line-height:1.7}
-  .line .lt b{color:var(--vermilion)}
-  .voice{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:13px;padding:13px 16px;margin-bottom:10px}
-  .voice .vw{font-family:var(--sans);font-weight:800;font-size:14px;color:var(--ink);margin-bottom:5px}
-  .voice .va{font-size:14px;color:var(--ink2);line-height:1.7}
-  .note{font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:center;margin-top:12px}
-  .q{font-family:var(--serif);font-size:16.5px;color:var(--ink);line-height:1.75;margin:14px 0;padding-left:14px;border-left:3px solid var(--gold)}
-  .q b{color:var(--gold)}
-  textarea{width:100%;box-sizing:border-box;margin-top:10px;font-family:var(--sans);font-size:15px;color:var(--ink);
-    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:12px;padding:13px 15px;min-height:80px;outline:none;resize:vertical}
-  .btnrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
-  .nextbtn{font-family:var(--sans);font-weight:800;font-size:15px;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));
-    border:none;border-radius:999px;padding:13px 30px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.16)}
-  .nextbtn:active{transform:scale(.97)}
-  .nextbtn[disabled]{opacity:.4;cursor:not-allowed;box-shadow:none}
-  .ghost{font-family:var(--sans);font-weight:700;font-size:14px;color:var(--gold);background:var(--panel-bg);
-    border:1px solid var(--panel-line);border-radius:999px;padding:11px 20px;cursor:pointer;text-decoration:none;display:inline-block}
-  .gate{text-align:center;font-family:var(--sans);font-size:12.5px;color:var(--ink3);margin-top:6px}
-</style>
+<link rel="stylesheet" href="./decision.css?v=1"/>
 </head>
 <body data-theme="warm">
 <div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
@@ -92,7 +21,6 @@
 <script src="./track.js?v=1"></script>
 <script>
 window.__aiCtx='用户正在体验"抉择时刻·爱德温与那只麻雀"(母题:开门还是关门/面对外来的新事物,接纳还是拒绝)。出处:英国修道士比德(Bede,约673—735)的《英吉利教会史》(731年用拉丁文写成),这是了解早期英格兰历史最重要的文献。故事:公元627年,英格兰北部诺森布里亚王国的国王爱德温(Edwin),面临一个重大抉择——要不要放弃盎格鲁-撒克逊人世代信奉的古老众神,改信从欧洲大陆传来的基督教。起因是他娶了来自肯特的基督徒公主,公主带来了传教士保利努斯(Paulinus)。爱德温没有独断,而是召集贵族与祭司开会商议。会上,一位老臣说出了著名的"麻雀的比喻":人生就像一只麻雀,在寒冬里从一扇门飞进灯火温暖的厅堂,又从另一扇门飞回外面的黑暗风雪——我们只看见它在厅中短暂的片刻,却不知它从何处来、往何处去;如果这个新信仰能告诉我们生前死后之事,那就值得一听。连原本的大祭司科伊菲(Coifi)也被说动,承认自己侍奉旧神多年却没得到什么回报,愿意尝试新信仰,并亲自骑马去捣毁了旧神庙(在古德曼汉姆)。最终,627年复活节,爱德温与众多贵族在约克受洗,诺森布里亚成为基督教王国。历史真实:爱德温后来于633年战死,诺森布里亚一度反弹回异教,但基督教最终在英格兰扎根。深远影响:基督教不只是信仰,它带来了拉丁文字、书籍与学问,修道院成为学术中心——一百年后,正是诺森布里亚的修道士比德本人,用拉丁文写下了这部《英吉利教会史》。这扇"开门",让英格兰接上了整个欧洲基督教世界的文明与学问。教学要点:这是"面对外来的新事物(信仰、文字、学问),接纳还是拒绝"的抉择,与日本圣德太子主动开门学中国同属"开门还是关门"母题(都是开门接纳→与更大的世界相连);与明朝郑和后的关门内向形成对照。讲述宗教时保持客观中立,只叙史实,不褒贬任何信仰,把"改信"作为一个历史选择来呈现。请用适合10-12岁孩子的语言陪他思考,多反问,不要替他下结论。';
-let pick=null;
 const DOSSIER=[
   {i:'👑',t:'你是谁',b:'你是<b>爱德温</b>,公元7世纪英格兰北部<b>诺森布里亚</b>王国的国王,统治着一片刚刚强盛起来的土地。'},
   {i:'⚒️',t:'祖先的神',b:'你的子民,世世代代信奉盎格鲁-撒克逊人<b>古老的众神</b>。神庙、祭司、祭祀,一切都和祖先一模一样——这是你们身份的根。'},
@@ -101,7 +29,6 @@ const DOSSIER=[
   {i:'🐦',t:'麻雀的比喻',b:'你召集贵族和祭司商议。一位老臣说:"<b>人生就像一只麻雀,从寒夜飞进暖厅,转眼又飞回黑暗</b>——我们不知它从哪来、往哪去。如果这新信仰能告诉我们生前死后之事,就值得一听。"连大祭司都动摇了。'},
   {i:'⚖️',t:'眼前的难题',b:'<b>接受新信仰</b>——拥抱一个未知的神、和它带来的文字与新世界,却要背弃祖先的众神;<b>守住旧神</b>——保住传统与身份的根,却可能把自己关在那扇门外。'},
 ];
-let opened=new Set();
 const beats=[];
 beats.push(()=>`
   <div class="kicker">公元 627 年 · 英格兰 · 诺森布里亚</div>
@@ -174,44 +101,14 @@ beats.push(()=>`
   </div>
   <div class="btnrow" style="margin-top:8px">
     <button class="ghost" onclick="if(window.toggleAIFloat)toggleAIFloat()">🤖 和 AI 聊聊这个抉择</button>
-    <button class="ghost" onclick="pick=null;opened=new Set();go(0)">↺ 重新走一遍</button>
+    <button class="ghost" onclick="restart()">↺ 重新走一遍</button>
   </div>`);
 
-let cur=0;
-function render(){
-  document.getElementById('beat').innerHTML=beats[cur]();
-  document.getElementById('prog').innerHTML=beats.map((_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('');
-  if(cur===1){ refreshGate(); }
-  if(cur===7){ const m=document.getElementById('myPick'); if(m)m.textContent=pick||'?'; const n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('decision_edwin')||''; }
-  window.scrollTo({top:0,behavior:'instant'});
-  if(window.Track) Track.log('抉择时刻');
-}
-function go(n){ cur=n; render(); }
-function flip(i){
-  const card=document.querySelector('.dcard[data-i="'+i+'"]');
-  const body=document.getElementById('db'+i);
-  const isOpen=card.classList.toggle('open');
-  body.style.maxHeight=isOpen?(body.scrollHeight+'px'):'0';
-  if(isOpen){ opened.add(i); refreshGate(); }
-}
-function refreshGate(){
-  const c=document.getElementById('dcount'); if(c)c.textContent='已了解 '+opened.size+' / '+DOSSIER.length;
-  const btn=document.getElementById('toChoice'); const gate=document.getElementById('gate');
-  if(opened.size>=DOSSIER.length){ if(btn)btn.disabled=false; if(gate)gate.textContent='✅ 你已看清整盘棋,可以决定了'; }
-}
-function choose(k){
-  pick=k;
-  document.querySelectorAll('.choice').forEach(c=>{c.classList.toggle('picked',c.dataset.k===k);c.onclick=null;});
-  const react={A:'推开了一扇通往新世界的门!可你也放下了祖先的神——族里那些守旧的人,你安抚得了吗?',
+window.DECISION={key:'edwin',DOSSIER:DOSSIER,beats:beats,reactions:{A:'推开了一扇通往新世界的门!可你也放下了祖先的神——族里那些守旧的人,你安抚得了吗?',
     B:'守住了根,听着稳妥。可你也把文字、学问和与外界的联系一起挡在了门外——长远看,值吗?',
-    C:'两边都拜,谁也不得罪?可这样一来,新信仰扎不下根,旧传统也被动摇——常常落得两头都不踏实。'}[k];
-  const r=document.getElementById('reaction');
-  r.innerHTML=react+'<div class="btnrow" style="margin-top:14px"><button class="nextbtn" onclick="go(3)">👉 看真实的爱德温怎么选</button></div>';
-  r.classList.add('show');
-}
-function saveNote(e){ const n=document.getElementById('myNote'); if(n){localStorage.setItem('decision_edwin',n.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的收获',1500);} }
-render();
+    C:'两边都拜,谁也不得罪?可这样一来,新信仰扎不下根,旧传统也被动摇——常常落得两头都不踏实。'},confirmLabel:'👉 看真实的爱德温怎么选'};
 </script>
+<script src="./decision-engine.js?v=1"></script>
 <script src="./ai_float.js?v=2"></script>
 </body>
 </html>

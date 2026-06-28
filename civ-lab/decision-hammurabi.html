@@ -6,78 +6,7 @@
 <title>抉择时刻 · 汉谟拉比立法 · CivLab</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
-<style>
-  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
-  #app{position:relative;z-index:10;min-height:100dvh;display:flex;flex-direction:column;align-items:center}
-  .top{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:12px 16px;
-    background:linear-gradient(180deg,rgba(var(--scrim,0,0,0),.25),transparent);position:sticky;top:0;z-index:20}
-  .top a.back{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.1em;
-    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
-  .top .brand{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink)}
-  .prog{display:flex;gap:5px;margin-left:auto}
-  .prog i{width:13px;height:4px;border-radius:3px;background:var(--panel-line)}
-  .prog i.on{background:var(--gold)}
-  .wrap{width:min(660px,92%);margin:8px auto 70px;flex:1}
-  .beat{animation:fin .5s cubic-bezier(.22,1,.36,1)}
-  @keyframes fin{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
-  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;font-weight:700;text-align:center;margin-top:18px}
-  .htitle{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);text-align:center;line-height:1.3;margin:6px 0 4px;text-shadow:var(--label-shadow)}
-  .hsub{font-family:var(--mono);font-size:12px;color:var(--ink3);text-align:center;letter-spacing:.08em;margin-bottom:18px}
-  .scene{font-family:var(--serif);font-size:clamp(15px,3.8vw,17.5px);color:var(--ink);line-height:1.95;
-    background:var(--panel-bg);border:1px solid var(--panel-line);border-left:4px solid var(--gold);border-radius:14px;
-    padding:18px 20px;backdrop-filter:blur(8px)}
-  .scene b{color:var(--gold)}
-  .dossier-intro{font-family:var(--sans);font-size:14.5px;color:var(--ink2);text-align:center;line-height:1.7;margin:4px 0 16px}
-  .dcount{font-family:var(--mono);font-size:12px;color:var(--gold);text-align:center;font-weight:700;margin-bottom:12px}
-  .dcard{background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:14px;margin-bottom:11px;overflow:hidden;cursor:pointer;transition:border-color .2s}
-  .dcard.open{border-color:var(--gold)}
-  .dhead{display:flex;align-items:center;gap:11px;padding:15px 17px}
-  .dhead .di{font-size:21px}
-  .dhead .dt{font-family:var(--sans);font-weight:800;font-size:15.5px;color:var(--ink);flex:1}
-  .dhead .dchev{font-family:var(--mono);font-size:11px;color:var(--ink3);transition:transform .2s}
-  .dcard.open .dchev{transform:rotate(90deg);color:var(--gold)}
-  .dhead .ddot{width:8px;height:8px;border-radius:50%;background:var(--vermilion);flex:none}
-  .dcard.open .ddot{background:var(--cyan)}
-  .dbody{max-height:0;overflow:hidden;transition:max-height .35s ease}
-  .dbody-in{padding:0 17px 16px;font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.85}
-  .dbody-in b{color:var(--gold)}
-  .dbody-in ul{margin:8px 0 0;padding-left:2px;list-style:none}
-  .dbody-in li{margin:7px 0;padding-left:16px;position:relative}
-  .dbody-in li:before{content:'·';position:absolute;left:3px;color:var(--vermilion);font-weight:900}
-  .dbody-in li b{color:var(--vermilion)}
-  .ask{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);text-align:center;margin:22px 0 6px}
-  .asksub{font-family:var(--sans);font-size:13.5px;color:var(--ink2);text-align:center;margin-bottom:16px;line-height:1.6}
-  .choices{display:flex;flex-direction:column;gap:11px}
-  .choice{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink);background:var(--panel-bg);
-    border:1.5px solid var(--panel-line);border-radius:14px;padding:15px 17px;cursor:pointer;transition:all .15s;text-align:left;line-height:1.5}
-  .choice:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
-  .choice .ckey{font-weight:900;color:var(--gold);margin-right:8px}
-  .choice.picked{border-color:var(--gold);background:rgba(224,138,44,.1)}
-  .reaction{margin-top:14px;font-size:14.5px;color:var(--ink);line-height:1.75;background:rgba(224,138,44,.1);
-    border-left:4px solid var(--gold);border-radius:8px;padding:13px 16px;display:none}
-  .reaction.show{display:block;animation:fin .4s}
-  .lines{display:flex;flex-direction:column;gap:10px;margin-top:6px}
-  .line{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:12px;padding:13px 16px}
-  .line .lh{font-family:var(--serif);font-weight:900;font-size:14px;color:var(--gold);margin-bottom:4px}
-  .line .lt{font-size:14px;color:var(--ink);line-height:1.7}
-  .line .lt b{color:var(--vermilion)}
-  .voice{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:13px;padding:13px 16px;margin-bottom:10px}
-  .voice .vw{font-family:var(--sans);font-weight:800;font-size:14px;color:var(--ink);margin-bottom:5px}
-  .voice .va{font-size:14px;color:var(--ink2);line-height:1.7}
-  .note{font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:center;margin-top:12px}
-  .q{font-family:var(--serif);font-size:16.5px;color:var(--ink);line-height:1.75;margin:14px 0;padding-left:14px;border-left:3px solid var(--gold)}
-  .q b{color:var(--gold)}
-  textarea{width:100%;box-sizing:border-box;margin-top:10px;font-family:var(--sans);font-size:15px;color:var(--ink);
-    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:12px;padding:13px 15px;min-height:80px;outline:none;resize:vertical}
-  .btnrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
-  .nextbtn{font-family:var(--sans);font-weight:800;font-size:15px;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));
-    border:none;border-radius:999px;padding:13px 30px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.16)}
-  .nextbtn:active{transform:scale(.97)}
-  .nextbtn[disabled]{opacity:.4;cursor:not-allowed;box-shadow:none}
-  .ghost{font-family:var(--sans);font-weight:700;font-size:14px;color:var(--gold);background:var(--panel-bg);
-    border:1px solid var(--panel-line);border-radius:999px;padding:11px 20px;cursor:pointer;text-decoration:none;display:inline-block}
-  .gate{text-align:center;font-family:var(--sans);font-size:12.5px;color:var(--ink3);margin-top:6px}
-</style>
+<link rel="stylesheet" href="./decision.css?v=1"/>
 </head>
 <body data-theme="warm">
 <div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
@@ -92,7 +21,6 @@
 <script src="./track.js?v=1"></script>
 <script>
 window.__aiCtx='用户正在体验"抉择时刻·汉谟拉比立法"(母题:让规矩说话/把规则写下来约束所有人)。史实:约公元前1754年,古巴比伦国王汉谟拉比统一两河流域大部。当时各地缺乏统一标准,强者欺凌弱者、私人复仇无休止。汉谟拉比把282条法律刻在一根黑色玄武岩石碑上,公开竖立示众(石碑顶部浮雕:太阳神/正义之神沙马什把权杖交给汉谟拉比,象征法律来自神与正义)。这是人类最早、最完整的成文法典之一(并非最早,更早有乌尔纳姆法典等,但汉谟拉比法典最著名最完整)。最著名的原则是"以眼还眼、以牙还牙"(同态复仇 lex talionis)——它的进步意义在于:把报复限制在"对等"范围内,不许无限报复;并且法律公开,人人可知,有据可依,甚至带有"无罪推定""可呈堂证据"的雏形。但它也有明显局限:刑罚按社会阶级不同(贵族、平民、奴隶受罚不同,伤害贵族赔得重、伤害奴隶赔得轻),并不平等;"以眼还眼"本身在今天看来也很残酷。教学要点:成文法、公开的规则,是文明的一大步——它让"规矩"取代"谁拳头大谁说了算";但早期法律也带着时代的不平等。请用适合10-12岁孩子的语言陪他思考,多反问,不要替他下结论。这个抉择和商鞅"太子犯法罚不罚"(法律面前人人平等)属于同一母题:规则,能不能管住有权的人。';
-let pick=null;
 const DOSSIER=[
   {i:'👑',t:'你是谁',b:'你是<b>汉谟拉比</b>,古巴比伦的国王。你南征北战,把两河流域的大片土地统一在自己手下——可治理这么大的地方,你遇到了一个大麻烦。'},
   {i:'⚔️',t:'没有规矩的世界',b:'你的国土上,各地<b>各有各的规矩</b>。强者欺负弱者,有了纠纷就<b>私自报复</b>,你打我一拳、我就要你一条命,冤冤相报没完没了。说到底:<b>谁拳头硬,谁就说了算。</b>'},
@@ -101,7 +29,6 @@ const DOSSIER=[
   {i:'🏛️',t:'最难的一关',b:'可问题来了:法律一旦公开,就意味着连<b>贵族、官员、甚至你自己</b>,都得受它约束。手握大权的人,会愿意把自己也关进规矩的笼子里吗?'},
   {i:'🪨',t:'眼前的难题',b:'石匠已经备好巨大的石碑。<b>把法律刻上去公示</b>,你就给了所有人一个准绳,却也限制了权贵(和你)的随意;<b>不刻、继续由人临时裁断</b>,你和贵族说了算,却永远摆不平那无休止的私斗。'},
 ];
-let opened=new Set();
 const beats=[];
 beats.push(()=>`
   <div class="kicker">约公元前 1754 年 · 巴比伦</div>
@@ -174,44 +101,14 @@ beats.push(()=>`
   </div>
   <div class="btnrow" style="margin-top:8px">
     <button class="ghost" onclick="if(window.toggleAIFloat)toggleAIFloat()">🤖 和 AI 聊聊这个抉择</button>
-    <button class="ghost" onclick="pick=null;opened=new Set();go(0)">↺ 重新走一遍</button>
+    <button class="ghost" onclick="restart()">↺ 重新走一遍</button>
   </div>`);
 
-let cur=0;
-function render(){
-  document.getElementById('beat').innerHTML=beats[cur]();
-  document.getElementById('prog').innerHTML=beats.map((_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('');
-  if(cur===1){ refreshGate(); }
-  if(cur===7){ const m=document.getElementById('myPick'); if(m)m.textContent=pick||'?'; const n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('decision_hammurabi')||''; }
-  window.scrollTo({top:0,behavior:'instant'});
-  if(window.Track) Track.log('抉择时刻');
-}
-function go(n){ cur=n; render(); }
-function flip(i){
-  const card=document.querySelector('.dcard[data-i="'+i+'"]');
-  const body=document.getElementById('db'+i);
-  const isOpen=card.classList.toggle('open');
-  body.style.maxHeight=isOpen?(body.scrollHeight+'px'):'0';
-  if(isOpen){ opened.add(i); refreshGate(); }
-}
-function refreshGate(){
-  const c=document.getElementById('dcount'); if(c)c.textContent='已了解 '+opened.size+' / '+DOSSIER.length;
-  const btn=document.getElementById('toChoice'); const gate=document.getElementById('gate');
-  if(opened.size>=DOSSIER.length){ if(btn)btn.disabled=false; if(gate)gate.textContent='✅ 你已看清整盘棋,可以决定了'; }
-}
-function choose(k){
-  pick=k;
-  document.querySelectorAll('.choice').forEach(c=>{c.classList.toggle('picked',c.dataset.k===k);c.onclick=null;});
-  const react={A:'让规则取代拳头,了不起!可你也把自己关进了规矩的笼子——手握大权的人,真愿意守自己定的法吗?',
+window.DECISION={key:'hammurabi',DOSSIER:DOSSIER,beats:beats,reactions:{A:'让规则取代拳头,了不起!可你也把自己关进了规矩的笼子——手握大权的人,真愿意守自己定的法吗?',
     B:'凡事自己说了算,看似方便。可百姓永远没有准绳,私斗也永远停不下来——这样的国,稳得住吗?',
-    C:'只管平民、放过权贵?那石碑上的"正义",百姓会真心信服吗?规则一旦只管弱者,就成了欺压的工具。'}[k];
-  const r=document.getElementById('reaction');
-  r.innerHTML=react+'<div class="btnrow" style="margin-top:14px"><button class="nextbtn" onclick="go(3)">👉 看真实的汉谟拉比怎么选</button></div>';
-  r.classList.add('show');
-}
-function saveNote(e){ const n=document.getElementById('myNote'); if(n){localStorage.setItem('decision_hammurabi',n.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的收获',1500);} }
-render();
+    C:'只管平民、放过权贵?那石碑上的"正义",百姓会真心信服吗?规则一旦只管弱者,就成了欺压的工具。'},confirmLabel:'👉 看真实的汉谟拉比怎么选'};
 </script>
+<script src="./decision-engine.js?v=1"></script>
 <script src="./ai_float.js?v=2"></script>
 </body>
 </html>

@@ -6,79 +6,7 @@
 <title>抉择时刻 · 苏格拉底的最后一夜 · CivLab</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
-<style>
-  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
-  #app{position:relative;z-index:10;min-height:100dvh;display:flex;flex-direction:column;align-items:center}
-  .top{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:12px 16px;
-    background:linear-gradient(180deg,rgba(var(--scrim,0,0,0),.25),transparent);position:sticky;top:0;z-index:20}
-  .top a.back{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.1em;
-    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
-  .top .brand{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink)}
-  .prog{display:flex;gap:5px;margin-left:auto}
-  .prog i{width:13px;height:4px;border-radius:3px;background:var(--panel-line)}
-  .prog i.on{background:var(--gold)}
-  .wrap{width:min(660px,92%);margin:8px auto 70px;flex:1}
-  .beat{animation:fin .5s cubic-bezier(.22,1,.36,1)}
-  @keyframes fin{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
-  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;font-weight:700;text-align:center;margin-top:18px}
-  .htitle{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);text-align:center;line-height:1.3;margin:6px 0 4px;text-shadow:var(--label-shadow)}
-  .hsub{font-family:var(--mono);font-size:12px;color:var(--ink3);text-align:center;letter-spacing:.08em;margin-bottom:18px}
-  .scene{font-family:var(--serif);font-size:clamp(15px,3.8vw,17.5px);color:var(--ink);line-height:1.95;
-    background:var(--panel-bg);border:1px solid var(--panel-line);border-left:4px solid var(--gold);border-radius:14px;
-    padding:18px 20px;backdrop-filter:blur(8px)}
-  .scene b{color:var(--gold)}
-  .dossier-intro{font-family:var(--sans);font-size:14.5px;color:var(--ink2);text-align:center;line-height:1.7;margin:4px 0 16px}
-  .dcount{font-family:var(--mono);font-size:12px;color:var(--gold);text-align:center;font-weight:700;margin-bottom:12px}
-  .dcard{background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:14px;margin-bottom:11px;overflow:hidden;
-    cursor:pointer;transition:border-color .2s}
-  .dcard.open{border-color:var(--gold)}
-  .dhead{display:flex;align-items:center;gap:11px;padding:15px 17px}
-  .dhead .di{font-size:21px}
-  .dhead .dt{font-family:var(--sans);font-weight:800;font-size:15.5px;color:var(--ink);flex:1}
-  .dhead .dchev{font-family:var(--mono);font-size:11px;color:var(--ink3);transition:transform .2s}
-  .dcard.open .dchev{transform:rotate(90deg);color:var(--gold)}
-  .dhead .ddot{width:8px;height:8px;border-radius:50%;background:var(--vermilion);flex:none}
-  .dcard.open .ddot{background:var(--cyan)}
-  .dbody{max-height:0;overflow:hidden;transition:max-height .35s ease}
-  .dbody-in{padding:0 17px 16px;font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.85}
-  .dbody-in b{color:var(--gold)}
-  .dbody-in ul{margin:8px 0 0;padding-left:2px;list-style:none}
-  .dbody-in li{margin:7px 0;padding-left:16px;position:relative}
-  .dbody-in li:before{content:'·';position:absolute;left:3px;color:var(--vermilion);font-weight:900}
-  .dbody-in li b{color:var(--vermilion)}
-  .ask{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);text-align:center;margin:22px 0 6px}
-  .asksub{font-family:var(--sans);font-size:13.5px;color:var(--ink2);text-align:center;margin-bottom:16px;line-height:1.6}
-  .choices{display:flex;flex-direction:column;gap:11px}
-  .choice{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink);background:var(--panel-bg);
-    border:1.5px solid var(--panel-line);border-radius:14px;padding:15px 17px;cursor:pointer;transition:all .15s;text-align:left;line-height:1.5}
-  .choice:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
-  .choice .ckey{font-weight:900;color:var(--gold);margin-right:8px}
-  .choice.picked{border-color:var(--gold);background:rgba(224,138,44,.1)}
-  .reaction{margin-top:14px;font-size:14.5px;color:var(--ink);line-height:1.75;background:rgba(224,138,44,.1);
-    border-left:4px solid var(--gold);border-radius:8px;padding:13px 16px;display:none}
-  .reaction.show{display:block;animation:fin .4s}
-  .lines{display:flex;flex-direction:column;gap:10px;margin-top:6px}
-  .line{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:12px;padding:13px 16px}
-  .line .lh{font-family:var(--serif);font-weight:900;font-size:14px;color:var(--gold);margin-bottom:4px}
-  .line .lt{font-size:14px;color:var(--ink);line-height:1.7}
-  .line .lt b{color:var(--vermilion)}
-  .voice{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:13px;padding:13px 16px;margin-bottom:10px}
-  .voice .vw{font-family:var(--sans);font-weight:800;font-size:14px;color:var(--ink);margin-bottom:5px}
-  .voice .va{font-size:14px;color:var(--ink2);line-height:1.7}
-  .note{font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:center;margin-top:12px}
-  .q{font-family:var(--serif);font-size:16.5px;color:var(--ink);line-height:1.75;margin:14px 0;padding-left:14px;border-left:3px solid var(--gold)}
-  .q b{color:var(--gold)}
-  textarea{width:100%;box-sizing:border-box;margin-top:10px;font-family:var(--sans);font-size:15px;color:var(--ink);
-    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:12px;padding:13px 15px;min-height:80px;outline:none;resize:vertical}
-  .btnrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
-  .nextbtn{font-family:var(--sans);font-weight:800;font-size:15px;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));
-    border:none;border-radius:999px;padding:13px 30px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.16)}
-  .nextbtn:active{transform:scale(.97)}
-  .nextbtn[disabled]{opacity:.4;cursor:not-allowed;box-shadow:none}
-  .ghost{font-family:var(--sans);font-weight:700;font-size:14px;color:var(--gold);background:var(--panel-bg);
-    border:1px solid var(--panel-line);border-radius:999px;padding:11px 20px;cursor:pointer;text-decoration:none;display:inline-block}
-  .gate{text-align:center;font-family:var(--sans);font-size:12.5px;color:var(--ink3);margin-top:6px}
-</style>
+<link rel="stylesheet" href="./decision.css?v=1"/>
 </head>
 <body data-theme="warm">
 <div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
@@ -93,7 +21,6 @@
 <script src="./track.js?v=1"></script>
 <script>
 window.__aiCtx='用户正在体验"抉择时刻·苏格拉底的最后一夜":孩子先了解苏格拉底其人、雅典民主制的处境、他被控的罪名(不敬神、蛊惑青年)与死刑判决、学生克力同已安排好的越狱机会,以及苏格拉底一生坚守"守正义、守与城邦的约定"的信念;再代入苏格拉底做抉择——逃狱求生,还是留下赴死。真实的苏格拉底拒绝越狱、平静地喝下毒堇汁而死,理由是:用一桩不义(逃避城邦的判决)去回应另一桩不义,会背叛他一生所讲的道理;他的死经由学生柏拉图记录下来,成为西方哲学的起点,也成为"个人良心与国家法律冲突"这一永恒难题的象征。这是一个没有标准答案的道德两难。请用适合10-12岁孩子的语言陪他思考,多反问,不要替他下结论。';
-let pick=null;
 const DOSSIER=[
   {i:'🧓',t:'你是谁',b:'你是<b>苏格拉底</b>,雅典70岁的老哲人。你一辈子在街头巷尾追问人们:"什么是正义?什么是善?"<br>你常说:"<b>我唯一知道的,就是我什么都不知道。</b>" 可你的追问,总能把那些自以为很懂的人,问得哑口无言。'},
   {i:'🏛️',t:'你的雅典',b:'雅典是世界上最早的<b>民主城邦</b>,大事由公民投票决定。但它刚刚打输了一场漫长的大战,人心惶惶、互相猜忌。<br>你那些刨根问底的追问,让不少有权有势的人下不来台——你,树敌不少。'},
@@ -102,7 +29,6 @@ const DOSSIER=[
   {i:'🧭',t:'你信的东西',b:'可是你一生都在教别人:要<b>守正义</b>,要遵守自己和城邦之间的约定。<br>你心里反复问自己:法律这次判错了,但如果我用"<b>偷偷逃跑</b>"去回应这份不义——那我这一辈子讲的那些道理,还算数吗?'},
   {i:'⚡',t:'眼前的难题',b:'今夜,你必须做一个决定:<br><b>越狱求生</b>,去别处继续追求真理;还是<b>留下赴死</b>,用自己的生命,为你一生坚信的东西作证?<br>天一亮,就来不及了。'},
 ];
-let opened=new Set();
 const beats=[];
 beats.push(()=>`
   <div class="kicker">公元前 399 年 · 雅典 · 深夜的牢房</div>
@@ -175,44 +101,14 @@ beats.push(()=>`
   </div>
   <div class="btnrow" style="margin-top:8px">
     <button class="ghost" onclick="if(window.toggleAIFloat)toggleAIFloat()">🤖 和 AI 聊聊这个抉择</button>
-    <button class="ghost" onclick="pick=null;opened=new Set();go(0)">↺ 重新走一遍</button>
+    <button class="ghost" onclick="restart()">↺ 重新走一遍</button>
   </div>`);
 
-let cur=0;
-function render(){
-  document.getElementById('beat').innerHTML=beats[cur]();
-  document.getElementById('prog').innerHTML=beats.map((_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('');
-  if(cur===1){ refreshGate(); }
-  if(cur===7){ const m=document.getElementById('myPick'); if(m)m.textContent=pick||'?'; const n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('decision_socrates')||''; }
-  window.scrollTo({top:0,behavior:'instant'});
-  if(window.Track) Track.log('抉择时刻');
-}
-function go(n){ cur=n; render(); }
-function flip(i){
-  const card=document.querySelector('.dcard[data-i="'+i+'"]');
-  const body=document.getElementById('db'+i);
-  const isOpen=card.classList.toggle('open');
-  body.style.maxHeight=isOpen?(body.scrollHeight+'px'):'0';
-  if(isOpen){ opened.add(i); refreshGate(); }
-}
-function refreshGate(){
-  const c=document.getElementById('dcount'); if(c)c.textContent='已了解 '+opened.size+' / '+DOSSIER.length;
-  const btn=document.getElementById('toChoice'); const gate=document.getElementById('gate');
-  if(opened.size>=DOSSIER.length){ if(btn)btn.disabled=false; if(gate)gate.textContent='✅ 你已想清楚,可以决定了'; }
-}
-function choose(k){
-  pick=k;
-  document.querySelectorAll('.choice').forEach(c=>{c.classList.toggle('picked',c.dataset.k===k);c.onclick=null;});
-  const react={A:'活着才有一切——这很有道理。可苏格拉底会问你:用一桩不义,去回应另一桩不义,真的对吗?',
+window.DECISION={key:'socrates',DOSSIER:DOSSIER,beats:beats,reactions:{A:'活着才有一切——这很有道理。可苏格拉底会问你:用一桩不义,去回应另一桩不义,真的对吗?',
     B:'你愿意为信念付出最重的代价。可朋友们会哭着问你:难道活着继续讲学,不是更好吗?',
-    C:'保命要紧,人之常情。但对一个一辈子追求真理的人来说,低头认一个莫须有的错,他做得到吗?'}[k];
-  const r=document.getElementById('reaction');
-  r.innerHTML=react+'<div class="btnrow" style="margin-top:14px"><button class="nextbtn" onclick="go(3)">👉 看真实的苏格拉底怎么选</button></div>';
-  r.classList.add('show');
-}
-function saveNote(e){ const n=document.getElementById('myNote'); if(n){localStorage.setItem('decision_socrates',n.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的收获',1500);} }
-render();
+    C:'保命要紧,人之常情。但对一个一辈子追求真理的人来说,低头认一个莫须有的错,他做得到吗?'},confirmLabel:'👉 看真实的苏格拉底怎么选'};
 </script>
+<script src="./decision-engine.js?v=1"></script>
 <script src="./ai_float.js?v=2"></script>
 </body>
 </html>

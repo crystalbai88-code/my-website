@@ -6,78 +6,7 @@
 <title>抉择时刻 · 尼卡暴动·留还是逃 · CivLab</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
-<style>
-  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
-  #app{position:relative;z-index:10;min-height:100dvh;display:flex;flex-direction:column;align-items:center}
-  .top{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:12px 16px;
-    background:linear-gradient(180deg,rgba(var(--scrim,0,0,0),.25),transparent);position:sticky;top:0;z-index:20}
-  .top a.back{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.1em;
-    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
-  .top .brand{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--ink)}
-  .prog{display:flex;gap:5px;margin-left:auto}
-  .prog i{width:13px;height:4px;border-radius:3px;background:var(--panel-line)}
-  .prog i.on{background:var(--gold)}
-  .wrap{width:min(660px,92%);margin:8px auto 70px;flex:1}
-  .beat{animation:fin .5s cubic-bezier(.22,1,.36,1)}
-  @keyframes fin{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
-  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;font-weight:700;text-align:center;margin-top:18px}
-  .htitle{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);text-align:center;line-height:1.3;margin:6px 0 4px;text-shadow:var(--label-shadow)}
-  .hsub{font-family:var(--mono);font-size:12px;color:var(--ink3);text-align:center;letter-spacing:.08em;margin-bottom:18px}
-  .scene{font-family:var(--serif);font-size:clamp(15px,3.8vw,17.5px);color:var(--ink);line-height:1.95;
-    background:var(--panel-bg);border:1px solid var(--panel-line);border-left:4px solid var(--gold);border-radius:14px;
-    padding:18px 20px;backdrop-filter:blur(8px)}
-  .scene b{color:var(--gold)}
-  .dossier-intro{font-family:var(--sans);font-size:14.5px;color:var(--ink2);text-align:center;line-height:1.7;margin:4px 0 16px}
-  .dcount{font-family:var(--mono);font-size:12px;color:var(--gold);text-align:center;font-weight:700;margin-bottom:12px}
-  .dcard{background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:14px;margin-bottom:11px;overflow:hidden;cursor:pointer;transition:border-color .2s}
-  .dcard.open{border-color:var(--gold)}
-  .dhead{display:flex;align-items:center;gap:11px;padding:15px 17px}
-  .dhead .di{font-size:21px}
-  .dhead .dt{font-family:var(--sans);font-weight:800;font-size:15.5px;color:var(--ink);flex:1}
-  .dhead .dchev{font-family:var(--mono);font-size:11px;color:var(--ink3);transition:transform .2s}
-  .dcard.open .dchev{transform:rotate(90deg);color:var(--gold)}
-  .dhead .ddot{width:8px;height:8px;border-radius:50%;background:var(--vermilion);flex:none}
-  .dcard.open .ddot{background:var(--cyan)}
-  .dbody{max-height:0;overflow:hidden;transition:max-height .35s ease}
-  .dbody-in{padding:0 17px 16px;font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.85}
-  .dbody-in b{color:var(--gold)}
-  .dbody-in ul{margin:8px 0 0;padding-left:2px;list-style:none}
-  .dbody-in li{margin:7px 0;padding-left:16px;position:relative}
-  .dbody-in li:before{content:'·';position:absolute;left:3px;color:var(--vermilion);font-weight:900}
-  .dbody-in li b{color:var(--vermilion)}
-  .ask{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);text-align:center;margin:22px 0 6px}
-  .asksub{font-family:var(--sans);font-size:13.5px;color:var(--ink2);text-align:center;margin-bottom:16px;line-height:1.6}
-  .choices{display:flex;flex-direction:column;gap:11px}
-  .choice{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink);background:var(--panel-bg);
-    border:1.5px solid var(--panel-line);border-radius:14px;padding:15px 17px;cursor:pointer;transition:all .15s;text-align:left;line-height:1.5}
-  .choice:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
-  .choice .ckey{font-weight:900;color:var(--gold);margin-right:8px}
-  .choice.picked{border-color:var(--gold);background:rgba(224,138,44,.1)}
-  .reaction{margin-top:14px;font-size:14.5px;color:var(--ink);line-height:1.75;background:rgba(224,138,44,.1);
-    border-left:4px solid var(--gold);border-radius:8px;padding:13px 16px;display:none}
-  .reaction.show{display:block;animation:fin .4s}
-  .lines{display:flex;flex-direction:column;gap:10px;margin-top:6px}
-  .line{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:12px;padding:13px 16px}
-  .line .lh{font-family:var(--serif);font-weight:900;font-size:14px;color:var(--gold);margin-bottom:4px}
-  .line .lt{font-size:14px;color:var(--ink);line-height:1.7}
-  .line .lt b{color:var(--vermilion)}
-  .voice{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:13px;padding:13px 16px;margin-bottom:10px}
-  .voice .vw{font-family:var(--sans);font-weight:800;font-size:14px;color:var(--ink);margin-bottom:5px}
-  .voice .va{font-size:14px;color:var(--ink2);line-height:1.7}
-  .note{font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:center;margin-top:12px}
-  .q{font-family:var(--serif);font-size:16.5px;color:var(--ink);line-height:1.75;margin:14px 0;padding-left:14px;border-left:3px solid var(--gold)}
-  .q b{color:var(--gold)}
-  textarea{width:100%;box-sizing:border-box;margin-top:10px;font-family:var(--sans);font-size:15px;color:var(--ink);
-    background:var(--panel-bg);border:1.5px solid var(--panel-line);border-radius:12px;padding:13px 15px;min-height:80px;outline:none;resize:vertical}
-  .btnrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
-  .nextbtn{font-family:var(--sans);font-weight:800;font-size:15px;color:#fff;background:linear-gradient(90deg,var(--gold),var(--vermilion));
-    border:none;border-radius:999px;padding:13px 30px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.16)}
-  .nextbtn:active{transform:scale(.97)}
-  .nextbtn[disabled]{opacity:.4;cursor:not-allowed;box-shadow:none}
-  .ghost{font-family:var(--sans);font-weight:700;font-size:14px;color:var(--gold);background:var(--panel-bg);
-    border:1px solid var(--panel-line);border-radius:999px;padding:11px 20px;cursor:pointer;text-decoration:none;display:inline-block}
-  .gate{text-align:center;font-family:var(--sans);font-size:12.5px;color:var(--ink3);margin-top:6px}
-</style>
+<link rel="stylesheet" href="./decision.css?v=1"/>
 </head>
 <body data-theme="warm">
 <div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
@@ -92,7 +21,6 @@
 <script src="./track.js?v=1"></script>
 <script>
 window.__aiCtx='用户正在体验"抉择时刻·尼卡暴动(留还是逃)"(母题:向死的勇气/守还是退)。史实:公元532年,东罗马(拜占庭)皇帝查士丁尼一世在首都君士坦丁堡。赛车场(竞技场)两大派系"蓝党"与"绿党"本是死对头,却因不满高税与官员暴政联合暴动,口号"Nika(尼卡,意为胜利)",史称尼卡暴动。暴民焚烧半个城市(包括旧圣索菲亚大教堂),拥立新皇帝,围困皇宫。查士丁尼一度准备乘船弃城逃跑;关键时刻皇后狄奥多拉发表著名演说,大意:能逃,但她宁愿留下,"紫袍(帝王之色)是最体面的寿衣/最好的裹尸布",劝丈夫宁可战死也不做逃亡的皇帝。查士丁尼留下,派大将贝利撒留与蒙杜斯设伏,把暴民诱困在赛车场内镇压,约三万人被杀。暴动平息后,查士丁尼坐稳皇位,重建了宏伟的圣索菲亚大教堂(至今矗立伊斯坦布尔),并编纂《查士丁尼法典》、一度收复地中海故土。注意:狄奥多拉出身卑微(传为演员/马戏团之女),却成为帝国最有权势的皇后之一。请用适合10-12岁孩子的语言陪他思考,多反问,不要替他下结论。这是"守还是退"的抉择,和列奥尼达温泉关、荆轲刺秦属于同一母题。';
-let pick=null;
 const DOSSIER=[
   {i:'👑',t:'你是谁',b:'你是<b>查士丁尼一世</b>,东罗马(拜占庭)的皇帝。你雄心勃勃,想收复古罗马失去的疆土、重整法律——可你也加重了赋税,城里早已怨声载道。'},
   {i:'🏟️',t:'一座城的火药桶',b:'君士坦丁堡最热闹的地方是<b>赛车场</b>。看台上分"<b>蓝党</b>"和"<b>绿党</b>"两大球迷派系,平时势同水火。可这一次,他们竟然<b>联手</b>了。'},
@@ -101,7 +29,6 @@ const DOSSIER=[
   {i:'👸',t:'皇后的声音',b:'就在你要登船时,皇后<b>狄奥多拉</b>站了出来。她出身卑微,却最有胆识。她说:逃,当然能逃;可她宁愿留下——"<b>紫袍,是最体面的寿衣</b>"。意思是:<b>宁可作为皇帝战死,也不要做逃亡的废人。</b>'},
   {i:'🛡️',t:'你手里还有牌',b:'你身边还有两员忠诚的大将——<b>贝利撒留</b>和蒙杜斯,以及一支精锐卫队。暴民虽多,却乱成一团、全都挤在赛车场里狂欢。<b>机会,也许还在。</b>'},
 ];
-let opened=new Set();
 const beats=[];
 beats.push(()=>`
   <div class="kicker">公元 532 年 · 君士坦丁堡 · 皇宫</div>
@@ -174,44 +101,14 @@ beats.push(()=>`
   </div>
   <div class="btnrow" style="margin-top:8px">
     <button class="ghost" onclick="if(window.toggleAIFloat)toggleAIFloat()">🤖 和 AI 聊聊这个抉择</button>
-    <button class="ghost" onclick="pick=null;opened=new Set();go(0)">↺ 重新走一遍</button>
+    <button class="ghost" onclick="restart()">↺ 重新走一遍</button>
   </div>`);
 
-let cur=0;
-function render(){
-  document.getElementById('beat').innerHTML=beats[cur]();
-  document.getElementById('prog').innerHTML=beats.map((_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('');
-  if(cur===1){ refreshGate(); }
-  if(cur===7){ const m=document.getElementById('myPick'); if(m)m.textContent=pick||'?'; const n=document.getElementById('myNote'); if(n)n.value=localStorage.getItem('decision_nika')||''; }
-  window.scrollTo({top:0,behavior:'instant'});
-  if(window.Track) Track.log('抉择时刻');
-}
-function go(n){ cur=n; render(); }
-function flip(i){
-  const card=document.querySelector('.dcard[data-i="'+i+'"]');
-  const body=document.getElementById('db'+i);
-  const isOpen=card.classList.toggle('open');
-  body.style.maxHeight=isOpen?(body.scrollHeight+'px'):'0';
-  if(isOpen){ opened.add(i); refreshGate(); }
-}
-function refreshGate(){
-  const c=document.getElementById('dcount'); if(c)c.textContent='已了解 '+opened.size+' / '+DOSSIER.length;
-  const btn=document.getElementById('toChoice'); const gate=document.getElementById('gate');
-  if(opened.size>=DOSSIER.length){ if(btn)btn.disabled=false; if(gate)gate.textContent='✅ 你已看清整盘棋,可以决定了'; }
-}
-function choose(k){
-  pick=k;
-  document.querySelectorAll('.choice').forEach(c=>{c.classList.toggle('picked',c.dataset.k===k);c.onclick=null;});
-  const react={A:'宁站着倒下,不逃着活着!可这一搏要赌上身家性命,还可能血流成河——你担得起吗?',
+window.DECISION={key:'nika',DOSSIER:DOSSIER,beats:beats,reactions:{A:'宁站着倒下,不逃着活着!可这一搏要赌上身家性命,还可能血流成河——你担得起吗?',
     B:'保命要紧。可皇帝一旦先逃,军心民心就全散了——你这一走,可能再也回不来了。',
-    C:'花钱买平安。可暴民已经另立了皇帝、烧了半座城——他们要的,恐怕已经不只是减税了。'}[k];
-  const r=document.getElementById('reaction');
-  r.innerHTML=react+'<div class="btnrow" style="margin-top:14px"><button class="nextbtn" onclick="go(3)">👉 看真实的查士丁尼怎么选</button></div>';
-  r.classList.add('show');
-}
-function saveNote(e){ const n=document.getElementById('myNote'); if(n){localStorage.setItem('decision_nika',n.value); const b=e.target; b.textContent='✅ 已记下!'; setTimeout(()=>b.textContent='💾 记下我的收获',1500);} }
-render();
+    C:'花钱买平安。可暴民已经另立了皇帝、烧了半座城——他们要的,恐怕已经不只是减税了。'},confirmLabel:'👉 看真实的查士丁尼怎么选'};
 </script>
+<script src="./decision-engine.js?v=1"></script>
 <script src="./ai_float.js?v=2"></script>
 </body>
 </html>
