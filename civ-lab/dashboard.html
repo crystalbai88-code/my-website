@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>学习看板 · 给家长和老师 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent}
+  #app{position:relative;z-index:10;min-height:100dvh;padding-bottom:60px}
+  .nav{display:flex;align-items:center;gap:9px;padding:13px 16px 2px;flex-wrap:wrap}
+  .nav a.pill{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.08em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .wrap{width:min(720px,92%);margin:0 auto}
+  .hero{text-align:center;margin:20px auto 4px}
+  .hero .ic{font-size:40px}
+  .hero h1{font-family:var(--serif);font-weight:900;font-size:clamp(22px,5.5vw,30px);color:var(--ink);margin:7px 0 5px;text-shadow:var(--label-shadow)}
+  .hero p{font-family:var(--sans);font-size:13px;color:var(--ink2);line-height:1.7;max-width:30em;margin:0 auto}
+  .hero p b{color:var(--gold)}
+  .ov{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:18px 0 4px}
+  .ovc{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:13px;padding:11px 16px;min-width:88px;text-align:center;backdrop-filter:blur(8px)}
+  .ovc b{display:block;font-family:var(--serif);font-weight:900;font-size:23px;color:var(--gold);line-height:1.1}
+  .ovc span{font-family:var(--sans);font-size:11px;color:var(--ink2);display:block;margin-top:3px}
+  .sec{margin:22px auto 0;background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:16px;padding:16px 18px 15px;backdrop-filter:blur(10px)}
+  .sec h2{font-family:var(--serif);font-weight:900;font-size:17px;color:var(--ink);margin:0 0 4px}
+  .sec .sub{font-family:var(--sans);font-size:12px;color:var(--ink3);margin-bottom:12px;line-height:1.6}
+  /* 条形 */
+  .bar{display:flex;align-items:center;gap:10px;margin:8px 0}
+  .bar .bl{font-family:var(--sans);font-size:13px;color:var(--ink);width:42%;flex:none;line-height:1.3}
+  .bar .bt{flex:1;height:16px;background:var(--bg2,rgba(255,255,255,.05));border-radius:8px;overflow:hidden}
+  .bar .bf{height:100%;background:linear-gradient(90deg,var(--gold),var(--vermilion));border-radius:8px;min-width:3px}
+  .bar .bn{font-family:var(--mono);font-size:12px;color:var(--gold);font-weight:700;width:34px;text-align:right;flex:none}
+  /* 抉择完成 */
+  .deci{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px}
+  .dpill{font-family:var(--sans);font-size:12.5px;border-radius:10px;padding:7px 11px;line-height:1.4;border:1px solid var(--panel-line)}
+  .dpill.done{background:rgba(47,158,134,.12);border-color:var(--cyan,#2f9e86);color:var(--ink)}
+  .dpill.done b{color:var(--cyan,#2f9e86)}
+  .dpill.partial{background:rgba(226,96,63,.08);border-color:var(--vermilion);color:var(--ink2)}
+  .dpill.partial b{color:var(--vermilion)}
+  .notes{margin-top:12px}
+  .nt{border-left:3px solid var(--gold);padding:6px 0 6px 12px;margin:9px 0}
+  .nt .nh{font-family:var(--sans);font-weight:800;font-size:13px;color:var(--gold)}
+  .nt .nb{font-family:var(--serif);font-size:13.5px;color:var(--ink);line-height:1.7;margin-top:2px}
+  .empty{font-family:var(--sans);font-size:13px;color:var(--ink3);text-align:center;padding:14px;line-height:1.7}
+  .actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:22px 0 0}
+  .btn{font-family:var(--sans);font-weight:800;font-size:13px;border-radius:999px;padding:10px 18px;cursor:pointer;border:1px solid var(--panel-line);background:var(--panel-bg);color:var(--gold)}
+  .btn.danger{color:var(--vermilion)}
+  .hint{font-family:var(--sans);font-size:11.5px;color:var(--ink3);text-align:center;margin-top:12px;line-height:1.7}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="nav"><a class="pill" href="./index.html">⌂ 返回实验室</a><a class="pill" href="./about.html">这是什么</a><a class="pill" href="./privacy.html">🔒 隐私</a></div>
+  <div class="wrap">
+    <div class="hero">
+      <div class="ic">📊</div>
+      <h1>学习看板</h1>
+      <p>给<b>家长和老师</b>:看看孩子在<b>这台设备</b>上玩了些什么、走完了哪些、可能卡在了哪。<br>所有数据都只在本机,不上传任何地方。</p>
+    </div>
+    <div id="board"></div>
+    <div class="actions">
+      <button class="btn" onclick="exportData()">📋 复制数据(JSON)</button>
+      <button class="btn danger" onclick="resetAll()">🗑 清空本机记录</button>
+    </div>
+    <div class="hint">提示:换一台设备或清除浏览器缓存,记录就会消失。看板只反映当前这台设备。</div>
+  </div>
+</div>
+<script src="./decisions.js?v=6"></script>
+<script>
+const MOTIF_NAME={gamble:'倾国豪赌',merit:'功高震主',reform:'改革的代价',conscience:'良心与法律',mercy:'该不该痛下杀手',sacrifice:'向死的勇气',rubicon:'回不了头的一步',mortality:'终有一死',duty:'尽责还是不忍',contact:'看不懂的来客',clemency:'胜利者的宽容',opendoor:'开门还是关门',writtenlaw:'让规矩说话'};
+function esc(s){return String(s==null?'':s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));}
+function read(){try{return JSON.parse(localStorage.getItem('civlab_track_v1'))||{};}catch(e){return{};}}
+function fmt(ts){if(!ts)return'—';const d=new Date(ts);return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`;}
+
+function render(){
+  const t=read();
+  const visits=t.visits||{}, features=t.features||{};
+  const DEC=(window.DECISIONS||[]);
+  const id2person={}; DEC.forEach(d=>id2person[d.id]=d.person);
+  // 扫描 localStorage
+  const decNotes={}, finds=[];
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k.startsWith('decision_')){ const v=localStorage.getItem(k); if(v&&v.trim()) decNotes[k.slice(9)]=v; }
+    else if(k.startsWith('find_')){ finds.push(k.slice(5)); }
+  }
+  const totalVisits=Object.values(visits).reduce((a,b)=>a+b,0);
+  const pages=Object.keys(visits).length;
+  // 抉择漏斗:打开过的 vs 走完(写了收获)的
+  const opened=DEC.filter(d=>visits['decision-'+d.id]);
+  const done=DEC.filter(d=>decNotes[d.id]);
+  const partial=opened.filter(d=>!decNotes[d.id]);
+
+  let html='';
+  // 概览
+  html+=`<div class="ov">
+    <div class="ovc"><b>${pages}</b><span>访问过的页面</span></div>
+    <div class="ovc"><b>${done.length}</b><span>走完的抉择</span></div>
+    <div class="ovc"><b>${finds.length}</b><span>找到的规律</span></div>
+    <div class="ovc"><b>${fmt(t.firstSeen)}</b><span>首次使用</span></div>
+    <div class="ovc"><b>${fmt(t.lastSeen)}</b><span>最近使用</span></div>
+  </div>`;
+
+  // 玩了哪些板块
+  const fe=Object.entries(features).sort((a,b)=>b[1]-a[1]);
+  const fmax=fe.length?fe[0][1]:1;
+  html+=`<div class="sec"><h2>🧭 玩了哪些板块</h2><div class="sub">按互动次数排序(数字越大,孩子在这块花的功夫越多)。</div>`;
+  html+= fe.length? fe.map(([k,v])=>`<div class="bar"><div class="bl">${esc(k)}</div><div class="bt"><div class="bf" style="width:${Math.round(v/fmax*100)}%"></div></div><div class="bn">${v}</div></div>`).join('')
+       : `<div class="empty">还没有互动记录。让孩子先去玩一玩,再回来看 😊</div>`;
+  html+=`</div>`;
+
+  // 抉择完成情况(漏斗 = 卡点)
+  html+=`<div class="sec"><h2>🎯 抉择:走完 & 卡点</h2><div class="sub">"走完"= 看完并写下了自己的收获;"打开没走完"= 可能中途退出,是值得观察的<b>卡点</b>。</div>`;
+  if(opened.length){
+    html+=`<div class="deci">`;
+    done.forEach(d=>html+=`<span class="dpill done">✅ <b>${esc(d.person)}</b></span>`);
+    partial.forEach(d=>html+=`<span class="dpill partial">⏸ <b>${esc(d.person)}</b> 打开没走完</span>`);
+    html+=`</div>`;
+  } else {
+    html+=`<div class="empty">还没打开过任何抉择。</div>`;
+  }
+  // 收获摘录
+  if(done.length){
+    html+=`<div class="notes"><div class="sub" style="margin:14px 0 2px">✍️ 孩子写下的收获(原话):</div>`;
+    done.forEach(d=>html+=`<div class="nt"><div class="nh">${esc(d.person)}</div><div class="nb">${esc(decNotes[d.id])}</div></div>`);
+    html+=`</div>`;
+  }
+  html+=`</div>`;
+
+  // 找到的规律
+  html+=`<div class="sec"><h2>🧩 找到的规律</h2><div class="sub">孩子在「找规律」里完成了哪些母题线。</div>`;
+  html+= finds.length? `<div class="deci">`+finds.map(f=>`<span class="dpill done">✅ <b>${esc(MOTIF_NAME[f]||f)}</b></span>`).join('')+`</div>`
+       : `<div class="empty">还没有找到任何规律线。</div>`;
+  html+=`</div>`;
+
+  // 各页访问
+  const vs=Object.entries(visits).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  if(vs.length){
+    const vmax=vs[0][1];
+    html+=`<div class="sec"><h2>📄 去过哪些页面</h2><div class="sub">访问最多的前 12 个页面。</div>`;
+    html+= vs.map(([k,v])=>`<div class="bar"><div class="bl">${esc(k)}</div><div class="bt"><div class="bf" style="width:${Math.round(v/vmax*100)}%"></div></div><div class="bn">${v}</div></div>`).join('');
+    html+=`</div>`;
+  }
+
+  document.getElementById('board').innerHTML=html;
+}
+function exportData(){
+  const data={track:read(),notes:{},finds:[]};
+  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k.startsWith('decision_'))data.notes[k]=localStorage.getItem(k);else if(k.startsWith('find_'))data.finds.push(k);}
+  const s=JSON.stringify(data,null,2);
+  navigator.clipboard?.writeText(s).then(()=>alert('✅ 已复制到剪贴板,可粘贴保存。')).catch(()=>prompt('手动复制:',s));
+}
+function resetAll(){
+  if(!confirm('确定清空这台设备上的全部学习记录?(包括走过的抉择、写下的收获)此操作不可撤销。'))return;
+  const del=[];
+  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k==='civlab_track_v1'||k.startsWith('decision_')||k.startsWith('find_'))del.push(k);}
+  del.forEach(k=>localStorage.removeItem(k));
+  alert('已清空。'); render();
+}
+render();
+</script>
+</body>
+</html>
