@@ -52,6 +52,20 @@
   // 暴露给内联 onclick 调用
   window.go=go; window.flip=flip; window.choose=choose; window.saveNote=saveNote; window.restart=restart;
 
-  function boot(){ if(window.DECISION) render(); }
+  // 上下文返回:若链接带 ?ret=<本站页面>&rl=<返回文字>,把左上角"返回"指向来处
+  function setupBackLink(){
+    try{
+      var p=new URLSearchParams(location.search);
+      var ret=p.get('ret'); if(!ret) return;
+      ret=decodeURIComponent(ret);
+      // 只允许本站相对页面,挡掉 javascript:/外链
+      if(/:/.test(ret) || !/^[\w./?=&%一-龥-]+$/.test(ret)) return;
+      var b=document.querySelector('a.back'); if(!b) return;
+      b.href=ret;
+      var rl=p.get('rl'); b.textContent='← '+(rl?decodeURIComponent(rl):'返回');
+    }catch(e){}
+  }
+
+  function boot(){ setupBackLink(); if(window.DECISION) render(); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
 })();

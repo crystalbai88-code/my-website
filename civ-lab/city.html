@@ -134,7 +134,9 @@ function renderEra(){
   const voices = (st.voices||[]).map(v=>`<div class="voice"><div class="vw">${esc(v.who)}</div><div class="va">${esc(v.say)}</div></div>`).join('');
   const people = (e.people||[]).map(p=>`<span class="chip">👤 <b>${esc(p.n)}</b> <span class="ct">${esc(p.r)}</span></span>`).join('');
   const objects = (e.objects||[]).map(o=>`<span class="chip">📿 <b>${esc(o.n)}</b> <span class="ct">${esc(o.t)}·${esc(o.note)}</span></span>`).join('');
-  const decChip = e.decisionRef?`<a class="chip dec" href="${e.decisionRef}">🎯 相关抉择 →</a>`:'';
+  const ret = encodeURIComponent('city.html?era='+e.id);
+  const rl = encodeURIComponent(C.name+'·'+e.name);
+  const decChip = e.decisionRef?`<a class="chip dec" href="${e.decisionRef}${e.decisionRef.includes('?')?'&':'?'}ret=${ret}&rl=${rl}">🎯 相关抉择 →</a>`:'';
   document.getElementById('eraBox').innerHTML = `
     <div class="era" style="--ac:${ac}">
       <div class="ehead"><span class="en">${esc(e.name)}</span><span class="ey">${esc(e.years)}</span><span class="etag">${esc(e.tag||'')}</span></div>
@@ -162,6 +164,8 @@ function renderEra(){
 function render(){ renderRail(); renderEra(); window.scrollTo({top:0,behavior:'instant'}); if(window.Track) Track.log('走进一座城·'+C.name); }
 function jump(i){ cur=Math.max(0,Math.min(C.eras.length-1,i)); render(); }
 function step(d){ jump(cur+d); }
+// 返回时落回对应时代
+(function(){ const e=new URLSearchParams(location.search).get('era'); if(e){ const i=C.eras.findIndex(x=>x.id===e); if(i>=0) cur=i; } })();
 renderCover(); render();
 </script>
 <script src="./ai_float.js?v=3"></script>
