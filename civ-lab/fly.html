@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>史海飞机大战 · CivLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./cosmos-design-system.css?v=6"/>
+<style>
+  html,body{margin:0;min-height:100%;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+  #app{position:relative;z-index:10;min-height:100dvh;padding-bottom:20px}
+  .nav{display:flex;align-items:center;gap:9px;padding:12px 16px 2px;flex-wrap:wrap}
+  .nav a.pill{font-family:var(--mono);font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:.08em;
+    background:var(--topbar-bg);border:1px solid var(--panel-line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(8px)}
+  .wrap{width:min(420px,94%);margin:0 auto;text-align:center}
+  h1{font-family:var(--serif);font-weight:900;font-size:21px;color:var(--ink);margin:8px 0 2px;text-shadow:var(--label-shadow)}
+  .quest{font-family:var(--serif);font-size:14.5px;color:var(--ink);line-height:1.5;background:var(--panel-bg);
+    border:1px solid var(--panel-line);border-left:4px solid var(--gold);border-radius:12px;padding:10px 13px;margin:9px 0 7px;text-align:left;min-height:18px}
+  .quest .qk{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;display:block;margin-bottom:2px}
+  .quest b{color:var(--gold)}
+  .hud{display:flex;justify-content:space-between;font-family:var(--mono);font-size:13px;color:var(--ink2);margin:0 2px 6px}
+  .hud b{color:var(--gold)}
+  .boardwrap{position:relative;width:100%;aspect-ratio:3/4;margin:0 auto}
+  canvas{width:100%;height:100%;display:block;border-radius:16px;background:rgba(30,20,40,.18);border:1px solid var(--panel-line);touch-action:none}
+  .over{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.6);border-radius:16px;backdrop-filter:blur(3px);padding:20px;box-sizing:border-box}
+  .over.show{display:flex;animation:fin .3s}@keyframes fin{from{opacity:0}to{opacity:1}}
+  .over .oe{font-size:42px}.over h2{font-family:var(--serif);font-weight:900;font-size:22px;color:#fff;margin:6px 0 2px}
+  .over p{font-family:var(--sans);font-size:13.5px;color:#eee;line-height:1.6;margin:2px 0}.over p b{color:var(--gold)}
+  .over .ob{margin-top:14px;font-family:var(--sans);font-weight:800;font-size:15px;color:#fff;border:none;border-radius:999px;padding:12px 28px;cursor:pointer;background:linear-gradient(90deg,var(--gold),var(--vermilion))}
+  .fire{margin:14px auto 0;width:84%;font-family:var(--sans);font-weight:900;font-size:18px;color:#fff;border:none;border-radius:14px;
+    padding:15px;cursor:pointer;background:linear-gradient(90deg,var(--vermilion),var(--gold));box-shadow:0 6px 18px rgba(0,0,0,.18);letter-spacing:2px}
+  .fire:active{transform:scale(.98)}
+  .tip{font-family:var(--sans);font-size:11.5px;color:var(--ink3);margin-top:10px;line-height:1.6}
+</style>
+</head>
+<body data-theme="warm">
+<div class="ds-cosmos"><div class="nebula"></div><div class="stars"></div><div class="stars twinkle"></div></div>
+<div id="app">
+  <div class="nav"><a class="pill" href="./index.html">⌂ 首页</a><a class="pill" href="./game.html">🐍 贪吃蛇</a><a class="pill" href="./passport.html">🎒 足迹</a></div>
+  <div class="wrap">
+    <h1>🚀 史海飞机大战</h1>
+    <div class="quest" id="quest"><span class="qk" id="qk">题目</span><span id="qt">…</span></div>
+    <div class="hud"><span>得分 <b id="score">0</b></span><span id="lives">❤️❤️❤️</span></div>
+    <div class="boardwrap"><canvas id="cv"></canvas><div class="over" id="over"></div></div>
+    <button class="fire" id="fireBtn">🔥 开火</button>
+    <div class="tip" id="srctip"></div>
+  </div>
+</div>
+<script src="./decisions.js?v=6"></script>
+<script>
+function addTrail(t,id,l){try{var K='civlab_trail_v1',a=JSON.parse(localStorage.getItem(K)||'[]'),k=t+':'+id;if(a.some(x=>x.t+':'+x.id===k))return;a.push({t:t,id:id,l:l,ts:Date.now()});if(a.length>120)a=a.slice(-120);localStorage.setItem(K,JSON.stringify(a));}catch(e){}}
+function readTrail(){try{return JSON.parse(localStorage.getItem('civlab_trail_v1'))||[];}catch(e){return[];}}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function shortName(p){let s=p.split('·')[0].trim();s=s.replace(/(过卢比孔|破釜沉舟|求仙|的复仇|的宽容|的宽待|学中国|的宗教革命|与那只麻雀|的两难|迎客|立法|变法|大义灭亲|放过扫罗|闯冥界|刺秦|之后.*)/,'');return (s||p).slice(0,5);}
+const CULT={china:'中国',greece:'古希腊',europe:'欧洲',rome:'古罗马',mesopotamia:'两河',india:'古印度',byzantine:'拜占庭',levant:'希伯来',americas:'美洲',babylon:'巴比伦',egypt:'古埃及',persia:'波斯',islam:'伊斯兰',japan:'日本',mongol:'蒙古',maya:'玛雅',medieval_europe:'中世纪欧洲'};
+const ALL=(window.DECISIONS||[]).filter(d=>d.person&&d.tip);
+const ALLCULT=[...new Set(ALL.map(d=>CULT[d.culture]).filter(Boolean))];
+
+const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+let W=0,H=0, ship, enemies=[], bullets=[], parts=[], score=0, lives=3, alive=true, last=0, ESPD=0.018, best=+(localStorage.getItem('civlab_fly_best')||0);
+function pool(){const done=new Set(readTrail().filter(x=>x.t==='decision').map(x=>x.id));const mine=ALL.filter(d=>done.has(d.id));document.getElementById('srctip').innerHTML=mine.length>=4?'出的都是你<b>走过的人物</b>。瞄准、开火,打掉正确答案!':'先随便打打——走过更多抉择,题目就全是你认识的人。';return mine.length>=4?mine:ALL;}
+
+function resize(){const w=cv.clientWidth,h=cv.clientHeight,dpr=window.devicePixelRatio||1;cv.width=w*dpr;cv.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);W=w;H=h;if(ship)ship.y=H-34;draw();}
+function newWave(){
+  const P=pool(); const target=P[Math.floor(Math.random()*P.length)];
+  const type=Math.random()<0.5?'who':'where';
+  let correctLabel, distract;
+  if(type==='who'){
+    document.getElementById('qk').textContent='这道难题,是谁面对的?';
+    document.getElementById('qt').innerHTML='「'+target.tip+'」';
+    correctLabel=shortName(target.person);
+    distract=shuffle(ALL.filter(d=>d.id!==target.id&&shortName(d.person)!==correctLabel)).slice(0,3).map(d=>shortName(d.person));
+  } else {
+    document.getElementById('qk').textContent='这位历史人物,来自哪个文明?';
+    document.getElementById('qt').innerHTML='『'+shortName(target.person)+'』';
+    correctLabel=CULT[target.culture]||target.culture;
+    distract=shuffle(ALLCULT.filter(c=>c!==correctLabel)).slice(0,3);
+  }
+  const labels=shuffle([correctLabel,...distract]);
+  const slots=shuffle([0,1,2,3]);
+  enemies=labels.map((lab,i)=>({x:(slots[i]+0.5)*(W/4), y:-30-Math.random()*60, vy:H*ESPD*(0.85+Math.random()*0.3), label:lab, correct:lab===correctLabel, alive:true}));
+}
+function start(){score=0;lives=3;alive=true;ESPD=0.013;bullets=[];parts=[];ship={x:W/2,y:H-34,tx:W/2};newWave();updateHUD();document.getElementById('over').classList.remove('show');last=performance.now();requestAnimationFrame(loop);}
+function updateHUD(){document.getElementById('score').textContent=score;document.getElementById('lives').textContent='❤️'.repeat(Math.max(0,lives))+'🖤'.repeat(3-Math.max(0,lives));}
+
+function fire(){
+  if(!alive) return;
+  let best=null,bd=1e9; enemies.forEach(e=>{if(e.alive){const d=Math.abs(e.x-ship.x);if(d<bd){bd=d;best=e;}}});
+  if(best && bd<W*0.18){ bullets.push({x:ship.x,y:ship.y-14,target:best}); }
+  else parts.push({x:ship.x,y:ship.y-14,vx:0,vy:-2,life:12,c:'#bbb'});
+}
+function boom(x,y,col){for(let i=0;i<14;i++){const a=Math.random()*6.28,s=1+Math.random()*3;parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:18+Math.random()*12,c:col});}}
+function hit(e){
+  e.alive=false;
+  if(e.correct){ boom(e.x,e.y,'#2f9e86'); score++; if(score>best){best=score;localStorage.setItem('civlab_fly_best',best);} if(score===5||score===10||score===20)addTrail('game','fly','飞机大战·得分'+score); ESPD=Math.min(0.03,ESPD+0.001); newWave(); updateHUD(); }
+  else { boom(e.x,e.y,'#e2603f'); lives--; updateHUD(); if(lives<=0){gameOver();} }
+}
+function loop(t){ if(!alive)return; const dt=Math.min(40,t-last); last=t; update(dt); draw(); requestAnimationFrame(loop); }
+function update(dt){
+  ship.x += (ship.tx-ship.x)*0.25;
+  enemies.forEach(e=>{ if(e.alive){ e.y+=e.vy*dt/16; if(e.y>H+10){ e.alive=false; if(e.correct){ lives--; updateHUD(); if(lives<=0){gameOver();return;} newWave(); } } } });
+  bullets.forEach(b=>{ b.y-=H*0.05*dt/16; b.x+=((b.target&&b.target.alive?b.target.x:b.x)-b.x)*0.2; if(b.target&&b.target.alive&&b.y<=b.target.y+10&&Math.abs(b.x-b.target.x)<W*0.12){ hit(b.target); b.dead=true; } if(b.y<-20)b.dead=true; });
+  bullets=bullets.filter(b=>!b.dead);
+  parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=0.06;p.life--;}); parts=parts.filter(p=>p.life>0);
+}
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  // 敌机(答案)
+  ctx.font='700 13px "Noto Sans SC",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  enemies.forEach(e=>{ if(!e.alive)return; const tw=ctx.measureText(e.label).width,pw=Math.max(46,tw+18),ph=30;
+    ctx.fillStyle='rgba(90,70,120,.92)';ctx.strokeStyle='#caa6e0';ctx.lineWidth=1.5;rr(e.x-pw/2,e.y-ph/2,pw,ph,9);ctx.fill();ctx.stroke();
+    ctx.fillStyle='#3a2a18';ctx.fillStyle='#fff';ctx.fillText(e.label,e.x,e.y+0.5);
+    ctx.fillStyle='#caa6e0';ctx.beginPath();ctx.moveTo(e.x-7,e.y+ph/2);ctx.lineTo(e.x+7,e.y+ph/2);ctx.lineTo(e.x,e.y+ph/2+7);ctx.closePath();ctx.fill();
+  });
+  // 子弹
+  ctx.fillStyle='#ffd76a'; bullets.forEach(b=>{ctx.beginPath();ctx.ellipse(b.x,b.y,2.5,7,0,0,7);ctx.fill();});
+  // 粒子
+  parts.forEach(p=>{ctx.globalAlpha=Math.max(0,p.life/24);ctx.fillStyle=p.c;ctx.beginPath();ctx.arc(p.x,p.y,2.4,0,7);ctx.fill();});ctx.globalAlpha=1;
+  // 战机
+  if(ship){const x=ship.x,y=ship.y;ctx.fillStyle='#e0a83c';ctx.strokeStyle='#c86820';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,y-16);ctx.lineTo(x-12,y+12);ctx.lineTo(x,y+5);ctx.lineTo(x+12,y+12);ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.fillStyle='#e2603f';ctx.beginPath();ctx.arc(x,y-2,3,0,7);ctx.fill();}
+}
+function gameOver(){alive=false;const reached=score>=5;if(reached)addTrail('game','fly','飞机大战·得分'+score);const o=document.getElementById('over');
+  o.innerHTML=`<div class="oe">${score>=10?'🏆':(score>=5?'🎉':'🚀')}</div><h2>${score>=10?'王牌飞行员!':(score>=5?'打得不错!':'再来一次!')}</h2>
+    <p>本局打中 <b>${score}</b> · 最高 <b>${best}</b></p>${reached?'<p>已盖一枚 🔗 游戏章</p>':'<p style="color:#ccc">打中 5 题就能盖游戏章~</p>'}
+    <button class="ob" onclick="start()">↺ 再来一局</button>`; o.classList.add('show');}
+
+// 控制:拖动瞄准 + 开火键/空格
+function setTX(clientX){const r=cv.getBoundingClientRect();ship.tx=Math.max(14,Math.min(W-14,clientX-r.left));}
+cv.addEventListener('pointerdown',e=>{setTX(e.clientX);cv.setPointerCapture(e.pointerId);},{passive:true});
+cv.addEventListener('pointermove',e=>{if(e.pressure>0||e.buttons||e.pointerType==='touch')setTX(e.clientX);},{passive:true});
+document.getElementById('fireBtn').addEventListener('click',fire);
+window.addEventListener('keydown',e=>{if(e.key===' '||e.key==='ArrowUp'){fire();e.preventDefault();}else if(e.key==='ArrowLeft'){ship.tx=Math.max(14,ship.tx-W*0.12);}else if(e.key==='ArrowRight'){ship.tx=Math.min(W-14,ship.tx+W*0.12);}});
+window.addEventListener('resize',resize);
+window.__fly={fire:()=>fire(),step:(dt)=>update(dt||16),state:()=>({score,lives,alive,enemies,ship})};
+
+if(ALL.length>=4){ resize(); ship={x:W/2,y:H-34,tx:W/2}; start(); }
+else document.getElementById('quest').textContent='题库没加载,请刷新。';
+</script>
+</body>
+</html>
