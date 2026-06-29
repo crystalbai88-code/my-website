@@ -361,6 +361,7 @@ function openConcept(k){const c=findConcept(k),r=RICH[k]||{};
  $('cdEg').innerHTML=r.eg||'';$('cdWhen').innerHTML=r.when||'';$('cdExtra').innerHTML=c.extra||'';
  const rel=r.rel||[];
  $('cdRel').innerHTML=rel.length?`<div class="cd-rellbl">🔗 接着学这些(它们是连在一起的)</div>`+rel.map(x=>`<button class="relbtn" onclick="openConcept('${x}')">${nameOf(x)} →</button>`).join(''):'';
+ if(k==='x6'){$('cdRel').innerHTML+=`<div class="cd-rellbl">✍️ 去留下你的日志</div><button class="relbtn" onclick="gotoLog()">打开「成长记录」,写今天的日志 →</button>`;}
  $('cModal').classList.add('on');const d=document.querySelector('#cModal .cdetail');if(d)d.scrollTop=0;}
 function closeConcept(){$('cModal').classList.remove('on');}
 const KEYMAP=[
@@ -411,7 +412,7 @@ function renderFollow(){
  let h=`<div class="goal"><div class="gl">第 ${st.stage+1} 步 · ${s.n} · ${s.role}</div><div class="gt">${s.goal}</div></div>`;
  if(s.x.length){h+=`<div class="lbl">⭐ 这一阶段最该记住的心法</div>`+s.x.map(i=>xinfaCard(XINFA[i-1])).join('');}
  else{h+=`<div class="lbl">⭐ 这一阶段</div><div class="note">路演主要靠「表达」——把作品讲清楚(看下面的技巧);也回到 <b>心法1</b>:讲清你最初想为谁解决什么。</div>`;}
- h+=`<div class="lbl">🔁 这条心法,每节课都要做(贯穿全程)</div>`+xinfaCard(XINFA[5]);
+ h+=`<div class="lbl">🔁 这条心法,每节课都要做(贯穿全程)</div>`+xinfaCard(XINFA[5])+`<button class="morebtn" style="background:var(--orange);margin-top:8px" onclick="gotoLog()">✍️ 现在就去「成长记录」写今天的日志 →</button>`;
  h+=`<div class="lbl">🧩 这一阶段会碰到的专业环节(点开看全部概念)</div>`+s.e.map(i=>envCard(ENV[i-1])).join('');
  h+=`<div class="lbl">💬 这一阶段好用的协作技巧</div>`+s.j.map(i=>jqCard(JQ[i-1])).join('');
  $('p-follow').innerHTML=h;
@@ -450,6 +451,7 @@ function saveRec(){const jue=$('rJue').value.trim(),q1=$('rQ1').value.trim(),q2=
 function renderTimeline(){const el=$('recList');const keys=Object.keys(st.records).map(Number).sort((a,b)=>a-b);if(!keys.length){el.innerHTML='<div class="empty">还没有记录。选一节课,写下你今天觉察到的东西吧。</div>';return;}
  el.innerHTML=keys.map(k=>{const r=st.records[k];return `<div class="logitem"><div class="ld">第 ${k} 节课 · ${r.at}</div>${r.jue?`<p><b>🪞 觉察到:</b>${esc(r.jue)}</p>`:''}${r.q1?`<p><b>做出了:</b>${esc(r.q1)}</p>`:''}${r.q2?`<p><b>卡在:</b>${esc(r.q2)}</p>`:''}${r.q3?`<p><b>学到:</b>${esc(r.q3)}</p>`:''}</div>`;}).join('');}
 function renderRecTab(){renderSessPick();loadRec();renderTimeline();}
+function gotoLog(){closeConcept();const t=document.querySelector('.tab[data-p=log]');if(t)t.click();window.scrollTo(0,0);const j=$('rJue');if(j)setTimeout(()=>j.focus(),100);}
 function exportRecs(){const data={用户名:st.user||'',项目:st.proj||'',觉察概念数:st.aware.length+' / 33',已点亮概念:st.aware,成长记录:st.records,导出时间:new Date().toISOString()};
  const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`成长记录_${st.user||'学生'}_${st.proj||'项目'}.json`;a.click();}
 function esc(s){return s.replace(/</g,'&lt;').replace(/\n/g,'<br>');}
