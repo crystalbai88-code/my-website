@@ -154,6 +154,7 @@
   .lc{background:#fff;border:1px solid var(--line);border-left:4px solid var(--orange);border-radius:12px;padding:13px 15px;margin-bottom:11px;transition:.2s}
   .lc.done{border-left-color:var(--green);background:#f4f8f5}
   .lc-h{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .lc-step{color:var(--orange);font-weight:800;margin-right:5px;font-size:17px}
   .lc-name{font-size:15.5px;font-weight:700;color:var(--green);cursor:pointer;line-height:1.4}
   .lc-name:hover{text-decoration:underline}
   .lc-look{font-size:11.5px;font-weight:500;color:var(--orange);white-space:nowrap}
@@ -366,14 +367,23 @@ function findConcept(k){const n=+k.slice(1);
  const c=ENV[n-1];const terms=c.terms.map(t=>`<div class="trow" onclick="this.classList.toggle('open')"><div class="tt">${t[0]}</div><div class="td">${t[1]}</div></div>`).join('');
  const ar=AIROLE[n];const aiB=ar?`<div class="airole"><div class="ai"><span>🤖 AI 帮你做</span>${ar[0]}</div><div class="me"><span>🙋 这件事得你自己来</span>${ar[1]}</div></div>`:'';
  return{type:'🧩 专业环节',name:c.n+'. '+c.name,line:c.fn,extra:`${aiB}<p class="termtip" style="margin-top:14px">👇 这个环节里的小概念</p>${terms}<p class="good"><b>「好」的标准:</b>${c.good}</p>`};}
-function openConcept(k){const c=findConcept(k),r=RICH[k]||{};
+let _mctx=null;
+function openLessonConcept(k){const L=curL();openConcept(k,{ks:L.ks,label:'第 '+L.n+' 节 · '+L.title});}
+function openConcept(k,ctx){const c=findConcept(k),r=RICH[k]||{};_mctx=ctx||null;if(_mctx)_mctx.cur=k;
  $('cdType').textContent=c.type;$('cdName').textContent=c.name;$('cdLine').textContent=c.line;
  $('cdEg').innerHTML=r.eg||'';$('cdWhen').innerHTML=r.when||'';$('cdExtra').innerHTML=c.extra||'';
- const rel=r.rel||[];
- $('cdRel').innerHTML=rel.length?`<div class="cd-rellbl">🔗 接着学这些(它们是连在一起的)</div>`+rel.map(x=>`<button class="relbtn" onclick="openConcept('${x}')">${nameOf(x)} →</button>`).join(''):'';
- if(k==='x6'){$('cdRel').innerHTML+=`<div class="cd-rellbl">✍️ 去留下你的日志</div><button class="relbtn" onclick="gotoLog()">打开「成长记录」,写今天的日志 →</button>`;}
+ if(_mctx){const ks=_mctx.ks,i=ks.indexOf(k),total=ks.length;
+  let nav=`<div class="cd-rellbl">📚 ${_mctx.label} · 这节课第 ${i+1} / ${total} 个概念</div><div class="btnrow" style="margin-top:2px">`;
+  if(i>0)nav+=`<button class="btn ghost" onclick="mNav(-1)">← 上一个</button>`;
+  nav+= i<total-1?`<button class="btn" onclick="mNav(1)">下一个概念 →</button>`:`<button class="btn" onclick="closeConcept()">✓ 看完了,回到这节课</button>`;
+  nav+=`</div>`;$('cdRel').innerHTML=nav;
+ }else{const rel=r.rel||[];
+  $('cdRel').innerHTML=rel.length?`<div class="cd-rellbl">🔗 想深入,还可以看看这些</div>`+rel.map(x=>`<button class="relbtn" onclick="openConcept('${x}')">${nameOf(x)} →</button>`).join(''):'';
+  if(k==='x6'){$('cdRel').innerHTML+=`<div class="cd-rellbl">✍️ 去留下你的日志</div><button class="relbtn" onclick="gotoLog()">打开「今天上课」,写今天的总结 →</button>`;}
+ }
  $('cModal').classList.add('on');const d=document.querySelector('#cModal .cdetail');if(d)d.scrollTop=0;}
-function closeConcept(){$('cModal').classList.remove('on');}
+function mNav(d){if(!_mctx)return;const ks=_mctx.ks,i=ks.indexOf(_mctx.cur)+d;if(ks[i])openConcept(ks[i],_mctx);}
+function closeConcept(){$('cModal').classList.remove('on');_mctx=null;}
 const KEYMAP=[
  [['丑','不好看','难看','颜色','样子','配色','好看','字小','字大'],['e5','j1','j12']],
  [['没听懂','听不懂','不懂我','不明白','听不明白','理解'],['j5','j6','j7']],
@@ -475,11 +485,12 @@ function renderLesson(){
  h+=LESSONS.map(x=>`<div class="sbtn${x.n===st.sess?' on':''}${st.lessons[x.n]?' has':''}" onclick="selectL(${x.n})">第 ${x.n} 节${st.lessons[x.n]?' ✓':''}</div>`).join('')+`</div>`;
  h+=`<div class="goal"><div class="gl">📚 第 ${L.n} 节课 · ${L.title}</div><div class="gt">🎯 本节课目标:${L.goal}</div></div>`;
  h+=`<div class="note">这节课你会用到下面这几个概念——它们就是我们要你学会的「真本事」。<b>边做边学</b>:不懂就点开看例子;每真正学会一个,就勾上「✓ 我学会了」,再<b>用你自己的话</b>说说它。<b>能说清楚,才算真的学会。</b></div>`;
- h+=`<div class="lbl">🧩 这节课要掌握的概念(共 ${L.ks.length} 个)</div>`;
- h+=L.ks.map(k=>{const cd=(data.concepts||{})[k]||{};const got=cd.got;
+ h+=`<div class="lbl">🧩 这节课要掌握的概念 —— 按 ① → ② → ③ 的顺序学(共 ${L.ks.length} 个)</div>`;
+ const STEP=['①','②','③','④','⑤','⑥'];
+ h+=L.ks.map((k,idx)=>{const cd=(data.concepts||{})[k]||{};const got=cd.got;
    return `<div class="lc${got?' done':''}">
      <div class="lc-h">
-       <span class="lc-name" onclick="openConcept('${k}')">${conIcon(k)} ${nameOf(k)} <span class="lc-look">点开看例子 →</span></span>
+       <span class="lc-name" onclick="openLessonConcept('${k}')"><span class="lc-step">${STEP[idx]}</span>${conIcon(k)} ${nameOf(k)} <span class="lc-look">点开看例子 →</span></span>
        <label class="lc-chk"><input type="checkbox" class="lc-got" data-k="${k}" ${got?'checked':''} onchange="this.closest('.lc').classList.toggle('done',this.checked)"> 我学会了</label>
      </div>
      <textarea class="lc-say" data-k="${k}" placeholder="用我自己的话说说「${nameShort(k)}」是什么、什么时候用…">${esc2(cd.say||'')}</textarea>
