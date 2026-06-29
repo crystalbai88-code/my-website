@@ -200,7 +200,7 @@
       <div style="font-size:60px;font-weight:bold;color:#fff;text-shadow:0 2px 6px #000;"><span id="respawnSec">3</span> 秒后复活</div>
     </div>
     <div class="hintbox">
-W前 S后 A左 D右 ·空格 跳<br>左键 开枪 ·右键 瞄准 ·1手枪 2狙击 3刀<br>Z 爆闪 ·X 烟雾弹 ·C/Shift 滑铲 ·G 长烟(蜂医) ·H 治疗(蜂医)<br>V 榴弹炮 ·F 花来加速（红狼）<br>残血击杀回血 ·9左探头 0右探头 R换弹 ESC放鼠标
+WASD 慢跑(回体力) ·按住Shift 快跑(费体力) ·空格 跳<br>左键 开枪 ·右键 瞄准 ·1手枪 2狙击 3刀<br>Z 爆闪 ·X 烟雾弹 ·C 滑铲 ·G 长烟(蜂医) ·H 治疗(蜂医)<br>V 榴弹炮 ·F 花来加速（红狼）<br>残血击杀回血 ·9左探头 0右探头 R换弹 ESC放鼠标
     </div>
     <div id="hpbar">
       <div class="label">血量 <span id="armorTag"></span></div>
@@ -325,7 +325,7 @@ document.addEventListener('keydown', e=>{
   if(e.code==='Digit0') leanDir=1;
   if(e.code==='KeyR') startReload();
   if(e.code==='Space'){ jump(); e.preventDefault(); }
-  if(e.code==='ShiftLeft'||e.code==='ShiftRight'||e.code==='KeyC'){ slide(); }
+  if(e.code==='KeyC'){ slide(); }   // C 滑铲；Shift 改成按住快跑
   if(e.code==='KeyZ') useFlash();
   if(e.code==='KeyX') useSmoke();
   if(e.code==='KeyG') useDrone();
@@ -372,16 +372,17 @@ const player = {
   team:'blue',
   dead:false, respawnAt:0,
 };
-let aiming=false, smoothLean=0;
+let aiming=false, smoothLean=0, bobPhase=0;
 
 // ===== 体力 =====
 let stamina=100; const STAM_MAX=100;
 let tired=false;                 // 体力耗尽要休息
 let sliding=false, slideEnd=0, lastSlide=0; const slideDir=new THREE.Vector3();
-const STAM_JUMP = STAM_MAX/35;   // 跳35次累
-const STAM_SLIDE = STAM_MAX/15;  // 滑15次累
-const STAM_WALK = STAM_MAX/600;  // 走10分钟才空（每秒）
-const STAM_RECOVER = STAM_MAX/20;// 20秒回满（每秒），10秒回一半
+const STAM_JUMP = 10;            // 跳一下 -10
+const STAM_SLIDE = 20;           // 滑铲一次 -20
+const STAM_JOG_REGEN = 3;        // 慢跑（按W正常走）每秒 +3
+const STAM_SPRINT_DRAIN = 5;     // 快跑（按住Shift冲刺）每秒 -5
+const STAM_IDLE_REGEN = 5;       // 不动每秒 +5
 
 // ===== 角色 & 技能 =====
 let isNight=false;
@@ -1264,10 +1265,7 @@ function update(dt){
   // 自动连发（手枪/狙击按住左键）
   if(mouseDown) tryShoot();
 
-  // 玩家移动（WASD，也兼容方向键）
-  let speed = aiming?3.4:6.2;
-  if(tired) speed *= 0.45;          // 没体力跑不掉，只能慢慢挪
-  if(t < ab.huaLaiUntil) speed *= 1.7;  // 花来：加速
+  // 玩家移动（WASD）：默认慢跑，按住 Shift = 快跑冲刺
   const forward=new THREE.Vector3(Math.sin(yaw),0,Math.cos(yaw)); // 朝向看的方向
   const right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
   const move=new THREE.Vector3();
@@ -1276,6 +1274,11 @@ function update(dt){
   if(keys['KeyA']||keys['ArrowLeft'])  move.sub(right);
   if(keys['KeyD']||keys['ArrowRight']) move.add(right);
   const movingNow = move.lengthSq()>0;
+  const shiftHeld = keys['ShiftLeft']||keys['ShiftRight'];
+  const sprinting = movingNow && shiftHeld && !aiming && !tired && stamina>0;  // 快跑
+  let speed = aiming?3.4 : (sprinting?8.4:5.6);   // 快跑8.4 / 慢跑5.6
+  if(tired) speed *= 0.5;            // 没体力只能慢慢挪
+  if(t < ab.huaLaiUntil) speed *= 1.7;  // 花来：加速（跑不跑都加）
   // 滑铲：朝滑铲方向快速冲刺
   let dipCam=0;
   if(sliding){
@@ -1284,14 +1287,17 @@ function update(dt){
   }
   if(movingNow && !sliding){ move.normalize().multiplyScalar(speed*dt); player.pos.add(move); }
 
-  // ===== 体力：动了慢慢掉，停下回血，空了要休息 =====
+  // ===== 体力：慢跑回血、快跑掉血、不动回血更快 =====
   if(player.dead){ stamina = STAM_MAX; }
   else if(sliding){ /* 滑铲已扣过 */ }
-  else if(movingNow){ stamina -= STAM_WALK*dt; }
-  else { stamina += STAM_RECOVER*dt; }
+  else if(sprinting){ stamina -= STAM_SPRINT_DRAIN*dt; }   // 快跑 -5/秒
+  else if(movingNow){ stamina += STAM_JOG_REGEN*dt; }      // 慢跑 +3/秒
+  else { stamina += STAM_IDLE_REGEN*dt; }                  // 不动 +5/秒
   stamina = Math.max(0, Math.min(STAM_MAX, stamina));
   if(stamina<=0) tired=true;
-  if(tired && stamina>=30) tired=false;   // 回到3成才能再跑
+  if(tired && stamina>=30) tired=false;   // 回到3成才能再快跑
+  // 跑步镜头微晃（更真实）
+  if(!sliding){ bobPhase += dt*(sprinting?14:(movingNow?9:0)); }
   updateStaminaHUD();
 
   // 重力跳跃
@@ -1304,6 +1310,12 @@ function update(dt){
   // 相机
   camera.position.copy(player.pos);
   camera.position.y -= dipCam;       // 滑铲时镜头压低
+  // 跑步镜头上下+左右微晃（更真实），不动时不晃
+  const bobAmt = (movingNow && player.onGround && !sliding) ? (sprinting?0.06:0.035) : 0;
+  if(bobAmt>0){
+    camera.position.y += Math.sin(bobPhase*2)*bobAmt;
+    camera.position.add(right.clone().multiplyScalar(Math.sin(bobPhase)*bobAmt*0.7));
+  }
   // 探头：平滑左右偏移
   smoothLean += (leanDir - smoothLean) * Math.min(1, dt*10);
   if(Math.abs(smoothLean)>0.001){
@@ -1381,12 +1393,23 @@ function updateBots(dt,t){
     else if(b.action==='strafe')  mv.copy(sideDir).multiplyScalar(b.strafeSign);
     // hold => 原地不动，专心开枪
 
-    const moving = mv.lengthSq()>0.0001;
-    if(moving){ mv.normalize(); b.mesh.position.add(mv.multiplyScalar(b.moveSpeed*dt)); }
+    // 队友/敌人也会用技能：偶尔放烟掩护、偶尔滑铲冲刺；蜂医队友给残血队友补血
+    if(b.abilityAt===undefined) b.abilityAt = t + 4 + Math.random()*8;
+    if(t>b.abilityAt){
+      b.abilityAt = t + 9 + Math.random()*10;
+      const r=Math.random();
+      if(r<0.4 && dist<50){ spawnSmoke(b.mesh.position.clone().setY(0), 10, 0x9a9a9a); }
+      else if(r<0.8){ b.slideUntil=t+0.45; b.slideDir=to.clone(); }   // 滑铲冲刺
+      else if(b.team==='blue' && chosenChar==='medic'){ const hurt=bots.find(x=>!x.dead&&x.team==='blue'&&x.hp<x.maxHp*0.6&&x!==b); if(hurt) hurt.hp=Math.min(hurt.maxHp,hurt.hp+hurt.maxHp*0.5); }
+    }
+    if(b.slideUntil && t<b.slideUntil){ b.mesh.position.add(b.slideDir.clone().multiplyScalar(11*dt)); }
+
+    const moving = mv.lengthSq()>0.0001 || (b.slideUntil&&t<b.slideUntil);
+    if(mv.lengthSq()>0.0001){ mv.normalize(); b.mesh.position.add(mv.multiplyScalar(b.moveSpeed*dt)); }
     collide(b.mesh.position,0.5);
 
     // 走路时腿摆动（像人走，不僵硬）
-    b.walkPhase += dt*(moving?9:0);
+    b.walkPhase += dt*(moving?(b.slideUntil&&t<b.slideUntil?16:9):0);
     const legL=b.mesh.getObjectByName('legL'), legR=b.mesh.getObjectByName('legR');
     if(legL){ legL.rotation.x=Math.sin(b.walkPhase)*0.5; legR.rotation.x=-Math.sin(b.walkPhase)*0.5; }
 
