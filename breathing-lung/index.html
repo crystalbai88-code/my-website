@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Breathing Lung — Scientific X-ray Visualization</title>
+    <script type="module" crossorigin src="./assets/index-B_TOmkJF.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-Dckbs66t.css">
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="viewport"></canvas>
+      <header class="hud hud-top">
+        <h1>Pulmonary X-Ray Viewer</h1>
+        <p class="subtitle">
+          Weibel symmetric airway model · 5-lobe lung · physiological breathing
+        </p>
+      </header>
+      <aside class="hud hud-bottom" id="metrics">
+        <div><span class="k">Phase</span><span class="v" id="m-phase">—</span></div>
+        <div><span class="k">Volume</span><span class="v" id="m-volume">—</span></div>
+        <div><span class="k">Flow</span><span class="v" id="m-flow">—</span></div>
+        <div><span class="k">RR</span><span class="v" id="m-rr">—</span></div>
+      </aside>
+      <div id="legend" class="hud hud-left"></div>
+      <div id="loading">Initializing scene…</div>
+    </div>
+  </body>
+</html>
