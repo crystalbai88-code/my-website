@@ -194,6 +194,44 @@ footer{background:var(--ink);padding:32px 28px;text-align:center}
 .footer-url{font-size:.84rem;color:var(--gold-light)}
 .footer-note{font-size:.72rem;color:rgba(255,255,255,.2);margin-top:16px}
 
+/* ── MANIFESTO / 80-20 ── */
+#manifesto{background:var(--navy);padding:88px 0}
+.mani-center{text-align:center;max-width:780px;margin:0 auto}
+.mani-h{font-size:clamp(1.7rem,3.5vw,2.5rem);color:#fff;line-height:1.45;margin-bottom:24px;letter-spacing:.02em}
+.mani-h em{color:var(--gold-light);font-style:normal}
+.mani-sub{color:rgba(255,255,255,.5);font-size:.95rem;line-height:1.9;font-family:'Noto Serif SC',serif;font-weight:300;margin-bottom:56px;max-width:600px;margin-left:auto;margin-right:auto}
+.cap-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:52px}
+.cap-card{background:rgba(255,255,255,.05);border:1px solid rgba(200,150,62,.18);border-radius:4px;padding:24px 14px;text-align:center;transition:background .2s}
+.cap-card:hover{background:rgba(255,255,255,.09)}
+.cap-icon{font-size:1.7rem;margin-bottom:10px;line-height:1}
+.cap-name{font-family:'Noto Serif SC',serif;font-size:.98rem;font-weight:700;color:var(--gold-light);margin-bottom:8px;letter-spacing:.04em}
+.cap-desc{font-size:.78rem;color:rgba(255,255,255,.4);line-height:1.65}
+.outcome-quote{background:rgba(200,150,62,.07);border:1.5px solid rgba(200,150,62,.22);border-radius:6px;padding:28px 40px;margin-top:4px;text-align:center}
+.outcome-quote p{font-family:'Noto Serif SC',serif;font-size:1.02rem;color:rgba(255,255,255,.65);line-height:1.85}
+.outcome-quote strong{color:rgba(255,255,255,.9)}
+.outcome-quote em{font-style:normal;color:var(--gold-light);border-bottom:1.5px solid rgba(200,150,62,.5)}
+
+/* ── SERVICE MODELS ── */
+#models{background:var(--cream)}
+.models-header{text-align:center;margin-bottom:48px}
+.models-header h2{font-size:clamp(1.8rem,3.5vw,2.4rem);color:var(--navy);margin-bottom:14px}
+.models-header p{color:var(--ink-light);font-size:1rem;line-height:1.8;max-width:480px;margin:0 auto}
+.models-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.model-card{background:var(--white);border:1.5px solid var(--border);border-radius:6px;padding:36px 32px;position:relative;overflow:hidden}
+.model-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.model-long::after{background:linear-gradient(90deg,var(--jade),var(--jade-light))}
+.model-single::after{background:linear-gradient(90deg,var(--gold),var(--gold-light))}
+.model-badge{position:absolute;top:16px;right:16px;background:var(--jade);color:#fff;font-size:.64rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:2px}
+.model-icon{font-size:1.9rem;margin-bottom:14px;line-height:1}
+.model-title{font-family:'Noto Serif SC',serif;font-size:1.25rem;font-weight:700;color:var(--navy);margin-bottom:4px}
+.model-en{font-size:.7rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-light);margin-bottom:18px}
+.model-desc{color:var(--ink-mid);font-size:.9rem;line-height:1.8;font-family:'Noto Serif SC',serif;font-weight:300;margin-bottom:22px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.model-features{list-style:none;display:flex;flex-direction:column;gap:10px}
+.model-features li{font-size:.86rem;color:var(--ink-mid);padding-left:20px;position:relative;line-height:1.5}
+.model-features li::before{content:'✓';position:absolute;left:0;font-weight:700}
+.model-long .model-features li::before{color:var(--jade)}
+.model-single .model-features li::before{color:var(--gold)}
+
 /* ── RESPONSIVE ── */
 @media(max-width:900px){
   .tracks-grid{grid-template-columns:repeat(2,1fr)}
@@ -203,9 +241,12 @@ footer{background:var(--ink);padding:32px 28px;text-align:center}
   .steps{grid-template-columns:repeat(2,1fr);gap:32px}
   .steps::before{display:none}
   .proof-grid{grid-template-columns:repeat(2,1fr)}
+  .cap-grid{grid-template-columns:repeat(2,1fr)}
+  .models-grid{grid-template-columns:1fr}
 }
 @media(max-width:600px){
   section{padding:56px 0}
+  #manifesto{padding:64px 0}
   nav{position:static}
   #hero{padding:80px 0 64px}
   .tracks-grid{grid-template-columns:1fr}
@@ -213,6 +254,8 @@ footer{background:var(--ink);padding:32px 28px;text-align:center}
   .hero-proof{flex-wrap:wrap;gap:24px}
   .proof-divider{display:none}
   .steps{grid-template-columns:1fr;gap:24px}
+  .outcome-quote{padding:22px 24px}
+  .model-card{padding:28px 22px}
 }
 </style>
 </head>
@@ -375,6 +418,42 @@ footer{background:var(--ink);padding:32px 28px;text-align:center}
   </div>
 </section>
 
+<!-- MANIFESTO / 80-20 -->
+<section id="manifesto">
+  <div class="container">
+    <div class="mani-center">
+      <p class="eyebrow" style="color:var(--gold-light);margin-bottom:22px">The Big Picture · 时代判断</p>
+      <h2 class="mani-h">在 <em>80%</em> 的工作都能被 AI 取代的趋势下，<br>孩子需要成为那 <em>20%</em> 真正会用 AI 的人。</h2>
+      <p class="mani-sub">通过 AI 深度学习，孩子建立的不只是工具技能——而是一套完整的思维框架，让他在 AI 时代成为创造者，而不是被取代的那一个。</p>
+      <div class="cap-grid">
+        <div class="cap-card">
+          <div class="cap-icon">🧠</div>
+          <div class="cap-name">产品思维</div>
+          <div class="cap-desc">从用户需求出发，定义问题，设计真正有价值的解决方案</div>
+        </div>
+        <div class="cap-card">
+          <div class="cap-icon">🔍</div>
+          <div class="cap-name">洞察能力</div>
+          <div class="cap-desc">发现别人看不到的机会，读懂真实的用户与市场</div>
+        </div>
+        <div class="cap-card">
+          <div class="cap-icon">🔄</div>
+          <div class="cap-name">迭代能力</div>
+          <div class="cap-desc">快速测试、快速调整，在每一次失败中积累真正的判断力</div>
+        </div>
+        <div class="cap-card">
+          <div class="cap-icon">⭐</div>
+          <div class="cap-name">高标准追求</div>
+          <div class="cap-desc">对"好"有自己的定义，不满足于"够用就行"，持续追求卓越</div>
+        </div>
+      </div>
+      <div class="outcome-quote">
+        <p>项目结束后，孩子得到的不只是一个作品——<strong>他已经学会了如何做一个<em>好的</em>作品</strong>：用产品思维去定义问题，用商业思维去评估价值，用宏观思维去看待影响。这是任何证书都无法给予的竞争力。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- PROOF -->
 <section id="proof">
   <div class="container">
@@ -516,6 +595,44 @@ footer{background:var(--ink);padding:32px 28px;text-align:center}
         <div class="partner-card-num">04</div>
         <div class="partner-card-title">配套申请材料协助</div>
         <div class="partner-card-desc">项目完成后，我们提供活动描述初稿、项目展示建议，方便整合进申请材料，减轻你的工作量。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICE MODELS -->
+<section id="models">
+  <div class="container">
+    <div class="models-header">
+      <p class="eyebrow" style="color:var(--gold);margin-bottom:14px">Service Models · 服务模式</p>
+      <h2>一种关系，两种深度。</h2>
+      <p>根据孩子的申请节奏和目标，灵活选择最适合的陪伴方式。</p>
+    </div>
+    <div class="models-grid">
+      <div class="model-card model-long">
+        <div class="model-badge">推荐</div>
+        <div class="model-icon">🌱</div>
+        <div class="model-title">长期深度陪跑</div>
+        <div class="model-en">Long-Term Accompaniment</div>
+        <div class="model-desc">导师全程陪伴，从选题到交付持续引导——多个项目相互呼应，积累完整的能力成长轨迹，是申请故事最有力的底座。</div>
+        <ul class="model-features">
+          <li>3–12个月持续陪跑，节奏灵活</li>
+          <li>可完成1个以上项目，形成体系</li>
+          <li>每阶段能力复盘与针对性反馈</li>
+          <li>配合申请时间节点规划路径</li>
+        </ul>
+      </div>
+      <div class="model-card model-single">
+        <div class="model-icon">⚡</div>
+        <div class="model-title">单个项目赋能</div>
+        <div class="model-en">Single Project Sprint</div>
+        <div class="model-desc">有明确想法、有时间限制？用最短的路径做出一个高质量的项目，快速产出真实可展示的成果，灵活接入已有规划。</div>
+        <ul class="model-features">
+          <li>8–16周完成单个完整项目</li>
+          <li>聚焦一个主题，做深做透</li>
+          <li>完整交付：作品 + 项目故事 + 申请材料</li>
+          <li>适合已有整体规划、需要补强的学生</li>
+        </ul>
       </div>
     </div>
   </div>
