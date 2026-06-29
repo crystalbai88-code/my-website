@@ -5,184 +5,276 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>少年 CEO · 创造者驾驶舱</title>
 <style>
-  :root{--green:#2F5D50;--orange:#D98A3D;--bg:#FBF8F2;--ink:#33312c;--mut:#8a857c;--line:#e7e0d2;--card:#fff;--soft:#f3efe6;}
-  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-  body{background:var(--bg);color:var(--ink);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.6}
-  .wrap{max-width:960px;margin:0 auto;padding:18px 16px 70px}
-  .top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
-  .brand{font-size:13px;letter-spacing:2px;color:var(--orange);font-weight:700}
-  .brand b{font-family:"Songti SC",serif;font-size:22px;color:var(--green);display:block;letter-spacing:0;margin-top:2px}
-  .ceo{font-size:11px;color:var(--mut);letter-spacing:1px}
-  .right{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
-  .proj{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
-  .proj label{font-size:12px;color:var(--mut)}
-  .proj input{border:none;background:transparent;font-size:15px;font-weight:700;color:var(--green);width:150px;outline:none}
-  .awbar{font-size:12px;color:var(--mut);background:#fdf3e6;border:1px solid var(--orange);border-radius:999px;padding:5px 13px}
-  .awbar b{color:#8a5410}
-  .journey{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:14px}
-  .jhead{font-size:12px;color:var(--mut);margin-bottom:10px;text-align:center;letter-spacing:1px}
-  .jhead b{color:var(--orange)}
-  .stages{display:flex;gap:6px}
-  .stage{flex:1;text-align:center;cursor:pointer;border-radius:12px;padding:9px 3px;border:1.5px solid var(--line);background:var(--soft);transition:.15s}
-  .stage.active{background:var(--green);border-color:var(--green)}
-  .stage .sn{font-size:10.5px;color:var(--mut)}.stage.active .sn{color:#bcd3c9}
-  .stage .st{font-size:14px;font-weight:700;margin-top:2px}.stage.active .st{color:#fff}
-  .stage .role{font-size:9.5px;color:var(--orange);margin-top:2px;font-weight:700}.stage.active .role{color:#f3c98c}
-  .tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
-  .tab{flex:1;min-width:110px;text-align:center;padding:11px 6px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);cursor:pointer;font-size:14px;font-weight:700;color:var(--mut)}
-  .tab.on{background:var(--orange);border-color:var(--orange);color:#fff}
-  .panel{display:none}.panel.on{display:block}
-  .goal{background:linear-gradient(120deg,var(--green),#26483d);color:#fff;border-radius:14px;padding:15px 18px;margin-bottom:16px}
-  .goal .gl{font-size:12px;color:#a9c6bb;letter-spacing:1px}.goal .gt{font-size:17px;font-weight:700;margin-top:5px}
-  .lbl{font-size:12.5px;color:var(--mut);letter-spacing:1px;margin:18px 0 8px;font-weight:700}
-  .lbl:first-child{margin-top:4px}
-  .phase{font-size:13px;font-weight:700;color:var(--orange);margin:18px 0 8px;letter-spacing:1px}
-  .formula{text-align:center;background:#fdf3e6;border:1px solid var(--orange);border-radius:12px;padding:13px;margin:4px 0 8px;font-size:15px;color:#8a5410;font-weight:700}
-  /* accordion */
-  .acc{background:var(--card);border:1px solid var(--line);border-radius:13px;margin-bottom:9px;overflow:hidden}
-  .acc-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 15px;cursor:pointer}
-  .acc-t{font-size:15px;font-weight:700;color:var(--green)}
-  .acc-t .no{color:var(--orange);margin-right:6px}
-  .acc-t small{display:block;font-size:11px;color:var(--mut);font-weight:400;margin-top:2px}
-  .acc-b{display:none;padding:0 15px 15px;border-top:1px dashed var(--line)}
-  .acc.open .acc-b{display:block}
-  .acc.open .acc-h{background:var(--soft)}
-  .fn{font-size:13.5px;color:var(--ink);margin:12px 0 4px}
-  .fn b{color:var(--green)}
-  .good{font-size:13px;color:#6b5a2a;background:#fbf6ea;border-radius:9px;padding:9px 12px;margin-top:10px;line-height:1.55}
-  .good b{color:var(--orange)}
-  .desc{font-size:14px;color:var(--ink);margin-top:12px;line-height:1.7}
-  .ex{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
-  .ex div{flex:1;min-width:200px;border-radius:9px;padding:9px 11px;font-size:13px;line-height:1.5}
-  .ex .gd{background:#eef5f0;color:#2c5042;border:1px solid #cfe0d6}
-  .ex .bd{background:#f6efe9;color:#9a6a44;border:1px solid #ead9cc}
-  .ex .tag{font-size:11px;font-weight:700;display:block;margin-bottom:3px;opacity:.8}
-  /* terms */
-  .termtip{font-size:12px;color:var(--mut);margin:10px 0 4px}
-  .trow{border:1px solid var(--line);border-radius:9px;padding:9px 12px;margin-bottom:6px;cursor:pointer;transition:.12s}
-  .trow:hover{border-color:var(--orange)}
-  .trow .tt{font-size:14px;font-weight:600;color:var(--green)}
-  .trow .tt::after{content:"  点开看概念 ›";font-size:11px;color:var(--mut);font-weight:400}
-  .trow.open .tt::after{content:""}
-  .trow .td{display:none;font-size:13px;color:var(--ink);margin-top:5px;line-height:1.5}
-  .trow.open .td{display:block}
-  .trow.open{background:var(--soft);border-color:var(--orange)}
-  /* awareness btn */
-  .aw{flex:none;font-size:12px;font-weight:700;border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:5px 12px;color:var(--mut);cursor:pointer;white-space:nowrap}
-  .aw.on{background:var(--green);border-color:var(--green);color:#fff}
-  /* stuck */
-  .sit{display:flex;flex-direction:column;gap:8px;margin-bottom:8px}
-  .sitbtn{text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:13px 15px;cursor:pointer;font-size:15px;font-weight:700;color:var(--ink)}
-  .sitbtn.on{background:#fdf3e6;border-color:var(--orange);color:#8a5410}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:9px}
-  .mini{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:11px 13px}
-  .mini .mt{font-size:14px;font-weight:700;color:var(--green)}.mini .md{font-size:12.5px;color:var(--mut);margin-top:4px;line-height:1.5}
-  .prompt{background:#1f2a26;border-radius:12px;padding:14px 16px;margin-top:12px;position:relative}
-  .prompt .pl{font-size:11px;color:#8fb3a6;letter-spacing:1px}.prompt .pt{font-size:14px;color:#eaf2ee;line-height:1.7;margin-top:6px;white-space:pre-wrap}
-  .copy{position:absolute;top:12px;right:12px;background:var(--orange);color:#fff;border:none;border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer;font-weight:700}
-  /* journal */
-  .form label{display:block;font-size:14px;font-weight:700;color:var(--green);margin:12px 0 5px}
-  .form label small{color:var(--mut);font-weight:400}
-  .form textarea{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:11px 13px;font-size:14px;font-family:inherit;resize:vertical;min-height:56px;outline:none;background:var(--card)}
-  .form textarea:focus{border-color:var(--orange)}
-  .btnrow{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
-  .btn{background:var(--green);color:#fff;border:none;border-radius:12px;padding:11px 20px;font-size:14px;font-weight:700;cursor:pointer}
-  .btn.ghost{background:var(--card);color:var(--green);border:1.5px solid var(--line)}
-  .logitem{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:10px}
-  .logitem .ld{font-size:12px;color:var(--orange);font-weight:700;margin-bottom:6px}
-  .logitem p{font-size:13px;margin:3px 0}.logitem p b{color:var(--green)}
-  .empty{font-size:13px;color:var(--mut);text-align:center;padding:24px}
-  .sesspick{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:8px}
-  .sbtn{padding:9px 15px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);cursor:pointer;font-size:14px;font-weight:700;color:var(--mut)}
-  .sbtn.has{color:var(--green);border-color:#cfe0d6;background:#f4f8f5}
-  .sbtn.on{background:var(--green);border-color:var(--green);color:#fff}
-  .reclbl{font-family:"Songti SC",serif;font-size:16px;font-weight:700;color:var(--green);margin-bottom:8px}
-  .note{font-size:12.5px;color:var(--mut);background:var(--soft);border-radius:10px;padding:10px 13px;margin-bottom:12px;line-height:1.6}
-  .albhead{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:8px}
-  .albtop{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px}
-  .albbig{font-size:30px;font-weight:800;color:var(--green);font-family:"Songti SC",serif}
-  .albbig small{font-size:16px;color:var(--mut);font-weight:400}
-  .albrank{font-size:14px;font-weight:700;color:var(--orange)}
-  .prog{height:14px;background:var(--soft);border-radius:999px;overflow:hidden;border:1px solid var(--line)}
-  .prog>i{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--orange));transition:width .35s}
-  .albtip{font-size:12px;color:var(--mut);margin-top:9px;line-height:1.5}
-  .tilegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(116px,1fr));gap:8px}
-  .tile{border:1.5px solid var(--line);border-radius:12px;padding:11px 9px;text-align:center;cursor:pointer;background:var(--soft);opacity:.5;transition:.15s}
-  .tile.on{opacity:1;background:#fff;border-color:var(--orange);box-shadow:0 3px 10px rgba(217,138,61,.16)}
-  .tile .ti{font-size:11px;color:var(--mut);font-weight:700}.tile.on .ti{color:var(--orange)}
-  .tile .tn{font-size:13px;font-weight:700;color:var(--mut);margin-top:4px;line-height:1.3}.tile.on .tn{color:var(--green)}
-  .tile .chk{font-size:10.5px;margin-top:4px;color:var(--orange);font-weight:700}
-  .cert-btn{margin-top:12px;width:100%;background:linear-gradient(90deg,#caa23f,var(--orange));color:#fff;border:none;border-radius:10px;padding:11px;font-size:14px;font-weight:700;cursor:pointer}
-  .modal{display:none;position:fixed;inset:0;background:rgba(20,16,10,.55);z-index:99;align-items:center;justify-content:center;padding:20px;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
-  .modal.on{display:flex}
-  .cert{width:380px;max-width:100%;background:linear-gradient(180deg,#fffdf8,#FBF8F2);border:2px solid var(--orange);border-radius:18px;padding:30px 28px;text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.4);position:relative}
-  .cert::before{content:"";position:absolute;inset:8px;border:1px solid #e7c98f;border-radius:12px;pointer-events:none}
-  .cert-seal{font-size:50px;line-height:1}
-  .cert-k{font-size:11px;letter-spacing:4px;color:var(--orange);font-weight:700;margin-top:8px}
-  .cert-h{font-family:"Songti SC",serif;font-size:29px;color:var(--green);font-weight:700;margin:6px 0}
-  .cert-sub{font-size:12px;color:var(--mut);letter-spacing:3px;margin-top:10px}
-  .cert-name{font-family:"Songti SC",serif;font-size:22px;color:var(--green);font-weight:700;margin:5px auto 12px;border-bottom:2px solid #e7c98f;padding:0 16px 5px;display:inline-block}
-  .cert-body{font-size:14px;color:var(--ink);line-height:1.95}.cert-body b{color:var(--orange)}
-  .cert-foot{display:flex;justify-content:space-between;font-size:11.5px;color:var(--mut);margin-top:18px;padding-top:12px;border-top:1px dashed #d9cdb3}
-  .cert-ceo{font-size:11px;letter-spacing:2px;color:var(--orange);margin-top:7px;font-weight:700}
-  .cert-close{margin-top:18px;width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer}
-  .relbtn{display:inline-block;margin:0 7px 7px 0;background:#fdf3e6;border:1.5px solid var(--orange);color:#8a5410;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer}
-  .morebtn{margin-top:11px;background:var(--green);color:#fff;border:none;border-radius:9px;padding:9px 15px;font-size:13px;font-weight:700;cursor:pointer}
-  .route{font-size:14px;color:var(--green);font-weight:700;margin:8px 0 9px;line-height:1.5}
-  .stxt{flex:1;border:1.5px solid var(--line);border-radius:10px;padding:10px 13px;font-size:14px;font-family:inherit;outline:none;background:var(--card)}
-  .stxt:focus{border-color:var(--orange)}
-  .cdetail{width:430px;max-width:100%;max-height:86vh;overflow:auto;background:var(--bg);border-radius:18px;padding:24px;box-shadow:0 24px 70px rgba(0,0,0,.45)}
-  .cd-type{font-size:12px;letter-spacing:1px;color:var(--orange);font-weight:700}
-  .cd-name{font-family:"Songti SC",serif;font-size:24px;color:var(--green);font-weight:700;margin:4px 0 9px}
-  .cd-line{font-size:15px;color:var(--ink);line-height:1.7;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:11px 13px}
-  .cd-eg{background:#fbf6ea;border:1px solid #e7c98f;border-radius:11px;padding:13px 15px;margin-top:12px}
-  .cd-eglbl{font-size:13px;font-weight:700;color:#8a5410;display:block;margin-bottom:5px}
-  .cd-eg>div{font-size:14.5px;color:var(--ink);line-height:1.8}
-  .cd-when{margin-top:12px}
-  .cd-when>span{font-size:13px;font-weight:700;color:var(--green);display:block;margin-bottom:4px}
-  .cd-when>div{font-size:14px;color:var(--mut);line-height:1.6}
-  .cd-rellbl{font-size:13px;font-weight:700;color:var(--mut);margin:16px 0 9px}
-  .cd-close{margin-top:16px;width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;padding:11px;font-size:14px;font-weight:700;cursor:pointer}
-  .airole{display:flex;gap:8px;margin-top:13px;flex-wrap:wrap}
-  .airole>div{flex:1;min-width:165px;border-radius:11px;padding:11px 13px;font-size:13.5px;line-height:1.65}
-  .airole .ai{background:#eef5f0;border:1px solid #cfe0d6;color:#2c5042}
-  .airole .me{background:#fdf3e6;border:1px solid #e7c98f;color:#8a5410}
-  .airole span{display:block;font-size:12px;font-weight:700;margin-bottom:4px}
-  .foot2{display:none}
-  .foot{text-align:center;font-size:11.5px;color:var(--mut);margin-top:26px}
-  /* lesson cards */
-  .lc{background:#fff;border:1px solid var(--line);border-left:4px solid var(--orange);border-radius:12px;padding:13px 15px;margin-bottom:11px;transition:.2s}
-  .lc.done{border-left-color:var(--green);background:#f4f8f5}
-  .lc-h{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-  .mile{background:#eef5f0;border:1px solid #cfe0d6;border-radius:12px;padding:12px 15px;margin:-6px 0 16px;font-size:14.5px;color:#2c5042;line-height:1.6;font-weight:600}
-  .mile .mlbl{display:block;font-size:11.5px;letter-spacing:1px;color:var(--green);font-weight:700;margin-bottom:4px;opacity:.85}
-  .lc-step{color:var(--orange);font-weight:800;margin-right:5px;font-size:17px}
-  .lc-name{font-size:15.5px;font-weight:700;color:var(--green);cursor:pointer;line-height:1.4}
-  .lc-name:hover{text-decoration:underline}
-  .lc-look{font-size:11.5px;font-weight:500;color:var(--orange);white-space:nowrap}
-  .lc-chk{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;color:var(--mut);cursor:pointer;user-select:none;white-space:nowrap}
-  .lc.done .lc-chk{color:var(--green)}
-  .lc-chk input{width:16px;height:16px;accent-color:var(--green);cursor:pointer}
-  .lc-say{width:100%;margin-top:9px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13.5px;font-family:inherit;line-height:1.6;min-height:46px;resize:vertical;background:#fdfcfa;color:#333;box-sizing:border-box}
-  .lc-say:focus{outline:none;border-color:var(--green)}
+:root{
+ --void:#0E1512;--panel:#15201B;--panel2:#1A2620;--raise:#21302A;
+ --line:rgba(135,165,148,.15);--line2:rgba(135,165,148,.30);
+ --ink:#EAF0EC;--ink2:#C4D1CA;--mut:#88998F;--dim:#5E6E65;
+ --amber:#E9A24B;--amber-d:#C9863A;--glow:rgba(233,162,75,.22);--amber-soft:rgba(233,162,75,.1);
+ --jade:#62B89B;--jade-soft:rgba(98,184,155,.1);
+ --green:#62B89B;--orange:#E9A24B;
+ --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--void);color:var(--ink);
+ font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+.deck{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:238px 1fr;min-height:100vh}
+
+/* ===== LEFT RAIL · ALTITUDE LADDER ===== */
+.rail{border-right:1px solid var(--line);padding:30px 22px 30px 28px;position:relative;
+ background:linear-gradient(180deg,rgba(233,162,75,.04),transparent 40%)}
+.alt{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--dim)}
+.alt b{color:var(--mut);font-weight:600}
+.alt.top{margin-bottom:18px}.alt.bot{margin-top:18px}
+.rungs{display:flex;flex-direction:column;position:relative;padding-left:18px}
+.rungs::before{content:"";position:absolute;left:4px;top:8px;bottom:8px;width:2px;background:var(--line2)}
+.rung{position:relative;padding:10px 0;display:flex;align-items:center;gap:11px;cursor:pointer}
+.rung .dot{position:absolute;left:-18px;width:11px;height:11px;border-radius:50%;border:2px solid var(--dim);background:var(--void);transition:.2s}
+.rung.done .dot{background:var(--jade);border-color:var(--jade)}
+.rung.now .dot{background:var(--amber);border-color:var(--amber);box-shadow:0 0 0 5px var(--glow),0 0 16px var(--amber)}
+.rung .mno{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--dim);width:26px}
+.rung.done .mno{color:var(--jade)}.rung.now .mno{color:var(--amber)}
+.rung .rt{font-size:13px;color:var(--mut);font-weight:600}
+.rung.done .rt{color:var(--ink2)}.rung.now .rt{color:var(--ink);font-weight:700;font-size:14px}
+.rung.todo .rt{color:var(--dim)}
+.rung:hover .rt{color:var(--ink)}
+
+/* ===== RIGHT CABIN ===== */
+.cabin{padding:30px 38px 60px;min-width:0}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;
+ padding-bottom:20px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.wm-k{font-family:var(--mono);font-size:10.5px;letter-spacing:.32em;color:var(--amber);font-weight:600}
+.wm{font-size:23px;font-weight:800;letter-spacing:.04em;margin-top:4px}
+.ceo{font-size:11px;color:var(--dim);letter-spacing:.04em;margin-top:3px}
+.readouts{display:flex;gap:9px;flex-wrap:wrap}
+.ro{border:1px solid var(--line);border-radius:11px;padding:7px 12px;min-width:104px;background:var(--panel)}
+.ro .rk{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--dim)}
+.ro .rv{font-size:14px;font-weight:700;margin-top:3px;color:var(--ink)}
+.ro.gauge .rv{color:var(--amber)}
+.ri{width:100%;border:none;background:transparent;font-size:14px;font-weight:700;color:var(--ink);outline:none;margin-top:3px;font-family:inherit}
+.ri::placeholder{color:var(--dim)}
+
+/* nav tabs */
+.nav{display:flex;gap:6px;margin-bottom:26px;flex-wrap:wrap}
+.tab{padding:9px 16px;border-radius:10px;border:1px solid var(--line);background:var(--panel);cursor:pointer;
+ font-size:14px;font-weight:700;color:var(--mut);transition:.15s}
+.tab:hover{color:var(--ink);border-color:var(--line2)}
+.tab.on{background:var(--amber);border-color:var(--amber);color:#1a1206}
+.panel{display:none}.panel.on{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ===== mission header ===== */
+.eye{font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:var(--amber);font-weight:600}
+.h1{font-size:30px;font-weight:800;letter-spacing:.01em;margin:9px 0 12px;line-height:1.22}
+.goal{font-size:16px;color:var(--ink2);max-width:720px;line-height:1.75}
+.goal b{color:var(--amber);font-weight:700}
+.telem{margin:22px 0 26px;border:1px solid var(--line);border-radius:14px;
+ background:linear-gradient(180deg,var(--panel),var(--void));padding:16px 19px}
+.telem .tk{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--dim);margin-bottom:10px}
+.telem .mile{font-size:15px;color:var(--ink);font-weight:600;line-height:1.6}
+
+/* section divider */
+.sect{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;color:var(--mut);
+ margin:26px 0 14px;display:flex;align-items:center;gap:12px;text-transform:none}
+.sect::after{content:"";flex:1;height:1px;background:var(--line)}
+.lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--mut);margin:22px 0 12px;font-weight:600}
+.lbl:first-child{margin-top:2px}
+.phase{font-size:13px;font-weight:700;color:var(--amber);margin:22px 0 10px;letter-spacing:.04em}
+.note{font-size:13px;color:var(--mut);background:var(--panel);border:1px solid var(--line);border-radius:12px;
+ padding:12px 15px;margin-bottom:14px;line-height:1.7}
+.note b{color:var(--ink2)}
+.formula{text-align:center;background:var(--panel);border:1px solid var(--amber-d);border-radius:12px;
+ padding:14px;margin:2px 0 8px;font-size:15px;color:var(--amber);font-weight:700}
+
+/* ===== lesson concept instrument cards ===== */
+.lc{border:1px solid var(--line);border-radius:15px;background:var(--panel);padding:17px 19px;margin-bottom:12px;transition:.2s}
+.lc:hover{border-color:var(--line2)}
+.lc.done{background:linear-gradient(180deg,var(--jade-soft),var(--panel));border-color:rgba(98,184,155,.3)}
+.lc-h{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.lc-name{display:flex;align-items:center;gap:11px;font-size:16px;font-weight:700;color:var(--ink);cursor:pointer;line-height:1.4;min-width:0}
+.lc-name:hover{color:var(--amber)}
+.lc-step{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--amber);border:1.5px solid var(--amber);
+ border-radius:8px;width:28px;height:28px;display:inline-grid;place-items:center;flex:none}
+.lc.done .lc-step{color:var(--jade);border-color:var(--jade)}
+.lc-look{font-family:var(--mono);font-size:10px;letter-spacing:.05em;color:var(--mut);border:1px solid var(--line);
+ border-radius:7px;padding:4px 9px;white-space:nowrap;font-weight:600}
+.lc-chk{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--mut);cursor:pointer;user-select:none;white-space:nowrap;flex:none}
+.lc.done .lc-chk{color:var(--jade)}
+.lc-chk input{width:17px;height:17px;accent-color:var(--jade);cursor:pointer}
+.lc-say{width:100%;margin-top:13px;background:var(--void);border:1px solid var(--line);border-radius:10px;
+ padding:10px 13px;font-size:14px;font-family:inherit;line-height:1.6;min-height:48px;resize:vertical;color:var(--ink)}
+.lc-say::placeholder{color:var(--dim)}
+.lc-say:focus{outline:none;border-color:var(--amber)}
+.lc-say.filled{border-color:rgba(98,184,155,.4)}
+
+/* ===== form / log ===== */
+.form{border:1px solid var(--line);border-radius:15px;background:var(--panel2);padding:18px 20px}
+.form label{display:block;font-size:13.5px;font-weight:600;color:var(--ink2);margin:14px 0 6px}
+.form label:first-child{margin-top:0}
+.form label small{color:var(--mut);font-weight:400}
+.form textarea{width:100%;background:var(--void);border:1px solid var(--line);border-radius:10px;
+ padding:10px 13px;font-size:14px;font-family:inherit;resize:vertical;min-height:44px;outline:none;color:var(--ink)}
+.form textarea:focus{border-color:var(--amber)}
+.btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.btn{background:var(--panel);color:var(--ink);border:1px solid var(--line2);border-radius:11px;padding:11px 20px;font-size:14px;font-weight:700;cursor:pointer}
+.btn:hover{border-color:var(--amber)}
+.btn.ghost{background:transparent;color:var(--mut)}
+.save{background:var(--amber);color:#1a1206;border:none;border-radius:11px;padding:12px 24px;font-size:15px;font-weight:800;
+ letter-spacing:.02em;cursor:pointer;box-shadow:0 6px 22px var(--glow)}
+.save:hover{background:#f1ad5b}
+
+/* ===== concept library accordions ===== */
+.acc{border:1px solid var(--line);border-radius:13px;margin-bottom:9px;overflow:hidden;background:var(--panel)}
+.acc-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;cursor:pointer}
+.acc-h:hover{background:var(--panel2)}
+.acc-t{font-size:15px;font-weight:700;color:var(--ink)}
+.acc-t .no{font-family:var(--mono);color:var(--amber);margin-right:7px}
+.acc-t small{display:block;font-family:var(--mono);font-size:10.5px;color:var(--dim);font-weight:400;margin-top:3px;letter-spacing:.02em}
+.acc-b{display:none;padding:0 16px 16px;border-top:1px solid var(--line)}
+.acc.open .acc-b{display:block}
+.acc.open .acc-h{background:var(--panel2)}
+.desc{font-size:14px;color:var(--ink2);margin-top:13px;line-height:1.7}
+.ex{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.ex div{flex:1;min-width:200px;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.55}
+.ex .gd{background:var(--jade-soft);color:#9fd9c4;border:1px solid rgba(98,184,155,.3)}
+.ex .bd{background:rgba(233,162,75,.08);color:#e6b97f;border:1px solid rgba(233,162,75,.25)}
+.ex .tag{font-size:11px;font-weight:700;display:block;margin-bottom:3px;opacity:.85}
+.termtip{font-family:var(--mono);font-size:10.5px;color:var(--dim);margin:12px 0 6px;letter-spacing:.04em}
+.trow{border:1px solid var(--line);border-radius:9px;padding:10px 12px;margin-bottom:6px;cursor:pointer;transition:.12s}
+.trow:hover{border-color:var(--line2)}
+.trow .tt{font-size:14px;font-weight:600;color:var(--ink2)}
+.trow .tt::after{content:"  点开看概念 ›";font-family:var(--mono);font-size:10px;color:var(--dim);font-weight:400}
+.trow.open .tt::after{content:""}
+.trow .td{display:none;font-size:13px;color:var(--mut);margin-top:6px;line-height:1.55}
+.trow.open .td{display:block}.trow.open{background:var(--panel2);border-color:var(--line2)}
+.good{font-size:13px;color:#cdb98a;background:rgba(233,162,75,.06);border:1px solid rgba(233,162,75,.18);border-radius:10px;padding:10px 13px;margin-top:11px;line-height:1.6}
+.good b{color:var(--amber)}
+.aw{flex:none;font-size:12px;font-weight:700;border:1px solid var(--line2);background:transparent;border-radius:999px;padding:5px 12px;color:var(--mut);cursor:pointer;white-space:nowrap}
+.aw.on{background:var(--jade);border-color:var(--jade);color:#0c1713}
+.morebtn{margin-top:12px;background:var(--amber);color:#1a1206;border:none;border-radius:10px;padding:9px 15px;font-size:13px;font-weight:700;cursor:pointer}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:9px}
+.mini{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:11px 13px}
+.mini .mt{font-size:14px;font-weight:700;color:var(--ink)}.mini .md{font-size:12.5px;color:var(--mut);margin-top:4px;line-height:1.5}
+
+/* ===== stuck ===== */
+.stuckrow{display:flex;gap:8px;margin-bottom:8px}
+.stxt{flex:1;border:1px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14px;font-family:inherit;outline:none;background:var(--panel);color:var(--ink)}
+.stxt::placeholder{color:var(--dim)}.stxt:focus{border-color:var(--amber)}
+.sit{display:flex;flex-direction:column;gap:8px;margin-bottom:8px}
+.sitbtn{text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 16px;cursor:pointer;font-size:15px;font-weight:700;color:var(--ink2)}
+.sitbtn:hover{border-color:var(--line2)}
+.sitbtn.on{background:rgba(233,162,75,.1);border-color:var(--amber);color:var(--amber)}
+.route{font-size:14px;color:var(--ink2);font-weight:600;margin:10px 0 9px;line-height:1.5}
+.relbtn{display:inline-block;margin:0 7px 7px 0;background:rgba(233,162,75,.1);border:1px solid var(--amber-d);color:var(--amber);
+ border-radius:999px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer}
+.relbtn:hover{background:rgba(233,162,75,.18)}
+.prompt{background:#0a100d;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:12px;position:relative}
+.prompt .pl{font-family:var(--mono);font-size:10.5px;color:var(--mut);letter-spacing:.06em}
+.prompt .pt{font-size:14px;color:var(--ink2);line-height:1.75;margin-top:7px;white-space:pre-wrap}
+.copy{position:absolute;top:12px;right:12px;background:var(--amber);color:#1a1206;border:none;border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer;font-weight:700}
+
+/* ===== gain / album ===== */
+.albhead{border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:8px;
+ background:linear-gradient(180deg,var(--panel),var(--void))}
+.albtop{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.albbig{font-size:32px;font-weight:800;color:var(--amber)}
+.albbig small{font-size:16px;color:var(--mut);font-weight:400}
+.albrank{font-family:var(--mono);font-size:12.5px;font-weight:700;color:var(--jade);letter-spacing:.04em}
+.prog{height:12px;background:var(--raise);border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+.prog>i{display:block;height:100%;background:linear-gradient(90deg,var(--jade),var(--amber));transition:width .4s}
+.albtip{font-size:12px;color:var(--mut);margin-top:10px;line-height:1.55}
+.cert-btn{margin-top:13px;width:100%;background:linear-gradient(90deg,#caa23f,var(--amber));color:#1a1206;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:800;cursor:pointer}
+.tilegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(116px,1fr));gap:8px}
+.tile{border:1px solid var(--line);border-radius:12px;padding:12px 9px;text-align:center;cursor:pointer;background:var(--panel);opacity:.45;transition:.15s}
+.tile.on{opacity:1;background:var(--panel2);border-color:var(--amber);box-shadow:0 0 18px var(--amber-soft)}
+.tile .ti{font-family:var(--mono);font-size:9.5px;color:var(--dim);font-weight:600;letter-spacing:.06em}.tile.on .ti{color:var(--amber)}
+.tile .tn{font-size:13px;font-weight:700;color:var(--mut);margin-top:5px;line-height:1.3}.tile.on .tn{color:var(--ink)}
+.tile .chk{font-size:10px;margin-top:5px;color:var(--jade);font-weight:700}
+.logitem{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin-top:10px}
+.logitem .ld{font-family:var(--mono);font-size:11px;color:var(--amber);font-weight:700;margin-bottom:7px;letter-spacing:.04em}
+.logitem p{font-size:13px;margin:4px 0;color:var(--ink2)}.logitem p b{color:var(--jade)}
+.empty{font-size:13px;color:var(--mut);text-align:center;padding:26px;border:1px dashed var(--line);border-radius:12px}
+
+.foot{text-align:center;font-family:var(--mono);font-size:10px;color:var(--dim);margin-top:34px;letter-spacing:.04em}
+
+/* ===== modals ===== */
+.modal{display:none;position:fixed;inset:0;background:rgba(6,9,7,.7);z-index:99;align-items:center;justify-content:center;padding:20px;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.modal.on{display:flex}
+.cdetail{width:440px;max-width:100%;max-height:86vh;overflow:auto;background:var(--panel);border:1px solid var(--line2);border-radius:18px;padding:24px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.cd-type{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--amber);font-weight:700}
+.cd-name{font-size:23px;color:var(--ink);font-weight:800;margin:5px 0 10px}
+.cd-line{font-size:15px;color:var(--ink2);line-height:1.7;background:var(--void);border:1px solid var(--line);border-radius:10px;padding:11px 13px}
+.cd-eg{background:rgba(233,162,75,.07);border:1px solid rgba(233,162,75,.22);border-radius:11px;padding:13px 15px;margin-top:12px}
+.cd-eglbl{font-size:13px;font-weight:700;color:var(--amber);display:block;margin-bottom:5px}
+.cd-eg>div{font-size:14.5px;color:var(--ink2);line-height:1.8}
+.cd-when{margin-top:12px}
+.cd-when>span{font-size:13px;font-weight:700;color:var(--jade);display:block;margin-bottom:4px}
+.cd-when>div{font-size:14px;color:var(--mut);line-height:1.6}
+.cd-rellbl{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--mut);margin:16px 0 9px;letter-spacing:.04em}
+.cd-close{margin-top:16px;width:100%;background:var(--panel2);color:var(--ink);border:1px solid var(--line2);border-radius:10px;padding:11px;font-size:14px;font-weight:700;cursor:pointer}
+.airole{display:flex;gap:8px;margin-top:13px;flex-wrap:wrap}
+.airole>div{flex:1;min-width:165px;border-radius:11px;padding:11px 13px;font-size:13.5px;line-height:1.65}
+.airole .ai{background:var(--jade-soft);border:1px solid rgba(98,184,155,.3);color:#9fd9c4}
+.airole .me{background:rgba(233,162,75,.08);border:1px solid rgba(233,162,75,.25);color:#e6b97f}
+.airole span{display:block;font-size:12px;font-weight:700;margin-bottom:4px}
+/* certificate stays a printable gold parchment */
+.cert{width:380px;max-width:100%;background:linear-gradient(180deg,#fffdf8,#f6efe0);border:2px solid var(--amber);border-radius:18px;padding:30px 28px;text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.55);position:relative;color:#33312c}
+.cert::before{content:"";position:absolute;inset:8px;border:1px solid #e7c98f;border-radius:12px;pointer-events:none}
+.cert-seal{font-size:50px;line-height:1}
+.cert-k{font-family:var(--mono);font-size:11px;letter-spacing:.3em;color:var(--amber-d);font-weight:700;margin-top:8px}
+.cert-h{font-size:29px;color:#2F5D50;font-weight:800;margin:6px 0}
+.cert-sub{font-size:12px;color:#8a857c;letter-spacing:.24em;margin-top:10px}
+.cert-name{font-size:22px;color:#2F5D50;font-weight:800;margin:5px auto 12px;border-bottom:2px solid #e7c98f;padding:0 16px 5px;display:inline-block}
+.cert-body{font-size:14px;line-height:1.95}.cert-body b{color:var(--amber-d)}
+.cert-foot{display:flex;justify-content:space-between;font-size:11.5px;color:#8a857c;margin-top:18px;padding-top:12px;border-top:1px dashed #d9cdb3}
+.cert-ceo{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--amber-d);margin-top:7px;font-weight:700}
+.cert-close{margin-top:18px;width:100%;background:#2F5D50;color:#fff;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer}
+
+/* ===== responsive ===== */
+@media(max-width:860px){
+ .deck{grid-template-columns:1fr}
+ .rail{border-right:none;border-bottom:1px solid var(--line);padding:16px 14px}
+ .alt{display:none}
+ .rungs{flex-direction:row;overflow-x:auto;padding-left:0;gap:6px;padding-bottom:4px}
+ .rungs::before{display:none}
+ .rung{flex-direction:column;align-items:center;gap:5px;min-width:78px;padding:8px 6px;text-align:center;
+  border:1px solid var(--line);border-radius:11px;background:var(--panel)}
+ .rung.now{border-color:var(--amber)}.rung.done{border-color:rgba(98,184,155,.3)}
+ .rung .dot{position:static}
+ .rung .rt{font-size:11px}
+ .cabin{padding:22px 16px 50px}
+ .h1{font-size:25px}
+ .topbar{gap:14px}.readouts{width:100%}
+}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="top">
-    <div class="brand">CREATOR COCKPIT<b>创造者驾驶舱</b><span class="ceo">少年 CEO · Creator · Explorer · Owner</span></div>
-    <div class="right">
-      <div class="proj"><label>我是</label><input id="user" placeholder="你的名字…" style="width:108px"></div>
-      <div class="proj"><label>我的项目</label><input id="proj" placeholder="给项目起个名…"></div>
-      <div class="awbar">🪞 我已觉察 <b id="awCount">0 / 33</b> 个概念</div>
-    </div>
+<div class="deck">
+
+ <aside class="rail">
+  <div class="alt top">ALT · 终点 🛬 <b>上线作品</b></div>
+  <div class="rungs" id="ladder"></div>
+  <div class="alt bot">起点 🛫 <b>一句话</b></div>
+ </aside>
+
+ <main class="cabin">
+  <div class="topbar">
+   <div>
+    <div class="wm-k">CREATOR · COCKPIT</div>
+    <div class="wm">创造者驾驶舱</div>
+    <div class="ceo">少年 CEO · Creator · Explorer · Owner</div>
+   </div>
+   <div class="readouts">
+    <div class="ro"><div class="rk">PILOT 飞行员</div><input id="user" class="ri" placeholder="你的名字"></div>
+    <div class="ro"><div class="rk">PROJECT 项目</div><input id="proj" class="ri" placeholder="项目名"></div>
+    <div class="ro gauge"><div class="rk">觉察 AWARENESS</div><div class="rv" id="awCount">0 / 33</div></div>
+   </div>
   </div>
 
-  <div class="tabs">
-    <div class="tab on" data-p="lesson">📚 今天上课</div>
-    <div class="tab" data-p="lib">📖 概念库</div>
-    <div class="tab" data-p="stuck">🆘 我卡住了</div>
-    <div class="tab" data-p="gain">🏅 我的收获</div>
+  <div class="nav">
+   <div class="tab on" data-p="lesson">📚 今天上课</div>
+   <div class="tab" data-p="lib">📖 概念库</div>
+   <div class="tab" data-p="stuck">🆘 我卡住了</div>
+   <div class="tab" data-p="gain">🏅 我的收获</div>
   </div>
 
   <div class="panel on" id="p-lesson"></div>
@@ -190,43 +282,44 @@
   <div class="panel" id="p-gain"></div>
 
   <div class="panel" id="p-stuck">
-    <div class="note">卡住不是你不行,是还没找到对的概念。把你的问题写下来,我帮你认出你卡在哪个概念,点过去就能学(有例子)。</div>
-    <div class="lbl" style="margin-top:4px">✍️ 用一句话说说你现在卡在哪</div>
-    <div style="display:flex;gap:8px;margin-bottom:6px"><input id="stuckText" class="stxt" placeholder="比如:AI 做的颜色好丑 / 我不知道下一步做什么…" oninput="findStuckText()"><button class="btn" onclick="findStuckText()">帮我找找</button></div>
-    <div id="stuckTextAns"></div>
-    <div class="lbl">或者,选一个最像你的情况</div>
-    <div class="sit" id="sitList"></div>
-    <div id="stuckAns"></div>
+   <div class="note">卡住不是你不行,是还没找到对的概念。把你的问题写下来,我帮你认出你卡在哪个概念,点过去就能学(有例子)。</div>
+   <div class="lbl" style="margin-top:4px">✍️ 用一句话说说你现在卡在哪</div>
+   <div class="stuckrow"><input id="stuckText" class="stxt" placeholder="比如:AI 做的颜色好丑 / 我不知道下一步做什么…" oninput="findStuckText()"><button class="btn" onclick="findStuckText()">帮我找找</button></div>
+   <div id="stuckTextAns"></div>
+   <div class="lbl">或者,选一个最像你的情况</div>
+   <div class="sit" id="sitList"></div>
+   <div id="stuckAns"></div>
   </div>
 
-  <div class="foot">少年 CEO · 创造者驾驶舱 · 内容源自「数字产品 13 环节(战略·决策)」+「Vibe Coding 6 心法 / 14 技巧」</div>
+  <div class="foot">少年 CEO · 创造者驾驶舱 · 内容源自「数字产品 13 环节」+「Vibe Coding 6 心法 / 14 技巧」</div>
+ </main>
 
-  <div class="modal" id="certModal" onclick="if(event.target===this)closeCert()">
-    <div class="cert" id="certCard">
-      <div class="cert-seal">🏆</div>
-      <div class="cert-k">CREATOR MASTER</div>
-      <div class="cert-h">创造大师 认证</div>
-      <div class="cert-sub">兹 证 明</div>
-      <div class="cert-name" id="certName">一位少年创造者</div>
-      <div class="cert-body">已亲手集齐 <b>全部 33 个</b> 数字产品专业概念，<br>从「有想法」真正成长为一名 <b>创造者</b>。<br>特授予最高称号 —— <b>创造大师</b>。</div>
-      <div class="cert-foot"><span id="certDate"></span><span>少年 CEO · 创造者驾驶舱</span></div>
-      <div class="cert-ceo">Creator · Explorer · Owner</div>
-      <button class="cert-close" onclick="closeCert()">📸 截图保存这张证书 · 关闭</button>
-    </div>
+ <div class="modal" id="certModal" onclick="if(event.target===this)closeCert()">
+  <div class="cert" id="certCard">
+   <div class="cert-seal">🏆</div>
+   <div class="cert-k">CREATOR MASTER</div>
+   <div class="cert-h">创造大师 认证</div>
+   <div class="cert-sub">兹 证 明</div>
+   <div class="cert-name" id="certName">一位少年创造者</div>
+   <div class="cert-body">已亲手集齐 <b>全部 33 个</b> 数字产品专业概念，<br>从「有想法」真正成长为一名 <b>创造者</b>。<br>特授予最高称号 —— <b>创造大师</b>。</div>
+   <div class="cert-foot"><span id="certDate"></span><span>少年 CEO · 创造者驾驶舱</span></div>
+   <div class="cert-ceo">Creator · Explorer · Owner</div>
+   <button class="cert-close" onclick="closeCert()">📸 截图保存这张证书 · 关闭</button>
   </div>
+ </div>
 
-  <div class="modal" id="cModal" onclick="if(event.target===this)closeConcept()">
-    <div class="cdetail">
-      <div class="cd-type" id="cdType"></div>
-      <div class="cd-name" id="cdName"></div>
-      <div class="cd-line" id="cdLine"></div>
-      <div class="cd-eg"><span class="cd-eglbl">🌰 举个例子</span><div id="cdEg"></div></div>
-      <div class="cd-when"><span>🤔 什么时候会用到它</span><div id="cdWhen"></div></div>
-      <div id="cdExtra"></div>
-      <div class="cd-rel" id="cdRel"></div>
-      <button class="cd-close" onclick="closeConcept()">关闭</button>
-    </div>
+ <div class="modal" id="cModal" onclick="if(event.target===this)closeConcept()">
+  <div class="cdetail">
+   <div class="cd-type" id="cdType"></div>
+   <div class="cd-name" id="cdName"></div>
+   <div class="cd-line" id="cdLine"></div>
+   <div class="cd-eg"><span class="cd-eglbl">🌰 举个例子</span><div id="cdEg"></div></div>
+   <div class="cd-when"><span>🤔 什么时候会用到它</span><div id="cdWhen"></div></div>
+   <div id="cdExtra"></div>
+   <div id="cdRel"></div>
+   <button class="cd-close" onclick="closeConcept()">关闭</button>
   </div>
+ </div>
 </div>
 
 <script>
@@ -297,13 +390,6 @@ const ENV=[
 ];
 const PHASES=['前期规划 · 想清楚做什么','开发执行 · 把它做出来','运营维护 · 算得过、守得住'];
 const CROSS=[['性能','前端、后端、基建每层都能拖慢体验'],['可访问性','从设计层就开始,不是前端补丁'],['安全与隐私','鉴权、越权、密钥、数据合规'],['数据与度量','让每个决定回到真实行为上验证'],['沟通与对齐','与人、与 AI 都要先复述目标'],['时间与优先级','永远资源有限,先做最锋利的']];
-const STAGES=[
- {n:'立项',role:'Explorer',goal:'找到一个「小而真」的需求,定下要为谁解决什么。',x:[1],e:[1,2],j:[4,5]},
- {n:'原型',role:'Explorer',goal:'做出第一个「能点的」可交互原型。',x:[2],e:[4,5],j:[10,2]},
- {n:'开发',role:'Creator',goal:'把作品一块块做出来,让它真正「能用」。',x:[3,4],e:[6,7,5],j:[7,13,12,6]},
- {n:'打磨',role:'Owner',goal:'测试、上线,让真实的人用一用,再改。',x:[5],e:[8,9,10],j:[11,3]},
- {n:'路演',role:'Owner',goal:'为自己的作品站台——讲清它、答辩、交付。',x:[],e:[1,11],j:[5,1]},
-];
 const STUCK=[
  {t:'AI 没听懂我想要什么',jq:[5,6,7],pr:'我想做的是:[谁] 在 [什么情况下],想要 [做什么]。\n现在的问题是 [具体哪里不对]。\n请你 [具体改什么]。我截图给你看:[贴图]'},
  {t:'做出来不好看',jq:[2,12,1],pr:'请给我 3 个不同风格的版本让我挑。\n我喜欢的参考是 [贴一个例子/截图]。\n重点把 [配色 / 字体 / 留白] 做得更 [更简洁 / 更暖 / 更高级]。'},
@@ -403,9 +489,10 @@ function findStuckText(){const t=($('stuckText').value||'').toLowerCase();const 
  let hit=null;for(const[kw,ks]of KEYMAP){if(kw.some(w=>t.includes(w.toLowerCase()))){hit=ks;break;}}
  if(!hit){out.innerHTML=`<div class="route">🤔 没太认出你卡在哪~ 换个说法,或选下面五个常见情况。</div>`;return;}
  out.innerHTML=`<div class="route">💡 看起来你可能卡在了这些概念上,点过去学一下(有例子)👇</div>`+hit.map(k=>`<button class="relbtn" onclick="openConcept('${k}')">${nameOf(k)} →</button>`).join('');}
+
 const KEY='cockpit_v2';
 let st=JSON.parse(localStorage.getItem(KEY)||'{}');
-if(st.stage==null)st.stage=0; st.proj=st.proj||''; st.aware=st.aware||[]; st.user=st.user||''; st.records=st.records||{}; st.lessons=st.lessons||{}; if(!st.sess)st.sess=1;
+st.proj=st.proj||''; st.aware=st.aware||[]; st.user=st.user||''; st.lessons=st.lessons||{}; if(!st.sess)st.sess=1;
 function save(){localStorage.setItem(KEY,JSON.stringify(st));}
 const $=id=>document.getElementById(id);
 
@@ -420,24 +507,12 @@ function aware(e,k,btn){e.stopPropagation();const i=st.aware.indexOf(k);if(i<0)s
 function updCount(){$('awCount').textContent=st.aware.length+' / 33';}
 function tog(h){h.parentNode.classList.toggle('open');}
 
-// builders
 function xinfaCard(x){return `<div class="acc"><div class="acc-h" onclick="tog(this)"><span class="acc-t">心法 ${x.n} · ${x.t}</span>${awBtn('x'+x.n)}</div><div class="acc-b"><p class="desc">${x.d}</p><button class="morebtn" onclick="openConcept('x${x.n}')">📖 看例子 · 什么时候用 · 连着学什么 →</button></div></div>`;}
 function jqCard(j){return `<div class="acc"><div class="acc-h" onclick="tog(this)"><span class="acc-t">${j.t}</span>${awBtn('j'+j.n)}</div><div class="acc-b"><p class="desc">${j.d}</p><div class="ex"><div class="gd"><span class="tag">✓ 这样说</span>「${j.gd}」</div><div class="bd"><span class="tag">✗ 别这样</span>「${j.bd}」</div></div><button class="morebtn" onclick="openConcept('j${j.n}')">📖 看例子 · 什么时候用 · 连着学什么 →</button></div></div>`;}
 function envCard(ev){
  const terms=ev.terms.map(t=>`<div class="trow" onclick="this.classList.toggle('open')"><div class="tt">${t[0]}</div><div class="td">${t[1]}</div></div>`).join('');
  return `<div class="acc"><div class="acc-h" onclick="tog(this)"><span class="acc-t"><span class="no">${ev.n}</span>${ev.name}<small>${ev.en} · ${ev.fn}</small></span>${awBtn('e'+ev.n)}</div>
   <div class="acc-b"><button class="morebtn" style="margin-top:12px;margin-bottom:4px" onclick="openConcept('e${ev.n}')">📖 看例子 · 什么时候用 · 连着学什么 →</button><p class="termtip">👇 点开每个术语,看它是什么</p>${terms}<p class="good"><b>「好」的标准:</b>${ev.good}</p></div></div>`;
-}
-
-function renderFollow(){
- const s=STAGES[st.stage];
- let h=`<div class="goal"><div class="gl">第 ${st.stage+1} 步 · ${s.n} · ${s.role}</div><div class="gt">${s.goal}</div></div>`;
- if(s.x.length){h+=`<div class="lbl">⭐ 这一阶段最该记住的心法</div>`+s.x.map(i=>xinfaCard(XINFA[i-1])).join('');}
- else{h+=`<div class="lbl">⭐ 这一阶段</div><div class="note">路演主要靠「表达」——把作品讲清楚(看下面的技巧);也回到 <b>心法1</b>:讲清你最初想为谁解决什么。</div>`;}
- h+=`<div class="lbl">🔁 这条心法,每节课都要做(贯穿全程)</div>`+xinfaCard(XINFA[5])+`<button class="morebtn" style="background:var(--orange);margin-top:8px" onclick="gotoLog()">✍️ 现在就去「成长记录」写今天的日志 →</button>`;
- h+=`<div class="lbl">🧩 这一阶段会碰到的专业环节(点开看全部概念)</div>`+s.e.map(i=>envCard(ENV[i-1])).join('');
- h+=`<div class="lbl">💬 这一阶段好用的协作技巧</div>`+s.j.map(i=>jqCard(JQ[i-1])).join('');
- $('p-follow').innerHTML=h;
 }
 function renderAll(){
  let h=`<div class="formula">创造力 × 专业性 = 既敢做,又做得住</div>`;
@@ -451,21 +526,13 @@ function renderAll(){
  $('p-lib').innerHTML=h;
 }
 
-function renderStages(){
- const el=$('stages');el.innerHTML='';
- STAGES.forEach((s,i)=>{const d=document.createElement('div');d.className='stage'+(i===st.stage?' active':'');
-  d.innerHTML=`<div class="sn">第 ${i+1} 步</div><div class="st">${s.n}</div><div class="role">${s.role}</div>`;
-  d.onclick=()=>{st.stage=i;save();renderStages();renderFollow();};el.appendChild(d);});
- $('roleNow').textContent=STAGES[st.stage].role;
-}
-
 function renderStuck(){const el=$('sitList');el.innerHTML='';STUCK.forEach((s,i)=>{const b=document.createElement('div');b.className='sitbtn';b.textContent=s.t;b.onclick=()=>{document.querySelectorAll('.sitbtn').forEach(x=>x.classList.remove('on'));b.classList.add('on');showStuck(i);};el.appendChild(b);});}
 function showStuck(i){const s=STUCK[i];const cards=JQ.filter(j=>s.jq.includes(j.n)).map(j=>`<div class="mini"><div class="mt">💡 ${j.t}</div><div class="md">${j.d}</div></div>`).join('');
  const routes=s.jq.map(nn=>`<button class="relbtn" onclick="openConcept('j${nn}')">${JQ[nn-1].t} →</button>`).join('');
  $('stuckAns').innerHTML=`<div class="lbl">试试这几招</div><div class="grid">${cards}</div><div class="route">📖 点过去看例子 + 怎么学:</div>${routes}<div class="prompt"><button class="copy" onclick="copyP(this)">复制</button><div class="pl">也可以这样跟 AI 说 ↓</div><div class="pt">${s.pr}</div></div>`;}
 function copyP(b){const t=b.parentNode.querySelector('.pt').textContent;navigator.clipboard&&navigator.clipboard.writeText(t);b.textContent='已复制✓';setTimeout(()=>b.textContent='复制',1200);}
 
-/* ===== 标准化上课主线:8 节课 → 边做边学概念 → 用自己的话总结 ===== */
+/* ===== 标准化上课主线 · 一次飞行 ===== */
 const LESSONS=[
  {n:1,title:'立项 · 让 AI 跑出第一版',goal:'把你想做的东西说清楚,让 AI 当场给你第一版——再用你的眼光判断:方向对不对。',mile:'你有了一个能打开、能点的产品 v0(多半又丑又跑偏,但它真的跑起来了)。',ks:['x1','x2','e1','j2']},
  {n:2,title:'验证 · 发现它其实还不行',goal:'别急着信「它做好了」。自己当一次用户走一遍、给同学试一下,看它到底有没有解决问题。',mile:'你看清了「我以为的」和「真实的」差距,知道下一步该改什么。',ks:['x5','e2','j3','j5']},
@@ -476,39 +543,53 @@ const LESSONS=[
  {n:7,title:'打磨 · 看数据和反馈再改一轮',goal:'不凭感觉改。看谁用了、卡在哪、数据怎么说,再有针对性地改。',mile:'你做了一轮「有证据支撑」的改进,而不是自我感觉良好。',ks:['e10','e3','j10','j14']},
  {n:8,title:'路演 · 为你的作品站台',goal:'把它讲清楚、算明白账、守住版权和隐私,像个真正的创造者一样把作品交付出去。',mile:'你能上台讲清它、答辩、说清它怎么持续——一个完整的作品交付了。',ks:['e11','e12','j6']},
 ];
+const MSHORT=['第一版','找真相','变好看','砍核心','别崩了','真上线','看数据','站台'];
 function curL(){return LESSONS[st.sess-1];}
 function conIcon(k){if(k[0]==='x')return '💡';if(k[0]==='e')return '🧩';return JQ[+k.slice(1)-1].g===1?'💬':'🤝';}
 function nameShort(k){return nameOf(k).replace(/^心法\d+·/,'').replace(/^\d+\./,'');}
 function esc2(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');}
-function selectL(n){st.sess=n;save();renderLesson();window.scrollTo(0,0);}
+function pad(n){return String(n).padStart(2,'0');}
+
+function renderLadder(){const el=$('ladder');if(!el)return;el.innerHTML='';
+ for(let n=8;n>=1;n--){const L=LESSONS[n-1];const done=!!st.lessons[n];const now=n===st.sess;
+  const cls=now?'now':(done?'done':'todo');const first=L.title.split(' · ')[0];
+  const d=document.createElement('div');d.className='rung '+cls;
+  d.innerHTML=`<span class="dot"></span><span class="mno">M${pad(n)}</span><span class="rt">${first} · ${MSHORT[n-1]}</span>`;
+  d.onclick=()=>goMission(n);el.appendChild(d);}
+}
+function goMission(n){st.sess=n;save();renderLadder();renderLesson();
+ document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+ const t=document.querySelector('.tab[data-p=lesson]');if(t)t.classList.add('on');
+ document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));$('p-lesson').classList.add('on');
+ window.scrollTo(0,0);
+}
 function renderLesson(){
  const L=curL();const data=st.lessons[st.sess]||{concepts:{}};
- let h=`<div class="lbl" style="margin-top:2px">📅 选这是第几节课(我们的课共 4–8 节,每上完一节来这里总结一次)</div><div class="sesspick">`;
- h+=LESSONS.map(x=>`<div class="sbtn${x.n===st.sess?' on':''}${st.lessons[x.n]?' has':''}" onclick="selectL(${x.n})">第 ${x.n} 节${st.lessons[x.n]?' ✓':''}</div>`).join('')+`</div>`;
- h+=`<div class="goal"><div class="gl">📚 第 ${L.n} 节课 · ${L.title}</div><div class="gt">🎯 本节课目标:${L.goal}</div></div>`;
- h+=`<div class="mile"><span class="mlbl">✅ 这节课做完,你的作品会到这一步</span>${L.mile}</div>`;
- h+=`<div class="note">这节课你会用到下面这几个概念——它们就是我们要你学会的「真本事」。<b>边做边学</b>:不懂就点开看例子;每真正学会一个,就勾上「✓ 我学会了」,再<b>用你自己的话</b>说说它。<b>能说清楚,才算真的学会。</b></div>`;
- h+=`<div class="lbl">🧩 这节课要掌握的概念 —— 按 ① → ② → ③ 的顺序学(共 ${L.ks.length} 个)</div>`;
+ let h=`<div class="eye">▸ MISSION ${pad(L.n)} / 08</div>`;
+ h+=`<div class="h1">${L.title}</div>`;
+ h+=`<div class="goal">🎯 本节课目标:${L.goal}</div>`;
+ h+=`<div class="telem"><div class="tk">飞行高度 · 这节课做完,你的作品会到这一步</div><div class="mile">✅ ${L.mile}</div></div>`;
+ h+=`<div class="note">这节课你会用到下面这几个概念——它们就是我们要你学会的「真本事」。<b>边做边学</b>:不懂就点开看简报;每真正学会一个,就勾上「学会了」,再<b>用你自己的话</b>说说它。<b>能说清楚,才算真学会。</b></div>`;
+ h+=`<div class="sect">本次任务概念 · 按 ① → ② → ③ 顺序 · 共 ${L.ks.length} 个</div>`;
  const STEP=['①','②','③','④','⑤','⑥'];
  h+=L.ks.map((k,idx)=>{const cd=(data.concepts||{})[k]||{};const got=cd.got;
    return `<div class="lc${got?' done':''}">
      <div class="lc-h">
-       <span class="lc-name" onclick="openLessonConcept('${k}')"><span class="lc-step">${STEP[idx]}</span>${conIcon(k)} ${nameOf(k)} <span class="lc-look">点开看例子 →</span></span>
-       <label class="lc-chk"><input type="checkbox" class="lc-got" data-k="${k}" ${got?'checked':''} onchange="this.closest('.lc').classList.toggle('done',this.checked)"> 我学会了</label>
+       <span class="lc-name" onclick="openLessonConcept('${k}')"><span class="lc-step">${STEP[idx]}</span><span>${conIcon(k)} ${nameOf(k)}</span> <span class="lc-look">查看简报 ↗</span></span>
+       <label class="lc-chk"><input type="checkbox" class="lc-got" data-k="${k}" ${got?'checked':''} onchange="this.closest('.lc').classList.toggle('done',this.checked)"> 学会了</label>
      </div>
-     <textarea class="lc-say" data-k="${k}" placeholder="用我自己的话说说「${nameShort(k)}」是什么、什么时候用…">${esc2(cd.say||'')}</textarea>
+     <textarea class="lc-say${cd.say?' filled':''}" data-k="${k}" placeholder="用我自己的话说说「${nameShort(k)}」是什么、什么时候用…">${esc2(cd.say||'')}</textarea>
    </div>`;}).join('');
- h+=`<div class="lbl">🏗 这节课结束,回答「创造者三问」</div>
+ h+=`<div class="sect">飞行日志 · 创造者三问</div>
    <div class="form">
      <label>① 这节课我做出了 / 改出了什么?</label><textarea id="lQ1">${esc2(data.q1||'')}</textarea>
      <label>② 我卡在哪?后来怎么过去的(或还没过去)?</label><textarea id="lQ2">${esc2(data.q2||'')}</textarea>
      <label>③ 今天学的概念里,哪个最有用?我打算怎么用它?</label><textarea id="lQ3">${esc2(data.q3||'')}</textarea>
-     <div class="btnrow"><button class="btn" onclick="saveLesson()">✅ 保存第 ${L.n} 节课的总结</button><button class="btn ghost" onclick="exportRecs()">导出我的全部收获</button></div>
+     <div class="btnrow"><button class="save" onclick="saveLesson()">✦ 记录这次飞行 · 完成 M${pad(L.n)}</button><button class="btn ghost" onclick="exportRecs()">导出全部收获</button></div>
    </div>
-   <div class="note" style="margin-top:14px">💡 保存后,你勾选「学会了」的概念会自动点亮到「🏅 我的收获」图鉴里;每写一次总结,也就完成了 <b>心法 6:留一条日志</b>。</div>`;
+   <div class="note" style="margin-top:14px">💡 保存后,你勾选「学会了」的概念会自动点亮到「🏅 我的收获」图鉴;每写一次总结,也就完成了 <b>心法 6:留一条日志</b>。</div>`;
  $('p-lesson').innerHTML=h;
 }
-function pad(n){return String(n).padStart(2,'0');}
 function saveLesson(){
  const L=curL();const concepts={};const gotList=[];
  L.ks.forEach(k=>{const cb=document.querySelector('.lc-got[data-k="'+k+'"]');const ta=document.querySelector('.lc-say[data-k="'+k+'"]');
@@ -518,17 +599,17 @@ function saveLesson(){
  const d=new Date();st.lessons[st.sess]={concepts,q1,q2,q3,at:`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`};
  gotList.forEach(k=>{if(!st.aware.includes(k))st.aware.push(k);});
  if(!st.aware.includes('x6'))st.aware.push('x6');
- save();updCount();renderLesson();checkComplete();
- alert('第 '+L.n+' 节课的总结已保存 ✓\n你这节课学会了 '+gotList.length+' 个概念,并留下了一条成长日志(心法6)。');
+ save();updCount();renderLadder();renderLesson();checkComplete();
+ alert('第 '+L.n+' 节课的飞行日志已记录 ✓\n你这节课学会了 '+gotList.length+' 个概念,并留下了一条成长日志(心法6)。');
 }
 function lessonTimeline(){const ks=Object.keys(st.lessons).map(Number).sort((a,b)=>a-b);
  if(!ks.length)return '<div class="empty">还没有总结。去「📚 今天上课」选一节课,上完用自己的话总结一下吧。</div>';
  return ks.map(n=>{const L=LESSONS[n-1];const r=st.lessons[n];
   const says=Object.entries(r.concepts||{}).filter(([k,c])=>c.got&&c.say).map(([k,c])=>`<p><b>${nameShort(k)}:</b>「${esc(c.say)}」</p>`).join('');
-  return `<div class="logitem"><div class="ld">第 ${n} 节课 · ${L.title} · ${r.at}</div>${says}${r.q1?`<p><b>做出了:</b>${esc(r.q1)}</p>`:''}${r.q2?`<p><b>卡在:</b>${esc(r.q2)}</p>`:''}${r.q3?`<p><b>最有用:</b>${esc(r.q3)}</p>`:''}</div>`;}).join('');
+  return `<div class="logitem"><div class="ld">M${pad(n)} · ${L.title} · ${r.at}</div>${says}${r.q1?`<p><b>做出了:</b>${esc(r.q1)}</p>`:''}${r.q2?`<p><b>卡在:</b>${esc(r.q2)}</p>`:''}${r.q3?`<p><b>最有用:</b>${esc(r.q3)}</p>`:''}</div>`;}).join('');
 }
 function gotoLog(){closeConcept();const t=document.querySelector('.tab[data-p=lesson]');if(t)t.click();window.scrollTo(0,0);}
-function exportRecs(){const data={用户名:st.user||'',项目:st.proj||'',学会概念数:st.aware.length+' / 33',已点亮概念:st.aware,各节课总结:st.lessons,导出时间:new Date().toISOString()};
+function exportRecs(){const data={飞行员:st.user||'',项目:st.proj||'',学会概念数:st.aware.length+' / 33',已点亮概念:st.aware,各节课总结:st.lessons,导出时间:new Date().toISOString()};
  const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`我的收获_${st.user||'学生'}_${st.proj||'项目'}.json`;a.click();}
 function esc(s){return s.replace(/</g,'&lt;').replace(/\n/g,'<br>');}
 
@@ -540,7 +621,7 @@ document.querySelectorAll('.tab').forEach(t=>{t.onclick=()=>{
 
 function tileTog(k){const i=st.aware.indexOf(k);if(i<0)st.aware.push(k);else st.aware.splice(i,1);save();updCount();renderGain();checkComplete();}
 function checkComplete(){if(st.aware.length>=33){if(!window._cp){window._cp=true;showCert();}}else{window._cp=false;}}
-function showCert(){$('certName').textContent=st.user?st.user:(st.proj?(st.proj+' 的创造者'):'一位少年创造者');const d=new Date();$('certDate').textContent=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('certModal').classList.add('on');}
+function showCert(){$('certName').textContent=st.user?st.user:(st.proj?(st.proj+' 的创造者'):'一位少年创造者');const d=new Date();$('certDate').textContent=`${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())}`;$('certModal').classList.add('on');}
 function closeCert(){$('certModal').classList.remove('on');}
 function renderGain(){
  const n=st.aware.length,pct=Math.round(n/33*100);let rank,ric;
@@ -550,10 +631,10 @@ function renderGain(){
  h+=`<div class="lbl">⭐ 心法 (6)</div><div class="tilegrid">`+XINFA.map(x=>tile('x'+x.n,'心法 '+x.n,x.t)).join('')+`</div>`;
  h+=`<div class="lbl">🧩 专业环节 (13)</div><div class="tilegrid">`+ENV.map(e=>tile('e'+e.n,'环节 '+e.n,e.name)).join('')+`</div>`;
  h+=`<div class="lbl">💬 实战技巧 (14)</div><div class="tilegrid">`+JQ.map(j=>tile('j'+j.n,(j.g===1?'沟通':'协作'),j.t)).join('')+`</div>`;
- h+=`<div class="lbl" style="margin-top:24px">📖 我的上课总结(历次,用自己的话留下的)</div>`+lessonTimeline();
+ h+=`<div class="sect" style="margin-top:26px">📖 我的飞行日志(历次总结,用自己的话留下的)</div>`+lessonTimeline();
  $('p-gain').innerHTML=h;
 }
-renderLesson();renderStuck();updCount();
+renderLadder();renderLesson();renderStuck();updCount();
 </script>
 </body>
 </html>
