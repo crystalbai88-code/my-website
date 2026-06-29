@@ -150,6 +150,18 @@
   .airole span{display:block;font-size:12px;font-weight:700;margin-bottom:4px}
   .foot2{display:none}
   .foot{text-align:center;font-size:11.5px;color:var(--mut);margin-top:26px}
+  /* lesson cards */
+  .lc{background:#fff;border:1px solid var(--line);border-left:4px solid var(--orange);border-radius:12px;padding:13px 15px;margin-bottom:11px;transition:.2s}
+  .lc.done{border-left-color:var(--green);background:#f4f8f5}
+  .lc-h{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .lc-name{font-size:15.5px;font-weight:700;color:var(--green);cursor:pointer;line-height:1.4}
+  .lc-name:hover{text-decoration:underline}
+  .lc-look{font-size:11.5px;font-weight:500;color:var(--orange);white-space:nowrap}
+  .lc-chk{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;color:var(--mut);cursor:pointer;user-select:none;white-space:nowrap}
+  .lc.done .lc-chk{color:var(--green)}
+  .lc-chk input{width:16px;height:16px;accent-color:var(--green);cursor:pointer}
+  .lc-say{width:100%;margin-top:9px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13.5px;font-family:inherit;line-height:1.6;min-height:46px;resize:vertical;background:#fdfcfa;color:#333;box-sizing:border-box}
+  .lc-say:focus{outline:none;border-color:var(--green)}
 </style>
 </head>
 <body>
@@ -163,22 +175,16 @@
     </div>
   </div>
 
-  <div class="journey">
-    <div class="jhead">我的创造旅程 · <b id="roleNow">Explorer</b></div>
-    <div class="stages" id="stages"></div>
-  </div>
-
   <div class="tabs">
-    <div class="tab on" data-p="follow">🎯 跟着做</div>
-    <div class="tab" data-p="all">🗺 全部概念</div>
+    <div class="tab on" data-p="lesson">📚 今天上课</div>
+    <div class="tab" data-p="lib">📖 概念库</div>
     <div class="tab" data-p="stuck">🆘 我卡住了</div>
-    <div class="tab" data-p="log">🌱 成长记录</div>
-    <div class="tab" data-p="album">🏅 我的图鉴</div>
+    <div class="tab" data-p="gain">🏅 我的收获</div>
   </div>
 
-  <div class="panel on" id="p-follow"></div>
-  <div class="panel" id="p-all"></div>
-  <div class="panel" id="p-album"></div>
+  <div class="panel on" id="p-lesson"></div>
+  <div class="panel" id="p-lib"></div>
+  <div class="panel" id="p-gain"></div>
 
   <div class="panel" id="p-stuck">
     <div class="note">卡住不是你不行,是还没找到对的概念。把你的问题写下来,我帮你认出你卡在哪个概念,点过去就能学(有例子)。</div>
@@ -188,24 +194,6 @@
     <div class="lbl">或者,选一个最像你的情况</div>
     <div class="sit" id="sitList"></div>
     <div id="stuckAns"></div>
-  </div>
-
-  <div class="panel" id="p-log">
-    <div class="reclbl" style="font-size:18px;margin-bottom:8px">🌱 成长记录 ·「心法 6:留一条日志」</div>
-    <div class="note">这里就是<b>心法 6</b>在做的事——把每一步记下来,看见自己的成长。每节课上课前/后,选今天是<b>第几节课</b>,把你「觉察到的东西」写进去,不限次数,随时可以来写。</div>
-    <div class="lbl" style="margin-top:4px">📅 选一节课(我们的课程共 4–8 节)</div>
-    <div class="sesspick" id="sessPick"></div>
-    <div class="form" id="recForm">
-      <div class="reclbl" id="recHead">📅 第 1 节课 · 今天的成长记录</div>
-      <label>🪞 我今天「觉察」到了什么?<small>（任何发现、感受、想通的事——自由写）</small></label>
-      <textarea id="rJue" placeholder="比如:我发现做减法以后,作品反而更清楚了…" style="min-height:74px"></textarea>
-      <label>① 我做出了什么?</label><textarea id="rQ1"></textarea>
-      <label>② 我卡在哪?<small>（怎么解决的 / 还没解决）</small></label><textarea id="rQ2"></textarea>
-      <label>③ 我学会了哪个新概念?用在哪?</label><textarea id="rQ3"></textarea>
-      <div class="btnrow"><button class="btn" onclick="saveRec()">保存这节课的记录</button><button class="btn ghost" onclick="exportRecs()">导出我的成长记录</button></div>
-    </div>
-    <div class="lbl">🌱 我的成长足迹</div>
-    <div id="recList"></div>
   </div>
 
   <div class="foot">少年 CEO · 创造者驾驶舱 · 内容源自「数字产品 13 环节(战略·决策)」+「Vibe Coding 6 心法 / 14 技巧」</div>
@@ -405,7 +393,7 @@ function findStuckText(){const t=($('stuckText').value||'').toLowerCase();const 
  out.innerHTML=`<div class="route">💡 看起来你可能卡在了这些概念上,点过去学一下(有例子)👇</div>`+hit.map(k=>`<button class="relbtn" onclick="openConcept('${k}')">${nameOf(k)} →</button>`).join('');}
 const KEY='cockpit_v2';
 let st=JSON.parse(localStorage.getItem(KEY)||'{}');
-if(st.stage==null)st.stage=0; st.proj=st.proj||''; st.aware=st.aware||[]; st.user=st.user||''; st.records=st.records||{}; if(!st.sess)st.sess=1;
+if(st.stage==null)st.stage=0; st.proj=st.proj||''; st.aware=st.aware||[]; st.user=st.user||''; st.records=st.records||{}; st.lessons=st.lessons||{}; if(!st.sess)st.sess=1;
 function save(){localStorage.setItem(KEY,JSON.stringify(st));}
 const $=id=>document.getElementById(id);
 
@@ -448,7 +436,7 @@ function renderAll(){
  h+=`<div class="lbl">🤝 14 个实战技巧 · 8 个协作动作</div>`+JQ.filter(j=>j.g===2).map(jqCard).join('');
  h+=`<div class="lbl">🧵 横切关注(贯穿全程)</div><div class="grid">`+CROSS.map(c=>`<div class="mini"><div class="mt">${c[0]}</div><div class="md">${c[1]}</div></div>`).join('')+`</div>`;
  h+=`<div class="good" style="margin-top:14px"><b>核心规律:</b>上台阶的往往不是「派活」,而是「定框架」——一句好的约束,比一百个细节指令更有方向。(案例:aha 美术馆 139 页 / 0 行手写代码 / 1 个上线产品)</div>`;
- $('p-all').innerHTML=h;
+ $('p-lib').innerHTML=h;
 }
 
 function renderStages(){
@@ -465,30 +453,82 @@ function showStuck(i){const s=STUCK[i];const cards=JQ.filter(j=>s.jq.includes(j.
  $('stuckAns').innerHTML=`<div class="lbl">试试这几招</div><div class="grid">${cards}</div><div class="route">📖 点过去看例子 + 怎么学:</div>${routes}<div class="prompt"><button class="copy" onclick="copyP(this)">复制</button><div class="pl">也可以这样跟 AI 说 ↓</div><div class="pt">${s.pr}</div></div>`;}
 function copyP(b){const t=b.parentNode.querySelector('.pt').textContent;navigator.clipboard&&navigator.clipboard.writeText(t);b.textContent='已复制✓';setTimeout(()=>b.textContent='复制',1200);}
 
-const TOTAL_SESS=8;
-function selectSess(n){st.sess=n;save();renderSessPick();loadRec();}
-function renderSessPick(){const el=$('sessPick');el.innerHTML='';for(let i=1;i<=TOTAL_SESS;i++){const b=document.createElement('div');b.className='sbtn'+(i===st.sess?' on':'')+(st.records[i]?' has':'');b.textContent='第 '+i+' 节'+(st.records[i]?' ✓':'');b.onclick=()=>selectSess(i);el.appendChild(b);}$('recHead').textContent='📅 第 '+st.sess+' 节课 · 今天的成长记录';}
-function loadRec(){const r=st.records[st.sess]||{};$('rJue').value=r.jue||'';$('rQ1').value=r.q1||'';$('rQ2').value=r.q2||'';$('rQ3').value=r.q3||'';}
-function saveRec(){const jue=$('rJue').value.trim(),q1=$('rQ1').value.trim(),q2=$('rQ2').value.trim(),q3=$('rQ3').value.trim();if(!jue&&!q1&&!q2&&!q3){alert('先写一点点再保存吧～');return;}const d=new Date();st.records[st.sess]={jue,q1,q2,q3,at:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};save();renderSessPick();renderTimeline();alert('第 '+st.sess+' 节课的记录已保存 ✓');}
-function renderTimeline(){const el=$('recList');const keys=Object.keys(st.records).map(Number).sort((a,b)=>a-b);if(!keys.length){el.innerHTML='<div class="empty">还没有记录。选一节课,写下你今天觉察到的东西吧。</div>';return;}
- el.innerHTML=keys.map(k=>{const r=st.records[k];return `<div class="logitem"><div class="ld">第 ${k} 节课 · ${r.at}</div>${r.jue?`<p><b>🪞 觉察到:</b>${esc(r.jue)}</p>`:''}${r.q1?`<p><b>做出了:</b>${esc(r.q1)}</p>`:''}${r.q2?`<p><b>卡在:</b>${esc(r.q2)}</p>`:''}${r.q3?`<p><b>学到:</b>${esc(r.q3)}</p>`:''}</div>`;}).join('');}
-function renderRecTab(){renderSessPick();loadRec();renderTimeline();}
-function gotoLog(){closeConcept();const t=document.querySelector('.tab[data-p=log]');if(t)t.click();window.scrollTo(0,0);const j=$('rJue');if(j)setTimeout(()=>j.focus(),100);}
-function exportRecs(){const data={用户名:st.user||'',项目:st.proj||'',觉察概念数:st.aware.length+' / 33',已点亮概念:st.aware,成长记录:st.records,导出时间:new Date().toISOString()};
- const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`成长记录_${st.user||'学生'}_${st.proj||'项目'}.json`;a.click();}
+/* ===== 标准化上课主线:8 节课 → 边做边学概念 → 用自己的话总结 ===== */
+const LESSONS=[
+ {n:1,title:'立项 · 找到一个真问题',goal:'找到一个「小而真」的痒点,定下「为谁、解决什么」。',ks:['x1','e1','e2','j4']},
+ {n:2,title:'原型 · 做一个能点的东西',goal:'把想法变成第一个「能点、会动」的原型,先让它跑起来。',ks:['x2','e4','j10','j2']},
+ {n:3,title:'设计 · 让它好看起来',goal:'用你的品味,把第一眼的样子和气质定下来。',ks:['x3','e5','j1','j12']},
+ {n:4,title:'开发 · 把功能做出来',goal:'前台、后台一块块搭起来,让它真的「能用」。',ks:['e6','e7','j13','j9']},
+ {n:5,title:'做减法 · 回到原点',goal:'砍掉多余,把一个最核心的功能做到极致。',ks:['x4','e13','j8']},
+ {n:6,title:'测试上线 · 让它能被打开',goal:'自己先挑毛病、修好 bug,把作品发布出去给人用。',ks:['x5','e8','e9','j11']},
+ {n:7,title:'打磨 · 用数据和反馈改',goal:'看真实的人怎么用、数据怎么说,再有针对性地改一轮。',ks:['e10','e3','j3','j7']},
+ {n:8,title:'路演 · 为作品站台',goal:'讲清它、算明白账、守住边界——把作品交付出去。',ks:['j5','j6','j14','e11','e12']},
+];
+function curL(){return LESSONS[st.sess-1];}
+function conIcon(k){if(k[0]==='x')return '💡';if(k[0]==='e')return '🧩';return JQ[+k.slice(1)-1].g===1?'💬':'🤝';}
+function nameShort(k){return nameOf(k).replace(/^心法\d+·/,'').replace(/^\d+\./,'');}
+function esc2(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+function selectL(n){st.sess=n;save();renderLesson();window.scrollTo(0,0);}
+function renderLesson(){
+ const L=curL();const data=st.lessons[st.sess]||{concepts:{}};
+ let h=`<div class="lbl" style="margin-top:2px">📅 选这是第几节课(我们的课共 4–8 节,每上完一节来这里总结一次)</div><div class="sesspick">`;
+ h+=LESSONS.map(x=>`<div class="sbtn${x.n===st.sess?' on':''}${st.lessons[x.n]?' has':''}" onclick="selectL(${x.n})">第 ${x.n} 节${st.lessons[x.n]?' ✓':''}</div>`).join('')+`</div>`;
+ h+=`<div class="goal"><div class="gl">📚 第 ${L.n} 节课 · ${L.title}</div><div class="gt">🎯 本节课目标:${L.goal}</div></div>`;
+ h+=`<div class="note">这节课你会用到下面这几个概念——它们就是我们要你学会的「真本事」。<b>边做边学</b>:不懂就点开看例子;每真正学会一个,就勾上「✓ 我学会了」,再<b>用你自己的话</b>说说它。<b>能说清楚,才算真的学会。</b></div>`;
+ h+=`<div class="lbl">🧩 这节课要掌握的概念(共 ${L.ks.length} 个)</div>`;
+ h+=L.ks.map(k=>{const cd=(data.concepts||{})[k]||{};const got=cd.got;
+   return `<div class="lc${got?' done':''}">
+     <div class="lc-h">
+       <span class="lc-name" onclick="openConcept('${k}')">${conIcon(k)} ${nameOf(k)} <span class="lc-look">点开看例子 →</span></span>
+       <label class="lc-chk"><input type="checkbox" class="lc-got" data-k="${k}" ${got?'checked':''} onchange="this.closest('.lc').classList.toggle('done',this.checked)"> 我学会了</label>
+     </div>
+     <textarea class="lc-say" data-k="${k}" placeholder="用我自己的话说说「${nameShort(k)}」是什么、什么时候用…">${esc2(cd.say||'')}</textarea>
+   </div>`;}).join('');
+ h+=`<div class="lbl">🏗 这节课结束,回答「创造者三问」</div>
+   <div class="form">
+     <label>① 这节课我做出了 / 改出了什么?</label><textarea id="lQ1">${esc2(data.q1||'')}</textarea>
+     <label>② 我卡在哪?后来怎么过去的(或还没过去)?</label><textarea id="lQ2">${esc2(data.q2||'')}</textarea>
+     <label>③ 今天学的概念里,哪个最有用?我打算怎么用它?</label><textarea id="lQ3">${esc2(data.q3||'')}</textarea>
+     <div class="btnrow"><button class="btn" onclick="saveLesson()">✅ 保存第 ${L.n} 节课的总结</button><button class="btn ghost" onclick="exportRecs()">导出我的全部收获</button></div>
+   </div>
+   <div class="note" style="margin-top:14px">💡 保存后,你勾选「学会了」的概念会自动点亮到「🏅 我的收获」图鉴里;每写一次总结,也就完成了 <b>心法 6:留一条日志</b>。</div>`;
+ $('p-lesson').innerHTML=h;
+}
+function pad(n){return String(n).padStart(2,'0');}
+function saveLesson(){
+ const L=curL();const concepts={};const gotList=[];
+ L.ks.forEach(k=>{const cb=document.querySelector('.lc-got[data-k="'+k+'"]');const ta=document.querySelector('.lc-say[data-k="'+k+'"]');
+  const got=!!(cb&&cb.checked);const say=ta?ta.value.trim():'';concepts[k]={got,say};if(got)gotList.push(k);});
+ const q1=$('lQ1').value.trim(),q2=$('lQ2').value.trim(),q3=$('lQ3').value.trim();
+ if(!gotList.length&&!q1&&!q2&&!q3&&!Object.values(concepts).some(c=>c.say)){alert('先勾一个「学会了」、或写一点点总结,再保存吧～');return;}
+ const d=new Date();st.lessons[st.sess]={concepts,q1,q2,q3,at:`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`};
+ gotList.forEach(k=>{if(!st.aware.includes(k))st.aware.push(k);});
+ if(!st.aware.includes('x6'))st.aware.push('x6');
+ save();updCount();renderLesson();checkComplete();
+ alert('第 '+L.n+' 节课的总结已保存 ✓\n你这节课学会了 '+gotList.length+' 个概念,并留下了一条成长日志(心法6)。');
+}
+function lessonTimeline(){const ks=Object.keys(st.lessons).map(Number).sort((a,b)=>a-b);
+ if(!ks.length)return '<div class="empty">还没有总结。去「📚 今天上课」选一节课,上完用自己的话总结一下吧。</div>';
+ return ks.map(n=>{const L=LESSONS[n-1];const r=st.lessons[n];
+  const says=Object.entries(r.concepts||{}).filter(([k,c])=>c.got&&c.say).map(([k,c])=>`<p><b>${nameShort(k)}:</b>「${esc(c.say)}」</p>`).join('');
+  return `<div class="logitem"><div class="ld">第 ${n} 节课 · ${L.title} · ${r.at}</div>${says}${r.q1?`<p><b>做出了:</b>${esc(r.q1)}</p>`:''}${r.q2?`<p><b>卡在:</b>${esc(r.q2)}</p>`:''}${r.q3?`<p><b>最有用:</b>${esc(r.q3)}</p>`:''}</div>`;}).join('');
+}
+function gotoLog(){closeConcept();const t=document.querySelector('.tab[data-p=lesson]');if(t)t.click();window.scrollTo(0,0);}
+function exportRecs(){const data={用户名:st.user||'',项目:st.proj||'',学会概念数:st.aware.length+' / 33',已点亮概念:st.aware,各节课总结:st.lessons,导出时间:new Date().toISOString()};
+ const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`我的收获_${st.user||'学生'}_${st.proj||'项目'}.json`;a.click();}
 function esc(s){return s.replace(/</g,'&lt;').replace(/\n/g,'<br>');}
 
 document.querySelectorAll('.tab').forEach(t=>{t.onclick=()=>{
  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');
  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));$('p-'+t.dataset.p).classList.add('on');
- if(t.dataset.p==='follow')renderFollow();if(t.dataset.p==='all')renderAll();if(t.dataset.p==='album')renderAlbum();if(t.dataset.p==='log')renderRecTab();
+ if(t.dataset.p==='lesson')renderLesson();if(t.dataset.p==='lib')renderAll();if(t.dataset.p==='gain')renderGain();
 };});
 
-function tileTog(k){const i=st.aware.indexOf(k);if(i<0)st.aware.push(k);else st.aware.splice(i,1);save();updCount();renderAlbum();checkComplete();}
+function tileTog(k){const i=st.aware.indexOf(k);if(i<0)st.aware.push(k);else st.aware.splice(i,1);save();updCount();renderGain();checkComplete();}
 function checkComplete(){if(st.aware.length>=33){if(!window._cp){window._cp=true;showCert();}}else{window._cp=false;}}
 function showCert(){$('certName').textContent=st.user?st.user:(st.proj?(st.proj+' 的创造者'):'一位少年创造者');const d=new Date();$('certDate').textContent=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('certModal').classList.add('on');}
 function closeCert(){$('certModal').classList.remove('on');}
-function renderAlbum(){
+function renderGain(){
  const n=st.aware.length,pct=Math.round(n/33*100);let rank,ric;
  if(n>=33){rank='全图鉴 · 创造大师';ric='🏆';}else if(n>=23){rank='主理人 Owner';ric='👑';}else if(n>=12){rank='创造者 Creator';ric='🛠';}else if(n>=1){rank='探索者 Explorer';ric='🧭';}else{rank='准备出发';ric='🌱';}
  const tile=(k,top,name)=>`<div class="tile${awHas(k)?' on':''}" onclick="tileTog('${k}')"><div class="ti">${top}</div><div class="tn">${name}</div>${awHas(k)?'<div class="chk">✓ 已点亮</div>':''}</div>`;
@@ -496,9 +536,10 @@ function renderAlbum(){
  h+=`<div class="lbl">⭐ 心法 (6)</div><div class="tilegrid">`+XINFA.map(x=>tile('x'+x.n,'心法 '+x.n,x.t)).join('')+`</div>`;
  h+=`<div class="lbl">🧩 专业环节 (13)</div><div class="tilegrid">`+ENV.map(e=>tile('e'+e.n,'环节 '+e.n,e.name)).join('')+`</div>`;
  h+=`<div class="lbl">💬 实战技巧 (14)</div><div class="tilegrid">`+JQ.map(j=>tile('j'+j.n,(j.g===1?'沟通':'协作'),j.t)).join('')+`</div>`;
- $('p-album').innerHTML=h;
+ h+=`<div class="lbl" style="margin-top:24px">📖 我的上课总结(历次,用自己的话留下的)</div>`+lessonTimeline();
+ $('p-gain').innerHTML=h;
 }
-renderStages();renderFollow();renderStuck();renderRecTab();updCount();
+renderLesson();renderStuck();updCount();
 </script>
 </body>
 </html>
