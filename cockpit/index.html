@@ -154,6 +154,8 @@
   .lc{background:#fff;border:1px solid var(--line);border-left:4px solid var(--orange);border-radius:12px;padding:13px 15px;margin-bottom:11px;transition:.2s}
   .lc.done{border-left-color:var(--green);background:#f4f8f5}
   .lc-h{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .mile{background:#eef5f0;border:1px solid #cfe0d6;border-radius:12px;padding:12px 15px;margin:-6px 0 16px;font-size:14.5px;color:#2c5042;line-height:1.6;font-weight:600}
+  .mile .mlbl{display:block;font-size:11.5px;letter-spacing:1px;color:var(--green);font-weight:700;margin-bottom:4px;opacity:.85}
   .lc-step{color:var(--orange);font-weight:800;margin-right:5px;font-size:17px}
   .lc-name{font-size:15.5px;font-weight:700;color:var(--green);cursor:pointer;line-height:1.4}
   .lc-name:hover{text-decoration:underline}
@@ -465,14 +467,14 @@ function copyP(b){const t=b.parentNode.querySelector('.pt').textContent;navigato
 
 /* ===== 标准化上课主线:8 节课 → 边做边学概念 → 用自己的话总结 ===== */
 const LESSONS=[
- {n:1,title:'立项 · 找到一个真问题',goal:'找到一个「小而真」的痒点,定下「为谁、解决什么」。',ks:['x1','e1','e2','j4']},
- {n:2,title:'原型 · 做一个能点的东西',goal:'把想法变成第一个「能点、会动」的原型,先让它跑起来。',ks:['x2','e4','j10','j2']},
- {n:3,title:'设计 · 让它好看起来',goal:'用你的品味,把第一眼的样子和气质定下来。',ks:['x3','e5','j1','j12']},
- {n:4,title:'开发 · 把功能做出来',goal:'前台、后台一块块搭起来,让它真的「能用」。',ks:['e6','e7','j13','j9']},
- {n:5,title:'做减法 · 回到原点',goal:'砍掉多余,把一个最核心的功能做到极致。',ks:['x4','e13','j8']},
- {n:6,title:'测试上线 · 让它能被打开',goal:'自己先挑毛病、修好 bug,把作品发布出去给人用。',ks:['x5','e8','e9','j11']},
- {n:7,title:'打磨 · 用数据和反馈改',goal:'看真实的人怎么用、数据怎么说,再有针对性地改一轮。',ks:['e10','e3','j3','j7']},
- {n:8,title:'路演 · 为作品站台',goal:'讲清它、算明白账、守住边界——把作品交付出去。',ks:['j5','j6','j14','e11','e12']},
+ {n:1,title:'立项 · 让 AI 跑出第一版',goal:'把你想做的东西说清楚,让 AI 当场给你第一版——再用你的眼光判断:方向对不对。',mile:'你有了一个能打开、能点的产品 v0(多半又丑又跑偏,但它真的跑起来了)。',ks:['x1','x2','e1','j2']},
+ {n:2,title:'验证 · 发现它其实还不行',goal:'别急着信「它做好了」。自己当一次用户走一遍、给同学试一下,看它到底有没有解决问题。',mile:'你看清了「我以为的」和「真实的」差距,知道下一步该改什么。',ks:['x5','e2','j3','j5']},
+ {n:3,title:'品味 · 让它好看、变清楚',goal:'用你的品味挑刺——说得出哪里不对、给 AI 参照,把第一眼的样子和层级定下来。',mile:'作品第一眼舒服了、重点清楚了,不再像草稿。',ks:['x3','e5','j1','j12']},
+ {n:4,title:'做减法 · 砍到一个核心',goal:'AI 会不停给你加功能。这节课反着来:退回原点,把一个最核心的功能做到位。',mile:'作品从「什么都有点」变成「一件事做得很好」。',ks:['x4','e13','j8','j4']},
+ {n:5,title:'做扎实 · 别人乱用也不崩',goal:'盯住 AI 最爱漏的地方:出错怎么办、空白长什么样、数据存不存得住、谁能登录。',mile:'别人随便点也不崩、刷新还在、信息存得住——它从玩具变得可靠。',ks:['e4','e6','e7','j9','j13']},
+ {n:6,title:'上线 · 让真实的人能打开',goal:'自己先挑一遍毛病、修好 bug,把作品真正发布出去,给它一个网址。',mile:'作品有了网址、真有人能打开用了——它出现在真实世界里。',ks:['e8','e9','j7','j11']},
+ {n:7,title:'打磨 · 看数据和反馈再改一轮',goal:'不凭感觉改。看谁用了、卡在哪、数据怎么说,再有针对性地改。',mile:'你做了一轮「有证据支撑」的改进,而不是自我感觉良好。',ks:['e10','e3','j10','j14']},
+ {n:8,title:'路演 · 为你的作品站台',goal:'把它讲清楚、算明白账、守住版权和隐私,像个真正的创造者一样把作品交付出去。',mile:'你能上台讲清它、答辩、说清它怎么持续——一个完整的作品交付了。',ks:['e11','e12','j6']},
 ];
 function curL(){return LESSONS[st.sess-1];}
 function conIcon(k){if(k[0]==='x')return '💡';if(k[0]==='e')return '🧩';return JQ[+k.slice(1)-1].g===1?'💬':'🤝';}
@@ -484,6 +486,7 @@ function renderLesson(){
  let h=`<div class="lbl" style="margin-top:2px">📅 选这是第几节课(我们的课共 4–8 节,每上完一节来这里总结一次)</div><div class="sesspick">`;
  h+=LESSONS.map(x=>`<div class="sbtn${x.n===st.sess?' on':''}${st.lessons[x.n]?' has':''}" onclick="selectL(${x.n})">第 ${x.n} 节${st.lessons[x.n]?' ✓':''}</div>`).join('')+`</div>`;
  h+=`<div class="goal"><div class="gl">📚 第 ${L.n} 节课 · ${L.title}</div><div class="gt">🎯 本节课目标:${L.goal}</div></div>`;
+ h+=`<div class="mile"><span class="mlbl">✅ 这节课做完,你的作品会到这一步</span>${L.mile}</div>`;
  h+=`<div class="note">这节课你会用到下面这几个概念——它们就是我们要你学会的「真本事」。<b>边做边学</b>:不懂就点开看例子;每真正学会一个,就勾上「✓ 我学会了」,再<b>用你自己的话</b>说说它。<b>能说清楚,才算真的学会。</b></div>`;
  h+=`<div class="lbl">🧩 这节课要掌握的概念 —— 按 ① → ② → ③ 的顺序学(共 ${L.ks.length} 个)</div>`;
  const STEP=['①','②','③','④','⑤','⑥'];
