@@ -143,6 +143,11 @@
   .cd-when>div{font-size:14px;color:var(--mut);line-height:1.6}
   .cd-rellbl{font-size:13px;font-weight:700;color:var(--mut);margin:16px 0 9px}
   .cd-close{margin-top:16px;width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;padding:11px;font-size:14px;font-weight:700;cursor:pointer}
+  .airole{display:flex;gap:8px;margin-top:13px;flex-wrap:wrap}
+  .airole>div{flex:1;min-width:165px;border-radius:11px;padding:11px 13px;font-size:13.5px;line-height:1.65}
+  .airole .ai{background:#eef5f0;border:1px solid #cfe0d6;color:#2c5042}
+  .airole .me{background:#fdf3e6;border:1px solid #e7c98f;color:#8a5410}
+  .airole span{display:block;font-size:12px;font-weight:700;margin-bottom:4px}
   .foot2{display:none}
   .foot{text-align:center;font-size:11.5px;color:var(--mut);margin-top:26px}
 </style>
@@ -351,12 +356,28 @@ const RICH={
  e12:{eg:'守规矩——别用别人的图片不标出处、别乱收集同学的隐私。把风险提前挡住。',when:'用到别人的素材、或收集了别人信息时。',rel:['e7']},
  e13:{eg:'像小组做手抄报——谁画、谁写、什么时候完成,排好。一个人做项目,也要把任务拆开、排好顺序。',when:'事情多、要安排「先做什么后做什么」时。',rel:['j8','x4']},
 };
+const AIROLE={
+ 1:['扫竞品、列方案、做推演','赌哪个方向、押多少资源——你来拍板'],
+ 2:['整理访谈、生成用户画像','把作品放到真人面前看反应——这是 AI 给不了的最硬参照系'],
+ 3:['批量产内容、写文案、做素材','增长策略和品牌调性的判断,在你'],
+ 4:['把功能和流程搭出来','边界和异常(空白/出错/没权限)最容易被 AI 漏掉,你得主动点名'],
+ 5:['照着你给的参照图、设计规范出图','建立你的设计系统、定品味——你建的,就是喂给 AI 的「品味内核」'],
+ 6:['写界面代码(它最顺手)','定标准、抽查验收:性能、响应式、可访问,它不会主动较真'],
+ 7:['搭数据和接口','追问「这真的拦住越权了吗?」——鉴权和数据安全不能「看起来对就行」'],
+ 8:['跑测试、报「通过」','追问「测了哪些边界?没测什么?」别只信它说通过'],
+ 9:['帮你部署、配置上线','较真:密钥别泄露、服务别误杀、上线要能一键回退'],
+ 10:['做埋点、出图表','把「我以为有用」换成「数据显示」;埋点要在做功能时就想好'],
+ 11:['算模型、跑测算','商业能不能持续、怎么取舍——你来判断'],
+ 12:['生成内容、找素材','版权和合规要你把关——这条边界踩了,前面努力可能一夜归零'],
+ 13:['帮你拆任务、做一部分活','把判断写下来、留时间戳、记进产品日志——一个人也要会项目管理'],
+};
 function nameOf(k){const n=+k.slice(1);if(k[0]==='x')return '心法'+n+'·'+XINFA[n-1].t;if(k[0]==='j')return JQ[n-1].t;if(k[0]==='e')return ENV[n-1].n+'.'+ENV[n-1].name;return k;}
 function findConcept(k){const n=+k.slice(1);
  if(k[0]==='x'){const c=XINFA[n-1];return{type:'💡 心法',name:'心法 '+n+' · '+c.t,line:c.d,extra:''};}
  if(k[0]==='j'){const c=JQ[n-1];return{type:c.g===1?'💬 沟通技巧':'🤝 协作技巧',name:c.t,line:c.d,extra:`<div class="ex" style="margin-top:12px"><div class="gd"><span class="tag">✓ 这样说</span>「${c.gd}」</div><div class="bd"><span class="tag">✗ 别这样</span>「${c.bd}」</div></div>`};}
  const c=ENV[n-1];const terms=c.terms.map(t=>`<div class="trow" onclick="this.classList.toggle('open')"><div class="tt">${t[0]}</div><div class="td">${t[1]}</div></div>`).join('');
- return{type:'🧩 专业环节',name:c.n+'. '+c.name,line:c.fn,extra:`<p class="termtip" style="margin-top:14px">👇 这个环节里的小概念</p>${terms}<p class="good"><b>「好」的标准:</b>${c.good}</p>`};}
+ const ar=AIROLE[n];const aiB=ar?`<div class="airole"><div class="ai"><span>🤖 AI 帮你做</span>${ar[0]}</div><div class="me"><span>🙋 这件事得你自己来</span>${ar[1]}</div></div>`:'';
+ return{type:'🧩 专业环节',name:c.n+'. '+c.name,line:c.fn,extra:`${aiB}<p class="termtip" style="margin-top:14px">👇 这个环节里的小概念</p>${terms}<p class="good"><b>「好」的标准:</b>${c.good}</p>`};}
 function openConcept(k){const c=findConcept(k),r=RICH[k]||{};
  $('cdType').textContent=c.type;$('cdName').textContent=c.name;$('cdLine').textContent=c.line;
  $('cdEg').innerHTML=r.eg||'';$('cdWhen').innerHTML=r.when||'';$('cdExtra').innerHTML=c.extra||'';
