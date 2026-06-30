@@ -3,296 +3,255 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>少年 CEO · 创造者驾驶舱</title>
+<title>创造者探险手账 · 少年 CEO</title>
 <style>
 :root{
- --void:#0E1512;--panel:#15201B;--panel2:#1A2620;--raise:#21302A;
- --line:rgba(135,165,148,.15);--line2:rgba(135,165,148,.30);
- --ink:#EAF0EC;--ink2:#C4D1CA;--mut:#88998F;--dim:#5E6E65;
- --amber:#E9A24B;--amber-d:#C9863A;--glow:rgba(233,162,75,.22);--amber-soft:rgba(233,162,75,.1);
- --jade:#62B89B;--jade-soft:rgba(98,184,155,.1);
- --green:#62B89B;--orange:#E9A24B;
- --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+ --paper:#F4ECD8;--paper2:#FBF5E6;--card:#FDFAF0;
+ --ink:#3A352B;--ink2:#5F584A;--mut:#9A917E;--rule:#D9CDB0;
+ --coral:#E0604A;--gold:#E0A229;--teal:#2E9C8A;--blue:#3C6CA8;--berry:#C2557E;
+ --kai:"Kaiti SC","STKaiti","KaiTi","楷体",serif;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{background:var(--void);color:var(--ink);
- font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
-.deck{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:238px 1fr;min-height:100vh}
+body{color:var(--ink);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;
+ background:radial-gradient(circle at 16% 10%,rgba(224,162,41,.08),transparent 40%),radial-gradient(circle at 84% 55%,rgba(46,156,138,.06),transparent 45%),var(--paper);background-attachment:fixed}
+body::before{content:"";position:fixed;inset:0;z-index:-1;opacity:.5;background-image:radial-gradient(rgba(120,105,75,.13) 1px,transparent 1px);background-size:22px 22px}
+.sheet{max-width:1060px;margin:0 auto;padding:28px 34px 70px}
+.kai{font-family:var(--kai)}
 
-/* ===== LEFT RAIL · ALTITUDE LADDER ===== */
-.rail{border-right:1px solid var(--line);padding:30px 22px 30px 28px;position:relative;
- background:linear-gradient(180deg,rgba(233,162,75,.04),transparent 40%)}
-.alt{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--dim)}
-.alt b{color:var(--mut);font-weight:600}
-.alt.top{margin-bottom:18px}.alt.bot{margin-top:18px}
-.rungs{display:flex;flex-direction:column;position:relative;padding-left:18px}
-.rungs::before{content:"";position:absolute;left:4px;top:8px;bottom:8px;width:2px;background:var(--line2)}
-.rung{position:relative;padding:10px 0;display:flex;align-items:center;gap:11px;cursor:pointer}
-.rung .dot{position:absolute;left:-18px;width:11px;height:11px;border-radius:50%;border:2px solid var(--dim);background:var(--void);transition:.2s}
-.rung.done .dot{background:var(--jade);border-color:var(--jade)}
-.rung.now .dot{background:var(--amber);border-color:var(--amber);box-shadow:0 0 0 5px var(--glow),0 0 16px var(--amber)}
-.rung .mno{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--dim);width:26px}
-.rung.done .mno{color:var(--jade)}.rung.now .mno{color:var(--amber)}
-.rung .rt{font-size:13px;color:var(--mut);font-weight:600}
-.rung.done .rt{color:var(--ink2)}.rung.now .rt{color:var(--ink);font-weight:700;font-size:14px}
-.rung.todo .rt{color:var(--dim)}
-.rung:hover .rt{color:var(--ink)}
+/* masthead */
+.mast{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;flex-wrap:wrap;margin-bottom:6px}
+.title{font-family:var(--kai);font-size:38px;font-weight:700;letter-spacing:2px;position:relative;display:inline-block}
+.title .doodle{position:absolute;right:-42px;top:-12px;font-size:27px;transform:rotate(12deg)}
+.wsquig{display:block;width:220px;height:11px;margin-top:2px}
+.sub{font-family:var(--kai);font-size:15px;color:var(--ink2);margin-top:3px;letter-spacing:1px}
+.tags{display:flex;gap:9px;flex-wrap:wrap}
+.tag{font-size:13px;font-weight:700;padding:7px 13px;border:2px solid var(--ink);border-radius:14px 18px 15px 19px;background:var(--card);transform:rotate(-1.5deg);box-shadow:2px 3px 0 rgba(58,53,43,.16)}
+.tag:nth-child(2){transform:rotate(1.5deg)}
+.tag small{display:block;font-size:9px;color:var(--mut);font-weight:600;letter-spacing:1px}
+.tag input{border:none;background:transparent;font-size:14px;font-weight:700;color:var(--ink);outline:none;width:78px;font-family:inherit}
+.tag input::placeholder{color:var(--mut)}
+.tag .gv{color:var(--coral)}
 
-/* ===== RIGHT CABIN ===== */
-.cabin{padding:30px 38px 60px;min-width:0}
-.topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;
- padding-bottom:20px;border-bottom:1px solid var(--line);margin-bottom:20px}
-.wm-k{font-family:var(--mono);font-size:10.5px;letter-spacing:.32em;color:var(--amber);font-weight:600}
-.wm{font-size:23px;font-weight:800;letter-spacing:.04em;margin-top:4px}
-.ceo{font-size:11px;color:var(--dim);letter-spacing:.04em;margin-top:3px}
-.readouts{display:flex;gap:9px;flex-wrap:wrap}
-.ro{border:1px solid var(--line);border-radius:11px;padding:7px 12px;min-width:104px;background:var(--panel)}
-.ro .rk{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--dim)}
-.ro .rv{font-size:14px;font-weight:700;margin-top:3px;color:var(--ink)}
-.ro.gauge .rv{color:var(--amber)}
-.ri{width:100%;border:none;background:transparent;font-size:14px;font-weight:700;color:var(--ink);outline:none;margin-top:3px;font-family:inherit}
-.ri::placeholder{color:var(--dim)}
+/* trail */
+.trailwrap{margin:16px 0 6px}
+.trailcap{font-family:var(--kai);font-size:15px;color:var(--ink2);margin-bottom:2px}
+.trailcap b{color:var(--coral)}
 
-/* nav tabs */
-.nav{display:flex;gap:6px;margin-bottom:26px;flex-wrap:wrap}
-.tab{padding:9px 16px;border-radius:10px;border:1px solid var(--line);background:var(--panel);cursor:pointer;
- font-size:14px;font-weight:700;color:var(--mut);transition:.15s}
-.tab:hover{color:var(--ink);border-color:var(--line2)}
-.tab.on{background:var(--amber);border-color:var(--amber);color:#1a1206}
-.panel{display:none}.panel.on{display:block;animation:fade .25s ease}
-@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+/* tabs */
+.tabs{display:flex;gap:9px;flex-wrap:wrap;margin:18px 0 22px}
+.tab{font-family:var(--kai);font-size:16px;font-weight:700;padding:8px 16px;border:2px solid var(--ink);border-radius:14px 17px 13px 18px;background:var(--card);cursor:pointer;box-shadow:2px 3px 0 rgba(58,53,43,.14);transition:transform .1s}
+.tab:nth-child(even){transform:rotate(1deg)}.tab:nth-child(odd){transform:rotate(-1deg)}
+.tab:hover{transform:translateY(-2px) rotate(0)}
+.tab.on{background:var(--coral);color:#fff;border-color:var(--ink)}
+.panel{display:none}.panel.on{display:block}
 
-/* ===== mission header ===== */
-.eye{font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:var(--amber);font-weight:600}
-.h1{font-size:30px;font-weight:800;letter-spacing:.01em;margin:9px 0 12px;line-height:1.22}
-.goal{font-size:16px;color:var(--ink2);max-width:720px;line-height:1.75}
-.goal b{color:var(--amber);font-weight:700}
-.telem{margin:22px 0 26px;border:1px solid var(--line);border-radius:14px;
- background:linear-gradient(180deg,var(--panel),var(--void));padding:16px 19px}
-.telem .tk{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--dim);margin-bottom:10px}
-.telem .mile{font-size:15px;color:var(--ink);font-weight:600;line-height:1.6}
+/* headings inside */
+.shead{font-family:var(--kai);font-size:20px;font-weight:700;margin:26px 0 14px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.shead .n{font-size:14px;color:var(--mut);font-weight:700}
+.lbl{font-family:var(--kai);font-size:17px;font-weight:700;color:var(--ink);margin:22px 0 12px}
+.phase{font-family:var(--kai);font-size:17px;font-weight:700;color:var(--coral);margin:22px 0 10px}
+.note{font-size:14px;color:var(--ink2);background:var(--paper2);border:2px dashed var(--rule);border-radius:13px;padding:12px 15px;margin-bottom:14px;line-height:1.75}
+.note b{color:var(--ink)}
+.formula{font-family:var(--kai);text-align:center;background:var(--paper2);border:2.5px solid var(--ink);border-radius:16px;padding:14px;margin:2px 0 10px;font-size:18px;color:var(--coral);font-weight:700;transform:rotate(-.4deg);box-shadow:3px 4px 0 rgba(58,53,43,.12)}
 
-/* section divider */
-.sect{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;color:var(--mut);
- margin:26px 0 14px;display:flex;align-items:center;gap:12px;text-transform:none}
-.sect::after{content:"";flex:1;height:1px;background:var(--line)}
-.lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--mut);margin:22px 0 12px;font-weight:600}
-.lbl:first-child{margin-top:2px}
-.phase{font-size:13px;font-weight:700;color:var(--amber);margin:22px 0 10px;letter-spacing:.04em}
-.note{font-size:13px;color:var(--mut);background:var(--panel);border:1px solid var(--line);border-radius:12px;
- padding:12px 15px;margin-bottom:14px;line-height:1.7}
-.note b{color:var(--ink2)}
-.formula{text-align:center;background:var(--panel);border:1px solid var(--amber-d);border-radius:12px;
- padding:14px;margin:2px 0 8px;font-size:15px;color:var(--amber);font-weight:700}
+/* mission card */
+.mission{position:relative;background:var(--card);border:2.5px solid var(--ink);border-radius:20px 14px 22px 12px;padding:24px 26px 22px;margin:24px 0 22px;transform:rotate(-.5deg);box-shadow:4px 6px 0 rgba(58,53,43,.14)}
+.tape{position:absolute;width:108px;height:30px;background:rgba(224,162,41,.42);top:-14px;left:40px;transform:rotate(-4deg);border-left:1px dashed rgba(120,90,20,.3);border-right:1px dashed rgba(120,90,20,.3)}
+.tape.r{left:auto;right:46px;top:-13px;transform:rotate(5deg);background:rgba(46,156,138,.34)}
+.mlabel{font-family:var(--kai);font-size:15px;color:var(--coral);font-weight:700;letter-spacing:2px}
+.mtitle{font-family:var(--kai);font-size:29px;font-weight:700;margin:2px 0 10px;letter-spacing:1px}
+.goal{font-size:16px;color:var(--ink);line-height:1.85}
+.hl{background:linear-gradient(transparent 58%,rgba(224,162,41,.45) 58% 92%,transparent 92%);padding:0 2px;font-weight:700}
+.hl.t{background:linear-gradient(transparent 58%,rgba(46,156,138,.4) 58% 92%,transparent 92%)}
+.mile{margin-top:16px;display:flex;gap:11px;align-items:flex-start;background:var(--paper2);border:2px dashed var(--rule);border-radius:14px;padding:12px 15px;transform:rotate(.4deg)}
+.mile .star{font-size:22px;line-height:1.2;flex:none;transform:rotate(-8deg)}
+.mile .mt{font-family:var(--kai);font-size:13px;color:var(--teal);font-weight:700;letter-spacing:1px}
+.mile .md{font-size:15px;color:var(--ink);font-weight:600;margin-top:1px}
+.guide{display:flex;gap:11px;align-items:center;margin-top:16px}
+.guide .ava{width:46px;height:46px;flex:none;border:2.5px solid var(--ink);border-radius:50% 47% 53% 48%;background:#2b2722;display:grid;place-items:center;font-size:24px;transform:rotate(-5deg)}
+.guide .bubble{position:relative;background:var(--paper2);border:2px solid var(--ink);border-radius:14px;padding:9px 14px;font-family:var(--kai);font-size:15px;color:var(--ink)}
+.guide .bubble::before{content:"";position:absolute;left:-9px;top:16px;width:14px;height:14px;background:var(--paper2);border-left:2px solid var(--ink);border-bottom:2px solid var(--ink);transform:rotate(45deg)}
 
-/* ===== lesson concept instrument cards ===== */
-.lc{border:1px solid var(--line);border-radius:15px;background:var(--panel);padding:17px 19px;margin-bottom:12px;transition:.2s}
-.lc:hover{border-color:var(--line2)}
-.lc.done{background:linear-gradient(180deg,var(--jade-soft),var(--panel));border-color:rgba(98,184,155,.3)}
-.lc-h{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.lc-name{display:flex;align-items:center;gap:11px;font-size:16px;font-weight:700;color:var(--ink);cursor:pointer;line-height:1.4;min-width:0}
-.lc-name:hover{color:var(--amber)}
-.lc-step{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--amber);border:1.5px solid var(--amber);
- border-radius:8px;width:28px;height:28px;display:inline-grid;place-items:center;flex:none}
-.lc.done .lc-step{color:var(--jade);border-color:var(--jade)}
-.lc-look{font-family:var(--mono);font-size:10px;letter-spacing:.05em;color:var(--mut);border:1px solid var(--line);
- border-radius:7px;padding:4px 9px;white-space:nowrap;font-weight:600}
-.lc-chk{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--mut);cursor:pointer;user-select:none;white-space:nowrap;flex:none}
-.lc.done .lc-chk{color:var(--jade)}
-.lc-chk input{width:17px;height:17px;accent-color:var(--jade);cursor:pointer}
-.lc-say{width:100%;margin-top:13px;background:var(--void);border:1px solid var(--line);border-radius:10px;
- padding:10px 13px;font-size:14px;font-family:inherit;line-height:1.6;min-height:48px;resize:vertical;color:var(--ink)}
-.lc-say::placeholder{color:var(--dim)}
-.lc-say:focus{outline:none;border-color:var(--amber)}
-.lc-say.filled{border-color:rgba(98,184,155,.4)}
+/* concept sticky notes */
+.notes{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.snote{position:relative;border:2.5px solid var(--ink);border-radius:16px 20px 15px 19px;padding:15px 17px;box-shadow:3px 4px 0 rgba(58,53,43,.13)}
+.snote:nth-child(4n+1){background:#FBF3DD;transform:rotate(-1deg)}
+.snote:nth-child(4n+2){background:#EAF5EF;transform:rotate(.8deg)}
+.snote:nth-child(4n+3){background:#FBEEE9;transform:rotate(.6deg)}
+.snote:nth-child(4n){background:#EEF1FA;transform:rotate(-.8deg)}
+.snote.done{background:#E6F3EA !important}
+.n-h{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap}
+.n-l{display:flex;align-items:center;gap:10px;min-width:0;cursor:pointer}
+.bub{font-family:var(--kai);font-weight:700;font-size:17px;width:32px;height:32px;flex:none;display:grid;place-items:center;border:2.5px solid var(--ink);border-radius:50% 48% 52% 49%;background:#fff;transform:rotate(-6deg)}
+.n-name{font-family:var(--kai);font-size:17px;font-weight:700}
+.n-name:hover{color:var(--coral)}
+.peek{font-size:11px;font-weight:700;color:var(--blue);border-bottom:2px solid rgba(60,108,168,.4);white-space:nowrap}
+.chk{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--ink2);flex:none;cursor:pointer;user-select:none}
+.snote.done .chk{color:var(--teal)}
+.chk input{width:20px;height:20px;accent-color:var(--teal);cursor:pointer}
+.say{width:100%;margin-top:11px;border:none;border-top:2px dotted var(--rule);background:transparent;padding-top:9px;font-size:14px;color:var(--ink);font-family:inherit;line-height:1.6;min-height:42px;resize:vertical;outline:none}
+.say::placeholder{color:var(--mut);font-style:italic}
 
-/* ===== form / log ===== */
-.form{border:1px solid var(--line);border-radius:15px;background:var(--panel2);padding:18px 20px}
-.form label{display:block;font-size:13.5px;font-weight:600;color:var(--ink2);margin:14px 0 6px}
-.form label:first-child{margin-top:0}
-.form label small{color:var(--mut);font-weight:400}
-.form textarea{width:100%;background:var(--void);border:1px solid var(--line);border-radius:10px;
- padding:10px 13px;font-size:14px;font-family:inherit;resize:vertical;min-height:44px;outline:none;color:var(--ink)}
-.form textarea:focus{border-color:var(--amber)}
-.btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
-.btn{background:var(--panel);color:var(--ink);border:1px solid var(--line2);border-radius:11px;padding:11px 20px;font-size:14px;font-weight:700;cursor:pointer}
-.btn:hover{border-color:var(--amber)}
-.btn.ghost{background:transparent;color:var(--mut)}
-.save{background:var(--amber);color:#1a1206;border:none;border-radius:11px;padding:12px 24px;font-size:15px;font-weight:800;
- letter-spacing:.02em;cursor:pointer;box-shadow:0 6px 22px var(--glow)}
-.save:hover{background:#f1ad5b}
+/* journal log */
+.log{margin-top:26px;background:repeating-linear-gradient(var(--card),var(--card) 33px,var(--rule) 33px,var(--rule) 34px);border:2.5px solid var(--ink);border-radius:18px;padding:18px 22px 22px;transform:rotate(.3deg);box-shadow:4px 6px 0 rgba(58,53,43,.13)}
+.log .lh{font-family:var(--kai);font-size:19px;font-weight:700;margin-bottom:8px}
+.log label{display:block;font-size:14px;color:var(--ink2);margin:13px 0 4px;font-weight:600}
+.log textarea{width:100%;background:rgba(255,255,255,.55);border:2px solid var(--rule);border-radius:10px;padding:8px 12px;font-size:14px;font-family:inherit;resize:vertical;min-height:40px;outline:none;color:var(--ink)}
+.log textarea:focus{border-color:var(--coral)}
+.btnrow{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap;align-items:center}
+.stamp{font-family:var(--kai);font-size:17px;font-weight:800;color:#fff;background:var(--coral);border:2.5px solid var(--ink);border-radius:16px 20px 15px 19px;padding:12px 24px;cursor:pointer;transform:rotate(-1.5deg);box-shadow:3px 4px 0 rgba(58,53,43,.25);letter-spacing:1px}
+.stamp:hover{transform:rotate(0) translateY(-1px)}
+.ghost{font-family:var(--kai);font-size:14px;font-weight:700;color:var(--ink2);background:transparent;border:2px dashed var(--rule);border-radius:12px;padding:10px 16px;cursor:pointer}
 
-/* ===== concept library accordions ===== */
-.acc{border:1px solid var(--line);border-radius:13px;margin-bottom:9px;overflow:hidden;background:var(--panel)}
-.acc-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;cursor:pointer}
-.acc-h:hover{background:var(--panel2)}
-.acc-t{font-size:15px;font-weight:700;color:var(--ink)}
-.acc-t .no{font-family:var(--mono);color:var(--amber);margin-right:7px}
-.acc-t small{display:block;font-family:var(--mono);font-size:10.5px;color:var(--dim);font-weight:400;margin-top:3px;letter-spacing:.02em}
-.acc-b{display:none;padding:0 16px 16px;border-top:1px solid var(--line)}
-.acc.open .acc-b{display:block}
-.acc.open .acc-h{background:var(--panel2)}
-.desc{font-size:14px;color:var(--ink2);margin-top:13px;line-height:1.7}
+/* generic hand-drawn cards (library/stuck/gain) */
+.acc{border:2.5px solid var(--ink);border-radius:16px 19px 15px 18px;margin-bottom:11px;overflow:hidden;background:var(--card);box-shadow:2px 3px 0 rgba(58,53,43,.1)}
+.acc-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;cursor:pointer}
+.acc-t{font-family:var(--kai);font-size:17px;font-weight:700;color:var(--ink)}
+.acc-t .no{color:var(--coral);margin-right:6px}
+.acc-t small{display:block;font-size:11.5px;color:var(--mut);font-weight:400;margin-top:2px;font-family:-apple-system,"PingFang SC",sans-serif}
+.acc-b{display:none;padding:0 16px 16px;border-top:2px dashed var(--rule)}
+.acc.open .acc-b{display:block}.acc.open .acc-h{background:var(--paper2)}
+.desc{font-size:14px;color:var(--ink2);margin-top:13px;line-height:1.75}
 .ex{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-.ex div{flex:1;min-width:200px;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.55}
-.ex .gd{background:var(--jade-soft);color:#9fd9c4;border:1px solid rgba(98,184,155,.3)}
-.ex .bd{background:rgba(233,162,75,.08);color:#e6b97f;border:1px solid rgba(233,162,75,.25)}
-.ex .tag{font-size:11px;font-weight:700;display:block;margin-bottom:3px;opacity:.85}
-.termtip{font-family:var(--mono);font-size:10.5px;color:var(--dim);margin:12px 0 6px;letter-spacing:.04em}
-.trow{border:1px solid var(--line);border-radius:9px;padding:10px 12px;margin-bottom:6px;cursor:pointer;transition:.12s}
-.trow:hover{border-color:var(--line2)}
-.trow .tt{font-size:14px;font-weight:600;color:var(--ink2)}
-.trow .tt::after{content:"  点开看概念 ›";font-family:var(--mono);font-size:10px;color:var(--dim);font-weight:400}
+.ex div{flex:1;min-width:200px;border-radius:11px;padding:10px 12px;font-size:13px;line-height:1.55;border:2px solid var(--ink)}
+.ex .gd{background:#E6F3EA}.ex .bd{background:#FBEEE4}
+.ex .tag{font-size:11px;font-weight:700;display:block;margin-bottom:3px}
+.termtip{font-family:var(--kai);font-size:13px;color:var(--mut);margin:12px 0 6px}
+.trow{border:2px solid var(--rule);border-radius:10px;padding:9px 12px;margin-bottom:6px;cursor:pointer}
+.trow:hover{border-color:var(--ink)}
+.trow .tt{font-size:14px;font-weight:700;color:var(--ink)}
+.trow .tt::after{content:"  翻开 ›";font-size:11px;color:var(--mut);font-weight:400}
 .trow.open .tt::after{content:""}
-.trow .td{display:none;font-size:13px;color:var(--mut);margin-top:6px;line-height:1.55}
-.trow.open .td{display:block}.trow.open{background:var(--panel2);border-color:var(--line2)}
-.good{font-size:13px;color:#cdb98a;background:rgba(233,162,75,.06);border:1px solid rgba(233,162,75,.18);border-radius:10px;padding:10px 13px;margin-top:11px;line-height:1.6}
-.good b{color:var(--amber)}
-.aw{flex:none;font-size:12px;font-weight:700;border:1px solid var(--line2);background:transparent;border-radius:999px;padding:5px 12px;color:var(--mut);cursor:pointer;white-space:nowrap}
-.aw.on{background:var(--jade);border-color:var(--jade);color:#0c1713}
-.morebtn{margin-top:12px;background:var(--amber);color:#1a1206;border:none;border-radius:10px;padding:9px 15px;font-size:13px;font-weight:700;cursor:pointer}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:9px}
-.mini{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:11px 13px}
-.mini .mt{font-size:14px;font-weight:700;color:var(--ink)}.mini .md{font-size:12.5px;color:var(--mut);margin-top:4px;line-height:1.5}
+.trow .td{display:none;font-size:13px;color:var(--ink2);margin-top:6px;line-height:1.55}
+.trow.open .td{display:block}.trow.open{background:var(--paper2);border-color:var(--ink)}
+.good{font-size:13px;color:#7a5a1e;background:#FBF1D8;border:2px solid var(--gold);border-radius:11px;padding:10px 13px;margin-top:11px;line-height:1.6}
+.good b{color:var(--coral)}
+.aw{flex:none;font-family:var(--kai);font-size:13px;font-weight:700;border:2px solid var(--ink);background:#fff;border-radius:999px;padding:5px 13px;color:var(--ink2);cursor:pointer;white-space:nowrap}
+.aw.on{background:var(--teal);border-color:var(--ink);color:#fff}
+.morebtn{font-family:var(--kai);margin-top:12px;background:var(--gold);color:var(--ink);border:2.5px solid var(--ink);border-radius:12px;padding:9px 15px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:2px 2px 0 rgba(58,53,43,.2)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.mini{background:var(--card);border:2px solid var(--ink);border-radius:13px;padding:11px 13px}
+.mini .mt{font-family:var(--kai);font-size:15px;font-weight:700;color:var(--ink)}.mini .md{font-size:12.5px;color:var(--ink2);margin-top:4px;line-height:1.5}
 
-/* ===== stuck ===== */
-.stuckrow{display:flex;gap:8px;margin-bottom:8px}
-.stxt{flex:1;border:1px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14px;font-family:inherit;outline:none;background:var(--panel);color:var(--ink)}
-.stxt::placeholder{color:var(--dim)}.stxt:focus{border-color:var(--amber)}
+/* stuck */
+.stuckrow{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.stxt{flex:1;min-width:220px;border:2.5px solid var(--ink);border-radius:12px;padding:11px 14px;font-size:14px;font-family:inherit;outline:none;background:var(--card);color:var(--ink)}
+.stxt::placeholder{color:var(--mut)}
+.btn{font-family:var(--kai);background:var(--card);color:var(--ink);border:2.5px solid var(--ink);border-radius:12px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:2px 3px 0 rgba(58,53,43,.16)}
+.btn.ghost{border-style:dashed;box-shadow:none}
 .sit{display:flex;flex-direction:column;gap:8px;margin-bottom:8px}
-.sitbtn{text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 16px;cursor:pointer;font-size:15px;font-weight:700;color:var(--ink2)}
-.sitbtn:hover{border-color:var(--line2)}
-.sitbtn.on{background:rgba(233,162,75,.1);border-color:var(--amber);color:var(--amber)}
-.route{font-size:14px;color:var(--ink2);font-weight:600;margin:10px 0 9px;line-height:1.5}
-.relbtn{display:inline-block;margin:0 7px 7px 0;background:rgba(233,162,75,.1);border:1px solid var(--amber-d);color:var(--amber);
- border-radius:999px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer}
-.relbtn:hover{background:rgba(233,162,75,.18)}
-.prompt{background:#0a100d;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:12px;position:relative}
-.prompt .pl{font-family:var(--mono);font-size:10.5px;color:var(--mut);letter-spacing:.06em}
-.prompt .pt{font-size:14px;color:var(--ink2);line-height:1.75;margin-top:7px;white-space:pre-wrap}
-.copy{position:absolute;top:12px;right:12px;background:var(--amber);color:#1a1206;border:none;border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer;font-weight:700}
+.sitbtn{font-family:var(--kai);text-align:left;background:var(--card);border:2.5px solid var(--ink);border-radius:13px;padding:12px 16px;cursor:pointer;font-size:16px;font-weight:700;color:var(--ink);box-shadow:2px 3px 0 rgba(58,53,43,.12)}
+.sitbtn.on{background:var(--gold)}
+.route{font-family:var(--kai);font-size:15px;color:var(--ink);font-weight:700;margin:10px 0 9px}
+.relbtn{font-family:var(--kai);display:inline-block;margin:0 7px 7px 0;background:#fff;border:2px solid var(--ink);color:var(--ink);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:1px 2px 0 rgba(58,53,43,.18)}
+.relbtn:hover{background:var(--gold)}
+.prompt{background:#2b2722;border:2.5px solid var(--ink);border-radius:13px;padding:14px 16px;margin-top:12px;position:relative}
+.prompt .pl{font-family:var(--kai);font-size:12px;color:#cbb88f}
+.prompt .pt{font-size:14px;color:#f3ead6;line-height:1.75;margin-top:7px;white-space:pre-wrap}
+.copy{font-family:var(--kai);position:absolute;top:12px;right:12px;background:var(--gold);color:var(--ink);border:2px solid #fff;border-radius:9px;padding:5px 12px;font-size:12px;cursor:pointer;font-weight:700}
 
-/* ===== gain / album ===== */
-.albhead{border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:8px;
- background:linear-gradient(180deg,var(--panel),var(--void))}
+/* gain / album */
+.albhead{border:2.5px solid var(--ink);border-radius:18px;padding:18px 20px;margin-bottom:8px;background:var(--card);transform:rotate(-.3deg);box-shadow:4px 5px 0 rgba(58,53,43,.13)}
 .albtop{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px}
-.albbig{font-size:32px;font-weight:800;color:var(--amber)}
+.albbig{font-family:var(--kai);font-size:34px;font-weight:800;color:var(--coral)}
 .albbig small{font-size:16px;color:var(--mut);font-weight:400}
-.albrank{font-family:var(--mono);font-size:12.5px;font-weight:700;color:var(--jade);letter-spacing:.04em}
-.prog{height:12px;background:var(--raise);border-radius:999px;overflow:hidden;border:1px solid var(--line)}
-.prog>i{display:block;height:100%;background:linear-gradient(90deg,var(--jade),var(--amber));transition:width .4s}
-.albtip{font-size:12px;color:var(--mut);margin-top:10px;line-height:1.55}
-.cert-btn{margin-top:13px;width:100%;background:linear-gradient(90deg,#caa23f,var(--amber));color:#1a1206;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:800;cursor:pointer}
-.tilegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(116px,1fr));gap:8px}
-.tile{border:1px solid var(--line);border-radius:12px;padding:12px 9px;text-align:center;cursor:pointer;background:var(--panel);opacity:.45;transition:.15s}
-.tile.on{opacity:1;background:var(--panel2);border-color:var(--amber);box-shadow:0 0 18px var(--amber-soft)}
-.tile .ti{font-family:var(--mono);font-size:9.5px;color:var(--dim);font-weight:600;letter-spacing:.06em}.tile.on .ti{color:var(--amber)}
-.tile .tn{font-size:13px;font-weight:700;color:var(--mut);margin-top:5px;line-height:1.3}.tile.on .tn{color:var(--ink)}
-.tile .chk{font-size:10px;margin-top:5px;color:var(--jade);font-weight:700}
-.logitem{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin-top:10px}
-.logitem .ld{font-family:var(--mono);font-size:11px;color:var(--amber);font-weight:700;margin-bottom:7px;letter-spacing:.04em}
-.logitem p{font-size:13px;margin:4px 0;color:var(--ink2)}.logitem p b{color:var(--jade)}
-.empty{font-size:13px;color:var(--mut);text-align:center;padding:26px;border:1px dashed var(--line);border-radius:12px}
+.albrank{font-family:var(--kai);font-size:15px;font-weight:700;color:var(--teal)}
+.prog{height:14px;background:var(--paper2);border-radius:999px;overflow:hidden;border:2px solid var(--ink)}
+.prog>i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),var(--gold),var(--coral));transition:width .4s}
+.albtip{font-size:12.5px;color:var(--ink2);margin-top:10px;line-height:1.55}
+.cert-btn{font-family:var(--kai);margin-top:13px;width:100%;background:var(--gold);color:var(--ink);border:2.5px solid var(--ink);border-radius:13px;padding:12px;font-size:16px;font-weight:800;cursor:pointer;box-shadow:2px 3px 0 rgba(58,53,43,.2)}
+.tilegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(116px,1fr));gap:9px}
+.tile{border:2.5px solid var(--ink);border-radius:13px 16px 12px 15px;padding:12px 9px;text-align:center;cursor:pointer;background:var(--paper2);opacity:.5}
+.tile:nth-child(3n+1){transform:rotate(-1.5deg)}.tile:nth-child(3n+2){transform:rotate(1deg)}.tile:nth-child(3n){transform:rotate(.5deg)}
+.tile.on{opacity:1;background:#fff;box-shadow:3px 4px 0 rgba(58,53,43,.16)}
+.tile .ti{font-family:var(--kai);font-size:11px;color:var(--mut);font-weight:700}.tile.on .ti{color:var(--coral)}
+.tile .tn{font-family:var(--kai);font-size:14px;font-weight:700;color:var(--mut);margin-top:4px;line-height:1.3}.tile.on .tn{color:var(--ink)}
+.tile .chk{font-size:10.5px;margin-top:5px;color:var(--teal);font-weight:700}
+.logitem{background:var(--card);border:2.5px solid var(--ink);border-radius:14px;padding:13px 16px;margin-top:11px;box-shadow:2px 3px 0 rgba(58,53,43,.1)}
+.logitem:nth-child(even){transform:rotate(.4deg)}.logitem:nth-child(odd){transform:rotate(-.4deg)}
+.logitem .ld{font-family:var(--kai);font-size:15px;color:var(--coral);font-weight:700;margin-bottom:7px}
+.logitem p{font-size:13.5px;margin:4px 0;color:var(--ink2)}.logitem p b{color:var(--teal)}
+.empty{font-family:var(--kai);font-size:15px;color:var(--mut);text-align:center;padding:26px;border:2px dashed var(--rule);border-radius:14px}
+.foot{text-align:center;font-family:var(--kai);font-size:13px;color:var(--mut);margin-top:34px}
 
-.foot{text-align:center;font-family:var(--mono);font-size:10px;color:var(--dim);margin-top:34px;letter-spacing:.04em}
-
-/* ===== modals ===== */
-.modal{display:none;position:fixed;inset:0;background:rgba(6,9,7,.7);z-index:99;align-items:center;justify-content:center;padding:20px;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+/* modals */
+.modal{display:none;position:fixed;inset:0;background:rgba(40,32,20,.55);z-index:99;align-items:center;justify-content:center;padding:20px;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
 .modal.on{display:flex}
-.cdetail{width:440px;max-width:100%;max-height:86vh;overflow:auto;background:var(--panel);border:1px solid var(--line2);border-radius:18px;padding:24px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
-.cd-type{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--amber);font-weight:700}
-.cd-name{font-size:23px;color:var(--ink);font-weight:800;margin:5px 0 10px}
-.cd-line{font-size:15px;color:var(--ink2);line-height:1.7;background:var(--void);border:1px solid var(--line);border-radius:10px;padding:11px 13px}
-.cd-eg{background:rgba(233,162,75,.07);border:1px solid rgba(233,162,75,.22);border-radius:11px;padding:13px 15px;margin-top:12px}
-.cd-eglbl{font-size:13px;font-weight:700;color:var(--amber);display:block;margin-bottom:5px}
-.cd-eg>div{font-size:14.5px;color:var(--ink2);line-height:1.8}
+.cdetail{width:440px;max-width:100%;max-height:86vh;overflow:auto;background:var(--card);border:3px solid var(--ink);border-radius:20px;padding:24px;box-shadow:6px 8px 0 rgba(58,53,43,.3);position:relative}
+.cd-type{font-family:var(--kai);font-size:14px;color:var(--coral);font-weight:700}
+.cd-name{font-family:var(--kai);font-size:24px;color:var(--ink);font-weight:700;margin:4px 0 10px}
+.cd-line{font-size:15px;color:var(--ink);line-height:1.7;background:var(--paper2);border:2px solid var(--rule);border-radius:12px;padding:11px 13px}
+.cd-eg{background:#FBF1D8;border:2px solid var(--gold);border-radius:12px;padding:13px 15px;margin-top:12px}
+.cd-eglbl{font-family:var(--kai);font-size:14px;font-weight:700;color:#7a5a1e;display:block;margin-bottom:5px}
+.cd-eg>div{font-size:14.5px;color:var(--ink);line-height:1.8}
 .cd-when{margin-top:12px}
-.cd-when>span{font-size:13px;font-weight:700;color:var(--jade);display:block;margin-bottom:4px}
-.cd-when>div{font-size:14px;color:var(--mut);line-height:1.6}
-.cd-rellbl{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--mut);margin:16px 0 9px;letter-spacing:.04em}
-.cd-close{margin-top:16px;width:100%;background:var(--panel2);color:var(--ink);border:1px solid var(--line2);border-radius:10px;padding:11px;font-size:14px;font-weight:700;cursor:pointer}
+.cd-when>span{font-family:var(--kai);font-size:14px;font-weight:700;color:var(--teal);display:block;margin-bottom:4px}
+.cd-when>div{font-size:14px;color:var(--ink2);line-height:1.6}
+.cd-rellbl{font-family:var(--kai);font-size:14px;font-weight:700;color:var(--ink2);margin:16px 0 9px}
+.cd-close{font-family:var(--kai);margin-top:16px;width:100%;background:var(--ink);color:var(--paper);border:none;border-radius:13px;padding:11px;font-size:15px;font-weight:700;cursor:pointer}
 .airole{display:flex;gap:8px;margin-top:13px;flex-wrap:wrap}
-.airole>div{flex:1;min-width:165px;border-radius:11px;padding:11px 13px;font-size:13.5px;line-height:1.65}
-.airole .ai{background:var(--jade-soft);border:1px solid rgba(98,184,155,.3);color:#9fd9c4}
-.airole .me{background:rgba(233,162,75,.08);border:1px solid rgba(233,162,75,.25);color:#e6b97f}
-.airole span{display:block;font-size:12px;font-weight:700;margin-bottom:4px}
-/* certificate stays a printable gold parchment */
-.cert{width:380px;max-width:100%;background:linear-gradient(180deg,#fffdf8,#f6efe0);border:2px solid var(--amber);border-radius:18px;padding:30px 28px;text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.55);position:relative;color:#33312c}
-.cert::before{content:"";position:absolute;inset:8px;border:1px solid #e7c98f;border-radius:12px;pointer-events:none}
+.airole>div{flex:1;min-width:165px;border-radius:12px;padding:11px 13px;font-size:13.5px;line-height:1.65;border:2px solid var(--ink)}
+.airole .ai{background:#E6F3EA}.airole .me{background:#FBF1D8}
+.airole span{display:block;font-family:var(--kai);font-size:13px;font-weight:700;margin-bottom:4px}
+.cert{width:380px;max-width:100%;background:linear-gradient(180deg,#fffdf8,#f6efe0);border:3px solid var(--gold);border-radius:18px;padding:30px 28px;text-align:center;box-shadow:6px 8px 0 rgba(58,53,43,.3);position:relative;color:#3A352B}
+.cert::before{content:"";position:absolute;inset:8px;border:2px dashed #e7c98f;border-radius:12px;pointer-events:none}
 .cert-seal{font-size:50px;line-height:1}
-.cert-k{font-family:var(--mono);font-size:11px;letter-spacing:.3em;color:var(--amber-d);font-weight:700;margin-top:8px}
-.cert-h{font-size:29px;color:#2F5D50;font-weight:800;margin:6px 0}
-.cert-sub{font-size:12px;color:#8a857c;letter-spacing:.24em;margin-top:10px}
-.cert-name{font-size:22px;color:#2F5D50;font-weight:800;margin:5px auto 12px;border-bottom:2px solid #e7c98f;padding:0 16px 5px;display:inline-block}
-.cert-body{font-size:14px;line-height:1.95}.cert-body b{color:var(--amber-d)}
-.cert-foot{display:flex;justify-content:space-between;font-size:11.5px;color:#8a857c;margin-top:18px;padding-top:12px;border-top:1px dashed #d9cdb3}
-.cert-ceo{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--amber-d);margin-top:7px;font-weight:700}
-.cert-close{margin-top:18px;width:100%;background:#2F5D50;color:#fff;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer}
+.cert-k{font-family:var(--kai);font-size:13px;letter-spacing:3px;color:var(--gold);font-weight:700;margin-top:8px}
+.cert-h{font-family:var(--kai);font-size:29px;color:var(--teal);font-weight:800;margin:6px 0}
+.cert-sub{font-size:12px;color:var(--mut);letter-spacing:3px;margin-top:10px}
+.cert-name{font-family:var(--kai);font-size:23px;color:var(--coral);font-weight:800;margin:5px auto 12px;border-bottom:2px solid #e7c98f;padding:0 16px 5px;display:inline-block}
+.cert-body{font-size:14px;line-height:1.95}.cert-body b{color:var(--coral)}
+.cert-foot{display:flex;justify-content:space-between;font-size:11.5px;color:var(--mut);margin-top:18px;padding-top:12px;border-top:2px dashed #d9cdb3}
+.cert-ceo{font-family:var(--kai);font-size:12px;letter-spacing:2px;color:var(--gold);margin-top:7px;font-weight:700}
+.cert-close{font-family:var(--kai);margin-top:18px;width:100%;background:var(--teal);color:#fff;border:none;border-radius:13px;padding:11px;font-size:14px;font-weight:700;cursor:pointer}
 
-/* ===== responsive ===== */
-@media(max-width:860px){
- .deck{grid-template-columns:1fr}
- .rail{border-right:none;border-bottom:1px solid var(--line);padding:16px 14px}
- .alt{display:none}
- .rungs{flex-direction:row;overflow-x:auto;padding-left:0;gap:6px;padding-bottom:4px}
- .rungs::before{display:none}
- .rung{flex-direction:column;align-items:center;gap:5px;min-width:78px;padding:8px 6px;text-align:center;
-  border:1px solid var(--line);border-radius:11px;background:var(--panel)}
- .rung.now{border-color:var(--amber)}.rung.done{border-color:rgba(98,184,155,.3)}
- .rung .dot{position:static}
- .rung .rt{font-size:11px}
- .cabin{padding:22px 16px 50px}
- .h1{font-size:25px}
- .topbar{gap:14px}.readouts{width:100%}
+@media(max-width:760px){
+ .sheet{padding:20px 16px 50px}
+ .title{font-size:30px}.notes{grid-template-columns:1fr}
+ .mast{gap:12px}
 }
 </style>
 </head>
 <body>
-<div class="deck">
+<div class="sheet">
 
- <aside class="rail">
-  <div class="alt top">ALT · 终点 🛬 <b>上线作品</b></div>
-  <div class="rungs" id="ladder"></div>
-  <div class="alt bot">起点 🛫 <b>一句话</b></div>
- </aside>
-
- <main class="cabin">
-  <div class="topbar">
-   <div>
-    <div class="wm-k">CREATOR · COCKPIT</div>
-    <div class="wm">创造者驾驶舱</div>
-    <div class="ceo">少年 CEO · Creator · Explorer · Owner</div>
-   </div>
-   <div class="readouts">
-    <div class="ro"><div class="rk">PILOT 飞行员</div><input id="user" class="ri" placeholder="你的名字"></div>
-    <div class="ro"><div class="rk">PROJECT 项目</div><input id="proj" class="ri" placeholder="项目名"></div>
-    <div class="ro gauge"><div class="rk">觉察 AWARENESS</div><div class="rv" id="awCount">0 / 33</div></div>
-   </div>
+ <div class="mast">
+  <div>
+   <div class="title">创造者探险手账<span class="doodle">🚀</span></div>
+   <svg class="wsquig" viewBox="0 0 220 11"><path d="M2 6 Q28 1 55 6 T110 6 T166 6 T218 5" fill="none" stroke="#E0604A" stroke-width="3" stroke-linecap="round"/></svg>
+   <div class="sub">少年 CEO · 把一句话,亲手做成一个真作品</div>
   </div>
-
-  <div class="nav">
-   <div class="tab on" data-p="lesson">📚 今天上课</div>
-   <div class="tab" data-p="lib">📖 概念库</div>
-   <div class="tab" data-p="stuck">🆘 我卡住了</div>
-   <div class="tab" data-p="gain">🏅 我的收获</div>
+  <div class="tags">
+   <div class="tag"><small>探险家</small><input id="user" placeholder="你的名字"></div>
+   <div class="tag"><small>我的作品</small><input id="proj" placeholder="作品名"></div>
+   <div class="tag"><small>已收集概念</small><span class="gv" id="awCount">0 / 33 ✦</span></div>
   </div>
+ </div>
 
-  <div class="panel on" id="p-lesson"></div>
-  <div class="panel" id="p-lib"></div>
-  <div class="panel" id="p-gain"></div>
+ <div class="trailwrap" id="trail"></div>
 
-  <div class="panel" id="p-stuck">
-   <div class="note">卡住不是你不行,是还没找到对的概念。把你的问题写下来,我帮你认出你卡在哪个概念,点过去就能学(有例子)。</div>
-   <div class="lbl" style="margin-top:4px">✍️ 用一句话说说你现在卡在哪</div>
-   <div class="stuckrow"><input id="stuckText" class="stxt" placeholder="比如:AI 做的颜色好丑 / 我不知道下一步做什么…" oninput="findStuckText()"><button class="btn" onclick="findStuckText()">帮我找找</button></div>
-   <div id="stuckTextAns"></div>
-   <div class="lbl">或者,选一个最像你的情况</div>
-   <div class="sit" id="sitList"></div>
-   <div id="stuckAns"></div>
-  </div>
+ <div class="tabs">
+  <div class="tab on" data-p="lesson">📓 今天闯关</div>
+  <div class="tab" data-p="lib">🎒 概念库</div>
+  <div class="tab" data-p="stuck">🆘 我卡住了</div>
+  <div class="tab" data-p="gain">🏅 我的收获</div>
+ </div>
 
-  <div class="foot">少年 CEO · 创造者驾驶舱 · 内容源自「数字产品 13 环节」+「Vibe Coding 6 心法 / 14 技巧」</div>
- </main>
+ <div class="panel on" id="p-lesson"></div>
+ <div class="panel" id="p-lib"></div>
+ <div class="panel" id="p-gain"></div>
+
+ <div class="panel" id="p-stuck">
+  <div class="note">卡住不是你不行,是还没找到对的概念。把你的问题写下来,我帮你认出你卡在哪个概念,翻过去就能学(有例子)。</div>
+  <div class="lbl">✍️ 用一句话说说你现在卡在哪</div>
+  <div class="stuckrow"><input id="stuckText" class="stxt" placeholder="比如:AI 做的颜色好丑 / 我不知道下一步做什么…" oninput="findStuckText()"><button class="btn" onclick="findStuckText()">帮我找找</button></div>
+  <div id="stuckTextAns"></div>
+  <div class="lbl">或者,选一个最像你的情况</div>
+  <div class="sit" id="sitList"></div>
+  <div id="stuckAns"></div>
+ </div>
+
+ <div class="foot">少年 CEO · 创造者探险手账 · 内容源自「数字产品 13 环节」+「Vibe Coding 6 心法 / 14 技巧」</div>
 
  <div class="modal" id="certModal" onclick="if(event.target===this)closeCert()">
   <div class="cert" id="certCard">
@@ -302,7 +261,7 @@ body{background:var(--void);color:var(--ink);
    <div class="cert-sub">兹 证 明</div>
    <div class="cert-name" id="certName">一位少年创造者</div>
    <div class="cert-body">已亲手集齐 <b>全部 33 个</b> 数字产品专业概念，<br>从「有想法」真正成长为一名 <b>创造者</b>。<br>特授予最高称号 —— <b>创造大师</b>。</div>
-   <div class="cert-foot"><span id="certDate"></span><span>少年 CEO · 创造者驾驶舱</span></div>
+   <div class="cert-foot"><span id="certDate"></span><span>少年 CEO · 创造者探险手账</span></div>
    <div class="cert-ceo">Creator · Explorer · Owner</div>
    <button class="cert-close" onclick="closeCert()">📸 截图保存这张证书 · 关闭</button>
   </div>
@@ -317,7 +276,7 @@ body{background:var(--void);color:var(--ink);
    <div class="cd-when"><span>🤔 什么时候会用到它</span><div id="cdWhen"></div></div>
    <div id="cdExtra"></div>
    <div id="cdRel"></div>
-   <button class="cd-close" onclick="closeConcept()">关闭</button>
+   <button class="cd-close" onclick="closeConcept()">合上</button>
   </div>
  </div>
 </div>
@@ -397,7 +356,6 @@ const STUCK=[
  {t:'不知道下一步做什么',jq:[4,8,1],pr:'先退一步:我这个产品最核心的是帮 [谁] 解决 [什么]。\n请帮我把接下来要做的,按重要程度列成 3 步。\n我们从最重要的第 1 步开始。'},
  {t:'我以为做好了,但不确定',jq:[11,5],pr:'(这一条要去找真人)\n请一个同学/家长用一下你的作品,别提示他。\n看他卡在哪、哪里不会用——那就是你下一步要改的。'},
 ];
-
 const RICH={
  x1:{eg:'就像你觉得「书包里总找不到东西」很烦,于是想做个「书包整理小帮手」——先有那个让你难受的「痒」,再去做。',when:'刚开始定项目、不知道做什么的时候。',rel:['e1','e2','j4']},
  x2:{eg:'别先在脑子里想一个完美的游戏。先让 AI 做出一个「能点一下、会动」的小页面,哪怕很简陋——你一点,就知道好不好玩了。',when:'想法太多、迟迟不敢动手的时候。',rel:['e4','j10']},
@@ -456,18 +414,18 @@ function findConcept(k){const n=+k.slice(1);
  const ar=AIROLE[n];const aiB=ar?`<div class="airole"><div class="ai"><span>🤖 AI 帮你做</span>${ar[0]}</div><div class="me"><span>🙋 这件事得你自己来</span>${ar[1]}</div></div>`:'';
  return{type:'🧩 专业环节',name:c.n+'. '+c.name,line:c.fn,extra:`${aiB}<p class="termtip" style="margin-top:14px">👇 这个环节里的小概念</p>${terms}<p class="good"><b>「好」的标准:</b>${c.good}</p>`};}
 let _mctx=null;
-function openLessonConcept(k){const L=curL();openConcept(k,{ks:L.ks,label:'第 '+L.n+' 节 · '+L.title});}
+function openLessonConcept(k){const L=curL();openConcept(k,{ks:L.ks,label:'第 '+L.n+' 站 · '+L.title});}
 function openConcept(k,ctx){const c=findConcept(k),r=RICH[k]||{};_mctx=ctx||null;if(_mctx)_mctx.cur=k;
  $('cdType').textContent=c.type;$('cdName').textContent=c.name;$('cdLine').textContent=c.line;
  $('cdEg').innerHTML=r.eg||'';$('cdWhen').innerHTML=r.when||'';$('cdExtra').innerHTML=c.extra||'';
  if(_mctx){const ks=_mctx.ks,i=ks.indexOf(k),total=ks.length;
-  let nav=`<div class="cd-rellbl">📚 ${_mctx.label} · 这节课第 ${i+1} / ${total} 个概念</div><div class="btnrow" style="margin-top:2px">`;
+  let nav=`<div class="cd-rellbl">📓 ${_mctx.label} · 这关第 ${i+1} / ${total} 个概念</div><div class="btnrow" style="margin-top:2px">`;
   if(i>0)nav+=`<button class="btn ghost" onclick="mNav(-1)">← 上一个</button>`;
-  nav+= i<total-1?`<button class="btn" onclick="mNav(1)">下一个概念 →</button>`:`<button class="btn" onclick="closeConcept()">✓ 看完了,回到这节课</button>`;
+  nav+= i<total-1?`<button class="btn" onclick="mNav(1)">下一个概念 →</button>`:`<button class="btn" onclick="closeConcept()">✓ 看完了,回到这关</button>`;
   nav+=`</div>`;$('cdRel').innerHTML=nav;
  }else{const rel=r.rel||[];
   $('cdRel').innerHTML=rel.length?`<div class="cd-rellbl">🔗 想深入,还可以看看这些</div>`+rel.map(x=>`<button class="relbtn" onclick="openConcept('${x}')">${nameOf(x)} →</button>`).join(''):'';
-  if(k==='x6'){$('cdRel').innerHTML+=`<div class="cd-rellbl">✍️ 去留下你的日志</div><button class="relbtn" onclick="gotoLog()">打开「今天上课」,写今天的总结 →</button>`;}
+  if(k==='x6'){$('cdRel').innerHTML+=`<div class="cd-rellbl">✍️ 去留下你的日志</div><button class="relbtn" onclick="gotoLog()">打开「今天闯关」,写今天的探险日记 →</button>`;}
  }
  $('cModal').classList.add('on');const d=document.querySelector('#cModal .cdetail');if(d)d.scrollTop=0;}
 function mNav(d){if(!_mctx)return;const ks=_mctx.ks,i=ks.indexOf(_mctx.cur)+d;if(ks[i])openConcept(ks[i],_mctx);}
@@ -488,7 +446,7 @@ function findStuckText(){const t=($('stuckText').value||'').toLowerCase();const 
  if(!t.trim()){out.innerHTML='';return;}
  let hit=null;for(const[kw,ks]of KEYMAP){if(kw.some(w=>t.includes(w.toLowerCase()))){hit=ks;break;}}
  if(!hit){out.innerHTML=`<div class="route">🤔 没太认出你卡在哪~ 换个说法,或选下面五个常见情况。</div>`;return;}
- out.innerHTML=`<div class="route">💡 看起来你可能卡在了这些概念上,点过去学一下(有例子)👇</div>`+hit.map(k=>`<button class="relbtn" onclick="openConcept('${k}')">${nameOf(k)} →</button>`).join('');}
+ out.innerHTML=`<div class="route">💡 看起来你可能卡在了这些概念上,翻过去学一下(有例子)👇</div>`+hit.map(k=>`<button class="relbtn" onclick="openConcept('${k}')">${nameOf(k)} →</button>`).join('');}
 
 const KEY='cockpit_v2';
 let st=JSON.parse(localStorage.getItem(KEY)||'{}');
@@ -502,9 +460,9 @@ $('user').value=st.user;
 $('user').addEventListener('input',()=>{st.user=$('user').value;save();});
 
 function awHas(k){return st.aware.includes(k);}
-function awBtn(k){return `<span class="aw${awHas(k)?' on':''}" onclick="aware(event,'${k}',this)">${awHas(k)?'✓ 已觉察':'○ 觉察'}</span>`;}
-function aware(e,k,btn){e.stopPropagation();const i=st.aware.indexOf(k);if(i<0)st.aware.push(k);else st.aware.splice(i,1);save();const on=awHas(k);btn.textContent=on?'✓ 已觉察':'○ 觉察';btn.classList.toggle('on',on);updCount();checkComplete();}
-function updCount(){$('awCount').textContent=st.aware.length+' / 33';}
+function awBtn(k){return `<span class="aw${awHas(k)?' on':''}" onclick="aware(event,'${k}',this)">${awHas(k)?'✓ 已收集':'○ 收集'}</span>`;}
+function aware(e,k,btn){e.stopPropagation();const i=st.aware.indexOf(k);if(i<0)st.aware.push(k);else st.aware.splice(i,1);save();const on=awHas(k);btn.textContent=on?'✓ 已收集':'○ 收集';btn.classList.toggle('on',on);updCount();checkComplete();}
+function updCount(){$('awCount').textContent=st.aware.length+' / 33 ✦';}
 function tog(h){h.parentNode.classList.toggle('open');}
 
 function xinfaCard(x){return `<div class="acc"><div class="acc-h" onclick="tog(this)"><span class="acc-t">心法 ${x.n} · ${x.t}</span>${awBtn('x'+x.n)}</div><div class="acc-b"><p class="desc">${x.d}</p><button class="morebtn" onclick="openConcept('x${x.n}')">📖 看例子 · 什么时候用 · 连着学什么 →</button></div></div>`;}
@@ -525,69 +483,90 @@ function renderAll(){
  h+=`<div class="good" style="margin-top:14px"><b>核心规律:</b>上台阶的往往不是「派活」,而是「定框架」——一句好的约束,比一百个细节指令更有方向。(案例:aha 美术馆 139 页 / 0 行手写代码 / 1 个上线产品)</div>`;
  $('p-lib').innerHTML=h;
 }
-
 function renderStuck(){const el=$('sitList');el.innerHTML='';STUCK.forEach((s,i)=>{const b=document.createElement('div');b.className='sitbtn';b.textContent=s.t;b.onclick=()=>{document.querySelectorAll('.sitbtn').forEach(x=>x.classList.remove('on'));b.classList.add('on');showStuck(i);};el.appendChild(b);});}
 function showStuck(i){const s=STUCK[i];const cards=JQ.filter(j=>s.jq.includes(j.n)).map(j=>`<div class="mini"><div class="mt">💡 ${j.t}</div><div class="md">${j.d}</div></div>`).join('');
  const routes=s.jq.map(nn=>`<button class="relbtn" onclick="openConcept('j${nn}')">${JQ[nn-1].t} →</button>`).join('');
- $('stuckAns').innerHTML=`<div class="lbl">试试这几招</div><div class="grid">${cards}</div><div class="route">📖 点过去看例子 + 怎么学:</div>${routes}<div class="prompt"><button class="copy" onclick="copyP(this)">复制</button><div class="pl">也可以这样跟 AI 说 ↓</div><div class="pt">${s.pr}</div></div>`;}
+ $('stuckAns').innerHTML=`<div class="lbl">试试这几招</div><div class="grid">${cards}</div><div class="route">📖 翻过去看例子 + 怎么学:</div>${routes}<div class="prompt"><button class="copy" onclick="copyP(this)">复制</button><div class="pl">也可以这样跟 AI 说 ↓</div><div class="pt">${s.pr}</div></div>`;}
 function copyP(b){const t=b.parentNode.querySelector('.pt').textContent;navigator.clipboard&&navigator.clipboard.writeText(t);b.textContent='已复制✓';setTimeout(()=>b.textContent='复制',1200);}
 
-/* ===== 标准化上课主线 · 一次飞行 ===== */
+/* ===== 闯关主线 ===== */
 const LESSONS=[
  {n:1,title:'立项 · 让 AI 跑出第一版',goal:'把你想做的东西说清楚,让 AI 当场给你第一版——再用你的眼光判断:方向对不对。',mile:'你有了一个能打开、能点的产品 v0(多半又丑又跑偏,但它真的跑起来了)。',ks:['x1','x2','e1','j2']},
  {n:2,title:'验证 · 发现它其实还不行',goal:'别急着信「它做好了」。自己当一次用户走一遍、给同学试一下,看它到底有没有解决问题。',mile:'你看清了「我以为的」和「真实的」差距,知道下一步该改什么。',ks:['x5','e2','j3','j5']},
  {n:3,title:'品味 · 让它好看、变清楚',goal:'用你的品味挑刺——说得出哪里不对、给 AI 参照,把第一眼的样子和层级定下来。',mile:'作品第一眼舒服了、重点清楚了,不再像草稿。',ks:['x3','e5','j1','j12']},
- {n:4,title:'做减法 · 砍到一个核心',goal:'AI 会不停给你加功能。这节课反着来:退回原点,把一个最核心的功能做到位。',mile:'作品从「什么都有点」变成「一件事做得很好」。',ks:['x4','e13','j8','j4']},
+ {n:4,title:'做减法 · 砍到一个核心',goal:'AI 会不停给你加功能。这一关反着来:退回原点,把一个最核心的功能做到位。',mile:'作品从「什么都有点」变成「一件事做得很好」。',ks:['x4','e13','j8','j4']},
  {n:5,title:'做扎实 · 别人乱用也不崩',goal:'盯住 AI 最爱漏的地方:出错怎么办、空白长什么样、数据存不存得住、谁能登录。',mile:'别人随便点也不崩、刷新还在、信息存得住——它从玩具变得可靠。',ks:['e4','e6','e7','j9','j13']},
  {n:6,title:'上线 · 让真实的人能打开',goal:'自己先挑一遍毛病、修好 bug,把作品真正发布出去,给它一个网址。',mile:'作品有了网址、真有人能打开用了——它出现在真实世界里。',ks:['e8','e9','j7','j11']},
  {n:7,title:'打磨 · 看数据和反馈再改一轮',goal:'不凭感觉改。看谁用了、卡在哪、数据怎么说,再有针对性地改。',mile:'你做了一轮「有证据支撑」的改进,而不是自我感觉良好。',ks:['e10','e3','j10','j14']},
  {n:8,title:'路演 · 为你的作品站台',goal:'把它讲清楚、算明白账、守住版权和隐私,像个真正的创造者一样把作品交付出去。',mile:'你能上台讲清它、答辩、说清它怎么持续——一个完整的作品交付了。',ks:['e11','e12','j6']},
 ];
-const MSHORT=['第一版','找真相','变好看','砍核心','别崩了','真上线','看数据','站台'];
+const NODES=[{x:30,y:96,ly:124},{x:160,y:52,ly:30},{x:320,y:92,ly:120},{x:470,y:70},{x:610,y:44,ly:24},{x:700,y:74,ly:104},{x:830,y:92,ly:122},{x:970,y:56,ly:34}];
+const TRAILPATH="M30 96 C120 40,180 40,250 80 S400 120,470 70 S620 28,700 74 S850 116,970 56";
+const GUIDE=['先有一个让你心痒的点子,别急着完美。','别信它说"做好了",自己去试一次。','你说得出哪里不对,它才改得对。','贪多必乱——砍到一个核心就赢。','别人乱点也不崩,才算真扎实。','真发出去给人用,才算数。','看数据说话,别凭感觉改。','把它讲清楚,你就是创造者了。'];
 function curL(){return LESSONS[st.sess-1];}
 function conIcon(k){if(k[0]==='x')return '💡';if(k[0]==='e')return '🧩';return JQ[+k.slice(1)-1].g===1?'💬':'🤝';}
 function nameShort(k){return nameOf(k).replace(/^心法\d+·/,'').replace(/^\d+\./,'');}
 function esc2(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');}
 function pad(n){return String(n).padStart(2,'0');}
 
-function renderLadder(){const el=$('ladder');if(!el)return;el.innerHTML='';
- for(let n=8;n>=1;n--){const L=LESSONS[n-1];const done=!!st.lessons[n];const now=n===st.sess;
-  const cls=now?'now':(done?'done':'todo');const first=L.title.split(' · ')[0];
-  const d=document.createElement('div');d.className='rung '+cls;
-  d.innerHTML=`<span class="dot"></span><span class="mno">M${pad(n)}</span><span class="rt">${first} · ${MSHORT[n-1]}</span>`;
-  d.onclick=()=>goMission(n);el.appendChild(d);}
+function renderTrail(){const el=$('trail');if(!el)return;
+ let s=`<div class="trailcap">🗺 我的探险路线 —— 现在在 <b>第 ${st.sess} 站</b>,通关全部 8 站,你的作品就上线啦!</div>`;
+ s+=`<svg viewBox="0 0 1000 150" width="100%" preserveAspectRatio="xMidYMid meet" font-family="Kaiti SC,KaiTi,serif">`;
+ s+=`<path d="${TRAILPATH}" fill="none" stroke="#3A352B" stroke-width="3" stroke-dasharray="2 9" stroke-linecap="round"/>`;
+ s+=`<g font-weight="700" text-anchor="middle">`;
+ LESSONS.forEach((L,i)=>{const n=i+1;const N=NODES[i];const done=!!st.lessons[n];const now=n===st.sess;const nm=L.title.split(' · ')[0];
+  if(now){
+   s+=`<circle cx="${N.x}" cy="${N.y}" r="22" fill="#E0A229" stroke="#3A352B" stroke-width="3"/>`;
+   s+=`<circle cx="${N.x}" cy="${N.y}" r="28" fill="none" stroke="#E0604A" stroke-width="2.5" stroke-dasharray="3 5"/>`;
+   s+=`<text x="${N.x}" y="${N.y+6}" fill="#3A352B" font-size="18">${n}</text>`;
+   s+=`<text x="${N.x}" y="${N.y+48}" font-size="13" fill="#E0604A">${nm}·你在这!</text>`;
+  }else if(done){
+   s+=`<circle cx="${N.x}" cy="${N.y}" r="15" fill="#2E9C8A" stroke="#3A352B" stroke-width="2.5"/>`;
+   s+=`<text x="${N.x}" y="${N.y+5}" fill="#fff" font-size="15">✓</text>`;
+   s+=`<text x="${N.x}" y="${N.ly}" font-size="11.5" fill="#5F584A">${nm}</text>`;
+  }else{
+   s+=`<circle cx="${N.x}" cy="${N.y}" r="13" fill="#FDFAF0" stroke="#bdb39a" stroke-width="2.5" stroke-dasharray="3 4"/>`;
+   s+=`<text x="${N.x}" y="${N.y+5}" fill="#9a917e" font-size="12">${n}</text>`;
+   s+=`<text x="${N.x}" y="${N.ly}" font-size="11" fill="#9a917e">${nm}</text>`;
+  }
+  s+=`<circle cx="${N.x}" cy="${N.y}" r="26" fill="transparent" style="cursor:pointer" onclick="goMission(${n})"><title>第 ${n} 站 · ${L.title}</title></circle>`;
+ });
+ s+=`</g></svg>`;
+ el.innerHTML=s;
 }
-function goMission(n){st.sess=n;save();renderLadder();renderLesson();
+function goMission(n){st.sess=n;save();renderTrail();renderLesson();
  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
  const t=document.querySelector('.tab[data-p=lesson]');if(t)t.classList.add('on');
  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));$('p-lesson').classList.add('on');
- window.scrollTo(0,0);
+ window.scrollTo({top:0,behavior:'smooth'});
 }
 function renderLesson(){
  const L=curL();const data=st.lessons[st.sess]||{concepts:{}};
- let h=`<div class="eye">▸ MISSION ${pad(L.n)} / 08</div>`;
- h+=`<div class="h1">${L.title}</div>`;
- h+=`<div class="goal">🎯 本节课目标:${L.goal}</div>`;
- h+=`<div class="telem"><div class="tk">飞行高度 · 这节课做完,你的作品会到这一步</div><div class="mile">✅ ${L.mile}</div></div>`;
- h+=`<div class="note">这节课你会用到下面这几个概念——它们就是我们要你学会的「真本事」。<b>边做边学</b>:不懂就点开看简报;每真正学会一个,就勾上「学会了」,再<b>用你自己的话</b>说说它。<b>能说清楚,才算真学会。</b></div>`;
- h+=`<div class="sect">本次任务概念 · 按 ① → ② → ③ 顺序 · 共 ${L.ks.length} 个</div>`;
- const STEP=['①','②','③','④','⑤','⑥'];
+ let h=`<div class="mission"><span class="tape"></span><span class="tape r"></span>`;
+ h+=`<div class="mlabel">第 ${L.n} 站 · MISSION ${pad(L.n)}</div>`;
+ h+=`<div class="mtitle">${L.title}</div>`;
+ h+=`<div class="goal">${L.goal}</div>`;
+ h+=`<div class="mile"><span class="star">⭐️</span><div><div class="mt">这关打完,你的作品会变成 →</div><div class="md">${L.mile}</div></div></div>`;
+ h+=`<div class="guide"><div class="ava">🐤</div><div class="bubble">小黑:${GUIDE[L.n-1]}</div></div>`;
+ h+=`</div>`;
+ h+=`<div class="shead">🎒 这一关要收集的概念 <span class="n">(按 1 → 2 → 3 顺序解锁,共 ${L.ks.length} 个)</span></div>`;
+ h+=`<div class="notes">`;
  h+=L.ks.map((k,idx)=>{const cd=(data.concepts||{})[k]||{};const got=cd.got;
-   return `<div class="lc${got?' done':''}">
-     <div class="lc-h">
-       <span class="lc-name" onclick="openLessonConcept('${k}')"><span class="lc-step">${STEP[idx]}</span><span>${conIcon(k)} ${nameOf(k)}</span> <span class="lc-look">查看简报 ↗</span></span>
-       <label class="lc-chk"><input type="checkbox" class="lc-got" data-k="${k}" ${got?'checked':''} onchange="this.closest('.lc').classList.toggle('done',this.checked)"> 学会了</label>
+   return `<div class="snote${got?' done':''}">
+     <div class="n-h">
+       <span class="n-l" onclick="openLessonConcept('${k}')"><span class="bub">${idx+1}</span><span class="n-name">${conIcon(k)} ${nameShort(k)}</span> <span class="peek">翻开看看 ↗</span></span>
+       <label class="chk"><input type="checkbox" class="lc-got" data-k="${k}" ${got?'checked':''} onchange="this.closest('.snote').classList.toggle('done',this.checked)"> 学会啦</label>
      </div>
-     <textarea class="lc-say${cd.say?' filled':''}" data-k="${k}" placeholder="用我自己的话说说「${nameShort(k)}」是什么、什么时候用…">${esc2(cd.say||'')}</textarea>
+     <textarea class="say lc-say" data-k="${k}" placeholder="用我自己的话说说「${nameShort(k)}」是什么…">${esc2(cd.say||'')}</textarea>
    </div>`;}).join('');
- h+=`<div class="sect">飞行日志 · 创造者三问</div>
-   <div class="form">
-     <label>① 这节课我做出了 / 改出了什么?</label><textarea id="lQ1">${esc2(data.q1||'')}</textarea>
-     <label>② 我卡在哪?后来怎么过去的(或还没过去)?</label><textarea id="lQ2">${esc2(data.q2||'')}</textarea>
-     <label>③ 今天学的概念里,哪个最有用?我打算怎么用它?</label><textarea id="lQ3">${esc2(data.q3||'')}</textarea>
-     <div class="btnrow"><button class="save" onclick="saveLesson()">✦ 记录这次飞行 · 完成 M${pad(L.n)}</button><button class="btn ghost" onclick="exportRecs()">导出全部收获</button></div>
-   </div>
-   <div class="note" style="margin-top:14px">💡 保存后,你勾选「学会了」的概念会自动点亮到「🏅 我的收获」图鉴;每写一次总结,也就完成了 <b>心法 6:留一条日志</b>。</div>`;
+ h+=`</div>`;
+ h+=`<div class="log">
+   <div class="lh">✍️ 这一关的探险日记</div>
+   <label>① 这关我做出 / 改出了什么?</label><textarea id="lQ1">${esc2(data.q1||'')}</textarea>
+   <label>② 我卡在哪?后来怎么过去的(或还没过去)?</label><textarea id="lQ2">${esc2(data.q2||'')}</textarea>
+   <label>③ 今天学的,哪个最有用?打算怎么用它?</label><textarea id="lQ3">${esc2(data.q3||'')}</textarea>
+   <div class="btnrow"><button class="stamp" onclick="saveLesson()">🏅 盖个章 · 通关第 ${L.n} 站!</button><button class="ghost" onclick="exportRecs()">导出全部收获</button></div>
+  </div>`;
  $('p-lesson').innerHTML=h;
 }
 function saveLesson(){
@@ -595,22 +574,22 @@ function saveLesson(){
  L.ks.forEach(k=>{const cb=document.querySelector('.lc-got[data-k="'+k+'"]');const ta=document.querySelector('.lc-say[data-k="'+k+'"]');
   const got=!!(cb&&cb.checked);const say=ta?ta.value.trim():'';concepts[k]={got,say};if(got)gotList.push(k);});
  const q1=$('lQ1').value.trim(),q2=$('lQ2').value.trim(),q3=$('lQ3').value.trim();
- if(!gotList.length&&!q1&&!q2&&!q3&&!Object.values(concepts).some(c=>c.say)){alert('先勾一个「学会了」、或写一点点总结,再保存吧～');return;}
+ if(!gotList.length&&!q1&&!q2&&!q3&&!Object.values(concepts).some(c=>c.say)){alert('先勾一个「学会啦」、或写一点点日记,再盖章吧～');return;}
  const d=new Date();st.lessons[st.sess]={concepts,q1,q2,q3,at:`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`};
  gotList.forEach(k=>{if(!st.aware.includes(k))st.aware.push(k);});
  if(!st.aware.includes('x6'))st.aware.push('x6');
- save();updCount();renderLadder();renderLesson();checkComplete();
- alert('第 '+L.n+' 节课的飞行日志已记录 ✓\n你这节课学会了 '+gotList.length+' 个概念,并留下了一条成长日志(心法6)。');
+ save();updCount();renderTrail();renderLesson();checkComplete();
+ alert('🏅 第 '+L.n+' 站通关!\n你这关收集了 '+gotList.length+' 个概念,还写下了一条探险日记(心法6)。');
 }
 function lessonTimeline(){const ks=Object.keys(st.lessons).map(Number).sort((a,b)=>a-b);
- if(!ks.length)return '<div class="empty">还没有总结。去「📚 今天上课」选一节课,上完用自己的话总结一下吧。</div>';
+ if(!ks.length)return '<div class="empty">还没有日记。去「📓 今天闯关」选一关,通关后用自己的话写一写吧。</div>';
  return ks.map(n=>{const L=LESSONS[n-1];const r=st.lessons[n];
   const says=Object.entries(r.concepts||{}).filter(([k,c])=>c.got&&c.say).map(([k,c])=>`<p><b>${nameShort(k)}:</b>「${esc(c.say)}」</p>`).join('');
-  return `<div class="logitem"><div class="ld">M${pad(n)} · ${L.title} · ${r.at}</div>${says}${r.q1?`<p><b>做出了:</b>${esc(r.q1)}</p>`:''}${r.q2?`<p><b>卡在:</b>${esc(r.q2)}</p>`:''}${r.q3?`<p><b>最有用:</b>${esc(r.q3)}</p>`:''}</div>`;}).join('');
+  return `<div class="logitem"><div class="ld">🏅 第 ${n} 站 · ${L.title} · ${r.at}</div>${says}${r.q1?`<p><b>做出了:</b>${esc(r.q1)}</p>`:''}${r.q2?`<p><b>卡在:</b>${esc(r.q2)}</p>`:''}${r.q3?`<p><b>最有用:</b>${esc(r.q3)}</p>`:''}</div>`;}).join('');
 }
 function gotoLog(){closeConcept();const t=document.querySelector('.tab[data-p=lesson]');if(t)t.click();window.scrollTo(0,0);}
-function exportRecs(){const data={飞行员:st.user||'',项目:st.proj||'',学会概念数:st.aware.length+' / 33',已点亮概念:st.aware,各节课总结:st.lessons,导出时间:new Date().toISOString()};
- const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`我的收获_${st.user||'学生'}_${st.proj||'项目'}.json`;a.click();}
+function exportRecs(){const data={探险家:st.user||'',作品:st.proj||'',收集概念数:st.aware.length+' / 33',已点亮概念:st.aware,各关日记:st.lessons,导出时间:new Date().toISOString()};
+ const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`我的收获_${st.user||'学生'}_${st.proj||'作品'}.json`;a.click();}
 function esc(s){return s.replace(/</g,'&lt;').replace(/\n/g,'<br>');}
 
 document.querySelectorAll('.tab').forEach(t=>{t.onclick=()=>{
@@ -626,15 +605,15 @@ function closeCert(){$('certModal').classList.remove('on');}
 function renderGain(){
  const n=st.aware.length,pct=Math.round(n/33*100);let rank,ric;
  if(n>=33){rank='全图鉴 · 创造大师';ric='🏆';}else if(n>=23){rank='主理人 Owner';ric='👑';}else if(n>=12){rank='创造者 Creator';ric='🛠';}else if(n>=1){rank='探索者 Explorer';ric='🧭';}else{rank='准备出发';ric='🌱';}
- const tile=(k,top,name)=>`<div class="tile${awHas(k)?' on':''}" onclick="tileTog('${k}')"><div class="ti">${top}</div><div class="tn">${name}</div>${awHas(k)?'<div class="chk">✓ 已点亮</div>':''}</div>`;
- let h=`<div class="albhead"><div class="albtop"><span class="albbig">${ric} ${n}<small> / 33</small></span><span class="albrank">当前称号:${rank}</span></div><div class="prog"><i style="width:${pct}%"></i></div><div class="albtip">每觉察(点亮)一个概念,图鉴就亮一格。点亮全部 33 个,成为创造大师。点格子可直接点亮 / 取消。</div>${n>=33?'<button class="cert-btn" onclick="showCert()">🏆 查看我的「创造大师」证书</button>':''}</div>`;
+ const tile=(k,top,name)=>`<div class="tile${awHas(k)?' on':''}" onclick="tileTog('${k}')"><div class="ti">${top}</div><div class="tn">${name}</div>${awHas(k)?'<div class="chk">✓ 已收集</div>':''}</div>`;
+ let h=`<div class="albhead"><div class="albtop"><span class="albbig">${ric} ${n}<small> / 33</small></span><span class="albrank">当前称号:${rank}</span></div><div class="prog"><i style="width:${pct}%"></i></div><div class="albtip">每收集(点亮)一个概念,图鉴就亮一格。集齐全部 33 个,成为创造大师。点格子可直接点亮 / 取消。</div>${n>=33?'<button class="cert-btn" onclick="showCert()">🏆 查看我的「创造大师」证书</button>':''}</div>`;
  h+=`<div class="lbl">⭐ 心法 (6)</div><div class="tilegrid">`+XINFA.map(x=>tile('x'+x.n,'心法 '+x.n,x.t)).join('')+`</div>`;
  h+=`<div class="lbl">🧩 专业环节 (13)</div><div class="tilegrid">`+ENV.map(e=>tile('e'+e.n,'环节 '+e.n,e.name)).join('')+`</div>`;
  h+=`<div class="lbl">💬 实战技巧 (14)</div><div class="tilegrid">`+JQ.map(j=>tile('j'+j.n,(j.g===1?'沟通':'协作'),j.t)).join('')+`</div>`;
- h+=`<div class="sect" style="margin-top:26px">📖 我的飞行日志(历次总结,用自己的话留下的)</div>`+lessonTimeline();
+ h+=`<div class="shead" style="margin-top:24px">📖 我的探险日记(历次通关,用自己的话留下的)</div>`+lessonTimeline();
  $('p-gain').innerHTML=h;
 }
-renderLadder();renderLesson();renderStuck();updCount();
+renderTrail();renderLesson();renderStuck();updCount();
 </script>
 </body>
 </html>
