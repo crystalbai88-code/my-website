@@ -211,26 +211,31 @@ footer{background:var(--ink);padding:32px 28px;text-align:center}
 .outcome-quote strong{color:rgba(255,255,255,.9)}
 .outcome-quote em{font-style:normal;color:var(--gold-light);border-bottom:1.5px solid rgba(200,150,62,.5)}
 
-/* ── SERVICE MODELS ── */
+/* ── SERVICE MATRIX ── */
 #models{background:var(--cream)}
-.models-header{text-align:center;margin-bottom:48px}
+.models-header{text-align:center;margin-bottom:44px}
 .models-header h2{font-size:clamp(1.8rem,3.5vw,2.4rem);color:var(--navy);margin-bottom:14px}
-.models-header p{color:var(--ink-light);font-size:1rem;line-height:1.8;max-width:480px;margin:0 auto}
-.models-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
-.model-card{background:var(--white);border:1.5px solid var(--border);border-radius:6px;padding:36px 32px;position:relative;overflow:hidden}
-.model-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px}
-.model-long::after{background:linear-gradient(90deg,var(--jade),var(--jade-light))}
-.model-single::after{background:linear-gradient(90deg,var(--gold),var(--gold-light))}
-.model-badge{position:absolute;top:16px;right:16px;background:var(--jade);color:#fff;font-size:.64rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:2px}
-.model-icon{font-size:1.9rem;margin-bottom:14px;line-height:1}
-.model-title{font-family:'Noto Serif SC',serif;font-size:1.25rem;font-weight:700;color:var(--navy);margin-bottom:4px}
-.model-en{font-size:.7rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-light);margin-bottom:18px}
-.model-desc{color:var(--ink-mid);font-size:.9rem;line-height:1.8;font-family:'Noto Serif SC',serif;font-weight:300;margin-bottom:22px;padding-bottom:20px;border-bottom:1px solid var(--border)}
-.model-features{list-style:none;display:flex;flex-direction:column;gap:10px}
-.model-features li{font-size:.86rem;color:var(--ink-mid);padding-left:20px;position:relative;line-height:1.5}
-.model-features li::before{content:'✓';position:absolute;left:0;font-weight:700}
-.model-long .model-features li::before{color:var(--jade)}
-.model-single .model-features li::before{color:var(--gold)}
+.models-header p{color:var(--ink-light);font-size:1rem;line-height:1.8;max-width:500px;margin:0 auto}
+.matrix{display:grid;grid-template-columns:84px 1fr 1fr;gap:10px;margin-bottom:20px}
+.matrix-corner{background:transparent}
+.matrix-col-head{background:var(--navy);border-radius:4px;padding:18px 16px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+.col-icon{font-size:1.4rem;line-height:1}
+.col-title{font-family:'Noto Serif SC',serif;font-size:.98rem;font-weight:700;color:#fff;letter-spacing:.04em}
+.col-sub{font-size:.68rem;color:rgba(255,255,255,.4);letter-spacing:.06em}
+.matrix-row-head{background:var(--navy);border-radius:4px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px}
+.row-label{font-family:'Noto Serif SC',serif;font-size:1.05rem;font-weight:700;color:var(--gold-light);line-height:1}
+.row-sub{font-size:.65rem;color:rgba(255,255,255,.4);line-height:1.5;letter-spacing:.04em}
+.matrix-cell{border-radius:4px;padding:20px 18px;display:flex;flex-direction:column;gap:8px}
+.cell-qi{background:rgba(43,122,86,.06);border:1.5px solid rgba(43,122,86,.2)}
+.cell-qs{background:rgba(200,150,62,.06);border:1.5px solid rgba(200,150,62,.2)}
+.cell-di{background:rgba(43,122,86,.06);border:1.5px solid rgba(43,122,86,.2)}
+.cell-ds{background:rgba(200,150,62,.06);border:1.5px solid rgba(200,150,62,.2)}
+.cell-title{font-family:'Noto Serif SC',serif;font-size:.95rem;font-weight:700;color:var(--navy)}
+.cell-desc{font-size:.82rem;color:var(--ink-mid);line-height:1.7}
+.cell-fit{font-size:.72rem;color:var(--ink-light);margin-top:4px;padding:5px 8px;border-radius:2px;border-left:2px solid}
+.cell-qi .cell-fit,.cell-di .cell-fit{background:rgba(43,122,86,.06);border-color:var(--jade)}
+.cell-qs .cell-fit,.cell-ds .cell-fit{background:rgba(200,150,62,.07);border-color:var(--gold)}
+.matrix-note{text-align:center;font-size:.82rem;color:var(--ink-light);font-style:italic;padding-top:4px}
 
 /* ── RESPONSIVE ── */
 @media(max-width:900px){
@@ -242,7 +247,7 @@ footer{background:var(--ink);padding:32px 28px;text-align:center}
   .steps::before{display:none}
   .proof-grid{grid-template-columns:repeat(2,1fr)}
   .cap-grid{grid-template-columns:repeat(2,1fr)}
-  .models-grid{grid-template-columns:1fr}
+  .matrix{grid-template-columns:72px 1fr 1fr}
 }
 @media(max-width:600px){
   section{padding:56px 0}
@@ -255,7 +260,14 @@ footer{background:var(--ink);padding:32px 28px;text-align:center}
   .proof-divider{display:none}
   .steps{grid-template-columns:1fr;gap:24px}
   .outcome-quote{padding:22px 24px}
-  .model-card{padding:28px 22px}
+  .matrix{grid-template-columns:1fr;gap:8px}
+  .matrix-corner,.matrix-row-head{display:none}
+  .matrix-col-head{flex-direction:row;justify-content:flex-start;gap:10px;padding:12px 16px}
+  .matrix-cell{padding:16px 14px}
+  .cell-qi::before{content:'🌱 公益出口 · 长期';font-size:.68rem;color:var(--jade);font-weight:700;letter-spacing:.06em}
+  .cell-qs::before{content:'⚡ 商业出口 · 长期';font-size:.68rem;color:var(--gold);font-weight:700;letter-spacing:.06em}
+  .cell-di::before{content:'🌱 公益出口 · 单项';font-size:.68rem;color:var(--jade);font-weight:700;letter-spacing:.06em}
+  .cell-ds::before{content:'⚡ 商业出口 · 单项';font-size:.68rem;color:var(--gold);font-weight:700;letter-spacing:.06em}
 }
 </style>
 </head>
@@ -600,41 +612,64 @@ footer{background:var(--ink);padding:32px 28px;text-align:center}
   </div>
 </section>
 
-<!-- SERVICE MODELS -->
+<!-- SERVICE MATRIX -->
 <section id="models">
   <div class="container">
     <div class="models-header">
-      <p class="eyebrow" style="color:var(--gold);margin-bottom:14px">Service Models · 服务模式</p>
-      <h2>一种关系，两种深度。</h2>
-      <p>根据孩子的申请节奏和目标，灵活选择最适合的陪伴方式。</p>
+      <p class="eyebrow" style="color:var(--gold);margin-bottom:14px">Service Matrix · 服务坐标</p>
+      <h2>两个问题，找到孩子的坐标。</h2>
+      <p>孩子申请什么方向？有多少时间？答案决定项目的角度——执行过程完全一样。</p>
     </div>
-    <div class="models-grid">
-      <div class="model-card model-long">
-        <div class="model-badge">推荐</div>
-        <div class="model-icon">🌱</div>
-        <div class="model-title">长期深度陪跑</div>
-        <div class="model-en">Long-Term Accompaniment</div>
-        <div class="model-desc">导师全程陪伴，从选题到交付持续引导——多个项目相互呼应，积累完整的能力成长轨迹，是申请故事最有力的底座。</div>
-        <ul class="model-features">
-          <li>3–12个月持续陪跑，节奏灵活</li>
-          <li>可完成1个以上项目，形成体系</li>
-          <li>每阶段能力复盘与针对性反馈</li>
-          <li>配合申请时间节点规划路径</li>
-        </ul>
+    <div class="matrix">
+      <!-- corner -->
+      <div class="matrix-corner"></div>
+      <!-- col headers -->
+      <div class="matrix-col-head">
+        <div class="col-icon">🌱</div>
+        <div>
+          <div class="col-title">公益出口</div>
+          <div class="col-sub">Social Impact</div>
+        </div>
       </div>
-      <div class="model-card model-single">
-        <div class="model-icon">⚡</div>
-        <div class="model-title">单个项目赋能</div>
-        <div class="model-en">Single Project Sprint</div>
-        <div class="model-desc">有明确想法、有时间限制？用最短的路径做出一个高质量的项目，快速产出真实可展示的成果，灵活接入已有规划。</div>
-        <ul class="model-features">
-          <li>8–16周完成单个完整项目</li>
-          <li>聚焦一个主题，做深做透</li>
-          <li>完整交付：作品 + 项目故事 + 申请材料</li>
-          <li>适合已有整体规划、需要补强的学生</li>
-        </ul>
+      <div class="matrix-col-head">
+        <div class="col-icon">⚡</div>
+        <div>
+          <div class="col-title">商业出口</div>
+          <div class="col-sub">Commercial</div>
+        </div>
+      </div>
+      <!-- row 1 -->
+      <div class="matrix-row-head">
+        <div class="row-label">长期</div>
+        <div class="row-sub">深度陪跑<br>3–12个月</div>
+      </div>
+      <div class="matrix-cell cell-qi">
+        <div class="cell-title">深度影响力积累</div>
+        <div class="cell-desc">持续服务真实社群，建立可量化的影响数据，形成完整的社会行动叙事。</div>
+        <div class="cell-fit">社科 · 教育 · 公共政策 · 医学预科</div>
+      </div>
+      <div class="matrix-cell cell-qs">
+        <div class="cell-title">创始人成长路径</div>
+        <div class="cell-desc">多轮迭代积累真实用户反馈，产品思维与商业判断在过程中自然形成。</div>
+        <div class="cell-fit">商科 · 经济 · 创业 · MIT / Stanford 工程</div>
+      </div>
+      <!-- row 2 -->
+      <div class="matrix-row-head">
+        <div class="row-label">单项</div>
+        <div class="row-sub">项目赋能<br>8–16周</div>
+      </div>
+      <div class="matrix-cell cell-di">
+        <div class="cell-title">聚焦公益冲刺</div>
+        <div class="cell-desc">明确一个社区需求，快速交付有真实使用者的项目，故事简洁有力。</div>
+        <div class="cell-fit">加拿大 · 英国社科 · UBC · UCL</div>
+      </div>
+      <div class="matrix-cell cell-ds">
+        <div class="cell-title">MVP 快速孵化</div>
+        <div class="cell-desc">聚焦核心功能，8–16周产出可演示的商业原型，灵活接入已有申请规划。</div>
+        <div class="cell-fit">港大商科 · 美国文理 · 新加坡 SMU</div>
       </div>
     </div>
+    <p class="matrix-note">项目执行过程完全一致——出口形式由孩子的申请方向和顾问共同决定。</p>
   </div>
 </section>
 
