@@ -269,8 +269,8 @@ const SCORE_TARGET=10;
 const RESPAWN_DELAY=3; // 秒
 
 // 金币 + 已购护甲（存浏览器本地）
-let coins = parseInt(localStorage.getItem('coins')||'0');
-let ownedArmor = parseInt(localStorage.getItem('armor')||'0'); // 0=无, 1..6
+let coins = Math.max(800, parseInt(localStorage.getItem('coins')||'800'));
+let ownedArmor = Math.max(6, parseInt(localStorage.getItem('armor')||'6')); // 默认就送6级甲(500血)，永远至少6级
 function saveProgress(){ localStorage.setItem('coins',coins); localStorage.setItem('armor',ownedArmor); localStorage.setItem('gun',ownedGun); }
 // 把当前狙击枪等级套到武器伤害 + 第一人称模型上
 function applyGunUpgrade(){
@@ -310,7 +310,7 @@ const GUNS = [
   {lv:5, name:'五级枪',  body:160, head:500, price:5000, color:'#ffd54a', css:'linear-gradient(135deg,#bd8a00,#ffe27a)'},
   {lv:6, name:'六级枪',  body:200, head:600, price:9000, color:'#ff4b4b', css:'linear-gradient(135deg,#a00,#ff6b6b)'},
 ];
-let ownedGun = parseInt(localStorage.getItem('gun')||'0'); // 0..6 已买到的最高级狙击枪
+let ownedGun = Math.max(6, parseInt(localStorage.getItem('gun')||'6')); // 默认就送6级枪(爆头600)，永远至少6级
 
 // ===================== 输入 =====================
 const keys = {};
