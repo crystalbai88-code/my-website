@@ -329,17 +329,32 @@ a.crow:hover .crow-arrow{color:var(--warm);transform:translate(4px,-4px)}
 .filter-btn:hover{color:var(--warm)}
 .filter-btn.active{color:var(--warm);border-bottom-color:var(--warm)}
 .portfolio-grid-wrap{padding:48px 56px 80px;background:var(--paper2)}
-.proj-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.proj-card{background:var(--paper);border-radius:4px;cursor:pointer;transition:all 0.3s;overflow:hidden;border:1.5px solid var(--paper3)}
-.proj-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(232,114,12,0.1);border-color:var(--warm2)}
-.proj-card-img{aspect-ratio:4/3;overflow:hidden;background:var(--paper3);position:relative;display:flex;align-items:center;justify-content:center;font-size:56px;opacity:0.2}
-.proj-card-body{padding:24px 24px 30px}
-.proj-house-tag{font-size:10px;letter-spacing:0.15em;color:var(--warm);text-transform:uppercase;margin-bottom:8px}
-.proj-card-body h3{font-family:var(--serif);font-size:17px;font-weight:400;color:var(--ink);margin-bottom:8px;line-height:1.4}
-.proj-card-body p{font-size:12px;color:var(--ink2);line-height:1.85}
-.proj-meta{display:flex;gap:14px;margin-top:18px;padding-top:14px;border-top:1px solid var(--paper3)}
-.proj-meta span{font-size:11px;color:var(--ink3);letter-spacing:0.06em}
-.proj-level{display:inline-block;font-size:10px;padding:3px 10px;background:var(--paper3);color:var(--warm);border-radius:20px}
+/* ── 作品墙 Gallery Wall ── */
+.proj-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.proj-card{border-radius:10px;overflow:hidden;cursor:pointer;background:var(--paper);border:none;box-shadow:0 2px 20px rgba(43,29,14,.08);transition:transform .4s cubic-bezier(.34,1.56,.64,1),box-shadow .35s ease}
+.proj-card:hover{transform:translateY(-9px) scale(1.014);box-shadow:0 28px 56px rgba(43,29,14,.18)}
+.proj-cover{aspect-ratio:4/3;position:relative;overflow:hidden}
+.proj-cover::before{content:'';position:absolute;inset:0;transition:transform .55s ease}
+.proj-card:hover .proj-cover::before{transform:scale(1.07)}
+.proj-cov-emoji{position:absolute;top:16px;left:18px;font-size:26px;z-index:2;filter:drop-shadow(0 2px 8px rgba(0,0,0,.55));transition:transform .35s ease;line-height:1}
+.proj-card:hover .proj-cov-emoji{transform:scale(1.18) translateY(-2px)}
+.proj-cover-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.84) 0%,rgba(0,0,0,.28) 48%,transparent 80%);display:flex;flex-direction:column;justify-content:flex-end;padding:16px 18px;z-index:1}
+.proj-cov-cat{font-size:9px;letter-spacing:.22em;color:rgba(255,255,255,.5);text-transform:uppercase;margin-bottom:7px}
+.proj-cov-h{font-family:var(--serif);font-size:15px;font-weight:400;color:#fff;line-height:1.4;margin:0;text-shadow:0 1px 8px rgba(0,0,0,.6)}
+.proj-info{padding:14px 18px 18px}
+.proj-info>p{font-size:11.5px;color:var(--ink2);line-height:1.8;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:10px}
+.proj-meta{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--ink3)}
+.proj-level{color:var(--warm);font-weight:600;letter-spacing:.04em}
+/* ── per-project cover art ── */
+.pj15::before{background:radial-gradient(ellipse 55% 70% at 50% 60%,rgba(0,200,255,.2) 0%,transparent 70%),linear-gradient(135deg,#060e1a,#0d2240,#091c35)}
+.pj7::before{background:repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0,rgba(255,255,255,.035) 1px,transparent 1px,transparent 55px),repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0,rgba(255,255,255,.035) 1px,transparent 1px,transparent 70px),linear-gradient(160deg,#0c2e18,#1a5c30,#0d3820)}
+.pj8::before{background:radial-gradient(ellipse 70% 50% at 70% 30%,rgba(200,150,62,.24) 0%,transparent 70%),linear-gradient(135deg,#140a02,#2c1810,#3a220e)}
+.pj9::before{background:repeating-linear-gradient(0deg,rgba(255,255,255,.022) 0,rgba(255,255,255,.022) 1px,transparent 1px,transparent 28px),linear-gradient(135deg,#1a120a,#2b1f12,#1f160d)}
+.pj11::before{background:radial-gradient(ellipse 55% 60% at 50% 50%,rgba(255,180,100,.14) 0%,transparent 70%),linear-gradient(135deg,#6e1210,#a82018,#6e1210)}
+.pj10::before{background:radial-gradient(circle 90px at 50% 48%,rgba(255,50,50,.24) 0%,transparent 100%),repeating-linear-gradient(90deg,rgba(255,40,40,.022) 0,rgba(255,40,40,.022) 1px,transparent 1px,transparent 28px),repeating-linear-gradient(0deg,rgba(255,40,40,.022) 0,rgba(255,40,40,.022) 1px,transparent 1px,transparent 28px),linear-gradient(135deg,#080808,#141414,#080808)}
+.pj12::before{background:radial-gradient(ellipse 65% 50% at 50% 40%,rgba(212,175,55,.2) 0%,transparent 70%),repeating-linear-gradient(90deg,rgba(255,255,255,.012) 0,rgba(255,255,255,.012) 2px,transparent 2px,transparent 16px),linear-gradient(135deg,#0e0e0e,#1c1a14,#0e0e0e)}
+.pj13::before{background:radial-gradient(circle 50px at 28% 32%,rgba(45,212,191,.28) 0%,transparent 100%),radial-gradient(circle 30px at 72% 24%,rgba(45,212,191,.22) 0%,transparent 100%),radial-gradient(circle 70px at 55% 68%,rgba(45,212,191,.16) 0%,transparent 100%),linear-gradient(135deg,#071818,#0d2828,#071818)}
+.pj14::before{background:radial-gradient(ellipse 60% 55% at 62% 35%,rgba(139,92,246,.24) 0%,transparent 70%),linear-gradient(135deg,#120e28,#1e1540,#120e28)}
 .proj-modal-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(43,29,14,0.5);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:40px}
 .proj-modal-overlay.open{display:flex}
 .proj-modal{background:var(--paper);max-width:680px;width:100%;max-height:80vh;overflow-y:auto;position:relative;border-radius:6px}
@@ -497,26 +512,11 @@ footer p{font-size:12px;color:var(--ink3);letter-spacing:0.08em}
 .entries-grid>.ecard:nth-child(3)::before{background:var(--moss)}
 .entries-grid>.ecard:nth-child(4)::before{background:var(--lav)}
 
-/* 4 · Project card thumbnails — restore visibility + category palettes */
-.proj-card-img{font-size:64px;opacity:1}
-.proj-img-humanities{background:linear-gradient(150deg,rgba(232,114,12,0.13),rgba(255,200,112,0.07))}
-.proj-img-science{background:linear-gradient(150deg,rgba(46,140,86,0.13),rgba(90,179,124,0.07))}
-.proj-img-engineering{background:linear-gradient(150deg,rgba(46,124,184,0.13),rgba(90,168,216,0.07))}
-.proj-img-business{background:linear-gradient(150deg,rgba(112,96,176,0.13),rgba(150,130,210,0.07))}
-
-/* 4b · 作品卡 SVG 品类图标 + 弹性 hover（注入能量） */
-.proj-card-img svg{width:54px;height:54px;transition:transform 0.4s cubic-bezier(.34,1.56,.64,1)}
-.proj-img-humanities{color:var(--warm)}
-.proj-img-science{color:var(--moss)}
-.proj-img-engineering{color:var(--sky)}
-.proj-img-business{color:var(--lav)}
-.proj-card{transition:transform 0.4s cubic-bezier(.34,1.56,.64,1),box-shadow 0.35s ease,border-color 0.35s ease}
-.proj-card:hover{transform:translateY(-6px) scale(1.012);box-shadow:0 18px 44px rgba(232,114,12,0.18);border-color:var(--warm)}
-.proj-card:hover .proj-card-img svg{transform:scale(1.14) translateY(-3px)}
+/* 4 · Gallery wall — reduced motion */
 @media(prefers-reduced-motion:reduce){
-  .proj-card,.proj-card-img svg{transition:none}
+  .proj-card,.proj-cover::before,.proj-cov-emoji{transition:none}
   .proj-card:hover{transform:none}
-  .proj-card:hover .proj-card-img svg{transform:none}
+  .proj-card:hover .proj-cover::before{transform:none}
 }
 
 /* 5 · Belief cards — richer depth on hover */
@@ -1371,11 +1371,15 @@ function renderProjects(){
   const filtered=currentFilter==='all'?projects:projects.filter(p=>p.category===currentFilter);
   grid.innerHTML=filtered.map(p=>`
     <div class="proj-card" onclick="openModal(${p.id})">
-      <div class="proj-card-img proj-img-${p.category}">${CATEGORY_ICONS[p.category]||p.emoji}</div>
-      <div class="proj-card-body">
-        <div class="proj-house-tag">${p.house}</div>
-        <h3>${p.title}</h3>
-        <p>${p.summary}</p>
+      <div class="proj-cover pj${p.id}">
+        <span class="proj-cov-emoji">${p.emoji}</span>
+        <div class="proj-cover-grad">
+          <span class="proj-cov-cat">${p.house}</span>
+          <h3 class="proj-cov-h">${p.title}</h3>
+        </div>
+      </div>
+      <div class="proj-info">
+        <p>${p.summary.slice(0,72)}…</p>
         <div class="proj-meta">
           <span>${p.author}</span>
           <span class="proj-level">${p.level}</span>
