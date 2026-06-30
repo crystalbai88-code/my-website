@@ -171,6 +171,8 @@
     <div class="armorgrid" id="armorGrid"></div>
     <div style="font-size:16px;margin:10px 0 2px;opacity:.85;">🔫 狙击枪升级（按 2 使用，要按顺序买）</div>
     <div class="armorgrid" id="gunShop"></div>
+    <div style="font-size:16px;margin:10px 0 2px;opacity:.85;">🔫 手枪升级（按 1 使用，要按顺序买）</div>
+    <div class="armorgrid" id="pistolShop"></div>
     <button class="btn gray" id="shopBack">返回</button>
   </div>
 
@@ -271,13 +273,20 @@ const RESPAWN_DELAY=3; // 秒
 // 金币 + 已购护甲（存浏览器本地）
 let coins = Math.max(800, parseInt(localStorage.getItem('coins')||'800'));
 let ownedArmor = Math.max(6, parseInt(localStorage.getItem('armor')||'6')); // 默认就送6级甲(500血)，永远至少6级
-function saveProgress(){ localStorage.setItem('coins',coins); localStorage.setItem('armor',ownedArmor); localStorage.setItem('gun',ownedGun); }
+function saveProgress(){ localStorage.setItem('coins',coins); localStorage.setItem('armor',ownedArmor); localStorage.setItem('gun',ownedGun); localStorage.setItem('pistol',ownedPistol); }
 // 把当前狙击枪等级套到武器伤害 + 第一人称模型上
 function applyGunUpgrade(){
   const g=GUNS[ownedGun];
   WEAPONS[2].body=g.body; WEAPONS[2].head=g.head;
   WEAPONS[2].name = ownedGun===0?'狙击枪':('狙击·'+g.name);
   if(typeof refreshSniperViewmodel==='function') refreshSniperViewmodel();
+}
+// 手枪等级 → 伤害 + 模型
+function applyPistolUpgrade(){
+  const p=PISTOLS[ownedPistol];
+  WEAPONS[1].body=p.body; WEAPONS[1].head=p.head;
+  WEAPONS[1].name = ownedPistol===0?'手枪':p.name;
+  if(typeof refreshPistolViewmodel==='function') refreshPistolViewmodel();
 }
 
 // 护甲定义：等级->{名,颜色,血量,价格}
@@ -311,6 +320,18 @@ const GUNS = [
   {lv:6, name:'六级枪',  body:200, head:600, price:9000, color:'#ff4b4b', css:'linear-gradient(135deg,#a00,#ff6b6b)'},
 ];
 let ownedGun = Math.max(6, parseInt(localStorage.getItem('gun')||'6')); // 默认就送6级枪(爆头600)，永远至少6级
+
+// 手枪升级（按1键用，商店购买）：等级越高伤害越大、模型越多地方变真实、颜色不同
+const PISTOLS = [
+  {lv:0, name:'手枪',    body:10,  head:10,  price:0,    color:'#888888', css:'linear-gradient(135deg,#777,#aaa)'},
+  {lv:1, name:'一级手枪', body:30,  head:150, price:250,  color:'#ffffff', css:'linear-gradient(135deg,#cfcfcf,#fff)'},
+  {lv:2, name:'二级手枪', body:50,  head:200, price:500,  color:'#3ddc6a', css:'linear-gradient(135deg,#1f8c3f,#5cff8a)'},
+  {lv:3, name:'三级手枪', body:100, head:300, price:1000, color:'#3aa0ff', css:'linear-gradient(135deg,#1565c0,#62b6ff)'},
+  {lv:4, name:'四级手枪', body:130, head:330, price:1250, color:'#b06bff', css:'linear-gradient(135deg,#7b2ff7,#c79bff)'},
+  {lv:5, name:'五级手枪', body:150, head:350, price:1500, color:'#ffd54a', css:'linear-gradient(135deg,#bd8a00,#ffe27a)'},
+  {lv:6, name:'六级手枪', body:200, head:400, price:2500, color:'#ff4b4b', css:'linear-gradient(135deg,#a00,#ff6b6b)'},
+];
+let ownedPistol = parseInt(localStorage.getItem('pistol')||'0'); // 0..6
 
 // ===================== 输入 =====================
 const keys = {};
@@ -676,15 +697,29 @@ function buildViewmodels(){
   const cyl=(r,h,m,x,y,z,rx)=>{ const o=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,12), m); o.position.set(x,y,z); o.rotation.x=rx!==undefined?rx:Math.PI/2; return o; };
   const X=0.3, Y=-0.32; // 枪在右下
 
-  // —— 手枪：套筒+枪管+握把+扳机护圈+准星，加一只手 ——
-  viewmodels[1]=mk([
-    box(0.085,0.11,0.34,gunM, X,Y,-0.6),         // 套筒
-    box(0.07,0.09,0.3,darkM, X,Y-0.02,-0.58),    // 机匣
-    box(0.075,0.2,0.1,gunM, X,Y-0.16,-0.45),     // 握把
-    box(0.06,0.13,0.06,darkM, X,Y-0.12,-0.52),   // 扳机护圈
-    box(0.02,0.03,0.02,steelM, X,Y+0.07,-0.74),  // 准星
-    box(0.13,0.1,0.12,skinM, X,Y-0.16,-0.46),    // 手
-  ]);
+  // —— 手枪（可升级）：整把随等级换色，每级一个部位变真实 ——
+  pistolBodyMat = mat(0x2b2e33,{metal:0.7,rough:0.4});
+  pistolTintMat = mat(0x9aa0a6,{metal:0.85,rough:0.3});
+  const PP=[]; const pk=o=>{PP.push(o);return o;};
+  pistolToggle={};
+  // 基础件（主体用 pistolBodyMat 整体换色）
+  pk(box(0.085,0.11,0.34,pistolBodyMat, X,Y,-0.6));   // 套筒
+  pk(box(0.075,0.2,0.1,pistolBodyMat, X,Y-0.16,-0.45)); // 握把
+  pk(box(0.06,0.13,0.06,darkM, X,Y-0.12,-0.52));      // 扳机护圈
+  pk(box(0.13,0.1,0.12,skinM, X,Y-0.16,-0.46));       // 手
+  const psec=(lv,basics,details)=>{ basics.forEach(pk); details.forEach(pk); pistolToggle[lv]={basic:basics,detail:details}; };
+  // L1 枪口(发射处)
+  psec(1, [ box(0.04,0.04,0.06,darkM, X,Y+0.0,-0.78) ],
+          [ cyl(0.035,0.1,pistolTintMat, X,Y,-0.8), box(0.02,0.03,0.02,steelM, X,Y+0.07,-0.74) ]); // 消焰口+准星
+  // L2 前端
+  psec(2, [], [ box(0.07,0.05,0.16,pistolTintMat, X,Y+0.04,-0.72), box(0.05,0.03,0.12,darkM, X,Y-0.06,-0.74) ]); // 顶部导轨+下挂
+  // L3 枪身
+  psec(3, [], [ box(0.092,0.06,0.2,pistolTintMat, X,Y,-0.58), box(0.05,0.05,0.06,steelM, X+0.05,Y+0.02,-0.5) ]); // 机匣纹+拉套柄
+  // L4 下方握处
+  psec(4, [], [ box(0.06,0.07,0.16,darkM, X,Y-0.18,-0.7), box(0.07,0.03,0.12,pistolTintMat, X,Y-0.13,-0.72) ]); // 前握+导轨
+  // L6 狙击形(加长枪管，去镜)
+  psec(6, [], [ box(0.05,0.05,0.5,pistolBodyMat, X,Y+0.02,-0.95), cyl(0.045,0.18,darkM, X,Y+0.02,-1.22) ]);
+  viewmodels[1]=mk(PP);
 
   // —— 狙击枪（可升级）——
   // 整把枪都随等级换色：gunBodyMat=枪身主体(深一档)，gunTintMat=亮色配件
@@ -772,8 +807,30 @@ function buildViewmodels(){
     playerSleeves.push(sleeve);
   }
   refreshSniperViewmodel();   // 套用当前狙击枪等级
+  refreshPistolViewmodel();   // 套用当前手枪等级
 }
 let playerSleeves=[], gunTintMat=null, gunBodyMat=null, gloveMat=null, sniperToggle={};
+let pistolBodyMat=null, pistolTintMat=null, pistolToggle={};
+// 按当前手枪等级：整把换色 + 切换各部位真实件 + 五级以上变大
+function refreshPistolViewmodel(){
+  if(!pistolTintMat) return;
+  const p=PISTOLS[ownedPistol], c=new THREE.Color(p.color);
+  pistolTintMat.color.set(p.color);
+  pistolTintMat.metalness=0.75+ownedPistol*0.03;
+  pistolTintMat.emissive.set(ownedPistol>=5?p.color:'#000000');
+  pistolTintMat.emissiveIntensity=ownedPistol>=6?0.5:(ownedPistol>=5?0.25:0);
+  pistolBodyMat.color.copy(c.clone().multiplyScalar(ownedPistol>=1?0.5:0.5));
+  pistolBodyMat.metalness=0.7+ownedPistol*0.03;
+  pistolBodyMat.emissive.set(ownedPistol>=6?p.color:'#000000');
+  pistolBodyMat.emissiveIntensity=ownedPistol>=6?0.25:0;
+  for(const lvKey in pistolToggle){
+    const lv=parseInt(lvKey), s=pistolToggle[lvKey], unlocked=ownedPistol>=lv;
+    s.basic.forEach(o=>o.visible=!unlocked);
+    s.detail.forEach(o=>o.visible=unlocked);
+  }
+  // 五级以上整把变大一点点
+  if(viewmodels[1]) viewmodels[1].scale.setScalar(0.78 * (ownedPistol>=5?1.18:1));
+}
 // 按角色给第一人称手套换色（红狼黑金 / 蜂医橄榄绿）
 function applyCharacterVisual(){
   if(!gloveMat) return;
@@ -1785,6 +1842,26 @@ function renderShop(){
     };
     gs.appendChild(card);
   });
+  // 手枪升级（六级），按1键使用；要按顺序升级
+  const ps=$('pistolShop'); ps.innerHTML='';
+  PISTOLS.filter(p=>p.lv>=1).forEach(p=>{
+    const owned = ownedPistol>=p.lv;
+    const card=document.createElement('div');
+    card.className='acard'+(owned?' owned':'');
+    card.style.background=p.css;
+    card.style.color=(p.lv===1)?'#234':'#fff';
+    card.innerHTML=`<div class="an">${p.name} 🔫</div>
+      <div class="ad">身体 ${p.body} · 爆头 ${p.head}</div>
+      <div class="ap">${owned?'✔ 已拥有':p.price+' 金币'}</div>`;
+    card.onclick=()=>{
+      if(ownedPistol>=p.lv){ flashShop('已经拥有了，游戏里按 1 使用'); return; }
+      if(ownedPistol < p.lv-1){ flashShop('要先买'+PISTOLS[p.lv-1].name); return; }
+      if(coins<p.price){ flashShop('金币不够！还差 '+(p.price-coins)); return; }
+      coins-=p.price; ownedPistol=p.lv; saveProgress();
+      updateCoins(); renderShop(); flashShop('购买成功！按 1 用 '+p.name+'（更高伤害+更真实）');
+    };
+    ps.appendChild(card);
+  });
 }
 let shopMsg;
 function flashShop(msg){
@@ -1859,6 +1936,7 @@ function startGame(){
   $('respawnOverlay').style.display='none';
   applyPlayerArmorVisual();
   applyGunUpgrade();
+  applyPistolUpgrade();
   applyCharacterVisual();
   updateWeaponHUD(); updateHpHUD(); updateScoreboard(); updateCoins(); updateStaminaHUD(); updateAbilityHUD();
   $('menu').classList.add('hidden');
