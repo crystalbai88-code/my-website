@@ -208,11 +208,10 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;opacity:.5;background-
 /* 小黑 guide */
 .guide{align-items:center}
 .xhc{flex:none;cursor:pointer}
-.guide .xh{width:84px;height:auto;display:block;animation:bob 2.8s ease-in-out infinite;transform-origin:50% 90%}
+.guide .xh{width:94px;height:auto;display:block;animation:bob 3s ease-in-out infinite;filter:drop-shadow(2px 4px 4px rgba(58,53,43,.22))}
 .xhc:active .xh{animation:none;transform:scale(.94)}
-@keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-5px) rotate(2deg)}}
-.guide .xh .wavehand{transform-origin:80px 78px;animation:wave 1.4s ease-in-out infinite}
-@keyframes wave{0%,100%{transform:rotate(0)}50%{transform:rotate(-18deg)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.xhmini{width:40px;height:40px;object-fit:contain;vertical-align:middle;margin-right:5px}
 /* concept mini-game */
 .game{margin-top:14px;background:var(--paper2);border:2px dashed var(--gold);border-radius:13px;padding:13px 15px}
 .gq{font-family:var(--kai);font-size:15px;font-weight:700;margin-bottom:10px}
@@ -526,6 +525,7 @@ const LESSONS=[
 const NODES=[{x:30,y:96,ly:124},{x:160,y:52,ly:30},{x:320,y:92,ly:120},{x:470,y:70},{x:610,y:44,ly:24},{x:700,y:74,ly:104},{x:830,y:92,ly:122},{x:970,y:56,ly:34}];
 const TRAILPATH="M30 96 C120 40,180 40,250 80 S400 120,470 70 S620 28,700 74 S850 116,970 56";
 const GUIDE=['先有一个让你心痒的点子,别急着完美。','别信它说"做好了",自己去试一次。','你说得出哪里不对,它才改得对。','贪多必乱——砍到一个核心就赢。','别人乱点也不崩,才算真扎实。','真发出去给人用,才算数。','看数据说话,别凭感觉改。','把它讲清楚,你就是创造者了。'];
+const MPOSE=['xh01_kaixin','xh05_sikao','xh11_deyi','xh17_zhidian','xh16_jingli','xh12_guli','xh25_pingban','xh02_daxiao'];
 function curL(){return LESSONS[st.sess-1];}
 function conIcon(k){if(k[0]==='x')return '💡';if(k[0]==='e')return '🧩';return JQ[+k.slice(1)-1].g===1?'💬':'🤝';}
 function nameShort(k){return nameOf(k).replace(/^心法\d+·/,'').replace(/^\d+\./,'');}
@@ -570,7 +570,7 @@ function renderLesson(){
  h+=`<div class="mtitle">${L.title}</div>`;
  h+=`<div class="goal">${L.goal}</div>`;
  h+=`<div class="mile"><span class="star">⭐️</span><div><div class="mt">这关打完,你的作品会变成 →</div><div class="md">${L.mile}</div></div></div>`;
- h+=`<div class="guide"><div class="xhc" onclick="xhTip()" title="点点小黑">${xiaohei('wave')}</div><div class="bubble" id="xhBubble">小黑:${GUIDE[L.n-1]}</div></div>`;
+ h+=`<div class="guide"><div class="xhc" onclick="xhTip()" title="点点小黑"><img class="xh" src="xh/${MPOSE[L.n-1]}.png" alt="小黑" onerror="this.style.display='none'"></div><div class="bubble" id="xhBubble">小黑:${GUIDE[L.n-1]}</div></div>`;
  h+=`</div>`;
  h+=`<div class="shead">🎒 这一关要收集的概念 <span class="n">(按 1 → 2 → 3 顺序解锁,共 ${L.ks.length} 个)</span></div>`;
  h+=`<div class="notes">`;
@@ -666,8 +666,8 @@ function pickOpt(btn){const box=btn.parentNode;const good=btn.dataset.good==='1'
  box.querySelectorAll('.opt').forEach(b=>{b.disabled=true;if(b.dataset.good==='1')b.classList.add('ok');});
  if(!good)btn.classList.add('no');
  box.querySelector('.gres').innerHTML = good
-  ? '<div class="xhsay ok">🎉 小黑:答对!把「感觉 / 场景 / 问题」说清楚,AI 才懂你。</div>'
-  : '<div class="xhsay no">🤔 小黑:看绿色那句~ 含糊地说「做好点」,AI 只能瞎猜。</div>';
+  ? '<div class="xhsay ok"><img class="xhmini" src="xh/xh14_dazhi.png" alt="">小黑:答对!把「感觉 / 场景 / 问题」说清楚,AI 才懂你。</div>'
+  : '<div class="xhsay no"><img class="xhmini" src="xh/xh06_yihuo.png" alt="">小黑:看绿色那句~ 含糊地说「做好点」,AI 只能瞎猜。</div>';
 }
 renderTrail();renderLesson();renderStuck();updCount();
 </script>
