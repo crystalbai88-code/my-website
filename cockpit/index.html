@@ -205,6 +205,24 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;opacity:.5;background-
 .cert-ceo{font-family:var(--kai);font-size:12px;letter-spacing:2px;color:var(--gold);margin-top:7px;font-weight:700}
 .cert-close{font-family:var(--kai);margin-top:18px;width:100%;background:var(--teal);color:#fff;border:none;border-radius:13px;padding:11px;font-size:14px;font-weight:700;cursor:pointer}
 
+/* 小黑 guide */
+.guide{align-items:center}
+.xhc{flex:none;cursor:pointer}
+.guide .xh{width:84px;height:auto;display:block;animation:bob 2.8s ease-in-out infinite;transform-origin:50% 90%}
+.xhc:active .xh{animation:none;transform:scale(.94)}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-5px) rotate(2deg)}}
+.guide .xh .wavehand{transform-origin:80px 78px;animation:wave 1.4s ease-in-out infinite}
+@keyframes wave{0%,100%{transform:rotate(0)}50%{transform:rotate(-18deg)}}
+/* concept mini-game */
+.game{margin-top:14px;background:var(--paper2);border:2px dashed var(--gold);border-radius:13px;padding:13px 15px}
+.gq{font-family:var(--kai);font-size:15px;font-weight:700;margin-bottom:10px}
+.opt{display:block;width:100%;text-align:left;margin-bottom:8px;background:#fff;border:2px solid var(--ink);border-radius:11px;padding:10px 13px;font-size:14px;cursor:pointer;font-family:inherit;color:var(--ink);line-height:1.5}
+.opt:hover:not(:disabled){background:var(--paper2)}
+.opt:disabled{cursor:default;opacity:.92}
+.opt.ok{background:#E6F3EA;border-color:var(--teal)}
+.opt.no{background:#FBE7E2;border-color:var(--coral)}
+.gres .xhsay{font-family:var(--kai);font-size:14px;margin-top:5px;line-height:1.65}
+.xhsay.ok{color:var(--teal)}.xhsay.no{color:var(--coral)}
 @media(max-width:760px){
  .sheet{padding:20px 16px 50px}
  .title{font-size:30px}.notes{grid-template-columns:1fr}
@@ -409,7 +427,12 @@ const AIROLE={
 function nameOf(k){const n=+k.slice(1);if(k[0]==='x')return '心法'+n+'·'+XINFA[n-1].t;if(k[0]==='j')return JQ[n-1].t;if(k[0]==='e')return ENV[n-1].n+'.'+ENV[n-1].name;return k;}
 function findConcept(k){const n=+k.slice(1);
  if(k[0]==='x'){const c=XINFA[n-1];return{type:'💡 心法',name:'心法 '+n+' · '+c.t,line:c.d,extra:''};}
- if(k[0]==='j'){const c=JQ[n-1];return{type:c.g===1?'💬 沟通技巧':'🤝 协作技巧',name:c.t,line:c.d,extra:`<div class="ex" style="margin-top:12px"><div class="gd"><span class="tag">✓ 这样说</span>「${c.gd}」</div><div class="bd"><span class="tag">✗ 别这样</span>「${c.bd}」</div></div>`};}
+ if(k[0]==='j'){const c=JQ[n-1];const flip=Math.random()<.5;const o1=flip?c.gd:c.bd,g1=flip?1:0,o2=flip?c.bd:c.gd,g2=flip?0:1;
+  const game=`<div class="game"><div class="gq">🎮 小黑考考你:同样一件事,哪句话更像创造者?</div>
+   <button class="opt" data-good="${g1}" onclick="pickOpt(this)">「${o1}」</button>
+   <button class="opt" data-good="${g2}" onclick="pickOpt(this)">「${o2}」</button>
+   <div class="gres"></div></div>`;
+  return{type:c.g===1?'💬 沟通技巧':'🤝 协作技巧',name:c.t,line:c.d,extra:game};}
  const c=ENV[n-1];const terms=c.terms.map(t=>`<div class="trow" onclick="this.classList.toggle('open')"><div class="tt">${t[0]}</div><div class="td">${t[1]}</div></div>`).join('');
  const ar=AIROLE[n];const aiB=ar?`<div class="airole"><div class="ai"><span>🤖 AI 帮你做</span>${ar[0]}</div><div class="me"><span>🙋 这件事得你自己来</span>${ar[1]}</div></div>`:'';
  return{type:'🧩 专业环节',name:c.n+'. '+c.name,line:c.fn,extra:`${aiB}<p class="termtip" style="margin-top:14px">👇 这个环节里的小概念</p>${terms}<p class="good"><b>「好」的标准:</b>${c.good}</p>`};}
@@ -547,7 +570,7 @@ function renderLesson(){
  h+=`<div class="mtitle">${L.title}</div>`;
  h+=`<div class="goal">${L.goal}</div>`;
  h+=`<div class="mile"><span class="star">⭐️</span><div><div class="mt">这关打完,你的作品会变成 →</div><div class="md">${L.mile}</div></div></div>`;
- h+=`<div class="guide"><div class="ava">🐤</div><div class="bubble">小黑:${GUIDE[L.n-1]}</div></div>`;
+ h+=`<div class="guide"><div class="xhc" onclick="xhTip()" title="点点小黑">${xiaohei('wave')}</div><div class="bubble" id="xhBubble">小黑:${GUIDE[L.n-1]}</div></div>`;
  h+=`</div>`;
  h+=`<div class="shead">🎒 这一关要收集的概念 <span class="n">(按 1 → 2 → 3 顺序解锁,共 ${L.ks.length} 个)</span></div>`;
  h+=`<div class="notes">`;
@@ -612,6 +635,39 @@ function renderGain(){
  h+=`<div class="lbl">💬 实战技巧 (14)</div><div class="tilegrid">`+JQ.map(j=>tile('j'+j.n,(j.g===1?'沟通':'协作'),j.t)).join('')+`</div>`;
  h+=`<div class="shead" style="margin-top:24px">📖 我的探险日记(历次通关,用自己的话留下的)</div>`+lessonTimeline();
  $('p-gain').innerHTML=h;
+}
+/* ===== 小黑 · 向导(矢量版,可后续换真 PNG) ===== */
+function xiaohei(mood){mood=mood||'wave';
+ const arm = mood==='cheer'
+  ? `<path d="M78 76 Q92 64 90 50" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/><path d="M78 76 Q92 64 90 50" fill="none" stroke="#3A352B" stroke-width="2.4"/><circle cx="90" cy="48" r="6" fill="#fff" stroke="#3A352B" stroke-width="2.4"/>`
+  : `<g class="wavehand"><path d="M76 80 Q90 74 91 60" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/><path d="M76 80 Q90 74 91 60" fill="none" stroke="#3A352B" stroke-width="2.4"/><circle cx="91" cy="58" r="6" fill="#fff" stroke="#3A352B" stroke-width="2.4"/></g>`;
+ return `<svg class="xh" viewBox="0 0 104 118" xmlns="http://www.w3.org/2000/svg">
+  <path d="M24 118 Q24 88 52 88 Q80 88 80 118 Z" fill="#fff" stroke="#3A352B" stroke-width="2.6"/>
+  <path d="M40 92 Q52 100 64 92 L64 98 Q52 106 40 98 Z" fill="#F4C430" stroke="#3A352B" stroke-width="2"/>
+  <circle cx="52" cy="106" r="7.5" fill="#F4C430" stroke="#3A352B" stroke-width="2.2"/>
+  <text x="52" y="110" font-size="10" text-anchor="middle" fill="#3A352B" font-weight="800" font-family="Arial">C</text>
+  ${arm}
+  <circle cx="52" cy="47" r="36" fill="#fff" stroke="#3A352B" stroke-width="2.8"/>
+  <line x1="52" y1="11" x2="52" y2="4" stroke="#3A352B" stroke-width="2.4"/><circle cx="52" cy="3.4" r="3.4" fill="#F4C430" stroke="#3A352B" stroke-width="1.6"/>
+  <text x="26" y="28" font-size="16" text-anchor="middle" fill="#F4C430" stroke="#3A352B" stroke-width="0.7">★</text>
+  <circle cx="84" cy="51" r="10.5" fill="#F4C430" stroke="#3A352B" stroke-width="2.4"/><circle cx="84" cy="51" r="5" fill="#3FA9D6" stroke="#3A352B" stroke-width="1.6"/>
+  <ellipse cx="50" cy="55" rx="22" ry="22" fill="#F7CBA0" stroke="#3A352B" stroke-width="1.2"/>
+  <path d="M29 51 Q31 29 50 29 Q69 29 71 51 Q62 41 54 44 Q50 37 46 44 Q38 41 29 51 Z" fill="#5A3B28" stroke="#3A352B" stroke-width="1.6" stroke-linejoin="round"/>
+  <ellipse cx="42" cy="56" rx="4.6" ry="6" fill="#2B2722"/><circle cx="43.6" cy="53.6" r="1.6" fill="#fff"/>
+  <ellipse cx="60" cy="56" rx="4.6" ry="6" fill="#2B2722"/><circle cx="61.6" cy="53.6" r="1.6" fill="#fff"/>
+  <circle cx="36" cy="64" r="3.2" fill="#F2917E" opacity=".55"/><circle cx="66" cy="64" r="3.2" fill="#F2917E" opacity=".55"/>
+  <path d="M44 65 Q50 72 57 65" fill="none" stroke="#6b3a2a" stroke-width="2.6" stroke-linecap="round"/>
+ </svg>`;
+}
+const XHTIPS=['卡住啦?去「🆘 我卡住了」找我帮忙!','每真正学会一个,记得勾上「学会啦」哦~','做不出来很正常,先做一个最小能跑的版本!','别让 AI 一次做太多——一次只改一件事!','觉得丑?把你要的「感觉」说给 AI 听!','通关一站就盖个章,集齐 33 个概念当创造大师!','点开每个概念,我都准备了小游戏考考你 😎'];
+let _xhi=-1;
+function xhTip(){const b=$('xhBubble');if(!b)return;_xhi=(_xhi+1)%XHTIPS.length;b.textContent='小黑:'+XHTIPS[_xhi];if(b.animate)b.animate([{transform:'scale(1)'},{transform:'scale(1.06)'},{transform:'scale(1)'}],{duration:280});}
+function pickOpt(btn){const box=btn.parentNode;const good=btn.dataset.good==='1';
+ box.querySelectorAll('.opt').forEach(b=>{b.disabled=true;if(b.dataset.good==='1')b.classList.add('ok');});
+ if(!good)btn.classList.add('no');
+ box.querySelector('.gres').innerHTML = good
+  ? '<div class="xhsay ok">🎉 小黑:答对!把「感觉 / 场景 / 问题」说清楚,AI 才懂你。</div>'
+  : '<div class="xhsay no">🤔 小黑:看绿色那句~ 含糊地说「做好点」,AI 只能瞎猜。</div>';
 }
 renderTrail();renderLesson();renderStuck();updCount();
 </script>
