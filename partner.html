@@ -237,6 +237,37 @@ footer{background:var(--ink);padding:32px 28px;text-align:center}
 .cell-qs .cell-fit,.cell-ds .cell-fit{background:rgba(200,150,62,.07);border-color:var(--gold)}
 .matrix-note{text-align:center;font-size:.82rem;color:var(--ink-light);font-style:italic;padding-top:4px}
 
+/* ── DELIVERABLES ── */
+#deliverables{background:var(--white)}
+.dl-header{text-align:center;margin-bottom:52px}
+.dl-header h2{font-size:clamp(1.8rem,3.5vw,2.6rem);color:var(--navy);margin-bottom:14px}
+.dl-header p{color:var(--ink-light);font-size:1rem;max-width:540px;margin:0 auto;line-height:1.8}
+.dl-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.dl-item{display:flex;gap:18px;align-items:flex-start;padding:24px;background:var(--cream);border:1px solid var(--border);border-radius:4px;border-left:3.5px solid var(--gold)}
+.dl-icon{font-size:1.55rem;line-height:1;flex-shrink:0;margin-top:3px}
+.dl-title{font-family:'Noto Serif SC',serif;font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:7px}
+.dl-desc{font-size:.84rem;color:var(--ink-mid);line-height:1.78}
+
+/* ── COMPARE ── */
+#compare{background:var(--cream)}
+.compare-header{text-align:center;margin-bottom:44px}
+.compare-header h2{font-size:clamp(1.8rem,3.5vw,2.4rem);color:var(--navy);margin-bottom:14px;line-height:1.35}
+.compare-header p{color:var(--ink-light);font-size:1rem;line-height:1.8;max-width:480px;margin:0 auto}
+.compare-table{border:1.5px solid var(--border);border-radius:6px;overflow:hidden}
+.compare-row{display:grid;grid-template-columns:1.1fr 1fr 1fr;border-bottom:1px solid var(--border)}
+.compare-row:last-child{border-bottom:none}
+.compare-hdr{background:var(--navy)}
+.compare-cell{padding:14px 20px;font-size:.87rem;line-height:1.65}
+.compare-hdr .compare-cell{font-family:'Noto Serif SC',serif;font-weight:700;font-size:.78rem;letter-spacing:.08em;color:rgba(255,255,255,.5);padding:16px 20px}
+.compare-hdr .c-us{color:var(--gold-light);background:rgba(200,150,62,.13)}
+.c-feat{font-weight:600;color:var(--navy);background:var(--white)}
+.c-other{color:var(--ink-mid);background:var(--white)}
+.c-us{background:rgba(200,150,62,.05)}
+.compare-row:hover .c-feat,.compare-row:hover .c-other{background:rgba(11,30,53,.02)}
+.compare-row:hover .c-us{background:rgba(200,150,62,.09)}
+.neg{color:#C84040}
+.pos{color:var(--jade);font-weight:600}
+
 /* ── RESPONSIVE ── */
 @media(max-width:900px){
   .tracks-grid{grid-template-columns:repeat(2,1fr)}
@@ -249,7 +280,17 @@ footer{background:var(--ink);padding:32px 28px;text-align:center}
   .cap-grid{grid-template-columns:repeat(2,1fr)}
   .matrix{grid-template-columns:72px 1fr 1fr}
 }
+@media(max-width:900px){
+  .dl-grid{grid-template-columns:1fr}
+  .compare-row{grid-template-columns:1fr 1fr 1fr}
+}
 @media(max-width:600px){
+  .dl-grid{grid-template-columns:1fr}
+  .compare-row{grid-template-columns:1fr}
+  .compare-hdr{display:none}
+  .c-feat{font-weight:700;background:rgba(11,30,53,.06);padding-bottom:6px}
+  .c-other::before{content:'其他选项：';font-size:.7rem;color:var(--ink-light);display:block}
+  .c-us::before{content:'智造少年：';font-size:.7rem;color:var(--gold);font-weight:700;display:block}
   section{padding:56px 0}
   #manifesto{padding:64px 0}
   nav{position:static}
@@ -310,6 +351,272 @@ footer{background:var(--ink);padding:32px 28px;text-align:center}
         <div class="proof-label">Creator · Explorer · Owner<br>我们培养的三种身份</div>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- DELIVERABLES -->
+<section id="deliverables">
+  <div class="container">
+    <div class="dl-header">
+      <p class="eyebrow" style="color:var(--gold);margin-bottom:14px">Project Deliverables · 项目交付清单</p>
+      <h2>项目完成时，你的学生手里有什么？</h2>
+      <p>不是证书，不是报告——是可以当场打开、可以发给招生官的真实作品和申请素材。</p>
+    </div>
+    <div class="dl-grid">
+      <div class="dl-item">
+        <div class="dl-icon">🔗</div>
+        <div>
+          <div class="dl-title">可在线打开的完整作品</div>
+          <div class="dl-desc">永久上线于 ai00.tech，招生官可直接点击使用——不是截图，是真实运行的应用。链接可附在 Common App、简历、面试邮件和推荐信中。</div>
+        </div>
+      </div>
+      <div class="dl-item">
+        <div class="dl-icon">📋</div>
+        <div>
+          <div class="dl-title">活动清单描述初稿</div>
+          <div class="dl-desc">项目完成后提供 150 字中英文活动描述框架，可直接接入 Common App 活动清单或中国学校的综合素质评价材料，减轻你的工作量。</div>
+        </div>
+      </div>
+      <div class="dl-item">
+        <div class="dl-icon">📖</div>
+        <div>
+          <div class="dl-title">过程记录 · 文书天然素材</div>
+          <div class="dl-desc">每轮迭代的决策记录——"我遇到什么问题、为什么这么改"是文书最好的素材来源，不需要事后编造故事，故事在做项目的过程中已经发生。</div>
+        </div>
+      </div>
+      <div class="dl-item">
+        <div class="dl-icon">💡</div>
+        <div>
+          <div class="dl-title">个人陈述切入点清单</div>
+          <div class="dl-desc">从项目过程中提炼 3–5 个独特叙事角度，供文书顾问选用——不同申请方向，同一个项目可以讲出不同的故事。</div>
+        </div>
+      </div>
+      <div class="dl-item">
+        <div class="dl-icon">🎯</div>
+        <div>
+          <div class="dl-title">项目展示 Deck</div>
+          <div class="dl-desc">一页可发送的项目介绍，适用于面试前发给招生官预读、写进推荐信，或在家长会上展示学生的真实成果。</div>
+        </div>
+      </div>
+      <div class="dl-item">
+        <div class="dl-icon">🤝</div>
+        <div>
+          <div class="dl-title">申请方向整合建议</div>
+          <div class="dl-desc">项目结束时，我们与顾问共同梳理项目成果如何与申请目标衔接，提供书面整合建议，帮助你更好地向学校呈现学生的独特竞争力。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROOF -->
+<section id="proof">
+  <div class="container">
+    <div class="proof-header">
+      <p class="eyebrow" style="color:var(--gold);margin-bottom:14px">Portfolio · 作品实证</p>
+      <h2 style="color:var(--navy)">这些，都是真实做出来的。</h2>
+      <p style="color:var(--ink-light)">每一个项目都在 ai00.tech 上线，可以打开、可以使用、可以展示给招生官。</p>
+    </div>
+    <div class="proof-grid">
+      <div class="proof-card">
+        <div class="proof-card-header">
+          <div class="proof-card-emoji">🌍</div>
+          <div class="proof-card-title">AI 世界文明实验室</div>
+          <div class="proof-card-sub">AI Global Civilization Lab</div>
+          <span class="proof-card-tag tag-sci">历史 × 科技</span>
+        </div>
+        <div class="proof-card-body">面向10-12岁学生的互动历史课程应用——时间轴、文明档案、抉择时刻。展示了如何将传统学科与 AI 工具结合做教育产品。</div>
+      </div>
+      <div class="proof-card">
+        <div class="proof-card-header">
+          <div class="proof-card-emoji">📚</div>
+          <div class="proof-card-title">语文暑期复习</div>
+          <div class="proof-card-sub">Chinese Literacy AI Coach</div>
+          <span class="proof-card-tag tag-lang">教育科技</span>
+        </div>
+        <div class="proof-card-body">为三年级学生设计的个性化语文复习工具——词语记忆、古诗赏析、AI语音朗读。体现了将教育痛点转化为产品的完整路径。</div>
+      </div>
+      <div class="proof-card">
+        <div class="proof-card-header">
+          <div class="proof-card-emoji">🧪</div>
+          <div class="proof-card-title">化学实验室模拟器</div>
+          <div class="proof-card-sub">Chemistry Reaction Sandbox</div>
+          <span class="proof-card-tag tag-sci">科学 × 工程</span>
+        </div>
+        <div class="proof-card-body">基于物理引擎的化学反应可视化平台，支持多种元素交互实验。展示了对 STEM 内容的深度理解与技术实现能力。</div>
+      </div>
+      <div class="proof-card">
+        <div class="proof-card-header">
+          <div class="proof-card-emoji">🎮</div>
+          <div class="proof-card-title">3D 策略射击游戏</div>
+          <div class="proof-card-sub">First-Person Strategy Game</div>
+          <span class="proof-card-tag tag-game">游戏 × 工程</span>
+        </div>
+        <div class="proof-card-body">三维第一人称4v4对战游戏，完整实现 AI 角色、地图设计与游戏逻辑。体现创意与工程能力的跨界整合。</div>
+      </div>
+      <div class="proof-card">
+        <div class="proof-card-header">
+          <div class="proof-card-emoji">✍️</div>
+          <div class="proof-card-title">AI 写作表达课</div>
+          <div class="proof-card-sub">AI Writing Expression Coach</div>
+          <span class="proof-card-tag tag-art">创意 × 教育</span>
+        </div>
+        <div class="proof-card-body">AI 只提问不代笔的写作陪练系统——帮助学生用自己的声音写作，不被 AI 替代。体现了对教育伦理的独立思考。</div>
+      </div>
+      <div class="proof-card" style="background:rgba(200,150,62,.08);border:1.5px dashed rgba(200,150,62,.4)">
+        <div class="proof-card-header">
+          <div class="proof-card-emoji">🌱</div>
+          <div class="proof-card-title" style="color:var(--gold-light)">这里可以是你孩子的项目</div>
+          <div class="proof-card-sub">Your Child's Project Here</div>
+        </div>
+        <div class="proof-card-body" style="color:rgba(255,255,255,.45)">每个学生的项目都来自他们自己的问题意识。从一个想法，到一个真实运转的作品，时间：8–16周。</div>
+      </div>
+    </div>
+    <div class="proof-url">
+      <a href="https://ai00.tech" target="_blank">在 ai00.tech 查看全部学生作品</a>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARE -->
+<section id="compare">
+  <div class="container">
+    <div class="compare-header">
+      <p class="eyebrow" style="color:var(--gold);margin-bottom:14px">vs. Alternatives · 与其他选项的区别</p>
+      <h2>学生有很多"背景提升"选项。<br>这是我们真正不同的地方。</h2>
+      <p>竞赛、挂名科研、国际实习——每种都有价值，但没有一种能给学生一个可打开的在线作品，和一个完全属于自己的故事。</p>
+    </div>
+    <div class="compare-table">
+      <div class="compare-row compare-hdr">
+        <div class="compare-cell c-feat"></div>
+        <div class="compare-cell c-other">竞赛 / 挂名科研 / 国际实习</div>
+        <div class="compare-cell c-us">智造少年 AI 项目</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell c-feat">招生官可验证真实性</div>
+        <div class="compare-cell c-other neg">✗ &nbsp;仅凭证书或署名文件</div>
+        <div class="compare-cell c-us pos">✓ &nbsp;可点击使用的在线作品</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell c-feat">孩子是真正的主导者</div>
+        <div class="compare-cell c-other neg">✗ &nbsp;多为执行者或观察者</div>
+        <div class="compare-cell c-us pos">✓ &nbsp;所有决策来自学生本人</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell c-feat">文书素材自然产出</div>
+        <div class="compare-cell c-other neg">✗ &nbsp;需事后挖掘、编排故事</div>
+        <div class="compare-cell c-us pos">✓ &nbsp;过程记录即文书来源</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell c-feat">适合非竞赛/非学术型学生</div>
+        <div class="compare-cell c-other neg">✗ &nbsp;门槛高或高度同质化</div>
+        <div class="compare-cell c-us pos">✓ &nbsp;从任意真实兴趣出发</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell c-feat">与顾问现有服务重叠</div>
+        <div class="compare-cell c-other neg">✗ &nbsp;可能与文书/课辅竞争资源</div>
+        <div class="compare-cell c-us pos">✓ &nbsp;新品类，可无缝组合推荐</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell c-feat">申请材料直接可用</div>
+        <div class="compare-cell c-other neg">✗ &nbsp;需顾问二次加工转化</div>
+        <div class="compare-cell c-us pos">✓ &nbsp;活动描述 + 文书切入点已就绪</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PARTNER -->
+<section id="partner">
+  <div class="container">
+    <div class="partner-header">
+      <p class="eyebrow" style="color:var(--gold-light);margin-bottom:14px">For Partners · 为什么推荐我们</p>
+      <h2>对你和你的学生，都是真正的增值。</h2>
+      <p>我们理解顾问的工作逻辑，帮你提供一个差异化、有说服力的服务选项。</p>
+    </div>
+    <div class="partner-grid">
+      <div class="partner-card">
+        <div class="partner-card-num">01</div>
+        <div class="partner-card-title">差异化产品，不与其他机构重叠</div>
+        <div class="partner-card-desc">AI 项目孵化是全新品类，不是竞赛培训、不是学术写作——你可以放心地组合推荐，无冲突。</div>
+      </div>
+      <div class="partner-card">
+        <div class="partner-card-num">02</div>
+        <div class="partner-card-title">真实作品，家长信服度极高</div>
+        <div class="partner-card-desc">打开链接，就能看到学生做的东西在运转。这种可见的交付物，比任何证书都更容易让家长认可。</div>
+      </div>
+      <div class="partner-card">
+        <div class="partner-card-num">03</div>
+        <div class="partner-card-title">学生获得感强，续费与转介绍率高</div>
+        <div class="partner-card-desc">孩子有了属于自己的作品，自然愿意继续深化、推进第二个项目——口碑自然积累。</div>
+      </div>
+      <div class="partner-card">
+        <div class="partner-card-num">04</div>
+        <div class="partner-card-title">配套申请材料协助</div>
+        <div class="partner-card-desc">项目完成后，我们提供活动描述初稿、项目展示建议，方便整合进申请材料，减轻你的工作量。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICE MATRIX -->
+<section id="models">
+  <div class="container">
+    <div class="models-header">
+      <p class="eyebrow" style="color:var(--gold);margin-bottom:14px">Service Matrix · 服务坐标</p>
+      <h2>两个问题，找到孩子的坐标。</h2>
+      <p>孩子申请什么方向？有多少时间？答案决定项目的角度——执行过程完全一样。</p>
+    </div>
+    <div class="matrix">
+      <!-- corner -->
+      <div class="matrix-corner"></div>
+      <!-- col headers -->
+      <div class="matrix-col-head">
+        <div class="col-icon">🌱</div>
+        <div>
+          <div class="col-title">公益出口</div>
+          <div class="col-sub">Social Impact</div>
+        </div>
+      </div>
+      <div class="matrix-col-head">
+        <div class="col-icon">⚡</div>
+        <div>
+          <div class="col-title">商业出口</div>
+          <div class="col-sub">Commercial</div>
+        </div>
+      </div>
+      <!-- row 1 -->
+      <div class="matrix-row-head">
+        <div class="row-label">长期</div>
+        <div class="row-sub">深度陪跑<br>3–12个月</div>
+      </div>
+      <div class="matrix-cell cell-qi">
+        <div class="cell-title">深度影响力积累</div>
+        <div class="cell-desc">持续服务真实社群，建立可量化的影响数据，形成完整的社会行动叙事。</div>
+        <div class="cell-fit">社科 · 教育 · 公共政策 · 医学预科</div>
+      </div>
+      <div class="matrix-cell cell-qs">
+        <div class="cell-title">创始人成长路径</div>
+        <div class="cell-desc">多轮迭代积累真实用户反馈，产品思维与商业判断在过程中自然形成。</div>
+        <div class="cell-fit">商科 · 经济 · 创业 · MIT / Stanford 工程</div>
+      </div>
+      <!-- row 2 -->
+      <div class="matrix-row-head">
+        <div class="row-label">单项</div>
+        <div class="row-sub">项目赋能<br>8–16周</div>
+      </div>
+      <div class="matrix-cell cell-di">
+        <div class="cell-title">聚焦公益冲刺</div>
+        <div class="cell-desc">明确一个社区需求，快速交付有真实使用者的项目，故事简洁有力。</div>
+        <div class="cell-fit">加拿大 · 英国社科 · UBC · UCL</div>
+      </div>
+      <div class="matrix-cell cell-ds">
+        <div class="cell-title">MVP 快速孵化</div>
+        <div class="cell-desc">聚焦核心功能，8–16周产出可演示的商业原型，灵活接入已有申请规划。</div>
+        <div class="cell-fit">港大商科 · 美国文理 · 新加坡 SMU</div>
+      </div>
+    </div>
+    <p class="matrix-note">项目执行过程完全一致——出口形式由孩子的申请方向和顾问共同决定。</p>
   </div>
 </section>
 
@@ -466,75 +773,6 @@ footer{background:var(--ink);padding:32px 28px;text-align:center}
   </div>
 </section>
 
-<!-- PROOF -->
-<section id="proof">
-  <div class="container">
-    <div class="proof-header">
-      <p class="eyebrow" style="color:var(--gold);margin-bottom:14px">Portfolio · 作品实证</p>
-      <h2 style="color:var(--navy)">这些，都是真实做出来的。</h2>
-      <p style="color:var(--ink-light)">每一个项目都在 ai00.tech 上线，可以打开、可以使用、可以展示给招生官。</p>
-    </div>
-    <div class="proof-grid">
-      <div class="proof-card">
-        <div class="proof-card-header">
-          <div class="proof-card-emoji">🌍</div>
-          <div class="proof-card-title">AI 世界文明实验室</div>
-          <div class="proof-card-sub">AI Global Civilization Lab</div>
-          <span class="proof-card-tag tag-sci">历史 × 科技</span>
-        </div>
-        <div class="proof-card-body">面向10-12岁学生的互动历史课程应用——时间轴、文明档案、抉择时刻。展示了如何将传统学科与 AI 工具结合做教育产品。</div>
-      </div>
-      <div class="proof-card">
-        <div class="proof-card-header">
-          <div class="proof-card-emoji">📚</div>
-          <div class="proof-card-title">语文暑期复习</div>
-          <div class="proof-card-sub">Chinese Literacy AI Coach</div>
-          <span class="proof-card-tag tag-lang">教育科技</span>
-        </div>
-        <div class="proof-card-body">为三年级学生设计的个性化语文复习工具——词语记忆、古诗赏析、AI语音朗读。体现了将教育痛点转化为产品的完整路径。</div>
-      </div>
-      <div class="proof-card">
-        <div class="proof-card-header">
-          <div class="proof-card-emoji">🧪</div>
-          <div class="proof-card-title">化学实验室模拟器</div>
-          <div class="proof-card-sub">Chemistry Reaction Sandbox</div>
-          <span class="proof-card-tag tag-sci">科学 × 工程</span>
-        </div>
-        <div class="proof-card-body">基于物理引擎的化学反应可视化平台，支持多种元素交互实验。展示了对 STEM 内容的深度理解与技术实现能力。</div>
-      </div>
-      <div class="proof-card">
-        <div class="proof-card-header">
-          <div class="proof-card-emoji">🎮</div>
-          <div class="proof-card-title">3D 策略射击游戏</div>
-          <div class="proof-card-sub">First-Person Strategy Game</div>
-          <span class="proof-card-tag tag-game">游戏 × 工程</span>
-        </div>
-        <div class="proof-card-body">三维第一人称4v4对战游戏，完整实现 AI 角色、地图设计与游戏逻辑。体现创意与工程能力的跨界整合。</div>
-      </div>
-      <div class="proof-card">
-        <div class="proof-card-header">
-          <div class="proof-card-emoji">✍️</div>
-          <div class="proof-card-title">AI 写作表达课</div>
-          <div class="proof-card-sub">AI Writing Expression Coach</div>
-          <span class="proof-card-tag tag-art">创意 × 教育</span>
-        </div>
-        <div class="proof-card-body">AI 只提问不代笔的写作陪练系统——帮助学生用自己的声音写作，不被 AI 替代。体现了对教育伦理的独立思考。</div>
-      </div>
-      <div class="proof-card" style="background:rgba(200,150,62,.08);border:1.5px dashed rgba(200,150,62,.4)">
-        <div class="proof-card-header">
-          <div class="proof-card-emoji">🌱</div>
-          <div class="proof-card-title" style="color:var(--gold-light)">这里可以是你孩子的项目</div>
-          <div class="proof-card-sub">Your Child's Project Here</div>
-        </div>
-        <div class="proof-card-body" style="color:rgba(255,255,255,.45)">每个学生的项目都来自他们自己的问题意识。从一个想法，到一个真实运转的作品，时间：8–16周。</div>
-      </div>
-    </div>
-    <div class="proof-url">
-      <a href="https://ai00.tech" target="_blank">在 ai00.tech 查看全部学生作品</a>
-    </div>
-  </div>
-</section>
-
 <!-- WHY AI -->
 <section id="why">
   <div class="container">
@@ -576,100 +814,6 @@ footer{background:var(--ink);padding:32px 28px;text-align:center}
         </div>
       </div>
     </div>
-  </div>
-</section>
-
-<!-- PARTNER -->
-<section id="partner">
-  <div class="container">
-    <div class="partner-header">
-      <p class="eyebrow" style="color:var(--gold-light);margin-bottom:14px">For Partners · 为什么推荐我们</p>
-      <h2>对你和你的学生，都是真正的增值。</h2>
-      <p>我们理解顾问的工作逻辑，帮你提供一个差异化、有说服力的服务选项。</p>
-    </div>
-    <div class="partner-grid">
-      <div class="partner-card">
-        <div class="partner-card-num">01</div>
-        <div class="partner-card-title">差异化产品，不与其他机构重叠</div>
-        <div class="partner-card-desc">AI 项目孵化是全新品类，不是竞赛培训、不是学术写作——你可以放心地组合推荐，无冲突。</div>
-      </div>
-      <div class="partner-card">
-        <div class="partner-card-num">02</div>
-        <div class="partner-card-title">真实作品，家长信服度极高</div>
-        <div class="partner-card-desc">打开链接，就能看到学生做的东西在运转。这种可见的交付物，比任何证书都更容易让家长认可。</div>
-      </div>
-      <div class="partner-card">
-        <div class="partner-card-num">03</div>
-        <div class="partner-card-title">学生获得感强，续费与转介绍率高</div>
-        <div class="partner-card-desc">孩子有了属于自己的作品，自然愿意继续深化、推进第二个项目——口碑自然积累。</div>
-      </div>
-      <div class="partner-card">
-        <div class="partner-card-num">04</div>
-        <div class="partner-card-title">配套申请材料协助</div>
-        <div class="partner-card-desc">项目完成后，我们提供活动描述初稿、项目展示建议，方便整合进申请材料，减轻你的工作量。</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- SERVICE MATRIX -->
-<section id="models">
-  <div class="container">
-    <div class="models-header">
-      <p class="eyebrow" style="color:var(--gold);margin-bottom:14px">Service Matrix · 服务坐标</p>
-      <h2>两个问题，找到孩子的坐标。</h2>
-      <p>孩子申请什么方向？有多少时间？答案决定项目的角度——执行过程完全一样。</p>
-    </div>
-    <div class="matrix">
-      <!-- corner -->
-      <div class="matrix-corner"></div>
-      <!-- col headers -->
-      <div class="matrix-col-head">
-        <div class="col-icon">🌱</div>
-        <div>
-          <div class="col-title">公益出口</div>
-          <div class="col-sub">Social Impact</div>
-        </div>
-      </div>
-      <div class="matrix-col-head">
-        <div class="col-icon">⚡</div>
-        <div>
-          <div class="col-title">商业出口</div>
-          <div class="col-sub">Commercial</div>
-        </div>
-      </div>
-      <!-- row 1 -->
-      <div class="matrix-row-head">
-        <div class="row-label">长期</div>
-        <div class="row-sub">深度陪跑<br>3–12个月</div>
-      </div>
-      <div class="matrix-cell cell-qi">
-        <div class="cell-title">深度影响力积累</div>
-        <div class="cell-desc">持续服务真实社群，建立可量化的影响数据，形成完整的社会行动叙事。</div>
-        <div class="cell-fit">社科 · 教育 · 公共政策 · 医学预科</div>
-      </div>
-      <div class="matrix-cell cell-qs">
-        <div class="cell-title">创始人成长路径</div>
-        <div class="cell-desc">多轮迭代积累真实用户反馈，产品思维与商业判断在过程中自然形成。</div>
-        <div class="cell-fit">商科 · 经济 · 创业 · MIT / Stanford 工程</div>
-      </div>
-      <!-- row 2 -->
-      <div class="matrix-row-head">
-        <div class="row-label">单项</div>
-        <div class="row-sub">项目赋能<br>8–16周</div>
-      </div>
-      <div class="matrix-cell cell-di">
-        <div class="cell-title">聚焦公益冲刺</div>
-        <div class="cell-desc">明确一个社区需求，快速交付有真实使用者的项目，故事简洁有力。</div>
-        <div class="cell-fit">加拿大 · 英国社科 · UBC · UCL</div>
-      </div>
-      <div class="matrix-cell cell-ds">
-        <div class="cell-title">MVP 快速孵化</div>
-        <div class="cell-desc">聚焦核心功能，8–16周产出可演示的商业原型，灵活接入已有申请规划。</div>
-        <div class="cell-fit">港大商科 · 美国文理 · 新加坡 SMU</div>
-      </div>
-    </div>
-    <p class="matrix-note">项目执行过程完全一致——出口形式由孩子的申请方向和顾问共同决定。</p>
   </div>
 </section>
 
