@@ -1,0 +1,2165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Monster Maker Lab · Academic English</title>
+<style>
+:root {
+  --cream: #f6f2e8;
+  --cream-deep: #efe8d8;
+  --card: #ffffff;
+  --ink: #4a4038;
+  --ink-soft: #8a7d70;
+  --line: #e6ddcc;
+  --coral: #ff7a6b;
+  --coral-deep: #f2543d;
+  --teal: #38b6a6;
+  --teal-deep: #1f9488;
+  --gold: #f0b429;
+  --gold-deep: #d99213;
+  --violet: #9b7bee;
+  --violet2: #8a6ee0;
+  --sky: #6ec6e6;
+  --pink: #ff9fb0;
+  --green: #57c98a;
+  --red: #f2543d;
+  --shadow: 0 8px 24px rgba(120,100,70,0.12);
+  --shadow-lg: 0 16px 44px rgba(120,100,70,0.20);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+body {
+  font-family: 'PingFang SC','Nunito','Microsoft YaHei',sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.screen { display:none; min-height:100vh; }
+.screen.active { display:block; }
+
+img.mon { image-rendering:auto; -webkit-user-drag:none; user-select:none; }
+
+/* ═══════ START ═══════ */
+#screen-start {
+  background: radial-gradient(ellipse at 50% 22%, #fffdf7 0%, var(--cream) 62%);
+  text-align:center;
+  padding: 30px 18px 60px;
+  display:none;
+}
+#screen-start.active { display:block; }
+.brand {
+  display:inline-flex; align-items:center; gap:12px; margin-top:14px;
+}
+.brand-emoji { font-size:2.2rem; }
+.start-title {
+  font-size: clamp(2rem, 6vw, 3rem);
+  font-weight: 900; letter-spacing: 4px;
+  color: var(--coral-deep);
+  text-shadow: 2px 3px 0 #ffd9a0;
+}
+.start-sub { color: var(--ink-soft); margin-top:10px; font-size:1rem; letter-spacing:1px; }
+.start-cta {
+  margin-top: 22px; font-size:1.1rem; font-weight:800; color: var(--teal-deep);
+}
+.start-cta .bubble {
+  display:inline-block; background:#fff; border:2px solid var(--teal);
+  border-radius:30px; padding:8px 22px; box-shadow: var(--shadow);
+  animation: bob 1.6s ease-in-out infinite;
+}
+@keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+
+.start-all-lab { font-size:.88rem; color:var(--ink-soft); margin:26px 0 10px; font-weight:700; }
+.start-all-lab b { color:var(--coral-deep); }
+.start-all {
+  max-width:920px; margin:0 auto; background:#fff;
+  border:2px solid var(--line); border-radius:20px; padding:14px;
+  box-shadow:var(--shadow);
+}
+.starter-row {
+  display:flex; justify-content:center; flex-wrap:wrap; gap:20px; margin-top:34px;
+}
+.starter-card {
+  background: var(--card); border:2px solid var(--line);
+  border-radius: 26px; padding: 18px 16px 16px; width: 210px;
+  cursor:pointer; transition: transform .22s, box-shadow .22s, border-color .22s;
+  box-shadow: var(--shadow);
+}
+.starter-card:hover {
+  transform: translateY(-10px); border-color: var(--accent, var(--coral));
+  box-shadow: var(--shadow-lg);
+}
+.starter-art {
+  height: 160px; display:flex; align-items:flex-end; justify-content:center;
+  background: radial-gradient(ellipse at 50% 80%, var(--halo,#fff2d8) 0%, transparent 66%);
+  border-radius: 18px;
+}
+.starter-art img { max-height: 158px; max-width: 88%; animation: floaty 3s ease-in-out infinite; }
+.starter-card:nth-child(2) .starter-art img { animation-delay:.5s; }
+.starter-card:nth-child(3) .starter-art img { animation-delay:1s; }
+.starter-card:nth-child(4) .starter-art img { animation-delay:1.5s; }
+@keyframes floaty { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-9px)} }
+.starter-name { font-size:1.25rem; font-weight:900; margin-top:12px; color:var(--ink); }
+.starter-talent { font-size:.8rem; color:var(--ink-soft); margin-top:5px; line-height:1.5; min-height:2.4em; }
+.starter-stats { display:flex; justify-content:center; gap:12px; margin-top:9px; font-size:.76rem; color:var(--ink-soft); }
+.starter-stats b { color: var(--teal-deep); }
+.pick-btn {
+  margin-top:13px; width:100%; padding:11px; border:none; border-radius:14px;
+  background: var(--accent, var(--coral)); color:#fff; font-family:inherit;
+  font-size:.98rem; font-weight:800; cursor:pointer; transition: filter .2s;
+}
+.starter-card:hover .pick-btn { filter: brightness(1.08); }
+.continue-bar { margin-top:30px; }
+.continue-btn {
+  padding:11px 30px; border:2px solid var(--line); background:#fff;
+  border-radius:16px; color:var(--ink-soft); font-family:inherit; font-size:.9rem;
+  font-weight:700; cursor:pointer; box-shadow:var(--shadow);
+}
+.continue-btn:hover { color:var(--ink); border-color:var(--teal); }
+
+/* ═══════ HEADER ═══════ */
+header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 12px 22px; background: #fff; border-bottom:2px solid var(--line);
+  flex-wrap:wrap; gap:10px; position:sticky; top:0; z-index:50;
+}
+.logo { display:flex; align-items:center; gap:9px; }
+.logo-emoji { font-size:1.5rem; }
+.logo-text { font-size:1.15rem; font-weight:900; letter-spacing:1px; color:var(--coral-deep); }
+.hdr-badges { display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+.pill {
+  display:flex; flex-direction:column; align-items:center; gap:1px;
+  background:var(--cream); border:1.5px solid var(--line); border-radius:14px;
+  padding:5px 13px; min-width:66px;
+}
+.pill .k { font-size:.6rem; color:var(--ink-soft); }
+.pill .v { font-size:.95rem; font-weight:900; }
+.pill .v.red{color:var(--coral-deep)} .pill .v.gold{color:var(--gold-deep)}
+.pill .v.teal{color:var(--teal-deep)} .pill .v.violet{color:var(--violet2)}
+.teacher-link {
+  font-size:.76rem; color:var(--violet2); cursor:pointer; font-weight:800;
+  border:2px dashed var(--violet2); border-radius:14px; padding:6px 12px;
+  background:#fff;
+}
+.teacher-link:hover { background:#f4efff; }
+
+/* ═══════ HUB ═══════ */
+.hub {
+  display:grid; grid-template-columns: 1fr 360px; min-height: calc(100vh - 60px);
+}
+.hub-stage {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding: 26px 20px; position:relative;
+  background: radial-gradient(ellipse at 50% 40%, #fffdf6 0%, var(--cream) 70%);
+}
+.mon-hero {
+  position:relative; width:min(360px,78vw); display:flex; align-items:flex-end; justify-content:center;
+  border-radius: 30px;
+}
+.mon-hero::before {
+  content:''; position:absolute; inset:8% 6% -2%;
+  background: radial-gradient(ellipse at 50% 60%, var(--aura-col, #ffe6b0) 0%, transparent 68%);
+  opacity: var(--aura-op, .3); border-radius:50%; z-index:0;
+  transition: opacity .5s;
+}
+#hero-img { max-width:100%; max-height:340px; position:relative; z-index:1;
+  animation: floaty 3.4s ease-in-out infinite; filter: drop-shadow(0 14px 18px rgba(120,100,70,.18)); }
+#hero-img.evolving { animation: evolvePop .8s ease-out; }
+@keyframes evolvePop {
+  0%{transform:scale(1)} 40%{transform:scale(1.12); filter:brightness(1.8) drop-shadow(0 0 30px #fff)} 100%{transform:scale(1)}
+}
+.hero-name-row { display:flex; align-items:center; gap:10px; margin-top:8px; }
+.hero-name { font-size:1.6rem; font-weight:900; color:var(--ink); }
+.hero-power { font-size:.86rem; font-weight:800; color:var(--gold-deep);
+  background:#fff6df; border:1.5px solid #f0d89a; border-radius:12px; padding:3px 11px; }
+.wp-badge {
+  margin-top:8px; font-size:.82rem; font-weight:800; color:var(--violet2);
+  display:flex; align-items:center; gap:6px;
+}
+.wp-stars { color: var(--gold); letter-spacing:2px; }
+
+.stat-bars { width:min(340px,86vw); margin-top:16px; display:flex; flex-direction:column; gap:7px; }
+.sbar { display:flex; align-items:center; gap:9px; font-size:.78rem; }
+.sbar .lab { width:34px; color:var(--ink-soft); flex-shrink:0; }
+.sbar .track { flex:1; height:11px; background:#fff; border:1.5px solid var(--line); border-radius:7px; overflow:hidden; }
+.sbar .fill { height:100%; border-radius:6px; transition:width .7s cubic-bezier(.2,1.4,.4,1); }
+.fill-atk{background:linear-gradient(90deg,#ffb0a5,var(--coral))}
+.fill-spd{background:linear-gradient(90deg,#a9e2f0,var(--sky))}
+.fill-def{background:linear-gradient(90deg,#a9e6c4,var(--green))}
+.fill-hp{background:linear-gradient(90deg,#ffc7d3,var(--pink))}
+.sbar .num { width:34px; text-align:right; font-weight:900; color:var(--ink); }
+
+/* actions */
+.hub-side {
+  background:#fff; border-left:2px solid var(--line); padding:20px 18px;
+  display:flex; flex-direction:column; gap:14px; overflow-y:auto;
+}
+.act {
+  border-radius:20px; padding:17px 16px; cursor:pointer; border:2px solid;
+  transition: transform .18s, box-shadow .18s; position:relative; overflow:hidden;
+}
+.act:hover { transform:translateY(-3px); }
+.act-arena{ background:linear-gradient(135deg,#fff1ee,#ffe3dd); border-color:var(--coral); }
+.act-arena:hover{ box-shadow:0 8px 26px rgba(242,84,61,.22); }
+.act-train{ background:linear-gradient(135deg,#eafaf7,#d8f3ee); border-color:var(--teal); }
+.act-train:hover{ box-shadow:0 8px 26px rgba(31,148,136,.2); }
+.act-shop{ background:linear-gradient(135deg,#fff8e6,#ffefc6); border-color:var(--gold); }
+.act-shop:hover{ box-shadow:0 8px 26px rgba(217,146,19,.2); }
+.act-theme{ background:linear-gradient(135deg,#f3efff,#e7dfff); border-color:var(--violet2); }
+.act-theme:hover{ box-shadow:0 8px 26px rgba(138,110,224,.22); }
+.act-title { font-size:1.12rem; font-weight:900; color:var(--ink); display:flex; align-items:center; gap:8px; }
+.act-desc { font-size:.77rem; color:var(--ink-soft); margin-top:5px; line-height:1.55; }
+.act-hint { display:inline-block; margin-top:9px; font-size:.72rem; font-weight:800; padding:3px 11px; border-radius:20px; background:rgba(255,255,255,.7); }
+.act-arena .act-hint{color:var(--coral-deep)} .act-train .act-hint{color:var(--teal-deep)}
+.act-shop .act-hint{color:var(--gold-deep)} .act-theme .act-hint{color:var(--violet2)}
+.guide-arrow { position:absolute; top:10px; right:14px; font-size:1.3rem; animation: pointer 1s ease-in-out infinite; }
+@keyframes pointer { 0%,100%{transform:scale(1)} 50%{transform:scale(1.35)} }
+
+.collected {
+  background:var(--cream); border:1.5px solid var(--line); border-radius:16px; padding:13px 14px;
+}
+.collected .t { font-size:.72rem; color:var(--ink-soft); font-weight:800; margin-bottom:9px; }
+.collected .grid { display:flex; flex-wrap:wrap; gap:7px; }
+.trophy { display:flex; flex-direction:column; align-items:center; width:52px; }
+.trophy img { width:44px; height:44px; object-fit:contain; filter: drop-shadow(0 3px 4px rgba(0,0,0,.1)); }
+.trophy span { font-size:.56rem; color:var(--ink-soft); margin-top:2px; text-align:center; line-height:1.1; }
+.collected .empty { font-size:.75rem; color:var(--ink-soft); opacity:.7; }
+
+.records { background:var(--cream); border:1.5px solid var(--line); border-radius:16px; padding:13px 14px; }
+.records .t { font-size:.72rem; color:var(--ink-soft); font-weight:800; margin-bottom:8px; }
+.rec-list { display:flex; flex-direction:column; gap:6px; max-height:170px; overflow-y:auto; }
+.rec { font-size:.75rem; color:var(--ink-soft); display:flex; gap:7px; line-height:1.45; }
+.rec .w{color:var(--green);font-weight:800;flex-shrink:0} .rec .l{color:var(--coral-deep);font-weight:800;flex-shrink:0}
+.rec .st{color:var(--gold);flex-shrink:0}
+.reset { font-size:.7rem; color:var(--ink-soft); text-align:center; cursor:pointer; opacity:.55; margin-top:auto; padding-top:6px; }
+.reset:hover { opacity:1; color:var(--coral-deep); }
+
+/* ═══════ OVERLAY ═══════ */
+.overlay {
+  display:none; position:fixed; inset:0; background:rgba(74,64,56,.42);
+  backdrop-filter: blur(3px); z-index:200; overflow-y:auto; padding:26px 14px;
+}
+.overlay.active { display:flex; align-items:flex-start; justify-content:center; }
+.modal {
+  background:#fff; border-radius:26px; width:min(680px,96vw); padding:24px;
+  box-shadow: var(--shadow-lg); animation: rise .28s ease-out;
+}
+@keyframes rise { from{transform:translateY(22px);opacity:0} to{transform:none;opacity:1} }
+.modal-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+.modal-title { font-size:1.25rem; font-weight:900; color:var(--ink); }
+.close-x { font-size:1.2rem; color:var(--ink-soft); cursor:pointer; padding:4px 10px; border-radius:10px; }
+.close-x:hover { background:var(--cream); color:var(--coral-deep); }
+.modal-sub { font-size:.82rem; color:var(--ink-soft); line-height:1.7; margin-bottom:12px; }
+.modal-sub b { color:var(--teal-deep); }
+
+.genre-tabs { display:flex; gap:8px; margin:6px 0 12px; }
+.g-tab {
+  flex:1; padding:10px 6px; border-radius:14px; border:2px solid var(--line);
+  background:var(--cream); font-family:inherit; font-size:.88rem; font-weight:800;
+  color:var(--ink-soft); cursor:pointer; transition:all .18s;
+}
+.g-tab:hover { border-color:var(--g-color); color:var(--g-color); }
+.g-tab.on { border-color:var(--g-color); color:var(--g-color); background:#fff; box-shadow:var(--shadow); }
+.wp-genres { display:flex; gap:6px; margin-top:7px; flex-wrap:wrap; justify-content:center; }
+.wg-chip {
+  font-size:.68rem; font-weight:800; padding:3px 10px; border-radius:12px;
+  border:1.5px solid var(--g-color); color:var(--g-color); background:#fff;
+}
+.hints { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.hint-tag { font-size:.72rem; padding:5px 11px; background:var(--cream); border:1.5px solid var(--line);
+  border-radius:20px; color:var(--ink-soft); cursor:pointer; font-weight:700; transition:all .18s; }
+.hint-tag:hover { border-color:var(--teal); color:var(--teal-deep); }
+#train-input {
+  width:100%; height:132px; background:var(--cream); border:2px solid var(--line);
+  border-radius:16px; padding:13px 15px; color:var(--ink); font-size:.92rem;
+  font-family:inherit; resize:none; outline:none; line-height:1.7;
+}
+#train-input:focus { border-color:var(--teal); }
+.train-meta { display:flex; justify-content:space-between; align-items:center; margin-top:7px; }
+.live-score { display:flex; flex-wrap:wrap; gap:6px; }
+.ls-chip { font-size:.68rem; padding:3px 10px; border-radius:14px; background:var(--cream);
+  border:1.5px solid var(--line); color:var(--ink-soft); font-weight:700; transition:all .22s; }
+.ls-chip.on { background:#e3f7ee; border-color:var(--green); color:var(--teal-deep); }
+.char-count { font-size:.72rem; color:var(--ink-soft); }
+.char-count.good{color:var(--green)} .char-count.great{color:var(--gold-deep)}
+.big-btn {
+  width:100%; margin-top:15px; padding:15px; border:none; border-radius:18px;
+  color:#fff; font-size:1.02rem; font-weight:900; font-family:inherit; letter-spacing:1px;
+  cursor:pointer; transition: filter .2s, transform .1s;
+}
+.big-btn:active { transform:scale(.98); }
+.big-btn:disabled { opacity:.4; cursor:not-allowed; }
+.btn-teal { background:linear-gradient(135deg,var(--teal),var(--teal-deep)); }
+.btn-teal:hover:not(:disabled){ filter:brightness(1.06); }
+.btn-coral { background:linear-gradient(135deg,var(--coral),var(--coral-deep)); }
+.btn-violet { background:linear-gradient(135deg,#a78bea,var(--violet2)); }
+
+/* training result */
+.train-result { display:none; text-align:center; }
+.tr-mon { width:150px; margin:6px auto 0; }
+.tr-mon img { max-width:100%; max-height:150px; }
+.tr-stars { font-size:2rem; letter-spacing:6px; margin:8px 0; }
+.tr-stars .on{color:var(--gold);text-shadow:0 0 12px #ffdd88} .tr-stars .off{color:#e2d8c4}
+.tr-gains { display:flex; justify-content:center; gap:12px; margin:12px 0; flex-wrap:wrap; }
+.gain { font-size:1rem; font-weight:900; padding:8px 16px; border-radius:14px; animation: pop .5s cubic-bezier(.2,1.6,.4,1) both; }
+.gain:nth-child(2){animation-delay:.12s} .gain:nth-child(3){animation-delay:.24s}
+@keyframes pop { from{transform:scale(0)} to{transform:scale(1)} }
+.gain.a{background:#ffe7e2;color:var(--coral-deep)} .gain.s{background:#e0f4fb;color:var(--teal-deep)} .gain.d{background:#e3f7ee;color:var(--green)}
+.pvp-mode-btns { display:flex; gap:14px; margin-top:14px; }
+.pvp-mode-card {
+  flex:1; background:var(--cream); border:2.5px solid var(--line); border-radius:18px;
+  padding:22px 16px; text-align:center; cursor:pointer; transition:all .18s;
+}
+.pvp-mode-card:hover { border-color:var(--pink); transform:translateY(-4px); box-shadow:0 10px 26px rgba(255,159,176,.3); }
+.pm-icon { font-size:2.2rem; }
+.pm-name { font-size:1.05rem; font-weight:900; color:var(--ink); margin:8px 0 6px; }
+.pm-desc { font-size:.75rem; color:var(--ink-soft); line-height:1.7; }
+#write-pk, #wpk-compare { display:none; }
+.pk-cols { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px; }
+.pk-col { background:var(--cream); border:1.5px solid var(--line); border-radius:14px; padding:12px 14px; }
+.pk-col .pk-head { font-size:.85rem; font-weight:900; color:var(--ink); margin-bottom:4px; }
+.pk-col .pk-stars { color:var(--gold); font-size:1rem; letter-spacing:2px; }
+.pk-col .pk-pts { font-size:.75rem; font-weight:800; color:var(--teal-deep); margin:4px 0 8px; }
+.pk-col.winner { border-color:var(--gold); box-shadow:0 0 18px rgba(240,180,41,.35); }
+@media (max-width:640px){ .pk-cols{grid-template-columns:1fr} .pvp-mode-btns{flex-direction:column} }
+.hint-tip {
+  font-size:.8rem; color:var(--ink); background:#fffbe8; border:1.5px dashed var(--gold);
+  border-radius:12px; padding:8px 14px; margin-bottom:10px; line-height:1.7;
+}
+.hint-tip b { color:var(--coral-deep); }
+.topic-cats { display:flex; flex-wrap:wrap; gap:7px; margin:4px 0 10px; }
+.cat-chip {
+  font-size:.82rem; font-weight:800; padding:6px 13px; border-radius:999px;
+  background:#fff; border:2px solid var(--cream-deep); color:var(--ink-soft);
+  cursor:pointer; transition:all .15s;
+}
+.cat-chip:hover{ border-color:var(--teal); color:var(--teal-deep); transform:translateY(-2px); }
+.cat-chip.on{ background:var(--teal); border-color:var(--teal); color:#fff; }
+.subject-line {
+  font-size:.95rem; font-weight:800; color:var(--teal-deep);
+  background:#eefaf8; border:1.5px solid var(--teal); border-radius:12px;
+  padding:9px 14px; margin-bottom:10px; line-height:1.6;
+}
+.subject-line .roll{ float:right; font-size:.72rem; color:var(--ink-soft); cursor:pointer; font-weight:700; }
+.subject-line .roll:hover{ color:var(--coral-deep); }
+.toast {
+  position:fixed; left:50%; top:18%; transform:translateX(-50%);
+  background:var(--ink); color:#fff; font-size:.88rem; font-weight:700;
+  padding:12px 22px; border-radius:14px; z-index:999; box-shadow:0 8px 30px rgba(0,0,0,.3);
+  animation:toastIn .25s ease-out;
+}
+@keyframes toastIn { from{transform:translate(-50%,-12px);opacity:0} to{transform:translate(-50%,0);opacity:1} }
+.mic-btn {
+  padding:7px 14px; border:1.5px solid var(--sky); background:#f0f9ff; border-radius:12px;
+  color:#2a7ab0; font-family:inherit; font-size:.78rem; font-weight:800; cursor:pointer;
+  transition:all .15s; flex-shrink:0;
+}
+.mic-btn:hover { box-shadow:0 0 12px rgba(126,199,240,.4); }
+.mic-btn.rec {
+  background:#ffe8ec; border-color:var(--coral); color:var(--coral-deep);
+  animation:recPulse 1s ease-in-out infinite;
+}
+@keyframes recPulse { 0%,100%{box-shadow:0 0 0 0 rgba(255,122,89,.4)} 50%{box-shadow:0 0 0 8px rgba(255,122,89,0)} }
+.essay-item {
+  background:var(--cream); border:1.5px solid var(--line); border-radius:14px;
+  padding:14px 16px; margin-bottom:12px;
+}
+.essay-meta { font-size:.74rem; font-weight:800; color:var(--gold-deep); margin-bottom:6px; }
+.essay-text { font-size:1rem; color:var(--ink); line-height:2; }
+.topic-chip {
+  display:inline-block; font-size:.8rem; font-weight:800; color:var(--gold-deep);
+  background:#fff7e0; border:1.5px solid var(--gold); border-radius:12px;
+  padding:6px 14px; margin-bottom:10px;
+}
+.score-detail {
+  text-align:left; background:var(--cream); border:1.5px solid var(--line);
+  border-radius:14px; padding:12px 16px; margin:12px auto; max-width:440px;
+  max-height:200px; overflow-y:auto;
+}
+.sd-row {
+  display:flex; justify-content:space-between; gap:10px;
+  font-size:.78rem; padding:3px 0; color:#b8ab92;
+}
+.sd-row.on { color:var(--ink); font-weight:600; }
+.sd-row .hit { color:var(--teal-deep); font-weight:800; }
+.sd-row .pt { color:var(--green); font-weight:800; flex-shrink:0; }
+.tr-tip { font-size:.8rem; color:var(--ink-soft); margin-top:8px; line-height:1.7; }
+.tr-tip b { color:var(--teal-deep); }
+.tr-btns { display:flex; gap:10px; margin-top:16px; }
+.mini-btn { flex:1; padding:12px; border-radius:16px; font-family:inherit; font-size:.92rem; font-weight:800; cursor:pointer; border:2px solid; transition:all .18s; }
+.mini-btn.fill { border-color:var(--coral); background:var(--coral); color:#fff; }
+.mini-btn.fill:hover{ filter:brightness(1.06); }
+.mini-btn.ghost { border-color:var(--line); background:#fff; color:var(--ink-soft); }
+.mini-btn.ghost:hover{ color:var(--ink); border-color:var(--teal); }
+
+/* shop */
+.shop-gold { display:flex; align-items:center; gap:10px; font-size:.95rem; font-weight:700;
+  background:#fff8e6; border:1.5px solid #f0d89a; border-radius:14px; padding:12px 16px; margin:10px 0 14px; }
+.shop-gold b { color:var(--gold-deep); font-size:1.15rem; }
+.shop-gold .tip { margin-left:auto; font-size:.72rem; color:var(--ink-soft); font-weight:400; }
+.shop-item { display:flex; align-items:center; gap:13px; background:var(--cream);
+  border:1.5px solid var(--line); border-radius:18px; padding:15px; margin-bottom:11px; }
+.shop-ic { font-size:1.9rem; flex-shrink:0; }
+.shop-info { flex:1; min-width:0; }
+.shop-nm { font-size:.96rem; font-weight:900; color:var(--ink); }
+.shop-lv { font-size:.74rem; color:var(--gold-deep); font-weight:800; margin-left:7px; }
+.shop-ds { font-size:.74rem; color:var(--ink-soft); margin:4px 0 8px; }
+.shop-track { height:8px; background:#fff; border:1.5px solid var(--line); border-radius:5px; overflow:hidden; }
+.shop-track .f { height:100%; border-radius:4px; width:0; transition:width .4s; }
+.shop-buy { flex-shrink:0; padding:10px 15px; border:none; border-radius:14px; font-family:inherit;
+  font-size:.82rem; font-weight:900; line-height:1.4; cursor:pointer; background:var(--gold); color:#fff; transition:filter .2s; }
+.shop-buy:hover:not(:disabled){ filter:brightness(1.07); }
+.shop-buy:disabled { opacity:.4; cursor:not-allowed; }
+.shop-msg { text-align:center; font-size:.82rem; min-height:22px; color:var(--green); font-weight:800; }
+.shop-msg.err { color:var(--coral-deep); }
+
+/* teacher & themes */
+.tf-lab { font-size:.78rem; color:var(--ink-soft); font-weight:700; margin:14px 0 6px; }
+.tf-in, .tf-ta {
+  width:100%; background:var(--cream); border:2px solid var(--line); border-radius:14px;
+  padding:11px 13px; color:var(--ink); font-size:.88rem; font-family:inherit; outline:none;
+}
+.tf-in:focus,.tf-ta:focus{ border-color:var(--violet2); }
+.tf-ta { height:150px; resize:vertical; line-height:1.7; }
+.tf-btns { display:flex; gap:10px; margin-top:13px; flex-wrap:wrap; }
+.tf-btn { flex:1; min-width:150px; padding:12px; border-radius:15px; font-family:inherit;
+  font-size:.9rem; font-weight:800; cursor:pointer; border:2px solid; transition:all .18s; }
+.tf-btn.ai { border-color:var(--violet2); background:var(--violet2); color:#fff; }
+.tf-btn.ai:hover{ filter:brightness(1.07); }
+.tf-btn.qk { border-color:var(--teal); background:#fff; color:var(--teal-deep); }
+.tf-btn.qk:hover{ background:#eafaf7; }
+.tf-btn:disabled{ opacity:.5; cursor:wait; }
+.tf-status { font-size:.78rem; margin-top:10px; min-height:20px; color:var(--teal-deep); font-weight:700; }
+.tf-status.err{ color:var(--coral-deep); }
+.theme-item { display:flex; align-items:center; gap:12px; background:var(--cream);
+  border:1.5px solid var(--line); border-radius:16px; padding:12px 14px; margin-bottom:9px; cursor:pointer; transition:all .18s; }
+.theme-item:hover{ border-color:var(--violet2); transform:translateY(-2px); }
+.theme-ic { font-size:1.4rem; }
+.theme-info{ flex:1; min-width:0; }
+.theme-nm{ font-size:.94rem; font-weight:900; color:var(--ink); }
+.theme-meta{ font-size:.72rem; color:var(--ink-soft); margin-top:2px; }
+.theme-del{ font-size:.74rem; color:var(--ink-soft); padding:4px 8px; cursor:pointer; flex-shrink:0; }
+.theme-del:hover{ color:var(--coral-deep); }
+.theme-best{ font-size:.72rem; color:var(--gold); flex-shrink:0; }
+.theme-empty{ text-align:center; color:var(--ink-soft); font-size:.82rem; padding:24px 10px; line-height:1.8; }
+
+/* ═══════ ARENA ═══════ */
+#screen-arena {
+  background: radial-gradient(ellipse at 50% 18%, #fff4ef 0%, var(--cream) 66%);
+  padding:16px; display:none; flex-direction:column; align-items:center;
+}
+#screen-arena.active { display:flex; }
+.arena-title { font-size:1.3rem; font-weight:900; letter-spacing:2px; color:var(--coral-deep); margin:6px 0 4px; }
+.arena-sub { font-size:.8rem; color:var(--ink-soft); margin-bottom:14px; text-align:center; }
+.arena-sub b { color:var(--coral-deep); }
+.field { display:grid; grid-template-columns:1fr auto 1fr; gap:16px; align-items:center; width:min(860px,97vw); }
+.fighter { text-align:center; position:relative; }
+.fighter .art { height:min(230px,32vh); display:flex; align-items:flex-end; justify-content:center; }
+.fighter .art img { max-height:100%; max-width:88%; transition: transform .22s, filter .22s;
+  filter: drop-shadow(0 10px 12px rgba(120,100,70,.16)); }
+.fighter.lunge-r .art img{ transform:translateX(40px) scale(1.05) }
+.fighter.lunge-l .art img{ transform:translateX(-40px) scale(1.05) }
+.fighter.hit .art img{ filter:brightness(2.2) saturate(.4); transform:rotate(-4deg) }
+.fighter.dead .art img{ filter:grayscale(.85) brightness(.7); transform:rotate(88deg) translateY(16px); transition:all .7s; }
+.f-name { font-size:1rem; font-weight:900; color:var(--ink); margin-top:4px; }
+.f-tag { font-size:.68rem; color:var(--ink-soft); }
+.hpbar { width:86%; height:14px; margin:7px auto 0; background:#fff; border:1.5px solid var(--line); border-radius:8px; overflow:hidden; }
+.hpbar .f { height:100%; border-radius:7px; background:linear-gradient(90deg,#7ad6a0,var(--green)); transition:width .4s; }
+.hpbar .f.low{ background:linear-gradient(90deg,#ffcf87,#ff9d3c) }
+.hpbar .f.crit{ background:linear-gradient(90deg,#ff9a8f,var(--coral-deep)) }
+.hp-num { font-size:.7rem; color:var(--ink-soft); margin-top:3px; }
+.vs { font-size:2rem; font-weight:900; font-style:italic; color:var(--coral-deep); }
+.dmg-float { position:absolute; top:26%; left:50%; font-size:1.8rem; font-weight:900; color:var(--gold-deep);
+  text-shadow:0 2px 6px #fff; pointer-events:none; animation:dmgUp .9s ease-out forwards; z-index:10; }
+.dmg-float.heavy{ color:var(--coral-deep); font-size:2.2rem; }
+@keyframes dmgUp { 0%{transform:translate(-50%,0) scale(.6);opacity:0} 20%{transform:translate(-50%,-12px) scale(1.2);opacity:1} 100%{transform:translate(-50%,-64px) scale(1);opacity:0} }
+.battle-log { margin-top:16px; font-size:.9rem; color:var(--ink); min-height:26px; text-align:center; font-weight:600; }
+.battle-log b { color:var(--coral-deep); }
+
+/* ── VOCAB BATTLE ── */
+.vocab-card { display:none; margin-top:10px; width:min(600px,95vw); }
+.v-type {
+  display:inline-block; font-size:.72rem; font-weight:900; padding:3px 12px;
+  border-radius:14px; margin-bottom:8px; color:#fff; background:var(--vt,var(--coral));
+}
+.v-timer { float:right; font-size:.72rem; font-weight:800; color:var(--gold-deep); }
+.pick-grid {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(94px,1fr)); gap:10px;
+  max-height:56vh; overflow-y:auto; padding:4px;
+}
+.pick-item {
+  background:var(--cream); border:2px solid var(--line); border-radius:14px;
+  padding:8px 4px 6px; text-align:center; cursor:pointer; transition:all .15s;
+}
+.pick-item:hover { border-color:var(--coral); transform:translateY(-3px); }
+.pick-item img { height:64px; max-width:90%; object-fit:contain; }
+.pick-item .nm { font-size:.68rem; font-weight:800; color:var(--ink); margin-top:4px; line-height:1.2; }
+.pick-item .kd { font-size:.58rem; font-weight:800; margin-top:2px; }
+.kd.skill{color:var(--teal-deep)} .kd.foe{color:var(--coral-deep)} .kd.tool{color:var(--gold-deep)}
+.pick-item.solved { border-color:var(--green); }
+.codex-btn {
+  margin-top:14px; padding:9px 22px; border:2px solid var(--line); background:#fff;
+  border-radius:14px; color:var(--ink-soft); font-family:inherit; font-size:.85rem;
+  font-weight:800; cursor:pointer; box-shadow:var(--shadow);
+}
+.codex-btn:hover { color:var(--violet2); border-color:var(--violet2); }
+.act-pvp { background:linear-gradient(135deg,#fff0f4,#ffe0ea); border-color:var(--pink); }
+.act-pvp:hover { box-shadow:0 8px 26px rgba(255,159,176,.35); }
+.act-pvp .act-hint { color:#e0607e; }
+#screen-pvp {
+  background: radial-gradient(ellipse at 50% 18%, #fff0f4 0%, var(--cream) 66%);
+  padding:16px; display:none; flex-direction:column; align-items:center;
+}
+#screen-pvp.active { display:flex; }
+.pvp-title { font-size:1.3rem; font-weight:900; letter-spacing:2px; color:#e0607e; margin:6px 0 4px; }
+.fighter.turn-glow .art img { filter: drop-shadow(0 0 18px rgba(240,180,41,.85)); }
+
+.timing { display:none; margin-top:8px; text-align:center; width:min(460px,93vw); }
+.timing .lab { font-size:.8rem; color:var(--ink-soft); margin-bottom:9px; }
+.timing .lab b { color:var(--green); }
+.tt-track { position:relative; height:26px; border-radius:13px; border:2px solid var(--line); cursor:pointer; overflow:hidden;
+  background: linear-gradient(90deg,#ffd9d3 0 25%, #ffe9b8 25% 42%, #b9edcf 42% 58%, #ffe9b8 58% 75%, #ffd9d3 75% 100%); }
+.tt-track::after { content:''; position:absolute; left:42%; top:0; bottom:0; width:16%; box-shadow:inset 0 0 10px rgba(87,201,138,.55); }
+.tt-cursor { position:absolute; top:-2px; bottom:-2px; left:0; width:5px; margin-left:-2.5px; background:var(--ink); border-radius:3px; box-shadow:0 0 8px rgba(74,64,56,.5); }
+.tt-btn { margin-top:11px; padding:12px 44px; border:none; border-radius:16px; color:#fff; font-family:inherit;
+  font-size:1.05rem; font-weight:900; letter-spacing:2px; cursor:pointer;
+  background:linear-gradient(135deg,var(--coral),var(--coral-deep)); box-shadow:var(--shadow); transition:transform .12s; }
+.tt-btn:hover{ transform:scale(1.04); } .tt-btn:active{ transform:scale(.97); }
+
+.result { display:none; text-align:center; margin-top:14px; animation:rise .4s ease-out; }
+.result .rt { font-size:1.9rem; font-weight:900; letter-spacing:2px; }
+.result .rt.win{ color:var(--gold-deep); text-shadow:2px 2px 0 #ffe6a0; }
+.result .rt.lose{ color:var(--ink-soft); }
+.result .rp { font-size:1rem; color:var(--teal-deep); margin-top:8px; font-weight:800; }
+.result .ra { font-size:.82rem; color:var(--ink-soft); margin-top:10px; line-height:1.7; max-width:440px; }
+.result .ra.analysis { text-align:left; max-width:480px; background:var(--cream); border:1.5px solid var(--line); border-radius:16px; padding:14px 18px; }
+.result .ra b { color:var(--teal-deep); }
+.result .ra .bad { color:var(--coral-deep); }
+.result .rbtns { display:flex; gap:12px; margin-top:16px; justify-content:center; flex-wrap:wrap; }
+
+/* ═══════ QUIZ ═══════ */
+#screen-quiz {
+  background: radial-gradient(ellipse at 50% 15%, #f4efff 0%, var(--cream) 66%);
+  padding:16px 14px 40px; display:none; flex-direction:column; align-items:center;
+}
+#screen-quiz.active { display:flex; }
+.quiz-top { display:flex; align-items:center; justify-content:space-between; width:min(720px,96vw); }
+.quiz-title { font-size:1.1rem; font-weight:900; color:var(--violet2); }
+.quiz-prog { font-size:.8rem; color:var(--ink-soft); font-weight:700; }
+.quiz-boss { text-align:center; position:relative; margin-top:4px; }
+.quiz-boss .art { height:min(180px,26vh); display:flex; align-items:flex-end; justify-content:center; }
+.quiz-boss .art img { max-height:100%; transition:transform .25s, filter .25s; filter: drop-shadow(0 8px 10px rgba(120,100,70,.16)); }
+.quiz-boss.hit .art img{ filter:brightness(2.2) saturate(.3); transform:rotate(-5deg) scale(.96) }
+.quiz-boss.dead .art img{ filter:grayscale(.85) brightness(.6); transform:rotate(88deg); transition:all .7s; }
+.quiz-boss-nm { font-size:.95rem; font-weight:900; color:var(--ink); }
+.q-hp { display:flex; align-items:center; gap:9px; width:min(420px,90vw); margin:6px auto 0; }
+.q-hp .lab{ font-size:.7rem; color:var(--ink-soft); width:56px; text-align:right; flex-shrink:0; }
+.qcard { background:#fff; border:2px solid var(--line); border-radius:20px; padding:19px 21px; width:min(720px,96vw); margin-top:14px; box-shadow:var(--shadow); }
+.qtext { font-size:1rem; color:var(--ink); line-height:1.75; font-weight:700; }
+.opts { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:15px; }
+.opt { padding:13px 15px; text-align:left; background:var(--cream); border:2px solid var(--line); border-radius:14px;
+  color:var(--ink); font-family:inherit; font-size:.9rem; line-height:1.5; cursor:pointer; transition:all .15s; }
+.opt:hover:not(:disabled){ border-color:var(--violet2); transform:translateY(-2px); }
+.opt.correct{ border-color:var(--green); background:#e3f7ee; color:var(--teal-deep); font-weight:800; }
+.opt.wrong{ border-color:var(--coral); background:#ffe7e2; color:var(--coral-deep); }
+.opt:disabled{ cursor:default; }
+.qfb { margin-top:12px; font-size:.82rem; line-height:1.7; min-height:22px; color:var(--ink-soft); }
+.qfb b { color:var(--green); } .qfb.bad b { color:var(--coral-deep); }
+.q-player { display:flex; align-items:center; gap:12px; width:min(720px,96vw); margin-top:14px; }
+.q-player img { width:60px; height:60px; object-fit:contain; flex-shrink:0; }
+.q-player .hpbar { flex:1; margin:0; }
+
+@media (max-width:900px){
+  .hub { grid-template-columns:1fr; }
+  .hub-side { border-left:none; border-top:2px solid var(--line); }
+  .field { grid-template-columns:1fr; }
+  .vs { margin:-4px 0; }
+  .fighter.lunge-r .art img{ transform:translateY(26px) scale(1.05) }
+  .fighter.lunge-l .art img{ transform:translateY(-26px) scale(1.05) }
+}
+@media (max-width:620px){ .opts{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+
+<!-- ═══ START ═══ -->
+<div class="screen active" id="screen-start">
+  <div class="brand">
+    <span class="brand-emoji">🧪</span>
+    <div class="start-title">Monster Maker Lab</div>
+  </div>
+  <div class="start-sub">MONSTER MAKER LAB · Grow your writing companion with words</div>
+  <div class="start-cta"><span class="bubble">👇 Pick a writing companion and jump into battle!</span></div>
+  <div class="starter-row" id="starter-row"></div>
+  <div class="start-all-lab">👀 Want something else? <b>All 50</b> can be your companion:</div>
+  <div class="start-all">
+    <div class="pick-grid" id="start-all-grid" style="max-height:340px"></div>
+  </div>
+  <div class="continue-bar" id="continue-bar" style="display:none">
+    <button class="continue-btn" onclick="continueGame()">📂 Continue your adventure</button>
+  </div>
+</div>
+
+<!-- ═══ HUB ═══ -->
+<div class="screen" id="screen-main">
+  <header>
+    <div class="logo"><span class="logo-emoji">🧪</span><span class="logo-text">Monster Maker Lab</span></div>
+    <div class="hdr-badges">
+      <div class="pill"><span class="k">Stage</span><span class="v red" id="hdr-level">Stage 1</span></div>
+      <div class="pill"><span class="k">Coins</span><span class="v gold" id="hdr-gold">🪙 0</span></div>
+      <div class="pill"><span class="k">Rank</span><span class="v teal" id="hdr-rank">Bronze</span></div>
+      <div class="pill"><span class="k">Record</span><span class="v violet" id="hdr-record">0W 0L</span></div>
+      <div class="teacher-link" onclick="openTeacher()">👩‍🏫 Teacher</div>
+      <a class="teacher-link" href="index.html" style="text-decoration:none" title="Switch language">🌐 Language</a>
+    </div>
+  </header>
+
+  <div class="hub">
+    <div class="hub-stage">
+      <div class="mon-hero" id="mon-hero"><img class="mon" id="hero-img" alt=""></div>
+      <div class="hero-name-row">
+        <span class="hero-name" id="hero-name">???</span>
+        <span class="hero-power" id="hero-power">Power 0</span>
+      </div>
+      <div class="wp-badge">✍️ Writing Power <span class="wp-stars" id="wp-stars"></span> <span id="wp-lv">Lv.0</span></div>
+      <div class="wp-genres" id="wp-genres"></div>
+      <div class="stat-bars">
+        <div class="sbar"><span class="lab">Attack</span><div class="track"><div class="fill fill-atk" id="bar-atk"></div></div><span class="num" id="num-atk">0</span></div>
+        <div class="sbar"><span class="lab">Speed</span><div class="track"><div class="fill fill-spd" id="bar-spd"></div></div><span class="num" id="num-spd">0</span></div>
+        <div class="sbar"><span class="lab">Stamina</span><div class="track"><div class="fill fill-def" id="bar-def"></div></div><span class="num" id="num-def">0</span></div>
+        <div class="sbar"><span class="lab">HP</span><div class="track"><div class="fill fill-hp" id="bar-hp"></div></div><span class="num" id="num-hp">0</span></div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+        <button class="codex-btn" onclick="openCodex()">📕 Monster Codex</button>
+        <button class="codex-btn" onclick="openEssays()">📄 My Writing Book (<span id="essay-count">0</span>)</button>
+      </div>
+    </div>
+
+    <div class="hub-side">
+      <div class="act act-arena" onclick="enterArena()">
+        <span class="guide-arrow" id="arena-guide">👈</span>
+        <div class="act-title">⚔️ Arena · Campaign</div>
+        <div class="act-desc">Fight the “writing-problem” monsters — beating them means beating bad habits! Win coins & points.</div>
+        <span class="act-hint" id="arena-hint">Opponents get tougher…</span>
+      </div>
+      <div class="act act-train" onclick="openTraining()">
+        <div class="act-title">✍️ Training</div>
+        <div class="act-desc">Describe your companion in words — the sharper and more vivid your writing, the stronger it grows!</div>
+        <span class="act-hint">Writing = the way to grow</span>
+      </div>
+      <div class="act act-shop" onclick="openShop()">
+        <div class="act-title">🏪 Shop</div>
+        <div class="act-desc">Spend coins: +2 Attack / level, +10 HP / level, up to Lv.30 each.</div>
+        <span class="act-hint">🪙 20 coins / level</span>
+      </div>
+      <div class="act act-pvp" onclick="startPvp()">
+        <div class="act-title">👥 Duel · Vocab PK</div>
+        <div class="act-desc">You and a classmate each pick a monster (any of 50!), take turns on synonym/antonym questions — answer right to attack!</div>
+        <span class="act-hint">Quick answer = critical hit</span>
+      </div>
+      <div class="act act-theme" onclick="openThemes()">
+        <div class="act-title">📚 Text Quest</div>
+        <div class="act-desc">Teacher-made quests: answer correctly to strike the Guardian — fight with your brain!</div>
+        <span class="act-hint" id="theme-hint">No quests yet</span>
+      </div>
+
+      <div class="collected">
+        <div class="t">🏅 Writing problems defeated</div>
+        <div class="grid" id="collected-grid"><div class="empty">No problems beaten yet — head to the Arena!</div></div>
+      </div>
+      <div class="records">
+        <div class="t">📜 Adventure Log</div>
+        <div class="rec-list" id="rec-list"><div class="rec" style="opacity:.6">No records yet — go play a round!</div></div>
+      </div>
+      <div class="reset" onclick="resetGame()">Restart (clear save)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TRAINING ═══ -->
+<div class="overlay" id="train-ov">
+  <div class="modal">
+    <div id="train-form">
+      <div class="modal-head"><div class="modal-title">✍️ Training</div><div class="close-x" onclick="closeTraining()">✕</div></div>
+      <div class="genre-tabs" id="genre-tabs"></div>
+      <div class="topic-chip" id="topic-chip" style="display:none"></div>
+      <div class="modal-sub" id="train-sub"></div>
+      <div class="topic-cats" id="topic-cats"></div>
+      <div class="subject-line" id="subject-line" style="display:none"></div>
+      <div class="hints" id="train-hints"></div>
+      <div class="hint-tip" id="hint-tip" style="display:none"></div>
+      <textarea id="train-input" placeholder=""></textarea>
+      <div class="train-meta">
+        <button class="mic-btn" id="mic-train" onclick="toggleVoice('train-input','mic-train')">🎤 Voice input</button>
+        <div class="live-score" id="live-score"></div>
+        <div class="char-count" id="train-count">0 words</div>
+      </div>
+      <button class="big-btn btn-teal" id="train-submit" onclick="submitTraining()" disabled>⚡ Finish training</button>
+    </div>
+    <div class="train-result" id="train-result">
+      <div class="modal-title" style="text-align:center">Training complete!</div>
+      <div class="tr-mon"><img class="mon" id="tr-img" alt=""></div>
+      <div class="tr-stars" id="tr-stars"></div>
+      <div class="tr-gains" id="tr-gains"></div>
+      <div class="score-detail" id="tr-detail"></div>
+      <div class="tr-tip" id="tr-tip"></div>
+      <div class="tr-btns">
+        <button class="mini-btn fill" onclick="closeTraining();enterArena()">⚔️ Try the Arena</button>
+        <button class="mini-btn ghost" onclick="backToTrainForm()">Write another</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SHOP ═══ -->
+<div class="overlay" id="shop-ov">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">🏪 Shop</div><div class="close-x" onclick="closeShop()">✕</div></div>
+    <div class="shop-gold">My coins: <b id="shop-gold">🪙 0</b><span class="tip">Win stages to earn coins</span></div>
+    <div class="shop-item">
+      <div class="shop-ic">⚔️</div>
+      <div class="shop-info">
+        <div class="shop-nm">Attack Boost <span class="shop-lv" id="shop-atk-lv">Lv.0 / 30</span></div>
+        <div class="shop-ds">+2 Attack per level — hit harder</div>
+        <div class="shop-track"><div class="f fill-atk" id="shop-atk-f"></div></div>
+      </div>
+      <button class="shop-buy" id="buy-atk" onclick="buyUpgrade('atk')">🪙 20<br>Upgrade</button>
+    </div>
+    <div class="shop-item">
+      <div class="shop-ic">❤️</div>
+      <div class="shop-info">
+        <div class="shop-nm">HP Boost <span class="shop-lv" id="shop-hp-lv">Lv.0 / 30</span></div>
+        <div class="shop-ds">+10 HP per level — last longer</div>
+        <div class="shop-track"><div class="f fill-hp" id="shop-hp-f"></div></div>
+      </div>
+      <button class="shop-buy" id="buy-hp" onclick="buyUpgrade('hp')">🪙 20<br>Upgrade</button>
+    </div>
+    <div class="shop-msg" id="shop-msg"></div>
+  </div>
+</div>
+
+<!-- ═══ TEACHER ═══ -->
+<div class="overlay" id="teacher-ov">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">👩‍🏫 Teacher Desk</div><div class="close-x" onclick="closeTeacher()">✕</div></div>
+    <div class="modal-sub">Paste a passage you want to teach, and it auto-builds a “beat-the-Guardian” quiz quest. <b>AI quiz</b> is higher quality (needs a DeepSeek key); <b>Quick quiz</b> works offline.</div>
+    <div class="tf-lab">Quest title</div>
+    <input class="tf-in" id="tf-title" placeholder="e.g. Photosynthesis" maxlength="20">
+    <div class="tf-lab">Passage (paste the full text)</div>
+    <textarea class="tf-ta" id="tf-article" placeholder="Paste the whole passage here… (150+ words recommended)"></textarea>
+    <div class="tf-lab">DeepSeek API Key (optional, stored on this device only)</div>
+    <input class="tf-in" id="tf-key" type="password" placeholder="sk-… (leave blank to use Quick quiz)">
+    <div class="tf-btns">
+      <button class="tf-btn ai" id="btn-ai" onclick="generateAI()">🤖 AI quiz (8 Qs)</button>
+      <button class="tf-btn qk" id="btn-qk" onclick="generateQuick()">⚡ Quick quiz (offline)</button>
+    </div>
+    <div class="tf-status" id="tf-status"></div>
+    <div class="tf-lab" style="margin-top:20px">⚙️ Training · word target (length bonus scales to it: ⅓ +1, ⅔ +1, target +2)</div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <input class="tf-in" id="tf-wordgoal" type="number" min="30" max="1000" step="10" style="width:130px">
+      <span style="font-size:.8rem;color:var(--ink-soft)">words (e.g. IGCSE 150-200, IB/A-Level 250-400)</span>
+    </div>
+    <div class="tf-lab">⚙️ Writing topic for this lesson (set before class; +1 on-topic bonus if a keyword appears; blank = free writing)</div>
+    <input class="tf-in" id="tf-topic" placeholder="e.g. Climate change / A stormy night / Should schools ban phones" maxlength="30">
+    <div class="tf-lab" style="margin-top:20px">Published quests</div>
+    <div id="tf-list"></div>
+    <div class="tf-lab">Share quests (copy for students to import)</div>
+    <div class="tf-btns" style="margin-top:6px">
+      <button class="tf-btn qk" onclick="exportThemes()">📤 Export quest code</button>
+      <button class="tf-btn qk" onclick="importThemes()">📥 Import quest code</button>
+    </div>
+    <textarea class="tf-ta" id="tf-io" style="height:64px;margin-top:10px" placeholder="Exported code appears here; to import, paste code here then click Import"></textarea>
+  </div>
+</div>
+
+<!-- ═══ THEMES (student) ═══ -->
+<div class="overlay" id="themes-ov">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">📚 Text Quest</div><div class="close-x" onclick="closeThemes()">✕</div></div>
+    <div class="modal-sub">Correct answer = strike the Guardian; wrong = take a hit. Fight with knowledge!</div>
+    <div id="student-list"></div>
+  </div>
+</div>
+
+<!-- ═══ QUIZ ═══ -->
+<div class="screen" id="screen-quiz">
+  <div class="quiz-top"><div class="quiz-title" id="quiz-title">📚 Text Quest</div><div class="quiz-prog" id="quiz-prog">Q 1 / 8</div></div>
+  <div class="quiz-boss" id="quiz-boss">
+    <div class="art"><img class="mon" id="quiz-boss-img" alt=""></div>
+    <div class="quiz-boss-nm" id="quiz-boss-nm">Guardian</div>
+    <div class="q-hp"><span class="lab">Guardian</span><div class="hpbar"><div class="f" id="quiz-boss-hp" style="width:100%"></div></div></div>
+  </div>
+  <div class="qcard" id="qcard">
+    <div class="qtext" id="qtext">Loading question…</div>
+    <div class="opts" id="opts"></div>
+    <div class="qfb" id="qfb"></div>
+  </div>
+  <div class="q-player">
+    <img class="mon" id="quiz-player-img" alt="">
+    <div class="hpbar"><div class="f" id="quiz-player-hp" style="width:100%"></div></div>
+    <span class="hp-num" id="quiz-player-nm"></span>
+  </div>
+  <div class="result" id="quiz-result">
+    <div class="rt" id="qr-title"></div>
+    <div class="tr-stars" id="qr-stars"></div>
+    <div class="rp" id="qr-points"></div>
+    <div class="ra" id="qr-advice"></div>
+    <div class="rbtns">
+      <button class="mini-btn fill" style="flex:none;padding:12px 24px" id="qr-retry">🔁 Retry</button>
+      <button class="mini-btn ghost" style="flex:none;padding:12px 24px" onclick="exitQuiz()">🏠 Base</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CODEX ═══ -->
+<div class="overlay" id="codex-ov">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">📕 Monster Codex</div><div class="close-x" onclick="closeCodex()">✕</div></div>
+    <div class="modal-sub">All <b>50</b> writing monsters: <b style="color:var(--teal-deep)">Companions</b> are writing strengths, <b style="color:var(--coral-deep)">Problem monsters</b> are bad habits to beat (✅=defeated), <b style="color:var(--gold-deep)">Guardians</b> are writing tools.</div>
+    <div class="pick-grid" id="codex-grid"></div>
+  </div>
+</div>
+
+<!-- ═══ ESSAYS 作文本 ═══ -->
+<div class="overlay" id="essays-ov">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">📄 My Writing Book</div><div class="close-x" onclick="closeEssays()">✕</div></div>
+    <div class="modal-sub">✍️ <b>Teacher tip</b>: pick your best piece and <b>copy it onto paper</b> — write it as well on the page as you did in the game!</div>
+    <div class="tf-btns" style="margin:0 0 12px">
+      <button class="tf-btn qk" onclick="copyEssays()">📋 Copy all pieces</button>
+    </div>
+    <div id="essays-list"></div>
+  </div>
+</div>
+
+<!-- ═══ PVP MODE ═══ -->
+<div class="overlay" id="pvp-mode-ov">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-head"><div class="modal-title">👥 Duel · Choose a mode</div><div class="close-x" onclick="document.getElementById('pvp-mode-ov').classList.remove('active')">✕</div></div>
+    <div class="pvp-mode-btns">
+      <div class="pvp-mode-card" onclick="choosePvpMode('vocab')">
+        <div class="pm-icon">⚡</div>
+        <div class="pm-name">Vocab PK</div>
+        <div class="pm-desc">Take turns: synonyms · antonyms · collocations · literary devices · show-don’t-tell. Answer right to attack, answer fast for a critical!</div>
+      </div>
+      <div class="pvp-mode-card" onclick="choosePvpMode('write')">
+        <div class="pm-icon">✍️</div>
+        <div class="pm-name">Writing PK</div>
+        <div class="pm-desc">Both write on the same prompt; the scoring engine marks every criterion — highest score wins!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PVP PICK ═══ -->
+<div class="overlay" id="pvp-pick-ov">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title" id="pvp-pick-title">Left player, pick your monster!</div><div class="close-x" onclick="closePvpPick()">✕</div></div>
+    <div class="modal-sub">Pick any of the 50 — duels ignore stats, it’s all about <b>vocabulary</b>!</div>
+    <div class="pick-grid" id="pvp-pick-grid"></div>
+  </div>
+</div>
+
+<!-- ═══ PVP BATTLE ═══ -->
+<div class="screen" id="screen-pvp">
+  <div class="pvp-title">👥 Duel · Vocab PK</div>
+  <div class="arena-sub" id="pvp-sub"></div>
+  <div class="field">
+    <div class="fighter" id="pf-p1">
+      <div class="art"><img class="mon" id="pvp-img-p1" alt=""></div>
+      <div class="f-name" id="pvp-nm-p1"></div>
+      <div class="f-tag">Left player</div>
+      <div class="hpbar"><div class="f" id="hp-p1" style="width:100%"></div></div>
+      <div class="hp-num" id="hpn-p1"></div>
+    </div>
+    <div class="vs">VS</div>
+    <div class="fighter" id="pf-p2">
+      <div class="art"><img class="mon" id="pvp-img-p2" alt=""></div>
+      <div class="f-name" id="pvp-nm-p2"></div>
+      <div class="f-tag">Right player</div>
+      <div class="hpbar"><div class="f" id="hp-p2" style="width:100%"></div></div>
+      <div class="hp-num" id="hpn-p2"></div>
+    </div>
+  </div>
+  <div class="battle-log" id="pvp-log"></div>
+  <div class="qcard vocab-card" id="vocab-pvp">
+    <span class="v-type" id="vp-type">Synonym</span><span class="v-timer" id="vp-timer">⚡ Answer within 4s = critical hit</span>
+    <div class="qtext" id="vp-q"></div>
+    <div class="opts" id="vp-opts"></div>
+  </div>
+  <div class="qcard vocab-card" id="write-pk">
+    <span class="v-type" style="--vt:var(--teal)" id="wpk-turn">Left player’s turn</span>
+    <span class="v-timer" id="wpk-topic-tag"></span>
+    <div class="qtext" id="wpk-prompt"></div>
+    <textarea class="tf-ta" id="wpk-input" style="height:120px;margin-top:10px" placeholder="Write your paragraph here… (no peeking, opponent!)"></textarea>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:10px">
+      <button class="mic-btn" id="mic-wpk" onclick="toggleVoice('wpk-input','mic-wpk')">🎤 Voice input</button>
+      <span class="char-count" id="wpk-count">0 words</span>
+      <button class="mini-btn fill" style="flex:none;padding:10px 26px" id="wpk-submit" onclick="submitWritePk()">✅ Done</button>
+    </div>
+  </div>
+  <div class="qcard vocab-card" id="wpk-compare">
+    <div class="qtext" style="text-align:center" id="wpk-versus"></div>
+    <div class="pk-cols">
+      <div class="pk-col" id="pk-col-p1"></div>
+      <div class="pk-col" id="pk-col-p2"></div>
+    </div>
+  </div>
+  <div class="result" id="pvp-result">
+    <div class="rt win" id="pvp-r-title"></div>
+    <div class="rp" id="pvp-r-sub"></div>
+    <div class="rbtns">
+      <button class="mini-btn fill" style="flex:none;padding:12px 24px" onclick="pvpRematch()">🔁 Rematch</button>
+      <button class="mini-btn ghost" style="flex:none;padding:12px 24px" onclick="startPvp()">🔄 Change monster</button>
+      <button class="mini-btn ghost" style="flex:none;padding:12px 24px" onclick="exitPvp()">🏠 Base</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ARENA ═══ -->
+<div class="screen" id="screen-arena">
+  <div class="arena-title" id="arena-title">⚔️ Stage 1</div>
+  <div class="arena-sub" id="arena-sub"></div>
+  <div class="field">
+    <div class="fighter" id="f-me">
+      <div class="art"><img class="mon" id="arena-me" alt=""></div>
+      <div class="f-name" id="arena-me-nm"></div>
+      <div class="f-tag" id="arena-me-tag"></div>
+      <div class="hpbar"><div class="f" id="hp-me" style="width:100%"></div></div>
+      <div class="hp-num" id="hpn-me"></div>
+    </div>
+    <div class="vs">VS</div>
+    <div class="fighter" id="f-foe">
+      <div class="art"><img class="mon" id="arena-foe" alt=""></div>
+      <div class="f-name" id="arena-foe-nm"></div>
+      <div class="f-tag" id="arena-foe-tag"></div>
+      <div class="hpbar"><div class="f" id="hp-foe" style="width:100%"></div></div>
+      <div class="hp-num" id="hpn-foe"></div>
+    </div>
+  </div>
+  <div class="battle-log" id="battle-log">Battle starting…</div>
+  <div class="qcard vocab-card" id="vocab-arena">
+    <span class="v-type" id="va-type">Synonym</span><span class="v-timer" id="va-timer">⚡ Answer within 4s = critical hit</span>
+    <div class="qtext" id="va-q"></div>
+    <div class="opts" id="va-opts"></div>
+  </div>
+  <div class="result" id="battle-result">
+    <div class="rt" id="br-title"></div>
+    <div class="rp" id="br-points"></div>
+    <div class="ra" id="br-advice"></div>
+    <div class="rbtns">
+      <button class="mini-btn fill" style="flex:none;padding:12px 24px" onclick="startBattle()">🔁 Fight again</button>
+      <button class="mini-btn ghost" style="flex:none;padding:12px 24px" onclick="exitArena()">🏠 Back to base</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const IMG = 'img/';
+
+/* ══════ ROSTER (real jimeng art, writing-themed) ══════ */
+// kind: skill=写作技能(可选伙伴) · foe=写作问题(打败=克服) · tool=写作工具(中性对手)
+const ROSTER = [
+  // — skills (starters) —
+  {f:'1077_2', n:'Observer Deer', kind:'skill', hint:'Observation · spots every detail', arch:'spd'},
+  {f:'1077_4', n:'Imagi-Whale',   kind:'skill', hint:'Imagination · a mind full of rainbows', arch:'def'},
+  {f:'1077_3', n:'Detail Mouse',  kind:'skill', hint:'Precision · collects the little sparkles', arch:'atk'},
+  {f:'9696_3', n:'Vivid Dragon',  kind:'skill', hint:'Vivid writing · brings it to life', arch:'spd'},
+  {f:'6337_1', n:'Senso Frog',    kind:'skill', hint:'Five senses · can taste the wind', arch:'def'},
+  {f:'9696_4', n:'Quotable Lion', kind:'skill', hint:'The perfect line · one to remember', arch:'atk'},
+  // — problems (thematic foes), genre = 哪种文体最常见 —
+  {f:'1077_0', n:'Lazy Comma',   kind:'foe', genre:'all',   hint:'Never uses punctuation'},
+  {f:'1077_1', n:'Off-Topic Ram',   kind:'foe', genre:'argu',  hint:'Drifts away from the thesis'},
+  {f:'2905_0', n:'Redundant Roc',   kind:'foe', genre:'expo',  hint:'Says the same thing again and again'},
+  {f:'2905_2', n:'Run-on Train', kind:'foe', genre:'story', hint:'Sentences that never stop'},
+  {f:'2905_3', n:'Typo Rat', kind:'foe', genre:'all',   hint:'Spelling mistakes everywhere'},
+  {f:'2905_4', n:'Melodrama Cloud', kind:'foe', genre:'story', hint:'All emotion, no real content'},
+  {f:'6578_2', n:'Procrasti-Sloth', kind:'foe', genre:'all',   hint:'Never gets started'},
+  {f:'6578_3', n:'Writer-Block Ball', kind:'foe', genre:'all',   hint:'Stuck after two lines'},
+  {f:'6578_4', n:'Blank-Page Ghost', kind:'foe', genre:'argu',  hint:'No ideas, no argument'},
+  {f:'6546_3', n:'Tangled Mummy', kind:'foe', genre:'all',   hint:'Logic all knotted up'},
+  {f:'9696_2', n:'Slow Snail', kind:'foe', genre:'all',   hint:'Writes at a snail’s pace'},
+  {f:'6578_0', n:'Purple-Prose Jelly', kind:'foe', genre:'story', hint:'Piles on fancy words for no reason'},
+  {f:'6578_1', n:'Maze Muddle', kind:'foe', genre:'expo',  hint:'Unclear · logic goes in circles'},
+  {f:'7230_1', n:'Rant Dragon', kind:'foe', genre:'argu',  hint:'Pure emotion, no reasoning'},
+  // — tools (neutral opponents / boss pool)，名字尽量沿用即梦原设定 —
+  {f:'2905_1', n:'Thesis Lighthouse', kind:'tool'}, {f:'3037_0', n:'Vocab Hamster', kind:'tool'},
+  {f:'3037_1', n:'Link Rainbow', kind:'tool'}, {f:'3037_2', n:'Idea Octopus', kind:'tool'},
+  {f:'3037_3', n:'Logic Bot', kind:'tool'}, {f:'3037_4', n:'Brainstorm Squid', kind:'tool'},
+  {f:'3827_0', n:'Title Crown', kind:'tool'}, {f:'3827_1', n:'Outline Moth', kind:'tool'},
+  {f:'3827_2', n:'Edit Eraser', kind:'tool'}, {f:'3827_3', n:'Echo Bat', kind:'tool'},
+  {f:'3827_4', n:'Golden-Line Dragon', kind:'tool'}, {f:'5480_0', n:'Descriptive Peacock', kind:'tool'},
+  {f:'5480_1', n:'Prompt Turtle', kind:'tool'}, {f:'5480_2', n:'Association Fox', kind:'tool'},
+  {f:'5480_3', n:'Structure Snake', kind:'tool'}, {f:'5480_4', n:'Muse Bee', kind:'tool'},
+  {f:'6337_0', n:'Zoom Lens', kind:'tool'}, {f:'6337_2', n:'Chrono Sloth', kind:'tool'},
+  {f:'6337_3', n:'Setting Mushroom', kind:'tool'}, {f:'6337_4', n:'Persona Masks', kind:'tool'},
+  {f:'6546_0', n:'Structure Cube', kind:'tool'}, {f:'6546_1', n:'Muse Cloud', kind:'tool'},
+  {f:'6546_2', n:'Suspense Dragon', kind:'tool'}, {f:'6546_4', n:'Spotlight Firefly', kind:'tool'},
+  {f:'7230_0', n:'Plot-Wheel Bot', kind:'tool'}, {f:'7230_2', n:'Twist Ram', kind:'tool'},
+  {f:'7230_3', n:'Foreshadow Seedling', kind:'tool'}, {f:'7230_4', n:'Climax Drummer', kind:'tool'},
+  {f:'9696_0', n:'Wordsmith Beetle', kind:'tool'}, {f:'9696_1', n:'Structure Rabbit', kind:'tool'},
+];
+const byFile = Object.fromEntries(ROSTER.map(m => [m.f, m]));
+const STARTERS = ROSTER.filter(m => m.kind === 'skill');
+const FOE_POOL = ROSTER.filter(m => m.kind === 'foe' || m.kind === 'tool');
+const PROBLEM_POOL = ROSTER.filter(m => m.kind === 'foe');
+
+function imgTag(f) { return `${IMG}${f}.png`; }
+
+/* ══════ SCORING ENGINE — 按写作文体分轨 ══════ */
+// Length bonus scales with the word target the teacher sets (⅓ +1, ⅔ +1, target +2)
+function wordGoal(){
+  const v = parseInt(localStorage.getItem('ml_wordgoal_en'));
+  return (v >= 20 && v <= 800) ? v : 120;
+}
+function lenCriteria(){
+  const g = wordGoal();
+  const t1 = Math.max(10, Math.round(g/3)), t2 = Math.round(g*2/3);
+  return [
+    {key:'m1', label:t1+'+ words', pts:1, test:t=>wordCount(t)>=t1},
+    {key:'m2', label:t2+'+ words', pts:1, test:t=>wordCount(t)>=t2},
+    {key:'m3', label:'reached '+g+' words', pts:2, test:t=>wordCount(t)>=g},
+  ];
+}
+
+const GENRES = {
+  story: {
+    label:'Descriptive', icon:'📖', color:'var(--coral)', stat:'spd', statName:'Speed',
+    motto:'Vivid imagery = Speed',
+    placeholder:'e.g. The creature crept from behind the jagged rock, then lunged — its claws tearing through the air like knives. A low growl echoed through the mist. Its heart pounded as it turned, frozen with dread.',
+    criteria: [
+      {key:'sense',  label:'Sensory detail',    pts:1, re:/\b(saw|heard|felt|smell(ed|t)?|taste(d)?|sound|scent|glow(ing|ed)?|echo(ed|ing)?|whisper|silence|glare|shimmer)\b/i},
+      {key:'simile', label:'Simile / metaphor', pts:1, re:/\b(like a|like the|as if|as though|resembl(ed|ing)|seemed to be|was a)\b/i},
+      {key:'verb',   label:'Vivid verbs',       pts:1, re:/\b(darted|lunged|soared|crept|shattered|trembl(ed|ing)|surged|snarled|clawed|pounced|swooped|slithered)\b/i},
+      {key:'emotion',label:'Emotion / feeling', pts:1, re:/\b(fear|terror|dread|joy|awe|curious|nervous|panic|thrill(ed)?|heart (raced|pounded|sank))\b/i},
+      {key:'talk',   label:'Dialogue',          pts:1, re:/["“][^"”]{2,}["”]|\b(said|whispered|shouted|cried|asked)\b/i},
+      {key:'device', label:'Literary device',   pts:1, re:/\b(the (wind|sky|night|sun) (whispered|sighed|wept|screamed|smiled)|dancing (shadows|flames)|hungry (darkness|silence))\b/i},
+      {key:'scene',  label:'Setting / mood',    pts:1, re:/\b(night|storm|forest|ocean|dawn|dusk|moonlight|mist|shadows|thunder|twilight)\b/i},
+    ],
+    hints: {
+      'Sensory':['A low growl echoed through the mist…','The scent of ash hung in the air…','Cold wind brushed against its scales…'],
+      'Simile':['Its claws tore the air like knives.','It moved as if the ground itself feared it.'],
+      'Vivid verb':['It lunged forward…','It crept silently…','It soared into the storm…'],
+      'Emotion':['Its heart pounded with dread.','A thrill of excitement ran through it.'],
+      'Setting':['Beneath the pale moonlight…','As the storm rolled in…'],
+    },
+  },
+  expo: {
+    label:'Analytical', icon:'🔍', color:'var(--teal)', stat:'def', statName:'Stamina',
+    motto:'Clarity & structure = Stamina',
+    placeholder:'e.g. The Observer Deer is a nocturnal creature defined by its seven eyes. Firstly, its central eye locks onto a target; secondly, the smaller eyes scan the surroundings. Compared to an ordinary deer, its field of vision is three times wider, which allows it to detect danger early.',
+    criteria: [
+      {key:'define', label:'Definition / topic', pts:1, re:/\b(is a|are a|refers to|is defined as|can be described as|is known as|is a type of)\b/i},
+      {key:'seq',    label:'Sequencing',         pts:1, re:/\b(first(ly)?|second(ly)?|third(ly)?|next|then|finally|to begin with|subsequently)\b/i},
+      {key:'explain',label:'Explanation',        pts:1, re:/\b(this means|in other words|that is|which shows|which means|this suggests)\b/i},
+      {key:'example',label:'Example',            pts:1, re:/\b(for (example|instance)|such as|namely|to illustrate)\b/i},
+      {key:'compare',label:'Comparison',         pts:1, re:/\b(compared to|whereas|in contrast|unlike|similarly|likewise|on the other hand)\b/i},
+      {key:'data',   label:'Data / facts',       pts:1, re:/\d+\s*(%|percent|times|metres?|meters?|kilograms?|kg|years?|degrees?)/i},
+      {key:'cause',  label:'Cause & effect',     pts:1, re:/\b(because|due to|leads? to|causes?|results? in|therefore|consequently)\b/i},
+      {key:'sum',    label:'Summary',            pts:1, re:/\b(in summary|overall|to sum up|in short|to conclude)\b/i},
+    ],
+    hints: {
+      'Define':['The Observer Deer is a nocturnal creature that…','This species can be described as…'],
+      'Sequence':['Firstly, …','Secondly, …','Finally, …'],
+      'Explain':['This means that…','In other words, …'],
+      'Example':['For example, …','For instance, …','Such as…'],
+      'Compare':['Compared to an ordinary deer, …','In contrast, …'],
+      'Data':['about 1.2 metres tall','three times wider','up to 200 kg'],
+    },
+  },
+  argu: {
+    label:'Argumentative', icon:'⚖️', color:'var(--violet2)', stat:'atk', statName:'Attack',
+    motto:'Persuasion = Attack Power',
+    placeholder:'e.g. This essay argues that the Observer Deer is the ideal companion for beginners. Firstly, observation is the foundation of good writing. For instance, in the last contest it instantly spotted the weakness of its rival. Although some claim its attack is too low, its sharp eyes let it dodge every strike. Therefore, it is undoubtedly the wisest choice.',
+    criteria: [
+      {key:'thesis', label:'Thesis / claim',      pts:1, re:/\b(I (argue|believe|contend)|this essay (argues|contends|will)|it is (clear|evident) that|in my (view|opinion)|my (view|position) is)\b/i},
+      {key:'reason', label:'Reasoning',           pts:1, re:/\b(because|since|due to|for this reason|the (main )?reason)\b/i},
+      {key:'evidence',label:'Evidence',           pts:1, re:/\b(for (example|instance)|according to|research (shows|suggests)|studies|statistics|the data|evidence)\b/i},
+      {key:'connect',label:'Connectives',         pts:1, re:/\b(however|therefore|moreover|furthermore|nevertheless|consequently|thus|hence|in addition)\b/i},
+      {key:'counter',label:'Counter-argument',    pts:1, re:/\b(although|while|some (argue|claim|may)|admittedly|on the other hand|critics|it may seem)\b/i},
+      {key:'acad',   label:'Academic vocabulary', pts:1, re:/\b(significant|substantial|crucial|inevitable|fundamental|considerable|demonstrat(e|es)|illustrat(e|es)|emphasi[sz]e|undoubtedly)\b/i},
+      {key:'hedge',  label:'Hedging (may/might)', pts:1, re:/\b(may|might|could|tends? to|arguably|it seems|suggests that|to some extent)\b/i},
+      {key:'concl',  label:'Conclusion',          pts:1, re:/\b(in conclusion|to conclude|overall|ultimately|in summary|to sum up)\b/i},
+    ],
+    hints: {
+      'Thesis':['This essay argues that…','In my view, …','It is evident that…'],
+      'Reason':['This is because…','The main reason is that…'],
+      'Evidence':['For example, …','According to …','Research suggests that…'],
+      'Connective':['However, …','Therefore, …','Moreover, …','Nevertheless, …'],
+      'Counter':['Although some argue that…','Admittedly, …','While it may seem…'],
+      'Conclusion':['In conclusion, …','Ultimately, …'],
+    },
+  },
+};
+let currentGenre = 'argu';
+
+function writingTopic(){ return (localStorage.getItem('ml_writing_topic_en')||'').trim(); }
+
+function scoreDesc(text, genre) {
+  const g = GENRES[genre || currentGenre];
+  const all = g.criteria.concat(lenCriteria());
+  const results = all.map(c => {
+    if (c.re) {
+      const m = text.match(c.re);
+      return {...c, on:!!m, hit:m?m[0]:null};
+    }
+    const on = c.test(text);
+    return {...c, on, hit:on?wordCount(text)+' words':null};
+  });
+  // On-topic bonus: when the teacher sets a writing topic, +1 if a keyword appears
+  const topic = writingTopic();
+  if (topic) {
+    const stop = /^(the|a|an|of|to|in|on|and|or|my|your|about|with|for)$/i;
+    const toks = topic.split(/[^a-zA-Z0-9一-龥]+/).filter(w=>w.length>=3 && !stop.test(w));
+    const lower = text.toLowerCase();
+    const hitTok = toks.find(w=>lower.includes(w.toLowerCase())) || null;
+    results.push({key:'topic', label:'On-topic “'+topic.slice(0,16)+'”', pts:1, on:!!hitTok, hit:hitTok});
+  }
+  const pts = results.reduce((s,r)=>s+(r.on?r.pts:0),0);
+  const stars = pts<=1?1:pts<=3?2:pts<=5?3:pts<=7?4:5;
+  return {results, pts, stars};
+}
+function wordCount(t){ const m=t.trim().match(/[A-Za-z0-9'’-]+/g); return m?m.length:0; }
+function simpleHash(str){let h=5381;for(let i=0;i<str.length;i++)h=((h<<5)+h+str.charCodeAt(i))&0x7fffffff;return h;}
+
+/* ══════ GAME STATE ══════ */
+const KEY = 'monsterlab_v3_en';
+let G = null;
+
+function newGame(starter) {
+  const base = {atk:22, spd:22, def:22};
+  if (starter.arch==='atk'){base.atk=30;base.def=18;}
+  else if (starter.arch==='spd'){base.spd=30;base.def=18;}
+  else if (starter.arch==='def'){base.def=30;base.atk=18;}
+  else { // 非推荐伙伴：按名字哈希给一个天赋方向，总战力一致
+    const h = simpleHash(starter.f) % 3;
+    if (h===0){base.atk=28;base.spd=21;base.def=21;}
+    else if (h===1){base.spd=28;base.atk=21;base.def=21;}
+    else {base.def=28;base.atk=21;base.spd=21;}
+  }
+  G = {
+    starter: starter.f, name: starter.n,
+    atk:base.atk, spd:base.spd, def:base.def,
+    wp:0, wpGenre:{story:0,expo:0,argu:0}, gold:0, atkLvl:0, hpLvl:0, level:1,
+    score:0, wins:0, losses:0, records:[], usedTexts:[], defeated:{}, themeBest:{}, essays:[],
+  };
+  persist();
+}
+function persist(){ try{localStorage.setItem(KEY,JSON.stringify(G));}catch(e){} }
+function restore(){ try{const r=localStorage.getItem(KEY); if(r){G=JSON.parse(r); if(!G.wpGenre)G.wpGenre={story:0,expo:0,argu:0}; if(!G.essays)G.essays=[]; return true;}}catch(e){} return false; }
+function resetGame(){ if(!confirm('Clear your save and start over?'))return; localStorage.removeItem(KEY); G=null; showScreen('screen-start'); }
+
+/* derived */
+function effAtk(){ return G.atk + G.atkLvl*2; }
+function maxHp(){ return 60 + G.def*2 + G.hpLvl*10; }
+function playerPower(){ return effAtk() + G.spd + G.def + G.hpLvl*3 + G.wp; }
+function auraTier(){ return Math.min(5, Math.floor(G.wp/8)); }
+
+/* ══════ SCREENS ══════ */
+function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0,0); }
+
+/* — start — */
+function renderStarters(){
+  const row = document.getElementById('starter-row');
+  const accents = ['var(--coral)','var(--teal)','var(--gold)','var(--violet2)','var(--sky)','var(--pink)'];
+  const halos = ['#ffe0d6','#d6f3ee','#fff0c8','#eadffb','#d8eefb','#ffe0e8'];
+  row.innerHTML = '';
+  STARTERS.forEach((s,i)=>{
+    const archTxt = s.arch==='atk'?'High Attack talent':s.arch==='spd'?'High Speed talent':'High Stamina talent';
+    const st = s.arch==='atk'?{a:30,s:22,d:18}:s.arch==='spd'?{a:22,s:30,d:18}:{a:18,s:22,d:30};
+    const card = document.createElement('div');
+    card.className='starter-card';
+    card.style.setProperty('--accent',accents[i%accents.length]);
+    card.style.setProperty('--halo',halos[i%halos.length]);
+    card.innerHTML = `
+      <div class="starter-art" style="--halo:${halos[i%halos.length]}"><img class="mon" src="${imgTag(s.f)}" alt=""></div>
+      <div class="starter-name">${s.n}</div>
+      <div class="starter-talent">${s.hint}<br>${archTxt}</div>
+      <div class="starter-stats">A<b>${st.a}</b> S<b>${st.s}</b> D<b>${st.d}</b></div>
+      <button class="pick-btn">Choose!</button>`;
+    card.onclick = ()=>chooseStarter(s);
+    row.appendChild(card);
+  });
+  // 全部 50 只任选网格
+  const KIND={skill:'Companion',foe:'Problem',tool:'Guardian'};
+  const rec=new Set(STARTERS.map(s=>s.f));
+  document.getElementById('start-all-grid').innerHTML = ROSTER.map(m=>
+    `<div class="pick-item" onclick="chooseStarterByFile('${m.f}')">
+      <img class="mon" src="${imgTag(m.f)}" alt="">
+      <div class="nm">${rec.has(m.f)?'⭐':''}${m.n}</div>
+      <div class="kd ${m.kind}">${KIND[m.kind]}</div></div>`).join('');
+}
+function chooseStarterByFile(f){ chooseStarter(byFile[f]); }
+function chooseStarter(s){
+  // Picking a new companion when a save exists would wipe progress — confirm first to avoid losing levels
+  if(localStorage.getItem(KEY) && !confirm('You already have a companion! Choosing a new one clears your levels and coins. Are you sure?')){ enterHub(); return; }
+  newGame(s);
+  const nm = prompt('Name your companion! (blank = '+s.n+')');
+  if(nm && nm.trim()){ G.name = nm.trim().slice(0,10); persist(); }
+  enterHub();
+  document.getElementById('arena-guide').style.display='inline';
+  document.getElementById('arena-hint').textContent='🎯 Try a warm-up battle!';
+}
+function continueGame(){ enterHub(); }
+
+/* — hub — */
+const TIERS = [{n:'Bronze',m:0},{n:'Silver',m:30},{n:'Gold',m:70},{n:'Platinum',m:130},{n:'Diamond',m:210},{n:'Master',m:320}];
+function tierOf(s){ let t=TIERS[0]; for(const x of TIERS) if(s>=x.m) t=x; return t.n; }
+const AURA_COLS = ['#ffe6b0','#cdefe6','#bfe4fb','#e6d6fb','#ffd9c0','#ffd6e0'];
+
+function renderHub(){
+  document.getElementById('hero-img').src = imgTag(G.starter);
+  document.getElementById('hero-name').textContent = G.name;
+  document.getElementById('hero-power').textContent = 'Power '+playerPower();
+  const tier = auraTier();
+  const hero = document.getElementById('mon-hero');
+  hero.style.setProperty('--aura-col', AURA_COLS[tier]);
+  hero.style.setProperty('--aura-op', (0.25 + tier*0.13).toFixed(2));
+  document.getElementById('wp-stars').textContent = '★'.repeat(tier) + '☆'.repeat(5-tier);
+  document.getElementById('wp-lv').textContent = 'Lv.'+tier;
+  const wg = G.wpGenre || {story:0,expo:0,argu:0};
+  document.getElementById('wp-genres').innerHTML = Object.entries(GENRES).map(([k,g])=>
+    `<span class="wg-chip" style="--g-color:${g.color}">${g.icon} ${g.label} ★${wg[k]||0}</span>`).join('');
+
+  const M=120;
+  document.getElementById('bar-atk').style.width=Math.min(100,effAtk()/M*100)+'%';
+  document.getElementById('bar-spd').style.width=Math.min(100,G.spd/M*100)+'%';
+  document.getElementById('bar-def').style.width=Math.min(100,G.def/M*100)+'%';
+  document.getElementById('bar-hp').style.width=Math.min(100,maxHp()/500*100)+'%';
+  document.getElementById('num-atk').textContent=effAtk();
+  document.getElementById('num-spd').textContent=G.spd;
+  document.getElementById('num-def').textContent=G.def;
+  document.getElementById('num-hp').textContent=maxHp();
+
+  document.getElementById('hdr-level').textContent='Stage '+G.level;
+  document.getElementById('hdr-gold').textContent='🪙 '+G.gold;
+  document.getElementById('hdr-rank').textContent=tierOf(G.score);
+  document.getElementById('hdr-record').textContent=G.wins+'W '+G.losses+'L';
+
+  const tc = loadThemes().length;
+  document.getElementById('theme-hint').textContent = tc ? `📖 ${tc} quest${tc>1?'s':''} available` : 'No quests yet';
+  document.getElementById('essay-count').textContent = (G.essays||[]).length;
+
+  // collected problems
+  const cg = document.getElementById('collected-grid');
+  const solved = Object.keys(G.defeated||{});
+  if(!solved.length){ cg.innerHTML='<div class="empty">No problems beaten yet — head to the Arena!</div>'; }
+  else {
+    cg.innerHTML = solved.map(f=>{
+      const m=byFile[f]; if(!m)return '';
+      return `<div class="trophy"><img src="${imgTag(f)}" alt=""><span>${m.n}</span></div>`;
+    }).join('');
+  }
+
+  // records
+  const rl = document.getElementById('rec-list');
+  if(!G.records.length){ rl.innerHTML='<div class="rec" style="opacity:.6">No records yet — go play a round!</div>'; }
+  else {
+    rl.innerHTML = G.records.slice(-14).reverse().map(r=>{
+      if(r.type==='train') return `<div class="rec"><span class="st">${'★'.repeat(r.stars)}</span><span>${r.genre?GENRES[r.genre].icon+' ':''}Training: ${r.summary}</span></div>`;
+      return `<div class="rec"><span class="${r.win?'w':'l'}">${r.win?'W':'L'}</span><span>${r.level?'Stage '+r.level+' ':''}${r.foe}${r.win?' (+'+r.pts+'pts 🪙+'+r.gold+')':' (+'+r.gold+'🪙)'}</span></div>`;
+    }).join('');
+  }
+}
+function enterHub(){ showScreen('screen-main'); renderHub(); }
+
+/* ══════ TRAINING（分文体） ══════ */
+const GENRE_LABEL = {story:'Descriptive', expo:'Analytical', argu:'Argumentative', all:'General'};
+
+function renderGenreTabs(){
+  document.getElementById('genre-tabs').innerHTML = Object.entries(GENRES).map(([k,g])=>
+    `<button class="g-tab ${k===currentGenre?'on':''}" style="--g-color:${g.color}" onclick="setGenre('${k}')">${g.icon} ${g.label}</button>`).join('');
+}
+function renderScoreDetail(results){
+  return results.map(r=>
+    `<div class="sd-row ${r.on?'on':''}">`+
+    `<span>${r.on?'✓':'✗'} ${r.label}${r.on&&r.hit?`<span class="hit">「${r.hit}」</span>`:''}</span>`+
+    `<span class="pt">${r.on?'+'+r.pts:'—'}</span></div>`
+  ).join('');
+}
+// Writing topic categories: tap one for a fresh subject to write about
+const TOPICS = {
+  '🐲 Creature':['Freely describe your creature companion'],
+  '🧑 People':['Describe someone who changed your life','Your creature meets a mysterious traveller','A portrait of your most memorable teacher','Is it better to be feared or to be loved?'],
+  '🏙️ City':['Describe your ideal city','Your creature explores a human city for the first time','Will the cities of the future be greener?','A street at dawn'],
+  '📜 History':['If your creature travelled back in time…','Write about a historical figure you admire','Does history repeat itself?','A day on an ancient battlefield'],
+  '🌿 Nature':['Describe a storm at sea','Should we do more to protect endangered species?','Your creature\u2019s favourite natural wonder','The forest after the rain'],
+  '🔬 Science':['Explain a scientific phenomenon in your own words','Will AI change the way we live?','If humans could live on Mars…','Your creature invents an amazing machine'],
+};
+let chosenCat = null;
+function renderTopicCats(){
+  document.getElementById('topic-cats').innerHTML =
+    Object.keys(TOPICS).map(c=>`<span class="cat-chip ${c===chosenCat?'on':''}" onclick="pickTopicCat('${c}')">${c}</span>`).join('');
+}
+function pickTopicCat(c){
+  chosenCat = c;
+  const arr = TOPICS[c];
+  const sub = arr[Math.floor(Math.random()*arr.length)];
+  const sl = document.getElementById('subject-line');
+  sl.innerHTML = `\u270d\ufe0f Write about this: ${sub}<span class="roll" onclick="pickTopicCat('${c}')">\ud83d\udd04 Shuffle</span>`;
+  sl.style.display='block';
+  renderTopicCats();
+}
+function setGenre(k){
+  currentGenre = k;
+  const g = GENRES[k];
+  renderGenreTabs();
+  document.getElementById('train-sub').innerHTML =
+    `<b>${g.motto}</b> — hitting <b>${g.criteria.map(c=>c.label).join(' · ')}</b> scores higher and boosts ${g.statName}!`;
+  document.getElementById('train-hints').innerHTML =
+    Object.keys(g.hints).map(h=>`<span class="hint-tag" onclick="showHint('${h}')">💡${h}</span>`).join('');
+  document.getElementById('hint-tip').style.display='none';
+  document.getElementById('train-input').placeholder = 'Write here… (tap a topic above for ideas, tap 💡 for keywords)';
+  document.getElementById('train-input').dispatchEvent(new Event('input'));
+}
+// 提示只给"参考"，绝不代写——孩子必须用自己的话打出来
+function showHint(k){
+  const arr = GENRES[currentGenre].hints[k]||[]; if(!arr.length)return;
+  const p = arr[Math.floor(Math.random()*arr.length)];
+  const tip = document.getElementById('hint-tip');
+  tip.innerHTML = `💡 Model: “${p}” — it won't be typed for you; write it in <b>your own words</b>!`;
+  tip.style.display='block';
+}
+function showToast(msg){
+  document.querySelectorAll('.toast').forEach(t=>t.remove());
+  const t=document.createElement('div'); t.className='toast'; t.textContent=msg;
+  document.body.appendChild(t); setTimeout(()=>t.remove(),2200);
+}
+// 防"点点点"和复制粘贴刷分：写作框只接受打字和语音
+for(const id of ['train-input','wpk-input']){
+  document.getElementById(id).addEventListener('paste',e=>{
+    e.preventDefault();
+    showToast('✋ No pasting — only what you write yourself counts!');
+  });
+  document.getElementById(id).addEventListener('drop',e=>e.preventDefault());
+}
+
+/* ── 语音输入（Chrome/Edge 内置识别，zh-CN） ── */
+let rec=null;
+function toggleVoice(taId,btnId){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){ showToast('This browser has no voice input — please use Chrome or Edge'); return; }
+  if(rec){ try{rec.stop();}catch(e){} return; }
+  const btn=document.getElementById(btnId);
+  rec=new SR(); rec.lang='zh-CN'; rec.continuous=true; rec.interimResults=false;
+  rec.onresult=e=>{
+    const ta=document.getElementById(taId);
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal){
+        ta.value+=e.results[i][0].transcript;
+        ta.dispatchEvent(new Event('input'));
+      }
+    }
+  };
+  rec.onend=()=>{ rec=null; document.querySelectorAll('.mic-btn').forEach(b=>{b.classList.remove('rec');b.textContent='🎤 Voice input';}); };
+  rec.onerror=ev=>{ if(ev.error==='not-allowed')showToast('Please allow microphone access'); };
+  rec.start();
+  btn.classList.add('rec'); btn.textContent='🔴 Tap to stop';
+  showToast('🎤 Start speaking — your words will appear as text!');
+}
+
+function openTraining(){
+  document.getElementById('train-ov').classList.add('active');
+  backToTrainForm(); setGenre(currentGenre);
+  chosenCat=null; document.getElementById('subject-line').style.display='none';
+  renderTopicCats();
+  const topic=writingTopic(), tc=document.getElementById('topic-chip');
+  if(topic){ tc.style.display='inline-block'; tc.textContent='📌 Topic: '+topic+' (+1 on-topic bonus)'; }
+  else tc.style.display='none';
+}
+function closeTraining(){ document.getElementById('train-ov').classList.remove('active'); }
+function backToTrainForm(){
+  document.getElementById('train-result').style.display='none';
+  document.getElementById('train-form').style.display='block';
+  const ta=document.getElementById('train-input'); ta.value=''; ta.dispatchEvent(new Event('input'));
+}
+function updateLiveScore(){
+  const {results}=scoreDesc(document.getElementById('train-input').value);
+  document.getElementById('live-score').innerHTML = results.map(r=>`<span class="ls-chip ${r.on?'on':''}">${r.label}${r.on?' ✓':''}</span>`).join('');
+}
+document.getElementById('train-input').addEventListener('input',function(){
+  const len=this.value.length;
+  const cc=document.getElementById('train-count');
+  const goal=wordGoal();
+  cc.textContent=len+' / '+goal+' words';
+  cc.className='char-count'+(len>=goal?' great':len>=Math.round(goal/3)?' good':'');
+  document.getElementById('train-submit').disabled=len<10;
+  updateLiveScore();
+});
+function submitTraining(){
+  const text=document.getElementById('train-input').value.trim();
+  if(text.length<10)return;
+  const h=simpleHash(text);
+  if(G.usedTexts.includes(h)){ alert('You already used this text! Write something new so your companion can learn.'); return; }
+  G.usedTexts.push(h);
+  const {results,pts,stars}=scoreDesc(text);
+  // 文体决定主属性：议论文=攻击(说服力)、说明文=耐力(条理)、故事类=速度(生动)
+  const gen=GENRES[currentGenre];
+  const main=Math.ceil(pts*0.5), rest=pts-main;
+  const o1=Math.ceil(rest/2), o2=rest-o1;
+  let gA=0,gS=0,gD=0;
+  if(gen.stat==='atk'){gA=main;gS=o1;gD=o2;}
+  else if(gen.stat==='spd'){gS=main;gA=o1;gD=o2;}
+  else {gD=main;gA=o1;gS=o2;}
+  const beforeTier=auraTier();
+  G.atk+=gA; G.spd+=gS; G.def+=gD; G.wp+=stars;
+  if(!G.wpGenre)G.wpGenre={story:0,expo:0,argu:0};
+  G.wpGenre[currentGenre]=(G.wpGenre[currentGenre]||0)+stars;
+  const afterTier=auraTier();
+  G.records.push({type:'train',stars,genre:currentGenre,summary:text.slice(0,15)+(text.length>15?'…':'')+` (+${gA+gS+gD} stats)`});
+  G.essays.push({text, stars, pts, genre:currentGenre, topic:writingTopic()||null, src:'train'});
+  persist();
+
+  document.getElementById('train-form').style.display='none';
+  const res=document.getElementById('train-result'); res.style.display='block';
+  document.getElementById('tr-img').src=imgTag(G.starter);
+  document.getElementById('tr-stars').innerHTML=Array.from({length:5},(_,i)=>`<span class="${i<stars?'on':'off'}">★</span>`).join('');
+  const gains=[];
+  if(gA)gains.push(`<span class="gain a">+${gA} Attack</span>`);
+  if(gS)gains.push(`<span class="gain s">+${gS} Speed</span>`);
+  if(gD)gains.push(`<span class="gain d">+${gD} Stamina</span>`);
+  document.getElementById('tr-gains').innerHTML=gains.join('');
+  document.getElementById('tr-detail').innerHTML =
+    '<div style="font-size:.72rem;font-weight:900;color:var(--ink-soft);margin-bottom:6px">📋 Score breakdown — where your points came from:</div>' +
+    renderScoreDetail(results);
+  const missing=results.filter(r=>!r.on).slice(0,3).map(r=>r.label);
+  let tip = stars>=5 ? 'Perfect writing! Your companion got the maximum boost!' : `Want more stars? Next time try adding: <b>${missing.join(', ')}</b>`;
+  tip = `${gen.icon} ${gen.label} · Writing Power +${stars}★, boosts ${gen.statName}.<br>` + tip;
+  if(afterTier>beforeTier) tip = `🎉 Writing Power reached Lv.${afterTier}! The aura shines brighter!<br>` + tip;
+  document.getElementById('tr-tip').innerHTML=tip;
+
+  renderHub();
+  const hi=document.getElementById('hero-img'); hi.classList.remove('evolving'); void hi.offsetWidth; hi.classList.add('evolving');
+}
+
+/* ══════ SHOP ══════ */
+const COST=20, MAX=30;
+function openShop(){ document.getElementById('shop-ov').classList.add('active'); document.getElementById('shop-msg').textContent=''; renderShop(); }
+function closeShop(){ document.getElementById('shop-ov').classList.remove('active'); if(G)renderHub(); }
+function renderShop(){
+  document.getElementById('shop-gold').textContent='🪙 '+G.gold;
+  document.getElementById('shop-atk-lv').textContent=`Lv.${G.atkLvl} / ${MAX}`;
+  document.getElementById('shop-hp-lv').textContent=`Lv.${G.hpLvl} / ${MAX}`;
+  document.getElementById('shop-atk-f').style.width=(G.atkLvl/MAX*100)+'%';
+  document.getElementById('shop-hp-f').style.width=(G.hpLvl/MAX*100)+'%';
+  const a=document.getElementById('buy-atk'), h=document.getElementById('buy-hp');
+  a.disabled=G.atkLvl>=MAX||G.gold<COST; h.disabled=G.hpLvl>=MAX||G.gold<COST;
+  a.innerHTML=G.atkLvl>=MAX?'MAX':`🪙 ${COST}<br>Upgrade`;
+  h.innerHTML=G.hpLvl>=MAX?'MAX':`🪙 ${COST}<br>Upgrade`;
+}
+function buyUpgrade(kind){
+  const msg=document.getElementById('shop-msg');
+  const lvl=kind==='atk'?G.atkLvl:G.hpLvl;
+  if(lvl>=MAX)return;
+  if(G.gold<COST){ msg.textContent='Not enough coins! Win stages to earn more.'; msg.className='shop-msg err'; return; }
+  G.gold-=COST;
+  if(kind==='atk'){ G.atkLvl++; msg.textContent=`⚔️ Attack reached Lv.${G.atkLvl}! +2 Attack`; }
+  else { G.hpLvl++; msg.textContent=`❤️ HP reached Lv.${G.hpLvl}! +10 HP`; }
+  msg.className='shop-msg'; persist(); renderShop();
+}
+
+/* ══════ THEMES (teacher-authored) ══════ */
+const THEMES_KEY='monsterlab_themes_en';
+function loadThemes(){ try{return JSON.parse(localStorage.getItem(THEMES_KEY))||[];}catch(e){return[];} }
+function saveThemes(t){ try{localStorage.setItem(THEMES_KEY,JSON.stringify(t));}catch(e){} }
+
+function openTeacher(){
+  document.getElementById('teacher-ov').classList.add('active');
+  document.getElementById('tf-key').value=localStorage.getItem('ml_dskey_en')||'';
+  document.getElementById('tf-wordgoal').value=wordGoal();
+  document.getElementById('tf-topic').value=writingTopic();
+  document.getElementById('tf-status').textContent=''; renderTeacherThemes();
+}
+document.getElementById('tf-topic').addEventListener('change',function(){
+  const v=this.value.trim();
+  if(v) localStorage.setItem('ml_writing_topic_en',v);
+  else localStorage.removeItem('ml_writing_topic_en');
+  const st=document.getElementById('tf-status');
+  st.textContent = v ? `✅ Lesson topic set to “${v}” — students get +1 for staying on topic` : '✅ Topic cleared — students write freely';
+  st.className='tf-status';
+});
+document.getElementById('tf-wordgoal').addEventListener('change',function(){
+  let v=parseInt(this.value)||150; v=Math.max(30,Math.min(1000,v)); this.value=v;
+  localStorage.setItem('ml_wordgoal_en',v);
+  const st=document.getElementById('tf-status');
+  st.textContent=`✅ Word target set to ${v}: ${Math.max(10,Math.round(v/3))} words +1, ${Math.round(v*2/3)} words +1, ${v} words +2`;
+  st.className='tf-status';
+});
+function closeTeacher(){ document.getElementById('teacher-ov').classList.remove('active'); if(G)renderHub(); }
+function renderTeacherThemes(){
+  const t=loadThemes(); const box=document.getElementById('tf-list');
+  if(!t.length){ box.innerHTML='<div class="theme-empty">No quests yet — create your first one</div>'; return; }
+  box.innerHTML=t.map(x=>`<div class="theme-item" style="cursor:default"><div class="theme-ic">📖</div>
+    <div class="theme-info"><div class="theme-nm">${x.title}</div><div class="theme-meta">${x.questions.length} Qs · ${x.mode==='ai'?'AI':'Quick'}</div></div>
+    <div class="theme-del" onclick="deleteTheme('${x.id}')">Delete</div></div>`).join('');
+}
+function deleteTheme(id){ if(!confirm('Delete this quest?'))return; saveThemes(loadThemes().filter(t=>t.id!==id)); renderTeacherThemes(); }
+function addTheme(title,qs,mode){ const t=loadThemes(); t.push({id:'t'+simpleHash(title+qs.length+t.length),title,questions:qs,mode}); saveThemes(t); renderTeacherThemes(); }
+function tfStatus(m,err){ const e=document.getElementById('tf-status'); e.textContent=m; e.className='tf-status'+(err?' err':''); }
+
+async function generateAI(){
+  const title=document.getElementById('tf-title').value.trim();
+  const article=document.getElementById('tf-article').value.trim();
+  const key=document.getElementById('tf-key').value.trim();
+  if(!title){tfStatus('Please enter a quest title first',1);return;}
+  if(article.length<120){tfStatus('The passage is too short — aim for 150+ words',1);return;}
+  if(!key){tfStatus('AI quiz needs a DeepSeek key, or use “Quick quiz” instead',1);return;}
+  localStorage.setItem('ml_dskey_en',key);
+  const btn=document.getElementById('btn-ai'); btn.disabled=true;
+  tfStatus('🤖 AI is reading the passage and writing questions (15-30s)…');
+  try{
+    const resp=await fetch('https://api.deepseek.com/chat/completions',{
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify({model:'deepseek-chat',messages:[
+        {role:'system',content:'You are an IB/A-Level English teacher writing quiz questions for international students. Output JSON only, no other text.'},
+        {role:'user',content:`From the passage below, write 8 multiple-choice questions for IB/A-Level (ages 14-18) students. Mix these focuses: key vocabulary in context, main idea, inference, and one literary/rhetorical device if present. Each question has 4 options, exactly one correct. Strict JSON:\n{"questions":[{"q":"question","options":["A","B","C","D"],"answer":0,"explain":"one-line explanation"}]}\nanswer is the index (0-3) of the correct option.\n\nPassage:\n${article.slice(0,3500)}`}
+      ],temperature:0.7})
+    });
+    if(!resp.ok)throw new Error('API returned '+resp.status+' (is the key correct?)');
+    const data=await resp.json();
+    let c=data.choices[0].message.content.trim().replace(/^```json\s*/i,'').replace(/^```\s*/,'').replace(/```$/,'').trim();
+    const parsed=JSON.parse(c);
+    const qs=(parsed.questions||[]).filter(q=>q.q&&Array.isArray(q.options)&&q.options.length===4&&q.answer>=0&&q.answer<=3);
+    if(qs.length<4)throw new Error('AI response was incomplete — please try again');
+    addTheme(title,qs,'ai');
+    tfStatus(`✅ Published “${title}”: ${qs.length} AI questions!`);
+    document.getElementById('tf-title').value=''; document.getElementById('tf-article').value='';
+  }catch(e){ tfStatus('❌ '+(String(e.message).includes('fetch')?'Network request blocked — use Quick quiz instead':e.message),1); }
+  finally{ btn.disabled=false; }
+}
+
+const STOP=new Set('the a an of to in on at and or but if is are was were be been being this that these those it its he she they we you i his her their our your my as for with from by about into over under then than so not no do does did has have had will would can could should may might must very more most much many some any each all both'.split(' '));
+function generateQuick(){
+  const title=document.getElementById('tf-title').value.trim();
+  const article=document.getElementById('tf-article').value.trim();
+  if(!title){tfStatus('Please enter a quest title first',1);return;}
+  if(article.length<120){tfStatus('The passage is too short — aim for 150+ words',1);return;}
+  const sentences=article.split(/(?<=[.!?;])\s+|\n+/).map(s=>s.trim()).filter(s=>{const wc=(s.match(/[A-Za-z'-]+/g)||[]).length;return wc>=5&&wc<=32;});
+  if(sentences.length<4){tfStatus('Not enough usable sentences — try a richer passage',1);return;}
+  const isContent=(w)=>w.length>=4&&/^[A-Za-z][A-Za-z'-]*$/.test(w)&&!STOP.has(w.toLowerCase());
+  const freq={};
+  for(const w of (article.match(/[A-Za-z'-]+/g)||[])){const lw=w.toLowerCase(); if(isContent(w))freq[lw]=(freq[lw]||0)+1;}
+  const keywordOf=(s)=>{
+    const words=(s.match(/[A-Za-z'-]+/g)||[]).filter(isContent);
+    let best=null,bs=-1;
+    for(const w of words){const f=freq[w.toLowerCase()]||0;const sc=f*2+w.length;if(sc>bs){bs=sc;best=w;}}
+    return best;
+  };
+  const step=Math.max(1,Math.floor(sentences.length/8));
+  const picked=[]; for(let i=0;i<sentences.length&&picked.length<8;i+=step)picked.push(sentences[i]);
+  const bank=Object.keys(freq).filter(w=>freq[w]>=1);
+  const questions=[];
+  for(const s of picked){
+    const kw=keywordOf(s); if(!kw)continue;
+    const q=s.replace(new RegExp('\\b'+kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b'),'______'); if(q===s)continue;
+    const pool=shuffleArr(bank.filter(w=>w!==kw.toLowerCase()&&!s.toLowerCase().includes(w)&&Math.abs(w.length-kw.length)<=2));
+    if(pool.length<3)continue;
+    const ds=pool.slice(0,3).map(w=>w.charAt(0).toUpperCase()+w.slice(1));
+    const options=shuffleArr([kw,...ds]);
+    questions.push({q:'Fill the blank: '+q,options,answer:options.indexOf(kw),explain:'From the text: '+s});
+  }
+  if(questions.length<4){tfStatus('Auto-generation was weak for this text — try AI quiz',1);return;}
+  addTheme(title,questions,'quick');
+  tfStatus(`✅ Published “${title}”: ${questions.length} fill-in-the-blank questions!`);
+  document.getElementById('tf-title').value=''; document.getElementById('tf-article').value='';
+}
+function exportThemes(){
+  const t=loadThemes(); if(!t.length){tfStatus('No quests to export',1);return;}
+  const io=document.getElementById('tf-io'); io.value=JSON.stringify(t); io.select();
+  try{document.execCommand('copy');tfStatus('✅ Quest code copied — send it to students to import');}catch(e){tfStatus('Code ready — select and copy it manually');}
+}
+function importThemes(){
+  const raw=document.getElementById('tf-io').value.trim(); if(!raw){tfStatus('Paste the code into the box below first',1);return;}
+  try{
+    const inc=JSON.parse(raw); if(!Array.isArray(inc))throw new Error();
+    const t=loadThemes(); const ex=new Set(t.map(x=>x.id)); let n=0;
+    for(const x of inc){ if(x.id&&x.title&&Array.isArray(x.questions)&&!ex.has(x.id)){t.push(x);n++;} }
+    saveThemes(t); renderTeacherThemes(); tfStatus(`✅ Imported: ${n} new quest(s)`);
+  }catch(e){ tfStatus('❌ Bad code format — check it is complete',1); }
+}
+
+/* — student quiz — */
+function openThemes(){
+  const t=loadThemes(); const box=document.getElementById('student-list');
+  if(!t.length){ box.innerHTML='<div class="theme-empty">No quests published yet<br>(teachers can create them from “Teacher” at the top right)</div>'; }
+  else box.innerHTML=t.map(x=>{
+    const best=(G.themeBest||{})[x.id];
+    return `<div class="theme-item" onclick="startQuiz('${x.id}')"><div class="theme-ic">📖</div>
+      <div class="theme-info"><div class="theme-nm">${x.title}</div><div class="theme-meta">${x.questions.length} Qs · a Guardian awaits</div></div>
+      ${best?`<span class="theme-best">Best ${'★'.repeat(best)}</span>`:''}</div>`;
+  }).join('');
+  document.getElementById('themes-ov').classList.add('active');
+}
+function closeThemes(){ document.getElementById('themes-ov').classList.remove('active'); }
+
+let quiz=null;
+function startQuiz(id){
+  const theme=loadThemes().find(t=>t.id===id); if(!theme)return;
+  closeThemes();
+  const boss=FOE_POOL[Math.floor(Math.random()*FOE_POOL.length)];
+  quiz={theme,idx:0,correct:0,bossHp:100,playerHp:100,dmg:Math.ceil(100/theme.questions.length)+4,taken:25,boss,over:false};
+  showScreen('screen-quiz');
+  document.getElementById('quiz-title').textContent='📚 '+theme.title;
+  document.getElementById('quiz-boss-nm').textContent=theme.title+' Guardian ('+boss.n+')';
+  document.getElementById('quiz-boss').className='quiz-boss';
+  document.getElementById('quiz-result').style.display='none';
+  document.getElementById('qcard').style.display='block';
+  document.getElementById('quiz-boss-img').src=imgTag(boss.f);
+  document.getElementById('quiz-player-img').src=imgTag(G.starter);
+  updateQuizBars(); showQuestion();
+}
+function updateQuizBars(){
+  const b=document.getElementById('quiz-boss-hp'); b.style.width=Math.max(0,quiz.bossHp)+'%';
+  b.className='f'+(quiz.bossHp<25?' crit':quiz.bossHp<55?' low':'');
+  const p=document.getElementById('quiz-player-hp'); p.style.width=Math.max(0,quiz.playerHp)+'%';
+  p.className='f'+(quiz.playerHp<25?' crit':quiz.playerHp<55?' low':'');
+  document.getElementById('quiz-player-nm').textContent=G.name;
+}
+function showQuestion(){
+  const q=quiz.theme.questions[quiz.idx];
+  document.getElementById('quiz-prog').textContent=`Q ${quiz.idx+1} / ${quiz.theme.questions.length}`;
+  document.getElementById('qtext').textContent=q.q;
+  const fb=document.getElementById('qfb'); fb.textContent=''; fb.className='qfb';
+  const grid=document.getElementById('opts'); grid.innerHTML='';
+  q.options.forEach((opt,i)=>{ const b=document.createElement('button'); b.className='opt'; b.textContent='ABCD'[i]+'. '+opt; b.onclick=()=>answerQ(i,b); grid.appendChild(b); });
+}
+function answerQ(i,btn){
+  if(quiz.over)return;
+  const q=quiz.theme.questions[quiz.idx];
+  const btns=document.querySelectorAll('#opts .opt'); btns.forEach(b=>b.disabled=true);
+  const fb=document.getElementById('qfb'); const correct=i===q.answer;
+  if(correct){ quiz.correct++; quiz.bossHp-=quiz.dmg; btn.classList.add('correct');
+    fb.innerHTML=`<b>✓ Correct!</b> Your companion strikes! ${q.explain?' '+q.explain:''}`;
+    const boss=document.getElementById('quiz-boss'); boss.classList.add('hit'); setTimeout(()=>boss.classList.remove('hit'),300);
+  } else { quiz.playerHp-=quiz.taken; btn.classList.add('wrong'); btns[q.answer].classList.add('correct');
+    fb.className='qfb bad'; fb.innerHTML=`<b>✗ Wrong!</b> The Guardian hits back! Correct answer: ${'ABCD'[q.answer]}. ${q.explain?' '+q.explain:''}`;
+  }
+  updateQuizBars();
+  setTimeout(()=>{
+    if(quiz.bossHp<=0){endQuiz(true);return;}
+    if(quiz.playerHp<=0){endQuiz(false);return;}
+    quiz.idx++;
+    if(quiz.idx>=quiz.theme.questions.length){endQuiz(quiz.bossHp<=35);return;}
+    showQuestion();
+  }, correct?1400:2600);
+}
+function endQuiz(win){
+  quiz.over=true;
+  const total=quiz.theme.questions.length, ratio=quiz.correct/total;
+  const stars=ratio>=0.95?5:ratio>=0.8?4:ratio>=0.6?3:ratio>=0.4?2:1;
+  const gold=win?20+quiz.correct*3:5+quiz.correct;
+  G.gold+=gold; G.score+=quiz.correct*2;
+  if(!G.themeBest)G.themeBest={}; if(win)G.themeBest[quiz.theme.id]=Math.max(G.themeBest[quiz.theme.id]||0,stars);
+  G.records.push({type:'battle',win,foe:quiz.theme.title+' Guardian',pts:quiz.correct*2,gold});
+  persist();
+  if(win)document.getElementById('quiz-boss').classList.add('dead');
+  document.getElementById('qcard').style.display='none';
+  const res=document.getElementById('quiz-result'); res.style.display='block';
+  const t=document.getElementById('qr-title'); t.textContent=win?'🏆 Guardian defeated!':'💫 The Guardian won this time…'; t.className='rt '+(win?'win':'lose');
+  document.getElementById('qr-stars').innerHTML=Array.from({length:5},(_,i)=>`<span class="${i<stars?'on':'off'}">★</span>`).join('');
+  document.getElementById('qr-points').textContent=`${quiz.correct} / ${total} correct　🪙 +${gold}　+${quiz.correct*2} pts`;
+  document.getElementById('qr-advice').className='ra';
+  document.getElementById('qr-advice').innerHTML=win?(stars>=5?'Full marks — you’ve mastered this topic!':'Try again for 5 stars and pick up the points you missed!'):'The Guardian only fears knowledge — reread the passage and it won’t stand a chance!';
+  document.getElementById('qr-retry').onclick=()=>startQuiz(quiz.theme.id);
+}
+function exitQuiz(){ enterHub(); }
+
+/* ══════ ARENA / BATTLE ══════ */
+let battle=null;
+function makeFoe(){
+  // 每过一关怪变强；前期偏「写作问题」，中后期混入工具兽
+  const levelPower=45+(G.level-1)*13;
+  const chase=playerPower()*0.8;
+  const power=Math.max(30, Math.round(Math.max(levelPower,chase)*(0.94+Math.random()*0.14)));
+  const preferProblem = G.level<=6 || Math.random()<0.6;
+  const pool = preferProblem && PROBLEM_POOL.length ? PROBLEM_POOL : FOE_POOL;
+  const spec = pool[Math.floor(Math.random()*pool.length)];
+  const w=[Math.random()+0.5,Math.random()+0.5,Math.random()+0.5]; const ws=w[0]+w[1]+w[2];
+  const atk=Math.max(8,Math.round(power*w[0]/ws)), spd=Math.max(8,Math.round(power*w[1]/ws)), def=Math.max(8,power-atk-spd);
+  return {f:spec.f, name:spec.n, kind:spec.kind, genre:spec.genre||'all', hint:spec.hint||'', atk, spd, def};
+}
+function hpOf(m){ return 60+m.def*2; }
+function powerOf(m){ return m.atk+m.spd+m.def; }
+
+function enterArena(){
+  document.getElementById('arena-guide').style.display='none';
+  document.getElementById('arena-hint').textContent='Opponents get tougher…';
+  showScreen('screen-arena'); startBattle();
+}
+function exitArena(){ enterHub(); }
+
+function startBattle(){
+  const foe=makeFoe();
+  const myHp=maxHp();
+  battle={ me:{name:G.name,f:G.starter,atk:effAtk(),spd:G.spd,def:G.def,hp:myHp,maxHp:myHp},
+           foe:{...foe,hp:hpOf(foe),maxHp:hpOf(foe)}, over:false };
+  if(vq){ vq.answered=true; clearTimeout(vq.timer); }
+  document.getElementById('vocab-arena').style.display='none';
+  document.getElementById('arena-title').textContent=`⚔️ Stage ${G.level}`;
+  document.getElementById('arena-sub').innerHTML = foe.kind==='foe'
+    ? `This stage · ${GENRE_LABEL[foe.genre]||'General'} problem: <b>${foe.name}</b> (${foe.hint}) — beat it to break the habit!`
+    : `Guardian: <b>${foe.name}</b>`;
+  document.getElementById('battle-result').style.display='none';
+  document.getElementById('f-me').className='fighter'; document.getElementById('f-foe').className='fighter';
+  document.getElementById('arena-me').src=imgTag(battle.me.f);
+  document.getElementById('arena-foe').src=imgTag(battle.foe.f);
+  document.getElementById('arena-me-nm').textContent=battle.me.name;
+  document.getElementById('arena-foe-nm').textContent=battle.foe.name;
+  document.getElementById('arena-me-tag').textContent='Power '+powerOf(battle.me);
+  document.getElementById('arena-foe-tag').textContent='Power '+powerOf(battle.foe);
+  updateHp();
+  document.getElementById('battle-log').innerHTML='<b>'+battle.foe.name+'</b> appears! Battle begins…';
+  const first=battle.me.spd>=battle.foe.spd?'me':'foe';
+  setTimeout(()=>turn(first),1100);
+}
+function updateHp(){
+  for(const side of ['me','foe']){
+    const f=battle[side]; const pct=Math.max(0,f.hp/f.maxHp*100);
+    const bar=document.getElementById('hp-'+side); bar.style.width=pct+'%';
+    bar.className='f'+(pct<25?' crit':pct<55?' low':'');
+    document.getElementById('hpn-'+side).textContent=Math.max(0,Math.round(f.hp))+' / '+f.maxHp;
+  }
+}
+function turn(side){
+  if(battle.over)return;
+  if(side==='me'){
+    document.getElementById('battle-log').innerHTML=`⚡ <b>${battle.me.name}</b>'s turn — answer right to attack!`;
+    askVocab({card:'vocab-arena',type:'va-type',q:'va-q',opts:'va-opts'},(ok,fast)=>{
+      if(battle.over)return;
+      if(ok){ executeAttack('me', fast?1.5:1.0, fast, fast?'⚡ Fast critical!':'✓ Correct!'); }
+      else {
+        document.getElementById('battle-log').innerHTML=`💥 Wrong — <b>${battle.me.name}</b>'s attack misses!`;
+        setTimeout(()=>turn('foe'),900);
+      }
+    });
+  } else executeAttack('foe',1,null,null);
+}
+function executeAttack(side,mult,timedCrit,timedMsg){
+  if(battle.over)return;
+  const dside=side==='me'?'foe':'me'; const A=battle[side], D=battle[dside];
+  let isCrit,dmg;
+  if(side==='me'){ isCrit=timedCrit; dmg=A.atk*(0.9+Math.random()*0.2)*mult - D.def*0.25; }
+  else { isCrit=Math.random()<0.15; dmg=A.atk*(0.85+Math.random()*0.3)-D.def*0.25; if(isCrit)dmg*=1.7; }
+  dmg=Math.max(2,Math.round(dmg));
+  const dodge = side==='foe' && Math.random()<Math.max(0,(D.spd-A.spd)*0.004);
+  const attEl=document.getElementById('f-'+side), defEl=document.getElementById('f-'+dside);
+  attEl.classList.add(side==='me'?'lunge-r':'lunge-l');
+  setTimeout(()=>{
+    attEl.classList.remove('lunge-r','lunge-l');
+    if(dodge){ document.getElementById('battle-log').innerHTML=`<b>${D.name}</b> nimbly dodges! (speed advantage)`; }
+    else {
+      D.hp-=dmg; defEl.classList.add('hit'); setTimeout(()=>defEl.classList.remove('hit'),250);
+      const fl=document.createElement('div'); fl.className='dmg-float'+(isCrit?' heavy':''); fl.textContent='-'+dmg+(isCrit?' crit!':'');
+      defEl.querySelector('.art').appendChild(fl); setTimeout(()=>fl.remove(),950);
+      updateHp();
+      document.getElementById('battle-log').innerHTML=(timedMsg?timedMsg+' ':'')+`<b>${A.name}</b> deals <b>${dmg}</b> damage${isCrit&&!timedMsg?' (crit!)':''}`;
+    }
+    if(D.hp<=0){ battle.over=true; defEl.classList.add('dead'); setTimeout(()=>endBattle(side==='me'),900); }
+    else { setTimeout(()=>turn(dside),950); }
+  },240);
+}
+
+function buildDefeatAnalysis(){
+  const me=battle.me, foe=battle.foe; const r=[];
+  if(foe.atk-me.atk>5) r.push(`Enemy Attack <b>${foe.atk}</b> vs your <b>${me.atk}</b> — your attack is too weak to hurt it`);
+  if(foe.maxHp-me.maxHp>20) r.push(`Enemy HP <b>${foe.maxHp}</b> vs your <b>${me.maxHp}</b> — too little HP to last the fight`);
+  if(foe.spd-me.spd>5) r.push(`Enemy Speed <b>${foe.spd}</b> vs your <b>${me.spd}</b> — it strikes first and dodges you`);
+  if(!r.length) r.push('You were actually very close — boost just one more stat and you’ll win');
+  const ex=['Instead of “my monster is strong”, write “its scales were hard as iron, and every swipe of its claws tore the air with a shriek.”',
+            'Instead of “it runs fast”, write “the instant it pushed off, it raised a storm — behind its rival before anyone could blink.”',
+            'Instead of “it can take a hit”, write “its shell layered like an ancient city wall; even the fiercest blow left only a white scratch.”'][G.losses%3];
+  const afford=Math.floor(G.gold/COST);
+  const shop=afford>0?`You have 🪙${G.gold} — enough for ${afford} upgrade(s) in the <b>Shop</b>`:'Not enough coins for the Shop — turn it around with <b>writing</b>';
+  return `Don’t rush to complain — calmly work out why you lost:<br><br>`+r.map(x=>'• '+x).join('<br>')+
+    `<br><br>Write precisely and deeply to grow stronger — ${ex}<br><br>${shop}. Losing isn’t the end — it shows you where to improve!`;
+}
+
+function endBattle(win){
+  const foePower=powerOf(battle.foe), myPower=powerOf(battle.me);
+  const cleared=G.level; let pts,gold;
+  if(win){ pts=10+Math.max(0,Math.round((foePower-myPower)/8)); gold=20+cleared*2; G.wins++; G.level++;
+    if(battle.foe.kind==='foe'){ if(!G.defeated)G.defeated={}; G.defeated[battle.foe.f]=true; }
+  } else { pts=2; gold=5; G.losses++; }
+  G.score+=pts; G.gold+=gold;
+  G.records.push({type:'battle',win,foe:battle.foe.name,pts,gold,level:cleared});
+  persist();
+  const res=document.getElementById('battle-result'); res.style.display='block';
+  const t=document.getElementById('br-title');
+  t.textContent=win?`🏆 Stage ${cleared} cleared!`:'💫 So close…'; t.className='rt '+(win?'win':'lose');
+  const solvedNote = win && battle.foe.kind==='foe' ? `　🎉 Defeated ${battle.foe.name}!` : '';
+  document.getElementById('br-points').textContent=`🪙 +${gold} (total ${G.gold})　+${pts} pts → ${G.score} (${tierOf(G.score)})`+solvedNote;
+  const adv=document.getElementById('br-advice');
+  adv.className='ra'+(win?'':' analysis');
+  adv.innerHTML = win ? `Stage ${G.level}'s monster is tougher! Spend coins in the <b>Shop</b>, or use <b>Training</b> to write new powers.` : buildDefeatAnalysis();
+  document.getElementById('battle-log').textContent='';
+}
+
+/* ══════ VOCAB ENGINE（词汇对战：近义词/反义词/生动表达） ══════ */
+const SYN = [  // upgrade a common word to an academic one: [common, academic]
+  ['important','significant'],['big','substantial'],['show','demonstrate'],['a lot of','numerous'],
+  ['idea','concept'],['think','consider'],['use','utilise'],['get','obtain'],['help','facilitate'],
+  ['need','require'],['start','commence'],['end','conclude'],['good','beneficial'],['bad','detrimental'],
+  ['clear','evident'],['improve','enhance'],['find','identify'],['enough','sufficient'],['strong','robust'],
+  ['hard','challenging'],['very','considerably'],['maybe','arguably'],['change','modify'],['main','primary'],
+  ['choose','select'],['because of','due to'],['so','therefore'],['also','moreover'],['but','however'],
+];
+const ANT = [  // opposites (academic register): [word, opposite]
+  ['expand','contract'],['include','exclude'],['increase','decrease'],['accept','reject'],
+  ['abstract','concrete'],['explicit','implicit'],['objective','subjective'],['strengthen','weaken'],
+  ['optimistic','pessimistic'],['artificial','natural'],['temporary','permanent'],['flexible','rigid'],
+  ['praise','criticise'],['reveal','conceal'],['unite','divide'],['generous','selfish'],
+  ['confident','doubtful'],['complex','simple'],['ancient','modern'],['victory','defeat'],
+  ['gather','scatter'],['approve','oppose'],['superior','inferior'],['majority','minority'],
+];
+const VIVID = [  // show, don't tell: weak telling vs vivid showing
+  {bad:'He ran fast.', good:'He shot forward like an arrow.'},
+  {bad:'The flower was pretty.', good:'The petals blushed crimson in the dusk.'},
+  {bad:'He was very angry.', good:'His eyebrows arched and his fists clenched.'},
+  {bad:'It was very hot.', good:'The sun melted the tar on the road.'},
+  {bad:'It was loud.', good:'The roar rattled the leaves from the trees.'},
+  {bad:'She was tired.', good:'Her legs felt as heavy as lead.'},
+  {bad:'The lake was clear.', good:'The lake was so clear you could count the pebbles below.'},
+  {bad:'He ate quickly.', good:'He devoured the meal in seconds.'},
+  {bad:'She was scared.', good:'Her heart hammered against her ribs.'},
+  {bad:'The night was quiet.', good:'The night was so still you could hear the moonlight land.'},
+  {bad:'The city was busy.', good:'The city roared like a hive that never slept.'},
+  {bad:'He was sad.', good:'His shoulders sagged and his eyes lost their light.'},
+];
+const COLLOC = [  // choose the word that collocates
+  {stem:'____ a decision', correct:'make', wrong:['do','take','get']},
+  {stem:'____ research', correct:'conduct', wrong:['make','do','play']},
+  {stem:'____ attention to', correct:'pay', wrong:['make','give','put']},
+  {stem:'a ____ argument', correct:'compelling', wrong:['loud','tall','heavy']},
+  {stem:'____ a conclusion', correct:'draw', wrong:['make','pull','give']},
+  {stem:'____ evidence', correct:'provide', wrong:['make','say','tell']},
+  {stem:'a ____ difference', correct:'significant', wrong:['loud','fast','tall']},
+  {stem:'take into ____', correct:'account', wrong:['mind','thought','head']},
+  {stem:'____ a risk', correct:'take', wrong:['make','do','have']},
+  {stem:'____ progress', correct:'make', wrong:['do','take','play']},
+  {stem:'____ knowledge', correct:'acquire', wrong:['catch','grab','hold']},
+  {stem:'____ a role', correct:'play', wrong:['make','do','act']},
+  {stem:'strongly ____', correct:'agree', wrong:['big','loud','fast']},
+  {stem:'____ an impact on', correct:'have', wrong:['do','make','give']},
+  {stem:'____ a point', correct:'make', wrong:['do','say','tell']},
+  {stem:'meet a ____', correct:'deadline', wrong:['time','clock','date']},
+];
+const DEVICE = [  // identify the literary device
+  {line:'The wind whispered through the trees.', dev:'Personification'},
+  {line:'Her smile was as bright as the sun.', dev:'Simile'},
+  {line:'Time is a thief.', dev:'Metaphor'},
+  {line:'I have told you a million times.', dev:'Hyperbole'},
+  {line:'The bees buzzed in the bright blossoms.', dev:'Alliteration'},
+  {line:'The bacon sizzled in the pan.', dev:'Onomatopoeia'},
+  {line:'The stars danced in the sky.', dev:'Personification'},
+  {line:'He was as brave as a lion.', dev:'Simile'},
+  {line:'The classroom was a zoo.', dev:'Metaphor'},
+  {line:'This bag weighs a ton.', dev:'Hyperbole'},
+  {line:'Peter Piper picked a peck of peppers.', dev:'Alliteration'},
+  {line:'The clock ticked and tocked.', dev:'Onomatopoeia'},
+  {line:'The sun smiled down on us.', dev:'Personification'},
+  {line:'Life is a journey.', dev:'Metaphor'},
+  {line:'Her eyes sparkled like diamonds.', dev:'Simile'},
+  {line:'I could eat a horse.', dev:'Hyperbole'},
+];
+const DEVICE_NAMES = ['Metaphor','Simile','Personification','Hyperbole','Alliteration','Onomatopoeia'];
+function shuffleArr(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function makeVocabQ(){
+  // when the teacher has published text-based quests, ~22% of questions come from that material
+  const themes = loadThemes();
+  if (themes.length && Math.random() < 0.22) {
+    const th = themes[Math.floor(Math.random()*themes.length)];
+    const q = th.questions[Math.floor(Math.random()*th.questions.length)];
+    return {type:'Text: '+th.title.slice(0,10), color:'var(--gold-deep)', q:q.q, options:q.options, answer:q.answer};
+  }
+  const roll=Math.random();
+  if(roll<0.30){  // synonym (upgrade) / antonym
+    const isSyn=roll<0.15;
+    const bank=isSyn?SYN:ANT;
+    const p=bank[Math.floor(Math.random()*bank.length)];
+    const correct=p[1];
+    const pool=shuffleArr(bank.filter(x=>x!==p).map(x=>x[1]).concat((isSyn?ANT:SYN).map(x=>x[1])))
+      .filter(w=>w!==correct&&w!==p[0]);
+    const options=shuffleArr([correct,...pool.slice(0,3)]);
+    return {type:isSyn?'Academic synonym':'Antonym', color:isSyn?'var(--teal)':'var(--violet2)',
+      q:isSyn?`A more academic word for “${p[0]}” is?`:`The opposite of “${p[0]}” is?`,
+      options, answer:options.indexOf(correct)};
+  }
+  if(roll<0.52){  // literary device ID
+    const d=DEVICE[Math.floor(Math.random()*DEVICE.length)];
+    const pool=shuffleArr(DEVICE_NAMES.filter(n=>n!==d.dev));
+    const options=shuffleArr([d.dev,...pool.slice(0,3)]);
+    return {type:'Literary device', color:'var(--violet2)', q:`Which device? “${d.line}”`, options, answer:options.indexOf(d.dev)};
+  }
+  if(roll<0.76){  // collocation
+    const c=COLLOC[Math.floor(Math.random()*COLLOC.length)];
+    const options=shuffleArr([c.correct,...c.wrong]);
+    return {type:'Collocation', color:'var(--coral-deep)', q:`Which word fits? “${c.stem}”`, options, answer:options.indexOf(c.correct)};
+  }
+  const v=VIVID[Math.floor(Math.random()*VIVID.length)];  // show, don't tell
+  const options=shuffleArr([v.good,v.bad]);
+  return {type:'Show, don’t tell', color:'var(--coral)', q:'Which sentence is more vivid?', options, answer:options.indexOf(v.good)};
+}
+let vq=null;
+function askVocab(ids,onDone){
+  vq={q:makeVocabQ(), start:performance.now(), done:onDone, ids, answered:false};
+  const g=vq.q;
+  const typeEl=document.getElementById(ids.type);
+  typeEl.textContent=g.type; typeEl.style.setProperty('--vt',g.color);
+  document.getElementById(ids.q).textContent=g.q;
+  const box=document.getElementById(ids.opts); box.innerHTML='';
+  g.options.forEach((o,i)=>{
+    const b=document.createElement('button'); b.className='opt';
+    b.textContent=(g.options.length>2?'ABCD'[i]+'. ':'')+o;
+    b.onclick=()=>answerVocab(i,b); box.appendChild(b);
+  });
+  document.getElementById(ids.card).style.display='block';
+  vq.timer=setTimeout(()=>{ if(vq&&!vq.answered)answerVocab(-1,null); },12000);
+}
+function answerVocab(i,btn){
+  if(!vq||vq.answered)return;
+  vq.answered=true; clearTimeout(vq.timer);
+  const g=vq.q, correct=i===g.answer;
+  const fast=performance.now()-vq.start<4000;
+  const btns=document.querySelectorAll('#'+vq.ids.opts+' .opt');
+  btns.forEach(b=>b.disabled=true);
+  if(btn) btn.classList.add(correct?'correct':'wrong');
+  if(!correct&&btns[g.answer]) btns[g.answer].classList.add('correct');
+  const cardId=vq.ids.card, done=vq.done;
+  setTimeout(()=>{ document.getElementById(cardId).style.display='none'; done(correct,fast&&correct); }, correct?600:1600);
+}
+
+/* ══════ PVP 同桌对战（词汇PK / 写作PK） ══════ */
+let pvp=null, pvpMode='vocab';
+function startPvp(){
+  document.getElementById('pvp-result').style.display='none';
+  document.getElementById('pvp-mode-ov').classList.add('active');
+}
+function choosePvpMode(m){
+  pvpMode=m;
+  document.getElementById('pvp-mode-ov').classList.remove('active');
+  pvp={p1:null,p2:null,picking:'p1',turn:'p1',over:false};
+  document.getElementById('pvp-pick-title').textContent='Left player, pick your monster!';
+  document.getElementById('pvp-pick-grid').innerHTML=ROSTER.map(mm=>
+    `<div class="pick-item" onclick="pvpPick('${mm.f}')"><img class="mon" src="${imgTag(mm.f)}" alt=""><div class="nm">${mm.n}</div></div>`).join('');
+  document.getElementById('pvp-pick-ov').classList.add('active');
+}
+function closePvpPick(){ document.getElementById('pvp-pick-ov').classList.remove('active'); }
+function pvpPick(f){
+  const m=byFile[f];
+  if(pvp.picking==='p1'){
+    pvp.p1={...m}; pvp.picking='p2';
+    document.getElementById('pvp-pick-title').textContent='Right player, pick your monster!';
+  } else {
+    pvp.p2={...m}; closePvpPick();
+    if(pvpMode==='write') beginWritePk(); else beginPvpBattle();
+  }
+}
+function beginPvpBattle(){
+  pvp.turn='p1'; pvp.over=false;
+  pvp.p1.hp=pvp.p1.maxHp=120; pvp.p2.hp=pvp.p2.maxHp=120;
+  showScreen('screen-pvp');
+  document.getElementById('pvp-result').style.display='none';
+  document.getElementById('vocab-pvp').style.display='none';
+  document.getElementById('write-pk').style.display='none';
+  document.getElementById('wpk-compare').style.display='none';
+  for(const p of ['p1','p2']){
+    document.getElementById('pf-'+p).className='fighter';
+    document.getElementById('pvp-img-'+p).src=imgTag(pvp[p].f);
+    document.getElementById('pvp-nm-'+p).textContent=pvp[p].n;
+  }
+  updatePvpHp();
+  document.getElementById('pvp-sub').innerHTML='Take turns; a correct answer attacks your opponent, <b>within 4s = critical hit</b>!';
+  document.getElementById('pvp-log').textContent='Battle begins!';
+  setTimeout(pvpTurn,900);
+}
+
+/* ── Writing PK：同一主题各写一段，评分定胜负 ── */
+const WRITE_PROMPTS = [
+  'Your creature enters a human city for the first time. Describe what it sees and does.',
+  'Your creature meets the opponent’s creature. Write about their clash — or their friendship.',
+  'A fierce storm rolls in. Describe how your creature survives it.',
+  'Your creature learns a new power. Explain how it mastered it.',
+  'Argue why your creature is the best companion for a young writer.',
+  'Your creature is lost. Describe how it finds its way home.',
+];
+function beginWritePk(){
+  pvp.over=false; pvp.turn='p1'; pvp.scores={};
+  pvp.p1.hp=pvp.p1.maxHp=120; pvp.p2.hp=pvp.p2.maxHp=120;
+  pvp.prompt = writingTopic()
+    ? '📌 Lesson topic: '+writingTopic()
+    : WRITE_PROMPTS[Math.floor(Math.random()*WRITE_PROMPTS.length)];
+  showScreen('screen-pvp');
+  document.getElementById('pvp-result').style.display='none';
+  document.getElementById('vocab-pvp').style.display='none';
+  document.getElementById('wpk-compare').style.display='none';
+  for(const p of ['p1','p2']){
+    document.getElementById('pf-'+p).className='fighter';
+    document.getElementById('pvp-img-'+p).src=imgTag(pvp[p].f);
+    document.getElementById('pvp-nm-'+p).textContent=pvp[p].n;
+  }
+  updatePvpHp();
+  document.getElementById('pvp-sub').innerHTML=`Genre: <b>${GENRES[currentGenre].icon} ${GENRES[currentGenre].label}</b> (switch it in Training) · highest score wins!`;
+  showWritePkTurn();
+}
+function showWritePkTurn(){
+  const side=pvp.turn;
+  document.getElementById('pf-p1').classList.toggle('turn-glow',side==='p1');
+  document.getElementById('pf-p2').classList.toggle('turn-glow',side==='p2');
+  document.getElementById('pvp-log').innerHTML=`✍️ <b>${side==='p1'?'Left':'Right'}</b> player's turn to write!`;
+  document.getElementById('wpk-turn').textContent=(side==='p1'?'Left':'Right')+' player’s turn';
+  document.getElementById('wpk-topic-tag').textContent='Target '+wordGoal()+' words';
+  document.getElementById('wpk-prompt').textContent=pvp.prompt;
+  const ta=document.getElementById('wpk-input');
+  ta.value=''; document.getElementById('wpk-count').textContent='0 words';
+  document.getElementById('write-pk').style.display='block';
+  ta.focus();
+}
+document.getElementById('wpk-input').addEventListener('input',function(){
+  const goal=wordGoal();
+  const cc=document.getElementById('wpk-count');
+  cc.textContent=wordCount(this.value)+' / '+goal+' words';
+  cc.className='char-count'+(this.value.length>=goal?' great':this.value.length>=Math.round(goal/3)?' good':'');
+});
+function submitWritePk(){
+  const text=document.getElementById('wpk-input').value.trim();
+  if(text.length<10){ alert('Write at least 10 characters before submitting!'); return; }
+  const side=pvp.turn;
+  pvp.scores[side]={ text, ...scoreDesc(text, currentGenre) };
+  if(G&&G.essays){ // 同桌PK的作品也进作文本，标注左右
+    const s=pvp.scores[side];
+    G.essays.push({text, stars:s.stars, pts:s.pts, genre:currentGenre,
+      topic:pvp.prompt.replace('📌 Lesson topic: ',''), src:side==='p1'?'PK-Left':'PK-Right'});
+    persist();
+  }
+  document.getElementById('write-pk').style.display='none';
+  if(side==='p1'){ pvp.turn='p2'; showWritePkTurn(); }
+  else finishWritePk();
+}
+function finishWritePk(){
+  pvp.over=true;
+  document.getElementById('pf-p1').classList.remove('turn-glow');
+  document.getElementById('pf-p2').classList.remove('turn-glow');
+  const s1=pvp.scores.p1, s2=pvp.scores.p2;
+  const winner = s1.pts===s2.pts ? null : (s1.pts>s2.pts?'p1':'p2');
+  // 得分对比面板：告诉每个人哪里得了分
+  document.getElementById('wpk-versus').textContent='📋 Score comparison — see where each point came from';
+  for(const [p,s] of [['p1',s1],['p2',s2]]){
+    document.getElementById('pk-col-'+p).className='pk-col'+(winner===p?' winner':'');
+    document.getElementById('pk-col-'+p).innerHTML=
+      `<div class="pk-head">${p==='p1'?'Left':'Right'} · ${pvp[p].n}${winner===p?' 🏆':''}</div>`+
+      `<div class="pk-stars">${'★'.repeat(s.stars)}${'☆'.repeat(5-s.stars)}</div>`+
+      `<div class="pk-pts">Total ${s.pts} pts · ${wordCount(s.text)} words</div>`+
+      renderScoreDetail(s.results);
+  }
+  document.getElementById('wpk-compare').style.display='block';
+  // 输家掉血动画
+  if(winner){
+    const loser=winner==='p1'?'p2':'p1';
+    pvp[loser].hp=Math.max(0,120-(Math.abs(s1.pts-s2.pts))*15-30);
+    updatePvpHp();
+    document.getElementById('pf-'+loser).classList.add('hit');
+    setTimeout(()=>document.getElementById('pf-'+loser).classList.remove('hit'),400);
+  }
+  document.getElementById('pvp-r-title').textContent =
+    winner ? `🏆 ${winner==='p1'?'Left':'Right'} player's ${pvp[winner].n} wins!` : '🤝 A draw! Evenly matched!';
+  document.getElementById('pvp-r-sub').textContent =
+    winner ? 'Compare the two score breakdowns to see who won where — fix the gap next round!' : 'Write another round to settle it!';
+  document.getElementById('pvp-result').style.display='block';
+  document.getElementById('pvp-log').textContent='';
+}
+function updatePvpHp(){
+  for(const p of ['p1','p2']){
+    const f=pvp[p], pct=Math.max(0,f.hp/f.maxHp*100);
+    const bar=document.getElementById('hp-'+p);
+    bar.style.width=pct+'%'; bar.className='f'+(pct<25?' crit':pct<55?' low':'');
+    document.getElementById('hpn-'+p).textContent=Math.max(0,Math.round(f.hp))+' / '+f.maxHp;
+  }
+}
+function pvpTurn(){
+  if(pvp.over)return;
+  const side=pvp.turn, foe=side==='p1'?'p2':'p1';
+  document.getElementById('pf-p1').classList.toggle('turn-glow',side==='p1');
+  document.getElementById('pf-p2').classList.toggle('turn-glow',side==='p2');
+  document.getElementById('pvp-log').innerHTML=`⚡ <b>${side==='p1'?'Left':'Right'}</b>'s <b>${pvp[side].n}</b> — answer quickly!`;
+  askVocab({card:'vocab-pvp',type:'vp-type',q:'vp-q',opts:'vp-opts'},(ok,fast)=>{
+    if(pvp.over)return;
+    if(ok){
+      let dmg=Math.round(26*(0.85+Math.random()*0.3)); if(fast)dmg=Math.round(dmg*1.5);
+      pvp[foe].hp-=dmg;
+      const el=document.getElementById('pf-'+foe);
+      el.classList.add('hit'); setTimeout(()=>el.classList.remove('hit'),250);
+      const fl=document.createElement('div'); fl.className='dmg-float'+(fast?' heavy':'');
+      fl.textContent='-'+dmg+(fast?' crit!':'');
+      el.querySelector('.art').appendChild(fl); setTimeout(()=>fl.remove(),950);
+      updatePvpHp();
+      document.getElementById('pvp-log').innerHTML=`${fast?'⚡ Fast critical! ':'✓ Correct! '}<b>${pvp[side].n}</b> deals <b>${dmg}</b> damage`;
+      if(pvp[foe].hp<=0){
+        pvp.over=true;
+        document.getElementById('pf-'+foe).classList.add('dead');
+        setTimeout(()=>endPvp(side),900);
+        return;
+      }
+    } else {
+      document.getElementById('pvp-log').innerHTML=`💥 Wrong — <b>${pvp[side].n}</b>'s attack misses!`;
+    }
+    pvp.turn=foe;
+    setTimeout(pvpTurn,1100);
+  });
+}
+function endPvp(winner){
+  document.getElementById('pf-p1').classList.remove('turn-glow');
+  document.getElementById('pf-p2').classList.remove('turn-glow');
+  document.getElementById('pvp-result').style.display='block';
+  document.getElementById('pvp-r-title').textContent=`🏆 ${winner==='p1'?'Left':'Right'} player's ${pvp[winner].n} wins!`;
+  document.getElementById('pvp-r-sub').textContent='Vocabulary is combat power — the loser can learn a few more words and come back for a rematch!';
+  document.getElementById('pvp-log').textContent='';
+}
+function pvpRematch(){ if(pvpMode==='write') beginWritePk(); else beginPvpBattle(); }
+function exitPvp(){ if(G)enterHub(); else showScreen('screen-start'); }
+
+/* ══════ CODEX 图鉴 ══════ */
+function openCodex(){
+  const KIND={skill:'Companion',foe:'Problem',tool:'Guardian'};
+  document.getElementById('codex-grid').innerHTML=ROSTER.map(m=>{
+    const solved=m.kind==='foe'&&G&&G.defeated&&G.defeated[m.f];
+    return `<div class="pick-item ${solved?'solved':''}" style="cursor:default">
+      <img class="mon" src="${imgTag(m.f)}" alt=""><div class="nm">${m.n}${solved?' ✅':''}</div>
+      <div class="kd ${m.kind}">${KIND[m.kind]}${m.kind==='foe'&&m.genre&&m.genre!=='all'?'·'+GENRE_LABEL[m.genre]:''}</div></div>`;
+  }).join('');
+  document.getElementById('codex-ov').classList.add('active');
+}
+function closeCodex(){ document.getElementById('codex-ov').classList.remove('active'); }
+
+/* ══════ 作文本：汇总每次写的内容，方便誊写和老师检查 ══════ */
+function openEssays(){
+  const list=[...(G.essays||[])].reverse();
+  const srcTag={train:'Training','PK-Left':'Duel · Left','PK-Right':'Duel · Right'};
+  document.getElementById('essays-list').innerHTML = list.length
+    ? list.map((e,i)=>`
+      <div class="essay-item">
+        <div class="essay-meta">#${list.length-i} · ${GENRES[e.genre]?.icon||'✍️'}${GENRES[e.genre]?.label||''} · ${'★'.repeat(e.stars)}${'☆'.repeat(5-e.stars)} ${e.pts} pts · ${wordCount(e.text)} words · ${srcTag[e.src]||''}${e.topic?' · topic “'+e.topic+'”':''}</div>
+        <div class="essay-text">${e.text}</div>
+      </div>`).join('')
+    : '<div class="theme-empty">Your writing book is empty<br>write something in Training or Writing PK!</div>';
+  document.getElementById('essays-ov').classList.add('active');
+}
+function closeEssays(){ document.getElementById('essays-ov').classList.remove('active'); }
+function copyEssays(){
+  const list=G.essays||[];
+  if(!list.length){ showToast('Nothing to copy yet'); return; }
+  const txt=list.map((e,i)=>`[#${i+1}] ${GENRES[e.genre]?.label||''} ${'★'.repeat(e.stars)}${e.topic?' topic: '+e.topic:''}\n${e.text}`).join('\n\n');
+  const done=()=>showToast('✅ Copied '+list.length+' piece(s) — paste them for your teacher!');
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(()=>showToast('Copy failed — please select manually'));
+  else showToast('Copy failed — please select manually');
+}
+
+/* ══════ INIT ══════ */
+renderStarters();
+// A saved game resumes straight into the hub so upgrades are never lost; only brand-new players see the pick screen
+if(restore()){ document.getElementById('continue-bar').style.display='block'; enterHub(); }
+</script>
+</body>
+</html>
