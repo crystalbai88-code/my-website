@@ -129,6 +129,15 @@ header {
 .logo { display:flex; align-items:center; gap:9px; }
 .logo-emoji { font-size:1.5rem; }
 .logo-text { font-size:1.15rem; font-weight:900; letter-spacing:1px; color:var(--coral-deep); }
+.stu-chip{ margin-left:10px; font-size:.78rem; font-weight:800; color:var(--teal-deep); background:#eafaf7; border:1.5px solid var(--teal); border-radius:999px; padding:3px 12px; cursor:pointer; }
+.stu-chip:hover{ background:#d6f3ee; }
+.rp-sub{ font-size:.82rem; color:var(--ink-soft); margin-bottom:16px; }
+.rp-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.rp-stat{ background:var(--cream); border:1.5px solid var(--cream-deep); border-radius:16px; padding:14px 8px; text-align:center; }
+.rp-num{ font-size:1.5rem; font-weight:900; color:var(--coral-deep); }
+.rp-lab{ font-size:.72rem; color:var(--ink-soft); margin-top:2px; }
+.rp-note{ font-size:.78rem; color:var(--ink-soft); margin-top:16px; line-height:1.7; background:#eafaf7; border:1.5px solid var(--teal); border-radius:12px; padding:10px 14px; }
+.rp-note b{ color:var(--teal-deep); }
 .hdr-badges { display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
 .pill {
   display:flex; flex-direction:column; align-items:center; gap:1px;
@@ -644,7 +653,7 @@ header {
 <!-- ═══ HUB ═══ -->
 <div class="screen" id="screen-main">
   <header>
-    <div class="logo"><span class="logo-emoji">🧪</span><span class="logo-text">Monster Maker Lab</span></div>
+    <div class="logo"><span class="logo-emoji">🧪</span><span class="logo-text">Monster Maker Lab</span><span class="stu-chip" id="stu-chip" onclick="location.href='index.html'" title="Switch student"></span></div>
     <div class="hdr-badges">
       <div class="pill"><span class="k">Stage</span><span class="v red" id="hdr-level">Stage 1</span></div>
       <div class="pill"><span class="k">Coins</span><span class="v gold" id="hdr-gold">🪙 0</span></div>
@@ -674,6 +683,7 @@ header {
         <button class="codex-btn" onclick="openCodex()">📕 Monster Codex</button>
         <button class="codex-btn" onclick="openEssays()">📄 My Writing Book (<span id="essay-count">0</span>)</button>
         <button class="codex-btn" onclick="openWordBank()">📖 Word Bank (<span id="wb-hub-count">0</span>)</button>
+        <button class="codex-btn" onclick="openReport()">📊 My progress</button>
       </div>
     </div>
 
@@ -857,6 +867,16 @@ header {
     </div>
     <div class="wb-count" id="wb-count"></div>
     <div class="wb-list" id="wb-list"></div>
+  </div>
+</div>
+
+<!-- ═══ PROGRESS REPORT ═══ -->
+<div class="overlay" id="report-ov">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title" id="rp-title">📊 My progress</div><div class="close-x" onclick="document.getElementById('report-ov').classList.remove('active')">✕</div></div>
+    <div class="rp-sub" id="rp-sub"></div>
+    <div class="rp-grid" id="rp-grid"></div>
+    <div class="rp-note" id="rp-note"></div>
   </div>
 </div>
 
@@ -1219,8 +1239,23 @@ function scoreDesc(text, genre) {
 function wordCount(t){ const m=t.trim().match(/[A-Za-z0-9'’-]+/g); return m?m.length:0; }
 function simpleHash(str){let h=5381;for(let i=0;i<str.length;i++)h=((h<<5)+h+str.charCodeAt(i))&0x7fffffff;return h;}
 
+/* ══════ Student profiles (shared with the landing page; per-device, cloud-ready later) ══════ */
+function loadStudents(){ try{return JSON.parse(localStorage.getItem('ml_students'))||[];}catch(e){return[];} }
+function saveStudents(a){ try{localStorage.setItem('ml_students',JSON.stringify(a));}catch(e){} }
+function studentId(){ return localStorage.getItem('ml_current')||''; }
+function currentStudent(){ const id=studentId(); return loadStudents().find(s=>s.id===id)||null; }
+function bumpStat(fn){
+  const students=loadStudents(); const s=students.find(x=>x.id===studentId()); if(!s)return;
+  if(!s.stats)s.stats={essays:0,words:0,aiGraded:0,aiScoreSum:0,arenaWins:0,arenaPlays:0,quizzes:0,quizCorrect:0,wbAdded:0,trainCN:0,trainEN:0,days:[]};
+  fn(s.stats);
+  const today=new Date().toISOString().slice(0,10);
+  if(!s.stats.days.includes(today)) s.stats.days.push(today);
+  s.lastActive=Date.now(); saveStudents(students);
+}
+if(!currentStudent()){ location.replace('index.html'); }
+
 /* ══════ GAME STATE ══════ */
-const KEY = 'monsterlab_v3_en';
+const KEY = 'monsterlab_v3_en_'+studentId();
 let G = null;
 
 function newGame(starter) {
@@ -1305,6 +1340,7 @@ function tierOf(s){ let t=TIERS[0]; for(const x of TIERS) if(s>=x.m) t=x; return
 const AURA_COLS = ['#ffe6b0','#cdefe6','#bfe4fb','#e6d6fb','#ffd9c0','#ffd6e0'];
 
 function renderHub(){
+  const stu=currentStudent(); if(stu){ document.getElementById('stu-chip').textContent='👤 '+stu.name; }
   document.getElementById('hero-img').src = imgTag(G.starter);
   document.getElementById('hero-name').textContent = G.name;
   document.getElementById('hero-power').textContent = 'Power '+playerPower();
@@ -1516,6 +1552,7 @@ function submitTraining(){
   const afterTier=auraTier();
   G.records.push({type:'train',stars,genre:currentGenre,summary:text.slice(0,15)+(text.length>15?'…':'')+` (+${gA+gS+gD} stats)`});
   G.essays.push({text, stars, pts, genre:currentGenre, topic:writingTopic()||null, src:'train'});
+  bumpStat(st=>{ st.essays++; st.words+=wordCount(text); st.trainEN++; });
   persist();
 
   document.getElementById('train-form').style.display='none';
@@ -1571,6 +1608,7 @@ async function aiGrade(){
       const bonus=Math.max(2,Math.round((d.score||60)/25));
       if(gen.stat==='atk')G.atk+=bonus; else if(gen.stat==='spd')G.spd+=bonus; else G.def+=bonus;
       G.records.push({type:'train',stars:0,genre:lastTrain.genre,summary:'AI marking '+(d.score||'')+' (+'+bonus+' '+gen.statName+')'});
+      bumpStat(st=>{ st.aiGraded++; st.aiScoreSum+=(d.score||0); });
       persist(); renderHub();
       box.innerHTML+=`<div style="margin-top:8px;color:var(--teal-deep);font-weight:800">✨ For taking the feedback, your monster gains +${bonus} ${gen.statName}!</div>`;
     }
@@ -1580,6 +1618,7 @@ async function aiGrade(){
 function stashUpgrades(arr){
   if(!G)return; let n=0;
   for(const t of arr){ if(t&&!G.wordBank.some(w=>w.text===t)){ G.wordBank.push({text:t,from:'AI'}); n++; } }
+  if(n)bumpStat(st=>st.wbAdded+=n);
   persist(); renderHub();
   showToast('Saved '+n+' to your Word Bank — use them next time for bonus points!');
 }
@@ -1734,9 +1773,25 @@ function saveManualTheme(){
 /* ══════ Word Bank (accumulate → apply → output) ══════ */
 function openWordBank(){ renderWordBank(); document.getElementById('wordbank-ov').classList.add('active'); }
 function closeWordBank(){ document.getElementById('wordbank-ov').classList.remove('active'); }
+
+/* ══════ Progress report ══════ */
+function openReport(){
+  const s=currentStudent(); if(!s){ location.href='index.html'; return; }
+  const st=s.stats||{};
+  const aiAvg=st.aiGraded?Math.round(st.aiScoreSum/st.aiGraded):0;
+  const quizAcc=st.quizzes?Math.round(st.quizCorrect/st.quizzes*100):0;
+  const winRate=st.arenaPlays?Math.round(st.arenaWins/st.arenaPlays*100):0;
+  document.getElementById('rp-title').textContent='📊 '+s.name+"'s progress";
+  document.getElementById('rp-sub').textContent='Joined '+new Date(s.created).toLocaleDateString()+' · active '+((st.days||[]).length)+' day(s)';
+  const cards=[['✍️',st.essays||0,'pieces written'],['📝',st.words||0,'total words'],['🤖',aiAvg||'—','avg AI score'],
+    ['⚔️',winRate+'%','arena win rate'],['📚',quizAcc+'%','quiz accuracy'],['📖',st.wbAdded||0,'words saved']];
+  document.getElementById('rp-grid').innerHTML=cards.map(([i,n,l])=>`<div class="rp-stat"><div class="rp-num">${i} ${n}</div><div class="rp-lab">${l}</div></div>`).join('');
+  document.getElementById('rp-note').innerHTML='This report tracks your writing growth on <b>this device</b> (Chinese '+(st.trainCN||0)+' · English '+(st.trainEN||0)+' pieces). Keep writing to make your monster stronger!';
+  document.getElementById('report-ov').classList.add('active');
+}
 function addWordBankItem(){
   const inp=document.getElementById('wb-input'); const v=inp.value.trim(); if(!v||!G)return;
-  if(!G.wordBank.some(w=>w.text===v)){ G.wordBank.push({text:v,from:'manual'}); persist(); }
+  if(!G.wordBank.some(w=>w.text===v)){ G.wordBank.push({text:v,from:'manual'}); bumpStat(st=>st.wbAdded++); persist(); }
   inp.value=''; renderWordBank();
 }
 function delWordBankItem(t){ G.wordBank=G.wordBank.filter(w=>w.text!==t); persist(); renderWordBank(); }
@@ -1762,6 +1817,7 @@ async function extractWordBank(){
     const arr=(JSON.parse(items).items||[]).filter(x=>typeof x==='string'&&x.length>=2);
     let added=0;
     for(const t of arr){ if(!G.wordBank.some(w=>w.text===t)){ G.wordBank.push({text:t,from:'passage'}); added++; } }
+    if(added)bumpStat(st=>st.wbAdded+=added);
     persist();
     tfStatus('✅ Done — added '+added+' to the Word Bank! Students earn bonus points for using them.');
   }catch(e){ tfStatus('❌ '+e.message,1); }
@@ -1932,6 +1988,7 @@ function endQuiz(win){
   G.gold+=gold; G.score+=quiz.correct*2;
   if(!G.themeBest)G.themeBest={}; if(win)G.themeBest[quiz.theme.id]=Math.max(G.themeBest[quiz.theme.id]||0,stars);
   G.records.push({type:'battle',win,foe:quiz.theme.title+' Guardian',pts:quiz.correct*2,gold});
+  bumpStat(st=>{ st.quizzes+=total; st.quizCorrect+=quiz.correct; });
   persist();
   if(win)document.getElementById('quiz-boss').classList.add('dead');
   document.getElementById('qcard').style.display='none';
@@ -2063,6 +2120,7 @@ function endBattle(win){
   } else { pts=2; gold=5; G.losses++; }
   G.score+=pts; G.gold+=gold;
   G.records.push({type:'battle',win,foe:battle.foe.name,pts,gold,level:cleared});
+  bumpStat(st=>{ st.arenaPlays++; if(win)st.arenaWins++; });
   persist();
   const res=document.getElementById('battle-result'); res.style.display='block';
   const t=document.getElementById('br-title');

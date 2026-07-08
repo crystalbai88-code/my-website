@@ -28,16 +28,33 @@ body{
   text-shadow:0 2px 0 #fff, 0 3px 10px rgba(242,84,61,.18);
 }
 .sub{color:var(--ink-soft);margin-top:12px;font-size:1rem;letter-spacing:.5px;max-width:520px;line-height:1.7;}
-.pick-hint{
-  margin-top:26px;font-size:1.05rem;font-weight:800;color:var(--teal-deep);
+.screen{display:none;flex-direction:column;align-items:center;width:100%;}
+.screen.on{display:flex;}
+
+/* ── student picker ── */
+.pick-hint{margin-top:26px;font-size:1.05rem;font-weight:800;color:var(--teal-deep);}
+.pick-hint .b{display:inline-block;background:#fff;border:2px solid var(--teal);border-radius:999px;padding:9px 22px;box-shadow:0 4px 0 rgba(31,148,136,.18);}
+.students{display:flex;gap:16px;margin-top:28px;flex-wrap:wrap;justify-content:center;max-width:680px;}
+.stu{
+  width:130px;background:#fff;border:3px solid var(--cream-deep);border-radius:22px;
+  padding:16px 10px 14px;cursor:pointer;transition:all .18s;
+  display:flex;flex-direction:column;align-items:center;position:relative;
 }
-.pick-hint .b{
-  display:inline-block;background:#fff;border:2px solid var(--teal);
-  border-radius:999px;padding:9px 22px;box-shadow:0 4px 0 rgba(31,148,136,.18);
-}
-.cards{
-  display:flex;gap:26px;margin-top:34px;flex-wrap:wrap;justify-content:center;width:100%;max-width:760px;
-}
+.stu:hover{transform:translateY(-6px);border-color:var(--teal);box-shadow:0 12px 26px rgba(0,0,0,.1);}
+.stu img{height:74px;object-fit:contain;filter:drop-shadow(0 4px 6px rgba(0,0,0,.12));}
+.stu-name{font-size:1rem;font-weight:900;margin-top:8px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px;}
+.stu-meta{font-size:.68rem;color:var(--ink-soft);margin-top:2px;}
+.stu-del{position:absolute;top:6px;right:8px;font-size:.7rem;color:var(--ink-soft);opacity:.5;}
+.stu-del:hover{opacity:1;color:var(--coral-deep);}
+.stu.new{border-style:dashed;border-color:var(--teal);justify-content:center;color:var(--teal-deep);}
+.stu.new .plus{font-size:2.2rem;line-height:1;}
+.stu.new .t{font-size:.9rem;font-weight:800;margin-top:6px;}
+
+/* ── language picker ── */
+.greet{margin-top:22px;font-size:1.2rem;font-weight:900;color:var(--ink);}
+.greet b{color:var(--coral-deep);}
+.switch-stu{margin-top:6px;font-size:.8rem;color:var(--teal-deep);cursor:pointer;font-weight:700;text-decoration:underline;}
+.cards{display:flex;gap:26px;margin-top:26px;flex-wrap:wrap;justify-content:center;width:100%;max-width:760px;}
 .mode{
   flex:1;min-width:280px;max-width:340px;background:#fff;
   border:3px solid var(--cream-deep);border-radius:26px;
@@ -57,24 +74,69 @@ body{
 .mode.cn .mode-name{color:var(--coral-deep);}
 .mode.en .mode-name{color:var(--violet-deep);}
 .mode-tag{font-size:.82rem;color:var(--ink-soft);margin-top:8px;line-height:1.65;}
-.mode-go{
-  margin-top:16px;width:100%;padding:12px;border-radius:16px;color:#fff;
-  font-size:1rem;font-weight:800;letter-spacing:1px;
-}
+.mode-go{margin-top:16px;width:100%;padding:12px;border-radius:16px;color:#fff;font-size:1rem;font-weight:800;letter-spacing:1px;}
 .mode.cn .mode-go{background:linear-gradient(135deg,#ff9a5b,var(--coral-deep));}
 .mode.en .mode-go{background:linear-gradient(135deg,#a99bff,var(--violet-deep));}
-.foot{margin-top:34px;font-size:.76rem;color:var(--ink-soft);opacity:.75;line-height:1.7;}
+.report-link{margin-top:22px;font-size:.9rem;color:var(--gold-deep);cursor:pointer;font-weight:800;background:#fff7e6;border:2px solid var(--gold);border-radius:999px;padding:8px 18px;}
+.foot{margin-top:30px;font-size:.76rem;color:var(--ink-soft);opacity:.75;line-height:1.7;}
 @media(max-width:640px){ .title{font-size:1.9rem;} .cards{gap:16px;} }
+
+/* ── report modal ── */
+.ov{display:none;position:fixed;inset:0;background:rgba(70,60,50,.45);z-index:50;align-items:flex-start;justify-content:center;padding:24px 14px;overflow-y:auto;}
+.ov.on{display:flex;}
+.rp-modal{background:#fff;border-radius:24px;max-width:560px;width:100%;padding:26px;text-align:left;box-shadow:0 20px 60px rgba(0,0,0,.25);}
+.rp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.rp-title{font-size:1.3rem;font-weight:900;color:var(--ink);}
+.rp-x{font-size:1.4rem;color:var(--ink-soft);cursor:pointer;}
+.rp-sub{font-size:.82rem;color:var(--ink-soft);margin-bottom:16px;}
+.rp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.rp-stat{background:var(--cream);border:1.5px solid var(--cream-deep);border-radius:16px;padding:14px 8px;text-align:center;}
+.rp-num{font-size:1.6rem;font-weight:900;color:var(--coral-deep);}
+.rp-lab{font-size:.72rem;color:var(--ink-soft);margin-top:2px;}
+.rp-note{font-size:.78rem;color:var(--ink-soft);margin-top:16px;line-height:1.7;background:#eafaf7;border:1.5px solid var(--teal);border-radius:12px;padding:10px 14px;}
+/* class bar + teacher entry */
+.class-bar{margin-top:16px;font-size:.85rem;font-weight:800;color:var(--gold-deep);}
+.class-bar .cc{background:#fff7e6;border:1.5px solid var(--gold);border-radius:999px;padding:5px 14px;}
+.teacher-entry{margin-top:24px;font-size:.82rem;color:var(--violet-deep);cursor:pointer;font-weight:800;border:1.5px dashed var(--violet);border-radius:999px;padding:7px 16px;}
+.teacher-entry:hover{background:#f2efff;}
+.stu-class{font-size:.62rem;color:var(--gold-deep);margin-top:2px;}
+/* teacher/class modal */
+.tc-section{margin-top:18px;}
+.tc-lab{font-size:.82rem;font-weight:800;color:var(--ink);margin-bottom:8px;}
+.tc-row{display:flex;gap:10px;flex-wrap:wrap;}
+.tc-select{flex:1;min-width:160px;padding:10px 12px;border:2px solid var(--cream-deep);border-radius:12px;font-family:inherit;font-size:.9rem;background:#fff;color:var(--ink);}
+.tc-btn{padding:10px 16px;border:2px solid var(--teal);background:var(--teal);color:#fff;border-radius:12px;font-family:inherit;font-size:.85rem;font-weight:800;cursor:pointer;}
+.tc-btn.ghost{background:#fff;color:var(--teal-deep);}
+.tc-btn:hover{filter:brightness(1.05);}
+.tc-table-wrap{overflow-x:auto;border:1.5px solid var(--cream-deep);border-radius:12px;}
+.tc-table{width:100%;border-collapse:collapse;font-size:.8rem;}
+.tc-table th{background:var(--cream);color:var(--ink);font-weight:800;padding:9px 10px;text-align:left;white-space:nowrap;position:sticky;top:0;}
+.tc-table td{padding:8px 10px;border-top:1px solid var(--cream-deep);white-space:nowrap;}
+.tc-table tr:nth-child(even) td{background:#fbf9f3;}
+.tc-empty{padding:22px;text-align:center;color:var(--ink-soft);font-size:.85rem;}
 </style>
 </head>
 <body>
-  <div class="brand">
-    <span class="brand-emoji">🧪</span>
-    <div class="title">怪兽制造局</div>
-  </div>
-  <div class="sub">MONSTER MAKER LAB · 用文字养成你的写作伙伴<br>Grow your writing companion, one word at a time.</div>
 
-  <div class="pick-hint"><span class="b">👇 选择语言 · Choose your language</span></div>
+<div class="brand">
+  <span class="brand-emoji">🧪</span>
+  <div class="title">怪兽制造局</div>
+</div>
+<div class="sub">MONSTER MAKER LAB · 用文字养成你的写作伙伴<br>Grow your writing companion, one word at a time.</div>
+
+<!-- ── SCREEN 1: 选我是谁 ── -->
+<div class="screen" id="screen-stu">
+  <div class="pick-hint"><span class="b">👋 你是谁？ · Who's writing today?</span></div>
+  <div class="class-bar" id="class-bar"></div>
+  <div class="students" id="students"></div>
+  <div class="foot">同一台设备可以有多个同学，各自的怪兽和成长档案分开保存。<br>Multiple students can share one device — each keeps their own monster & progress.</div>
+  <div class="teacher-entry" onclick="openTeacherClass()">👩‍🏫 老师入口 · 建班级 / 看全班报告</div>
+</div>
+
+<!-- ── SCREEN 2: 选语言 ── -->
+<div class="screen" id="screen-lang">
+  <div class="greet">👋 你好，<b id="greet-name">同学</b>！</div>
+  <div class="switch-stu" onclick="showStudents()">↩ 不是我？换一个同学</div>
 
   <div class="cards">
     <a class="mode cn" href="cn.html">
@@ -87,7 +149,6 @@ body{
       <div class="mode-tag">用中文养成怪兽 · 记叙 / 说明 / 议论<br>近义词 · 成语 · 古诗词 · 好词好句</div>
       <div class="mode-go">进入中文模式 →</div>
     </a>
-
     <a class="mode en" href="en.html">
       <div class="mode-imgs">
         <img class="small" src="img/1077_2.png" alt="">
@@ -100,6 +161,193 @@ body{
     </a>
   </div>
 
+  <div class="report-link" onclick="openReport()">📊 我的成长报告 · My progress report</div>
   <div class="foot">两种模式进度独立保存 · Progress is saved separately for each language</div>
+</div>
+
+<!-- ── REPORT MODAL ── -->
+<div class="ov" id="report-ov">
+  <div class="rp-modal">
+    <div class="rp-head">
+      <div class="rp-title" id="rp-title">📊 成长报告</div>
+      <div class="rp-x" onclick="document.getElementById('report-ov').classList.remove('on')">✕</div>
+    </div>
+    <div class="rp-sub" id="rp-sub"></div>
+    <div class="rp-grid" id="rp-grid"></div>
+    <div class="rp-note" id="rp-note"></div>
+  </div>
+</div>
+
+<!-- ── TEACHER / CLASS MODAL ── -->
+<div class="ov" id="teacher-ov">
+  <div class="rp-modal" style="max-width:720px">
+    <div class="rp-head">
+      <div class="rp-title">👩‍🏫 老师入口 · 班级管理</div>
+      <div class="rp-x" onclick="document.getElementById('teacher-ov').classList.remove('on')">✕</div>
+    </div>
+    <div class="rp-sub">在这台设备上建班级、看全班学生的写作报告。数据存本机（适合课堂共享电脑）。</div>
+
+    <div class="tc-section">
+      <div class="tc-lab">本机当前班级（新同学注册后自动归入）</div>
+      <div class="tc-row">
+        <select class="tc-select" id="tc-active" onchange="setActiveClass(this.value)"></select>
+        <button class="tc-btn" onclick="createClass()">➕ 新建班级</button>
+      </div>
+    </div>
+
+    <div class="tc-section">
+      <div class="tc-lab">📊 班级报告 <span id="tc-report-title" style="color:var(--ink-soft);font-weight:400"></span></div>
+      <div class="tc-table-wrap"><table class="tc-table" id="tc-table"></table></div>
+      <button class="tc-btn ghost" onclick="exportClassReport()" style="margin-top:10px">📋 复制班级报告（发给自己汇总）</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════ 学生档案（本设备，中英文共享；未来可上云） ══════ */
+const AVATARS=['1077_2','1077_3','1077_4','9696_3','9696_4','6337_1','5480_0','3827_4'];
+function loadStudents(){ try{return JSON.parse(localStorage.getItem('ml_students'))||[];}catch(e){return[];} }
+function saveStudents(a){ try{localStorage.setItem('ml_students',JSON.stringify(a));}catch(e){} }
+function currentId(){ return localStorage.getItem('ml_current')||''; }
+function currentStudent(){ const id=currentId(); return loadStudents().find(s=>s.id===id)||null; }
+function newStudent(name){
+  const students=loadStudents();
+  const id='s'+Date.now().toString(36)+Math.floor(Math.random()*1000);
+  const avatar=AVATARS[students.length%AVATARS.length];
+  const cls=activeClass();
+  const s={id,name:name.slice(0,12),avatar,created:Date.now(),lastActive:Date.now(),
+    classId:cls?cls.id:'', className:cls?cls.name:'',
+    stats:{essays:0,words:0,aiGraded:0,aiScoreSum:0,arenaWins:0,arenaPlays:0,quizzes:0,quizCorrect:0,wbAdded:0,trainCN:0,trainEN:0,days:[]}};
+  students.push(s); saveStudents(students);
+  localStorage.setItem('ml_current',id);
+  return s;
+}
+
+/* ══════ 班级（本机；老师建、学生归入） ══════ */
+function loadClasses(){ try{return JSON.parse(localStorage.getItem('ml_classes'))||[];}catch(e){return[];} }
+function saveClasses(a){ try{localStorage.setItem('ml_classes',JSON.stringify(a));}catch(e){} }
+function activeClass(){ const id=localStorage.getItem('ml_active_class')||''; return loadClasses().find(c=>c.id===id)||null; }
+function createClass(){
+  const name=(prompt('输入班级名称（例：五年级二班）:')||'').trim(); if(!name)return;
+  const classes=loadClasses(); const id='c'+Date.now().toString(36);
+  classes.push({id,name:name.slice(0,20),created:Date.now()}); saveClasses(classes);
+  localStorage.setItem('ml_active_class',id);
+  renderTeacherClass();
+}
+function setActiveClass(id){ localStorage.setItem('ml_active_class',id); renderTeacherClass(); renderClassBar(); }
+function renderClassBar(){
+  const c=activeClass(); const bar=document.getElementById('class-bar');
+  bar.innerHTML = c ? `<span class="cc">🏫 当前班级：${c.name}</span>` : '';
+}
+function openTeacherClass(){ renderTeacherClass(); document.getElementById('teacher-ov').classList.add('on'); }
+function renderTeacherClass(){
+  const classes=loadClasses(); const act=activeClass();
+  const sel=document.getElementById('tc-active');
+  sel.innerHTML = classes.length
+    ? classes.map(c=>`<option value="${c.id}" ${act&&act.id===c.id?'selected':''}>${c.name}</option>`).join('')
+    : '<option value="">（还没有班级，点右边新建）</option>';
+  // report table for active class
+  const tbl=document.getElementById('tc-table');
+  const title=document.getElementById('tc-report-title');
+  if(!act){ tbl.innerHTML='<tr><td class="tc-empty">先新建一个班级</td></tr>'; title.textContent=''; return; }
+  const roster=loadStudents().filter(s=>s.classId===act.id);
+  title.textContent='· '+act.name+'（'+roster.length+' 人）';
+  if(!roster.length){ tbl.innerHTML='<tr><td class="tc-empty">这个班还没有学生。让学生在本机注册即可自动归入。</td></tr>'; return; }
+  const rows=roster.map(s=>{
+    const st=s.stats||{};
+    const aiAvg=st.aiGraded?Math.round(st.aiScoreSum/st.aiGraded):'—';
+    const acc=st.quizzes?Math.round(st.quizCorrect/st.quizzes*100)+'%':'—';
+    return `<tr><td><b>${s.name}</b></td><td>${st.essays||0}</td><td>${st.words||0}</td><td>${aiAvg}</td><td>${acc}</td><td>${st.wbAdded||0}</td><td>${(st.days||[]).length}</td></tr>`;
+  }).join('');
+  tbl.innerHTML='<tr><th>姓名</th><th>写作篇数</th><th>累计字数</th><th>AI均分</th><th>答题正确率</th><th>积累词句</th><th>活跃天数</th></tr>'+rows;
+}
+function exportClassReport(){
+  const act=activeClass(); if(!act){ alert('先选一个班级'); return; }
+  const roster=loadStudents().filter(s=>s.classId===act.id);
+  if(!roster.length){ alert('这个班还没有学生'); return; }
+  let txt='班级报告 · '+act.name+'（'+new Date().toLocaleDateString()+'）\n姓名\t写作篇数\t累计字数\tAI均分\t答题正确率\t积累词句\t活跃天数\n';
+  roster.forEach(s=>{ const st=s.stats||{};
+    const aiAvg=st.aiGraded?Math.round(st.aiScoreSum/st.aiGraded):'-';
+    const acc=st.quizzes?Math.round(st.quizCorrect/st.quizzes*100)+'%':'-';
+    txt+=`${s.name}\t${st.essays||0}\t${st.words||0}\t${aiAvg}\t${acc}\t${st.wbAdded||0}\t${(st.days||[]).length}\n`;
+  });
+  const done=()=>alert('✅ 已复制班级报告（可粘贴到微信/表格）');
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(()=>prompt('手动复制：',txt));
+  else prompt('手动复制：',txt);
+}
+
+function renderStudents(){
+  renderClassBar();
+  const box=document.getElementById('students');
+  const act=activeClass();
+  // 有当前班级时只显示本班学生；否则显示全部
+  const students=loadStudents().filter(s=>!act || s.classId===act.id || !s.classId);
+  box.innerHTML = students.map(s=>{
+    const e=(s.stats&&s.stats.essays)||0;
+    return `<div class="stu" onclick="pickStudent('${s.id}')">
+      <span class="stu-del" onclick="event.stopPropagation();delStudent('${s.id}')">删除</span>
+      <img src="img/${s.avatar}.png" alt="">
+      <div class="stu-name">${s.name}</div>
+      <div class="stu-meta">已写 ${e} 篇</div>
+      ${s.className?`<div class="stu-class">🏫 ${s.className}</div>`:''}
+    </div>`;
+  }).join('') +
+  `<div class="stu new" onclick="addStudent()"><span class="plus">＋</span><span class="t">新同学<br>New</span></div>`;
+}
+function addStudent(){
+  const name=(prompt('输入你的名字 / Enter your name:')||'').trim();
+  if(!name)return;
+  newStudent(name);
+  showLang();
+}
+function pickStudent(id){
+  localStorage.setItem('ml_current',id);
+  const students=loadStudents(); const s=students.find(x=>x.id===id);
+  if(s){ s.lastActive=Date.now(); saveStudents(students); }
+  showLang();
+}
+function delStudent(id){
+  if(!confirm('删除这个同学的档案？TA 的怪兽和进度会一起清空。'))return;
+  saveStudents(loadStudents().filter(s=>s.id!==id));
+  // 同步清掉该学生的游戏存档
+  ['monsterlab_v3_','monsterlab_v3_en_'].forEach(k=>localStorage.removeItem(k+id));
+  if(currentId()===id) localStorage.removeItem('ml_current');
+  renderStudents();
+}
+function showStudents(){ renderStudents(); document.getElementById('screen-lang').classList.remove('on'); document.getElementById('screen-stu').classList.add('on'); }
+function showLang(){
+  const s=currentStudent(); if(!s){ showStudents(); return; }
+  document.getElementById('greet-name').textContent=s.name;
+  document.getElementById('screen-stu').classList.remove('on');
+  document.getElementById('screen-lang').classList.add('on');
+}
+
+/* ══════ 成长报告 ══════ */
+function openReport(){
+  const s=currentStudent(); if(!s)return;
+  const st=s.stats;
+  const aiAvg = st.aiGraded? Math.round(st.aiScoreSum/st.aiGraded):0;
+  const quizAcc = st.quizzes? Math.round(st.quizCorrect/st.quizzes*100):0;
+  const winRate = st.arenaPlays? Math.round(st.arenaWins/st.arenaPlays*100):0;
+  document.getElementById('rp-title').textContent='📊 '+s.name+' 的成长报告';
+  document.getElementById('rp-sub').textContent='加入于 '+new Date(s.created).toLocaleDateString()+' · 活跃 '+(st.days.length||0)+' 天';
+  const cards=[
+    ['✍️',st.essays,'写作篇数'],
+    ['📝',st.words,'累计字数'],
+    ['🤖',aiAvg||'—','AI精批均分'],
+    ['⚔️',winRate+'%','竞技胜率'],
+    ['📚',quizAcc+'%','答题正确率'],
+    ['📖',st.wbAdded,'积累词句'],
+  ];
+  document.getElementById('rp-grid').innerHTML=cards.map(([i,n,l])=>
+    `<div class="rp-stat"><div class="rp-num">${i} ${n}</div><div class="rp-lab">${l}</div></div>`).join('');
+  document.getElementById('rp-note').innerHTML=
+    '这份报告记录你在<b>本设备</b>的写作成长。中文写了 '+(st.trainCN||0)+' 次、英文 '+(st.trainEN||0)+' 次。<br>坚持写作，让你的怪兽越来越强！';
+  document.getElementById('report-ov').classList.add('on');
+}
+
+/* ══════ INIT ══════ */
+if(currentStudent()) showLang(); else showStudents();
+</script>
 </body>
 </html>
