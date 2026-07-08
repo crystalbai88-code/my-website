@@ -294,6 +294,16 @@ header {
 .big-btn:disabled { opacity:.4; cursor:not-allowed; }
 .btn-teal { background:linear-gradient(135deg,var(--teal),var(--teal-deep)); }
 .btn-teal:hover:not(:disabled){ filter:brightness(1.06); }
+.btn-violet { background:linear-gradient(135deg,var(--violet2,#9b8cff),var(--violet-deep,#6f5cf0)); margin-top:12px; }
+.btn-violet:hover:not(:disabled){ filter:brightness(1.06); }
+.wb-strip { background:#fff7e6; border:1.5px dashed var(--gold); border-radius:12px; padding:8px 12px; margin-bottom:10px; font-size:.8rem; line-height:1.9; }
+.wb-strip b { color:var(--gold-deep); }
+.wb-strip .w { display:inline-block; background:#fff; border:1px solid var(--gold); border-radius:999px; padding:1px 9px; margin:2px 3px; color:var(--ink); }
+.wb-strip .w.done { background:var(--teal); border-color:var(--teal); color:#fff; }
+.ai-feedback { text-align:left; background:#f2efff; border:1.5px solid var(--violet2,#9b8cff); border-radius:14px; padding:14px 16px; margin-top:12px; font-size:.86rem; line-height:1.8; color:var(--ink); }
+.ai-feedback h4 { font-size:.92rem; color:var(--violet-deep,#6f5cf0); margin-bottom:6px; }
+.ai-feedback .sug { margin:4px 0; padding-left:4px; }
+.ai-feedback .band { display:inline-block; font-weight:900; color:var(--violet-deep,#6f5cf0); }
 .btn-coral { background:linear-gradient(135deg,var(--coral),var(--coral-deep)); }
 .btn-violet { background:linear-gradient(135deg,#a78bea,var(--violet2)); }
 
@@ -431,9 +441,40 @@ header {
 .tf-btn.ai:hover{ filter:brightness(1.07); }
 .tf-btn.qk { border-color:var(--teal); background:#fff; color:var(--teal-deep); }
 .tf-btn.qk:hover{ background:#eafaf7; }
+.tf-btn.manual { border-color:var(--gold); background:#fff; color:var(--gold-deep); }
+.tf-btn.manual:hover{ background:#fff7e6; }
+.tf-btn.wb { border-color:var(--coral); background:#fff; color:var(--coral-deep); flex:1 1 100%; }
+.tf-btn.wb:hover{ background:#fff1ee; }
 .tf-btn:disabled{ opacity:.5; cursor:wait; }
-.tf-status { font-size:.78rem; margin-top:10px; min-height:20px; color:var(--teal-deep); font-weight:700; }
+.tf-status { font-size:.78rem; margin-top:10px; min-height:20px; color:var(--teal-deep); font-weight:700; line-height:1.6; }
 .tf-status.err{ color:var(--coral-deep); }
+/* ── file upload ── */
+.tf-upload{ display:flex; align-items:center; gap:12px; margin-bottom:8px; flex-wrap:wrap; }
+.tf-file-btn{ display:inline-block; padding:9px 16px; border-radius:12px; background:#eafaf7;
+  border:2px dashed var(--teal); color:var(--teal-deep); font-weight:800; font-size:.85rem; cursor:pointer; transition:all .15s; }
+.tf-file-btn:hover{ background:#d6f3ee; }
+.tf-file-name{ font-size:.76rem; color:var(--ink-soft); }
+/* ── manual editor ── */
+.mn-q{ background:var(--cream); border:1.5px solid var(--cream-deep); border-radius:14px; padding:14px; margin-bottom:12px; }
+.mn-q-head{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.mn-q-num{ font-weight:900; color:var(--violet-deep); }
+.mn-q-del{ margin-left:auto; font-size:.75rem; color:var(--ink-soft); cursor:pointer; }
+.mn-q-del:hover{ color:var(--coral-deep); }
+.mn-opt{ display:flex; align-items:center; gap:8px; margin-top:6px; }
+.mn-radio{ width:20px; height:20px; border-radius:50%; border:2px solid var(--ink-soft); flex-shrink:0; cursor:pointer; transition:all .15s; }
+.mn-radio.on{ border-color:var(--teal); background:var(--teal); box-shadow:inset 0 0 0 3px #fff; }
+/* ── word bank ── */
+.wb-add{ display:flex; gap:8px; margin-bottom:8px; }
+.wb-add .tf-in{ flex:1; }
+.wb-add .tf-btn{ flex:none; min-width:auto; padding:10px 16px; }
+.wb-count{ font-size:.78rem; color:var(--ink-soft); font-weight:700; margin-bottom:8px; }
+.wb-list{ display:flex; flex-wrap:wrap; gap:8px; max-height:44vh; overflow-y:auto; }
+.wb-chip{ background:#fff; border:1.5px solid var(--gold); border-radius:999px; padding:6px 12px 6px 14px;
+  font-size:.85rem; color:var(--ink); display:flex; align-items:center; gap:8px; }
+.wb-chip .x{ cursor:pointer; color:var(--ink-soft); font-weight:900; }
+.wb-chip .x:hover{ color:var(--coral-deep); }
+.wb-chip.used{ border-color:var(--teal); background:#eafaf7; }
+.wb-empty{ font-size:.85rem; color:var(--ink-soft); padding:20px; text-align:center; }
 .theme-item { display:flex; align-items:center; gap:12px; background:var(--cream);
   border:1.5px solid var(--line); border-radius:16px; padding:12px 14px; margin-bottom:9px; cursor:pointer; transition:all .18s; }
 .theme-item:hover{ border-color:var(--violet2); transform:translateY(-2px); }
@@ -635,6 +676,7 @@ header {
       <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
         <button class="codex-btn" onclick="openCodex()">📕 怪兽图鉴</button>
         <button class="codex-btn" onclick="openEssays()">📄 我的作文本（<span id="essay-count">0</span> 篇）</button>
+        <button class="codex-btn" onclick="openWordBank()">📖 词句银行（<span id="wb-hub-count">0</span> 条）</button>
       </div>
     </div>
 
@@ -691,6 +733,7 @@ header {
       <div class="subject-line" id="subject-line" style="display:none"></div>
       <div class="hints" id="train-hints"></div>
       <div class="hint-tip" id="hint-tip" style="display:none"></div>
+      <div class="wb-strip" id="wb-strip" style="display:none"></div>
       <textarea id="train-input" placeholder=""></textarea>
       <div class="train-meta">
         <button class="mic-btn" id="mic-train" onclick="toggleVoice('train-input','mic-train')">🎤 语音输入</button>
@@ -706,6 +749,8 @@ header {
       <div class="tr-gains" id="tr-gains"></div>
       <div class="score-detail" id="tr-detail"></div>
       <div class="tr-tip" id="tr-tip"></div>
+      <button class="big-btn btn-violet" id="ai-grade-btn" onclick="aiGrade()">🤖 AI 精批 · 给我提升建议</button>
+      <div class="ai-feedback" id="ai-feedback" style="display:none"></div>
       <div class="tr-btns">
         <button class="mini-btn fill" onclick="closeTraining();enterArena()">⚔️ 去竞技场试试</button>
         <button class="mini-btn ghost" onclick="backToTrainForm()">再写一段</button>
@@ -748,13 +793,23 @@ header {
     <div class="modal-sub">把要讲的主题文章贴进来，自动生成「答题打Boss」的知识关卡。<b>AI出题</b>质量更高（需 DeepSeek Key）；<b>快速出题</b>无需联网。</div>
     <div class="tf-lab">关卡标题</div>
     <input class="tf-in" id="tf-title" placeholder="例：秦朝的统一" maxlength="20">
-    <div class="tf-lab">主题文章（粘贴全文）</div>
-    <textarea class="tf-ta" id="tf-article" placeholder="把文章全文粘贴到这里……（建议 200 字以上）"></textarea>
-    <div class="tf-lab">DeepSeek API Key（选填，只存本机）</div>
-    <input class="tf-in" id="tf-key" type="password" placeholder="sk-…（不填则用快速出题）">
+    <div class="tf-lab">主题文章（上传文件或粘贴全文）</div>
+    <div class="tf-upload">
+      <label class="tf-file-btn">📎 上传 PDF / Word / TXT
+        <input type="file" id="tf-file" accept=".pdf,.doc,.docx,.txt" style="display:none" onchange="handleFileUpload(this)">
+      </label>
+      <span class="tf-file-name" id="tf-file-name">支持 .pdf / .docx / .txt，自动提取文字（需联网）</span>
+    </div>
+    <textarea class="tf-ta" id="tf-article" placeholder="把文章全文粘贴到这里，或点上方上传文件……（建议 200 字以上）"></textarea>
+    <div class="tf-lab">DeepSeek API Key（选填，只存本机；用于 AI 出题 / AI 精批 / 提取好词好句）</div>
+    <input class="tf-in" id="tf-key" type="password" placeholder="sk-…（不填则只能用快速出题）">
     <div class="tf-btns">
       <button class="tf-btn ai" id="btn-ai" onclick="generateAI()">🤖 AI 出题（8题）</button>
       <button class="tf-btn qk" id="btn-qk" onclick="generateQuick()">⚡ 快速出题（本地）</button>
+      <button class="tf-btn manual" id="btn-manual" onclick="openManualEditor()">✍️ 自己出题</button>
+    </div>
+    <div class="tf-btns" style="margin-top:6px">
+      <button class="tf-btn wb" id="btn-extract" onclick="extractWordBank()">📖 从文章提取好词好句 → 存入词句银行</button>
     </div>
     <div class="tf-status" id="tf-status"></div>
     <div class="tf-lab" style="margin-top:20px">⚙️ 强化训练 · 字数目标（字数加分按它折算：写到 ⅓ +1分、⅔ +1分、达标 +2分）</div>
@@ -772,6 +827,36 @@ header {
       <button class="tf-btn qk" onclick="importThemes()">📥 导入关卡代码</button>
     </div>
     <textarea class="tf-ta" id="tf-io" style="height:64px;margin-top:10px" placeholder="导出代码会出现在这里；导入时粘贴到这里再点导入"></textarea>
+  </div>
+</div>
+
+<!-- ═══ 手动出题编辑器 ═══ -->
+<div class="overlay" id="manual-ov">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">✍️ 自己出题</div><div class="close-x" onclick="closeManualEditor()">✕</div></div>
+    <div class="modal-sub">给这套关卡起个标题，逐题输入。每题四个选项，点选项前的圆圈标记正确答案。</div>
+    <div class="tf-lab">关卡标题</div>
+    <input class="tf-in" id="mn-title" placeholder="例：《草原》阅读理解" maxlength="20">
+    <div id="mn-list"></div>
+    <div class="tf-btns" style="margin-top:10px">
+      <button class="tf-btn qk" onclick="addManualQ()">➕ 加一题</button>
+      <button class="tf-btn ai" onclick="saveManualTheme()">✅ 发布这套关卡</button>
+    </div>
+    <div class="tf-status" id="mn-status"></div>
+  </div>
+</div>
+
+<!-- ═══ 词句银行（积累闭环） ═══ -->
+<div class="overlay" id="wordbank-ov">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">📖 词句银行</div><div class="close-x" onclick="closeWordBank()">✕</div></div>
+    <div class="modal-sub">积累好词好句，写作时用上就能<b>额外加分</b>、让怪兽更强——这是「积累→应用→输出」的闭环。</div>
+    <div class="wb-add">
+      <input class="tf-in" id="wb-input" placeholder="输入一个好词或好句，回车加入…" onkeydown="if(event.key==='Enter')addWordBankItem()">
+      <button class="tf-btn qk" onclick="addWordBankItem()">➕ 收藏</button>
+    </div>
+    <div class="wb-count" id="wb-count"></div>
+    <div class="wb-list" id="wb-list"></div>
   </div>
 </div>
 
@@ -1121,6 +1206,14 @@ function scoreDesc(text, genre) {
     const hitTok = toks.find(w=>w.length>=2&&text.includes(w)) || null;
     results.push({key:'topic', label:'扣题「'+topic.slice(0,10)+'」', pts:1, on:!!hitTok, hit:hitTok});
   }
+  // 应用词句银行：用上积累的好词好句额外加分（积累→应用闭环），最多 +2
+  if (G && G.wordBank && G.wordBank.length) {
+    const used = G.wordBank.map(w=>w.text).filter(t=>t.length>=2 && text.includes(t));
+    if (used.length) {
+      const bonus = Math.min(2, used.length);
+      results.push({key:'wordbank', label:'用上积累的好词好句', pts:bonus, on:true, hit:used.slice(0,3).join('、')+(used.length>3?'…':'')});
+    }
+  }
   const pts = results.reduce((s,r)=>s+(r.on?r.pts:0),0);
   const stars = pts<=1?1:pts<=3?2:pts<=5?3:pts<=7?4:5;
   return {results, pts, stars};
@@ -1146,12 +1239,12 @@ function newGame(starter) {
     starter: starter.f, name: starter.n,
     atk:base.atk, spd:base.spd, def:base.def,
     wp:0, wpGenre:{story:0,expo:0,argu:0}, gold:0, atkLvl:0, hpLvl:0, level:1,
-    score:0, wins:0, losses:0, records:[], usedTexts:[], defeated:{}, themeBest:{}, essays:[],
+    score:0, wins:0, losses:0, records:[], usedTexts:[], defeated:{}, themeBest:{}, essays:[], wordBank:[],
   };
   persist();
 }
 function persist(){ try{localStorage.setItem(KEY,JSON.stringify(G));}catch(e){} }
-function restore(){ try{const r=localStorage.getItem(KEY); if(r){G=JSON.parse(r); if(!G.wpGenre)G.wpGenre={story:0,expo:0,argu:0}; if(!G.essays)G.essays=[]; return true;}}catch(e){} return false; }
+function restore(){ try{const r=localStorage.getItem(KEY); if(r){G=JSON.parse(r); if(!G.wpGenre)G.wpGenre={story:0,expo:0,argu:0}; if(!G.essays)G.essays=[]; if(!G.wordBank)G.wordBank=[]; return true;}}catch(e){} return false; }
 function resetGame(){ if(!confirm('确定清空存档、重新开始吗？'))return; localStorage.removeItem(KEY); G=null; showScreen('screen-start'); }
 
 /* derived */
@@ -1244,6 +1337,7 @@ function renderHub(){
   const tc = loadThemes().length;
   document.getElementById('theme-hint').textContent = tc ? `📖 ${tc} 个关卡可挑战` : '暂无关卡';
   document.getElementById('essay-count').textContent = (G.essays||[]).length;
+  document.getElementById('wb-hub-count').textContent = (G.wordBank||[]).length;
 
   // collected problems
   const cg = document.getElementById('collected-grid');
@@ -1371,6 +1465,15 @@ function openTraining(){
   const topic=writingTopic(), tc=document.getElementById('topic-chip');
   if(topic){ tc.style.display='inline-block'; tc.textContent='📌 本课主题：'+topic+'（写进内容 +1 扣题分）'; }
   else tc.style.display='none';
+  renderWbStrip();
+}
+function renderWbStrip(){
+  const strip=document.getElementById('wb-strip');
+  if(!G||!G.wordBank||!G.wordBank.length){ strip.style.display='none'; return; }
+  const text=document.getElementById('train-input').value||'';
+  strip.style.display='block';
+  strip.innerHTML='<b>📖 试着用上词句银行里的词（用一个+1分）：</b>'+
+    G.wordBank.slice(0,12).map(w=>`<span class="w ${text.includes(w.text)?'done':''}">${w.text}</span>`).join('');
 }
 function closeTraining(){ document.getElementById('train-ov').classList.remove('active'); }
 function backToTrainForm(){
@@ -1390,6 +1493,7 @@ document.getElementById('train-input').addEventListener('input',function(){
   cc.className='char-count'+(len>=goal?' great':len>=Math.round(goal/3)?' good':'');
   document.getElementById('train-submit').disabled=len<10;
   updateLiveScore();
+  renderWbStrip();
 });
 function submitTraining(){
   const text=document.getElementById('train-input').value.trim();
@@ -1433,8 +1537,54 @@ function submitTraining(){
   if(afterTier>beforeTier) tip = `🎉 写作力升到 Lv.${afterTier}！光环更亮了！<br>` + tip;
   document.getElementById('tr-tip').innerHTML=tip;
 
+  // 重置 AI 精批区
+  lastTrain={text, genre:currentGenre, graded:false};
+  const gb=document.getElementById('ai-grade-btn');
+  const hasKey=!!(localStorage.getItem('ml_dskey'));
+  gb.style.display='block'; gb.disabled=false;
+  gb.textContent = hasKey ? '🤖 AI 精批 · 给我提升建议' : '🤖 AI 精批（需老师先填 DeepSeek Key）';
+  document.getElementById('ai-feedback').style.display='none';
+
   renderHub();
   const hi=document.getElementById('hero-img'); hi.classList.remove('evolving'); void hi.offsetWidth; hi.classList.add('evolving');
+}
+
+/* ══════ AI 精批 · 引导提升（DeepSeek） ══════ */
+let lastTrain=null;
+async function aiGrade(){
+  if(!lastTrain||lastTrain.graded)return;
+  const key=(localStorage.getItem('ml_dskey')||'').trim();
+  if(!key){ showToast('需要老师先在「老师入口」填 DeepSeek Key'); return; }
+  const gb=document.getElementById('ai-grade-btn'); gb.disabled=true; gb.textContent='🤖 AI 正在精批你的作文……';
+  const gen=GENRES[lastTrain.genre];
+  try{
+    const raw=await dsChat(key,'你是一位鼓励式的小学语文老师，只输出JSON，不要多余文字。',
+      `请精批下面这段【${gen.label}】小学生习作。要求：1)给一个0-100的分数；2)先肯定1个优点；3)给2-3条具体、可操作的提升建议（告诉他改哪里、怎么改）；4)推荐2个可以让文章更好的升级词或句式。语气亲切鼓励。严格JSON：\n{"score":85,"praise":"一句肯定","suggestions":["建议1","建议2","建议3"],"upgrades":["升级词1","升级词2"]}\n\n习作：\n${lastTrain.text.slice(0,1500)}`);
+    const d=JSON.parse(raw);
+    const box=document.getElementById('ai-feedback');
+    box.style.display='block';
+    box.innerHTML=`<h4>🤖 AI 老师精批 · <span class="band">${d.score||'-'} 分</span></h4>`+
+      (d.praise?`<div class="sug">👍 ${d.praise}</div>`:'')+
+      '<div style="font-weight:800;margin:8px 0 2px;color:var(--ink)">✏️ 这样改能更强：</div>'+
+      (d.suggestions||[]).map(s=>`<div class="sug">• ${s}</div>`).join('')+
+      ((d.upgrades&&d.upgrades.length)?`<div style="margin-top:8px">💎 推荐升级词：${d.upgrades.map(u=>`<b>${u}</b>`).join('、')} <span style="color:var(--teal-deep);cursor:pointer;font-weight:800" onclick="stashUpgrades(${JSON.stringify(d.upgrades).replace(/"/g,'&quot;')})">＋存入词句银行</span></div>`:'');
+    // AI 精批奖励：额外 +3 属性（分主属性），只给一次
+    if(!lastTrain.graded){
+      lastTrain.graded=true;
+      const bonus=Math.max(2,Math.round((d.score||60)/25)); // 3~4
+      if(gen.stat==='atk')G.atk+=bonus; else if(gen.stat==='spd')G.spd+=bonus; else G.def+=bonus;
+      G.records.push({type:'train',stars:0,genre:lastTrain.genre,summary:'AI精批 '+ (d.score||'')+'分（+'+bonus+gen.statName+'）'});
+      persist(); renderHub();
+      box.innerHTML+=`<div style="margin-top:8px;color:var(--teal-deep);font-weight:800">✨ 认真接受精批，怪兽 +${bonus} ${gen.statName}！</div>`;
+    }
+    gb.style.display='none';
+  }catch(e){ showToast('AI 精批失败：'+e.message); gb.disabled=false; gb.textContent='🤖 AI 精批 · 给我提升建议'; }
+}
+function stashUpgrades(arr){
+  if(!G)return; let n=0;
+  for(const t of arr){ if(t&&!G.wordBank.some(w=>w.text===t)){ G.wordBank.push({text:t,from:'AI推荐'}); n++; } }
+  persist(); renderHub();
+  showToast('已存入词句银行 '+n+' 条，下次写作用上能加分！');
 }
 
 /* ══════ SHOP ══════ */
@@ -1501,6 +1651,123 @@ function renderTeacherThemes(){
 function deleteTheme(id){ if(!confirm('确定删除这个关卡？'))return; saveThemes(loadThemes().filter(t=>t.id!==id)); renderTeacherThemes(); }
 function addTheme(title,qs,mode){ const t=loadThemes(); t.push({id:'t'+simpleHash(title+qs.length+t.length),title,questions:qs,mode}); saveThemes(t); renderTeacherThemes(); }
 function tfStatus(m,err){ const e=document.getElementById('tf-status'); e.textContent=m; e.className='tf-status'+(err?' err':''); }
+
+/* ══════ 文件上传解析（PDF / Word / TXT，老师端联网加载库） ══════ */
+function loadScript(src){ return new Promise((res,rej)=>{ if([...document.scripts].some(s=>s.src===src))return res(); const s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=()=>rej(new Error('库加载失败（检查网络）')); document.head.appendChild(s); }); }
+async function handleFileUpload(input){
+  const f=input.files&&input.files[0]; if(!f)return;
+  const nameEl=document.getElementById('tf-file-name');
+  nameEl.textContent='正在解析「'+f.name+'」……';
+  try{
+    let text='';
+    const ext=f.name.toLowerCase().split('.').pop();
+    if(ext==='txt'){ text=await f.text(); }
+    else if(ext==='pdf'){
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+      pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      const buf=await f.arrayBuffer();
+      const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+      for(let i=1;i<=pdf.numPages;i++){ const pg=await pdf.getPage(i); const c=await pg.getTextContent(); text+=c.items.map(x=>x.str).join(' ')+'\n'; }
+    }
+    else if(ext==='docx'||ext==='doc'){
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js');
+      const buf=await f.arrayBuffer();
+      const r=await mammoth.extractRawText({arrayBuffer:buf});
+      text=r.value;
+    }
+    text=text.replace(/\s*\n\s*\n\s*/g,'\n').replace(/[ \t]+/g,' ').trim();
+    if(!text){ nameEl.textContent='没提取到文字（可能是扫描版图片PDF），请改用粘贴'; return; }
+    document.getElementById('tf-article').value=text;
+    nameEl.textContent='✅ 已提取「'+f.name+'」约 '+text.length+' 字，可直接出题';
+    if(!document.getElementById('tf-title').value.trim())
+      document.getElementById('tf-title').value=f.name.replace(/\.[^.]+$/,'').slice(0,20);
+  }catch(e){ nameEl.textContent='❌ '+e.message+'（也可以直接粘贴文字）'; }
+  input.value='';
+}
+
+/* ══════ 手动出题编辑器 ══════ */
+let manualQs=[];
+function openManualEditor(){
+  manualQs=[{q:'',options:['','','',''],answer:0,explain:''}];
+  document.getElementById('mn-title').value=document.getElementById('tf-title').value||'';
+  document.getElementById('mn-status').textContent='';
+  renderManual();
+  document.getElementById('manual-ov').classList.add('active');
+}
+function closeManualEditor(){ document.getElementById('manual-ov').classList.remove('active'); }
+function addManualQ(){ manualQs.push({q:'',options:['','','',''],answer:0,explain:''}); renderManual(); }
+function delManualQ(i){ manualQs.splice(i,1); if(!manualQs.length)addManualQ(); else renderManual(); }
+function renderManual(){
+  document.getElementById('mn-list').innerHTML=manualQs.map((q,i)=>`
+    <div class="mn-q">
+      <div class="mn-q-head"><span class="mn-q-num">第 ${i+1} 题</span>
+        <span class="mn-q-del" onclick="delManualQ(${i})">删除</span></div>
+      <input class="tf-in" placeholder="题干（例：本文的主人公是谁？）" value="${(q.q||'').replace(/"/g,'&quot;')}" oninput="manualQs[${i}].q=this.value">
+      ${q.options.map((o,j)=>`<div class="mn-opt">
+        <div class="mn-radio ${q.answer===j?'on':''}" onclick="manualQs[${i}].answer=${j};renderManual()"></div>
+        <input class="tf-in" style="margin:0" placeholder="选项 ${'ABCD'[j]}${q.answer===j?'（正确答案）':''}" value="${(o||'').replace(/"/g,'&quot;')}" oninput="manualQs[${i}].options[${j}]=this.value">
+      </div>`).join('')}
+      <input class="tf-in" style="margin-top:6px" placeholder="解析（选填，答错时给学生看）" value="${(q.explain||'').replace(/"/g,'&quot;')}" oninput="manualQs[${i}].explain=this.value">
+    </div>`).join('');
+}
+function saveManualTheme(){
+  const title=document.getElementById('mn-title').value.trim();
+  const st=document.getElementById('mn-status');
+  if(!title){ st.textContent='请先填关卡标题'; st.className='tf-status err'; return; }
+  const valid=manualQs.filter(q=>q.q.trim()&&q.options.every(o=>o.trim()));
+  if(valid.length<1){ st.textContent='至少完整填写一道题（题干+四个选项）'; st.className='tf-status err'; return; }
+  addTheme(title,valid.map(q=>({q:q.q.trim(),options:q.options.map(o=>o.trim()),answer:q.answer,explain:q.explain.trim()})),'manual');
+  st.textContent='✅ 已发布「'+title+'」：'+valid.length+' 道题！'; st.className='tf-status';
+  setTimeout(closeManualEditor,900);
+}
+
+/* ══════ 词句银行（积累闭环） ══════ */
+function openWordBank(){ renderWordBank(); document.getElementById('wordbank-ov').classList.add('active'); }
+function closeWordBank(){ document.getElementById('wordbank-ov').classList.remove('active'); }
+function addWordBankItem(){
+  const inp=document.getElementById('wb-input'); const v=inp.value.trim(); if(!v||!G)return;
+  if(!G.wordBank.some(w=>w.text===v)){ G.wordBank.push({text:v,from:'手动'}); persist(); }
+  inp.value=''; renderWordBank();
+}
+function delWordBankItem(t){ G.wordBank=G.wordBank.filter(w=>w.text!==t); persist(); renderWordBank(); }
+function renderWordBank(){
+  if(!G)return;
+  document.getElementById('wb-count').textContent='已积累 '+G.wordBank.length+' 条好词好句';
+  const box=document.getElementById('wb-list');
+  box.innerHTML=G.wordBank.length? G.wordBank.map(w=>
+    `<span class="wb-chip" title="${w.from||''}">${w.text}<span class="x" onclick="delWordBankItem('${w.text.replace(/'/g,"\\'")}')">✕</span></span>`).join('')
+    : '<div class="wb-empty">还没有积累。点老师工作台的「提取好词好句」，或在这里手动收藏。</div>';
+}
+async function extractWordBank(){
+  const article=document.getElementById('tf-article').value.trim();
+  const key=(document.getElementById('tf-key').value||localStorage.getItem('ml_dskey')||'').trim();
+  if(article.length<40){ tfStatus('先上传或粘贴一篇文章',1); return; }
+  if(!G){ tfStatus('学生先选好伙伴再提取（词句存在学生的银行里）',1); return; }
+  if(!key){ tfStatus('提取好词好句需要 DeepSeek Key',1); return; }
+  localStorage.setItem('ml_dskey',key);
+  const btn=document.getElementById('btn-extract'); btn.disabled=true;
+  tfStatus('📖 AI 正在从文章里挑好词好句……');
+  try{
+    const items=await dsChat(key,'你是语文老师，只输出JSON。',
+      `从下面文章里挑选 10 个最值得小学生积累的好词或好句（成语、优美短语、精彩句子），存进"词句银行"。严格JSON：{"items":["词或句1","词或句2",...]}\n\n文章：\n${article.slice(0,3000)}`);
+    const arr=(JSON.parse(items).items||[]).filter(x=>typeof x==='string'&&x.length>=2);
+    let added=0;
+    for(const t of arr){ if(!G.wordBank.some(w=>w.text===t)){ G.wordBank.push({text:t,from:'文章提取'}); added++; } }
+    persist();
+    tfStatus('✅ 提取完成，新增 '+added+' 条到词句银行！学生写作时用上就能加分。');
+  }catch(e){ tfStatus('❌ '+e.message,1); }
+  finally{ btn.disabled=false; }
+}
+/* DeepSeek 通用对话（返回纯文本内容，已去 ```json 包裹） */
+async function dsChat(key,sys,user){
+  const resp=await fetch('https://api.deepseek.com/chat/completions',{
+    method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+    body:JSON.stringify({model:'deepseek-chat',messages:[{role:'system',content:sys},{role:'user',content:user}],temperature:0.6})
+  });
+  if(!resp.ok)throw new Error('API 返回 '+resp.status+'（Key 是否正确？）');
+  const d=await resp.json();
+  return d.choices[0].message.content.trim().replace(/^```json\s*/i,'').replace(/^```\s*/,'').replace(/```$/,'').trim();
+}
 
 async function generateAI(){
   const title=document.getElementById('tf-title').value.trim();
