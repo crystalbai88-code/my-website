@@ -1244,6 +1244,14 @@ function loadStudents(){ try{return JSON.parse(localStorage.getItem('ml_students
 function saveStudents(a){ try{localStorage.setItem('ml_students',JSON.stringify(a));}catch(e){} }
 function studentId(){ return localStorage.getItem('ml_current')||''; }
 function currentStudent(){ const id=studentId(); return loadStudents().find(s=>s.id===id)||null; }
+
+/* ══════ 云端同步 Supabase（选配；填 URL+KEY 才启用，否则纯本机） ══════ */
+const SB_URL='https://eyzvsdokczdmrlexdrxd.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5enZzZG9rY3pkbXJsZXhkcnhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1MDI5NjgsImV4cCI6MjA5OTA3ODk2OH0.HJRKKECAnYEB9I5OJ1tfvMWxxdrq3BrXbAlV8ZBfMvk';
+let _sb=null;
+function loadScriptSB(src){ return new Promise((res,rej)=>{ if([...document.scripts].some(s=>s.src===src))return res(); const s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); }
+async function sbClient(){ if(!SB_URL||!SB_KEY)return null; if(_sb)return _sb; try{ if(!window.supabase) await loadScriptSB('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js'); _sb=window.supabase.createClient(SB_URL,SB_KEY); }catch(e){ return null; } return _sb; }
+async function cloudUpsertStudent(s){ try{ const c=await sbClient(); if(!c||!s||!s.classId)return; await c.from('students').upsert({id:s.id,name:s.name,avatar:s.avatar||'',class_code:s.classId,stats:s.stats||{},updated_at:new Date().toISOString()}); }catch(e){} }
 function bumpStat(fn){
   const students=loadStudents(); const s=students.find(x=>x.id===studentId()); if(!s)return;
   if(!s.stats)s.stats={essays:0,words:0,aiGraded:0,aiScoreSum:0,arenaWins:0,arenaPlays:0,quizzes:0,quizCorrect:0,wbAdded:0,trainCN:0,trainEN:0,days:[]};
@@ -1251,6 +1259,7 @@ function bumpStat(fn){
   const today=new Date().toISOString().slice(0,10);
   if(!s.stats.days.includes(today)) s.stats.days.push(today);
   s.lastActive=Date.now(); saveStudents(students);
+  cloudUpsertStudent(s);
 }
 if(!currentStudent()){ location.replace('index.html'); }
 

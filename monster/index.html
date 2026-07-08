@@ -185,7 +185,7 @@ body{
       <div class="rp-title">👩‍🏫 老师入口 · 班级管理</div>
       <div class="rp-x" onclick="document.getElementById('teacher-ov').classList.remove('on')">✕</div>
     </div>
-    <div class="rp-sub">在这台设备上建班级、看全班学生的写作报告。数据存本机（适合课堂共享电脑）。</div>
+    <div class="rp-sub" id="tc-sub"></div>
 
     <div class="tc-section">
       <div class="tc-lab">本机当前班级（新同学注册后自动归入）</div>
@@ -210,6 +210,18 @@ function loadStudents(){ try{return JSON.parse(localStorage.getItem('ml_students
 function saveStudents(a){ try{localStorage.setItem('ml_students',JSON.stringify(a));}catch(e){} }
 function currentId(){ return localStorage.getItem('ml_current')||''; }
 function currentStudent(){ const id=currentId(); return loadStudents().find(s=>s.id===id)||null; }
+
+/* ══════ 云端同步 Supabase（选配；填 URL+KEY 才启用，否则纯本机） ══════ */
+const SB_URL='https://eyzvsdokczdmrlexdrxd.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5enZzZG9rY3pkbXJsZXhkcnhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1MDI5NjgsImV4cCI6MjA5OTA3ODk2OH0.HJRKKECAnYEB9I5OJ1tfvMWxxdrq3BrXbAlV8ZBfMvk';
+let _sb=null;
+function loadScriptSB(src){ return new Promise((res,rej)=>{ if([...document.scripts].some(s=>s.src===src))return res(); const s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); }
+async function sbClient(){ if(!SB_URL||!SB_KEY)return null; if(_sb)return _sb; try{ if(!window.supabase) await loadScriptSB('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js'); _sb=window.supabase.createClient(SB_URL,SB_KEY); }catch(e){ return null; } return _sb; }
+function cloudOn(){ return !!(SB_URL&&SB_KEY); }
+async function cloudUpsertStudent(s){ try{ const c=await sbClient(); if(!c||!s||!s.classId)return; await c.from('students').upsert({id:s.id,name:s.name,avatar:s.avatar||'',class_code:s.classId,stats:s.stats||{},updated_at:new Date().toISOString()}); }catch(e){} }
+async function cloudInsertClass(id,name){ try{ const c=await sbClient(); if(!c)return; await c.from('classes').upsert({code:id,name}); }catch(e){} }
+async function cloudRoster(code){ try{ const c=await sbClient(); if(!c)return null; const {data,error}=await c.from('students').select('*').eq('class_code',code); if(error)return null; return data||[]; }catch(e){ return null; } }
+async function cloudFindClass(code){ try{ const c=await sbClient(); if(!c)return null; const {data}=await c.from('classes').select('*').eq('code',code).limit(1); return data&&data[0]||null; }catch(e){ return null; } }
 function newStudent(name){
   const students=loadStudents();
   const id='s'+Date.now().toString(36)+Math.floor(Math.random()*1000);
@@ -227,19 +239,34 @@ function newStudent(name){
 function loadClasses(){ try{return JSON.parse(localStorage.getItem('ml_classes'))||[];}catch(e){return[];} }
 function saveClasses(a){ try{localStorage.setItem('ml_classes',JSON.stringify(a));}catch(e){} }
 function activeClass(){ const id=localStorage.getItem('ml_active_class')||''; return loadClasses().find(c=>c.id===id)||null; }
+function genCode(){ const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let x=''; for(let i=0;i<4;i++)x+=c[Math.floor(Math.random()*c.length)]; return x; }
 function createClass(){
   const name=(prompt('输入班级名称（例：五年级二班）:')||'').trim(); if(!name)return;
-  const classes=loadClasses(); const id='c'+Date.now().toString(36);
+  const classes=loadClasses(); const id=genCode();
   classes.push({id,name:name.slice(0,20),created:Date.now()}); saveClasses(classes);
   localStorage.setItem('ml_active_class',id);
+  cloudInsertClass(id,name.slice(0,20));
   renderTeacherClass();
+  if(cloudOn()) alert('✅ 班级「'+name+'」已创建，班级码：'+id+'\n把这个码发给学生，他们在自己的设备上注册时输入即可加入，你就能看到全班报告。');
+}
+// 学生用班级码加入（跨设备）
+async function joinByCode(code){
+  code=(code||'').trim().toUpperCase(); if(!code)return null;
+  let cls=loadClasses().find(c=>c.id===code);
+  if(!cls){ const remote=await cloudFindClass(code); if(remote){ cls={id:remote.code,name:remote.name,created:Date.now()}; const cs=loadClasses(); cs.push(cls); saveClasses(cs); } }
+  return cls;
 }
 function setActiveClass(id){ localStorage.setItem('ml_active_class',id); renderTeacherClass(); renderClassBar(); }
 function renderClassBar(){
   const c=activeClass(); const bar=document.getElementById('class-bar');
-  bar.innerHTML = c ? `<span class="cc">🏫 当前班级：${c.name}</span>` : '';
+  bar.innerHTML = c ? `<span class="cc">🏫 当前班级：${c.name}${cloudOn()?'（码 '+c.id+'）':''}</span>` : '';
 }
-function openTeacherClass(){ renderTeacherClass(); document.getElementById('teacher-ov').classList.add('on'); }
+function openTeacherClass(){
+  document.getElementById('tc-sub').innerHTML = cloudOn()
+    ? '建班级会生成<b>班级码</b>，发给学生在自己设备上注册时输入即可加入。报告自动汇总<b>全班所有设备</b>的数据（云端同步）。'
+    : '在这台设备上建班级、看全班学生的写作报告。数据存本机（适合课堂共享电脑）。';
+  renderTeacherClass(); document.getElementById('teacher-ov').classList.add('on');
+}
 function renderTeacherClass(){
   const classes=loadClasses(); const act=activeClass();
   const sel=document.getElementById('tc-active');
@@ -247,12 +274,20 @@ function renderTeacherClass(){
     ? classes.map(c=>`<option value="${c.id}" ${act&&act.id===c.id?'selected':''}>${c.name}</option>`).join('')
     : '<option value="">（还没有班级，点右边新建）</option>';
   // report table for active class
+  const title=document.getElementById('tc-report-title');
+  if(!act){ document.getElementById('tc-table').innerHTML='<tr><td class="tc-empty">先新建一个班级</td></tr>'; title.textContent=''; return; }
+  // 本机数据先渲染，云端可用则拉全班（跨设备）覆盖
+  renderClassTable(loadStudents().filter(s=>s.classId===act.id), act, cloudOn());
+  if(cloudOn()){
+    title.textContent='· '+act.name+'（云端加载中…）';
+    cloudRoster(act.id).then(rows=>{ if(rows) renderClassTable(rows.map(r=>({name:r.name,stats:r.stats||{}})), act, false); });
+  }
+}
+function renderClassTable(roster, act, loading){
   const tbl=document.getElementById('tc-table');
   const title=document.getElementById('tc-report-title');
-  if(!act){ tbl.innerHTML='<tr><td class="tc-empty">先新建一个班级</td></tr>'; title.textContent=''; return; }
-  const roster=loadStudents().filter(s=>s.classId===act.id);
-  title.textContent='· '+act.name+'（'+roster.length+' 人）';
-  if(!roster.length){ tbl.innerHTML='<tr><td class="tc-empty">这个班还没有学生。让学生在本机注册即可自动归入。</td></tr>'; return; }
+  title.textContent='· '+act.name+'（'+roster.length+' 人'+(loading?' · 云端同步中':'')+'）';
+  if(!roster.length){ tbl.innerHTML='<tr><td class="tc-empty">这个班还没有学生。'+(cloudOn()?'把班级码 '+act.id+' 发给学生，他们注册时输入即可加入。':'让学生在本机注册即可自动归入。')+'</td></tr>'; return; }
   const rows=roster.map(s=>{
     const st=s.stats||{};
     const aiAvg=st.aiGraded?Math.round(st.aiScoreSum/st.aiGraded):'—';
@@ -294,10 +329,16 @@ function renderStudents(){
   }).join('') +
   `<div class="stu new" onclick="addStudent()"><span class="plus">＋</span><span class="t">新同学<br>New</span></div>`;
 }
-function addStudent(){
-  const name=(prompt('输入你的名字 / Enter your name:')||'').trim();
+async function addStudent(){
+  const name=(prompt('输入你的名字（建议用昵称）/ Enter your name:')||'').trim();
   if(!name)return;
-  newStudent(name);
+  // 云端开启且本机没有当前班级时，让学生输入老师给的班级码加入（跨设备）
+  if(cloudOn() && !activeClass()){
+    const code=(prompt('老师给的班级码（没有可跳过）/ Class code (optional):')||'').trim();
+    if(code){ const cls=await joinByCode(code); if(cls){ localStorage.setItem('ml_active_class',cls.id); } else { alert('没找到这个班级码，先按无班级注册。'); } }
+  }
+  const s=newStudent(name);
+  cloudUpsertStudent(s);
   showLang();
 }
 function pickStudent(id){
