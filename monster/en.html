@@ -471,6 +471,7 @@ header {
 .tf-btn:disabled{ opacity:.5; cursor:wait; }
 .tf-status { font-size:.78rem; margin-top:10px; min-height:20px; color:var(--teal-deep); font-weight:700; }
 .tf-status.err{ color:var(--coral-deep); }
+.tf-ready{ font-size:.85rem; font-weight:800; color:var(--teal-deep); background:#eafaf7; border:1.5px solid var(--teal); border-radius:12px; padding:9px 14px; margin:6px 0; }
 .theme-item { display:flex; align-items:center; gap:12px; background:var(--cream);
   border:1.5px solid var(--line); border-radius:16px; padding:12px 14px; margin-bottom:9px; cursor:pointer; transition:all .18s; }
 .theme-item:hover{ border-color:var(--violet2); transform:translateY(-2px); }
@@ -797,8 +798,11 @@ header {
       <span class="tf-file-name" id="tf-file-name">.pdf / .docx / .txt — text is extracted automatically (needs internet)</span>
     </div>
     <textarea class="tf-ta" id="tf-article" placeholder="Paste the whole passage here, or upload a file above… (150+ words recommended)"></textarea>
-    <div class="tf-lab">DeepSeek API Key (optional, stored on this device only; used for AI quiz / AI marking / extracting good words)</div>
-    <input class="tf-in" id="tf-key" type="password" placeholder="sk-… (leave blank to use Quick quiz only)">
+    <div id="tf-key-row">
+      <div class="tf-lab">DeepSeek API Key (optional, stored on this device only; used for AI quiz / AI marking / extracting good words)</div>
+      <input class="tf-in" id="tf-key" type="password" placeholder="sk-… (leave blank to use Quick quiz only)">
+    </div>
+    <div class="tf-ready" id="tf-ready" style="display:none">✅ AI features are ready — just use them (AI quiz / AI marking / word extraction)</div>
     <div class="tf-btns">
       <button class="tf-btn ai" id="btn-ai" onclick="generateAI()">🤖 AI quiz (8 Qs)</button>
       <button class="tf-btn qk" id="btn-qk" onclick="generateQuick()">⚡ Quick quiz (offline)</button>
@@ -1534,7 +1538,7 @@ function submitTraining(){
 
   lastTrain={text, genre:currentGenre, graded:false};
   const gb=document.getElementById('ai-grade-btn');
-  const hasKey=!!(localStorage.getItem('ml_dskey_en'));
+  const hasKey=!!getKey();
   gb.style.display='block'; gb.disabled=false;
   gb.textContent = hasKey ? '🤖 AI marking · give me tips to improve' : '🤖 AI marking (teacher must add a DeepSeek key first)';
   document.getElementById('ai-feedback').style.display='none';
@@ -1547,8 +1551,8 @@ function submitTraining(){
 let lastTrain=null;
 async function aiGrade(){
   if(!lastTrain||lastTrain.graded)return;
-  const key=(localStorage.getItem('ml_dskey_en')||'').trim();
-  if(!key){ showToast('The teacher needs to add a DeepSeek key in the Teacher panel first'); return; }
+  const key=getKey();
+  if(!key){ showToast('AI features are not ready yet (no key preset)'); return; }
   const gb=document.getElementById('ai-grade-btn'); gb.disabled=true; gb.textContent='🤖 AI is marking your writing…';
   const gen=GENRES[lastTrain.genre];
   try{
@@ -1613,7 +1617,10 @@ function saveThemes(t){ try{localStorage.setItem(THEMES_KEY,JSON.stringify(t));}
 
 function openTeacher(){
   document.getElementById('teacher-ov').classList.add('active');
-  document.getElementById('tf-key').value=localStorage.getItem('ml_dskey_en')||'';
+  const preset=!!presetKey();
+  document.getElementById('tf-key-row').style.display=preset?'none':'block';
+  document.getElementById('tf-ready').style.display=preset?'block':'none';
+  document.getElementById('tf-key').value=preset?'':(localStorage.getItem('ml_dskey_en')||'');
   document.getElementById('tf-wordgoal').value=wordGoal();
   document.getElementById('tf-topic').value=writingTopic();
   document.getElementById('tf-status').textContent=''; renderTeacherThemes();
@@ -1644,6 +1651,16 @@ function renderTeacherThemes(){
 function deleteTheme(id){ if(!confirm('Delete this quest?'))return; saveThemes(loadThemes().filter(t=>t.id!==id)); renderTeacherThemes(); }
 function addTheme(title,qs,mode){ const t=loadThemes(); t.push({id:'t'+simpleHash(title+qs.length+t.length),title,questions:qs,mode}); saveThemes(t); renderTeacherThemes(); }
 function tfStatus(m,err){ const e=document.getElementById('tf-status'); e.textContent=m; e.className='tf-status'+(err?' err':''); }
+
+/* ══════ Preset DeepSeek key (base64-obfuscated shards; teachers never type it once filled) ══════ */
+const _KP=['c2stOTdjZ','jFjMzUwNmI','0NDQ3ZjhlZTQ','2NzhlMzdiZDhkNzk='];
+function presetKey(){ try{ const p=atob(_KP.join('')); return p.length>15?p:''; }catch(e){ return ''; } }
+function getKey(){
+  const p=presetKey(); if(p) return p;
+  const el=document.getElementById('tf-key'); const typed=el?el.value.trim():'';
+  if(typed){ try{localStorage.setItem('ml_dskey_en',typed);}catch(e){} return typed; }
+  return (localStorage.getItem('ml_dskey_en')||'').trim();
+}
 
 /* ══════ File upload (PDF / Word / TXT — teacher side, loads libs online) ══════ */
 function loadScript(src){ return new Promise((res,rej)=>{ if([...document.scripts].some(x=>x.src===src))return res(); const el=document.createElement('script'); el.src=src; el.onload=res; el.onerror=()=>rej(new Error('library failed to load (check your connection)')); document.head.appendChild(el); }); }
@@ -1733,11 +1750,10 @@ function renderWordBank(){
 }
 async function extractWordBank(){
   const article=document.getElementById('tf-article').value.trim();
-  const key=(document.getElementById('tf-key').value||localStorage.getItem('ml_dskey_en')||'').trim();
+  const key=getKey();
   if(article.length<40){ tfStatus('Upload or paste a passage first',1); return; }
   if(!G){ tfStatus('A student must pick a companion first (words save to their bank)',1); return; }
   if(!key){ tfStatus('Extracting good words needs a DeepSeek key',1); return; }
-  localStorage.setItem('ml_dskey_en',key);
   const btn=document.getElementById('btn-extract'); btn.disabled=true;
   tfStatus('📖 AI is picking useful words & phrases from the passage…');
   try{
@@ -1765,7 +1781,7 @@ async function dsChat(key,sys,user){
 async function generateAI(){
   const title=document.getElementById('tf-title').value.trim();
   const article=document.getElementById('tf-article').value.trim();
-  const key=document.getElementById('tf-key').value.trim();
+  const key=getKey();
   if(!title){tfStatus('Please enter a quest title first',1);return;}
   if(article.length<120){tfStatus('The passage is too short — aim for 150+ words',1);return;}
   if(!key){tfStatus('AI quiz needs a DeepSeek key, or use “Quick quiz” instead',1);return;}
