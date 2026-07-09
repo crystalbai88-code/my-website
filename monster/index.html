@@ -131,16 +131,16 @@ body{
 
 <!-- ── SCREEN 1: 选我是谁 ── -->
 <div class="screen" id="screen-stu">
-  <div class="pick-hint"><span class="b">👋 你是谁？ · Who's writing today?</span></div>
+  <div class="pick-hint"><span class="b">👋 输入你的名字开始 · Enter your name to start</span></div>
   <div class="class-bar" id="class-bar"></div>
   <div class="students" id="students"></div>
-  <div class="foot">同一台设备可以有多个同学，各自的怪兽和成长档案分开保存。<br>Multiple students can share one device — each keeps their own monster & progress.</div>
+  <div class="foot">输入你自己的名字即可，用过一次下次自动记住你。<br>Just enter your own name — it remembers you next time.</div>
 </div>
 
 <!-- ── SCREEN 2: 选语言 ── -->
 <div class="screen" id="screen-lang">
   <div class="greet">👋 你好，<b id="greet-name">同学</b>！</div>
-  <div class="switch-stu" onclick="showStudents()">↩ 不是我？换一个同学</div>
+  <div class="switch-stu" onclick="localStorage.removeItem('ml_current');showStudents()">↩ 不是我？换个名字</div>
 
   <div class="cards">
     <a class="mode cn" href="cn.html">
@@ -317,21 +317,9 @@ function exportClassReport(){
 
 function renderStudents(){
   renderClassBar();
-  const box=document.getElementById('students');
-  const act=activeClass();
-  // 有当前班级时只显示本班学生；否则显示全部
-  const students=loadStudents().filter(s=>!act || s.classId===act.id || !s.classId);
-  box.innerHTML = students.map(s=>{
-    const e=(s.stats&&s.stats.essays)||0;
-    return `<div class="stu" onclick="pickStudent('${s.id}')">
-      <span class="stu-del" onclick="event.stopPropagation();delStudent('${s.id}')">删除</span>
-      <img src="img/${s.avatar}.png" alt="">
-      <div class="stu-name">${s.name}</div>
-      <div class="stu-meta">已写 ${e} 篇</div>
-      ${s.className?`<div class="stu-class">🏫 ${s.className}</div>`:''}
-    </div>`;
-  }).join('') +
-  `<div class="stu new" onclick="addStudent()"><span class="plus">＋</span><span class="t">新同学<br>New</span></div>`;
+  // 隐私：不显示任何人的名字列表，只给一个"输入你的名字"的入口
+  document.getElementById('students').innerHTML =
+    `<div class="stu new" onclick="addStudent()"><span class="plus">＋</span><span class="t">输入你的名字<br>Enter your name</span></div>`;
 }
 async function addStudent(){
   const name=(prompt('输入你的名字（建议用昵称）/ Enter your name:')||'').trim();
@@ -341,8 +329,11 @@ async function addStudent(){
     const code=(prompt('老师给的班级码（没有可跳过）/ Class code (optional):')||'').trim();
     if(code){ const cls=await joinByCode(code); if(cls){ localStorage.setItem('ml_active_class',cls.id); } else { alert('没找到这个班级码，先按无班级注册。'); } }
   }
-  const s=newStudent(name);
-  cloudUpsertStudent(s);
+  // 同名（同班）已注册过 → 直接接着上次的档案，不新建重复
+  const act=activeClass(); const students=loadStudents();
+  let s=students.find(x=>x.name===name.slice(0,12) && (!act || x.classId===act.id));
+  if(s){ s.lastActive=Date.now(); saveStudents(students); localStorage.setItem('ml_current',s.id); }
+  else { s=newStudent(name); cloudUpsertStudent(s); }
   showLang();
 }
 function pickStudent(id){
