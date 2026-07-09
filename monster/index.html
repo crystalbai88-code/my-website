@@ -99,6 +99,9 @@ body{
 .class-bar .cc{background:#fff7e6;border:1.5px solid var(--gold);border-radius:999px;padding:5px 14px;}
 .teacher-entry{margin-top:24px;font-size:.82rem;color:var(--violet-deep);cursor:pointer;font-weight:800;border:1.5px dashed var(--violet);border-radius:999px;padding:7px 16px;}
 .teacher-entry:hover{background:#f2efff;}
+.teacher-corner{position:fixed;top:14px;right:16px;z-index:20;font-size:.75rem;color:var(--ink-soft);cursor:pointer;font-weight:700;background:rgba(255,255,255,.7);border:1px solid var(--cream-deep);border-radius:999px;padding:6px 12px;opacity:.6;transition:all .18s;}
+.teacher-corner:hover{opacity:1;color:var(--violet-deep);border-color:var(--violet);}
+@media(max-width:640px){.teacher-corner{top:10px;right:10px;font-size:.7rem;padding:5px 10px;}}
 .stu-class{font-size:.62rem;color:var(--gold-deep);margin-top:2px;}
 /* teacher/class modal */
 .tc-section{margin-top:18px;}
@@ -118,6 +121,8 @@ body{
 </head>
 <body>
 
+<div class="teacher-corner" onclick="openTeacherClass()" title="老师上课用">👩‍🏫 老师入口</div>
+
 <div class="brand">
   <span class="brand-emoji">🧪</span>
   <div class="title">怪兽制造局</div>
@@ -130,7 +135,6 @@ body{
   <div class="class-bar" id="class-bar"></div>
   <div class="students" id="students"></div>
   <div class="foot">同一台设备可以有多个同学，各自的怪兽和成长档案分开保存。<br>Multiple students can share one device — each keeps their own monster & progress.</div>
-  <div class="teacher-entry" onclick="openTeacherClass()">👩‍🏫 老师入口 · 建班级 / 看全班报告</div>
 </div>
 
 <!-- ── SCREEN 2: 选语言 ── -->
