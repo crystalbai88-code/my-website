@@ -357,7 +357,8 @@ function setYear(y){ year=Math.max(-3500,Math.min(2025,y|0));
   present = year>=2000; // 进入当代即点亮现代世界
   document.getElementById('yearLabel').textContent=eraLabel(year);
   document.getElementById('eraLabel').textContent=present?'今天的世界':eraName(year);
-  document.getElementById('slider').value=year; draw(); }
+  document.getElementById('slider').value=year; draw();
+  if(window.CivMusic&&CivMusic.setEra)CivMusic.setEra(year); }
 
 // 命中检测
 function civAt(sx,sy){

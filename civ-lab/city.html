@@ -161,7 +161,8 @@ function renderEra(){
   document.getElementById('prev').disabled = cur===0;
   document.getElementById('next').disabled = cur===C.eras.length-1;
 }
-function render(){ renderRail(); renderEra(); window.scrollTo({top:0,behavior:'instant'}); if(window.Track) Track.log('走进一座城·'+C.name); }
+function eraYear(e){ var s=(e&&e.years)||''; var m=s.match(/公元前\s*(\d+)/); if(m)return -(+m[1]); m=s.match(/公元\s*(\d+)/); if(m){ var v=+m[1]; return v<25?v*100-50:v; } m=s.match(/(\d+)\s*世纪/); if(m)return (+m[1])*100-50; return 700; }
+function render(){ renderRail(); renderEra(); window.scrollTo({top:0,behavior:'instant'}); if(window.Track) Track.log('走进一座城·'+C.name); if(window.CivMusic&&CivMusic.setEra)CivMusic.setEra(eraYear(C.eras[cur])); }
 function jump(i){ cur=Math.max(0,Math.min(C.eras.length-1,i)); render(); }
 function step(d){ jump(cur+d); }
 // 历史足迹:走进一座城,盖一枚章
