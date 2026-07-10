@@ -1,9 +1,9 @@
 // CivLab · 实验室背景音乐(真实录制曲目,非合成)
-// 曲目:Echoes of Time v2 — Kevin MacLeod (incompetech.com),Creative Commons BY 4.0(需署名,已在页面标注)。
-// 默认关闭(浏览器禁自动播放),右上浮 🔈 开关;首次点击才加载并播放,循环、音量低、缓入缓出。
+// 曲目:Gymnopédie No.1(Erik Satie 作曲,公共领域)— 录音 Kevin MacLeod (incompetech.com),Creative Commons BY 4.0(需署名,已在页面标注)。
+// 舒缓唯美的钢琴独奏。默认关闭(浏览器禁自动播放),右上浮 🔈 开关;首次点击才加载并播放,循环、音量柔和、缓入缓出。
 (function(){
   if(window.CivMusic) return;
-  var SRC='./audio/echoes-of-time.mp3', VOL=0.42, audio, fadeT, on=false;
+  var SRC='./audio/gymnopedie.mp3', VOL=0.55, audio, fadeT, on=false;
 
   function ensure(){
     if(audio) return;
@@ -37,7 +37,7 @@
     btn.onclick=toggle; document.body.appendChild(btn);
     // CC BY 署名(播放时显示)
     credit=document.createElement('div');
-    credit.textContent='♪ Echoes of Time — Kevin MacLeod · CC BY';
+    credit.textContent='♪ Gymnopédie No.1 (Satie) — Kevin MacLeod · CC BY';
     credit.style.cssText='position:fixed;right:10px;top:calc(136px + env(safe-area-inset-top));z-index:60;max-width:160px;text-align:right;font-family:system-ui,sans-serif;font-size:10px;line-height:1.4;color:rgba(60,45,30,.9);text-shadow:0 1px 2px rgba(255,255,255,.5);opacity:0;transition:opacity .4s;pointer-events:none';
     document.body.appendChild(credit);
     setBtn();
