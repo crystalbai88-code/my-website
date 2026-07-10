@@ -252,11 +252,13 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;opacity:.5;background-
   <div class="tab" data-p="lib">🎒 概念库</div>
   <div class="tab" data-p="stuck">🆘 我卡住了</div>
   <div class="tab" data-p="gain">🏅 我的收获</div>
+  <div class="tab" data-p="airev">🤖 AI复盘</div>
  </div>
 
  <div class="panel on" id="p-lesson"></div>
  <div class="panel" id="p-lib"></div>
  <div class="panel" id="p-gain"></div>
+ <div class="panel" id="p-airev"></div>
 
  <div class="panel" id="p-stuck">
   <div class="note">卡住不是你不行,是还没找到对的概念。把你的问题写下来,我帮你认出你卡在哪个概念,翻过去就能学(有例子)。</div>
@@ -472,7 +474,7 @@ function findStuckText(){const t=($('stuckText').value||'').toLowerCase();const 
 
 const KEY='cockpit_v2';
 let st=JSON.parse(localStorage.getItem(KEY)||'{}');
-st.proj=st.proj||''; st.aware=st.aware||[]; st.user=st.user||''; st.lessons=st.lessons||{}; if(!st.sess)st.sess=1;
+st.proj=st.proj||''; st.aware=st.aware||[]; st.user=st.user||''; st.lessons=st.lessons||{}; if(!st.sess)st.sess=1; st.airevs=st.airevs||[];
 function save(){localStorage.setItem(KEY,JSON.stringify(st));}
 const $=id=>document.getElementById(id);
 
@@ -611,14 +613,14 @@ function lessonTimeline(){const ks=Object.keys(st.lessons).map(Number).sort((a,b
   return `<div class="logitem"><div class="ld">🏅 第 ${n} 站 · ${L.title} · ${r.at}</div>${says}${r.q1?`<p><b>做出了:</b>${esc(r.q1)}</p>`:''}${r.q2?`<p><b>卡在:</b>${esc(r.q2)}</p>`:''}${r.q3?`<p><b>最有用:</b>${esc(r.q3)}</p>`:''}</div>`;}).join('');
 }
 function gotoLog(){closeConcept();const t=document.querySelector('.tab[data-p=lesson]');if(t)t.click();window.scrollTo(0,0);}
-function exportRecs(){const data={探险家:st.user||'',作品:st.proj||'',收集概念数:st.aware.length+' / 33',已点亮概念:st.aware,各关日记:st.lessons,导出时间:new Date().toISOString()};
+function exportRecs(){const data={探险家:st.user||'',作品:st.proj||'',收集概念数:st.aware.length+' / 33',已点亮概念:st.aware,各关日记:st.lessons,AI复盘:st.airevs||[],导出时间:new Date().toISOString()};
  const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`我的收获_${st.user||'学生'}_${st.proj||'作品'}.json`;a.click();}
 function esc(s){return s.replace(/</g,'&lt;').replace(/\n/g,'<br>');}
 
 document.querySelectorAll('.tab').forEach(t=>{t.onclick=()=>{
  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');
  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));$('p-'+t.dataset.p).classList.add('on');
- if(t.dataset.p==='lesson')renderLesson();if(t.dataset.p==='lib')renderAll();if(t.dataset.p==='gain')renderGain();
+ if(t.dataset.p==='lesson')renderLesson();if(t.dataset.p==='lib')renderAll();if(t.dataset.p==='gain')renderGain();if(t.dataset.p==='airev')renderAirev();
 };});
 
 function tileTog(k){const i=st.aware.indexOf(k);if(i<0)st.aware.push(k);else st.aware.splice(i,1);save();updCount();renderGain();checkComplete();}
@@ -636,6 +638,49 @@ function renderGain(){
  h+=`<div class="shead" style="margin-top:24px">📖 我的探险日记(历次通关,用自己的话留下的)</div>`+lessonTimeline();
  $('p-gain').innerHTML=h;
 }
+/* ===== 🤖 AI 复盘:学生 × AI 一轮交互的复盘 ===== */
+function renderAirev(){
+ const list=st.airevs||[];
+ let h=`<div class="mission" style="transform:rotate(.4deg)"><span class="tape"></span><span class="tape r"></span>`;
+ h+=`<div class="mlabel">🤖 AI 复盘 · 越复盘越会指挥 AI</div>`;
+ h+=`<div class="mtitle">跟 AI 打完一轮,回来复盘一次</div>`;
+ h+=`<div class="goal">你给 AI 一个指令、它给你一段回应——这一来一回里藏着最值钱的东西:你怎么把话说得更准、下次怎么让它更懂你。每次交互后写一条,你会越来越会「指挥」AI,而不是被它牵着走。</div>`;
+ h+=`<div class="guide"><div class="xhc" onclick="xhTip()" title="点点小黑"><img class="xh" src="xh/xh05_sikao.png" alt="小黑" onerror="this.style.display='none'"></div><div class="bubble" id="xhBubble">小黑:AI 不是许愿池——你说得越清楚,它给得越准。复盘就是练这个!</div></div>`;
+ h+=`</div>`;
+ h+=`<div class="log">
+   <div class="lh">📝 写一条新的 AI 复盘</div>
+   <label>这轮我在做什么?(可留空,例:给作品做登录页)</label><textarea id="arCtx" style="min-height:34px"></textarea>
+   <label>① 我给 AI 的指令是什么?(尽量原话)</label><textarea id="arQ1" placeholder="我当时是怎么跟 AI 说的…"></textarea>
+   <label>② AI 给了我什么分析 / 回应?</label><textarea id="arQ2" placeholder="AI 做了什么、说了什么…"></textarea>
+   <label>③ 这个过程我学到了什么?</label><textarea id="arQ3" placeholder="关于我要做的东西、或关于 AI…"></textarea>
+   <label>④ 关于「下一次指令」,我发现了什么?</label><textarea id="arQ4" placeholder="下次我会换个说法 / 多补一句…"></textarea>
+   <label>⑤ 怎样能更好地和 AI 交互?</label><textarea id="arQ5" placeholder="我的一条小心得…"></textarea>
+   <div class="btnrow"><button class="stamp" onclick="saveAirev()">🏅 存下这条复盘</button><button class="ghost" onclick="exportRecs()">导出全部收获</button></div>
+  </div>`;
+ h+=`<div class="shead" style="margin-top:24px">🤖 我的 AI 复盘记录 <span class="n">(共 ${list.length} 条)</span></div>`;
+ if(!list.length){h+=`<div class="empty">还没有复盘。每次跟 AI 打完一轮交道,回来写一条——你会越来越会指挥 AI。</div>`;}
+ else{for(let i=list.length-1;i>=0;i--)h+=airevItem(list[i],i);}
+ $('p-airev').innerHTML=h;
+}
+function airevItem(r,i){
+ return `<div class="logitem"><div class="ld">🤖 AI 复盘 · ${r.at}${r.ctx?' · '+esc(r.ctx):''}<span onclick="delAirev(${i})" style="float:right;font-size:12px;color:var(--mut);cursor:pointer;font-family:inherit">🗑 删除</span></div>`
+  +(r.q1?`<p><b>我的指令:</b>${esc(r.q1)}</p>`:'')
+  +(r.q2?`<p><b>AI 的分析:</b>${esc(r.q2)}</p>`:'')
+  +(r.q3?`<p><b>我学到了:</b>${esc(r.q3)}</p>`:'')
+  +(r.q4?`<p><b>下次指令的发现:</b>${esc(r.q4)}</p>`:'')
+  +(r.q5?`<p><b>怎样更好交互:</b>${esc(r.q5)}</p>`:'')
+  +`</div>`;
+}
+function saveAirev(){
+ const g=id=>($(id)?$(id).value.trim():'');
+ const ctx=g('arCtx'),q1=g('arQ1'),q2=g('arQ2'),q3=g('arQ3'),q4=g('arQ4'),q5=g('arQ5');
+ if(!q1&&!q2&&!q3&&!q4&&!q5){alert('至少写一条再存哦～\n哪怕只写「我给 AI 的指令」也行。');return;}
+ const d=new Date();
+ st.airevs.push({ctx,q1,q2,q3,q4,q5,at:`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`});
+ save();renderAirev();window.scrollTo({top:0,behavior:'smooth'});
+ alert('🏅 复盘存好了!这是你第 '+st.airevs.length+' 条 AI 复盘。\n多存几条,回头翻翻,你会看到自己越来越会跟 AI 说话。');
+}
+function delAirev(i){if(!confirm('删掉这条复盘?'))return;st.airevs.splice(i,1);save();renderAirev();}
 /* ===== 小黑 · 向导(矢量版,可后续换真 PNG) ===== */
 function xiaohei(mood){mood=mood||'wave';
  const arm = mood==='cheer'
