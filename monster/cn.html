@@ -495,6 +495,15 @@ header {
 .wb-chip .x:hover{ color:var(--coral-deep); }
 .wb-chip.used{ border-color:var(--teal); background:#eafaf7; }
 .wb-empty{ font-size:.85rem; color:var(--ink-soft); padding:20px; text-align:center; }
+.rd-add{ display:flex; flex-direction:column; gap:8px; margin-bottom:10px; }
+.rd-tip{ font-size:.82rem; font-weight:700; color:var(--teal-deep); min-height:20px; margin-bottom:6px; line-height:1.6; }
+.rd-tip.err{ color:var(--coral-deep); }
+.rd-list{ display:flex; flex-direction:column; gap:8px; max-height:44vh; overflow-y:auto; }
+.rd-item{ position:relative; background:var(--cream); border:1.5px solid var(--cream-deep); border-radius:14px; padding:11px 40px 11px 14px; }
+.rd-bk{ font-size:.92rem; font-weight:800; color:var(--ink); }
+.rd-sen{ font-size:.82rem; color:var(--teal-deep); margin-top:3px; line-height:1.6; }
+.rd-del{ position:absolute; top:10px; right:12px; font-size:.72rem; color:var(--ink-soft); cursor:pointer; }
+.rd-del:hover{ color:var(--coral-deep); }
 .theme-item { display:flex; align-items:center; gap:12px; background:var(--cream);
   border:1.5px solid var(--line); border-radius:16px; padding:12px 14px; margin-bottom:9px; cursor:pointer; transition:all .18s; }
 .theme-item:hover{ border-color:var(--violet2); transform:translateY(-2px); }
@@ -627,6 +636,9 @@ header {
 .opt.correct{ border-color:var(--green); background:#e3f7ee; color:var(--teal-deep); font-weight:800; }
 .opt.wrong{ border-color:var(--coral); background:#ffe7e2; color:var(--coral-deep); }
 .opt:disabled{ cursor:default; }
+.v-explain{ margin-top:12px; background:#fff7e6; border:1.5px solid var(--gold); border-radius:14px; padding:11px 15px; font-size:.9rem; line-height:1.7; color:var(--ink); animation:modalIn .2s ease-out; }
+.v-explain b{ color:var(--coral-deep); }
+.v-explain .why{ color:var(--gold-deep); font-weight:700; }
 .qfb { margin-top:12px; font-size:.82rem; line-height:1.7; min-height:22px; color:var(--ink-soft); }
 .qfb b { color:var(--green); } .qfb.bad b { color:var(--coral-deep); }
 .q-player { display:flex; align-items:center; gap:12px; width:min(720px,96vw); margin-top:14px; }
@@ -697,6 +709,7 @@ header {
         <button class="codex-btn" onclick="openCodex()">📕 怪兽图鉴</button>
         <button class="codex-btn" onclick="openEssays()">📄 我的作文本（<span id="essay-count">0</span> 篇）</button>
         <button class="codex-btn" onclick="openWordBank()">📖 词句银行（<span id="wb-hub-count">0</span> 条）</button>
+        <button class="codex-btn" onclick="openReading()">📚 读书记录（<span id="rd-hub-count">0</span> 本）</button>
         <button class="codex-btn" onclick="openReport()">📊 我的成长报告</button>
       </div>
     </div>
@@ -884,6 +897,22 @@ header {
   </div>
 </div>
 
+<!-- ═══ 读书记录 ═══ -->
+<div class="overlay" id="reading-ov">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">📚 读书记录</div><div class="close-x" onclick="closeReading()">✕</div></div>
+    <div class="modal-sub">读得越多，怪兽越强！记下你读过的书 + 一句最喜欢的话，就能得<b>金币</b>（去商店升级），那句好话还会自动进<b>词句银行</b>。读书 → 积累 → 写作，越读越会写。</div>
+    <div class="rd-add">
+      <input class="tf-in" id="rd-title" placeholder="书名（例：《夏洛的网》）" maxlength="30">
+      <input class="tf-in" id="rd-sentence" placeholder="书里你最喜欢的一句话（会存进词句银行）" maxlength="60">
+      <button class="tf-btn ai" onclick="addBook()">📖 记一本 +10🪙</button>
+    </div>
+    <div class="rd-tip" id="rd-tip"></div>
+    <div class="wb-count" id="rd-count"></div>
+    <div class="rd-list" id="rd-list"></div>
+  </div>
+</div>
+
 <!-- ═══ 成长报告 ═══ -->
 <div class="overlay" id="report-ov">
   <div class="modal">
@@ -1008,6 +1037,7 @@ header {
     <span class="v-type" id="vp-type">近义词</span><span class="v-timer" id="vp-timer">⚡ 4秒内答对＝会心一击</span>
     <div class="qtext" id="vp-q"></div>
     <div class="opts" id="vp-opts"></div>
+    <div class="v-explain" id="vp-explain" style="display:none"></div>
   </div>
   <div class="qcard vocab-card" id="write-pk">
     <span class="v-type" style="--vt:var(--teal)" id="wpk-turn">左边同学作答</span>
@@ -1064,6 +1094,7 @@ header {
     <span class="v-type" id="va-type">近义词</span><span class="v-timer" id="va-timer">⚡ 4秒内答对＝会心一击</span>
     <div class="qtext" id="va-q"></div>
     <div class="opts" id="va-opts"></div>
+    <div class="v-explain" id="va-explain" style="display:none"></div>
   </div>
   <div class="result" id="battle-result">
     <div class="rt" id="br-title"></div>
@@ -1298,12 +1329,12 @@ function newGame(starter) {
     starter: starter.f, name: starter.n,
     atk:base.atk, spd:base.spd, def:base.def,
     wp:0, wpGenre:{story:0,expo:0,argu:0}, gold:0, atkLvl:0, hpLvl:0, level:1,
-    score:0, wins:0, losses:0, records:[], usedTexts:[], defeated:{}, themeBest:{}, essays:[], wordBank:[],
+    score:0, wins:0, losses:0, records:[], usedTexts:[], defeated:{}, themeBest:{}, essays:[], wordBank:[], books:[],
   };
   persist();
 }
 function persist(){ try{localStorage.setItem(KEY,JSON.stringify(G));}catch(e){} }
-function restore(){ try{const r=localStorage.getItem(KEY); if(r){G=JSON.parse(r); if(!G.wpGenre)G.wpGenre={story:0,expo:0,argu:0}; if(!G.essays)G.essays=[]; if(!G.wordBank)G.wordBank=[]; return true;}}catch(e){} return false; }
+function restore(){ try{const r=localStorage.getItem(KEY); if(r){G=JSON.parse(r); if(!G.wpGenre)G.wpGenre={story:0,expo:0,argu:0}; if(!G.essays)G.essays=[]; if(!G.wordBank)G.wordBank=[]; if(!G.books)G.books=[]; return true;}}catch(e){} return false; }
 function resetGame(){ if(!confirm('确定清空存档、重新开始吗？'))return; localStorage.removeItem(KEY); G=null; showScreen('screen-start'); }
 
 /* derived */
@@ -1398,6 +1429,7 @@ function renderHub(){
   document.getElementById('theme-hint').textContent = tc ? `📖 ${tc} 个关卡可挑战` : '暂无关卡';
   document.getElementById('essay-count').textContent = (G.essays||[]).length;
   document.getElementById('wb-hub-count').textContent = (G.wordBank||[]).length;
+  document.getElementById('rd-hub-count').textContent = (G.books||[]).length;
 
   // collected problems
   const cg = document.getElementById('collected-grid');
@@ -1801,6 +1833,43 @@ function saveManualTheme(){
 function openWordBank(){ renderWordBank(); document.getElementById('wordbank-ov').classList.add('active'); }
 function closeWordBank(){ document.getElementById('wordbank-ov').classList.remove('active'); }
 
+/* ══════ 读书记录：读得多 → 得金币升级 + 好句进词句银行 ══════ */
+function openReading(){ document.getElementById('rd-tip').textContent=''; renderReading(); document.getElementById('reading-ov').classList.add('active'); }
+function closeReading(){ document.getElementById('reading-ov').classList.remove('active'); if(G)renderHub(); }
+function addBook(){
+  if(!G)return;
+  const title=document.getElementById('rd-title').value.trim();
+  const sentence=document.getElementById('rd-sentence').value.trim();
+  const tip=document.getElementById('rd-tip');
+  if(!title){ tip.textContent='先填书名'; tip.className='rd-tip err'; return; }
+  if(G.books.some(b=>b.title===title)){ tip.textContent='这本书已经记过啦，换一本吧！'; tip.className='rd-tip err'; return; }
+  G.books.push({title,sentence,date:Date.now()});
+  G.gold+=10;                                   // 读书给金币 → 去商店升级
+  if(!G.stats)G.stats={};
+  let msg='📚 记下《'+title.replace(/[《》]/g,'')+'》，+10🪙！';
+  if(sentence){ if(!G.wordBank.some(w=>w.text===sentence)){ G.wordBank.push({text:sentence,from:'读书摘抄'}); } msg+=' 好句已存进词句银行。'; }
+  // 每读 5 本，额外奖励一次属性（读书滋养写作）
+  if(G.books.length%5===0){
+    const gen=GENRES[currentGenre]; const stat=gen?gen.stat:'def';
+    if(stat==='atk')G.atk+=2; else if(stat==='spd')G.spd+=2; else G.def+=2;
+    msg+=' 🎉 读满 '+G.books.length+' 本，怪兽 +2 '+(gen?gen.statName:'耐力')+'！';
+  }
+  bumpStat(s=>{ s.booksRead=(s.booksRead||0)+1; });   // 记入成长报告 + 云端同步
+  persist();
+  document.getElementById('rd-title').value=''; document.getElementById('rd-sentence').value='';
+  tip.textContent=msg; tip.className='rd-tip';
+  renderReading();
+}
+function delBook(title){ if(!G)return; G.books=G.books.filter(b=>b.title!==title); persist(); renderReading(); }
+function renderReading(){
+  if(!G)return;
+  document.getElementById('rd-count').textContent='已读 '+G.books.length+' 本 · 再读 '+((5-G.books.length%5)%5||5)+' 本可得属性奖励';
+  const box=document.getElementById('rd-list');
+  box.innerHTML=G.books.length? [...G.books].reverse().map(b=>
+    `<div class="rd-item"><div class="rd-bk">📖 ${b.title}</div>${b.sentence?`<div class="rd-sen">「${b.sentence}」</div>`:''}<span class="rd-del" onclick="delBook('${b.title.replace(/'/g,"\\'")}')">删除</span></div>`).join('')
+    : '<div class="wb-empty">还没有读书记录。读完一本书，记下书名和最喜欢的一句话吧！</div>';
+}
+
 /* ══════ 成长报告 ══════ */
 function openReport(){
   const s=currentStudent(); if(!s){ location.href='index.html'; return; }
@@ -1811,7 +1880,8 @@ function openReport(){
   document.getElementById('rp-title').textContent='📊 '+s.name+' 的成长报告';
   document.getElementById('rp-sub').textContent='加入于 '+new Date(s.created).toLocaleDateString()+' · 活跃 '+((st.days||[]).length)+' 天';
   const cards=[['✍️',st.essays||0,'写作篇数'],['📝',st.words||0,'累计字数'],['🤖',aiAvg||'—','AI精批均分'],
-    ['⚔️',winRate+'%','竞技胜率'],['📚',quizAcc+'%','答题正确率'],['📖',st.wbAdded||0,'积累词句']];
+    ['⚔️',winRate+'%','竞技胜率'],['📚',quizAcc+'%','答题正确率'],['📖',st.wbAdded||0,'积累词句'],
+    ['📚',st.booksRead||0,'读书本数']];
   document.getElementById('rp-grid').innerHTML=cards.map(([i,n,l])=>`<div class="rp-stat"><div class="rp-num">${i} ${n}</div><div class="rp-lab">${l}</div></div>`).join('');
   document.getElementById('rp-note').innerHTML='这份报告记录你在<b>本设备</b>的写作成长（中文 '+(st.trainCN||0)+' 次 · 英文 '+(st.trainEN||0)+' 次）。坚持写作，让怪兽越来越强！';
   document.getElementById('report-ov').classList.add('active');
@@ -2229,13 +2299,16 @@ function makeVocabQ(){
       .filter(w=>w!==correct&&w!==p[0]);
     const options=shuffleArr([correct,...pool.slice(0,3)]);
     return {type:isSyn?'近义词':'反义词', color:isSyn?'var(--teal)':'var(--violet2)',
-      q:`「${p[0]}」的${isSyn?'近义词':'反义词'}是？`, options, answer:options.indexOf(correct)};
+      q:`「${p[0]}」的${isSyn?'近义词':'反义词'}是？`, options, answer:options.indexOf(correct),
+      explain:isSyn?`「${p[0]}」和「${correct}」意思相近，是一对近义词；其他几个词意思不一样。`
+                   :`「${p[0]}」的反义词是「${correct}」，两个词意思正好相反。`};
   }
   if(roll<0.56){ // 古诗词接句
     const p=POEM[Math.floor(Math.random()*POEM.length)];
     const pool=shuffleArr(POEM.filter(x=>x!==p).map(x=>x[1]).filter(s=>Math.abs(s.length-p[1].length)<=2));
     const options=shuffleArr([p[1],...pool.slice(0,3)]);
-    return {type:'古诗词', color:'var(--violet2)', q:`「${p[0]}」的下一句是？`, options, answer:options.indexOf(p[1])};
+    return {type:'古诗词', color:'var(--violet2)', q:`「${p[0]}」的下一句是？`, options, answer:options.indexOf(p[1]),
+      explain:`完整诗句是「${p[0]}，${p[1]}」，要记住上下句是连在一起的。`};
   }
   if(roll<0.78){ // 成语补字
     const idiom=IDIOMS[Math.floor(Math.random()*IDIOMS.length)];
@@ -2243,11 +2316,13 @@ function makeVocabQ(){
     const pool=shuffleArr(IDIOMS.filter(x=>x!==idiom).map(x=>x[3]))
       .filter((ch,i,arr)=>ch!==answerChar&&arr.indexOf(ch)===i);
     const options=shuffleArr([answerChar,...pool.slice(0,3)]);
-    return {type:'成语', color:'var(--coral-deep)', q:`补全成语：「${idiom.slice(0,3)}□」`, options, answer:options.indexOf(answerChar)};
+    return {type:'成语', color:'var(--coral-deep)', q:`补全成语：「${idiom.slice(0,3)}□」`, options, answer:options.indexOf(answerChar),
+      explain:`正确的成语是「${idiom}」，最后一个字是「${answerChar}」。`};
   }
   const v=VIVID[Math.floor(Math.random()*VIVID.length)];
   const options=shuffleArr([v.good,v.bad]);
-  return {type:'生动表达', color:'var(--coral)', q:'哪个说法更生动？', options, answer:options.indexOf(v.good)};
+  return {type:'生动表达', color:'var(--coral)', q:'哪个说法更生动？', options, answer:options.indexOf(v.good),
+    explain:`「${v.good}」更生动——它写出了具体的样子和动作，让人能想象出画面；而「${v.bad}」只是直接说结论，比较平淡。`};
 }
 let vq=null;
 function askVocab(ids,onDone){
@@ -2256,6 +2331,8 @@ function askVocab(ids,onDone){
   const typeEl=document.getElementById(ids.type);
   typeEl.textContent=g.type; typeEl.style.setProperty('--vt',g.color);
   document.getElementById(ids.q).textContent=g.q;
+  const ex=document.getElementById(ids.card==='vocab-arena'?'va-explain':'vp-explain');
+  if(ex){ ex.style.display='none'; ex.innerHTML=''; }
   const box=document.getElementById(ids.opts); box.innerHTML='';
   g.options.forEach((o,i)=>{
     const b=document.createElement('button'); b.className='opt';
@@ -2263,7 +2340,7 @@ function askVocab(ids,onDone){
     b.onclick=()=>answerVocab(i,b); box.appendChild(b);
   });
   document.getElementById(ids.card).style.display='block';
-  vq.timer=setTimeout(()=>{ if(vq&&!vq.answered)answerVocab(-1,null); },12000);
+  vq.timer=setTimeout(()=>{ if(vq&&!vq.answered)answerVocab(-1,null); },15000);
 }
 function answerVocab(i,btn){
   if(!vq||vq.answered)return;
@@ -2274,8 +2351,15 @@ function answerVocab(i,btn){
   btns.forEach(b=>b.disabled=true);
   if(btn) btn.classList.add(correct?'correct':'wrong');
   if(!correct&&btns[g.answer]) btns[g.answer].classList.add('correct');
+  // 答错时告诉他为什么错、正确答案是什么，多停一会儿让他看清
   const cardId=vq.ids.card, done=vq.done;
-  setTimeout(()=>{ document.getElementById(cardId).style.display='none'; done(correct,fast&&correct); }, correct?600:1600);
+  const ex=document.getElementById(cardId==='vocab-arena'?'va-explain':'vp-explain');
+  if(!correct && ex){
+    ex.innerHTML=`<b>✗ 答错了</b>　正确答案：<b>${'ABCD'[g.answer]}. ${g.options[g.answer]}</b>`+
+      (g.explain?`<br><span class="why">💡 ${g.explain}</span>`:'');
+    ex.style.display='block';
+  }
+  setTimeout(()=>{ document.getElementById(cardId).style.display='none'; if(ex){ex.style.display='none';} done(correct,fast&&correct); }, correct?600:3200);
 }
 
 /* ══════ PVP 同桌对战（词汇PK / 写作PK） ══════ */

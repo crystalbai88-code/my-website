@@ -374,6 +374,15 @@ header {
 .wb-chip .x{ cursor:pointer; color:var(--ink-soft); font-weight:900; }
 .wb-chip .x:hover{ color:var(--coral-deep); }
 .wb-empty{ font-size:.85rem; color:var(--ink-soft); padding:20px; text-align:center; }
+.rd-add{ display:flex; flex-direction:column; gap:8px; margin-bottom:10px; }
+.rd-tip{ font-size:.82rem; font-weight:700; color:var(--teal-deep); min-height:20px; margin-bottom:6px; line-height:1.6; }
+.rd-tip.err{ color:var(--coral-deep); }
+.rd-list{ display:flex; flex-direction:column; gap:8px; max-height:44vh; overflow-y:auto; }
+.rd-item{ position:relative; background:var(--cream); border:1.5px solid var(--cream-deep); border-radius:14px; padding:11px 44px 11px 14px; }
+.rd-bk{ font-size:.92rem; font-weight:800; color:var(--ink); }
+.rd-sen{ font-size:.82rem; color:var(--teal-deep); margin-top:3px; line-height:1.6; }
+.rd-del{ position:absolute; top:10px; right:12px; font-size:.72rem; color:var(--ink-soft); cursor:pointer; }
+.rd-del:hover{ color:var(--coral-deep); }
 .wb-strip { background:#fff7e6; border:1.5px dashed var(--gold); border-radius:12px; padding:8px 12px; margin-bottom:10px; font-size:.8rem; line-height:1.9; }
 .wb-strip b { color:var(--gold-deep); }
 .wb-strip .w { display:inline-block; background:#fff; border:1px solid var(--gold); border-radius:999px; padding:1px 9px; margin:2px 3px; color:var(--ink); }
@@ -623,6 +632,9 @@ header {
 .opt.correct{ border-color:var(--green); background:#e3f7ee; color:var(--teal-deep); font-weight:800; }
 .opt.wrong{ border-color:var(--coral); background:#ffe7e2; color:var(--coral-deep); }
 .opt:disabled{ cursor:default; }
+.v-explain{ margin-top:12px; background:#fff7e6; border:1.5px solid var(--gold); border-radius:14px; padding:11px 15px; font-size:.9rem; line-height:1.7; color:var(--ink); animation:modalIn .2s ease-out; }
+.v-explain b{ color:var(--coral-deep); }
+.v-explain .why{ color:var(--gold-deep); font-weight:700; }
 .qfb { margin-top:12px; font-size:.82rem; line-height:1.7; min-height:22px; color:var(--ink-soft); }
 .qfb b { color:var(--green); } .qfb.bad b { color:var(--coral-deep); }
 .q-player { display:flex; align-items:center; gap:12px; width:min(720px,96vw); margin-top:14px; }
@@ -693,6 +705,7 @@ header {
         <button class="codex-btn" onclick="openCodex()">📕 Monster Codex</button>
         <button class="codex-btn" onclick="openEssays()">📄 My Writing Book (<span id="essay-count">0</span>)</button>
         <button class="codex-btn" onclick="openWordBank()">📖 Word Bank (<span id="wb-hub-count">0</span>)</button>
+        <button class="codex-btn" onclick="openReading()">📚 Reading Log (<span id="rd-hub-count">0</span>)</button>
         <button class="codex-btn" onclick="openReport()">📊 My progress</button>
       </div>
     </div>
@@ -880,6 +893,22 @@ header {
   </div>
 </div>
 
+<!-- ═══ READING LOG ═══ -->
+<div class="overlay" id="reading-ov">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">📚 Reading Log</div><div class="close-x" onclick="closeReading()">✕</div></div>
+    <div class="modal-sub">The more you read, the stronger your monster! Log a book you've read + one favourite line to earn <b>coins</b> (spend them in the Shop). The line is saved to your <b>Word Bank</b> too. Read → collect → write.</div>
+    <div class="rd-add">
+      <input class="tf-in" id="rd-title" placeholder="Book title (e.g. Charlotte's Web)" maxlength="40">
+      <input class="tf-in" id="rd-sentence" placeholder="Your favourite line from it (saved to Word Bank)" maxlength="80">
+      <button class="tf-btn ai" onclick="addBook()">📖 Log it +10🪙</button>
+    </div>
+    <div class="rd-tip" id="rd-tip"></div>
+    <div class="wb-count" id="rd-count"></div>
+    <div class="rd-list" id="rd-list"></div>
+  </div>
+</div>
+
 <!-- ═══ PROGRESS REPORT ═══ -->
 <div class="overlay" id="report-ov">
   <div class="modal">
@@ -1004,6 +1033,7 @@ header {
     <span class="v-type" id="vp-type">Synonym</span><span class="v-timer" id="vp-timer">⚡ Answer within 4s = critical hit</span>
     <div class="qtext" id="vp-q"></div>
     <div class="opts" id="vp-opts"></div>
+    <div class="v-explain" id="vp-explain" style="display:none"></div>
   </div>
   <div class="qcard vocab-card" id="write-pk">
     <span class="v-type" style="--vt:var(--teal)" id="wpk-turn">Left player’s turn</span>
@@ -1060,6 +1090,7 @@ header {
     <span class="v-type" id="va-type">Synonym</span><span class="v-timer" id="va-timer">⚡ Answer within 4s = critical hit</span>
     <div class="qtext" id="va-q"></div>
     <div class="opts" id="va-opts"></div>
+    <div class="v-explain" id="va-explain" style="display:none"></div>
   </div>
   <div class="result" id="battle-result">
     <div class="rt" id="br-title"></div>
@@ -1292,12 +1323,12 @@ function newGame(starter) {
     starter: starter.f, name: starter.n,
     atk:base.atk, spd:base.spd, def:base.def,
     wp:0, wpGenre:{story:0,expo:0,argu:0}, gold:0, atkLvl:0, hpLvl:0, level:1,
-    score:0, wins:0, losses:0, records:[], usedTexts:[], defeated:{}, themeBest:{}, essays:[], wordBank:[],
+    score:0, wins:0, losses:0, records:[], usedTexts:[], defeated:{}, themeBest:{}, essays:[], wordBank:[], books:[],
   };
   persist();
 }
 function persist(){ try{localStorage.setItem(KEY,JSON.stringify(G));}catch(e){} }
-function restore(){ try{const r=localStorage.getItem(KEY); if(r){G=JSON.parse(r); if(!G.wpGenre)G.wpGenre={story:0,expo:0,argu:0}; if(!G.essays)G.essays=[]; if(!G.wordBank)G.wordBank=[]; return true;}}catch(e){} return false; }
+function restore(){ try{const r=localStorage.getItem(KEY); if(r){G=JSON.parse(r); if(!G.wpGenre)G.wpGenre={story:0,expo:0,argu:0}; if(!G.essays)G.essays=[]; if(!G.wordBank)G.wordBank=[]; if(!G.books)G.books=[]; return true;}}catch(e){} return false; }
 function resetGame(){ if(!confirm('Clear your save and start over?'))return; localStorage.removeItem(KEY); G=null; showScreen('screen-start'); }
 
 /* derived */
@@ -1392,6 +1423,7 @@ function renderHub(){
   document.getElementById('theme-hint').textContent = tc ? `📖 ${tc} quest${tc>1?'s':''} available` : 'No quests yet';
   document.getElementById('essay-count').textContent = (G.essays||[]).length;
   document.getElementById('wb-hub-count').textContent = (G.wordBank||[]).length;
+  document.getElementById('rd-hub-count').textContent = (G.books||[]).length;
 
   // collected problems
   const cg = document.getElementById('collected-grid');
@@ -1793,6 +1825,41 @@ function saveManualTheme(){
 function openWordBank(){ renderWordBank(); document.getElementById('wordbank-ov').classList.add('active'); }
 function closeWordBank(){ document.getElementById('wordbank-ov').classList.remove('active'); }
 
+/* ══════ Reading Log: read more → coins to upgrade + lines into Word Bank ══════ */
+function openReading(){ document.getElementById('rd-tip').textContent=''; renderReading(); document.getElementById('reading-ov').classList.add('active'); }
+function closeReading(){ document.getElementById('reading-ov').classList.remove('active'); if(G)renderHub(); }
+function addBook(){
+  if(!G)return;
+  const title=document.getElementById('rd-title').value.trim();
+  const sentence=document.getElementById('rd-sentence').value.trim();
+  const tip=document.getElementById('rd-tip');
+  if(!title){ tip.textContent='Enter a book title first'; tip.className='rd-tip err'; return; }
+  if(G.books.some(b=>b.title===title)){ tip.textContent='You already logged this book — try another!'; tip.className='rd-tip err'; return; }
+  G.books.push({title,sentence,date:Date.now()});
+  G.gold+=10;
+  let msg=`📚 Logged “${title}”, +10🪙!`;
+  if(sentence){ if(!G.wordBank.some(w=>w.text===sentence)){ G.wordBank.push({text:sentence,from:'Reading'}); } msg+=' Line saved to your Word Bank.'; }
+  if(G.books.length%5===0){
+    const gen=GENRES[currentGenre]; const stat=gen?gen.stat:'def';
+    if(stat==='atk')G.atk+=2; else if(stat==='spd')G.spd+=2; else G.def+=2;
+    msg+=` 🎉 ${G.books.length} books read — monster +2 ${gen?gen.statName:'Stamina'}!`;
+  }
+  bumpStat(s=>{ s.booksRead=(s.booksRead||0)+1; });
+  persist();
+  document.getElementById('rd-title').value=''; document.getElementById('rd-sentence').value='';
+  tip.textContent=msg; tip.className='rd-tip';
+  renderReading();
+}
+function delBook(title){ if(!G)return; G.books=G.books.filter(b=>b.title!==title); persist(); renderReading(); }
+function renderReading(){
+  if(!G)return;
+  document.getElementById('rd-count').textContent=`${G.books.length} books read · ${((5-G.books.length%5)%5||5)} more for a stat bonus`;
+  const box=document.getElementById('rd-list');
+  box.innerHTML=G.books.length? [...G.books].reverse().map(b=>
+    `<div class="rd-item"><div class="rd-bk">📖 ${b.title}</div>${b.sentence?`<div class="rd-sen">“${b.sentence}”</div>`:''}<span class="rd-del" onclick="delBook('${b.title.replace(/'/g,"\\'")}')">delete</span></div>`).join('')
+    : '<div class="wb-empty">No books yet. Finish a book, then log its title and your favourite line!</div>';
+}
+
 /* ══════ Progress report ══════ */
 function openReport(){
   const s=currentStudent(); if(!s){ location.href='index.html'; return; }
@@ -1803,6 +1870,7 @@ function openReport(){
   document.getElementById('rp-title').textContent='📊 '+s.name+"'s progress";
   document.getElementById('rp-sub').textContent='Joined '+new Date(s.created).toLocaleDateString()+' · active '+((st.days||[]).length)+' day(s)';
   const cards=[['✍️',st.essays||0,'pieces written'],['📝',st.words||0,'total words'],['🤖',aiAvg||'—','avg AI score'],
+    ['📚',st.booksRead||0,'books read'],
     ['⚔️',winRate+'%','arena win rate'],['📚',quizAcc+'%','quiz accuracy'],['📖',st.wbAdded||0,'words saved']];
   document.getElementById('rp-grid').innerHTML=cards.map(([i,n,l])=>`<div class="rp-stat"><div class="rp-num">${i} ${n}</div><div class="rp-lab">${l}</div></div>`).join('');
   document.getElementById('rp-note').innerHTML='This report tracks your writing growth on <b>this device</b> (Chinese '+(st.trainCN||0)+' · English '+(st.trainEN||0)+' pieces). Keep writing to make your monster stronger!';
@@ -2240,22 +2308,26 @@ function makeVocabQ(){
     const options=shuffleArr([correct,...pool.slice(0,3)]);
     return {type:isSyn?'Academic synonym':'Antonym', color:isSyn?'var(--teal)':'var(--violet2)',
       q:isSyn?`A more academic word for “${p[0]}” is?`:`The opposite of “${p[0]}” is?`,
-      options, answer:options.indexOf(correct)};
+      options, answer:options.indexOf(correct),
+      explain:isSyn?`“${p[0]}” and “${correct}” have a similar meaning — “${correct}” just sounds more academic.`:`The opposite of “${p[0]}” is “${correct}” — they mean opposite things.`};
   }
   if(roll<0.52){  // literary device ID
     const d=DEVICE[Math.floor(Math.random()*DEVICE.length)];
     const pool=shuffleArr(DEVICE_NAMES.filter(n=>n!==d.dev));
     const options=shuffleArr([d.dev,...pool.slice(0,3)]);
-    return {type:'Literary device', color:'var(--violet2)', q:`Which device? “${d.line}”`, options, answer:options.indexOf(d.dev)};
+    return {type:'Literary device', color:'var(--violet2)', q:`Which device? “${d.line}”`, options, answer:options.indexOf(d.dev),
+      explain:`This line is ${['a','e','i','o','u'].includes(d.dev[0].toLowerCase())?'an':'a'} ${d.dev.toLowerCase()}.`};
   }
   if(roll<0.76){  // collocation
     const c=COLLOC[Math.floor(Math.random()*COLLOC.length)];
     const options=shuffleArr([c.correct,...c.wrong]);
-    return {type:'Collocation', color:'var(--coral-deep)', q:`Which word fits? “${c.stem}”`, options, answer:options.indexOf(c.correct)};
+    return {type:'Collocation', color:'var(--coral-deep)', q:`Which word fits? “${c.stem}”`, options, answer:options.indexOf(c.correct),
+      explain:`The natural collocation is “${c.stem.replace('____',c.correct)}”. English pairs certain words together — you learn these by reading.`};
   }
   const v=VIVID[Math.floor(Math.random()*VIVID.length)];  // show, don't tell
   const options=shuffleArr([v.good,v.bad]);
-  return {type:'Show, don’t tell', color:'var(--coral)', q:'Which sentence is more vivid?', options, answer:options.indexOf(v.good)};
+  return {type:'Show, don’t tell', color:'var(--coral)', q:'Which sentence is more vivid?', options, answer:options.indexOf(v.good),
+    explain:`“${v.good}” is more vivid — it shows a picture through concrete detail, while “${v.bad}” just tells you flatly.`};
 }
 let vq=null;
 function askVocab(ids,onDone){
@@ -2264,6 +2336,8 @@ function askVocab(ids,onDone){
   const typeEl=document.getElementById(ids.type);
   typeEl.textContent=g.type; typeEl.style.setProperty('--vt',g.color);
   document.getElementById(ids.q).textContent=g.q;
+  const ex0=document.getElementById(ids.card==='vocab-arena'?'va-explain':'vp-explain');
+  if(ex0){ ex0.style.display='none'; ex0.innerHTML=''; }
   const box=document.getElementById(ids.opts); box.innerHTML='';
   g.options.forEach((o,i)=>{
     const b=document.createElement('button'); b.className='opt';
@@ -2271,7 +2345,7 @@ function askVocab(ids,onDone){
     b.onclick=()=>answerVocab(i,b); box.appendChild(b);
   });
   document.getElementById(ids.card).style.display='block';
-  vq.timer=setTimeout(()=>{ if(vq&&!vq.answered)answerVocab(-1,null); },12000);
+  vq.timer=setTimeout(()=>{ if(vq&&!vq.answered)answerVocab(-1,null); },15000);
 }
 function answerVocab(i,btn){
   if(!vq||vq.answered)return;
@@ -2283,7 +2357,12 @@ function answerVocab(i,btn){
   if(btn) btn.classList.add(correct?'correct':'wrong');
   if(!correct&&btns[g.answer]) btns[g.answer].classList.add('correct');
   const cardId=vq.ids.card, done=vq.done;
-  setTimeout(()=>{ document.getElementById(cardId).style.display='none'; done(correct,fast&&correct); }, correct?600:1600);
+  const ex=document.getElementById(cardId==='vocab-arena'?'va-explain':'vp-explain');
+  if(!correct && ex){
+    ex.innerHTML=`<b>✗ Not quite</b>　Correct answer: <b>${'ABCD'[g.answer]}. ${g.options[g.answer]}</b>`+(g.explain?`<br><span class="why">💡 ${g.explain}</span>`:'');
+    ex.style.display='block';
+  }
+  setTimeout(()=>{ document.getElementById(cardId).style.display='none'; if(ex){ex.style.display='none';} done(correct,fast&&correct); }, correct?600:3200);
 }
 
 /* ══════ PVP 同桌对战（词汇PK / 写作PK） ══════ */
