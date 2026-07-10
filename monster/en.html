@@ -154,6 +154,16 @@ header {
   background:#fff;
 }
 .teacher-link:hover { background:#f4efff; }
+/* ── 手机端更紧凑的头部，省出屏幕空间 ── */
+@media (max-width:640px){
+  header{ padding:8px 12px; gap:6px; }
+  .logo-emoji{ font-size:1.2rem; } .logo-text{ font-size:1rem; letter-spacing:0; }
+  .stu-chip{ margin-left:6px; font-size:.7rem; padding:2px 9px; }
+  .hdr-badges{ gap:6px; width:100%; }
+  .pill{ padding:3px 9px; min-width:auto; border-radius:11px; gap:0; white-space:nowrap; }
+  .pill .k{ font-size:.55rem; white-space:nowrap; } .pill .v{ font-size:.82rem; white-space:nowrap; }
+  .teacher-link{ font-size:.68rem; padding:4px 9px; border-width:1.5px; border-radius:11px; }
+}
 
 /* ═══════ HUB ═══════ */
 .hub {
