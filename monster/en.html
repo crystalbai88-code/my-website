@@ -1157,9 +1157,13 @@ function imgTag(f) { return `${IMG}${f}.png`; }
 
 /* ══════ SCORING ENGINE — 按写作文体分轨 ══════ */
 // Length bonus scales with the word target the teacher sets (⅓ +1, ⅔ +1, target +2)
+/* student grade info (drives questions/marking level) */
+function gradeInfo(){ const s=currentStudent(); return { v:(s&&s.gradeV)||3, l:(s&&s.gradeL)||'Grade 3' }; }
+function gradeWordDefault(v){ return v<=2?40 : v<=4?80 : v<=6?130 : v===8?200 : 350; } // English counts words
 function wordGoal(){
   const v = parseInt(localStorage.getItem('ml_wordgoal_en'));
-  return (v >= 20 && v <= 800) ? v : 120;
+  if (v >= 20 && v <= 800) return v;
+  return gradeWordDefault(gradeInfo().v);
 }
 function lenCriteria(){
   const g = wordGoal();
@@ -1390,7 +1394,7 @@ function tierOf(s){ let t=TIERS[0]; for(const x of TIERS) if(s>=x.m) t=x; return
 const AURA_COLS = ['#ffe6b0','#cdefe6','#bfe4fb','#e6d6fb','#ffd9c0','#ffd6e0'];
 
 function renderHub(){
-  const stu=currentStudent(); if(stu){ document.getElementById('stu-chip').textContent='👤 '+stu.name; }
+  const stu=currentStudent(); if(stu){ document.getElementById('stu-chip').textContent='👤 '+stu.name+(stu.gradeL?' · '+stu.gradeL.replace(/.* /,''):''); }
   document.getElementById('hero-img').src = imgTag(G.starter);
   document.getElementById('hero-name').textContent = G.name;
   document.getElementById('hero-power').textContent = 'Power '+playerPower();
@@ -1643,9 +1647,14 @@ async function aiGrade(){
   if(!key){ showToast('AI features are not ready yet (no key preset)'); return; }
   const gb=document.getElementById('ai-grade-btn'); gb.disabled=true; gb.textContent='🤖 AI is marking your writing…';
   const gen=GENRES[lastTrain.genre];
+  const gr=gradeInfo();
+  const ageNote = gr.v<=2 ? 'This is a young learner — mostly praise, one very simple next step, easy words.'
+                : gr.v<=4 ? 'This is a lower-primary student — praise, then give concrete "change this word / add this" advice.'
+                : gr.v<=6 ? 'This is an upper-primary student — expect richer detail, structure and a little figurative language.'
+                : 'This is a secondary / IB / A-Level student — mark to a high standard: argument, structure and language depth; suggestions should be specific and challenging.';
   try{
-    const raw=await dsChat(key,'You are an encouraging IB/A-Level English teacher. Output JSON only, no other text.',
-      `Mark this ${gen.label} paragraph by an IB/A-Level student. 1) give a score 0-100; 2) name ONE genuine strength; 3) give 2-3 specific, actionable suggestions (say what to change and how); 4) suggest 2 upgrade words or phrases that would raise the register. Be warm and encouraging. Strict JSON:\n{"score":85,"praise":"one strength","suggestions":["tip1","tip2","tip3"],"upgrades":["phrase1","phrase2"]}\n\nWriting:\n${lastTrain.text.slice(0,1500)}`);
+    const raw=await dsChat(key,'You are an encouraging English teacher who adjusts standards to the student’s grade. Output JSON only, no other text.',
+      `Mark this ${gen.label} paragraph. Student level: ${gr.l}. ${ageNote}\n1) give a score 0-100 judged AT THIS LEVEL (don't over-penalise a young writer, don't over-reward an older one); 2) name ONE genuine strength; 3) give 2-3 specific, level-appropriate suggestions; 4) suggest 2 upgrade words or phrases suited to this level. Be warm and encouraging. Strict JSON:\n{"score":85,"praise":"one strength","suggestions":["tip1","tip2","tip3"],"upgrades":["phrase1","phrase2"]}\n\nWriting:\n${lastTrain.text.slice(0,1500)}`);
     const d=JSON.parse(raw);
     const box=document.getElementById('ai-feedback');
     box.style.display='block';

@@ -1161,9 +1161,13 @@ function imgTag(f) { return `${IMG}${f}.png`; }
 
 /* ══════ SCORING ENGINE — 按写作文体分轨 ══════ */
 // 字数加分：按老师设定的字数目标折算三档（⅓ +1、⅔ +1、达标 +2）
+/* 学生年级信息（供出题/评分分档） */
+function gradeInfo(){ const s=currentStudent(); return { v:(s&&s.gradeV)||3, l:(s&&s.gradeL)||'三年级 G3' }; }
+function gradeWordDefault(v){ return v<=2?80 : v<=4?150 : v<=6?250 : v===8?400 : 600; } // 中文按字数
 function wordGoal(){
   const v = parseInt(localStorage.getItem('ml_wordgoal'));
-  return (v >= 30 && v <= 1000) ? v : 150;
+  if (v >= 30 && v <= 1000) return v;          // 老师设了就用老师的
+  return gradeWordDefault(gradeInfo().v);       // 否则按年级默认
 }
 function lenCriteria(){
   const g = wordGoal();
@@ -1396,7 +1400,7 @@ function tierOf(s){ let t=TIERS[0]; for(const x of TIERS) if(s>=x.m) t=x; return
 const AURA_COLS = ['#ffe6b0','#cdefe6','#bfe4fb','#e6d6fb','#ffd9c0','#ffd6e0'];
 
 function renderHub(){
-  const stu=currentStudent(); if(stu){ document.getElementById('stu-chip').textContent='👤 '+stu.name; }
+  const stu=currentStudent(); if(stu){ document.getElementById('stu-chip').textContent='👤 '+stu.name+(stu.gradeL?' · '+stu.gradeL.replace(/ .*/,''):''); }
   document.getElementById('hero-img').src = imgTag(G.starter);
   document.getElementById('hero-name').textContent = G.name;
   document.getElementById('hero-power').textContent = '战力 '+playerPower();
@@ -1650,9 +1654,14 @@ async function aiGrade(){
   if(!key){ showToast('AI 功能暂未就绪（未预置 Key）'); return; }
   const gb=document.getElementById('ai-grade-btn'); gb.disabled=true; gb.textContent='🤖 AI 正在精批你的作文……';
   const gen=GENRES[lastTrain.genre];
+  const gr=gradeInfo();
+  const ageNote = gr.v<=2 ? '这是低年级小朋友，请以表扬为主，只提一个最简单、马上能做到的小改进，用词浅显。'
+                : gr.v<=4 ? '这是中年级学生，肯定优点后，给具体到"改哪个词、加什么"的建议。'
+                : gr.v<=6 ? '这是高年级学生，可以要求更丰富的细节、条理和一点点修辞，建议要能真正提升。'
+                : '这是初高中学生，请按较高标准评：论证、结构、语言的深度都要点到，建议具体且有挑战性。';
   try{
-    const raw=await dsChat(key,'你是一位鼓励式的小学语文老师，只输出JSON，不要多余文字。',
-      `请精批下面这段【${gen.label}】小学生习作。要求：1)给一个0-100的分数；2)先肯定1个优点；3)给2-3条具体、可操作的提升建议（告诉他改哪里、怎么改）；4)推荐2个可以让文章更好的升级词或句式。语气亲切鼓励。严格JSON：\n{"score":85,"praise":"一句肯定","suggestions":["建议1","建议2","建议3"],"upgrades":["升级词1","升级词2"]}\n\n习作：\n${lastTrain.text.slice(0,1500)}`);
+    const raw=await dsChat(key,'你是一位鼓励式的语文老师，会根据学生年级调整标准，只输出JSON，不要多余文字。',
+      `请精批下面这段【${gen.label}】习作。学生年级：${gr.l}。${ageNote}\n要求：1)按【这个年级】的水平给一个0-100的分数（不要用超出年级的标准苛责，也不要放水）；2)先肯定1个优点；3)给2-3条适合该年级、具体可操作的提升建议；4)推荐2个适合该年级的升级词或句式。语气亲切鼓励。严格JSON：\n{"score":85,"praise":"一句肯定","suggestions":["建议1","建议2","建议3"],"upgrades":["升级词1","升级词2"]}\n\n习作：\n${lastTrain.text.slice(0,1500)}`);
     const d=JSON.parse(raw);
     const box=document.getElementById('ai-feedback');
     box.style.display='block';
