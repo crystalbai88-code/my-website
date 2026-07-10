@@ -383,6 +383,18 @@ header {
 .rd-sen{ font-size:.82rem; color:var(--teal-deep); margin-top:3px; line-height:1.6; }
 .rd-del{ position:absolute; top:10px; right:12px; font-size:.72rem; color:var(--ink-soft); cursor:pointer; }
 .rd-del:hover{ color:var(--coral-deep); }
+.rv-grade{ font-size:.82rem; color:var(--ink-soft); margin-bottom:12px; }
+.rv-grade b{ color:var(--teal-deep); }
+.rv-sec{ margin-bottom:14px; }
+.rv-h{ font-size:.98rem; font-weight:900; color:var(--ink); margin-bottom:8px; }
+.rv-h b{ color:var(--coral-deep); }
+.rv-chips{ display:flex; flex-wrap:wrap; gap:7px; }
+.rv-chip{ font-size:.82rem; font-weight:800; padding:5px 12px; border-radius:999px; }
+.rv-chip.good{ background:#e3f7ee; border:1.5px solid var(--teal); color:var(--teal-deep); }
+.rv-target{ background:#fff7e6; border:1.5px solid var(--gold); border-radius:16px; padding:16px; }
+.rv-ev{ font-size:.9rem; color:var(--ink); line-height:1.7; }
+.rv-tip{ font-size:.9rem; color:var(--gold-deep); font-weight:700; line-height:1.7; margin-top:6px; }
+.rv-pre{ font-size:.78rem; color:var(--ink-soft); margin-top:6px; }
 .wb-strip { background:#fff7e6; border:1.5px dashed var(--gold); border-radius:12px; padding:8px 12px; margin-bottom:10px; font-size:.8rem; line-height:1.9; }
 .wb-strip b { color:var(--gold-deep); }
 .wb-strip .w { display:inline-block; background:#fff; border:1px solid var(--gold); border-radius:999px; padding:1px 9px; margin:2px 3px; color:var(--ink); }
@@ -706,6 +718,7 @@ header {
         <button class="codex-btn" onclick="openEssays()">📄 My Writing Book (<span id="essay-count">0</span>)</button>
         <button class="codex-btn" onclick="openWordBank()">📖 Word Bank (<span id="wb-hub-count">0</span>)</button>
         <button class="codex-btn" onclick="openReading()">📚 Reading Log (<span id="rd-hub-count">0</span>)</button>
+        <button class="codex-btn" onclick="openReview()">📈 Writing Review</button>
         <button class="codex-btn" onclick="openReport()">📊 My progress</button>
       </div>
     </div>
@@ -890,6 +903,15 @@ header {
     </div>
     <div class="wb-count" id="wb-count"></div>
     <div class="wb-list" id="wb-list"></div>
+  </div>
+</div>
+
+<!-- ═══ WRITING REVIEW ═══ -->
+<div class="overlay" id="review-ov">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">📈 Writing Review</div><div class="close-x" onclick="closeReview()">✕</div></div>
+    <div class="modal-sub">See how your recent writing is going — <b>what you've nailed and the one skill to work on next</b>. One focus at a time is the fastest way to improve.</div>
+    <div id="rv-body"></div>
   </div>
 </div>
 
@@ -1245,6 +1267,37 @@ const GENRES = {
   },
 };
 let currentGenre = 'argu';
+
+/* ══════ Writing-skill map (review backbone; keys align with scoring dims + grade/prereq/next-step) ══════ */
+const SKILLS=[
+  // Descriptive
+  {key:'verb',   genre:'story', name:'Vivid verbs',      gradeMin:2, prereq:[], evidence:'use strong action verbs (not just "went/was")', tip:'swap a plain verb for a vivid one, e.g. "darted", "lunged"'},
+  {key:'scene',  genre:'story', name:'Setting',          gradeMin:2, prereq:[], evidence:'say where/when it happens', tip:'add a line of place or weather, e.g. "on a stormy night"'},
+  {key:'sense',  genre:'story', name:'Sensory detail',   gradeMin:3, prereq:['verb'], evidence:'use sight/sound/smell/touch', tip:'add "it heard…" or "the air smelled of…"'},
+  {key:'emotion',genre:'story', name:'Emotion',          gradeMin:3, prereq:['verb'], evidence:'show how the character feels', tip:'add a feeling, e.g. "its heart pounded"'},
+  {key:'talk',   genre:'story', name:'Dialogue',         gradeMin:4, prereq:['verb'], evidence:'a character speaks (in quotes)', tip:'give a character one line in quotation marks'},
+  {key:'simile', genre:'story', name:'Simile',           gradeMin:4, prereq:['sense'], evidence:'compare with "like / as if"', tip:'add "like a…" to a description'},
+  {key:'device', genre:'story', name:'Literary device',  gradeMin:5, prereq:['simile'], evidence:'metaphor / personification', tip:'let the wind "whisper" or the night "hold its breath"'},
+  // Analytical
+  {key:'define', genre:'expo', name:'Definition',        gradeMin:4, prereq:[], evidence:'open by saying what it is', tip:'start with "X is a…"'},
+  {key:'seq',    genre:'expo', name:'Sequencing',        gradeMin:4, prereq:[], evidence:'use First/Next/Finally', tip:'add "Firstly… Secondly…"'},
+  {key:'explain',genre:'expo', name:'Explanation',       gradeMin:5, prereq:['define'], evidence:'explain with "this means / which shows"', tip:'add "This means that…"'},
+  {key:'example',genre:'expo', name:'Example',           gradeMin:5, prereq:['define'], evidence:'give an example (for instance/such as)', tip:'add "For example, …"'},
+  {key:'compare',genre:'expo', name:'Comparison',        gradeMin:6, prereq:['explain'], evidence:'compare/contrast', tip:'add "Compared to…, it is…"'},
+  {key:'data',   genre:'expo', name:'Data / facts',      gradeMin:6, prereq:['explain'], evidence:'use numbers/measurements', tip:'add a figure, e.g. "about 1.2 m"'},
+  {key:'cause',  genre:'expo', name:'Cause & effect',    gradeMin:8, prereq:['compare'], evidence:'link cause and effect', tip:'add "because… as a result…"'},
+  {key:'sum',    genre:'expo', name:'Summary',           gradeMin:8, prereq:['seq'], evidence:'sum up at the end', tip:'close with "In summary,…"'},
+  // Argumentative
+  {key:'thesis', genre:'argu', name:'Thesis / claim',    gradeMin:5, prereq:[], evidence:'state a clear position', tip:'open with "This essay argues that…"'},
+  {key:'reason', genre:'argu', name:'Reasoning',         gradeMin:5, prereq:[], evidence:'give a reason (because/since)', tip:'add "This is because…"'},
+  {key:'evidence',genre:'argu',name:'Evidence',          gradeMin:6, prereq:['thesis'], evidence:'support with example/research', tip:'add "For example, research suggests…"'},
+  {key:'connect',genre:'argu', name:'Connectives',       gradeMin:6, prereq:['reason'], evidence:'link ideas (however/therefore)', tip:'join sentences with "However, … Therefore, …"'},
+  {key:'concl',  genre:'argu', name:'Conclusion',        gradeMin:8, prereq:['thesis'], evidence:'end with a conclusion', tip:'close with "In conclusion,…"'},
+  {key:'counter',genre:'argu', name:'Counter-argument',  gradeMin:8, prereq:['evidence'], evidence:'address the other side', tip:'add "Although some argue…, "'},
+  {key:'acad',   genre:'argu', name:'Academic vocabulary',gradeMin:11,prereq:['connect'], evidence:'use precise academic words', tip:'swap "big/important" for "significant/substantial"'},
+  {key:'hedge',  genre:'argu', name:'Hedging',           gradeMin:11,prereq:['counter'], evidence:'qualify claims (may/might/arguably)', tip:'soften a claim with "may / arguably"'},
+];
+const SKILL_KEYS=new Set(SKILLS.map(s=>s.key));
 
 function writingTopic(){ return (localStorage.getItem('ml_writing_topic_en')||'').trim(); }
 
@@ -1867,6 +1920,53 @@ function renderReading(){
   box.innerHTML=G.books.length? [...G.books].reverse().map(b=>
     `<div class="rd-item"><div class="rd-bk">📖 ${b.title}</div>${b.sentence?`<div class="rd-sen">“${b.sentence}”</div>`:''}<span class="rd-del" onclick="delBook('${b.title.replace(/'/g,"\\'")}')">delete</span></div>`).join('')
     : '<div class="wb-empty">No books yet. Finish a book, then log its title and your favourite line!</div>';
+}
+
+/* ══════ Writing Review (uses the skill map + grade; one focus at a time) ══════ */
+function computeReview(){
+  const gr=(typeof gradeInfo==='function')?gradeInfo():{v:3,l:'Grade 3'};
+  const recent=(G.essays||[]).slice(-8);
+  if(recent.length<2) return {enough:false, count:recent.length, grade:gr};
+  const tally={};
+  for(const e of recent){
+    const {results}=scoreDesc(e.text, e.genre);
+    for(const r of results){ if(!SKILL_KEYS.has(r.key))continue; const t=tally[r.key]||(tally[r.key]={hit:0,total:0}); t.total++; if(r.on)t.hit++; }
+  }
+  const mastered=k=> tally[k]&&tally[k].total>=2&&tally[k].hit/tally[k].total>=0.6;
+  const practiced=k=> tally[k]&&tally[k].total>=1;
+  const missCount=k=> tally[k]?tally[k].total-tally[k].hit:0;
+  const inGrade=SKILLS.filter(s=>s.gradeMin<=gr.v);
+  const strengths=inGrade.filter(s=>mastered(s.key));
+  const ready=inGrade.filter(s=> practiced(s.key) && !mastered(s.key) && (s.prereq||[]).every(p=>mastered(p)) );
+  const fallback=inGrade.filter(s=> practiced(s.key) && !mastered(s.key) );
+  const pool=ready.length?ready:fallback;
+  pool.sort((a,b)=> a.gradeMin-b.gradeMin || missCount(b.key)-missCount(a.key));
+  return {enough:true, count:recent.length, grade:gr, strengths, target:pool[0]||null, tally};
+}
+function openReview(){ renderReview(); document.getElementById('review-ov').classList.add('active'); }
+function closeReview(){ document.getElementById('review-ov').classList.remove('active'); }
+function renderReview(){
+  if(!G)return;
+  const box=document.getElementById('rv-body');
+  const r=computeReview();
+  if(!r.enough){ box.innerHTML=`<div class="wb-empty">Write ${2-r.count}+ more piece(s) in Training so the review can see your progress and gaps.</div>`; return; }
+  const low=r.grade.v<=3;
+  let html=`<div class="rv-grade">📅 Judged at <b>${r.grade.l}</b> · your last ${r.count} pieces</div>`;
+  if(r.strengths.length){
+    html+=`<div class="rv-sec"><div class="rv-h">✅ You've nailed</div><div class="rv-chips">`+
+      r.strengths.slice(0,5).map(s=>`<span class="rv-chip good">${s.name}</span>`).join('')+`</div></div>`;
+  }
+  if(r.target){
+    const t=r.target;
+    html+=`<div class="rv-sec rv-target"><div class="rv-h">🎯 Next focus: <b>${t.name}</b></div>`+
+      `<div class="rv-ev">${low?'Aim for: ':'Mastery: '}${t.evidence}</div>`+
+      `<div class="rv-tip">💡 Try: ${t.tip}</div>`+
+      (t.prereq&&t.prereq.length?`<div class="rv-pre">(You've got its basics — perfect time to practise this.)</div>`:'')+
+      `<button class="big-btn btn-teal" style="margin-top:12px" onclick="closeReview();openTraining()">✍️ Practise it now</button></div>`;
+  } else {
+    html+=`<div class="rv-sec rv-target"><div class="rv-h">🌟 Brilliant!</div><div class="rv-ev">You're handling the writing skills for your level well — keep it up, or try a higher genre (Analytical / Argumentative)!</div></div>`;
+  }
+  box.innerHTML=html;
 }
 
 /* ══════ Progress report ══════ */

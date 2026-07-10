@@ -504,6 +504,19 @@ header {
 .rd-sen{ font-size:.82rem; color:var(--teal-deep); margin-top:3px; line-height:1.6; }
 .rd-del{ position:absolute; top:10px; right:12px; font-size:.72rem; color:var(--ink-soft); cursor:pointer; }
 .rd-del:hover{ color:var(--coral-deep); }
+/* 写作复盘 */
+.rv-grade{ font-size:.82rem; color:var(--ink-soft); margin-bottom:12px; }
+.rv-grade b{ color:var(--teal-deep); }
+.rv-sec{ margin-bottom:14px; }
+.rv-h{ font-size:.98rem; font-weight:900; color:var(--ink); margin-bottom:8px; }
+.rv-h b{ color:var(--coral-deep); }
+.rv-chips{ display:flex; flex-wrap:wrap; gap:7px; }
+.rv-chip{ font-size:.82rem; font-weight:800; padding:5px 12px; border-radius:999px; }
+.rv-chip.good{ background:#e3f7ee; border:1.5px solid var(--teal); color:var(--teal-deep); }
+.rv-target{ background:#fff7e6; border:1.5px solid var(--gold); border-radius:16px; padding:16px; }
+.rv-ev{ font-size:.9rem; color:var(--ink); line-height:1.7; }
+.rv-tip{ font-size:.9rem; color:var(--gold-deep); font-weight:700; line-height:1.7; margin-top:6px; }
+.rv-pre{ font-size:.78rem; color:var(--ink-soft); margin-top:6px; }
 .theme-item { display:flex; align-items:center; gap:12px; background:var(--cream);
   border:1.5px solid var(--line); border-radius:16px; padding:12px 14px; margin-bottom:9px; cursor:pointer; transition:all .18s; }
 .theme-item:hover{ border-color:var(--violet2); transform:translateY(-2px); }
@@ -710,6 +723,7 @@ header {
         <button class="codex-btn" onclick="openEssays()">📄 我的作文本（<span id="essay-count">0</span> 篇）</button>
         <button class="codex-btn" onclick="openWordBank()">📖 词句银行（<span id="wb-hub-count">0</span> 条）</button>
         <button class="codex-btn" onclick="openReading()">📚 读书记录（<span id="rd-hub-count">0</span> 本）</button>
+        <button class="codex-btn" onclick="openReview()">📈 写作复盘</button>
         <button class="codex-btn" onclick="openReport()">📊 我的成长报告</button>
       </div>
     </div>
@@ -894,6 +908,15 @@ header {
     </div>
     <div class="wb-count" id="wb-count"></div>
     <div class="wb-list" id="wb-list"></div>
+  </div>
+</div>
+
+<!-- ═══ 写作复盘 ═══ -->
+<div class="overlay" id="review-ov">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">📈 写作复盘</div><div class="close-x" onclick="closeReview()">✕</div></div>
+    <div class="modal-sub">看看你最近写得怎么样——<b>哪几项已经很稳，下一步该练哪一个</b>。一次只盯一个小目标，进步最快。</div>
+    <div id="rv-body"></div>
   </div>
 </div>
 
@@ -1248,6 +1271,37 @@ const GENRES = {
   },
 };
 let currentGenre = 'story';
+
+/* ══════ 写作技能地图（复盘地基；key 对齐评分维度，加上年级+前置+下一步） ══════ */
+const SKILLS=[
+  // 故事类
+  {key:'action', genre:'story', name:'动作描写', gradeMin:2, prereq:[], evidence:'写出人物/怪兽"在做什么"', tip:'加一个具体动作，比如"猛地一跃""悄悄探出头"'},
+  {key:'scene',  genre:'story', name:'场景环境', gradeMin:2, prereq:[], evidence:'交代事情在什么地方、什么时候发生', tip:'开头点一句地点或天气，比如"暴风雨的夜里"'},
+  {key:'sense',  genre:'story', name:'感官描写', gradeMin:3, prereq:['action'], evidence:'用听、看、闻、摸写细节', tip:'加一句"它听见…"或"空气里飘着…的气味"'},
+  {key:'mood',   genre:'story', name:'心情心理', gradeMin:3, prereq:['action'], evidence:'写出人物当时的心情或想法', tip:'加一句"它心里…"，比如紧张、激动'},
+  {key:'talk',   genre:'story', name:'人物对话', gradeMin:4, prereq:['action'], evidence:'用引号写出人物说的话', tip:'给角色加一句直接说的话，用引号引起来'},
+  {key:'look',   genre:'story', name:'外貌描写', gradeMin:4, prereq:['scene'], evidence:'描写样子（颜色、大小、特征）', tip:'加一句它长什么样，比如颜色、身上的特征'},
+  {key:'twist',  genre:'story', name:'情节转折', gradeMin:5, prereq:['mood'], evidence:'出现"突然/没想到"的转折', tip:'加一个意外，比如"就在这时…"'},
+  // 说明文
+  {key:'target', genre:'expo', name:'说明对象', gradeMin:3, prereq:[], evidence:'开头点明"这是什么"', tip:'用"…是一种…"开头'},
+  {key:'order',  genre:'expo', name:'条理词',   gradeMin:3, prereq:[], evidence:'用"首先/其次/最后"分步', tip:'加"首先…其次…"让顺序清楚'},
+  {key:'example',genre:'expo', name:'举例子',   gradeMin:4, prereq:['target'], evidence:'用"比如/例如"举例', tip:'加一句"比如…"'},
+  {key:'number', genre:'expo', name:'列数字',   gradeMin:4, prereq:['target'], evidence:'用具体数字说明', tip:'加一个数字，比如"约1.2米"'},
+  {key:'compare',genre:'expo', name:'作比较',   gradeMin:5, prereq:['example'], evidence:'和别的东西比一比', tip:'加"和…相比，它更…"'},
+  {key:'analogy',genre:'expo', name:'打比方',   gradeMin:5, prereq:['example'], evidence:'用"像/仿佛"打比方', tip:'加"它像…一样"'},
+  {key:'aspect', genre:'expo', name:'分方面',   gradeMin:6, prereq:['order'], evidence:'从几个方面分别说明', tip:'用"一方面…另一方面…"'},
+  {key:'sum',    genre:'expo', name:'总结句',   gradeMin:6, prereq:['order'], evidence:'结尾总结一句', tip:'用"总之…"收尾'},
+  // 议论文
+  {key:'view',   genre:'argu', name:'亮观点',   gradeMin:4, prereq:[], evidence:'开头亮出观点', tip:'用"我认为…"开头'},
+  {key:'reason', genre:'argu', name:'讲理由',   gradeMin:4, prereq:[], evidence:'用"因为"说明理由', tip:'加一句"因为…"'},
+  {key:'case',   genre:'argu', name:'举例论证', gradeMin:5, prereq:['view'], evidence:'举例支持观点', tip:'加"比如上次…"'},
+  {key:'concl',  genre:'argu', name:'下结论',   gradeMin:5, prereq:['view'], evidence:'结尾得出结论', tip:'用"所以…"收尾'},
+  {key:'deep',   genre:'argu', name:'层层递进', gradeMin:6, prereq:['reason'], evidence:'用"不仅…而且…"深入', tip:'加"不仅…而且更重要的是…"'},
+  {key:'rebut',  genre:'argu', name:'反驳让步', gradeMin:6, prereq:['case'], evidence:'先让一步再反驳', tip:'加"虽然…但是…"'},
+  {key:'quote',  genre:'argu', name:'引用金句', gradeMin:8, prereq:['reason'], evidence:'引用名言俗语', tip:'加"俗话说…"'},
+  {key:'call',   genre:'argu', name:'联系呼吁', gradeMin:8, prereq:['concl'], evidence:'结尾发出号召', tip:'加"让我们…"'},
+];
+const SKILL_KEYS=new Set(SKILLS.map(s=>s.key));
 
 function writingTopic(){ return (localStorage.getItem('ml_writing_topic')||'').trim(); }
 
@@ -1877,6 +1931,57 @@ function renderReading(){
   box.innerHTML=G.books.length? [...G.books].reverse().map(b=>
     `<div class="rd-item"><div class="rd-bk">📖 ${b.title}</div>${b.sentence?`<div class="rd-sen">「${b.sentence}」</div>`:''}<span class="rd-del" onclick="delBook('${b.title.replace(/'/g,"\\'")}')">删除</span></div>`).join('')
     : '<div class="wb-empty">还没有读书记录。读完一本书，记下书名和最喜欢的一句话吧！</div>';
+}
+
+/* ══════ 写作复盘（基于写作技能地图 + 年级；一次只盯一个点） ══════ */
+function computeReview(){
+  const gr=(typeof gradeInfo==='function')?gradeInfo():{v:3,l:'三年级'};
+  const recent=(G.essays||[]).slice(-8);
+  if(recent.length<2) return {enough:false, count:recent.length, grade:gr};
+  // 只统计"当前年级及以下"该掌握的技能；按文体分别累计命中率
+  const tally={};
+  for(const e of recent){
+    const {results}=scoreDesc(e.text, e.genre);
+    for(const r of results){ if(!SKILL_KEYS.has(r.key))continue; const t=tally[r.key]||(tally[r.key]={hit:0,total:0}); t.total++; if(r.on)t.hit++; }
+  }
+  const mastered=k=> tally[k]&&tally[k].total>=2&&tally[k].hit/tally[k].total>=0.6;
+  const practiced=k=> tally[k]&&tally[k].total>=1;
+  const missCount=k=> tally[k]?tally[k].total-tally[k].hit:0;
+  const inGrade=SKILLS.filter(s=>s.gradeMin<=gr.v);
+  const strengths=inGrade.filter(s=>mastered(s.key));
+  // 下一个目标：本年级内、练过但还没稳、且前置都已掌握 → 取最基础(年级低)+最常漏的那个
+  const ready=inGrade.filter(s=> practiced(s.key) && !mastered(s.key) && (s.prereq||[]).every(p=>mastered(p)) );
+  const fallback=inGrade.filter(s=> practiced(s.key) && !mastered(s.key) );
+  const pool=ready.length?ready:fallback;
+  pool.sort((a,b)=> a.gradeMin-b.gradeMin || missCount(b.key)-missCount(a.key));
+  return {enough:true, count:recent.length, grade:gr, strengths, target:pool[0]||null, tally};
+}
+function openReview(){ renderReview(); document.getElementById('review-ov').classList.add('active'); }
+function closeReview(){ document.getElementById('review-ov').classList.remove('active'); }
+function renderReview(){
+  if(!G)return;
+  const box=document.getElementById('rv-body');
+  const r=computeReview();
+  if(!r.enough){ box.innerHTML=`<div class="wb-empty">先在【强化训练】里写 ${2-r.count} 篇以上，复盘才看得准你的进步和短板哦！</div>`; return; }
+  const low=r.grade.v<=3;
+  let html=`<div class="rv-grade">📅 按 <b>${r.grade.l}</b> 的标准 · 看了你最近 ${r.count} 篇</div>`;
+  // 优点
+  if(r.strengths.length){
+    html+=`<div class="rv-sec"><div class="rv-h">✅ 你已经稳稳掌握</div><div class="rv-chips">`+
+      r.strengths.slice(0,5).map(s=>`<span class="rv-chip good">${s.name}</span>`).join('')+`</div></div>`;
+  }
+  // 下一步（只给一个）
+  if(r.target){
+    const t=r.target;
+    html+=`<div class="rv-sec rv-target"><div class="rv-h">🎯 下一个小目标：<b>${t.name}</b></div>`+
+      `<div class="rv-ev">${low?'要做到：':'掌握标准：'}${t.evidence}</div>`+
+      `<div class="rv-tip">💡 试试：${t.tip}</div>`+
+      (t.prereq&&t.prereq.length?`<div class="rv-pre">（你已经会了它的基础，正好可以练这个）</div>`:'')+
+      `<button class="big-btn btn-teal" style="margin-top:12px" onclick="closeReview();openTraining()">✍️ 现在就去练一篇</button></div>`;
+  } else {
+    html+=`<div class="rv-sec rv-target"><div class="rv-h">🌟 太棒了！</div><div class="rv-ev">本年级该掌握的写作技能你都练得不错——继续保持，或者去挑战更高文体（说明文 / 议论文）！</div></div>`;
+  }
+  box.innerHTML=html;
 }
 
 /* ══════ 成长报告 ══════ */
