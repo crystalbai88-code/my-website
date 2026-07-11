@@ -1660,7 +1660,7 @@ function submitTraining(){
   const afterTier=auraTier();
   G.records.push({type:'train',stars,genre:currentGenre,summary:text.slice(0,15)+(text.length>15?'…':'')+` (+${gA+gS+gD} stats)`});
   G.essays.push({text, stars, pts, genre:currentGenre, topic:writingTopic()||null, src:'train'});
-  bumpStat(st=>{ st.essays++; st.words+=wordCount(text); st.trainEN++; });
+  bumpStat(st=>{ st.essays++; st.words+=wordCount(text); st.trainEN++; st.skills=computeSkillMastery(); });
   persist();
 
   document.getElementById('train-form').style.display='none';
@@ -1920,6 +1920,15 @@ function renderReading(){
   box.innerHTML=G.books.length? [...G.books].reverse().map(b=>
     `<div class="rd-item"><div class="rd-bk">📖 ${b.title}</div>${b.sentence?`<div class="rd-sen">“${b.sentence}”</div>`:''}<span class="rd-del" onclick="delBook('${b.title.replace(/'/g,"\\'")}')">delete</span></div>`).join('')
     : '<div class="wb-empty">No books yet. Finish a book, then log its title and your favourite line!</div>';
+}
+
+/* Compact per-skill mastery summary, synced with the profile to the cloud for the teacher's class diagnosis */
+function computeSkillMastery(){
+  const recent=(G.essays||[]).slice(-8); const tally={};
+  for(const e of recent){ const {results}=scoreDesc(e.text, e.genre);
+    for(const r of results){ if(!SKILL_KEYS.has(r.key))continue; const t=tally[r.key]||(tally[r.key]={h:0,t:0}); t.t++; if(r.on)t.h++; } }
+  const out={}; for(const s of SKILLS){ if(tally[s.key]) out[s.key]={h:tally[s.key].h,t:tally[s.key].t,n:s.name,g:s.gradeMin}; }
+  return out;
 }
 
 /* ══════ Writing Review (uses the skill map + grade; one focus at a time) ══════ */

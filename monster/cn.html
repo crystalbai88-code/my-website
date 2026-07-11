@@ -1667,7 +1667,7 @@ function submitTraining(){
   const afterTier=auraTier();
   G.records.push({type:'train',stars,genre:currentGenre,summary:text.slice(0,15)+(text.length>15?'…':'')+`（+${gA+gS+gD}属性）`});
   G.essays.push({text, stars, pts, genre:currentGenre, topic:writingTopic()||null, src:'train'});
-  bumpStat(st=>{ st.essays++; st.words+=text.length; st.trainCN++; });
+  bumpStat(st=>{ st.essays++; st.words+=text.length; st.trainCN++; st.skills=computeSkillMastery(); });
   persist();
 
   document.getElementById('train-form').style.display='none';
@@ -1931,6 +1931,15 @@ function renderReading(){
   box.innerHTML=G.books.length? [...G.books].reverse().map(b=>
     `<div class="rd-item"><div class="rd-bk">📖 ${b.title}</div>${b.sentence?`<div class="rd-sen">「${b.sentence}」</div>`:''}<span class="rd-del" onclick="delBook('${b.title.replace(/'/g,"\\'")}')">删除</span></div>`).join('')
     : '<div class="wb-empty">还没有读书记录。读完一本书，记下书名和最喜欢的一句话吧！</div>';
+}
+
+/* 把学生近期各技能的掌握度算成紧凑摘要，随档案同步到云端，供老师端班级诊断 */
+function computeSkillMastery(){
+  const recent=(G.essays||[]).slice(-8); const tally={};
+  for(const e of recent){ const {results}=scoreDesc(e.text, e.genre);
+    for(const r of results){ if(!SKILL_KEYS.has(r.key))continue; const t=tally[r.key]||(tally[r.key]={h:0,t:0}); t.t++; if(r.on)t.h++; } }
+  const out={}; for(const s of SKILLS){ if(tally[s.key]) out[s.key]={h:tally[s.key].h,t:tally[s.key].t,n:s.name,g:s.gradeMin}; }
+  return out;
 }
 
 /* ══════ 写作复盘（基于写作技能地图 + 年级；一次只盯一个点） ══════ */

@@ -117,6 +117,14 @@ body{
 .tc-table td{padding:8px 10px;border-top:1px solid var(--cream-deep);white-space:nowrap;}
 .tc-table tr:nth-child(even) td{background:#fbf9f3;}
 .tc-empty{padding:22px;text-align:center;color:var(--ink-soft);font-size:.85rem;}
+.tc-diag{margin-top:14px;}
+.tc-diag-empty{font-size:.8rem;color:var(--ink-soft);background:#f2efff;border:1.5px solid var(--violet);border-radius:12px;padding:10px 14px;line-height:1.6;}
+.tc-diag-h{font-size:.9rem;font-weight:900;color:var(--violet-deep);margin-bottom:8px;}
+.tc-diag-row{display:flex;align-items:center;gap:10px;margin-bottom:7px;}
+.dg-name{font-size:.85rem;font-weight:800;color:var(--ink);min-width:96px;}
+.dg-bar{flex:1;height:9px;background:#eee6d8;border-radius:5px;overflow:hidden;}
+.dg-fill{display:block;height:100%;background:linear-gradient(90deg,#ffb27a,var(--coral-deep));border-radius:5px;}
+.dg-cnt{font-size:.76rem;color:var(--coral-deep);font-weight:800;white-space:nowrap;}
 </style>
 </head>
 <body>
@@ -202,6 +210,7 @@ body{
     <div class="tc-section">
       <div class="tc-lab">📊 班级报告 <span id="tc-report-title" style="color:var(--ink-soft);font-weight:400"></span></div>
       <div class="tc-table-wrap"><table class="tc-table" id="tc-table"></table></div>
+      <div class="tc-diag" id="tc-diag"></div>
       <button class="tc-btn ghost" onclick="exportClassReport()" style="margin-top:10px">📋 复制班级报告（发给自己汇总）</button>
     </div>
   </div>
@@ -312,6 +321,25 @@ function renderClassTable(roster, act, loading){
     return `<tr><td><b>${s.name}</b></td><td>${grd}</td><td>${st.essays||0}</td><td>${st.words||0}</td><td>${aiAvg}</td><td>${acc}</td><td>${st.wbAdded||0}</td><td>${st.booksRead||0}</td><td>${(st.days||[]).length}</td></tr>`;
   }).join('');
   tbl.innerHTML='<tr><th>姓名</th><th>年级</th><th>写作篇数</th><th>累计字数</th><th>AI均分</th><th>答题正确率</th><th>积累词句</th><th>读书</th><th>活跃天数</th></tr>'+rows;
+  renderClassDiag(roster);
+}
+/* 班级技能诊断：全班在哪几个写作技能上普遍卡住 → 指导集体讲评 */
+function renderClassDiag(roster){
+  const box=document.getElementById('tc-diag'); if(!box)return;
+  const agg={}; // key -> {name, g, weak, mastered, practiced}
+  for(const s of roster){
+    const sk=(s.stats&&s.stats.skills)||{};
+    for(const k in sk){
+      const e=sk[k]; if(!e||!e.t||e.t<2)continue; // 至少练过2次才算数
+      const a=agg[k]||(agg[k]={name:e.n||k, g:e.g||0, weak:0, mastered:0, practiced:0});
+      a.practiced++;
+      if(e.h/e.t>=0.6) a.mastered++; else a.weak++;
+    }
+  }
+  const list=Object.values(agg).filter(a=>a.weak>0).sort((x,y)=> y.weak-x.weak || x.g-y.g).slice(0,4);
+  if(!list.length){ box.innerHTML='<div class="tc-diag-empty">💡 班级技能诊断：等学生多写几篇后，这里会显示"全班普遍卡在哪几项写作技能"，方便你集体讲评。</div>'; return; }
+  box.innerHTML='<div class="tc-diag-h">💡 班级普遍需要加强（可安排集体讲评）</div>'+
+    list.map(a=>`<div class="tc-diag-row"><span class="dg-name">${a.name}</span><span class="dg-bar"><span class="dg-fill" style="width:${Math.round(a.weak/a.practiced*100)}%"></span></span><span class="dg-cnt">${a.weak}/${a.practiced} 人待加强</span></div>`).join('');
 }
 function exportClassReport(){
   const act=activeClass(); if(!act){ alert('先选一个班级'); return; }
